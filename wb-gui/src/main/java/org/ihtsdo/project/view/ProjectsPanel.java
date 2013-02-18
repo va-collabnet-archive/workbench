@@ -462,7 +462,7 @@ public class ProjectsPanel extends JPanel {
 		TreeObj translationProjectsNode = new TreeObj(PROJECTROOTNODE, "Translation Projects", null);
 		projectRoot = addObject(rootNode, translationProjectsNode, true);
 
-		List<TranslationProject> projects = TerminologyProjectDAO.getAllTranslationProjects(config);
+		List<I_TerminologyProject> projects = TerminologyProjectDAO.getAllProjects(config);
 
 		for (i = 0; i < projects.size(); i++) {
 			addProjectToTree(projectRoot, projects.get(i), false);
@@ -921,8 +921,7 @@ public class ProjectsPanel extends JPanel {
 		}
 
 		if (to.getObjType().equals(PROJECTNODE)) {
-
-			TranslationProject proj = (TranslationProject) to.getAtrValue();
+			I_TerminologyProject proj = (I_TerminologyProject) to.getAtrValue();
 			if (node.getChildCount() < 1) {
 				loadProjectNodeDetails(node, proj, visibleChildren);
 			}
@@ -1093,8 +1092,7 @@ public class ProjectsPanel extends JPanel {
 		TreeObj to = (TreeObj) node.getUserObject();
 
 		if (to.getObjType().equals(PROJECTNODE)) {
-
-			TranslationProject proj = (TranslationProject) to.getAtrValue();
+			I_TerminologyProject proj = (I_TerminologyProject) to.getAtrValue();
 			to.setAtrName(proj.getName());
 			return;
 		}

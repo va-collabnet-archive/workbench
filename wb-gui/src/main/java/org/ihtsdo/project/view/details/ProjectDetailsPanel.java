@@ -204,9 +204,14 @@ public class ProjectDetailsPanel extends JPanel {
 			label38.setText("");
 			issuesHelpLbl.setIcon(IconUtilities.helpIcon);
 			issuesHelpLbl.setText("");
-			ExportTabPanel expPanel = new ExportTabPanel(tProj);
-			expPanel.revalidate();
-			tabbedPane1.addTab("Export Target Language", expPanel);
+			
+			if(tProj.getProjectType().equals(I_TerminologyProject.Type.TRANSLATION)){
+				ExportTabPanel expPanel = new ExportTabPanel(tProj);
+				expPanel.revalidate();
+				tabbedPane1.addTab("Export Target Language", expPanel);
+			}else{
+				tabbedPane1.remove(panel7);
+			}
 			// FileLinkAPI flApi = new FileLinkAPI(config);
 			// FileLink link1 = new FileLink(new
 			// File("sampleProcesses/TranslationWorkflow.bp"),
@@ -280,7 +285,6 @@ public class ProjectDetailsPanel extends JPanel {
 			list6Model = new DefaultListModel();
 			ListDataListener listDataListener = new ListDataListener() {
 				public void contentsChanged(ListDataEvent listDataEvent) {
-					// appendEvent(listDataEvent);
 				}
 
 				public void intervalAdded(ListDataEvent listDataEvent) {
@@ -360,12 +364,14 @@ public class ProjectDetailsPanel extends JPanel {
 
 			list6Model.addListDataListener(listDataListener);
 
-			for (I_GetConceptData sourceLanguageRefset : sourceLanguageRefsets) {
-				list6Model.addElement(sourceLanguageRefset);
+			if(sourceLanguageRefsets  != null){
+				for (I_GetConceptData sourceLanguageRefset : sourceLanguageRefsets) {
+					list6Model.addElement(sourceLanguageRefset);
+				}
+				list6.setModel(list6Model);
+				list6.setTransferHandler(ConceptDnDHandler);
+				list6.validate();
 			}
-			list6.setModel(list6Model);
-			list6.setTransferHandler(ConceptDnDHandler);
-			list6.validate();
 
 			updateList7Content();
 

@@ -100,7 +100,6 @@ import org.ihtsdo.project.model.WorkListMember;
 import org.ihtsdo.project.model.WorkSet;
 import org.ihtsdo.project.model.WorkSetMember;
 import org.ihtsdo.project.model.WorklistMetadata;
-import org.ihtsdo.project.model.I_TerminologyProject.Type;
 import org.ihtsdo.project.refset.LanguageMembershipRefset;
 import org.ihtsdo.project.refset.PromotionAndAssignmentRefset;
 import org.ihtsdo.project.refset.PromotionRefset;
@@ -168,8 +167,8 @@ public class TerminologyProjectDAO {
 	public static List<I_TerminologyProject> getAllProjects(I_ConfigAceFrame config) {
 		List<I_TerminologyProject> projects = new ArrayList<I_TerminologyProject>();
 		projects.addAll(getAllTranslationProjects(config));
-
 		projects.addAll(getAllTerminologyProjects(config));
+		projects.addAll(getAllMappingProjects(config));
 		return projects;
 	}
 
@@ -229,6 +228,38 @@ public class TerminologyProjectDAO {
 				}
 			}
 
+		} catch (TerminologyException e) {
+			AceLog.getAppLog().alertAndLogException(e);
+		} catch (IOException e) {
+			AceLog.getAppLog().alertAndLogException(e);
+		} catch (Exception e) {
+			AceLog.getAppLog().alertAndLogException(e);
+		}
+		return projects;
+	}
+	/**
+	 * Gets the all terminology projects.
+	 * 
+	 * @param config
+	 *            the config
+	 * @return all terminology projects
+	 */
+	public static List<MappingProject> getAllMappingProjects(I_ConfigAceFrame config) {
+		
+		I_TermFactory termFactory = Terms.get();
+		List<MappingProject> projects = new ArrayList<MappingProject>();
+		try {
+			I_GetConceptData projectsRoot = termFactory.getConcept(ArchitectonicAuxiliary.Concept.MAPPING_PROJECTS_ROOT.getUids());
+			I_IntSet allowedDestRelTypes = termFactory.newIntSet();
+			allowedDestRelTypes.add(termFactory.uuidToNative(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()));
+			Set<? extends I_GetConceptData> children = projectsRoot.getDestRelOrigins(config.getAllowedStatus(), allowedDestRelTypes, config.getViewPositionSetReadOnly(), Precedence.TIME, config.getConflictResolutionStrategy());
+			for (I_GetConceptData child : children) {
+				I_ConceptAttributePart lastAttributePart = getLastestAttributePart(child);
+				if (isActive(lastAttributePart.getStatusNid())) {
+					projects.add(getMappingProject(child, config));
+				}
+			}
+			
 		} catch (TerminologyException e) {
 			AceLog.getAppLog().alertAndLogException(e);
 		} catch (IOException e) {
@@ -485,7 +516,7 @@ public class TerminologyProjectDAO {
 			// termFactory.addUncommittedNoChecks(newConcept);
 			// termFactory.commit();
 			
-			project = getTerminologyProject(newConcept, config);
+			project = getMappingProject(newConcept, config);
 			
 			String nacWorkSetName = "Maintenance - " + project.getName().replace("(mapping project)", "");
 			WorkSet nacWorkSet = createNewWorkSet(nacWorkSetName, project, config);
@@ -1527,10 +1558,10 @@ public class TerminologyProjectDAO {
 	 * @param config
 	 *            the config
 	 */
-	public static void setModuleIdRefset(TranslationProject project, I_GetConceptData concept, I_ConfigAceFrame config) {
+	public static void setModuleIdRefset(I_TerminologyProject project, I_GetConceptData concept, I_ConfigAceFrame config) {
 		I_TermFactory termFactory = Terms.get();
 		try {
-			if ((concept != null && project != null) && (project.getReleasePath() == null) || (concept.getConceptNid() != project.getReleasePath().getConceptNid())) {
+			if ((concept != null && project != null) && (project.getReleasePath() == null) || (concept != null && concept.getConceptNid() != project.getReleasePath().getConceptNid())) {
 				List<? extends I_RelTuple> targetRefsetRels = null;
 				I_IntSet allowedDestRelTypes = termFactory.newIntSet();
 				// allowedDestRelTypes.add(ArchitectonicAuxiliary.Concept.PATRICIA_HOUGHTON.localize().getNid());
@@ -1582,7 +1613,7 @@ public class TerminologyProjectDAO {
 	 * @param config
 	 *            the config
 	 */
-	public static void setNamespaceRefset(TranslationProject project, String namespaceText, I_ConfigAceFrame config) {
+	public static void setNamespaceRefset(I_TerminologyProject project, String namespaceText, I_ConfigAceFrame config) {
 		try {
 			I_TermFactory termFactory = Terms.get();
 
@@ -1612,10 +1643,10 @@ public class TerminologyProjectDAO {
 	 * @param config
 	 *            the config
 	 */
-	public static void setReleasePathRefset(TranslationProject project, I_GetConceptData concept, I_ConfigAceFrame config) {
+	public static void setReleasePathRefset(I_TerminologyProject project, I_GetConceptData concept, I_ConfigAceFrame config) {
 		I_TermFactory termFactory = Terms.get();
 		try {
-			if ((concept != null) && (project.getReleasePath() == null) || (concept.getConceptNid() != project.getReleasePath().getConceptNid())) {
+			if ((concept != null) && (project.getReleasePath() == null) || ( concept != null && concept.getConceptNid() != project.getReleasePath().getConceptNid())) {
 				List<? extends I_RelTuple> targetRefsetRels = null;
 				I_IntSet allowedDestRelTypes = termFactory.newIntSet();
 				allowedDestRelTypes.add(ArchitectonicAuxiliary.Concept.HAS_RELEASE_PATH_REFSET_ATTRIBUTE.localize().getNid());
@@ -1717,7 +1748,7 @@ public class TerminologyProjectDAO {
 	 * @throws Exception
 	 *             the exception
 	 */
-	public static I_GetConceptData getSourceIssueRepoForProject(TranslationProject project, I_ConfigAceFrame config) throws Exception {
+	public static I_GetConceptData getSourceIssueRepoForProject(I_TerminologyProject project, I_ConfigAceFrame config) throws Exception {
 		List<I_RelTuple> repos = new ArrayList<I_RelTuple>();
 		List<? extends I_RelTuple> reposTuples = null;
 		I_TermFactory termFactory = Terms.get();
@@ -1758,7 +1789,7 @@ public class TerminologyProjectDAO {
 	 * @param config
 	 *            the config
 	 */
-	public static void setSourceIssueRepo(TranslationProject project, I_GetConceptData concept, I_ConfigAceFrame config) {
+	public static void setSourceIssueRepo(I_TerminologyProject project, I_GetConceptData concept, I_ConfigAceFrame config) {
 		I_TermFactory termFactory = Terms.get();
 
 		try {
@@ -1815,7 +1846,7 @@ public class TerminologyProjectDAO {
 	 * @throws Exception
 	 *             the exception
 	 */
-	public static I_GetConceptData getProjectIssueRepoForProject(TranslationProject project, I_ConfigAceFrame config) throws Exception {
+	public static I_GetConceptData getProjectIssueRepoForProject(I_TerminologyProject project, I_ConfigAceFrame config) throws Exception {
 		List<I_RelTuple> repos = new ArrayList<I_RelTuple>();
 		List<? extends I_RelTuple> reposTuples = null;
 		I_TermFactory termFactory = Terms.get();
@@ -1856,7 +1887,7 @@ public class TerminologyProjectDAO {
 	 * @param config
 	 *            the config
 	 */
-	public static void setProjectIssueRepo(TranslationProject project, I_GetConceptData concept, I_ConfigAceFrame config) {
+	public static void setProjectIssueRepo(I_TerminologyProject project, I_GetConceptData concept, I_ConfigAceFrame config) {
 		I_TermFactory termFactory = Terms.get();
 
 		try {
@@ -1957,7 +1988,7 @@ public class TerminologyProjectDAO {
 	 * @throws Exception
 	 *             the exception
 	 */
-	public static I_GetConceptData getReleasePathForProject(TranslationProject project, I_ConfigAceFrame config) throws Exception {
+	public static I_GetConceptData getReleasePathForProject(I_TerminologyProject project, I_ConfigAceFrame config) throws Exception {
 		List<I_RelTuple> targetRefsets = new ArrayList<I_RelTuple>();
 		List<? extends I_RelTuple> targetRefsetsTuples = null;
 		I_TermFactory termFactory = Terms.get();
@@ -2000,7 +2031,7 @@ public class TerminologyProjectDAO {
 	 * @throws Exception
 	 *             the exception
 	 */
-	public static I_GetConceptData getModuleIdRefsetForProject(TranslationProject project, I_ConfigAceFrame config) throws Exception {
+	public static I_GetConceptData getModuleIdRefsetForProject(I_TerminologyProject project, I_ConfigAceFrame config) throws Exception {
 		List<I_RelTuple> targetRefsets = new ArrayList<I_RelTuple>();
 		List<? extends I_RelTuple> targetRefsetsTuples = null;
 		I_TermFactory termFactory = Terms.get();
@@ -2043,7 +2074,7 @@ public class TerminologyProjectDAO {
 	 * @throws Exception
 	 *             the exception
 	 */
-	public static String getNamespaceRefsetForProject(TranslationProject project, I_ConfigAceFrame config) throws Exception {
+	public static String getNamespaceRefsetForProject(I_TerminologyProject project, I_ConfigAceFrame config) throws Exception {
 		List<I_RelTuple> targetRefsets = new ArrayList<I_RelTuple>();
 		List<? extends I_RelTuple> targetRefsetsTuples = null;
 		I_TermFactory termFactory = Terms.get();
