@@ -71,6 +71,9 @@ public class WfInstance implements Serializable, WfProcessInstanceBI {
 
 	/** The status. */
 	private WfState status;
+	
+	/** The change time. */
+	private Long changeTime;
 
 	/** The properties. */
 	private Map<String, Object> properties;
@@ -119,7 +122,7 @@ public class WfInstance implements Serializable, WfProcessInstanceBI {
 	 * @param history
 	 *            the history
 	 */
-	public WfInstance(UUID componentId, WorkflowDefinition wfDefinition, WfState state, Map<String, Object> properties, List<WfHistoryEntry> history) {
+	public WfInstance(UUID componentId, WorkflowDefinition wfDefinition, WfState state, Map<String, Object> properties, List<WfHistoryEntry> history, Long changeTime) {
 		super();
 		this.componentId = componentId;
 		this.wfDefinition = wfDefinition;
@@ -472,6 +475,15 @@ public class WfInstance implements Serializable, WfProcessInstanceBI {
 		} else {
 			return false;
 		}
+	}
+
+	@Override
+	public Long getLastChangeTime() {
+		return changeTime;
+	}
+	
+	public void setLastChangeTime(Long time) {
+		this.changeTime = time;
 	}
 
 }

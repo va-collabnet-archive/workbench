@@ -3109,6 +3109,7 @@ public class TerminologyProjectDAO {
 			wfInstance.setWorkList(workList);
 			wfInstance.setComponentName(concept.toString());
 			wfInstance.setState(provider.statusConceptToWfState(assingStatus));
+			wfInstance.setLastChangeTime(System.currentTimeMillis());
 			addConceptAsWorkListMember(workListMember, Terms.get().uuidToNative(interpreter.getNextDestination(wfInstance, workList).getId()), config);
 			Terms.get().commit();
 		} catch (Exception e) {
@@ -5514,6 +5515,7 @@ public class TerminologyProjectDAO {
 		instance.setState(prov.statusConceptToWfState(Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_ASSIGNED_STATUS.getUids())));
 		instance.setWfDefinition(workList.getWorkflowDefinition());
 		instance.setWorkList(workList);
+		instance.setLastChangeTime(System.currentTimeMillis());
 		WorkflowInterpreter interpreter = WorkflowInterpreter.createWorkflowInterpreter(workList.getWorkflowDefinition());
 
 		WfUser user = interpreter.getNextDestination(instance, workList);

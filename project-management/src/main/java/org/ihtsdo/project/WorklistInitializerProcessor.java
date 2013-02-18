@@ -192,6 +192,7 @@ public class WorklistInitializerProcessor implements
 											.getUids())));
 			instance.setWfDefinition(workList.getWorkflowDefinition());
 			instance.setWorkList(workList);
+			instance.setLastChangeTime(System.currentTimeMillis());
 			user = interpreter.getNextDestination(instance, workList);
 			if (user == null) {
 				userNid = ArchitectonicAuxiliary.Concept.USER.localize().getNid();
