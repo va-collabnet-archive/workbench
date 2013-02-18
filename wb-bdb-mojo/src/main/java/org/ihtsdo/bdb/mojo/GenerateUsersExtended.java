@@ -696,14 +696,17 @@ public class GenerateUsersExtended extends AbstractMojo {
 
         // Set inbox prefs.
         String inboxName = userName + ".inbox";
+        new File(userQueueRoot, inboxName).mkdirs();
         setInboxQueuePreferences(queueList, inboxName, userQueueRoot);
 
         // Set todo box prefs.
         String todoBoxName = userName + ".todo";
+        new File(userQueueRoot, todoBoxName).mkdirs();
         setInboxQueuePreferences(queueList, todoBoxName, userQueueRoot);
 
         // Set outbox prefs.
         String outboxName = userName + ".outbox";
+        new File(userQueueRoot, outboxName).mkdirs();
         setOutboxQueuePreferences(queueList, outboxName, userQueueRoot);
 
         getLog().info("** queueList: " + queueList);
