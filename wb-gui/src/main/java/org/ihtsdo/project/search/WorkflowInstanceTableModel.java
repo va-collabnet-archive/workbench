@@ -213,9 +213,10 @@ public class WorkflowInstanceTableModel extends DefaultTableModel implements WfI
 			} else {
 				modeler = "not assigned";
 			}
-			Long dueDate = wfProcessInstanceBI.getCreationDate() == null ? Long.MIN_VALUE : wfProcessInstanceBI.getCreationDate();
+			Long dueDate = wfProcessInstanceBI.getDueDate();
+			Long lastChangeDate = wfProcessInstanceBI.getLastChangeTime();
 			ConceptChronicleBI conceptFsn = Ts.get().getConcept(wfProcessInstanceBI.getComponentPrimUuid());
-			wisr = new WorkflowInstanceSearchResult(action, state, modeler, dueDate, conceptFsn.toUserString(), conceptFsn.toUserString());
+			wisr = new WorkflowInstanceSearchResult(action, state, modeler, lastChangeDate, conceptFsn.toUserString(), conceptFsn.toUserString());
 			Object[] rowToadd = new Object[WORKFLOW_FIELD.values().length];
 			rowToadd[WORKFLOW_FIELD.FSN.getColumnNumber()] = wisr.getFsn();
 			rowToadd[WORKFLOW_FIELD.EDITOR.getColumnNumber()] = wisr.getModeler();
