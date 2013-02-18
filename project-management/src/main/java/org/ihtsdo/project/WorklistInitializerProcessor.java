@@ -194,9 +194,11 @@ public class WorklistInitializerProcessor implements
 			instance.setWorkList(workList);
 			user = interpreter.getNextDestination(instance, workList);
 			if (user == null) {
-				throw new Exception("Cannot set next destination\n");
+				userNid = ArchitectonicAuxiliary.Concept.USER.localize().getNid();
+			} else {
+				userNid = ts.getNidForUuids(user.getId());
 			}
-			userNid = ts.getNidForUuids(user.getId());
+			
 
 		} catch (ValidationException e) {
 			AceLog.getAppLog().alertAndLogException(e);

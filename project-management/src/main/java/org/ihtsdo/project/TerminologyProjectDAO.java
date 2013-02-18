@@ -5517,12 +5517,21 @@ public class TerminologyProjectDAO {
 		WorkflowInterpreter interpreter = WorkflowInterpreter.createWorkflowInterpreter(workList.getWorkflowDefinition());
 
 		WfUser user = interpreter.getNextDestination(instance, workList);
-		if (user == null) {
-			throw new Exception("Cannot set next destination\n");
-		}
+//		if (user == null) {
+//			throw new Exception("Cannot set next destination\n");
+//		}
+		
 		TerminologyStoreDI ts = Ts.get();
-		int userNid = ts.getNidForUuids(user.getId());
+		
+		PromotionAndAssignmentRefset promRef = workList.getPromotionRefset(config);
 		ConceptVersionBI concept = ts.getConceptVersion(config.getViewCoordinate(), ts.getNidForUuids(member.getUids()));
+		
+		int userNid = promRef.getDestination(concept.getNid(), config).getNid();
+				
+		if (user != null) {
+			userNid = ts.getNidForUuids(user.getId());
+		}
+		
 		RefexCAB newSpec = new RefexCAB(TK_REFEX_TYPE.CID, concept.getNid(), ts.getNidForUuids(workList.getUids()));
 		int activeNid = SnomedMetadataRf1.CURRENT_RF1.getLenient().getNid();
 		int assignedNid = Terms.get().uuidToNative(ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_ASSIGNED_STATUS.getUids());
@@ -5532,7 +5541,6 @@ public class TerminologyProjectDAO {
 		TerminologyBuilderBI tc = Ts.get().getTerminologyBuilder(config.getEditCoordinate(), config.getViewCoordinate());
 		RefexChronicleBI<?> newRefex = tc.constructIfNotCurrent(newSpec);
 
-		PromotionAndAssignmentRefset promRef = workList.getPromotionRefset(config);
 		RefexCAB newSpecForProm = new RefexCAB(TK_REFEX_TYPE.CID_CID, concept.getNid(), promRef.getRefsetId());
 		newSpecForProm.put(RefexProperty.CNID1, assignedNid);
 		newSpecForProm.put(RefexProperty.CNID2, userNid);
