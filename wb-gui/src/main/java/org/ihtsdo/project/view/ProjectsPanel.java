@@ -54,7 +54,6 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
@@ -92,11 +91,10 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.project.TerminologyProjectDAO;
 import org.ihtsdo.project.help.HelpApi;
-import org.ihtsdo.project.model.I_TerminologyProject.Type;
 import org.ihtsdo.project.model.I_TerminologyProject;
+import org.ihtsdo.project.model.I_TerminologyProject.Type;
 import org.ihtsdo.project.model.Partition;
 import org.ihtsdo.project.model.PartitionScheme;
-import org.ihtsdo.project.model.TerminologyProject;
 import org.ihtsdo.project.model.TranslationProject;
 import org.ihtsdo.project.model.WorkList;
 import org.ihtsdo.project.model.WorkSet;
@@ -459,7 +457,7 @@ public class ProjectsPanel extends JPanel {
 		jTree1.setRootVisible(false);
 		config = Terms.get().getActiveAceFrameConfig();
 
-		TreeObj translationProjectsNode = new TreeObj(PROJECTROOTNODE, "Translation Projects", null);
+		TreeObj translationProjectsNode = new TreeObj(PROJECTROOTNODE, "Projects", null);
 		projectRoot = addObject(rootNode, translationProjectsNode, true);
 
 		List<I_TerminologyProject> projects = TerminologyProjectDAO.getAllProjects(config);
@@ -539,7 +537,7 @@ public class ProjectsPanel extends JPanel {
 	 * @param visibleChildren
 	 *            the visible children
 	 */
-	private void loadWorksetRootNodeDetail(DefaultMutableTreeNode node, TranslationProject project, boolean visibleChildren) {
+	private void loadWorksetRootNodeDetail(DefaultMutableTreeNode node, I_TerminologyProject project, boolean visibleChildren) {
 
 		node.removeAllChildren();
 		List<WorkSet> wslist = project.getWorkSets(config);
@@ -1237,7 +1235,7 @@ public class ProjectsPanel extends JPanel {
 				if (node.getFirstChild().toString().trim().equals("Loading...")) {
 					node.removeAllChildren();
 					TreeObj treeObj = (TreeObj) node.getUserObject();
-					TranslationProject project = (TranslationProject) treeObj.getAtrValue();
+					I_TerminologyProject project = (I_TerminologyProject) treeObj.getAtrValue();
 					loadWorksetRootNodeDetail(node, project, false);
 				}
 			}
@@ -1579,7 +1577,7 @@ public class ProjectsPanel extends JPanel {
 				return;
 			}
 			if (to.getObjType().equals(WORKSETROOTNODE)) {
-				TranslationProject project = (TranslationProject) to.getAtrValue();
+				I_TerminologyProject project = (I_TerminologyProject) to.getAtrValue();
 				loadWorksetRootNodeDetail(parentNode, project, true);
 				return;
 			}
