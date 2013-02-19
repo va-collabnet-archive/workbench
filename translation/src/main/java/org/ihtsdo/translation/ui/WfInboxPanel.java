@@ -69,6 +69,7 @@ import javax.swing.table.TableRowSorter;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.api.I_Identify;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
@@ -76,9 +77,12 @@ import org.dwfa.ace.config.AceFrame;
 import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.project.TerminologyProjectDAO;
 import org.ihtsdo.project.filter.WfDestinationFilter;
 import org.ihtsdo.project.filter.WfStateFilter;
 import org.ihtsdo.project.help.HelpApi;
+import org.ihtsdo.project.model.I_TerminologyProject;
+import org.ihtsdo.project.model.I_TerminologyProject.Type;
 import org.ihtsdo.project.model.WorkList;
 import org.ihtsdo.project.refset.PromotionAndAssignmentRefset;
 import org.ihtsdo.project.util.IconUtilities;
@@ -683,7 +687,40 @@ public class WfInboxPanel extends JPanel {
 				}
 				currentModelRowNum = inboxTable.convertRowIndexToModel(selectedIndex);
 				previousInstance = (WfInstance) model.getValueAt(currentModelRowNum, InboxColumn.values().length);
+
+				UUID memberUUid = previousInstance.getComponentId();
+				String memberStringUUid = previousInstance.getComponentId().toString();
+				
+				I_TerminologyProject project= TerminologyProjectDAO.getProjectForWorklist(previousInstance.getWorkList(), config);
+
 				JTabbedPane tpc = ((AceFrameConfig) config).getAceFrame().getCdePanel().getConceptTabs();
+				if (project.getProjectType().compareTo(Type.TRANSLATION)!=0){
+					I_HostConceptPlugins viewer = config.getConceptViewer(1);
+					I_GetConceptData concept = Terms.get().getConcept(memberUUid);
+					if (concept!=null){
+						viewer.setTermComponent(concept);
+
+						int tabCount = tpc.getTabCount();
+						for (int i = 0; i < tabCount; i++) {
+							if (tpc.getTitleAt(i).equals("arena")) {
+								tpc.setSelectedIndex(i);
+							}
+						}
+//						JOptionPane pane = new JOptionPane("The concept was sent to arena", JOptionPane.INFORMATION_MESSAGE);
+//						JDialog dialog = pane.createDialog(this, "Sent concept");
+//
+//						dialog.setVisible(true);
+//						pane.setVisible(true);
+//						Thread.sleep(2000);
+//						dialog.setVisible(false);
+//						pane.setVisible(false);
+//						dialog.dispose();
+//						dialog=null;
+//						pane=null;
+						
+					}
+					return;
+				}
 
 				if (uiPanel == null) {
 					uiPanel = new TranslationView();
@@ -707,10 +744,9 @@ public class WfInboxPanel extends JPanel {
 				List<String[]> uuidList = outboxContent.getUuidList();
 
 				UUID worklistUuid = previousInstance.getWorkList().getUids().get(0);
-				String memberUUid = previousInstance.getComponentId().toString();
 				boolean outbox = false;
 				for (String[] strings : uuidList) {
-					if (strings[0].equals(worklistUuid.toString()) && strings[1].equals(memberUUid)) {
+					if (strings[0].equals(worklistUuid.toString()) && strings[1].equals(memberStringUUid)) {
 						readOnly = true;
 						outbox = true;
 						break;

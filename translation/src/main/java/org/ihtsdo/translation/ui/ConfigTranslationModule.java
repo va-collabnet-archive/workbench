@@ -382,7 +382,10 @@ public class ConfigTranslationModule implements Serializable {
 		DESTINATION(String.class, "Destination", 4),
 
 		/** The STATUS. */
-		STATUS(String.class, "Status", 5);
+		STATUS(String.class, "Status", 5),
+		
+		/** The default description. */
+		DEFAULT_DESCRIPTION(String.class, "Default description", 6);
 		// STATUS_DATE(String.class,"Date",6);
 
 		/** The editor class. */
