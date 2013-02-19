@@ -96,9 +96,6 @@ public class BdbTermPromoter implements ProcessStampDataBI, ProcessUnfetchedConc
     }
 
     private void processConcept(ConceptChronicleBI conceptChronicle) throws IOException, ContradictionException, Exception {
-        if (conceptChronicle.getPrimUuid().equals(UUID.fromString("9c682197-2518-4794-bbe5-5ec5fa8b6b10"))) {
-            System.out.println("DEBUG");
-        }
         Set<Integer> nidsToPromote = conceptChronicle.getAllNidsForStamps(newStamps);
 
         if (!nidsToPromote.isEmpty()) {

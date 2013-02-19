@@ -452,9 +452,6 @@ public class RelationshipStatement extends RefsetSpecStatement {
     }
 
     private boolean relCharIs(ConceptChronicleBI requiredCharType, RelationshipVersionBI relTuple) {
-        if(requiredCharType == null || relTuple == null){
-            System.out.println("DEBUG");
-        }
         return relTuple.getCharacteristicNid() == requiredCharType.getConceptNid();
     }
 
