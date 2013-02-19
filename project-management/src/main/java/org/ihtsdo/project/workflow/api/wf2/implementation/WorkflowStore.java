@@ -350,6 +350,6 @@ public class WorkflowStore implements WorkflowStoreBI {
 
 	@Override
 	public ProjectBI getProject(UUID projectUuid) throws Exception {
-		return new Project(TerminologyProjectDAO.getTranslationProject(Terms.get().getConcept(projectUuid), config));
+		return new Project(TerminologyProjectDAO.getProject(Terms.get().getConcept(projectUuid), config));
 	}
 }
