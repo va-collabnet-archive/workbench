@@ -209,12 +209,15 @@ public class WfInstanceSearchPanel extends JPanel implements WFSearchFilterConta
 			if (selRow != -1) {
 				WorkflowInstanceTableModel tModel= (WorkflowInstanceTableModel)jTable.getModel();
 				try {
-					WorkflowResultItem rItem=(WorkflowResultItem)tModel.getValueAt(selRow, WorkflowInstanceTableModel.WORKFLOW_FIELD.FSN.getColumnNumber());
-					I_GetConceptData concept=Terms.get().getConcept(rItem.getConceptUuid());
-					if (concept !=null) {
-						Image dragImage = getDragImage(concept);
-						Point imageOffset = new Point(-10, -(dragImage.getHeight(jTable) + 1));
-						dge.startDrag(DragSource.DefaultCopyDrop, dragImage, imageOffset, getTransferable(concept), dsl);
+					Object obj=(Object)tModel.getValueAt(selRow, WorkflowInstanceTableModel.WORKFLOW_FIELD.FSN.getColumnNumber());
+					if (obj instanceof WorkflowResultItem){
+						WorkflowResultItem rItem=(WorkflowResultItem)obj;
+						I_GetConceptData concept=Terms.get().getConcept(rItem.getConceptUuid());
+						if (concept !=null) {
+							Image dragImage = getDragImage(concept);
+							Point imageOffset = new Point(-10, -(dragImage.getHeight(jTable) + 1));
+							dge.startDrag(DragSource.DefaultCopyDrop, dragImage, imageOffset, getTransferable(concept), dsl);
+						}
 					}
 				} catch (InvalidDnDOperationException e) {
 					AceLog.getAppLog().info(e.toString());

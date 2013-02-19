@@ -161,19 +161,19 @@ public class WorkflowInstanceTableModel extends DefaultTableModel implements WfI
 	}
 
 	public boolean isCellEditable(int row, int col) {
-		if (ACE.editMode == false) {
-			return false;
-		}
+//		if (ACE.editMode == false) {
+//			return false;
+//		}
+//
+//		if (row < 0 || row >= getRowCount()) {
+//			return false;
+//		}
+//
+//		if (AceLog.getAppLog().isLoggable(Level.FINER)) {
+//			AceLog.getAppLog().finer("Cell is editable: " + row + " " + col);
+//		}
 
-		if (row < 0 || row >= getRowCount()) {
-			return false;
-		}
-
-		if (AceLog.getAppLog().isLoggable(Level.FINER)) {
-			AceLog.getAppLog().finer("Cell is editable: " + row + " " + col);
-		}
-
-		return true;
+		return false;
 	}
 
 	public void setValueAt(Object value, int row, int col) {
