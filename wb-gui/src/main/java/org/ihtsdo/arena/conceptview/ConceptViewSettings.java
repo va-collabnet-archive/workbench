@@ -699,7 +699,7 @@ public class ConceptViewSettings extends ArenaComponentSettings {
 					relAssertionType = RelAssertionType.INFERRED_THEN_STATED;
 
 					button.setIcon(inferredAndStatedView);
-					button.setToolTipText("showing inferred and stated, toggle to show stated...");
+					button.setToolTipText("showing inferred and stated, toggle to show short normal form...");
 					fireConceptChanged();
 					break;
 				case STATED:
@@ -710,6 +710,14 @@ public class ConceptViewSettings extends ArenaComponentSettings {
 
 					break;
 				case INFERRED_THEN_STATED:
+					relAssertionType = RelAssertionType.SHORT_NORMAL_FORM;
+//TODO: need icon
+					button.setIcon(inferredAndStatedView);
+					button.setToolTipText("showing short normal form, toggle to show stated...");
+					fireConceptChanged();
+
+					break;
+                                case SHORT_NORMAL_FORM:
 					relAssertionType = RelAssertionType.STATED;
 					button.setIcon(statedView);
 					button.setToolTipText("showing stated, toggle to show inferred...");
@@ -721,6 +729,7 @@ public class ConceptViewSettings extends ArenaComponentSettings {
 		});
 
 		button.setSelected(true);
+                button.setToolTipText("rel display type");
 		button.setPreferredSize(new Dimension(21, 16));
 		button.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 		button.setOpaque(false);

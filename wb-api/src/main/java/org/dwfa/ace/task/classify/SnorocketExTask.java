@@ -40,6 +40,7 @@ import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
 import org.dwfa.cement.ArchitectonicAuxiliary.Concept;
 import org.dwfa.cement.SNOMED;
+import org.dwfa.tapi.ComputationCanceled;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
@@ -263,6 +264,9 @@ public class SnorocketExTask extends AbstractTask implements ActionListener {
         }
     }
 
+    public SnorocketExTask() {
+    }
+    
     /**
      * evaluate will run Snorocket based on the workbench preference settings.
      *
@@ -285,6 +289,60 @@ public class SnorocketExTask extends AbstractTask implements ActionListener {
                 ts = Ts.get();
                 tf = Terms.get();
                 config = tf.getActiveAceFrameConfig();
+                Condition c = runClassifier(config);
+                if(c != null){
+                    return c;
+                }
+
+            } catch (TerminologyException e) {
+                logger.info("\r\n::: TerminologyException");
+                logger.log(Level.INFO, e.toString());
+                throw new TaskFailedException("::: TerminologyException", e);
+            } catch (IOException e) {
+                logger.info("\r\n::: IOException");
+                logger.log(Level.INFO, e.toString());
+                throw new TaskFailedException("::: IOException", e);
+            } catch (Exception e) {
+                logger.info("\r\n::: Exception");
+                logger.log(Level.INFO, e.toString());
+                throw new TaskFailedException("::: Exception", e);
+            }
+
+            commitClassification();
+
+            // logger.info(toStringWatch());
+
+            return Condition.CONTINUE;
+        } finally {
+            Ts.get().resumeChangeNotifications();
+        }
+    }
+    
+    public void commitClassification(){
+        cClassSnoRels = null; // :MEMORY:
+            cRocketSnoRels = null; // :MEMORY:
+
+            SnoQuery.setDirty(true);
+            if (SwingUtilities.isEventDispatchThread()) {
+                config.fireCommit();
+            } else {
+                SwingUtilities.invokeLater(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        config.fireCommit();
+                    }
+                });
+            }
+    }
+    
+    public Condition runClassifier(I_ConfigAceFrame config) throws ComputationCanceled, TerminologyException, IOException, TaskFailedException, Exception{
+                if(this.config == null){
+                    ts = Ts.get();
+                    tf = Terms.get();
+                    this.config = config;
+                    logger = Logger.getLogger(SnorocketExTask.class.getName());
+                }
                 precedence = config.getPrecedence();
                 contradictionMgr = config.getConflictResolutionStrategy();
                 equivalentSet = new NidSet();
@@ -588,7 +646,7 @@ public class SnorocketExTask extends AbstractTask implements ActionListener {
                 // gui.setValue(0);
 
                 // GET CLASSIFER EQUIVALENTS
-                worker.getLogger().info("::: GET EQUIVALENT CONCEPTS...");
+                logger.info("::: GET EQUIVALENT CONCEPTS...");
                 startTime = System.currentTimeMillis();
                 ProcessEquiv pe = new ProcessEquiv();
                 rocket_123.getEquivalents(pe);
@@ -618,7 +676,7 @@ public class SnorocketExTask extends AbstractTask implements ActionListener {
 
                 // GET CLASSIFER RESULTS
                 cRocketSnoRels = new ArrayList<SnoRel>();
-                worker.getLogger().info("::: GET CLASSIFIER RESULTS...");
+                logger.info("::: GET CLASSIFIER RESULTS...");
                 startTime = System.currentTimeMillis();
                 ProcessResults pr = new ProcessResults(cRocketSnoRels);
                 rocket_123.getDistributionFormRelationships(pr);
@@ -759,45 +817,9 @@ public class SnorocketExTask extends AbstractTask implements ActionListener {
                 gui.setProgressInfoLower("writeback completed, lapsed time = "
                         + toStringLapseSec(startTime));
                 gui.complete(); // PHASE 5. DONE
-
-            } catch (TerminologyException e) {
-                logger.info("\r\n::: TerminologyException");
-                logger.log(Level.INFO, e.toString());
-                throw new TaskFailedException("::: TerminologyException", e);
-            } catch (IOException e) {
-                logger.info("\r\n::: IOException");
-                logger.log(Level.INFO, e.toString());
-                throw new TaskFailedException("::: IOException", e);
-            } catch (Exception e) {
-                logger.info("\r\n::: Exception");
-                logger.log(Level.INFO, e.toString());
-                throw new TaskFailedException("::: Exception", e);
-            }
-
-            cClassSnoRels = null; // :MEMORY:
-            cRocketSnoRels = null; // :MEMORY:
-
-            SnoQuery.setDirty(true);
-            if (SwingUtilities.isEventDispatchThread()) {
-                config.fireCommit();
-            } else {
-                SwingUtilities.invokeLater(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        config.fireCommit();
-                    }
-                });
-            }
-
-            // logger.info(toStringWatch());
-
-            return Condition.CONTINUE;
-        } finally {
-            Ts.get().resumeChangeNotifications();
-        }
+                
+                return null;
     }
-
     private void getPathOrigins(List<PositionBI> origins, PathBI p) {
         List<PositionBI> thisLevel = new ArrayList<PositionBI>();
 

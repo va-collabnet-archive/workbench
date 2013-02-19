@@ -91,6 +91,7 @@ import org.dwfa.util.id.Type3UuidFactory;
 import org.dwfa.util.id.Type5UuidFactory;
 import org.ihtsdo.db.change.ChangeNotifier;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
+import org.ihtsdo.tk.binding.snomed.RefsetAux;
 import org.ihtsdo.tk.binding.snomed.TermAux;
 
 public abstract class ConceptComponent<R extends Revision<R, C>, C extends ConceptComponent<R, C>>
@@ -780,7 +781,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
                 if (!cv.isBaselineGeneration() && (cv.getPathNid() != pathNid)
                         && (cv.getTime() != Long.MAX_VALUE)) {
                     changed = true;
-                    cv.makeAnalog(cv.getStatusNid(), Long.MAX_VALUE, ec.getModuleNid(), ec.getAuthorNid(), pathNid);
+                    cv.makeAnalog(cv.getStatusNid(), Long.MAX_VALUE, ec.getAuthorNid(), ec.getModuleNid(), pathNid);
                 }
             }
         } else if (versions.size() > 1) {
@@ -788,7 +789,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
             if (versions.size() > 0) {
                 for (Version cv : resolution) {
-                    cv.makeAnalog(cv.getStatusNid(), Long.MAX_VALUE, ec.getModuleNid(), ec.getAuthorNid(), pathNid);
+                    cv.makeAnalog(cv.getStatusNid(), Long.MAX_VALUE, ec.getAuthorNid(), ec.getModuleNid(), pathNid);
                     changed = true;
                 }
             }
@@ -805,7 +806,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
         return changed;
     }
-
+    
     @Override
     public final I_IdPart makeIdAnalog(int statusNid, long time, int authorNid, int moduleNid, int pathNid) {
         throw new UnsupportedOperationException();
@@ -1250,15 +1251,9 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         return sapNids;
     }
 
-    public Set<Integer> getAnnotationNidsForSaps(Set<Integer> sapNids) {
-        int size = 0;
+    public Set<Integer> getAnnotationNidsForSaps(Set<Integer> sapNids, Collection<? extends RefexChronicleBI<?>> annotations) throws IOException {
 
-        if (annotations != null) {
-            size = size + annotations.size();
-        }
-
-        HashSet<Integer> annotNids = new HashSet<Integer>(size);
-
+        HashSet<Integer> annotNids = new HashSet<>();
         if (annotations != null) {
             for (RefexChronicleBI<?> annotation : annotations) {
                 for (RefexVersionBI<?> av : annotation.getVersions()) {
@@ -1266,9 +1261,10 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
                         annotNids.add(av.getNid());
                     }
                 }
+                Set<Integer> subAnnotStampNids = getAnnotationNidsForSaps(sapNids, annotation.getAnnotations());
+                annotNids.addAll(subAnnotStampNids);
             }
         }
-
         return annotNids;
     }
 
@@ -1354,7 +1350,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
         componentNids.addAll(getVersionNidsForSaps(sapNids));
         componentNids.addAll(getIdNidsForSaps(sapNids));
-        componentNids.addAll(getAnnotationNidsForSaps(sapNids));
+        componentNids.addAll(getAnnotationNidsForSaps(sapNids, annotations));
 
         return componentNids;
     }
@@ -1919,8 +1915,10 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
                     componentNids.add(r.getNid());
                 }
             }
+        }        
+        if(sapNids.contains(primordialSapNid)){
+            componentNids.add(nid);
         }
-
         return componentNids;
     }
 
@@ -2491,7 +2489,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         public boolean makeAdjudicationAnalogs(EditCoordinate ec, ViewCoordinate vc) throws IOException {
             return ConceptComponent.this.makeAdjudicationAnalogs(ec, vc);
         }
-
+        
         @Override
         public boolean promote(PositionBI viewPosition, PathSetReadOnly pomotionPaths, NidSetBI allowedStatus,
                 Precedence precedence, int authorNid)

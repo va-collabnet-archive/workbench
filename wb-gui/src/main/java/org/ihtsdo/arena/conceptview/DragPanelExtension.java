@@ -39,6 +39,7 @@ import javax.swing.SwingConstants;
 import javax.swing.TransferHandler;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.log.AceLog;
+import org.ihtsdo.arena.editor.ArenaEditor;
 import org.ihtsdo.tk.api.refex.RefexAnalogBI;
 import org.ihtsdo.tk.api.refex.type_float.RefexFloatVersionBI;
 import org.ihtsdo.tk.api.refex.type_nid.RefexNidAnalogBI;
@@ -78,7 +79,15 @@ public class DragPanelExtension extends DragPanelComponentVersion<RefexVersionBI
       boolean            canDrop = false;
       TerminologyStoreDI ts      = Ts.get();
       RefexVersionBI<?>  refexV  = getRefexV();
-
+      
+      if (!ArenaEditor.diffColor.isEmpty()){
+            if(ArenaEditor.diffColor.containsKey(getThingToDrag().getNid())){
+                Color color = ArenaEditor.diffColor.get(getThingToDrag().getNid());
+                    setBackground(color);
+                
+            }
+        }
+      
       if (getRefexV().isUncommitted()) {
          setOpaque(true);
          setBackground(Color.YELLOW);

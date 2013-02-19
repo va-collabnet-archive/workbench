@@ -78,6 +78,7 @@ import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
 import org.intsdo.tk.drools.manager.DroolsExecutionManager;
 
 import com.sun.jini.start.LifeCycle;
+import org.ihtsdo.arena.promotion.PromotionEditorGenerator;
 import org.ihtsdo.batch.BatchActionEditorPanel;
 import org.ihtsdo.helper.time.TimeHelper;
 
@@ -219,6 +220,7 @@ public class WorkbenchRunner {
             }
 
             OpenFrames.addNewWindowMenuItemGenerator(new ContradictionEditorGenerator());
+            OpenFrames.addNewWindowMenuItemGenerator(new PromotionEditorGenerator());
             System.setProperty("javax.net.ssl.trustStore", "config/cacerts");
 
             long startTime = System.currentTimeMillis();

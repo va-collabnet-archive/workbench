@@ -36,7 +36,8 @@ public enum RelAssertionType {
     /**
      * Displays the inferred data if it exists on the concept. If not, the displays the stated.
      */
-    INFERRED_THEN_STATED("inferred then stated");
+    INFERRED_THEN_STATED("inferred then stated"),
+    SHORT_NORMAL_FORM("short normal form");
     /**
      * The string to display.
      */

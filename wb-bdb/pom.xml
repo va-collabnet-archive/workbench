@@ -35,6 +35,11 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
+            <groupId>org.ihtsdo</groupId>
+            <artifactId>tk-refset</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
         </dependency>

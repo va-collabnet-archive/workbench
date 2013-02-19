@@ -2432,7 +2432,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 				if (!refsetOnly) {
 
 					// CLASSIFIER TAB
-					snoRocketPanel = new SnoRocketTabPanel(this);
+					snoRocketPanel = new SnoRocketTabPanel(this.aceFrameConfig);
 					conceptTabs.addTab("classifier",
 							new ImageIcon(ACE.class.getResource("/16x16/plain/chrystal_ball.png")),
 							snoRocketPanel);

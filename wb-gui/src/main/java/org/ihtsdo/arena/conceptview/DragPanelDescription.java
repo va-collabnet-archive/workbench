@@ -27,6 +27,7 @@ import java.io.IOException;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Random;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -34,6 +35,7 @@ import javax.swing.JLabel;
 import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
 import javax.swing.TransferHandler;
+import org.ihtsdo.arena.editor.ArenaEditor;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.refex.type_nid.RefexNidVersionBI;
@@ -44,12 +46,14 @@ public class DragPanelDescription extends DragPanelComponentVersion<DescriptionA
      *
      */
     private static final long serialVersionUID = 1L;
+    private ConceptViewLayout viewLayout;
 
     //~--- constructors --------------------------------------------------------
     public DragPanelDescription(ConceptViewLayout viewLayout, CollapsePanel parentCollapsePanel,
             DescriptionAnalogBI desc)
             throws TerminologyException, IOException {
         super(viewLayout, parentCollapsePanel, desc);
+        this.viewLayout = viewLayout;
         layoutDescription();
     }
 
@@ -57,6 +61,7 @@ public class DragPanelDescription extends DragPanelComponentVersion<DescriptionA
             CollapsePanel parentCollapsePanel, DescriptionAnalogBI desc)
             throws TerminologyException, IOException {
         super(layout, viewLayout, parentCollapsePanel, desc);
+        this.viewLayout = viewLayout;
         layoutDescription();
     }
 
@@ -64,12 +69,20 @@ public class DragPanelDescription extends DragPanelComponentVersion<DescriptionA
     private void layoutDescription() throws TerminologyException, IOException {
         boolean canDrop = false;
 
+        if (!ArenaEditor.diffColor.isEmpty()){
+            if(ArenaEditor.diffColor.containsKey(getThingToDrag().getNid())){
+                Color color = ArenaEditor.diffColor.get(getThingToDrag().getNid());
+                setBackground(color);
+                
+            }
+        }
+        
         if (getDesc().getTime() == Long.MAX_VALUE) {
             setOpaque(true);
             setBackground(Color.YELLOW);
             canDrop = true;
         }
-
+        
         setupDrag(getDesc());
         setBorder(BorderFactory.createRaisedBevelBorder());
 

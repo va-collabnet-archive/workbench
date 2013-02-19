@@ -25,6 +25,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import org.ihtsdo.helper.promote.TerminologyPromoterBI;
+import org.ihtsdo.helper.query.QueryBuilderBI;
 import org.ihtsdo.tk.api.blueprint.CreateOrAmendBlueprint;
 import org.ihtsdo.tk.api.conceptattribute.ConceptAttributeVersionBI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
@@ -945,4 +947,9 @@ public interface TerminologyStoreDI extends TerminologyDI {
      * @throws Exception indicates an exception has occurred
      */
     boolean regenerateWfHxLuceneIndex(ViewCoordinate viewCoordinate) throws Exception;
+    
+    QueryBuilderBI getQueryBuilder(ViewCoordinate viewCoordinate);
+    
+    TerminologyPromoterBI getTerminologyPromoter(ViewCoordinate sourceViewCoordinate, EditCoordinate sourceEditCoordinate,
+            ViewCoordinate targetViewCoordinate);
 }

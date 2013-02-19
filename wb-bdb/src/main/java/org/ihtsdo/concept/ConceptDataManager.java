@@ -31,9 +31,13 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.ExecutionException;
+import org.ihtsdo.concept.component.attributes.ConceptAttributes;
 import org.ihtsdo.db.change.ChangeNotifier;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
@@ -206,13 +210,52 @@ public abstract class ConceptDataManager implements I_ManageConceptData {
       Collection<Integer> imgNids    = getImageNids();
       Collection<Integer> memberNids = new ArrayList<Integer>(0);
 
+       //add annotation nids
+       Set<Integer> annotNids = new HashSet<>();
+       ConceptAttributes ca = getConceptAttributes();
+       if (ca.annotations != null) {
+           for (RefsetMember rm : ca.annotations) {
+               annotNids.add(rm.nid);
+           }
+       }
+       AddDescriptionSet descriptions = getDescriptions();
+       Iterator<Description> di = descriptions.iterator();
+       while (di.hasNext()) {
+           Description d = di.next();
+           if (d.annotations != null) {
+               for (RefsetMember rm : d.annotations) {
+                   annotNids.add(rm.nid);
+               }
+           }
+       }
+       AddSrcRelSet sourceRels = getSourceRels();
+       Iterator<Relationship> sri = sourceRels.iterator();
+       while (sri.hasNext()) {
+           Relationship sr = sri.next();
+           if (sr.annotations != null) {
+               for (RefsetMember rm : sr.annotations) {
+                   annotNids.add(rm.nid);
+               }
+           }
+       }
+       AddImageSet images = getImages();
+       Iterator<Image> ii = images.iterator();
+       while (ii.hasNext()) {
+           Image i = ii.next();
+           if (i.annotations != null) {
+               for (RefsetMember rm : i.annotations) {
+                   annotNids.add(rm.nid);
+               }
+           }
+       }
+      
       if (!isAnnotationStyleSet()) {
          memberNids = getMemberNids();
       }
 
       int                size             = 1 + descNids.size() + srcRelNids.size() + imgNids.size()
-                                            + memberNids.size();
-      ArrayList<Integer> allContainedNids = new ArrayList<Integer>(size);
+                                            + memberNids.size() + annotNids.size();
+      HashSet<Integer> allContainedNids = new HashSet<Integer>(size);
 
       allContainedNids.add(enclosingConcept.getNid());
       if(enclosingConcept.getNid() == 0){
@@ -226,6 +269,8 @@ public abstract class ConceptDataManager implements I_ManageConceptData {
       allContainedNids.addAll(imgNids);
       assert !memberNids.contains(0);
       allContainedNids.addAll(memberNids);
+      assert !annotNids.contains(0);
+      allContainedNids.addAll(annotNids);
 
       return allContainedNids;
    }
