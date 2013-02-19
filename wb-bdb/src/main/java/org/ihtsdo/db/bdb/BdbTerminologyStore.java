@@ -873,4 +873,10 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
             ViewCoordinate targetViewCoordinate){
          return new BdbTermPromoter(sourceViewCoordinate, sourceEditCoordinate, targetViewCoordinate);
      }
+    
+    @Override
+     public TerminologyPromoterBI getTerminologyPromoter(ViewCoordinate sourceViewCoordinate, EditCoordinate sourceEditCoordinate,
+            int pathNid, PositionBI originPosition){
+         return new BdbTermPromoter(sourceViewCoordinate, sourceEditCoordinate, pathNid, originPosition);
+     }
 }
