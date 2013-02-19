@@ -21,7 +21,6 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
@@ -30,15 +29,14 @@ import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.ihtsdo.project.TerminologyProjectDAO;
 import org.ihtsdo.project.model.I_TerminologyProject;
+import org.ihtsdo.project.model.I_TerminologyProject.Type;
 import org.ihtsdo.project.model.TranslationProject;
 import org.ihtsdo.project.model.WorkList;
 import org.ihtsdo.project.refset.LanguageMembershipRefset;
 import org.ihtsdo.project.refset.PromotionAndAssignmentRefset;
-import org.ihtsdo.project.workflow.api.WfComponentProvider;
 import org.ihtsdo.project.workflow.api.wf2.implementation.WfActivityInstance;
 import org.ihtsdo.project.workflow.api.wf2.implementation.WfProcessDefinition;
 import org.ihtsdo.project.workflow.api.wf2.implementation.WorkflowStore;
-import org.ihtsdo.tk.api.id.IdBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.refex.type_nid_nid.RefexNidNidVersionBI;
@@ -72,7 +70,7 @@ public class WfInstance implements Serializable, WfProcessInstanceBI {
 
 	/** The status. */
 	private WfState status;
-	
+
 	/** The change time. */
 	private Long changeTime;
 
@@ -123,7 +121,8 @@ public class WfInstance implements Serializable, WfProcessInstanceBI {
 	 * @param history
 	 *            the history
 	 */
-	public WfInstance(UUID componentId, WorkflowDefinition wfDefinition, WfState state, Map<String, Object> properties, List<WfHistoryEntry> history, Long changeTime) {
+	public WfInstance(UUID componentId, WorkflowDefinition wfDefinition, WfState state, Map<String, Object> properties, List<WfHistoryEntry> history,
+			Long changeTime) {
 		super();
 		this.componentId = componentId;
 		this.wfDefinition = wfDefinition;
@@ -264,11 +263,13 @@ public class WfInstance implements Serializable, WfProcessInstanceBI {
 		pormAssigRefset.setPromotionStatus(tf.uuidToNative(instance.componentId), tf.uuidToNative(newState.getId()));
 		instance.setState(newState);
 		I_TerminologyProject project = TerminologyProjectDAO.getProjectForWorklist(workList, config);
-		if (project instanceof TranslationProject) {
-			I_GetConceptData targetLanguage = TerminologyProjectDAO.getTargetLanguageRefsetForProject((TranslationProject) project, config);
+		if (project.getProjectType().equals(Type.TRANSLATION)) {
+			TranslationProject transProject = (TranslationProject) project;
+			I_GetConceptData targetLanguage = TerminologyProjectDAO.getTargetLanguageRefsetForProject(transProject, config);
 			if (targetLanguage != null) {
 				LanguageMembershipRefset targetLangRefset = new LanguageMembershipRefset(targetLanguage, config);
-				targetLangRefset.getPromotionRefset(config).setPromotionStatus(tf.uuidToNative(instance.componentId), tf.uuidToNative(newState.getId()));
+				targetLangRefset.getPromotionRefset(config).setPromotionStatus(tf.uuidToNative(instance.componentId),
+						tf.uuidToNative(newState.getId()));
 			}
 		}
 	}
@@ -484,7 +485,7 @@ public class WfInstance implements Serializable, WfProcessInstanceBI {
 	public Long getLastChangeTime() {
 		return changeTime;
 	}
-	
+
 	public void setLastChangeTime(Long time) {
 		this.changeTime = time;
 	}
