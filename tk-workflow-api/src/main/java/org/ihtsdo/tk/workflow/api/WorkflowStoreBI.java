@@ -18,9 +18,6 @@ package org.ihtsdo.tk.workflow.api;
 import java.util.Collection;
 import java.util.UUID;
 
-import org.ihtsdo.tk.workflow.api.ProjectBI;
-import org.ihtsdo.tk.workflow.api.WorkListBI;
-
 /**
  * A class that handles all workflow operations
  * 
@@ -88,14 +85,12 @@ public interface WorkflowStoreBI {
      */
     Collection<ProjectBI> getAllProjects() throws Exception;
     
-    ProjectBI createProject(String name) throws Exception;
-    
-    ProjectBI createTranslationProject(String name) throws Exception;
+    ProjectBI createProject(String name, ProjectBI.ProjectType type) throws Exception;
     
     Collection<WfActivityBI> getActivities(WfProcessInstanceBI instance, WfUserBI user) throws Exception;
     
     WorkListBI getWorklist(UUID worklistUuid) throws Exception;
     
     ProjectBI getProject(UUID projectUuid) throws Exception;
-    
+
 }

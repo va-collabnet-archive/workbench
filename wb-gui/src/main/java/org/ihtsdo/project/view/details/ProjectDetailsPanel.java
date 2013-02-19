@@ -204,12 +204,12 @@ public class ProjectDetailsPanel extends JPanel {
 			label38.setText("");
 			issuesHelpLbl.setIcon(IconUtilities.helpIcon);
 			issuesHelpLbl.setText("");
-			
-			if(tProj.getProjectType().equals(I_TerminologyProject.Type.TRANSLATION)){
+
+			if (tProj.getProjectType().equals(I_TerminologyProject.Type.TRANSLATION)) {
 				ExportTabPanel expPanel = new ExportTabPanel(tProj);
 				expPanel.revalidate();
 				tabbedPane1.addTab("Export Target Language", expPanel);
-			}else{
+			} else {
 				tabbedPane1.remove(panel7);
 			}
 			// FileLinkAPI flApi = new FileLinkAPI(config);
@@ -364,7 +364,7 @@ public class ProjectDetailsPanel extends JPanel {
 
 			list6Model.addListDataListener(listDataListener);
 
-			if(sourceLanguageRefsets  != null){
+			if (sourceLanguageRefsets != null) {
 				for (I_GetConceptData sourceLanguageRefset : sourceLanguageRefsets) {
 					list6Model.addElement(sourceLanguageRefset);
 				}
@@ -1160,11 +1160,12 @@ public class ProjectDetailsPanel extends JPanel {
 		// create workset
 		try {
 			if (project.getReleasePath() == null) {
-				JOptionPane.showMessageDialog(this, "<html><body> Release path is not defined in translation project.<br>Cannot create workset.",
+				JOptionPane.showMessageDialog(this, "<html><body> Release path is not defined in project.<br>Cannot create workset.",
 						"Message", JOptionPane.ERROR_MESSAGE);
 				return;
 			}
-			if (project.getProjectType().equals(Type.TRANSLATION) && ((TranslationProject) project).getSourceLanguageRefsets().isEmpty() || ((TranslationProject) project).getTargetLanguageRefset() == null) {
+			if (project.getProjectType().equals(Type.TRANSLATION) && ((TranslationProject) project).getSourceLanguageRefsets().isEmpty()
+					|| ((TranslationProject) project).getTargetLanguageRefset() == null) {
 				JOptionPane.showMessageDialog(this, "<html><body> Warning. Source or Target languages <br>are not saved in the language tab.",
 						"Message", JOptionPane.WARNING_MESSAGE);
 				return;
@@ -1505,164 +1506,137 @@ public class ProjectDetailsPanel extends JPanel {
 	 *            the e
 	 */
 	private void button12ActionPerformed(ActionEvent e) {
-		// generate worklist
-		WfComponentProvider wcp = new WfComponentProvider();
-		List<WfUser> users = wcp.getUsers();
-		WizardLauncher wl = new WizardLauncher();
-		wl.launchWfWizard(users);
-		HashMap<String, Object> hsRes = wl.getResult();
-		List<WfRole> roles = null;
-		noName = "no name " + UUID.randomUUID().toString();
-		workflowDefinition = null;
-		final ArrayList<WfMembership> workflowUserRoles = new ArrayList<WfMembership>();
+		try {
+			if (project.getReleasePath() != null) {
+				// generate worklist
+				WfComponentProvider wcp = new WfComponentProvider();
+				List<WfUser> users = wcp.getUsers();
+				WizardLauncher wl = new WizardLauncher();
+				wl.launchWfWizard(users);
+				HashMap<String, Object> hsRes = wl.getResult();
+				List<WfRole> roles = null;
+				noName = "no name " + UUID.randomUUID().toString();
+				workflowDefinition = null;
+				final ArrayList<WfMembership> workflowUserRoles = new ArrayList<WfMembership>();
 
-		for (String key : hsRes.keySet()) {
-			Object val = hsRes.get(key);
-			if (key.equals("WDS")) {
-				workflowDefinition = WorkflowDefinitionManager.readWfDefinition(((File) val).getName());
-				roles = workflowDefinition.getRoles();
+				for (String key : hsRes.keySet()) {
+					Object val = hsRes.get(key);
+					if (key.equals("WDS")) {
+						workflowDefinition = WorkflowDefinitionManager.readWfDefinition(((File) val).getName());
+						roles = workflowDefinition.getRoles();
 
-			}
-
-			if (key.equals("WORKLIST_NAME")) {
-				noName = (String) val;
-			}
-			if (key.equals("roles")) {
-				roles = wcp.getRoles();
-				users = wcp.getUsers();
-				DefaultTableModel model = (DefaultTableModel) hsRes.get(key);
-				for (int j = 1; j < model.getColumnCount(); j += 2) {
-					WfRole role = null;
-					for (WfRole wfRole : roles) {
-						if (wfRole.getName().equals(model.getColumnName(j))) {
-							role = wfRole;
-							break;
-						}
 					}
-					for (int i = 0; i < model.getRowCount(); i++) {
-						Boolean sel = (Boolean) model.getValueAt(i, j);
-						if (sel) {
-							Boolean def = (Boolean) model.getValueAt(i, j + 1);
-							WfUser user = null;
-							for (WfUser wfUser : users) {
-								if (wfUser.getId().equals(((WfUser) model.getValueAt(i, 0)).getId())) {
-									user = wfUser;
+
+					if (key.equals("WORKLIST_NAME")) {
+						noName = (String) val;
+					}
+					if (key.equals("roles")) {
+						roles = wcp.getRoles();
+						users = wcp.getUsers();
+						DefaultTableModel model = (DefaultTableModel) hsRes.get(key);
+						for (int j = 1; j < model.getColumnCount(); j += 2) {
+							WfRole role = null;
+							for (WfRole wfRole : roles) {
+								if (wfRole.getName().equals(model.getColumnName(j))) {
+									role = wfRole;
 									break;
 								}
 							}
-							WfMembership workflowUserRole = new WfMembership(UUID.randomUUID(), user, role, def);
-							workflowUserRoles.add(workflowUserRole);
+							for (int i = 0; i < model.getRowCount(); i++) {
+								Boolean sel = (Boolean) model.getValueAt(i, j);
+								if (sel) {
+									Boolean def = (Boolean) model.getValueAt(i, j + 1);
+									WfUser user = null;
+									for (WfUser wfUser : users) {
+										if (wfUser.getId().equals(((WfUser) model.getValueAt(i, 0)).getId())) {
+											user = wfUser;
+											break;
+										}
+									}
+									WfMembership workflowUserRole = new WfMembership(UUID.randomUUID(), user, role, def);
+									workflowUserRoles.add(workflowUserRole);
+								}
+							}
 						}
 					}
 				}
-			}
-		}
 
-		final I_ShowActivity activity = Terms.get().newActivityPanel(true, config, "<html>Generating Worklist from partition", true);
-		activity.setIndeterminate(true);
-		final Long startTime = System.currentTimeMillis();
-		activity.update();
-		final SwingWorker<String, String> worker = new SwingWorker<String, String>() {
-			@Override
-			protected String doInBackground() throws Exception {
+				final I_ShowActivity activity = Terms.get().newActivityPanel(true, config, "<html>Generating Worklist from partition", true);
+				activity.setIndeterminate(true);
+				final Long startTime = System.currentTimeMillis();
+				activity.update();
+				final SwingWorker<String, String> worker = new SwingWorker<String, String>() {
+					@Override
+					protected String doInBackground() throws Exception {
 
-				try {
-					TerminologyProjectDAO.createNewNacWorkList(project, workflowDefinition, workflowUserRoles, noName, config, activity);
-				} catch (Exception e1) {
-					e1.printStackTrace();
-					JOptionPane.showMessageDialog(ProjectDetailsPanel.this, e1.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-				}
+						try {
+							TerminologyProjectDAO.createNewNacWorkList(project, workflowDefinition, workflowUserRoles, noName, config, activity);
+						} catch (Exception e1) {
+							e1.printStackTrace();
+							JOptionPane.showMessageDialog(ProjectDetailsPanel.this, e1.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+						}
 
-				updateList1Content();
+						updateList1Content();
 
-				TranslationHelperPanel.refreshProjectPanelNode(config);
-				JOptionPane.showMessageDialog(ProjectDetailsPanel.this, "Worklist created...", "Project Manager", JOptionPane.INFORMATION_MESSAGE);
-				return null;
-			}
-
-			@Override
-			protected void done() {
-				try {
-					get();
-					long endTime = System.currentTimeMillis();
-
-					long elapsed = endTime - startTime;
-					String elapsedStr = TimeHelper.getElapsedTimeString(elapsed);
-
-					activity.setProgressInfoUpper("Worklist created...");
-					activity.setProgressInfoLower("Elapsed: " + elapsedStr);
-					activity.complete();
-
-				} catch (CancellationException ce) {
-					activity.setProgressInfoLower("Canceled");
-					try {
-						activity.complete();
-					} catch (ComputationCanceled e) {
-						activity.setProgressInfoLower("Canceled");
+						TranslationHelperPanel.refreshProjectPanelNode(config);
+						JOptionPane.showMessageDialog(ProjectDetailsPanel.this, "Worklist created...", "Project Manager",
+								JOptionPane.INFORMATION_MESSAGE);
+						return null;
 					}
-				} catch (Exception e) {
-					activity.setProgressInfoLower("Canceled with error");
-					AceLog.getAppLog().alertAndLogException(e);
+
+					@Override
+					protected void done() {
+						try {
+							get();
+							long endTime = System.currentTimeMillis();
+
+							long elapsed = endTime - startTime;
+							String elapsedStr = TimeHelper.getElapsedTimeString(elapsed);
+
+							activity.setProgressInfoUpper("Worklist created...");
+							activity.setProgressInfoLower("Elapsed: " + elapsedStr);
+							activity.complete();
+
+						} catch (CancellationException ce) {
+							activity.setProgressInfoLower("Canceled");
+							try {
+								activity.complete();
+							} catch (ComputationCanceled e) {
+								activity.setProgressInfoLower("Canceled");
+							}
+						} catch (Exception e) {
+							activity.setProgressInfoLower("Canceled with error");
+							AceLog.getAppLog().alertAndLogException(e);
+						}
+					}
+
+				};
+				worker.execute();
+				activity.addStopActionListener(new ActionListener() {
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						worker.cancel(true);
+					}
+				});
+				try {
+					ActivityViewer.addActivity(activity);
+				} catch (InterruptedException i1) {
+					// thread canceled, cancel db changes
+					try {
+						Terms.get().cancel();
+					} catch (IOException e1) {
+						e1.printStackTrace();
+					}
+				} catch (Exception e1) {
+					AceLog.getAppLog().alertAndLogException(e1);
 				}
+			} else {
+				JOptionPane.showMessageDialog(this, "<html><body> Release path is not defined in project.<br>Cannot create worklist.",
+						"Message", JOptionPane.ERROR_MESSAGE);
 			}
-
-		};
-		worker.execute();
-		activity.addStopActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				worker.cancel(true);
-			}
-		});
-		try {
-			ActivityViewer.addActivity(activity);
-		} catch (InterruptedException i1) {
-			// thread canceled, cancel db changes
-			try {
-				Terms.get().cancel();
-			} catch (IOException e1) {
-				e1.printStackTrace();
-			}
-		} catch (Exception e1) {
-			AceLog.getAppLog().alertAndLogException(e1);
+		} catch (Exception x) {
+			AceLog.getAppLog().log(Level.SEVERE, "Exception getting project release candidate path", x);
 		}
-		// utwBusinessProcess = null;
-		// File selectedFileLink = (File) comboBox1.getSelectedItem();
-		//
-		// if (selectedFileLink != null) {
-		// WorkflowDefinition wDef=
-		// WorkflowDefinitionManager.readWfDefinition(selectedFileLink.getAbsolutePath());
-		// }
-		//
-		// if (textField2 == null || textField2.getText().isEmpty() ||
-		// utwBusinessProcess == null) {
-		// JOptionPane.showMessageDialog(this,
-		// "Missing data, complete name and choose bp file...",
-		// "Error", JOptionPane.ERROR_MESSAGE);
-		// } else {
-		// try {
-		// TerminologyProjectDAO.createNewNacWorkList(textField2.getText(),
-		// wDef, project, config);
-		// } catch (TerminologyException e1) {
-		// JOptionPane.showMessageDialog(this,
-		// "Error, check logs",
-		// "Error", JOptionPane.ERROR_MESSAGE);
-		// e1.printStackTrace();
-		// } catch (IOException e1) {
-		// JOptionPane.showMessageDialog(this,
-		// "Error, check logs",
-		// "Error", JOptionPane.ERROR_MESSAGE);
-		// e1.printStackTrace();
-		// } catch (Exception e2) {
-		// JOptionPane.showMessageDialog(this,
-		// "Error, check logs",
-		// "Error", JOptionPane.ERROR_MESSAGE);
-		// e2.printStackTrace();
-		// }
-		// textField2.setText("");
-		// utwBusinessProcess = null;
-
-		// }
 	}
 
 	/**
@@ -1930,7 +1904,7 @@ public class ProjectDetailsPanel extends JPanel {
 					((GridBagLayout) panel1.getLayout()).rowWeights = new double[] { 0.0, 1.0, 0.0, 1.0E-4 };
 
 					// ---- label1 ----
-					label1.setText("Translation project details");
+					label1.setText("Project details");
 					label1.setFont(new Font("Lucida Grande", Font.BOLD, 14));
 					panel1.add(label1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0,
 							0, 5, 0), 0, 0));
@@ -2058,7 +2032,7 @@ public class ProjectDetailsPanel extends JPanel {
 							0, 0, 5, 0), 0, 0));
 
 					// ---- label7 ----
-					label7.setText("<html><body>\nEnter translation project name<br><br>\n\nPress \u2018New Workset\u2019  for creating a new workset for this project<br><br>\n\nPress \u2018Save\u2019 for persisting changes<br><br>\n\nPress \u2018Retire project\u2019  to retire this project. Project needs to be empty or retiring will not succeed\n</html>");
+					label7.setText("<html><body>\nEnter project name<br><br>\n\nPress \u2018New Workset\u2019  for creating a new workset for this project<br><br>\n\nPress \u2018Save\u2019 for persisting changes<br><br>\n\nPress \u2018Retire project\u2019  to retire this project. Project needs to be empty or retiring will not succeed\n</html>");
 					label7.setBackground(new Color(238, 238, 238));
 					panel9.add(label7, new GridBagConstraints(0, 1, 2, 1, 0.0, 0.0, GridBagConstraints.NORTH, GridBagConstraints.HORIZONTAL,
 							new Insets(0, 0, 5, 0), 0, 0));
@@ -2547,7 +2521,7 @@ public class ProjectDetailsPanel extends JPanel {
 					((GridBagLayout) panel21.getLayout()).rowWeights = new double[] { 0.0, 0.0, 0.0, 1.0E-4 };
 
 					// ---- label13 ----
-					label13.setText("<html><body>Maintenance worklists are used to send any concept into a translation workflow without the requirement of creating a new workset. Many different workflows can be configured.");
+					label13.setText("<html><body>Maintenance worklists are used to send any concept into a workflow without the requirement of creating a new workset. Many different workflows can be configured.");
 					panel21.add(label13, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(
 							0, 0, 5, 0), 0, 0));
 				}

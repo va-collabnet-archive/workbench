@@ -30,7 +30,11 @@ import java.util.UUID;
  * @author alo
  */
 public interface ProjectBI {
-    
+	
+	public enum ProjectType {
+		TERMINOLOGY, TRANSLATION, MAPPING
+	}
+	
     /** 
      * Gets the name of the work list
      */

@@ -44,6 +44,7 @@ import org.ihtsdo.tk.workflow.api.WfStateBI;
 import org.ihtsdo.tk.workflow.api.WfUserBI;
 import org.ihtsdo.tk.workflow.api.WorkListBI;
 import org.ihtsdo.tk.workflow.api.WorkflowStoreBI;
+import org.ihtsdo.tk.workflow.api.ProjectBI.ProjectType;
 
 public class WorkflowStore implements WorkflowStoreBI {
 
@@ -206,10 +207,10 @@ public class WorkflowStore implements WorkflowStoreBI {
 							passed = false;
 						}
 					}
-					if(passed){
+					if (passed) {
 						result.add(wfProcessInstanceBI);
 					}
-					
+
 				}
 			} else if (wfFilterBI instanceof WfProjectFilter) {
 				WfProjectFilter pFilter = (WfProjectFilter) wfFilterBI;
@@ -300,11 +301,18 @@ public class WorkflowStore implements WorkflowStoreBI {
 	}
 
 	@Override
-	public ProjectBI createProject(String name) throws Exception {
-		return new Project(TerminologyProjectDAO.createNewTranslationProject(name, config));
+	public ProjectBI createProject(String name, ProjectBI.ProjectType type) throws Exception {
+		if (type.equals(ProjectType.TRANSLATION)) {
+			return new Project(TerminologyProjectDAO.createNewTranslationProject(name, config));
+		} else if (type.equals(ProjectType.TERMINOLOGY)) {
+			return new Project(TerminologyProjectDAO.createNewTerminologyProject(name, config));
+		} else if (type.equals(ProjectType.MAPPING)) {
+			return new Project(TerminologyProjectDAO.createNewMappingProject(name, config));
+		} else {
+			return null;
+		}
 	}
 
-	@Override
 	public ProjectBI createTranslationProject(String name) throws Exception {
 		return new Project(TerminologyProjectDAO.createNewTerminologyProject(name, config));
 	}
