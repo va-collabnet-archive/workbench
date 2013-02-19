@@ -3308,7 +3308,11 @@ public class TerminologyProjectDAO {
 			wfInstance.setComponentName(concept.toString());
 			wfInstance.setState(provider.statusConceptToWfState(assingStatus));
 			wfInstance.setLastChangeTime(System.currentTimeMillis());
-			addConceptAsWorkListMember(workListMember, Terms.get().uuidToNative(interpreter.getNextDestination(wfInstance, workList).getId()), config);
+			WfUser destination = interpreter.getNextDestination(wfInstance, workList);
+			if (destination == null) {
+				destination = new WfUser("user", ArchitectonicAuxiliary.Concept.USER.getPrimoridalUid());
+			}
+			addConceptAsWorkListMember(workListMember, Terms.get().uuidToNative(destination.getId()), config);
 			Terms.get().commit();
 		} catch (Exception e) {
 			AceLog.getAppLog().alertAndLogException(e);
