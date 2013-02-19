@@ -1461,6 +1461,7 @@ public class WorkflowHelper {
 
 	public static boolean isWorkflowCapabilityAvailable() {
 		if (new File("sampleProcesses/legacyWorkflowSuspended.txt").exists()) {
+			AceLog.getAppLog().log(Level.INFO, "Legacy Workflow Capability disabled");
 			return false;
 		}
 		if (!wfCapabilitiesInitialized) {
