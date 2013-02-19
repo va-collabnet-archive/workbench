@@ -3048,7 +3048,7 @@ public class TerminologyProjectDAO {
 		I_TerminologyProject project = null;
 		try {
 			// System.out.println(concept.toString());
-			project = getTranslationProject(concept, config);
+			project = getProject(concept, config);
 		} catch (Exception e1) {
 			// do nothing
 			// System.out.println(concept.toString());
@@ -3795,11 +3795,14 @@ public class TerminologyProjectDAO {
 				termFactory.addUncommittedNoChecks(workListConcept);
 				I_GetConceptData activityStatusConcept = member.getActivityStatus();
 				promotionRefset.setDestinationAndPromotionStatus(member.getId(), assignedUserId, activityStatusConcept.getConceptNid());
-				TranslationProject transProject = (TranslationProject) getProjectForWorklist(workList, config);
-				if (transProject.getTargetLanguageRefset() != null) {
-					LanguageMembershipRefset targetLanguage = new LanguageMembershipRefset(transProject.getTargetLanguageRefset(), config);
-					PromotionRefset languagePromotionRefset = targetLanguage.getPromotionRefset(config);
-					languagePromotionRefset.setPromotionStatus(member.getId(), activityStatusConcept.getConceptNid());
+				I_TerminologyProject project = getProjectForWorklist(workList, config);
+				if (project.getProjectType().equals(I_TerminologyProject.Type.TRANSLATION)) {
+					TranslationProject transProject = (TranslationProject) project;
+					if(transProject.getTargetLanguageRefset() != null){
+						LanguageMembershipRefset targetLanguage = new LanguageMembershipRefset(transProject.getTargetLanguageRefset(), config);
+						PromotionRefset languagePromotionRefset = targetLanguage.getPromotionRefset(config);
+						languagePromotionRefset.setPromotionStatus(member.getId(), activityStatusConcept.getConceptNid());
+					}
 				}
 			}
 		} catch (TerminologyException e1) {
@@ -4661,11 +4664,14 @@ public class TerminologyProjectDAO {
 			promotionRefset.setPromotionStatus(workListMemberWithMetadata.getId(), activityStatusConcept.getConceptNid());
 
 			// Translation specific concept level promotion refset
-			TranslationProject transProject = (TranslationProject) getProjectForWorklist(workList, config);
-			LanguageMembershipRefset targetLanguage = new LanguageMembershipRefset(transProject.getTargetLanguageRefset(), config);
-			PromotionRefset languagePromotionRefset = targetLanguage.getPromotionRefset(config);
-			languagePromotionRefset.setPromotionStatus(workListMemberWithMetadata.getId(), activityStatusConcept.getConceptNid());
+			I_TerminologyProject project = getProjectForWorklist(workList, config);
+			if(project.getProjectType().equals(I_TerminologyProject.Type.TRANSLATION)){
+				TranslationProject transProject = (TranslationProject)project;
+				LanguageMembershipRefset targetLanguage = new LanguageMembershipRefset(transProject.getTargetLanguageRefset(), config);
+				PromotionRefset languagePromotionRefset = targetLanguage.getPromotionRefset(config);
+				languagePromotionRefset.setPromotionStatus(workListMemberWithMetadata.getId(), activityStatusConcept.getConceptNid());
 			// end
+			}
 
 			workListMember = getWorkListMember(workListMemberWithMetadata.getConcept(), workList, config);
 		} catch (TerminologyException e) {

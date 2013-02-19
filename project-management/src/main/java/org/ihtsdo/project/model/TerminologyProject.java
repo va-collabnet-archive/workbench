@@ -29,7 +29,7 @@ import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.project.TerminologyProjectDAO;
 
 /**
- * The Class TranslationProject.
+ * The Class TerminologyProject.
  * 
  * TODO: Project properties: Coleccion de business process Issue management
  */
