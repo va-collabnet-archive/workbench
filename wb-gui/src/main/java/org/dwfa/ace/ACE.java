@@ -1063,27 +1063,31 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 				gbcCC.gridx++;
 				gbcCC.weightx = 1;
 
-				Collection<ProjectBI> projectsCC=null;
-				try {
-					projectsCC = wfStore.getAllProjects();
-				} catch (Exception e2) {
-					e2.printStackTrace();
-				}
 				JComboBox projectCCSelectCombo = new JComboBox();
 				
 				projectCCSelectCombo.addItem("none");
-				if (projectsCC!=null){
-					for (ProjectBI proj:projectsCC){
-						I_GetConceptData conceptTmp;
-						try {
-							conceptTmp = Terms.get().getConcept(proj.getUuid());
-							projectCCSelectCombo.addItem(conceptTmp); 
-						} catch (TerminologyException | IOException e1) {
-							e1.printStackTrace();
+				
+				if (WorkflowHelper.isWorkflowCapabilityAvailable()){
+					projectCCSelectCombo.setEnabled(false);
+				}else{
+					Collection<ProjectBI> projectsCC=null;
+					try {
+						projectsCC = wfStore.getAllProjects();
+					} catch (Exception e2) {
+						e2.printStackTrace();
+					}
+					if (projectsCC!=null){
+						for (ProjectBI proj:projectsCC){
+							I_GetConceptData conceptTmp;
+							try {
+								conceptTmp = Terms.get().getConcept(proj.getUuid());
+								projectCCSelectCombo.addItem(conceptTmp); 
+							} catch (TerminologyException | IOException e1) {
+								e1.printStackTrace();
+							}
 						}
 					}
 				}
-
 								
 				projectChangedConceptSubpanel.add(projectCCSelectCombo, gbcCC);
 				
@@ -1139,13 +1143,18 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
 				worklistCCSelectCombo = new JComboBox();
 				projectChangedConceptSubpanel.add(worklistCCSelectCombo, gbcCC);
-
-				I_GetConceptData projectCConcept=aceFrameConfig.getDefaultProjectForChangedConcept();
-
-				if (projectCConcept!=null){
-					projectCCSelectCombo.setSelectedItem(projectCConcept);
+				if (WorkflowHelper.isWorkflowCapabilityAvailable()){
+					aceFrameConfig.setDefaultProjectForChangedConcept(null);
+					aceFrameConfig.setDefaultWorkflowForChangedConcept(null);
+					worklistCCSelectCombo.addItem("none");
+					worklistCCSelectCombo.setEnabled(false);
+				}else{
+					I_GetConceptData projectCConcept=aceFrameConfig.getDefaultProjectForChangedConcept();
+	
+					if (projectCConcept!=null){
+						projectCCSelectCombo.setSelectedItem(projectCConcept);
+					}
 				}
-
 				
 				worklistCCSelectCombo.addActionListener(new ActionListener() {
 					@Override
@@ -1164,11 +1173,14 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
 				projectPrefPanel.add(projectChangedConceptSubpanel);
 
-				I_GetConceptData worklistConcept=aceFrameConfig.getDefaultWorkflowForChangedConcept();
-				if (worklistConcept!=null){
-					worklistCCSelectCombo.setSelectedItem(worklistConcept);
+				if (WorkflowHelper.isWorkflowCapabilityAvailable()){
+					worklistCCSelectCombo.setEnabled(false);
+				}else{
+					I_GetConceptData worklistConcept=aceFrameConfig.getDefaultWorkflowForChangedConcept();
+					if (worklistConcept!=null){
+						worklistCCSelectCombo.setSelectedItem(worklistConcept);
+					}
 				}
-
 				return projectPrefPanel;
 			}
 
