@@ -949,7 +949,23 @@ public interface TerminologyStoreDI extends TerminologyDI {
     boolean regenerateWfHxLuceneIndex(ViewCoordinate viewCoordinate) throws Exception;
     
     QueryBuilderBI getQueryBuilder(ViewCoordinate viewCoordinate);
-    
+    /**
+     * Use if origin path and target path are the same.
+     * @param sourceViewCoordinate
+     * @param sourceEditCoordinate
+     * @param targetViewCoordinate
+     * @return 
+     */
     TerminologyPromoterBI getTerminologyPromoter(ViewCoordinate sourceViewCoordinate, EditCoordinate sourceEditCoordinate,
             ViewCoordinate targetViewCoordinate);
+    /**
+     * Use if origin path is different from target path.
+     * @param sourceViewCoordinate
+     * @param sourceEditCoordinate
+     * @param targetPath
+     * @param originPosition
+     * @return 
+     */
+    TerminologyPromoterBI getTerminologyPromoter(ViewCoordinate sourceViewCoordinate, EditCoordinate sourceEditCoordinate,
+            int targetPath, PositionBI originPosition);
 }
