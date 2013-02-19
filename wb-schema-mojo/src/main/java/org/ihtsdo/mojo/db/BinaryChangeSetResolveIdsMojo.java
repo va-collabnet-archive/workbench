@@ -13,15 +13,13 @@
  */
 package org.ihtsdo.mojo.db;
 
-import java.io.File;
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.mojo.db.BinaryChangeSetResolveIds.SctIdResolution;
 
 /**
  * Read all binary change set under a specified directory hierarchy create a map of when the SCT IDs
@@ -49,11 +47,32 @@ public class BinaryChangeSetResolveIdsMojo extends AbstractMojo {
      */
     private String targetDirectory;
 
+    /**
+     * Location of the build directory.
+     * KEEP_ALL_SCTID, KEEP_NO_ECCS_SCTID, KEEP_LAST_CURRENT_USE
+     * 
+     * @parameter default-value= "KEEP_NO_ECCS_SCTID"
+     * @required
+     */
+    private String resolutionApproach;
+    private SctIdResolution resolution;
+
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         getLog().info("resolving change set ids in: " + changeSetDir);
+        
+        if (resolutionApproach.equalsIgnoreCase("KEEP_ALL_SCTID")) {
+            resolution = SctIdResolution.KEEP_ALL_SCTID;
+        } else if (resolutionApproach.equalsIgnoreCase("KEEP_NO_ECCS_SCTID")) {
+            resolution = SctIdResolution.KEEP_NO_ECCS_SCTID;
+        } else if (resolutionApproach.equalsIgnoreCase("KEEP_LAST_CURRENT_USE")) {
+            resolution = SctIdResolution.KEEP_LAST_CURRENT_USE;
+        } else {
+            throw new MojoFailureException("BinaryChangeSetResolveIdsMojo invalid ");
+        }
+        
         try {
-            BinaryChangeSetResolveIds rcsi = new BinaryChangeSetResolveIds(changeSetDir, targetDirectory);
+            BinaryChangeSetResolveIds rcsi = new BinaryChangeSetResolveIds(changeSetDir, targetDirectory, resolution);
             rcsi.processFiles();
         } catch (IOException | TerminologyException ex) {
             throw new MojoExecutionException("BinaryChangeSetResolveIdsMojo \n", ex);

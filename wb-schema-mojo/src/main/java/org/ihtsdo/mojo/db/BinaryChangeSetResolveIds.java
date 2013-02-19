@@ -50,16 +50,23 @@ import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationship;
  */
 public class BinaryChangeSetResolveIds {
 
-    ArrayList<File> eccsInputFiles;
-    File eccsOutputFile;
-    File keepMapOutputFile;
-    UUID snomedIntUuid;
-    UUID rf1ActiveUuid;
-    UUID rf2ActiveUuid;
-    HashMap<Long, UUID> keepMap;
-    StringBuilder instancesNotKept;
+    private ArrayList<File> eccsInputFiles;
+    private File eccsOutputFile;
+    private File keepMapOutputFile;
+    private UUID snomedIntUuid;
+    private UUID rf1ActiveUuid;
+    private UUID rf2ActiveUuid;
+    private HashMap<Long, UUID> keepMap;
+    private StringBuilder instancesNotKept;
+    private SctIdResolution resolution;
 
-    public BinaryChangeSetResolveIds(String rootDirStr, String targetDirStr)
+    public enum SctIdResolution {
+
+        KEEP_ALL_SCTID, KEEP_NO_ECCS_SCTID, KEEP_LAST_CURRENT_USE
+    };
+
+    public BinaryChangeSetResolveIds(String rootDirStr, String targetDirStr,
+            SctIdResolution resolutionApproach)
             throws IOException, TerminologyException {
         this.snomedIntUuid = ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.getPrimoridalUid();
         this.rf1ActiveUuid = SnomedMetadataRf1.CURRENT_RF1.getUuids()[0];
@@ -72,11 +79,12 @@ public class BinaryChangeSetResolveIds {
         artifactDirectory.mkdirs();
         this.eccsOutputFile = new File(targetDirStr + File.separator + "processed.eccs");
         this.keepMapOutputFile = new File(targetDirStr + File.separator + "keep_ids.txt");
+        this.resolution = resolutionApproach;
     }
 
     public void processFiles() {
         instancesNotKept = new StringBuilder("\r\n SCTID-UUID instance pairs not kept\r\n");
-        
+
         pass1CreateKeepMap();
         pass2CreateUpdatedEccsFile(eccsInputFiles);
 
@@ -209,7 +217,7 @@ public class BinaryChangeSetResolveIds {
                             preList = eConcept.getConceptAttributes().additionalIds;
                             postList = processIdListWithFilter(enclosingUuid, preList);
                             eConcept.getConceptAttributes().additionalIds = postList;
-                            firstDate = processIdListDate(postList, firstDate);
+                            firstDate = findIdListFirstUseDate(postList, firstDate);
                         }
                     }
                     // Description
@@ -223,7 +231,7 @@ public class BinaryChangeSetResolveIds {
                                 preList = tkd.additionalIds;
                                 postList = processIdListWithFilter(enclosingUuid, preList);
                                 tkd.additionalIds = postList;
-                                firstDate = processIdListDate(postList, firstDate);
+                                firstDate = findIdListFirstUseDate(postList, firstDate);
                             }
                         }
                     }
@@ -238,7 +246,7 @@ public class BinaryChangeSetResolveIds {
                                 preList = tkr.additionalIds;
                                 postList = processIdListWithFilter(enclosingUuid, preList);
                                 tkr.additionalIds = postList;
-                                firstDate = processIdListDate(postList, firstDate);
+                                firstDate = findIdListFirstUseDate(postList, firstDate);
                             }
                         }
                     }
@@ -253,7 +261,7 @@ public class BinaryChangeSetResolveIds {
                                 preList = tkram.additionalIds;
                                 postList = processIdListWithFilter(enclosingUuid, preList);
                                 tkram.additionalIds = postList;
-                                firstDate = processIdListDate(postList, firstDate);
+                                firstDate = findIdListFirstUseDate(postList, firstDate);
                             }
                         }
                     }
@@ -378,6 +386,12 @@ public class BinaryChangeSetResolveIds {
     private void processIdList(UUID enclosingConceptUuid,
             List<TkIdentifier> idList,
             List<SctIdUseInstance> inUseList) {
+        if (resolution.compareTo(SctIdResolution.KEEP_ALL_SCTID) == 0) {
+            return; // no special cases to add to use list
+        }
+        if (resolution.compareTo(SctIdResolution.KEEP_NO_ECCS_SCTID) == 0) {
+            return; // no special cases to add to use list
+        }
         for (TkIdentifier tki : idList) {
             if (tki.authorityUuid.compareTo(snomedIntUuid) == 0) {
                 boolean status = false;
@@ -394,22 +408,26 @@ public class BinaryChangeSetResolveIds {
 
     private List<TkIdentifier> processIdListWithFilter(UUID enclosingConceptUuid,
             List<TkIdentifier> idList) {
-//        return idList;
+        if (resolution.compareTo(SctIdResolution.KEEP_ALL_SCTID) == 0) {
+            return idList; // do not filter list
+        }
         ArrayList<TkIdentifier> filteredIdList = new ArrayList<>();
         for (TkIdentifier tki : idList) {
             if (tki.authorityUuid.compareTo(snomedIntUuid) == 0) {
-                if (keepMap.containsKey((Long) tki.getDenotation())) {
-//                    UUID keepUuid = keepMap.get((Long) tki.getDenotation());
-//                    if (enclosingConceptUuid.compareTo(keepUuid) == 0) {
-//                        filteredIdList.add(tki); // match, keep this instance
-//                    } else {
-//                        instancesNotKept.append((Long) tki.getDenotation());
-//                        instancesNotKept.append("\t");
-//                        instancesNotKept.append(enclosingConceptUuid.toString());
-//                        instancesNotKept.append("\r\n");
-//                    }
-                } else {
-                    filteredIdList.add(tki); // not a filtered case
+                if (resolution.compareTo(SctIdResolution.KEEP_NO_ECCS_SCTID) != 0) {
+                    if (keepMap.containsKey((Long) tki.getDenotation())) {
+                        UUID keepUuid = keepMap.get((Long) tki.getDenotation());
+                        if (enclosingConceptUuid.compareTo(keepUuid) == 0) {
+                            filteredIdList.add(tki); // match, keep this instance
+                        } else {
+                            instancesNotKept.append((Long) tki.getDenotation());
+                            instancesNotKept.append("\t");
+                            instancesNotKept.append(enclosingConceptUuid.toString());
+                            instancesNotKept.append("\r\n");
+                        }
+                    } else {
+                        filteredIdList.add(tki); // not a filtered case
+                    }
                 }
             } else {
                 filteredIdList.add(tki); // not a filtered authority
@@ -418,7 +436,7 @@ public class BinaryChangeSetResolveIds {
         return filteredIdList;
     }
 
-    private Long processIdListDate(List<TkIdentifier> idList, Long firstDate) {
+    private Long findIdListFirstUseDate(List<TkIdentifier> idList, Long firstDate) {
         Long aDate = firstDate;
         for (TkIdentifier tki : idList) {
             if (aDate > tki.time) {
