@@ -103,19 +103,15 @@ public class PromoteTargetContentToReleasePath extends AbstractTask {
         try {
             I_ConfigAceFrame config = (I_ConfigAceFrame) worker
                     .readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
-            TerminologyStoreDI ts = Ts.get();
-            I_TermFactory tf = Terms.get();
-
-            int activeNid = SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid();
 
             WfInstance instance = (WfInstance) process.readAttachement("WfInstance");
 
             I_TerminologyProject iproject = TerminologyProjectDAO.getProjectForWorklist(instance.getWorkList(), config);
-            TranslationProject project = (TranslationProject) iproject;
             ConceptChronicleBI concept = Ts.get().getConcept(instance.getComponentId());
 
-            TerminologyProjectDAO.promoteTargetContentToReleasePath(project, concept, config);
-
+            //OLD TerminologyProjectDAO.promoteTargetContentToReleasePath(project, concept, config);
+            TerminologyProjectDAO.promoteContent(concept.getNid(), 
+            		config.getViewCoordinate(), iproject.getReleasePath().getNid());
             return Condition.CONTINUE;
         } catch (Exception e) {
             throw new TaskFailedException(e);
