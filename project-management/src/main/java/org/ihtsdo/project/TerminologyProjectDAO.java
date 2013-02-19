@@ -5903,22 +5903,16 @@ public class TerminologyProjectDAO {
 	}
 	
 	public static void promoteContent(int conceptNid, ViewCoordinate sourceViewCoordinate, int targetPathNid) throws Exception {
-		ViewCoordinate targetViewCoordinate = new ViewCoordinate(sourceViewCoordinate);
-		
-		PathBI targetPath = Terms.get().getPath(targetPathNid);
-        PositionBI viewPosition = Terms.get().newPosition(targetPath, Long.MAX_VALUE);
-        PositionSetBI positionSet = new PositionSetReadOnly(viewPosition);
+		PathBI snomedCorePath = Terms.get().getPath(ArchitectonicAuxiliary.Concept.SNOMED_CORE.getUids());
+		PositionBI originPosition = Terms.get().newPosition(snomedCorePath, Long.MAX_VALUE);
         
-        targetViewCoordinate.setPositionSet(positionSet);
-		
-		TerminologyPromoterBI promoter = Ts.get().getTerminologyPromoter(sourceViewCoordinate, Terms.get().getActiveAceFrameConfig().getEditCoordinate(), 
-				targetViewCoordinate);
+        TerminologyPromoterBI promoter = Ts.get().getTerminologyPromoter(sourceViewCoordinate, Terms.get().getActiveAceFrameConfig().getEditCoordinate(), targetPathNid, 
+        		originPosition);
 		
 		NidBitSetBI promotionNids = Ts.get().getEmptyNidSet();
 		promotionNids.setMember(conceptNid);
 		
 		promoter.promote(promotionNids, false);
-		
 	}
 	
 }
