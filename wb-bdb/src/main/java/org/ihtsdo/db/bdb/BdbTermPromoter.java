@@ -55,15 +55,41 @@ public class BdbTermPromoter implements ProcessStampDataBI, ProcessUnfetchedConc
     boolean writeBack;
     ConcurrentSkipListSet<Integer> newStamps = new ConcurrentSkipListSet<>();
     int targetPathNid;
-    PositionBI targetPosition;
+    PositionBI originPosition;
     NidBitSetBI promotionConceptNids;
     HashSet<Integer> nidsToSkip = new HashSet<>();
-
+    
+    /**
+     * Use if origin and target paths are the same.
+     * @param sourceViewCoordinate
+     * @param sourceEditCoordinate
+     * @param targetViewCoordinate 
+     */
     public BdbTermPromoter(ViewCoordinate sourceViewCoordinate, EditCoordinate sourceEditCoordinate,
             ViewCoordinate targetViewCoordinate) {
         this.sourceViewCoordinate = sourceViewCoordinate.getViewCoordinateWithAllStatusValues();
         this.sourceEditCoordinate = sourceEditCoordinate;
         this.targetViewCoordinate = targetViewCoordinate;
+        
+        PositionBI[] positionArray = targetViewCoordinate.getPositionSet().getPositionArray();
+        //assuming only one view position
+        originPosition = positionArray[0];
+        
+        targetPathNid = originPosition.getPath().getConceptNid();
+    }
+    /**
+     * Use if the origin of the source path is different from the target path.
+     * @param sourceViewCoordinate
+     * @param sourceEditCoordinate
+     * @param targetViewCoordinate
+     * @param originPosition 
+     */
+    public BdbTermPromoter(ViewCoordinate sourceViewCoordinate, EditCoordinate sourceEditCoordinate,
+            int targetPathNid, PositionBI originPosition) {
+        this.sourceViewCoordinate = sourceViewCoordinate.getViewCoordinateWithAllStatusValues();
+        this.sourceEditCoordinate = sourceEditCoordinate;
+        this.targetPathNid = targetPathNid;
+        this.originPosition = originPosition;
 
     }
 
@@ -76,12 +102,6 @@ public class BdbTermPromoter implements ProcessStampDataBI, ProcessUnfetchedConc
         nidsToSkip.add(RefsetAux.WFHX_REFEX.getLenient().getConceptNid());
 
         promotionConceptNids = Bdb.getConceptDb().getEmptyIdSet();
-        PositionBI[] positionArray = targetViewCoordinate.getPositionSet().getPositionArray();
-        //assuming only one view position
-        targetPosition = positionArray[0];
-
-        targetPathNid = targetPosition.getPath().getConceptNid();
-
         Bdb.getSapDb().iterateStampDataInSequence(this);
 
         NidBitSetItrBI iterator = promotionNids.iterator();
@@ -163,13 +183,15 @@ public class BdbTermPromoter implements ProcessStampDataBI, ProcessUnfetchedConc
                     version.getPathNid());
         }
     }
-
+    /**
+     * Checks for which stamps are new on the source path and not inherited from an origin path.
+     * @param sap 
+     */
     private void processStamp(StampBI sap) {
         int pathNid = sap.getPathNid();
         long time = sap.getTime();
 
-        //is new stamp nid and needs to be promoted
-        if (!targetPosition.isSubsequentOrEqualTo(time, pathNid)) {
+        if (!originPosition.isSubsequentOrEqualTo(time, pathNid)) {
             newStamps.add(sap.getStampNid());
         }
 
