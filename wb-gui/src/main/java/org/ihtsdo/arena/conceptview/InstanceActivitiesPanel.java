@@ -44,6 +44,7 @@ public class InstanceActivitiesPanel extends JPanel {
 	private JTree tree;
 	private TreeModel model;
 	public I_GetConceptData concept;
+	private JScrollPane scrollPane;
 
 	public InstanceActivitiesPanel(I_ConfigAceFrame config, ConceptView view) {
 		initComponents();
@@ -83,14 +84,17 @@ public class InstanceActivitiesPanel extends JPanel {
 
 		JLabel title = new JLabel("Instance Activities");
 		panel.add(title);
+		
+		scrollPane = new JScrollPane();
+		GridBagConstraints gbc_scrollPane = new GridBagConstraints();
+		gbc_scrollPane.fill = GridBagConstraints.BOTH;
+		gbc_scrollPane.gridx = 0;
+		gbc_scrollPane.gridy = 1;
+		add(scrollPane, gbc_scrollPane);
 
 		tree = new JTree();
+		scrollPane.setViewportView(tree);
 		tree.setCellRenderer(new MyRenderer());
-		GridBagConstraints gbc_tree = new GridBagConstraints();
-		gbc_tree.fill = GridBagConstraints.BOTH;
-		gbc_tree.gridx = 0;
-		gbc_tree.gridy = 1;
-		add(tree, gbc_tree);
 	}
 
 	public void setDropSide(SIDE side) {
