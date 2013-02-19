@@ -62,6 +62,8 @@ import org.ihtsdo.issue.manager.IssueRepositoryDAO;
 import org.ihtsdo.issue.manager.implementation.CollabnetIssueManager;
 import org.ihtsdo.project.ContextualizedDescription;
 import org.ihtsdo.project.TerminologyProjectDAO;
+import org.ihtsdo.project.model.I_TerminologyProject;
+import org.ihtsdo.project.model.I_TerminologyProject.Type;
 import org.ihtsdo.project.model.TranslationProject;
 import org.ihtsdo.project.model.WorkList;
 import org.ihtsdo.project.model.WorkListMember;
@@ -88,7 +90,7 @@ public class WorklistMemberLogPanel extends JPanel {
 	private HashMap<Integer, Integer> hashVarCol;
 
 	/** The translation project. */
-	private TranslationProject translationProject;
+	private I_TerminologyProject project;
 
 	/** The repo. */
 	private IssueRepository repo;
@@ -129,9 +131,9 @@ public class WorklistMemberLogPanel extends JPanel {
 	 * @param regis
 	 *            the regis
 	 */
-	public void showMemberChanges(WorkListMember member, TranslationProject translationProject, IssueRepository repo, IssueRepoRegistration regis) {
+	public void showMemberChanges(WorkListMember member, I_TerminologyProject translationProject, IssueRepository repo, IssueRepoRegistration regis) {
 		this.member = member;
-		this.translationProject = translationProject;
+		this.project = translationProject;
 		if (repo == null || regis == null) {
 			try {
 
@@ -474,7 +476,8 @@ public class WorklistMemberLogPanel extends JPanel {
 			}
 			if (emptyRow) {
 				lastObjectStringdata = objStringdata;
-			} else if (lastObjectStringdata[0] != null && objStringdata[0] != null && lastObjectStringdata[2] != null && objStringdata[2] != null && lastObjectStringdata[0].equals(objStringdata[0]) && lastObjectStringdata[2].equals(objStringdata[2])) {
+			} else if (lastObjectStringdata[0] != null && objStringdata[0] != null && lastObjectStringdata[2] != null && objStringdata[2] != null
+					&& lastObjectStringdata[0].equals(objStringdata[0]) && lastObjectStringdata[2].equals(objStringdata[2])) {
 				lastObjectStringdata = objStringdata;
 			} else {
 				dataVecList.add(lastObjectStringdata);
@@ -534,42 +537,48 @@ public class WorklistMemberLogPanel extends JPanel {
 	 * @return the comments
 	 */
 	private void getComments() {
-		I_ConfigAceFrame config;
-		try {
-			config = Terms.get().getActiveAceFrameConfig();
-			I_GetConceptData langRefsetConcept = translationProject.getTargetLanguageRefset();
-			LanguageMembershipRefset targetLangRefset = new LanguageMembershipRefset(langRefsetConcept, config);
-			long thickVer;
-			String strDate;
+		if (project.getProjectType().equals(Type.TRANSLATION)) {
+			TranslationProject translationProject = (TranslationProject) project;
+			I_ConfigAceFrame config;
+			try {
+				config = Terms.get().getActiveAceFrameConfig();
+				I_GetConceptData langRefsetConcept = translationProject.getTargetLanguageRefset();
+				LanguageMembershipRefset targetLangRefset = new LanguageMembershipRefset(langRefsetConcept, config);
+				long thickVer;
+				String strDate;
 
-			List<String> comments = new ArrayList<String>();
-			if (targetLangRefset != null) {
-				comments.addAll(targetLangRefset.getCommentsRefset(config).getComments(this.member.getId()).values());
+				List<String> comments = new ArrayList<String>();
+				if (targetLangRefset != null) {
+					comments.addAll(targetLangRefset.getCommentsRefset(config).getComments(this.member.getId()).values());
+					for (int i = comments.size() - 1; i > -1; i--) {
+						thickVer = Long.valueOf(comments.get(i).substring(comments.get(i).trim().lastIndexOf(" ") + 1));
+						strDate = formatter.format(thickVer);
+						addStringTolist(strDate, "Language refset comment: " + comments.get(i).substring(0, comments.get(i).lastIndexOf(" - Time:")));
+
+					}
+				}
+				comments = new ArrayList<String>();
+				comments.addAll(TerminologyProjectDAO.getWorkList(Terms.get().getConcept(this.member.getWorkListUUID()), config)
+						.getCommentsRefset(config).getComments(this.member.getId()).values());
+
 				for (int i = comments.size() - 1; i > -1; i--) {
 					thickVer = Long.valueOf(comments.get(i).substring(comments.get(i).trim().lastIndexOf(" ") + 1));
 					strDate = formatter.format(thickVer);
-					addStringTolist(strDate, "Language refset comment: " + comments.get(i).substring(0, comments.get(i).lastIndexOf(" - Time:")));
+					addStringTolist(strDate, "Worklist comment: " + comments.get(i).substring(0, comments.get(i).lastIndexOf(" - Time:")));
 
 				}
+			} catch (TerminologyException e) {
+				// TODO Auto-generated catch block
+				AceLog.getAppLog().alertAndLogException(e);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				AceLog.getAppLog().alertAndLogException(e);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				AceLog.getAppLog().alertAndLogException(e);
 			}
-			comments = new ArrayList<String>();
-			comments.addAll(TerminologyProjectDAO.getWorkList(Terms.get().getConcept(this.member.getWorkListUUID()), config).getCommentsRefset(config).getComments(this.member.getId()).values());
+		} else {
 
-			for (int i = comments.size() - 1; i > -1; i--) {
-				thickVer = Long.valueOf(comments.get(i).substring(comments.get(i).trim().lastIndexOf(" ") + 1));
-				strDate = formatter.format(thickVer);
-				addStringTolist(strDate, "Worklist comment: " + comments.get(i).substring(0, comments.get(i).lastIndexOf(" - Time:")));
-
-			}
-		} catch (TerminologyException e) {
-			// TODO Auto-generated catch block
-			AceLog.getAppLog().alertAndLogException(e);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			AceLog.getAppLog().alertAndLogException(e);
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			AceLog.getAppLog().alertAndLogException(e);
 		}
 
 	}
@@ -580,43 +589,45 @@ public class WorklistMemberLogPanel extends JPanel {
 	 * @return the descriptions
 	 */
 	private void getDescriptions() {
-		try {
-			hashVarCol = new HashMap<Integer, Integer>();
-
-			I_GetConceptData langRefset = translationProject.getTargetLanguageRefset();
-			List<ContextualizedDescription> descriptions = ContextualizedDescription.getContextualizedDescriptions(member.getId(), langRefset.getConceptNid(), true);
-			for (ContextualizedDescription description : descriptions) {
-				if (description.getLanguageExtension() != null) {
-					Integer did = description.getDescId();
-					if (!hashVarCol.containsKey(did)) {
-						hashVarCol.put(did, 0);
-					}
-					List<? extends I_DescriptionPart> parts = description.getDescriptionParts();
-					if (parts != null) {
-						for (I_AmPart part : parts) {
-							addPartTolist(part, LogObjectContainer.PARTS.DESCRIPTION_PART, did);
+		if (project.getProjectType().equals(Type.TRANSLATION)) {
+			try {
+				hashVarCol = new HashMap<Integer, Integer>();
+				TranslationProject translationProject = (TranslationProject) project;
+				I_GetConceptData langRefset = translationProject.getTargetLanguageRefset();
+				List<ContextualizedDescription> descriptions = ContextualizedDescription.getContextualizedDescriptions(member.getId(),
+						langRefset.getConceptNid(), true);
+				for (ContextualizedDescription description : descriptions) {
+					if (description.getLanguageExtension() != null) {
+						Integer did = description.getDescId();
+						if (!hashVarCol.containsKey(did)) {
+							hashVarCol.put(did, 0);
 						}
-					}
-					List<? extends I_ExtendByRefPart> lParts = description.getLanguageRefsetParts();
+						List<? extends I_DescriptionPart> parts = description.getDescriptionParts();
+						if (parts != null) {
+							for (I_AmPart part : parts) {
+								addPartTolist(part, LogObjectContainer.PARTS.DESCRIPTION_PART, did);
+							}
+						}
+						List<? extends I_ExtendByRefPart> lParts = description.getLanguageRefsetParts();
 
-					if (lParts != null) {
-						for (I_AmPart part : lParts) {
-							addPartTolist(part, LogObjectContainer.PARTS.LANG_REFSET_PART, did);
+						if (lParts != null) {
+							for (I_AmPart part : lParts) {
+								addPartTolist(part, LogObjectContainer.PARTS.LANG_REFSET_PART, did);
+							}
 						}
 					}
 				}
+			} catch (TerminologyException e) {
+				// TODO Auto-generated catch block
+				AceLog.getAppLog().alertAndLogException(e);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				AceLog.getAppLog().alertAndLogException(e);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				AceLog.getAppLog().alertAndLogException(e);
 			}
-		} catch (TerminologyException e) {
-			// TODO Auto-generated catch block
-			AceLog.getAppLog().alertAndLogException(e);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			AceLog.getAppLog().alertAndLogException(e);
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			AceLog.getAppLog().alertAndLogException(e);
 		}
-
 	}
 
 	/**
@@ -766,7 +777,7 @@ public class WorklistMemberLogPanel extends JPanel {
 	 * Button1 action performed.
 	 */
 	private void button1ActionPerformed() {
-		showMemberChanges(this.member, this.translationProject, this.repo, this.regis);
+		showMemberChanges(this.member, this.project, this.repo, this.regis);
 	}
 
 	/**
@@ -803,7 +814,8 @@ public class WorklistMemberLogPanel extends JPanel {
 					button1ActionPerformed();
 				}
 			});
-			panel1.add(button1, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.VERTICAL, new Insets(0, 0, 0, 0), 0, 0));
+			panel1.add(button1, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.VERTICAL, new Insets(0, 0,
+					0, 0), 0, 0));
 		}
 		add(panel1, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
 
@@ -811,7 +823,8 @@ public class WorklistMemberLogPanel extends JPanel {
 		{
 			scrollPane1.setViewportView(table1);
 		}
-		add(scrollPane1, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
+		add(scrollPane1, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0,
+				0));
 		// JFormDesigner - End of component initialization
 		// //GEN-END:initComponents
 	}
