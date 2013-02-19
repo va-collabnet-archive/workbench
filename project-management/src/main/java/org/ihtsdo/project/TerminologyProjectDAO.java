@@ -68,6 +68,7 @@ import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.PathSetReadOnly;
+import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.RefsetPropertyMap;
 import org.dwfa.ace.api.RefsetPropertyMap.REFSET_PROPERTY;
 import org.dwfa.ace.api.Terms;
@@ -87,6 +88,7 @@ import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.cement.SNOMED;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.etypes.EConcept;
+import org.ihtsdo.helper.promote.TerminologyPromoterBI;
 import org.ihtsdo.lucene.SearchResult;
 import org.ihtsdo.project.model.I_TerminologyProject;
 import org.ihtsdo.project.model.MappingProject;
@@ -112,8 +114,12 @@ import org.ihtsdo.project.workflow.model.WfUser;
 import org.ihtsdo.project.workflow.model.WorkflowDefinition;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ContradictionException;
+import org.ihtsdo.tk.api.NidBitSetBI;
+import org.ihtsdo.tk.api.NidSet;
+import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
+import org.ihtsdo.tk.api.PositionSetBI;
 import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.TerminologyBuilderBI;
 import org.ihtsdo.tk.api.TerminologyStoreDI;
@@ -5894,6 +5900,25 @@ public class TerminologyProjectDAO {
 		// TODO Auto-generated method stub
 		MappingProject project = new MappingProject(projectName, 0, null);
 		return createNewMappingProject(project, config);
+	}
+	
+	public static void promoteContent(int conceptNid, ViewCoordinate sourceViewCoordinate, int targetPathNid) throws Exception {
+		ViewCoordinate targetViewCoordinate = new ViewCoordinate(sourceViewCoordinate);
+		
+		PathBI targetPath = Terms.get().getPath(targetPathNid);
+        PositionBI viewPosition = Terms.get().newPosition(targetPath, Long.MAX_VALUE);
+        PositionSetBI positionSet = new PositionSetReadOnly(viewPosition);
+        
+        targetViewCoordinate.setPositionSet(positionSet);
+		
+		TerminologyPromoterBI promoter = Ts.get().getTerminologyPromoter(sourceViewCoordinate, Terms.get().getActiveAceFrameConfig().getEditCoordinate(), 
+				targetViewCoordinate);
+		
+		NidBitSetBI promotionNids = Ts.get().getEmptyNidSet();
+		promotionNids.setMember(conceptNid);
+		
+		promoter.promote(promotionNids, false);
+		
 	}
 	
 }

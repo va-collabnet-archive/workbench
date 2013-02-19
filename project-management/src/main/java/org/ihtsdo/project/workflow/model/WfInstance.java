@@ -29,6 +29,7 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.ihtsdo.project.TerminologyProjectDAO;
+import org.ihtsdo.project.model.I_TerminologyProject;
 import org.ihtsdo.project.model.TranslationProject;
 import org.ihtsdo.project.model.WorkList;
 import org.ihtsdo.project.refset.LanguageMembershipRefset;
@@ -262,11 +263,13 @@ public class WfInstance implements Serializable, WfProcessInstanceBI {
 		PromotionAndAssignmentRefset pormAssigRefset = workList.getPromotionRefset(config);
 		pormAssigRefset.setPromotionStatus(tf.uuidToNative(instance.componentId), tf.uuidToNative(newState.getId()));
 		instance.setState(newState);
-		TranslationProject project = (TranslationProject) TerminologyProjectDAO.getProjectForWorklist(workList, config);
-		I_GetConceptData targetLanguage = TerminologyProjectDAO.getTargetLanguageRefsetForProject(project, config);
-		if (targetLanguage != null) {
-			LanguageMembershipRefset targetLangRefset = new LanguageMembershipRefset(targetLanguage, config);
-			targetLangRefset.getPromotionRefset(config).setPromotionStatus(tf.uuidToNative(instance.componentId), tf.uuidToNative(newState.getId()));
+		I_TerminologyProject project = TerminologyProjectDAO.getProjectForWorklist(workList, config);
+		if (project instanceof TranslationProject) {
+			I_GetConceptData targetLanguage = TerminologyProjectDAO.getTargetLanguageRefsetForProject((TranslationProject) project, config);
+			if (targetLanguage != null) {
+				LanguageMembershipRefset targetLangRefset = new LanguageMembershipRefset(targetLanguage, config);
+				targetLangRefset.getPromotionRefset(config).setPromotionStatus(tf.uuidToNative(instance.componentId), tf.uuidToNative(newState.getId()));
+			}
 		}
 	}
 

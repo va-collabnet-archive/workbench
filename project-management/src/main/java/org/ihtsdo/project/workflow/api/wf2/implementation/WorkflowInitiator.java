@@ -15,9 +15,11 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_RepresentIdSet;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
+import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.ihtsdo.project.TerminologyProjectDAO;
 import org.ihtsdo.project.model.I_TerminologyProject;
 import org.ihtsdo.project.model.WorkList;
+import org.ihtsdo.project.workflow.model.WfState;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.NidBitSetItrBI;
 import org.ihtsdo.tk.api.NidSet;
@@ -111,14 +113,19 @@ public class WorkflowInitiator implements WorkflowInitiatiorBI {
 				WorkList workList = (WorkList) wfStore.getWorklist(worklistConcept.getPrimUuid());
 				Collection<WfProcessInstanceBI> instances = wfStore.getProcessInstances(concept.getPrimUuid());
 
-				boolean alreadyInProject = false;
+				boolean alreadyActiveInProject = false;
+				WfProcessInstanceBI completeInstanceInSameWorklist = null;
 				
 				for (WfProcessInstanceBI loopInstance : instances) {
-					if (loopInstance.isActive() && !loopInstance.isCompleted()){
+					if (!loopInstance.isCompleted()){
 						I_TerminologyProject loopProject = TerminologyProjectDAO.getProjectForWorklist((WorkList) loopInstance.getWorkList(), config);
 						if (projectConcept.getNid() == loopProject.getId()) {
-							alreadyInProject = true;
+							alreadyActiveInProject = true;
 							break;
+						}
+					} else {
+						if (loopInstance.getWorkList().getUuid().equals(workList.getUuid())) {
+							completeInstanceInSameWorklist = loopInstance;
 						}
 					}
 				}
@@ -129,10 +136,17 @@ public class WorkflowInitiator implements WorkflowInitiatiorBI {
 				//System.out.println("instance.isActive(): " + instance.isActive());
 				//System.out.println("instance.isCompleted(): " + instance.isCompleted());
 
-				if ( alreadyInProject ){ //instance!=null
+				if ( alreadyActiveInProject ){ //instance!=null
 					return false;
 				}
-				workList.createInstanceForComponent(concept.getPrimUuid(), new WfProcessDefinition(workList.getWorkflowDefinition()));
+				
+				if (completeInstanceInSameWorklist != null) {
+					I_GetConceptData assingStatus = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_ASSIGNED_STATUS.getUids());
+					completeInstanceInSameWorklist.setState(new WfState(assingStatus.toString(), assingStatus.getPrimUuid()));
+				} else {
+					workList.createInstanceForComponent(concept.getPrimUuid(), new WfProcessDefinition(workList.getWorkflowDefinition()));
+				}
+				
 				return true;
 			} else {
 				return false;
