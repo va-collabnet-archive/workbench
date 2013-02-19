@@ -330,7 +330,6 @@ public class TerminologyProjectDAO {
 		return targetLanguagesCache;
 
 	}
-
 	/**
 	 * Creates the new translation project.
 	 * 
@@ -3190,7 +3189,7 @@ public class TerminologyProjectDAO {
 	 */
 	public static WorkSet getNonAssignedChangesWorkSet(I_TerminologyProject project, I_ConfigAceFrame config) {
 		WorkSet nacWorkSet = null;
-		String nacWorkSetName = "Maintenance - " + project.getName().replace("(translation project)", "");
+		String nacWorkSetName = "Maintenance - " ;
 
 		for (WorkSet loopWorkSet : project.getWorkSets(config)) {
 			if (loopWorkSet.getName().startsWith(nacWorkSetName)) {
