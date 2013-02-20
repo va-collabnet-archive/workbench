@@ -606,7 +606,7 @@ public class ConceptViewRenderer extends JLayeredPane {
 						WfUser nextDestination = wi.getNextDestination((WfInstance) wfInstance, (WorkList) wfInstance.getWorkList());
 
 						if (nextDestination != null) {
-							wfInstance.setAssignedUser(wfUser);
+							WfInstance.updateDestination((WfInstance) wfInstance, nextDestination);
 						}
 
 						WorkflowStore ws = new WorkflowStore();
