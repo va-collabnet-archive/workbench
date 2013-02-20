@@ -102,6 +102,7 @@ public class ConfigDialog extends JDialog {
 	
 	/** The preferd term default panel. */
 	private PreferedTermDefaultPanel preferdTermDefaultPanel;
+	private CompletionModePanel completionModePanel;
 
 	/** The is project configuration. */
 	private boolean isProjectConfiguration;
@@ -269,6 +270,9 @@ public class ConfigDialog extends JDialog {
 					} else if (conf.getItem().equals(ConfigurationConstants.PREFERD_TERM_DEFAULT_PANEL)) {
 						preferdTermDefaultPanel.selectCurrentConfButton();
 						cardLo.show(contentPanel, ConfigurationConstants.PREFERD_TERM_DEFAULT_PANEL);
+					} else if (conf.getItem().equals(ConfigurationConstants.COMPLETION_MODE_PANEL)) {
+						completionModePanel.selectCurrentConfButton();
+						cardLo.show(contentPanel, ConfigurationConstants.COMPLETION_MODE_PANEL);
 					}
 
 				} catch (Exception ex) {
@@ -288,6 +292,8 @@ public class ConfigDialog extends JDialog {
 			targetTreeComponentsPanel = new TargetTreeComponentsPanel(config, this.confTrans);
 			spellCheckConfigPanel = new SpellCheckerConfigPanel(config, confTrans);
 			preferdTermDefaultPanel = new PreferedTermDefaultPanel(config, confTrans);
+			completionModePanel = new CompletionModePanel(config, confTrans);
+			
 
 			contentPanel.add(inboxColumnComponentsPanel, ConfigurationConstants.INBOX_COLUMN_COMPONENTS_PANEL);
 			contentPanel.add(inboxItemConfigurationPanel, ConfigurationConstants.INBOX_ITEM_CONFIGURATION_PANEL);
@@ -295,6 +301,7 @@ public class ConfigDialog extends JDialog {
 			contentPanel.add(sourceTreeComponentsPanel, ConfigurationConstants.SOURCE_TREE_COMPONENTS_PANEL);
 			contentPanel.add(spellCheckConfigPanel, ConfigurationConstants.SPELL_CHECK_CONFIGURATION_PANEL);
 			contentPanel.add(targetTreeComponentsPanel, ConfigurationConstants.TARGET_TREE_COMPONENTS_PANEL);
+			contentPanel.add(completionModePanel, ConfigurationConstants.COMPLETION_MODE_PANEL);
 		} else {
 			editorModePanel = new EditorModePanel(config, this.confTrans);
 			editorModePanel.selectCurrentConfButton();
@@ -483,6 +490,9 @@ public class ConfigDialog extends JDialog {
 			top.add(category);
 
 			category = new DefaultMutableTreeNode(new ConfigTreeInfo("Target descriptions display", ConfigurationConstants.TARGET_TREE_COMPONENTS_PANEL));
+			top.add(category);
+		
+			category = new DefaultMutableTreeNode(new ConfigTreeInfo("Inbox instance completion mode", ConfigurationConstants.COMPLETION_MODE_PANEL));
 			top.add(category);
 		} else {
 			category = new DefaultMutableTreeNode(new ConfigTreeInfo("Editor mode", ConfigurationConstants.EDITOR_MODE_PANEL));

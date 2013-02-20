@@ -26,6 +26,8 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.project.TerminologyProjectDAO;
+import org.ihtsdo.project.filter.WfCompletionFilter;
+import org.ihtsdo.project.filter.WfCompletionFilter.CompletionOption;
 import org.ihtsdo.project.filter.WfDestinationFilter;
 import org.ihtsdo.project.filter.WfProjectFilter;
 import org.ihtsdo.project.filter.WfStateFilter;
@@ -66,6 +68,7 @@ public class SearchFilterPanel extends JPanel {
 		filterTypeCombo.addItem(new WfWorklistFilter());
 		filterTypeCombo.addItem(new WfProjectFilter());
 		filterTypeCombo.addItem(new WfStateFilter());
+		filterTypeCombo.addItem(new WfCompletionFilter());
 	}
 
 	private void addButtonActionPerformed(ActionEvent e) {
@@ -84,6 +87,16 @@ public class SearchFilterPanel extends JPanel {
 			return new WfWorklistFilter(((WorkList) filterCombo.getSelectedItem()).getUuid());
 		} else if (filterObject instanceof WfState) {
 			return new WfStateFilter((WfState) filterCombo.getSelectedItem());
+		} else if (filterObject instanceof WfCompletionFilter) {
+			CompletionOption co = (WfCompletionFilter.CompletionOption) filterCombo.getSelectedItem();
+			if (co.equals(CompletionOption.COMPLETE_INSTANCES)) {
+				return new WfCompletionFilter(true);
+			} else if (co.equals(CompletionOption.INCOMPLETE_INSTACES)) {
+				return new WfCompletionFilter(false);
+			} else {
+				return null;
+			}
+
 		} else {
 			return null;
 		}
@@ -99,7 +112,7 @@ public class SearchFilterPanel extends JPanel {
 				for (WfUserBI wfUserBI : fitlerOptions) {
 					filterCombo.addItem(wfUserBI);
 				}
-			} else if(e.getItem() instanceof WfStateFilter){
+			} else if (e.getItem() instanceof WfStateFilter) {
 				filterCombo.removeAllItems();
 				WfStateFilter sf = (WfStateFilter) e.getItem();
 				List<WfState> states = sf.getFilterOptions();
@@ -107,7 +120,7 @@ public class SearchFilterPanel extends JPanel {
 				for (WfStateBI wfStateBI : states) {
 					filterCombo.addItem(wfStateBI);
 				}
-			}else if (e.getItem() instanceof WfWorklistFilter) {
+			} else if (e.getItem() instanceof WfWorklistFilter) {
 				filterCombo.removeAllItems();
 				try {
 					I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
@@ -140,6 +153,12 @@ public class SearchFilterPanel extends JPanel {
 					e1.printStackTrace();
 				} catch (IOException e1) {
 					e1.printStackTrace();
+				}
+			} else if (e.getItem() instanceof WfCompletionFilter) {
+				filterCombo.removeAllItems();
+				CompletionOption[] completions = WfCompletionFilter.CompletionOption.values();
+				for (CompletionOption comp : completions) {
+					filterCombo.addItem(comp);
 				}
 			} else {
 				filterCombo.removeAllItems();

@@ -435,7 +435,7 @@ public class WorklistMemberStatusPanel extends JPanel {
 						return f1.toString().compareTo(f2.toString());
 					}
 				});
-				statuses = TerminologyProjectDAO.getWorkListMemberStatuses(workList, config);
+				statuses = TerminologyProjectDAO.getWorkListMemberStatuses(workList, config,null);
 				for (I_GetConceptData status : statuses.keySet()) {
 					publish(status.toString() + " (" + statuses.get(status) + ")");
 				}

@@ -138,6 +138,7 @@ import org.ihtsdo.tk.api.refex.type_nid_string.RefexNidStringVersionBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf1;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 import org.ihtsdo.tk.dto.concept.component.refex.TK_REFEX_TYPE;
+import org.ihtsdo.tk.workflow.api.WfFilterBI;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.json.JettisonMappedXmlDriver;
@@ -4461,6 +4462,7 @@ public class TerminologyProjectDAO {
 	 * @return the all work list members
 	 */
 	public static List<WorkListMember> getAllWorkListMembers(WorkList workList, I_ConfigAceFrame config) {
+		
 		I_TermFactory termFactory = Terms.get();
 		List<WorkListMember> workListMembers = new ArrayList<WorkListMember>();
 		try {
@@ -4528,13 +4530,20 @@ public class TerminologyProjectDAO {
 	 * @throws IOException
 	 *             Signals that an I/O exception has occurred.
 	 */
-	public static HashMap<I_GetConceptData, Integer> getWorkListMemberStatuses(WorkList workList, I_ConfigAceFrame config) throws TerminologyException, IOException {
+	public static HashMap<I_GetConceptData, Integer> getWorkListMemberStatuses(WorkList workList, I_ConfigAceFrame config, List<WfFilterBI> filters) throws TerminologyException, IOException {
 		HashMap<I_GetConceptData, Integer> workListMembersStatuses = new HashMap<I_GetConceptData, Integer>();
 		I_TermFactory tf = Terms.get();
 
 		List<WorkListMember> members = getAllWorkListMembers(workList, config);
 
 		for (WorkListMember loopMember : members) {
+			if(filters != null){
+				for (WfFilterBI filter : filters) {
+					if(!filter.evaluateInstance(loopMember.getWfInstance())){
+						continue;
+					}
+				}
+			}
 			I_GetConceptData activityStatus = loopMember.getActivityStatus();
 			Integer currentCount = workListMembersStatuses.get(activityStatus);
 			if (currentCount == null) {

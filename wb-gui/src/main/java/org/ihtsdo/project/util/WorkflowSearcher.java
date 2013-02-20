@@ -122,7 +122,7 @@ public class WorkflowSearcher {
 	 * @throws TerminologyException
 	 *             the terminology exception
 	 */
-	public HashMap<WfState, Integer> getWorklistMembersCountByState() throws IOException, TerminologyException {
+	public HashMap<WfState, Integer> getWorklistMembersCountByState(List<WfFilterBI> filters) throws IOException, TerminologyException {
 		HashMap<WfState, Integer> result = new HashMap<WfState, Integer>();
 		I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
 		List<I_TerminologyProject> projects = TerminologyProjectDAO.getAllProjects(config);
@@ -131,7 +131,7 @@ public class WorkflowSearcher {
 			for (WorkSet workSet : worksets) {
 				List<WorkList> worklists = TerminologyProjectDAO.getAllWorklistForWorkset(workSet, config);
 				for (WorkList loopWorkList : worklists) {
-					HashMap<I_GetConceptData, Integer> members = TerminologyProjectDAO.getWorkListMemberStatuses(loopWorkList, config);
+					HashMap<I_GetConceptData, Integer> members = TerminologyProjectDAO.getWorkListMemberStatuses(loopWorkList, config, filters);
 					Set<I_GetConceptData> keys = members.keySet();
 					for (I_GetConceptData wl : keys) {
 						WfState wfState = new WfState(wl.getInitialText(), wl.getPrimUuid());
@@ -290,7 +290,7 @@ public class WorkflowSearcher {
 	 *            the user
 	 * @return the count by worklist and state
 	 */
-	public HashMap<Object, Integer> getCountByWorklistAndState(WfUser user) {
+	public HashMap<Object, Integer> getCountByWorklistAndState(WfUser user, List<WfFilterBI> filters) {
 		HashMap<Object, Integer> result = new HashMap<Object, Integer>();
 		I_ConfigAceFrame config;
 		try {
@@ -314,6 +314,15 @@ public class WorkflowSearcher {
 							List<WorkListMember> allWorkListMembers = TerminologyProjectDAO.getAllWorkListMembers(workList, config);
 							int size = 0;
 							for (WorkListMember workListMember : allWorkListMembers) {
+								boolean passed = true;
+								for (WfFilterBI filter : filters) {
+									if (!filter.evaluateInstance(workListMember.getWfInstance())) {
+										passed = false;
+									}
+								}
+								if(!passed){
+									continue;
+								}
 								if (workListMember.getWfInstance().getDestination().equals(user)) {
 									String conceptUuid = workListMember.getConcept().getPrimUuid().toString();
 									String worklistUuid = workListMember.getWfInstance().getWorkList().getUids().iterator().next().toString();
