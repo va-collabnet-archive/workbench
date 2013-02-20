@@ -163,7 +163,9 @@ public class Bdb {
         HEAP_2000("je-prop-options/2G.je.properties"),
         HEAP_4000("je-prop-options/4G.je.properties"),
         HEAP_6000("je-prop-options/6G.je.properties"),
-        HEAP_8000("je-prop-options/8G.je.properties");
+        HEAP_8000("je-prop-options/8G.je.properties"),
+        HEAP_10000("je-prop-options/10G.je.properties"),
+        HEAP_12000("je-prop-options/12G.je.properties");
         String configFileName;
 
         private HeapSize(String configFileName) {
@@ -196,7 +198,23 @@ public class Bdb {
         File mutableDir = new File(dbDir, "mutable");
         File readOnlyDir = new File(dbDir, "read-only");
         mutableDir.mkdirs();
-        if (maxMem > 8000000000L) {
+        if (maxMem > 12000000000L) {
+            heapSize = HeapSize.HEAP_12000;
+            FileIO.copyFile(new File(configDir, HeapSize.HEAP_12000.configFileName),
+                    new File(mutableDir, "je.properties"));
+            if (readOnlyDir.exists()) {
+                FileIO.copyFile(new File(configDir, HeapSize.HEAP_12000.configFileName),
+                        new File(readOnlyDir, "je.properties"));
+            }
+        } else if (maxMem > 10000000000L) {
+            heapSize = HeapSize.HEAP_10000;
+            FileIO.copyFile(new File(configDir, HeapSize.HEAP_10000.configFileName),
+                    new File(mutableDir, "je.properties"));
+            if (readOnlyDir.exists()) {
+                FileIO.copyFile(new File(configDir, HeapSize.HEAP_10000.configFileName),
+                        new File(readOnlyDir, "je.properties"));
+            }
+        } else if (maxMem > 8000000000L) {
             heapSize = HeapSize.HEAP_8000;
             FileIO.copyFile(new File(configDir, HeapSize.HEAP_8000.configFileName),
                     new File(mutableDir, "je.properties"));
