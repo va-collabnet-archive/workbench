@@ -416,12 +416,11 @@ public class LoadBdbMulti extends AbstractMojo {
                 Bdb.getConceptDb().iterateConceptDataInParallel(nullComponentFinder);
                 System.out.println();
 
-                if (nullComponentFinder.getNullComponent().isEmpty()) {
+                if (nullComponentFinder.getNidsWithNullComponents().isEmpty()) {
                     getLog().info("No Null component found.");
                 } else {
-                    nullComponentFinder.writeNullComponentFile();
-                    getLog().warn("\n\n Null Components found: " + nullComponentFinder.getNullComponent().size() + "\n"
-                            + nullComponentFinder.getNullComponent() + "\n");
+                    getLog().warn("\n\n Null Components found: " + nullComponentFinder.getNidsWithNullComponents().size() + "\n"
+                            + nullComponentFinder.getNidsWithNullComponents() + "\n");
                 }
                 Concept.enableComponentsCRHM();
                 getLog().info("Testing for Null Components Finished.");
