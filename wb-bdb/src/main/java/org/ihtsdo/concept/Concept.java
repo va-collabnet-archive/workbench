@@ -437,7 +437,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
 
         // check if different primordial UUIDs are being merged
         if (c.getPrimUuid().compareTo(UUID.fromString("00000000-0000-0000-c000-000000000046")) != 0
-                && c.getPrimUuid().compareTo(eConcept.getPrimordialUuid()) != 0) {
+                && c.getUUIDs().contains(eConcept.primordialUuid) == false) {
             if (eConcept.getConceptAttributes() == null) {
                 StringBuilder sb = new StringBuilder();
                 sb.append("\r\nmergeWithEConcept eConcept.getConceptAttributes() == null");
