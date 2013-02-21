@@ -915,9 +915,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
     //~--- get methods ---------------------------------------------------------
     public static Concept get(EConcept eConcept, Set<ConceptChronicleBI> indexedAnnotationConcepts) throws IOException {
         int conceptNid;
-        if (Bdb.hasUuid(eConcept.getPrimordialUuid())) {
-            conceptNid = Bdb.uuidToNid(eConcept.getPrimordialUuid());
-        } else if (eConcept.getConceptAttributes() != null) {
+        if (eConcept.getConceptAttributes() != null) {
             conceptNid = Bdb.uuidsToNid(eConcept.getConceptAttributes().getUuids());
         } else {
             conceptNid = Bdb.uuidToNid(eConcept.getPrimordialUuid());
