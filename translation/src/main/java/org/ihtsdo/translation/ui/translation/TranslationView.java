@@ -429,6 +429,7 @@ public class TranslationView extends JPanel {
 							if (tp.getTitleAt(i).equals(TranslationHelperPanel.SEARCH_DOCS_TAB_NAME)) {
 								tp.setSelectedIndex(i);
 								thp.showTabbedPanel();
+								return;
 							}
 						}
 						JPanel panel = new JPanel();
