@@ -780,9 +780,9 @@ public class InboxTreePanel extends JPanel {
 				ConfigTranslationModule cfg = null;
 				cfg = LanguageUtil.getTranslationConfig(Terms.get().getActiveAceFrameConfig());
 				List<WfFilterBI> filters = new ArrayList<WfFilterBI>();
-				if(cfg.getCompletionMode().equals(ConfigTranslationModule.CompletionMode.COMPLETE_INSTANCES)){
+				if(cfg.getCompletionMode() != null && cfg.getCompletionMode().equals(ConfigTranslationModule.CompletionMode.COMPLETE_INSTANCES)){
 					filters.add(new WfCompletionFilter(true));
-				}else if(cfg.getCompletionMode().equals(ConfigTranslationModule.CompletionMode.INCOMPLETE_INSTACES)){
+				}else if(cfg.getCompletionMode() == null || cfg.getCompletionMode().equals(ConfigTranslationModule.CompletionMode.INCOMPLETE_INSTACES)){
 					filters.add(new WfCompletionFilter(false));
 				}
 				HashMap<Object, Integer> worklists = searcher.getCountByWorklistAndState(wfUser, filters);
