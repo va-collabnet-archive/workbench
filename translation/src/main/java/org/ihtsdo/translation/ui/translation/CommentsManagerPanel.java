@@ -176,7 +176,8 @@ public class CommentsManagerPanel extends JPanel {
 			if (urlCount > 0) {
 				tabbedPane1.setTitleAt(1, "<html>Web references <b><font color='red'>(" + urlCount + ")</font></b></html>");
 			} else {
-				tabbedPane1.setTitleAt(1, "<html>Web references (0)</font></b></html>");
+				tabbedPane1.getTitleAt(1);
+				tabbedPane1.setTitleAt(1, "Web references (0)");
 			}
 		} catch (TerminologyException e) {
 			e.printStackTrace();
