@@ -271,6 +271,11 @@ public class WfInstance implements Serializable, WfProcessInstanceBI {
 			if (WorkflowInitiator.lastComplete != null) {
 				WorkflowInitiator.lastComplete.put(concept.getNid(), System.currentTimeMillis());
 			}
+			if (WorkflowInitiator.alreadySeen != null) {
+				for (NidSet loopMap : WorkflowInitiator.alreadySeen.values()) {
+					loopMap.remove(concept.getNid());
+				}
+			}
 		}
 		I_TerminologyProject project = TerminologyProjectDAO.getProjectForWorklist(workList, config);
 		if (project.getProjectType().equals(Type.TRANSLATION)) {
@@ -283,12 +288,7 @@ public class WfInstance implements Serializable, WfProcessInstanceBI {
 			}
 		}
 		// Experiment to manage workflow restart in the same session
-//		concept.commit(ChangeSetGenerationPolicy.INCREMENTAL, ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);
-		if (instance.isCompleted()) {
-			if (WorkflowInitiator.alreadySeen != null && WorkflowInitiator.alreadySeen.get(workList.getId()) != null) {
-				WorkflowInitiator.alreadySeen.get(workList.getId()).remove(concept.getNid());
-			}
-		}
+		concept.commit(ChangeSetGenerationPolicy.INCREMENTAL, ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);
 	}
 
 	/**
