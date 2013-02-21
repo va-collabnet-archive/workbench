@@ -40,6 +40,7 @@ import org.dwfa.ace.task.WorkerAttachmentKeys;
 import org.dwfa.bpa.BusinessProcess;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_Work;
+import org.dwfa.bpa.worker.MasterWorker;
 import org.dwfa.cement.SNOMED;
 import org.ihtsdo.project.model.WorkList;
 import org.ihtsdo.project.workflow.model.WfAction;
@@ -55,89 +56,88 @@ import org.ihtsdo.project.workflow.model.WorkflowDefinition;
  */
 public class WorkflowInterpreter {
 
+	private static final String BATCH_OPERATION = "Batch operation";
+
 	/**
 	 * Creates the workflow interpreter.
-	 *
-	 * @param workflowfDefinition the workflowf definition
+	 * 
+	 * @param workflowfDefinition
+	 *            the workflowf definition
 	 * @return the workflow interpreter
 	 */
-	public static WorkflowInterpreter createWorkflowInterpreter(
-			WorkflowDefinition workflowfDefinition) {
-		if (hWfI.containsKey(workflowfDefinition.getName())){
-			return hWfI.get(workflowfDefinition.getName()) ;
+	public static WorkflowInterpreter createWorkflowInterpreter(WorkflowDefinition workflowfDefinition) {
+		if (hWfI.containsKey(workflowfDefinition.getName())) {
+			return hWfI.get(workflowfDefinition.getName());
 		}
-			
+
 		return new WorkflowInterpreter(workflowfDefinition);
 	}
 
 	/** The h wf i. */
-	private static HashMap<String,WorkflowInterpreter> hWfI=new HashMap<String,WorkflowInterpreter>();
-	
+	private static HashMap<String, WorkflowInterpreter> hWfI = new HashMap<String, WorkflowInterpreter>();
+
 	/** The wf definition. */
 	private WorkflowDefinition wfDefinition;
-	
+
 	/** The kbase. */
 	private KnowledgeBase kbase;
-	
+
 	/** The ksession. */
 	private StatelessKnowledgeSession ksession;
-	
+
 	/** The actions. */
 	private List<String> actions;
-	
+
 	/** The automatic actions. */
 	private List<String> autoActions;
-	
+
 	/** The prep actions. */
 	private List<String> prepActions;
-	
+
 	/**
 	 * Instantiates a new workflow interpreter.
-	 *
-	 * @param wfDefinition the wf definition
+	 * 
+	 * @param wfDefinition
+	 *            the wf definition
 	 */
 	private WorkflowInterpreter(WorkflowDefinition wfDefinition) {
 		super();
 		this.wfDefinition = wfDefinition;
-		
+
 		if (kbase != null && ksession != null) {
 			// kbase and ksession are singletons
 		} else {
 			// Crate knowledge base with decision table
-			DecisionTableConfiguration dtableconfiguration =
-				KnowledgeBuilderFactory.newDecisionTableConfiguration();
-			dtableconfiguration.setInputType( DecisionTableInputType.XLS );
+			DecisionTableConfiguration dtableconfiguration = KnowledgeBuilderFactory.newDecisionTableConfiguration();
+			dtableconfiguration.setInputType(DecisionTableInputType.XLS);
 
 			kbase = KnowledgeBaseFactory.newKnowledgeBase();
 			KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder(kbase);
 
 			for (String loopXls : wfDefinition.getXlsFileName()) {
 				Resource xlsRes = ResourceFactory.newFileResource(loopXls);
-				kbuilder.add( xlsRes,
-						ResourceType.DTABLE,
-						dtableconfiguration );
+				kbuilder.add(xlsRes, ResourceType.DTABLE, dtableconfiguration);
 			}
 
 			for (String loopDrl : wfDefinition.getDrlFileName()) {
-				kbuilder.add(ResourceFactory.newFileResource(loopDrl), 
-						ResourceType.DRL);
+				kbuilder.add(ResourceFactory.newFileResource(loopDrl), ResourceType.DRL);
 			}
 
-			if ( kbuilder.hasErrors() ) {
-				System.err.print( kbuilder.getErrors() );
+			if (kbuilder.hasErrors()) {
+				System.err.print(kbuilder.getErrors());
 			}
 
-			kbase.addKnowledgePackages( kbuilder.getKnowledgePackages() );
+			kbase.addKnowledgePackages(kbuilder.getKnowledgePackages());
 			ksession = kbase.newStatelessKnowledgeSession();
 			hWfI.put(wfDefinition.getName(), this);
-			
+
 		}
 
 	}
 
 	/**
 	 * Gets the wf definition.
-	 *
+	 * 
 	 * @return the wf definition
 	 */
 	public WorkflowDefinition getWfDefinition() {
@@ -146,16 +146,18 @@ public class WorkflowInterpreter {
 
 	/**
 	 * Gets the possible actions.
-	 *
-	 * @param instance the instance
-	 * @param user the user
+	 * 
+	 * @param instance
+	 *            the instance
+	 * @param user
+	 *            the user
 	 * @return the possible actions
 	 */
 	public List<WfAction> getPossibleActions(WfInstance instance, WfUser user) {
 		List<WfAction> possibleActions = new ArrayList<WfAction>();
-		WfComponentProvider cp=new WfComponentProvider();
+		WfComponentProvider cp = new WfComponentProvider();
 
-		//KnowledgeRuntimeLoggerFactory.newConsoleLogger(ksession);
+		// KnowledgeRuntimeLoggerFactory.newConsoleLogger(ksession);
 
 		actions = new ArrayList<String>();
 		ksession.setGlobal("actions", actions);
@@ -181,12 +183,12 @@ public class WorkflowInterpreter {
 
 		return possibleActions;
 	}
-	
+
 	public List<WfAction> getAutomaticActions(WfInstance instance, WfUser user) {
 		List<WfAction> automaticActions = new ArrayList<WfAction>();
-		WfComponentProvider cp=new WfComponentProvider();
+		WfComponentProvider cp = new WfComponentProvider();
 
-		//KnowledgeRuntimeLoggerFactory.newConsoleLogger(ksession);
+		// KnowledgeRuntimeLoggerFactory.newConsoleLogger(ksession);
 
 		actions = new ArrayList<String>();
 		ksession.setGlobal("actions", actions);
@@ -215,16 +217,18 @@ public class WorkflowInterpreter {
 
 	/**
 	 * Gets the preparation action.
-	 *
-	 * @param instance the instance
-	 * @param user the user
+	 * 
+	 * @param instance
+	 *            the instance
+	 * @param user
+	 *            the user
 	 * @return the preparation action
 	 */
 	public WfAction getPreparationAction(WfInstance instance, WfUser user) {
 		List<WfAction> candidatePrepActions = new ArrayList<WfAction>();
-		WfComponentProvider cp=new WfComponentProvider();
+		WfComponentProvider cp = new WfComponentProvider();
 
-		//KnowledgeRuntimeLoggerFactory.newConsoleLogger(ksession);
+		// KnowledgeRuntimeLoggerFactory.newConsoleLogger(ksession);
 
 		actions = new ArrayList<String>();
 		ksession.setGlobal("actions", actions);
@@ -250,7 +254,7 @@ public class WorkflowInterpreter {
 
 		if (candidatePrepActions.isEmpty()) {
 			return null;
-		} else if (candidatePrepActions.size() ==  1) {
+		} else if (candidatePrepActions.size() == 1) {
 			return candidatePrepActions.iterator().next();
 		} else if (candidatePrepActions.size() > 1) {
 			// raise exception?
@@ -263,9 +267,11 @@ public class WorkflowInterpreter {
 
 	/**
 	 * Gets the next role.
-	 *
-	 * @param instance the instance
-	 * @param workList the work list
+	 * 
+	 * @param instance
+	 *            the instance
+	 * @param workList
+	 *            the work list
 	 * @return the next role
 	 */
 	public List<WfRole> getNextRole(WfInstance instance, WorkList workList) {
@@ -301,9 +307,11 @@ public class WorkflowInterpreter {
 
 	/**
 	 * Gets the next destination.
-	 *
-	 * @param instance the instance
-	 * @param workList the work list
+	 * 
+	 * @param instance
+	 *            the instance
+	 * @param workList
+	 *            the work list
 	 * @return the next destination
 	 */
 	public WfUser getNextDestination(WfInstance instance, WorkList workList) {
@@ -315,7 +323,7 @@ public class WorkflowInterpreter {
 				if (getPossibleActions(instance, loopWfMember.getUser()).size() > 0) {
 					if (loopWfMember.isDefaultAssignment()) {
 						nextUser = loopWfMember.getUser();
-					} else if (nextUser==null){
+					} else if (nextUser == null) {
 						nextUser = loopWfMember.getUser();
 					}
 				}
@@ -327,9 +335,11 @@ public class WorkflowInterpreter {
 
 	/**
 	 * Gets the possible destinations.
-	 *
-	 * @param instance the instance
-	 * @param workList the work list
+	 * 
+	 * @param instance
+	 *            the instance
+	 * @param workList
+	 *            the work list
 	 * @return the possible destinations
 	 */
 	public List<WfUser> getPossibleDestinations(WfInstance instance, WorkList workList) {
@@ -349,13 +359,17 @@ public class WorkflowInterpreter {
 
 	/**
 	 * Do action.
-	 *
-	 * @param instance the instance
-	 * @param role the role
-	 * @param action the action
-	 * @param worker the worker
+	 * 
+	 * @param instance
+	 *            the instance
+	 * @param role
+	 *            the role
+	 * @param action
+	 *            the action
+	 * @param worker
+	 *            the worker
 	 */
-	public static boolean doAction(WfInstance instance, WfRole role,WfAction action, I_Work worker) {
+	public static boolean doAction(WfInstance instance, WfRole role, WfAction action, I_Work worker) {
 		// TODO: decide if should check for action is possible
 		try {
 			BusinessProcess bp;
@@ -374,13 +388,42 @@ public class WorkflowInterpreter {
 			}
 
 			tworker.execute(bp);
-			if(bp.getExitCondition().equals(Condition.ITEM_CANCELED)){
+			if (bp.getExitCondition().equals(Condition.ITEM_CANCELED)) {
 				return false;
 			}
 		} catch (Exception e) {
 			AceLog.getAppLog().alertAndLogException(e);
 			return false;
-		} 
+		}
+		return true;
+	}
+
+	public static boolean doActionInBatch(WfInstance instance, WfRole role, WfAction action, MasterWorker worker) {
+		try {
+			BusinessProcess bp;
+			ObjectInputStream ois = new ObjectInputStream(new BufferedInputStream(new FileInputStream(action.getBusinessProcess())));
+			bp = (BusinessProcess) ois.readObject();
+			bp.writeAttachment("WfInstance", instance);
+			bp.writeAttachment("WfRole", role);
+			bp.writeAttachment("BatchMessage", BATCH_OPERATION);
+			bp.writeAttachment("consequenceState", action.getConsequence());
+			final I_Work tworker;
+			if (worker.isExecuting()) {
+				tworker = worker.getTransactionIndependentClone();
+				tworker.writeAttachment(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name(), Terms.get().getActiveAceFrameConfig());
+			} else {
+				tworker = worker;
+
+			}
+
+			tworker.execute(bp);
+			if (bp.getExitCondition().equals(Condition.ITEM_CANCELED)) {
+				return false;
+			}
+		} catch (Exception e) {
+			AceLog.getAppLog().alertAndLogException(e);
+			return false;
+		}
 		return true;
 	}
 
