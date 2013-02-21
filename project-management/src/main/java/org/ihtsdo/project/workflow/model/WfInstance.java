@@ -36,7 +36,11 @@ import org.ihtsdo.project.refset.LanguageMembershipRefset;
 import org.ihtsdo.project.refset.PromotionAndAssignmentRefset;
 import org.ihtsdo.project.workflow.api.wf2.implementation.WfActivityInstance;
 import org.ihtsdo.project.workflow.api.wf2.implementation.WfProcessDefinition;
+import org.ihtsdo.project.workflow.api.wf2.implementation.WorkflowInitiator;
 import org.ihtsdo.project.workflow.api.wf2.implementation.WorkflowStore;
+import org.ihtsdo.tk.api.NidSet;
+import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
+import org.ihtsdo.tk.api.changeset.ChangeSetGenerationThreadingPolicy;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.refex.type_nid_nid.RefexNidNidVersionBI;
@@ -260,16 +264,29 @@ public class WfInstance implements Serializable, WfProcessInstanceBI {
 		I_ConfigAceFrame config = tf.getActiveAceFrameConfig();
 		WorkList workList = instance.getWorkList();
 		PromotionAndAssignmentRefset pormAssigRefset = workList.getPromotionRefset(config);
-		pormAssigRefset.setPromotionStatus(tf.uuidToNative(instance.componentId), tf.uuidToNative(newState.getId()));
+		I_GetConceptData concept = tf.getConcept(instance.getComponentId());
+		pormAssigRefset.setPromotionStatus(concept.getNid(), tf.uuidToNative(newState.getId()));
 		instance.setState(newState);
+		if (instance.isCompleted()) {
+			if (WorkflowInitiator.lastComplete != null) {
+				WorkflowInitiator.lastComplete.put(concept.getNid(), System.currentTimeMillis());
+			}
+		}
 		I_TerminologyProject project = TerminologyProjectDAO.getProjectForWorklist(workList, config);
 		if (project.getProjectType().equals(Type.TRANSLATION)) {
 			TranslationProject transProject = (TranslationProject) project;
 			I_GetConceptData targetLanguage = TerminologyProjectDAO.getTargetLanguageRefsetForProject(transProject, config);
 			if (targetLanguage != null) {
 				LanguageMembershipRefset targetLangRefset = new LanguageMembershipRefset(targetLanguage, config);
-				targetLangRefset.getPromotionRefset(config).setPromotionStatus(tf.uuidToNative(instance.componentId),
+				targetLangRefset.getPromotionRefset(config).setPromotionStatus(concept.getNid(),
 						tf.uuidToNative(newState.getId()));
+			}
+		}
+		// Experiment to manage workflow restart in the same session
+//		concept.commit(ChangeSetGenerationPolicy.INCREMENTAL, ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);
+		if (instance.isCompleted()) {
+			if (WorkflowInitiator.alreadySeen != null && WorkflowInitiator.alreadySeen.get(workList.getId()) != null) {
+				WorkflowInitiator.alreadySeen.get(workList.getId()).remove(concept.getNid());
 			}
 		}
 	}
