@@ -438,12 +438,6 @@ public class ConceptViewRenderer extends JLayeredPane {
 									conceptWorkflowPanel.add(instancePanel);
 								}
 								separator();
-							}else{
-								separator();
-								JLabel labelDisabled = new JLabel("Managed services workflow disabeld.");
-								labelDisabled.setForeground(Color.RED);
-								conceptWorkflowPanel.add(labelDisabled);
-								separator();
 							}
 						}
 					} catch (Exception e1) {
