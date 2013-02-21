@@ -456,22 +456,9 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
             } else {
                 TerminologyStoreDI ts = Ts.get();
                 int unspecifiedUuidNid = ts.getNidForUuids(ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.getUids());
-                int snomedT3UuidNid = ts.getNidForUuids(ArchitectonicAuxiliary.Concept.SNOMED_T3_UUID.getUids());
 
                 // check if Concept c already has the extra UUID
-                boolean found = false;
-                for (IdBI aid : c.getAdditionalIds()) {
-                    if (aid.getAuthorityNid() == snomedT3UuidNid
-                            || aid.getAuthorityNid() == unspecifiedUuidNid) {
-                        UUID dUuid = (UUID) aid.getDenotation();
-                        if (dUuid.compareTo(eConcept.getPrimordialUuid()) == 0) {
-                            found = true;
-                            AceLog.getAppLog().log(Level.INFO, "::FYI:: already has additional uuid");
-                        }
-                    }
-                }
-
-                if (!found) {
+                if (c.getUUIDs().contains(eConcept.primordialUuid) == false) {
                     // add EConcept eConcept primordial uuid into Concept c additional ids
                     // RF2 Active
                     int idStatusNid = ts.getNidForUuids(UUID.fromString("d12702ee-c37f-385f-a070-61d56d4d0f1f"));
