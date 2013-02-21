@@ -87,8 +87,8 @@ public class SearchFilterPanel extends JPanel {
 			return new WfWorklistFilter(((WorkList) filterCombo.getSelectedItem()).getUuid());
 		} else if (filterObject instanceof WfState) {
 			return new WfStateFilter((WfState) filterCombo.getSelectedItem());
-		} else if (filterObject instanceof WfCompletionFilter) {
-			CompletionOption co = (WfCompletionFilter.CompletionOption) filterCombo.getSelectedItem();
+		} else if (filterObject instanceof CompletionOption) {
+			CompletionOption co = (CompletionOption) filterCombo.getSelectedItem();
 			if (co.equals(CompletionOption.COMPLETE_INSTANCES)) {
 				return new WfCompletionFilter(true);
 			} else if (co.equals(CompletionOption.INCOMPLETE_INSTACES)) {
