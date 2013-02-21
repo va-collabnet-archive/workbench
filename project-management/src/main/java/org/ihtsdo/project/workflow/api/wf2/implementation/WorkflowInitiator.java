@@ -71,9 +71,9 @@ public class WorkflowInitiator implements WorkflowInitiatiorBI {
 					if (idSet!=null){
 						NidBitSetItrBI possibleItr = idSet.iterator();
 						while (possibleItr.next()) {
-							System.out.println("AlreadySeen: " + alreadySeen.get(workflowNid).contains(possibleItr.nid()) + " lastComplete: " + lastComplete.containsKey(possibleItr.nid()));
+//							System.out.println("AlreadySeen: " + alreadySeen.get(workflowNid).contains(possibleItr.nid()) + " lastComplete: " + lastComplete.containsKey(possibleItr.nid()));
 							if (lastComplete.containsKey(possibleItr.nid())) {
-								System.out.println("Diff cache time: " + (System.currentTimeMillis() - lastComplete.get(possibleItr.nid())));
+//								System.out.println("Diff cache time: " + (System.currentTimeMillis() - lastComplete.get(possibleItr.nid())));
 							}
 							
 							// 
@@ -82,7 +82,7 @@ public class WorkflowInitiator implements WorkflowInitiatiorBI {
 								alreadySeen.get(workflowNid).add(possibleItr.nid());
 								concept=Ts.get().getConcept(possibleItr.nid());
 								if (concept!=null){
-									System.out.println("Sending to workflow: " + concept.toString());
+//									System.out.println("Sending to workflow: " + concept.toString());
 									addComponentToDefaultWorklist(concept);
 								}
 							}
