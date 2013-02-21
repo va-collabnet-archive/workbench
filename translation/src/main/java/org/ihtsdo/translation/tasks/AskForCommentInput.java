@@ -125,7 +125,7 @@ public class AskForCommentInput extends AbstractTask {
 				commentsRefset.addComment(concept.getNid(), commentType.getNid() , rejReason.getNid(),commentx);
 				
 			}else{
-				throw new TaskFailedException("Comment is null or empty");
+				return Condition.ITEM_CANCELED;
 			}
 
 		} catch (Exception e) {

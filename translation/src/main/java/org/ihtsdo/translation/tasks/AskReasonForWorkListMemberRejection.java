@@ -123,7 +123,7 @@ public class AskReasonForWorkListMemberRejection extends AbstractTask {
 				commentsRefset.addComment(concept.getNid(), commentType.getNid() , rejReason.getNid(),commentx);
 				
 			}else{
-				throw new TaskFailedException("Null Rejection reason");
+				return Condition.ITEM_CANCELED;
 			}
 
 		} catch (Exception e) {
