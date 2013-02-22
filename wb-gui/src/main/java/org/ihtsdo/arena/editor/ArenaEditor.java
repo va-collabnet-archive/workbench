@@ -47,21 +47,15 @@ public class ArenaEditor extends BasicGraphEditor {
     private static final long serialVersionUID = -7007225006753337933L;
     private List<? extends ArenaComponentSettings> arenaList;
     boolean forAjudication = false;
+    boolean forPromotion = false;
     public static HashMap<Integer, Color> diffColor = new HashMap<>();
-
-    public boolean isForAjudication() {
-        return forAjudication;
-    }
-
-    public void setForAjudication(boolean forAjudication) {
-        this.forAjudication = forAjudication;
-    }
 
     /**
      * @throws IOException 
      * 
      */
-    public ArenaEditor(I_ConfigAceFrame config, File defaultArenaConfig, boolean isForAjudication) throws IOException {
+    public ArenaEditor(I_ConfigAceFrame config, File defaultArenaConfig,
+            boolean isForAjudication, boolean isForPromotion) throws IOException {
         super("mxGraph for JFC/Swing", new ArenaGraphComponent(new mxGraph() {
 
             /**
@@ -87,6 +81,7 @@ public class ArenaEditor extends BasicGraphEditor {
             }
         });
         this.forAjudication = isForAjudication;
+        this.forPromotion = isForPromotion;
         arenaList = (List<? extends ArenaComponentSettings>) config.getProperty(this.getClass().getCanonicalName());
         if (arenaList == null) {
             // Creates a single shapes palette
@@ -116,7 +111,7 @@ public class ArenaEditor extends BasicGraphEditor {
             }
         }
         mxCodecRegistry.addPackage("org.ihtsdo.arena.conceptview");
-        mxCodecRegistry.register(new mxObjectCodec(new ConceptViewSettings(isForAjudication()), 
+        mxCodecRegistry.register(new mxObjectCodec(new ConceptViewSettings(forAjudication, forPromotion), 
                 new String[] {"view", "navigator", "navigatorTree", "navButton", "statedInferredButton"}, null, null));
         
         if (defaultArenaConfig.exists()) {
@@ -132,7 +127,8 @@ public class ArenaEditor extends BasicGraphEditor {
     }
 
     private void addPaletteTemplate(EditorPalette palette, String label, String imageName, int link) {
-        addPaletteTemplate(palette, label, imageName, new ConceptViewSettings(isForAjudication(), link));
+        addPaletteTemplate(palette, label, imageName, new ConceptViewSettings(forAjudication, forPromotion,
+                link));
     }
 
     private void addPaletteTemplate(EditorPalette palette, String label, String imageName, ArenaComponentSettings settings) {

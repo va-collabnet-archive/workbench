@@ -27,6 +27,7 @@ import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.bpa.util.I_InitComponentMenus;
+import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.PathBI;
 
 /**
@@ -36,8 +37,10 @@ import org.ihtsdo.tk.api.PathBI;
 public class PromotionEditorGenerator implements I_InitComponentMenus{
     JComboBox sourcePathCombo;
     JComboBox targetPathCombo;
+    JComboBox mergePathCombo;
     PathBI sourcePath = null;
     PathBI targetPath = null;
+    PathBI mergePath = null;
 
     @Override
     public void addAppMenus(JMenuBar mainMenuBar) throws Exception {
@@ -69,73 +72,100 @@ public class PromotionEditorGenerator implements I_InitComponentMenus{
         @Override
         public void actionPerformed(ActionEvent e) {
             try {
+                mergePath = null;
+                sourcePath = null;
+                targetPath = null;
 //TODO: check for uncommitted changes, don't open until resolved
-                
-                JPanel pane = new JPanel();
-                pane.setLayout(new GridBagLayout());
-                GridBagConstraints gbc = new GridBagConstraints();
-                gbc.anchor = GridBagConstraints.WEST;
-                gbc.gridx = 0;
-                gbc.gridy = 1;
-                
-                SortedSet<PathBI> sortedPaths = new TreeSet<>(new Comparator<PathBI>() {
-                    @Override
-                    public int compare(PathBI o1, PathBI o2) {
-                        return o1.toString().toLowerCase().compareTo(o2.toString().toLowerCase());
-                    }
-                });
-                JLabel sourceLabel = new JLabel("source path:");
-                pane.add(sourceLabel, gbc);
-                
-                gbc.gridy++;
-                sortedPaths.addAll(Terms.get().getPaths());
-                sourcePathCombo = new JComboBox();
-                sourcePathCombo.addItem(null);
-                for(PathBI path : sortedPaths){
-                    sourcePathCombo.addItem(path);
+                if(Ts.get().hasUncommittedChanges()){
+                    JOptionPane.showMessageDialog(null,
+                            "There are uncommitted changes. Please commit or cancel before continuing.",
+                            "Check for uncommitted",
+                            JOptionPane.OK_OPTION);
+                }else{
+                    doPathSelection("Please select promotion parameters.");
                 }
-                sourcePathCombo.addActionListener(new SourcePathListener());
-                pane.add(sourcePathCombo, gbc);
-                
-                gbc.gridy++;
-                JLabel targetLabel = new JLabel("target path:");
-                pane.add(targetLabel, gbc);
-                
-                gbc.gridy++;
-                targetPathCombo = new JComboBox();
-                targetPathCombo.addItem(null);
-                for(PathBI path : sortedPaths){
-                    targetPathCombo.addItem(path);
-                }
-                targetPathCombo.addActionListener(new TargetPathListener());
-                pane.add(targetPathCombo, gbc);
-                int value = JOptionPane.showConfirmDialog(null, pane,
-                                                 "Please select promotion paths.",
-                                                 JOptionPane.OK_CANCEL_OPTION);
-                
-                if(JOptionPane.OK_OPTION == value && sourcePath != null &&
-                        targetPath != null){
-                    I_ConfigAceFrame activeConfig = AceConfig.config.getActiveConfig();
-                    if (activeConfig != null) {
-                        MarshalledObject<I_ConfigAceFrame> marshalledFrame =
-                                new MarshalledObject<I_ConfigAceFrame>(AceConfig.config.getActiveConfig());
-                        AceFrameConfig newFrameConfig = (AceFrameConfig) marshalledFrame.get();
-                        newFrameConfig.setAceFrame(((AceFrameConfig) activeConfig).getAceFrame());
-                        newFrameConfig.setDbConfig(activeConfig.getDbConfig());
-                        newFrameConfig.setWorker(activeConfig.getWorker());
-
-                        PromotionEditorFrame newFrame = new PromotionEditorFrame(newFrameConfig, sourcePath, targetPath);
-                        newFrame.setVisible(true);
-                    }
-                }else if(sourcePath == null || targetPath == null){
-//TODO need message                    
-                    AceLog.getAppLog().info("Please set paths before contiuing");
-                }
-                
             } catch (Exception e1) {
                 AceLog.getAppLog().alertAndLogException(e1);
             }
 
+        }
+    }
+    
+    private void doPathSelection(String message) throws Exception{
+        JPanel pane = new JPanel();
+        pane.setLayout(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+
+        SortedSet<PathBI> sortedPaths = new TreeSet<>(new Comparator<PathBI>() {
+            @Override
+            public int compare(PathBI o1, PathBI o2) {
+                return o1.toString().toLowerCase().compareTo(o2.toString().toLowerCase());
+            }
+        });
+        JLabel sourceLabel = new JLabel("source path:");
+        pane.add(sourceLabel, gbc);
+
+        gbc.gridy++;
+        sortedPaths.addAll(Terms.get().getPaths());
+        sourcePathCombo = new JComboBox();
+        sourcePathCombo.addItem(null);
+        for (PathBI path : sortedPaths) {
+            sourcePathCombo.addItem(path);
+        }
+        sourcePathCombo.addActionListener(new SourcePathListener());
+        pane.add(sourcePathCombo, gbc);
+
+        gbc.gridy++;
+        JLabel targetLabel = new JLabel("target path:");
+        pane.add(targetLabel, gbc);
+
+        gbc.gridy++;
+        targetPathCombo = new JComboBox();
+        targetPathCombo.addItem(null);
+        for (PathBI path : sortedPaths) {
+            targetPathCombo.addItem(path);
+        }
+        targetPathCombo.addActionListener(new TargetPathListener());
+        pane.add(targetPathCombo, gbc);
+        
+        gbc.gridy++;
+        JLabel mergeLabel = new JLabel("Select merge path to continue working on existing merge:");
+        pane.add(mergeLabel, gbc);
+
+        gbc.gridy++;
+        mergePathCombo = new JComboBox();
+        mergePathCombo.addItem(null);
+        for (PathBI path : sortedPaths) {
+            mergePathCombo.addItem(path);
+        }
+        mergePathCombo.addActionListener(new MergePathListener());
+        pane.add(mergePathCombo, gbc);
+        
+        
+        int value = JOptionPane.showConfirmDialog(null, pane,
+                message,
+                JOptionPane.OK_CANCEL_OPTION);
+
+        if (JOptionPane.OK_OPTION == value && sourcePath != null
+                && targetPath != null) {
+            I_ConfigAceFrame activeConfig = AceConfig.config.getActiveConfig();
+            if (activeConfig != null) {
+                MarshalledObject<I_ConfigAceFrame> marshalledFrame =
+                        new MarshalledObject<I_ConfigAceFrame>(AceConfig.config.getActiveConfig());
+                AceFrameConfig newFrameConfig = (AceFrameConfig) marshalledFrame.get();
+                newFrameConfig.setAceFrame(((AceFrameConfig) activeConfig).getAceFrame());
+                newFrameConfig.setDbConfig(activeConfig.getDbConfig());
+                newFrameConfig.setWorker(activeConfig.getWorker());
+
+                PromotionEditorFrame newFrame = new PromotionEditorFrame(newFrameConfig,
+                        sourcePath, targetPath, mergePath);
+                newFrame.setVisible(true);
+            }
+        } else if (JOptionPane.CANCEL_OPTION != value && (sourcePath == null || targetPath == null)) {                   
+            doPathSelection("Please set paths before contiuing");
         }
     }
     
@@ -161,6 +191,19 @@ public class PromotionEditorGenerator implements I_InitComponentMenus{
                 return;
             }
             targetPath = path;
+        }
+        
+    }
+    
+    private class MergePathListener implements ActionListener{
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            PathBI path = (PathBI) mergePathCombo.getSelectedItem();
+            if (path == null) {
+                return;
+            }
+            mergePath = path;
         }
         
     }

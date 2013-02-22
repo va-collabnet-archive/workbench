@@ -130,6 +130,18 @@ public class TermAux {
             new ConceptSpec("final",
             UUID.fromString("5f00d1a8-0daf-5eed-89ff-49731e1a4e86"));
     /**
+     * Represents the concept: ready to promote.
+     */
+    public static ConceptSpec PROMOTE = 
+            new ConceptSpec("ready to promote",
+            UUID.fromString("9801e17e-480b-3794-b002-e7de1d2cbb68"));
+    /**
+     * Represents the concept: ready to promoted.
+     */
+    public static ConceptSpec PROMOTED = 
+            new ConceptSpec("promoted",
+            UUID.fromString("96ce7a06-61ae-3c83-aaab-57bef0f56333"));
+    /**
      * Represents the concept: user.
      */
     public static ConceptSpec USER =

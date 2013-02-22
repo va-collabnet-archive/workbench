@@ -114,28 +114,30 @@ public class ConceptStatement extends RefsetSpecStatement {
                 }
                 break;
             case CONCEPT_IS_CHILD_OF:
-//TODO: need to implement                
+//TODO: need activity panel first             
 //                activity = setupActivityPanel(parentPossibleConcepts);
 //                activities.add(activity);
-//
-//                if (isNegated()) {
-//                    possibleConcepts.or(parentPossibleConcepts);
-//                } else {
+
+                if (isNegated()) {
+                    possibleConcepts.or(parentPossibleConcepts);
+                } else {
+//TODO: need to implement
 //                    NidBitSetBI results = queryConstraintConcept.getPossibleChildOfConcepts(config);
 //                    possibleConcepts.or(results);
-//                }
+                }
                 break;
             case CONCEPT_IS_DESCENDENT_OF:
             case CONCEPT_IS_KIND_OF:
-//TODO: need to implement
+//TODO: need activity panel first
 //                activity = setupActivityPanel(parentPossibleConcepts);
 //                activities.add(activity);
-//                if (isNegated()) {
-//                    possibleConcepts.or(parentPossibleConcepts);
-//                } else {
+                if (isNegated()) {
+                    possibleConcepts.or(parentPossibleConcepts);
+                } else {
+//TODO: need to implement
 //                    NidBitSetBI results = (NidBitSetBI) queryConstraintConcept.getPossibleKindOfConcepts(config);
 //                    possibleConcepts.or(results);
-//                }
+                }
                 break;
             case CONCEPT_IS_MEMBER_OF:
 //TODO: need activity panel first

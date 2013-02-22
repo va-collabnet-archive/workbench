@@ -119,6 +119,7 @@ public class ConceptViewRenderer extends JLayeredPane {
 	private final JButton cancelButton;
 	private final JButton commitButton;
 	private final JButton acceptButton;
+        private final JButton promoteButton;
 	private final JButton conflictButton;
 	private WfHxDetailsPanelHandler wfHxDetails;
 	private final JLabel workflowStatusLabel;
@@ -824,6 +825,16 @@ public class ConceptViewRenderer extends JLayeredPane {
 			acceptButton.setCursor(Cursor.getDefaultCursor());
 			footerPanel.add(acceptButton, gbc);
 		}
+                
+                promoteButton = new JButton(new ImageIcon(ACE.class.getResource("/16x16/plain/navigate_check.png")));
+		if (settings.isForPromotion()) {
+			gbc.gridx++;
+			promoteButton.setToolTipText("mark as ready for promotion");
+			promoteButton.addActionListener(new PromoteActionListener(settings));
+			promoteButton.setBorder(BorderFactory.createEmptyBorder(3, 0, 3, 0));
+			promoteButton.setCursor(Cursor.getDefaultCursor());
+			footerPanel.add(promoteButton, gbc);
+		}
 
 		gbc.gridx++;
 		cancelButton = new JButton(new ImageIcon(ACE.class.getResource("/16x16/plain/delete.png")));
@@ -936,11 +947,17 @@ public class ConceptViewRenderer extends JLayeredPane {
 				if (settings.isForAdjudication()) {
 					acceptButton.setVisible(false);
 				}
+                                if (settings.isForPromotion()) {
+					promoteButton.setVisible(false);
+				}
 			} else {
 				cancelButton.setVisible(false);
 				commitButton.setVisible(false);
 				if (settings.isForAdjudication()) {
 					acceptButton.setVisible(true);
+				}
+                                if (settings.isForPromotion()) {
+					promoteButton.setVisible(true);
 				}
 
 				if (settings.getConcept() != null) {

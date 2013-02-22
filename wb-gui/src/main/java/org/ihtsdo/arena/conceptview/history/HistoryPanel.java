@@ -124,7 +124,7 @@ public class HistoryPanel {
         this.navigator = navigator;
         navigator.getImplementButton().addActionListener(avcl);
 
-        if (view.getSettings().isForAdjudication()) {
+        if (view.getSettings().isForAdjudication() || view.getSettings().isForPromotion()) {
             navigator.getImplementButton().setEnabled(true);
         }
         historyScroller.setViewportView(header.getParentHistoryPanel());
