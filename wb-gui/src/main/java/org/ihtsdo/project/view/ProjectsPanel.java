@@ -1226,6 +1226,7 @@ public class ProjectsPanel extends JPanel {
 	private void jTree1TreeWillExpand(TreeExpansionEvent e) throws ExpandVetoException {
 		TreePath path = e.getPath();
 		DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
+		
 		Object obj = node.getUserObject();
 		if (obj instanceof TreeObj) {
 			TreeObj to = (TreeObj) obj;
@@ -1273,6 +1274,7 @@ public class ProjectsPanel extends JPanel {
 
 		/** The node type. */
 		private String nodeType;
+		private DefaultMutableTreeNode node;
 
 		/*
 		 * (non-Javadoc)
@@ -1283,9 +1285,11 @@ public class ProjectsPanel extends JPanel {
 		 */
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			if (nodeType.equals(PROJECTROOTNODE)) {
+			if (nodeType!=null && nodeType.equals(PROJECTROOTNODE)) {
 				addProjectActionPerformed(e);
 				return;
+			}else if (node!=null){
+				recursiveExpand(node);
 			}
 
 		}
@@ -1298,6 +1302,9 @@ public class ProjectsPanel extends JPanel {
 		 */
 		public void setNodeType(String nodeType) {
 			this.nodeType = nodeType;
+		}
+		public void setNode (DefaultMutableTreeNode node){
+			this.node=node;
 		}
 
 	}
@@ -1380,6 +1387,16 @@ public class ProjectsPanel extends JPanel {
 								e1.printStackTrace();
 							}
 
+						}else{
+
+							mItem.setText("Expand tree");
+							mItemListener.setNode(node);
+
+							SwingUtilities.invokeLater(new Runnable() {
+								public void run() {
+									menu.show(jTree, xPoint, yPoint);
+								}
+							});
 						}
 					}
 				}
@@ -1512,6 +1529,19 @@ public class ProjectsPanel extends JPanel {
 		}
 		add(panel2, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 		// //GEN-END:initComponents
+	}
+
+	public void recursiveExpand(DefaultMutableTreeNode node) {
+		nodeAction(node,false, true);
+		TreePath tPath=new TreePath( node.getPath());
+		jTree1.expandPath(tPath);
+		for (int i=0;i<node.getChildCount();i++){
+			DefaultMutableTreeNode nodeChild=(DefaultMutableTreeNode)node.getChildAt(i);
+			if (nodeChild!=null){
+				recursiveExpand(nodeChild);
+			}
+		}
+		
 	}
 
 	// JFormDesigner - Variables declaration - DO NOT MODIFY
