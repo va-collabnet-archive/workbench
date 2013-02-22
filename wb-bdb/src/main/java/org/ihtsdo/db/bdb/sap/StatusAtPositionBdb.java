@@ -471,27 +471,47 @@ public class StatusAtPositionBdb extends ComponentBdb {
 
         return specifiedSapNids;
     }
-    
-    public IntSet getSpecifiedSapNids(IntSet pathIds, long startTime, long endTime, IntSet allowedStatuses) {
+    /**
+     * 
+     * @param allowedStatuses can be null
+     * @param startTime required
+     * @param endTime required
+     * @param authorNid can be null
+     * @param moduleNid can be null
+     * @param pathNid can be null
+     * @return 
+     */
+    public IntSet getSpecifiedSapNids(IntSet allowedStatuses, long startTime, long endTime, 
+            Integer authorNid, IntSet moduleNids, IntSet pathNids) {
         IntSet specifiedSapNids = new IntSet();
         Collection<Integer> values = sapToIntMap.values();
-
-        if ((pathIds != null) && (pathIds.size() > 0)) {
-            for (int sapNid : values) {
-                if (pathIds.contains(getPathNid(sapNid))) {
-                    if(allowedStatuses.contains(getStatusNid(sapNid))){
-                        checkTimeAndAdd(startTime, endTime, specifiedSapNids, sapNid);
-                    }
+        for (int sapNid : values) {
+            boolean passed = true;
+            if (allowedStatuses != null) {
+                if (!allowedStatuses.contains(getStatusNid(sapNid))) {
+                    passed = false;
                 }
             }
-        } else {
-            for (int sapNid : values) {
-                if(allowedStatuses.contains(getStatusNid(sapNid))){
-                        checkTimeAndAdd(startTime, endTime, specifiedSapNids, sapNid);
+            if (authorNid != null) {
+                if(authorNid != getAuthorNid(sapNid)){
+                    passed = false;
                 }
+            }
+            if (moduleNids != null) {
+                if(moduleNids.contains(sapNid)){
+                    passed = false;
+                }
+            }
+            if (pathNids != null) {
+                if(!pathNids.contains(getPathNid(sapNid))){
+                    passed = false;
+                }
+            }
+            
+            if (passed) {
+                checkTimeAndAdd(startTime, endTime, specifiedSapNids, sapNid);
             }
         }
-
         return specifiedSapNids;
     }
 

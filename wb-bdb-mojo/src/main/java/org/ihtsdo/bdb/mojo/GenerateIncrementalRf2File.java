@@ -16,19 +16,18 @@
 package org.ihtsdo.bdb.mojo;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.ConcurrentSkipListSet;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.dwfa.ace.api.I_ConfigAceFrame;
-import org.dwfa.ace.api.Terms;
 import org.dwfa.util.id.Type5UuidFactory;
 import org.dwfa.vodb.types.IntSet;
 import org.ihtsdo.country.COUNTRY_CODE;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.helper.export.Rf2Export;
 import org.ihtsdo.helper.refex.Rf2RefexComputer;
-import org.ihtsdo.helper.rf2.Rf2File;
 import org.ihtsdo.helper.rf2.Rf2File.ReleaseType;
 import org.ihtsdo.helper.time.TimeHelper;
 import org.ihtsdo.helper.transform.UuidSnomedMapHandler;
@@ -39,7 +38,6 @@ import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.*;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.binding.snomed.Snomed;
-import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 import org.ihtsdo.tk.spec.ConceptSpec;
 
 /**
@@ -108,7 +106,7 @@ public class GenerateIncrementalRf2File extends AbstractMojo  {
      *
      * @parameter @required
      */
-    private ConceptDescriptor moduleConcept;
+    private ConceptDescriptor[] moduleConcepts;
     /**
      * country code
      *
@@ -178,9 +176,17 @@ public class GenerateIncrementalRf2File extends AbstractMojo  {
      * default-value="false"
      */
     private boolean makeRf2Refsets;
+    /**
+     * Taxonomy parent concepts.
+     *
+     * @parameter @required
+     */
+    private ConceptDescriptor[] taxonomyParentConcepts;
     
     private IntSet stampsToWrite = new IntSet();
     private IntSet pathIds;
+    ViewCoordinate vc;
+    Collection<Integer> taxonomyParentNids;
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
@@ -208,9 +214,11 @@ public class GenerateIncrementalRf2File extends AbstractMojo  {
                     excludedRefsetIds.add(validatedNid);
                 }
             }
-            UUID moduleId = null;
-            if(moduleConcept != null){
-                moduleId = UUID.fromString(moduleConcept.getUuid());
+            HashSet<UUID> moduleUuids = new HashSet<>();
+            if(moduleConcepts != null|| moduleConcepts.length > 0){
+                for(ConceptDescriptor cd : moduleConcepts){
+                    moduleUuids.add(UUID.fromString(cd.getUuid()));
+                }
             }else{
                 throw new MojoExecutionException("No module specified.");
             }
@@ -238,16 +246,25 @@ public class GenerateIncrementalRf2File extends AbstractMojo  {
                 startDate = "bot";
                 endDate = "latest";
             }
+            taxonomyParentNids = new HashSet<>();
+            for(ConceptDescriptor cd : taxonomyParentConcepts){
+                taxonomyParentNids.add(Ts.get().getNidForUuids(UUID.fromString(cd.getUuid())));
+            }
             
-            ViewCoordinate vc = new ViewCoordinate(Ts.get().getMetadataViewCoordinate());
+            vc = new ViewCoordinate(Ts.get().getMetadataViewCoordinate());
             vc.getIsaTypeNids().add(Snomed.IS_A.getLenient().getConceptNid());
             PathBI path = Ts.get().getPath(viewPathNid);
             PositionBI position = Ts.get().newPosition(path,
                     TimeHelper.getTimeFromString(endDate, TimeHelper.getFileDateFormat()));
             vc.setPositionSet(new PositionSet(position));
-            stampsToWrite = Bdb.getSapDb().getSpecifiedSapNids(pathIds,
+            IntSet moduleIds = new IntSet();
+            for(UUID uuid : moduleUuids){
+                moduleIds.add(Ts.get().getNidForUuids(uuid));
+            }
+            stampsToWrite = Bdb.getSapDb().getSpecifiedSapNids(null,
                     TimeHelper.getTimeFromString(startDate, TimeHelper.getFileDateFormat()),
-                    TimeHelper.getTimeFromString(endDate, TimeHelper.getFileDateFormat()));
+                    TimeHelper.getTimeFromString(endDate, TimeHelper.getFileDateFormat()),
+                    null, moduleIds, pathIds);
             File refsetCs = new File(output.getParentFile(), "changesets");
             refsetCs.mkdir();
             if (makeRf2Refsets) {
@@ -271,14 +288,8 @@ public class GenerateIncrementalRf2File extends AbstractMojo  {
             }
             getLog().info("Release type: " + releaseType);  
             getLog().info("Criterion matches " + stampsToWrite.size() + " sapNids: " + stampsToWrite);
-            for(int stamp : stampsToWrite.getAsSet()){
-                long timeForStampNid = Ts.get().getTimeForStampNid(stamp);
-                String time = TimeHelper.formatDate(timeForStampNid);
-                System.out.println("#### stamp: " + stamp + " Time: " + time);
-            }
-            NidBitSetBI allConcepts = Ts.get().getAllConceptNids();
             if (makeInitialMappingFiles) {
-                UuidToSctIdMapper mapper = new UuidToSctIdMapper(allConcepts, namespace, output);
+                UuidToSctIdMapper mapper = new UuidToSctIdMapper(Ts.get().getAllConceptNids(), namespace, output);
                 Ts.get().iterateConceptDataInSequence(mapper);
                 mapper.close();
             }
@@ -288,8 +299,11 @@ public class GenerateIncrementalRf2File extends AbstractMojo  {
             if (refsetParentConceptSpec != null) {
                 refsetParentConceptNid = Ts.get().getNidForUuids(UUID.fromString(refsetParentConceptSpec.getUuid()));
             }
-            
-             Rf2Export exporter = new Rf2Export(output,
+            TaxonomyFilter filter = new TaxonomyFilter();
+            Ts.get().iterateConceptDataInParallel(filter);
+            NidBitSetBI nidsToRelease = filter.getResults();
+            for(UUID moduleId : moduleUuids){
+                Rf2Export exporter = new Rf2Export(output,
                     releaseType,
                     LANG_CODE.EN,
                     COUNTRY_CODE.valueOf(countryCode),
@@ -300,12 +314,13 @@ public class GenerateIncrementalRf2File extends AbstractMojo  {
                     stampsToWrite.getAsSet(),
                     vc,
                     excludedRefsetIds.getAsSet(),
-                    allConcepts,
+                    nidsToRelease,
                     makePrivateAltIdsFile,
                     refsetParentConceptNid,
                     new Date(TimeHelper.getTimeFromString(this.previousReleaseDate,
                         TimeHelper.getFileDateFormat())),
-                    sapsToRemove.getAsSet());
+                    sapsToRemove.getAsSet(),
+                    taxonomyParentNids);
             Ts.get().iterateConceptDataInSequence(exporter);
             exporter.writeOneTimeFiles();
             exporter.close();
@@ -315,10 +330,43 @@ public class GenerateIncrementalRf2File extends AbstractMojo  {
                     TimeHelper.getAltFileDateFormat())));
             writer.write();
             writer.close();
+            }
             handler.writeMaps();
         } catch (Exception e) {
             throw new MojoExecutionException(e.getLocalizedMessage(), e);
         }
     }
 
+    
+    private class TaxonomyFilter implements ProcessUnfetchedConceptDataBI{
+        
+        ConcurrentSkipListSet<Integer> results = new ConcurrentSkipListSet<>();
+
+        @Override
+        public void processUnfetchedConceptData(int conceptNid, ConceptFetcherBI conceptFetcher) throws Exception {
+            for(int parentNid : taxonomyParentNids){
+                if(Ts.get().wasEverKindOf(conceptNid, parentNid, vc)){
+                    results.add(conceptNid);
+                }
+            }
+        }
+
+        @Override
+        public NidBitSetBI getNidSet() throws IOException {
+            return Ts.get().getAllConceptNids();
+        }
+
+        @Override
+        public boolean continueWork() {
+            return true;
+        }
+        
+        public NidBitSetBI getResults() throws IOException{
+            NidBitSetBI resultSet = Ts.get().getEmptyNidSet();
+            for(Integer nid : results){
+                resultSet.setMember(nid);
+            }
+            return resultSet;
+        }
+    }
 }
