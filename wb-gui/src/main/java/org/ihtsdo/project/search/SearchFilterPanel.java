@@ -66,7 +66,7 @@ public class SearchFilterPanel extends JPanel {
 		filterTypeCombo.addItem("");
 		filterTypeCombo.addItem(new WfDestinationFilter());
 		filterTypeCombo.addItem(new WfWorklistFilter());
-		filterTypeCombo.addItem(new WfProjectFilter());
+		// TODO: finish implementation filterTypeCombo.addItem(new WfProjectFilter());
 		filterTypeCombo.addItem(new WfStateFilter());
 		filterTypeCombo.addItem(new WfCompletionFilter());
 	}
