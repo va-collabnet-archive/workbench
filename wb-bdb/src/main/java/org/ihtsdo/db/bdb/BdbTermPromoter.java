@@ -26,6 +26,7 @@ import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.concept.component.ConceptComponent.Version;
 import org.ihtsdo.concept.component.attributes.ConceptAttributes;
 import org.ihtsdo.concept.component.refset.RefsetMember;
+import org.ihtsdo.concept.component.relationship.Relationship;
 import org.ihtsdo.helper.promote.TerminologyPromoterBI;
 import org.ihtsdo.tk.api.ComponentBI;
 import org.ihtsdo.tk.api.ConceptFetcherBI;
@@ -41,6 +42,7 @@ import org.ihtsdo.tk.api.conceptattribute.ConceptAttributeVersionBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.binding.snomed.RefsetAux;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 
 /**
  *
@@ -71,11 +73,14 @@ public class BdbTermPromoter implements ProcessStampDataBI, ProcessUnfetchedConc
         this.sourceEditCoordinate = sourceEditCoordinate;
         this.targetViewCoordinate = targetViewCoordinate;
         
+        PositionBI[] positionSet = sourceViewCoordinate.getPositionSet().getPositionArray();
+        originPosition = positionSet[0].getAllOrigins().iterator().next();
+        
         PositionBI[] positionArray = targetViewCoordinate.getPositionSet().getPositionArray();
         //assuming only one view position
-        originPosition = positionArray[0];
+        PositionBI targetPosition = positionArray[0];
         
-        targetPathNid = originPosition.getPath().getConceptNid();
+        targetPathNid = targetPosition.getPath().getConceptNid();
     }
     /**
      * Use if the origin of the source path is different from the target path.
@@ -141,7 +146,7 @@ public class BdbTermPromoter implements ProcessStampDataBI, ProcessUnfetchedConc
         }
     }
 
-    private void promoteComponent(ConceptComponent component) {
+    private void promoteComponent(ConceptComponent component) throws IOException {
         boolean okay = true;
         if (RefsetMember.class.isAssignableFrom(component.getClass())) {
             RefsetMember member = (RefsetMember) component;
@@ -153,17 +158,25 @@ public class BdbTermPromoter implements ProcessStampDataBI, ProcessUnfetchedConc
         if (okay) {
             List<Version> versions = component.getVersions(sourceViewCoordinate);
             for (Version version : versions) {
-                version.makeAnalog(version.getStatusNid(),
-                        Long.MAX_VALUE,
-                        sourceEditCoordinate.getAuthorNid(),
-                        version.getModuleNid(),
-                        targetPathNid);
-                if (writeBack) {
+                if(Relationship.Version.class.isAssignableFrom(version.getClass())){
+                    Relationship.Version r = (Relationship.Version) version;
+                    if(r.getCharacteristicId() == SnomedMetadataRfx.getREL_CH_INFERRED_RELATIONSHIP_NID()){
+                        okay = false;
+                    }
+                }
+                if (okay) {
                     version.makeAnalog(version.getStatusNid(),
                             Long.MAX_VALUE,
                             sourceEditCoordinate.getAuthorNid(),
                             version.getModuleNid(),
-                            version.getPathNid());
+                            targetPathNid);
+                    if (writeBack) {
+                        version.makeAnalog(version.getStatusNid(),
+                                Long.MAX_VALUE,
+                                sourceEditCoordinate.getAuthorNid(),
+                                version.getModuleNid(),
+                                version.getPathNid());
+                    }
                 }
             }
         }
