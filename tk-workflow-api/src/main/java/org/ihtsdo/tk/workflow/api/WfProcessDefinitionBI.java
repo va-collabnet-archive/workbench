@@ -34,23 +34,23 @@ import java.util.UUID;
 public interface WfProcessDefinitionBI {
     
     /** 
-     * Gets the name of the workflow definition
+     * Gets the name of the process definition
      */
     String getName();
     
     /** 
-     * Gets the UUID of the workflow definition
+     * Gets the UUID of the process definition
      * @throws Exception 
      */
     UUID getUuid() throws Exception;
     
     /** 
-     * Gets the roles that participate in this workflow definition
+     * Gets the roles that participate in this process definition
      */
     Collection<WfRoleBI> getRoles();
     
     /** 
-     * Gets the states that are used in this workflow definition
+     * Gets the states that are used in this process definition
      */
     Collection<WfStateBI> getStates();
     

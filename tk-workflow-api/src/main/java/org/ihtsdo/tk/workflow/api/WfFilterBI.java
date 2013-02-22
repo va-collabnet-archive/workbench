@@ -30,5 +30,7 @@ public interface WfFilterBI {
      * etc.
      */
     boolean evaluateInstance(WfProcessInstanceBI instance);
+    
+    @Deprecated
     public String getType();
 }
