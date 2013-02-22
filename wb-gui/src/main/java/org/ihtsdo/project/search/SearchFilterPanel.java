@@ -144,9 +144,9 @@ public class SearchFilterPanel extends JPanel {
 				filterCombo.removeAllItems();
 				try {
 					I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
-					List<TranslationProject> projects = TerminologyProjectDAO.getAllTranslationProjects(config);
+					List<I_TerminologyProject> projects = TerminologyProjectDAO.getAllProjects(config);
 					Collections.sort(projects);
-					for (TranslationProject project : projects) {
+					for (I_TerminologyProject project : projects) {
 						filterCombo.addItem(project);
 					}
 				} catch (TerminologyException e1) {
