@@ -114,6 +114,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
     private ConceptVersionBI refsetParentConcept;
     private File directory;
     private Set<Integer> sameCycleStampNids;
+    private Collection<Integer> taxonomyParentNids;
 
     //~--- constructors --------------------------------------------------------
     /**
@@ -146,7 +147,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
     public Rf2Export(File directory, ReleaseType releaseType, LANG_CODE language, COUNTRY_CODE country,
             String namespace, String module, Date effectiveDate, Set<Integer> stampNids, ViewCoordinate viewCoordinate,
             Set<Integer> excludedRefsetIds, NidBitSetBI conceptsToProcess, boolean makePrivateIdFile, int refsetParentConceptNid,
-            Date previousReleaseDate, Set<Integer> stampsToRemove)
+            Date previousReleaseDate, Set<Integer> stampsToRemove, Collection taxonomyParentNids)
             throws IOException, ContradictionException {
         this.directory = directory;
         directory.mkdirs();
@@ -168,6 +169,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
         if(refsetParentConceptNid != 0){
             this.refsetParentConcept = Ts.get().getConceptVersion(viewCoordinate, refsetParentConceptNid);
         }
+        this.taxonomyParentNids = taxonomyParentNids;
 
        
         if(releaseType.equals(ReleaseType.DELTA) && previousReleaseDate != null){
@@ -473,7 +475,6 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
         if (concept.getRelationshipsOutgoing() != null) {
             for (RelationshipChronicleBI r : concept.getRelationshipsOutgoing()) {
                 processRelationship(r);
-                processIdentifiers(r.getPrimUuid(), r.getPrimordialVersion().getStampNid());
             }
         }
     }
@@ -775,16 +776,31 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                 }
             }
             if (write) {
+                boolean inTaxonomy = false;
                 for (RelationshipVersionBI rv : versions) {
-                    if (stampNids.contains(rv.getStampNid())) {
-                        if (rv.getCharacteristicNid()
-                                == SnomedMetadataRfx.getREL_CH_INFERRED_RELATIONSHIP_NID()) {
-                            processInferredRelationship(rv);
-                        } else if (rv.getCharacteristicNid()
-                                == SnomedMetadataRfx.getREL_CH_STATED_RELATIONSHIP_NID()) {
-                            processStatedRelationship(rv);
+                    //TODO: need to support refset specs
+                    if (rv.getTypeNid() != RefsetAux.MARKED_PARENT_ISA.getLenient().getConceptNid()) {
+                        if (stampNids.contains(rv.getStampNid())) {
+                            for (int parentNid : taxonomyParentNids) {
+                                if (Ts.get().wasEverKindOf(rv.getTargetNid(), parentNid, viewCoordinate)) {
+                                    inTaxonomy = true;
+                                }
+                            }
+                            if (inTaxonomy) {
+                                if (rv.getCharacteristicNid()
+                                        == SnomedMetadataRfx.getREL_CH_INFERRED_RELATIONSHIP_NID()) {
+                                    processInferredRelationship(rv);
+                                } else if (rv.getCharacteristicNid()
+                                        == SnomedMetadataRfx.getREL_CH_STATED_RELATIONSHIP_NID()) {
+                                    processStatedRelationship(rv);
+                                }
+                            }
                         }
                     }
+                }
+                if (inTaxonomy) { //only need to write once if a relationship was added
+                    processIdentifiers(relationshipChronicle.getPrimUuid(),
+                            relationshipChronicle.getPrimordialVersion().getStampNid());
                 }
             }
         }
@@ -1602,7 +1618,9 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
      */
     @Override
     public void processUnfetchedConceptData(int cNid, ConceptFetcherBI fetcher) throws Exception {
-        process(fetcher.fetch());
+        if(conceptsToProcess.isMember(cNid)){
+            process(fetcher.fetch());
+        }
     }
 
     //~--- get methods ---------------------------------------------------------

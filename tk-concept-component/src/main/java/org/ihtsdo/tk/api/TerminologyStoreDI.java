@@ -888,6 +888,25 @@ public interface TerminologyStoreDI extends TerminologyDI {
      */
     boolean isKindOf(int childNid, int parentNid, ViewCoordinate viewCoordinate)
             throws IOException, ContradictionException;
+    
+    /**
+     * Checks if the concept specified by the
+     * <code>childNid</code> was ever a kind of the concept specified by the
+     * <code>parentNid</code>. Is kind of considers all possible children, not
+     * just the direct children of the parent concept.
+     *
+     * @param childNid the nid associated with the child concept
+     * @param parentNid the nid associated with the parent concept
+     * @param viewCoordinate the viewCoordinate specifying which version of the
+     * concepts in question to use. Will get converted to a view coordinate with all status values.
+     * @return <code>true</code>, if the child concept is kind of the parent
+     * concept
+     * @throws IOException signals that an I/O exception has occurred
+     * @throws ContradictionException if more than one version of a concept is
+     * found for the given view coordinate
+     */
+    boolean wasEverKindOf(int childNid, int parentNid, ViewCoordinate viewCoordinate)
+            throws IOException, ContradictionException;
 
     /**
      * Checks if the concept specified by the
