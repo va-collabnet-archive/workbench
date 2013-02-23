@@ -20,7 +20,6 @@ package org.ihtsdo.ttk.lookup;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import org.openide.util.Lookup;
 import org.openide.util.lookup.AbstractLookup;
 import org.openide.util.lookup.InstanceContent;
 
@@ -34,7 +33,7 @@ public class LookupService {
 
     private LookupService() {}
 
-    public static final Lookup get() {
+    public static AbstractLookup get() {
         return lookup;
     }
     

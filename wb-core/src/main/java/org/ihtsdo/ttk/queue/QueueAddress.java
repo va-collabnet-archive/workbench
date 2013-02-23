@@ -33,64 +33,68 @@ import java.util.Objects;
  * @author kec
  */
 public class QueueAddress implements PreferenceObject {
-    private String address;
+   private String address;
 
-    public QueueAddress() {
-        this.address = Fields.QUEUE_ADDRESS.getDefaultValue();
-    }
+   public QueueAddress() {
+      this.address = Fields.QUEUE_ADDRESS.getDefaultValue();
+   }
 
-    public QueueAddress(EnumBasedPreferences preferences) {
-        this.address = preferences.get(Fields.QUEUE_ADDRESS);
-    }
+   public QueueAddress(EnumBasedPreferences preferences) {
+      this.address = preferences.get(Fields.QUEUE_ADDRESS);
+   }
 
-    public QueueAddress(String address) {
-        this.address = address;
-    }
+   public QueueAddress(String address) {
+      this.address = address;
+   }
 
-    enum Fields implements PreferenceWithDefaultEnumBI<String> {
-        QUEUE_ADDRESS;
+   enum Fields implements PreferenceWithDefaultEnumBI<String> {
+      QUEUE_ADDRESS;
 
-        @Override
-        public String getDefaultValue() {
-            return "dwa1@informatics.com";
-        }
-    }
+      @Override
+      public String getDefaultValue() {
+         return "dwa1@informatics.com";
+      }
+   }
 
-    @Override
-    public void exportFields(EnumBasedPreferences preferences) {
-        preferences.put(Fields.QUEUE_ADDRESS, this.address);
-    }
+   @Override
+   public boolean equals(Object obj) {
+      if (obj == null) {
+         return false;
+      }
 
-    @Override
-    public int hashCode() {
-        int hash = 7;
+      if (getClass() != obj.getClass()) {
+         return false;
+      }
 
-        hash = 53 * hash + Objects.hashCode(this.address);
+      final QueueAddress other = (QueueAddress) obj;
 
-        return hash;
-    }
+      if (!Objects.equals(this.address, other.address)) {
+         return false;
+      }
 
-    @Override
-    public boolean equals(Object obj) {
-        if (obj == null) {
-            return false;
-        }
+      return true;
+   }
 
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
+   @Override
+   public void exportFields(EnumBasedPreferences preferences) {
+      preferences.put(Fields.QUEUE_ADDRESS, this.address);
+   }
 
-        final QueueAddress other = (QueueAddress) obj;
+   @Override
+   public int hashCode() {
+      int hash = 7;
 
-        if (!Objects.equals(this.address, other.address)) {
-            return false;
-        }
+      hash = 53 * hash + Objects.hashCode(this.address);
 
-        return true;
-    }
+      return hash;
+   }
 
-    @Override
-    public String toString() {
-        return "QueueAddress: " + address;
-    }
+   @Override
+   public String toString() {
+      return "QueueAddress: " + address;
+   }
+
+   public String getAddress() {
+      return address;
+   }
 }

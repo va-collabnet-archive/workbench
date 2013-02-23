@@ -87,6 +87,9 @@ public class EnumBasedPreferences {
         return Enum.valueOf(defaultValue.getClass(), name);
     }
 
+    public void write(PreferenceObject preference) {
+        preference.exportFields(this);
+    }
     public void put(PreferenceWithDefaultEnumBI key, String value) {
         EnumBasedPreferences enumNode = getNode(key);
         enumNode.preferences.put(key.name(), value);
@@ -173,9 +176,23 @@ public class EnumBasedPreferences {
 //    }
 
     public void putList(PreferenceWithDefaultEnumBI key, List<? extends PreferenceObject> value) {
+        // Need to erase existing list if it exists...
+        EnumBasedPreferences enumNode = getNode(key);
+        int oldCount = enumNode.preferences.getInt(key.name(), 0);
+        for (int i = 0; i < oldCount; i++) {
+            String indexNodeKey = Integer.toString(i);
+            EnumBasedPreferences indexNode = enumNode.childNode(indexNodeKey);
+            try {
+                indexNode.removeNode();
+            } catch (BackingStoreException ex) {
+                Logger.getLogger(EnumBasedPreferences.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            
+        }
+        
+        
         int count = value.size();
 
-        EnumBasedPreferences enumNode = getNode(key);
         enumNode.preferences.putInt(key.name(), count);
 
         for (int i = 0; i < count; i++) {
@@ -360,7 +377,7 @@ public class EnumBasedPreferences {
     /**
      * Compute an 'app prefix' to be used as the root of the user preference hierarchy.
      * @param groupId The Maven ${groupId} property.
-     * @param artifactId The Maven ${groupId} property.
+     * @param artifactId The Maven ${artifactId} property.
      * @param version The Maven ${version} property.
      * @param userName The name of the workbench user whose preferences will be accessed.
      * @return A String to pass into the {@link EnumBasedPreferences} constructor.
