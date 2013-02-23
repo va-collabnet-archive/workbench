@@ -114,7 +114,7 @@ public class SctRf2TextDefToArfMojo extends AbstractMojo implements Serializable
 
             // :NYI: extended status implementation does not multiple version years
             filesInStatus = Rf2File.getFiles(wDir, targetSubDir, statusDir, "AttributeValue", ".txt");
-            Rf2_RefsetCRecord[] statusRecords = Rf2_RefsetCRecord.parseRefset(filesInStatus.get(0), null); // hardcoded
+            Rf2_RefsetCRecord[] statusRecords = Rf2_RefsetCRecord.parseRefset(filesInStatus.get(0), null, pathUuid); // hardcoded
 
             // TEXTDEFINITION FILES "sct2_TextDefinition"
             BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(

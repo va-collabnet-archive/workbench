@@ -66,6 +66,11 @@ public class SctRf2DoSToMojo extends AbstractMojo implements Serializable {
      * @parameter default-value="generated-arf"
      */
     private String outputDir;
+    /**
+     * Path to import concepts on. Defaults to SNOMED Core.
+     * @parameter default-value="8c230474-9f11-30ce-9cad-185a96fd03a2"
+     */
+    private String pathUuid;
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
@@ -93,7 +98,7 @@ public class SctRf2DoSToMojo extends AbstractMojo implements Serializable {
             getLog().info("::: DoS REFSET FILE: " + outDir + "concept_refsetDoS_rf2.refset");
             filesIn = Rf2File.getFiles(wDir, targetSubDir, inputDir, "AttributeValue", ".txt");
             for (Rf2File rf2File : filesIn) {
-                Rf2_RefsetCRecord[] members = Rf2_RefsetCRecord.parseRefset(rf2File, null);
+                Rf2_RefsetCRecord[] members = Rf2_RefsetCRecord.parseRefset(rf2File, null, pathUuid);
                 for (Rf2_RefsetCRecord m : members) {
                     m.writeArf(bw);
                 }
