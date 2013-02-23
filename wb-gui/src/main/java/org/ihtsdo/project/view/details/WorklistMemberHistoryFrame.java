@@ -28,6 +28,7 @@ import javax.swing.border.EmptyBorder;
 
 import org.ihtsdo.issue.IssueRepoRegistration;
 import org.ihtsdo.issue.issuerepository.IssueRepository;
+import org.ihtsdo.project.model.I_TerminologyProject;
 import org.ihtsdo.project.model.TranslationProject;
 import org.ihtsdo.project.model.WorkListMember;
 
@@ -64,7 +65,7 @@ public class WorklistMemberHistoryFrame extends JFrame {
 	 * @param repo the repo
 	 * @param regis the regis
 	 */
-	public void refreshPanel(WorkListMember member,TranslationProject translationProject, IssueRepository repo, IssueRepoRegistration regis){
+	public void refreshPanel(WorkListMember member,I_TerminologyProject translationProject, IssueRepository repo, IssueRepoRegistration regis){
 
 		wmlpanel.showMemberChanges(member,translationProject,repo, regis) ;
 	}

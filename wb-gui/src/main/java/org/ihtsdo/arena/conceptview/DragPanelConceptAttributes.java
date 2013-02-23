@@ -28,6 +28,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.TransferHandler;
+import org.ihtsdo.arena.editor.ArenaEditor;
 
 /**
  *
@@ -60,7 +61,18 @@ public class DragPanelConceptAttributes extends DragPanelComponentVersion<Concep
         if (getAttr() == null) {
             return;
         }
-
+        
+        if (!ArenaEditor.diffColor.isEmpty()){
+            if(ArenaEditor.diffColor.containsKey(getThingToDrag().getNid())){
+                Color color = ArenaEditor.diffColor.get(getThingToDrag().getNid());
+                if(getThingToDrag().isDefined()){
+                    color = color.darker();
+                }
+                setBackground(color);
+                
+            }
+        }
+        
         if (getAttr().getTime() == Long.MAX_VALUE) {
             setOpaque(true);
             setBackground(Color.YELLOW);

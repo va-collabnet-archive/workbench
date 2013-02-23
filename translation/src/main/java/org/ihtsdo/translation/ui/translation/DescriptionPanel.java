@@ -425,7 +425,7 @@ public class DescriptionPanel extends JPanel {
 	private boolean doSpellCheck() {
 		AceFrameConfig config;
 		try {
-			if (!targetTextField.getText().trim().equals("")) {
+			if (!targetTextField.getText().trim().equals("") && !readOnlyMode) {
 				config = (AceFrameConfig) Terms.get().getActiveAceFrameConfig();
 				String spellcheckPhrase = DocumentManager.spellcheckPhrase(targetTextField.getText(), null, targetLangRefset.getLangCode(config));
 				if (spellcheckPhrase.equals(targetTextField.getText())) {
@@ -440,9 +440,8 @@ public class DescriptionPanel extends JPanel {
 					}
 					return true;
 				}
-			} else {
-				JOptionPane.showMessageDialog(this, "There is no text to spellcheck.", "Spellcheck", JOptionPane.INFORMATION_MESSAGE);
-				return false;
+			} else{
+				return true;
 			}
 		} catch (TerminologyException e) {
 			e.printStackTrace();

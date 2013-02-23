@@ -26,6 +26,7 @@ import java.util.UUID;
 
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.translation.ui.ConfigTranslationModule.CompletionMode;
 import org.ihtsdo.translation.ui.config.TranslatorDefaultEditorModePanel;
 
 /**
@@ -81,6 +82,9 @@ public class ConfigTranslationModule implements Serializable {
 	/** The source issues repository ids. */
 	private List<UUID> sourceIssuesRepositoryIds;
 
+	/** The source issues repository ids. */
+	private CompletionMode completionMode;
+
 	/**
 	 * Instantiates a new config translation module.
 	 */
@@ -103,6 +107,7 @@ public class ConfigTranslationModule implements Serializable {
 		this.selectedFsnGenStrategy = FsnGenerationStrategy.COPY_SOURCE_LANGUAGE;
 		this.selectedIcsGenerationStrategy = IcsGenerationStrategy.NONE;
 		this.selectedPrefTermDefault = PreferredTermDefault.BLANK;
+		this.completionMode = CompletionMode.INCOMPLETE_INSTACES;
 
 		LinkedHashSet<InboxColumn> columns = new LinkedHashSet<InboxColumn>();
 		columns.add(InboxColumn.SOURCE_PREFERRED);
@@ -250,6 +255,39 @@ public class ConfigTranslationModule implements Serializable {
 	/**
 	 * The Enum EditorMode.
 	 */
+	public enum CompletionMode implements Serializable {
+		
+		ALL_INSTANCES("All Instances"),
+		COMPLETE_INSTANCES("Complete Instances"),
+		INCOMPLETE_INSTACES("Incomplete Instances");
+		
+		/** The name. */
+		private final String name;
+		
+		/**
+		 * Instantiates a new editor mode.
+		 * 
+		 * @param name
+		 *            the name
+		 */
+		private CompletionMode(String name) {
+			this.name = name;
+		}
+		
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see java.lang.Enum#toString()
+		 */
+		public String toString() {
+			return this.name;
+		}
+		
+	}
+	
+	/**
+	 * The Enum EditorMode.
+	 */
 	public enum EditorMode implements Serializable {
 
 		/** The FUL l_ editor. */
@@ -382,7 +420,10 @@ public class ConfigTranslationModule implements Serializable {
 		DESTINATION(String.class, "Destination", 4),
 
 		/** The STATUS. */
-		STATUS(String.class, "Status", 5);
+		STATUS(String.class, "Status", 5),
+		
+		/** The default description. */
+		DEFAULT_DESCRIPTION(String.class, "Default description", 6);
 		// STATUS_DATE(String.class,"Date",6);
 
 		/** The editor class. */
@@ -570,6 +611,16 @@ public class ConfigTranslationModule implements Serializable {
 	 */
 	public void setSelectedPrefTermDefault(PreferredTermDefault selectedPrefTermDefault) {
 		this.selectedPrefTermDefault = selectedPrefTermDefault;
+	}
+
+	
+	
+	public CompletionMode getCompletionMode() {
+		return completionMode;
+	}
+
+	public void setCompletionMode(CompletionMode completionMode) {
+		this.completionMode = completionMode;
 	}
 
 	/**

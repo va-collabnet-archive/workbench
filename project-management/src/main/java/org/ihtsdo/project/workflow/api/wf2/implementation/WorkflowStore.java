@@ -44,6 +44,7 @@ import org.ihtsdo.tk.workflow.api.WfStateBI;
 import org.ihtsdo.tk.workflow.api.WfUserBI;
 import org.ihtsdo.tk.workflow.api.WorkListBI;
 import org.ihtsdo.tk.workflow.api.WorkflowStoreBI;
+import org.ihtsdo.tk.workflow.api.ProjectBI.ProjectType;
 
 public class WorkflowStore implements WorkflowStoreBI {
 
@@ -66,9 +67,8 @@ public class WorkflowStore implements WorkflowStoreBI {
 	}
 
 	@Override
-	public WfProcessInstanceBI getProcessInstance(
-			WorkListBI workList, UUID componentUuid) throws Exception {
-		
+	public WfProcessInstanceBI getProcessInstance(WorkListBI workList, UUID componentUuid) throws Exception {
+
 		for (WfProcessInstanceBI loopInstance : workList.getInstances()) {
 			if (loopInstance.getComponentPrimUuid().equals(componentUuid)) {
 				return loopInstance;
@@ -105,14 +105,39 @@ public class WorkflowStore implements WorkflowStoreBI {
 		return instances;
 	}
 
+	public Collection<WfProcessInstanceBI> getProcessInstances(ConceptChronicleBI concept) throws Exception {
+		Collection<WfProcessInstanceBI> instances = new ArrayList<WfProcessInstanceBI>();
+		Collection<? extends RefexVersionBI<?>> annotations = concept.getAnnotationsActive(config.getViewCoordinate());
+		I_TermFactory tf = Terms.get();
+		for (RefexVersionBI loopAnnot : annotations) {
+			I_GetConceptData refset = tf.getConcept(loopAnnot.getRefexNid());
+			if (ts.isKindOf(refset.getConceptNid(), worklistsRoot.getConceptNid(), config.getViewCoordinate())) {
+				I_IntSet allowedTypes = tf.newIntSet();
+				allowedTypes.add(RefsetAuxiliary.Concept.PROMOTION_REL.localize().getNid());
+				Set<? extends I_GetConceptData> sources = refset.getDestRelOrigins(config.getAllowedStatus(), allowedTypes,
+						config.getViewPositionSetReadOnly(), config.getPrecedence(), config.getConflictResolutionStrategy());
+
+				if (!sources.isEmpty()) {
+					I_GetConceptData wRefset = sources.iterator().next();
+					WorkList wlist = TerminologyProjectDAO.getWorkList(wRefset, config);
+					if (wlist != null) {
+						instances.add(TerminologyProjectDAO.getWorkListMember(tf.getConcept(concept.getNid()), wlist, config).getWfInstance());
+					}
+				}
+
+			}
+		}
+		return instances;
+	}
+
 	@Override
-	public  Collection<WfProcessInstanceBI> searchWorkflow(Collection<WfFilterBI> filters) throws Exception {
+	public Collection<WfProcessInstanceBI> searchWorkflow(Collection<WfFilterBI> filters) throws Exception {
 		boolean worklistOrProjectFilter = isProjectFilter(filters);
 		Collection<WfProcessInstanceBI> result = new ArrayList<WfProcessInstanceBI>();
-		if (!worklistOrProjectFilter) {
+		if (worklistOrProjectFilter) {
 			getInstancesForProjectFilter(filters, result);
 		} else {
-			WfInstanceSearcher instanceSearchWorker = new WfInstanceSearcher(filters, null);
+			WfInstanceSearcher instanceSearchWorker = new WfInstanceSearcher(filters, null, new CancelSearch());
 			instanceSearchWorker.execute();
 			try {
 				return instanceSearchWorker.get();
@@ -147,19 +172,20 @@ public class WorkflowStore implements WorkflowStoreBI {
 	 * @param propertyChangeListener
 	 *            Progress listener to update search progress.
 	 * @return whatever.
-	 * @throws IOException 
-	 * @throws TerminologyException 
+	 * @throws IOException
+	 * @throws TerminologyException
 	 */
 	public Collection<WfProcessInstanceBI> searchWorkflow(Collection<WfFilterBI> filters, WfInstanceContainer wfinstanceCont,
-			PropertyChangeListener propertyChangeListener) throws Exception {
+			PropertyChangeListener propertyChangeListener, CancelSearch keepSearching) throws Exception {
 		boolean worklistOrProjectFilter = isProjectFilter(filters);
 
 		if (worklistOrProjectFilter) {
 			Collection<WfProcessInstanceBI> result = new ArrayList<WfProcessInstanceBI>();
 			getInstancesForProjectFilter(filters, result);
+			keepSearching.cancel(true);
 			return result;
 		} else {
-			WfInstanceSearcher instanceSearchWorker = new WfInstanceSearcher(filters, wfinstanceCont);
+			WfInstanceSearcher instanceSearchWorker = new WfInstanceSearcher(filters, wfinstanceCont, keepSearching);
 			instanceSearchWorker.addPropertyChangeListener(propertyChangeListener);
 			instanceSearchWorker.execute();
 		}
@@ -174,7 +200,18 @@ public class WorkflowStore implements WorkflowStoreBI {
 				UUID wluuid = wlfilter.getWorklistUUID();
 				WorkListBI worklist = getWorklist(wluuid);
 				Collection<WfProcessInstanceBI> instances = worklist.getInstances();
-				result.addAll(instances);
+				for (WfProcessInstanceBI wfProcessInstanceBI : instances) {
+					boolean passed = true;
+					for (WfFilterBI filter : filters) {
+						if (!filter.evaluateInstance(wfProcessInstanceBI)) {
+							passed = false;
+						}
+					}
+					if (passed) {
+						result.add(wfProcessInstanceBI);
+					}
+
+				}
 			} else if (wfFilterBI instanceof WfProjectFilter) {
 				WfProjectFilter pFilter = (WfProjectFilter) wfFilterBI;
 				UUID puuid = pFilter.getProjectUUID();
@@ -182,7 +219,13 @@ public class WorkflowStore implements WorkflowStoreBI {
 				Collection<WorkListBI> worklists = project.getWorkLists();
 				for (WorkListBI workListBI : worklists) {
 					Collection<WfProcessInstanceBI> instances = workListBI.getInstances();
-					result.addAll(instances);
+					for (WfFilterBI filter : filters) {
+						for (WfProcessInstanceBI wfProcessInstanceBI : instances) {
+							if (filter.evaluateInstance(wfProcessInstanceBI)) {
+								result.add(wfProcessInstanceBI);
+							}
+						}
+					}
 				}
 			}
 		}
@@ -258,42 +301,48 @@ public class WorkflowStore implements WorkflowStoreBI {
 	}
 
 	@Override
-	public ProjectBI createProject(String name) throws Exception {
-		return new Project(TerminologyProjectDAO.createNewTranslationProject(name, config));
+	public ProjectBI createProject(String name, ProjectBI.ProjectType type) throws Exception {
+		if (type.equals(ProjectType.TRANSLATION)) {
+			return new Project(TerminologyProjectDAO.createNewTranslationProject(name, config));
+		} else if (type.equals(ProjectType.TERMINOLOGY)) {
+			return new Project(TerminologyProjectDAO.createNewTerminologyProject(name, config));
+		} else if (type.equals(ProjectType.MAPPING)) {
+			return new Project(TerminologyProjectDAO.createNewMappingProject(name, config));
+		} else {
+			return null;
+		}
 	}
 
-	@Override
 	public ProjectBI createTranslationProject(String name) throws Exception {
 		return new Project(TerminologyProjectDAO.createNewTerminologyProject(name, config));
 	}
 
 	@Override
-	public Collection<WfActivityBI> getActivities(WfProcessInstanceBI instance,
-			WfUserBI user) throws Exception {
-		
+	public Collection<WfActivityBI> getActivities(WfProcessInstanceBI instance, WfUserBI user) throws Exception {
+
 		List<WfActivityBI> activities = new ArrayList<WfActivityBI>();
-		
+
 		WorkflowDefinition oldStyleDefinition = ((WfProcessDefinition) instance.getProcessDefinition()).getDefinition();
 		WorkflowInterpreter interpreter = WorkflowInterpreter.createWorkflowInterpreter(oldStyleDefinition);
-		
+
 		List<WfAction> possibleActions = interpreter.getPossibleActions((WfInstance) instance, (WfUser) user);
 		List<WfAction> autoActions = interpreter.getAutomaticActions((WfInstance) instance, (WfUser) user);
-		
+
 		for (WfAction loopAction : possibleActions) {
 			WfActivity loopActivity = new WfActivity(loopAction);
 			loopActivity.setAutomatic(false);
 			activities.add(loopActivity);
 		}
-		
+
 		for (WfAction loopAction : autoActions) {
 			WfActivity loopActivity = new WfActivity(loopAction);
 			loopActivity.setAutomatic(true);
 			activities.add(loopActivity);
 		}
-		
+
 		return activities;
 	}
-	
+
 	@Override
 	public WorkListBI getWorklist(UUID worklistUuid) throws Exception {
 		return TerminologyProjectDAO.getWorkList(Terms.get().getConcept(worklistUuid), config);
@@ -301,6 +350,6 @@ public class WorkflowStore implements WorkflowStoreBI {
 
 	@Override
 	public ProjectBI getProject(UUID projectUuid) throws Exception {
-		return new Project(TerminologyProjectDAO.getTranslationProject(Terms.get().getConcept(projectUuid), config));
+		return new Project(TerminologyProjectDAO.getProject(Terms.get().getConcept(projectUuid), config));
 	}
 }

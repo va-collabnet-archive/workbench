@@ -16,9 +16,14 @@
  */
 package org.ihtsdo.project.filter;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.ihtsdo.project.workflow.api.WfComponentProvider;
 import org.ihtsdo.project.workflow.model.WfState;
 import org.ihtsdo.tk.workflow.api.WfFilterBI;
 import org.ihtsdo.tk.workflow.api.WfProcessInstanceBI;
+import org.ihtsdo.tk.workflow.api.WfStateBI;
 
 /**
  * The Class WfStateFilter.
@@ -30,6 +35,10 @@ public class WfStateFilter implements WfFilterBI {
 
 	/** The state. */
 	private WfState state;
+
+	public WfStateFilter() {
+		super();
+	}
 
 	/**
 	 * Instantiates a new wf state filter.
@@ -81,6 +90,17 @@ public class WfStateFilter implements WfFilterBI {
 	@Override
 	public String getType() {
 		return TYPE;
+	}
+
+	@Override
+	public String toString() {
+		return "State";
+	}
+
+	public List<WfState> getFilterOptions() {
+		List<WfState> users = new ArrayList<WfState>();
+		users.addAll(new WfComponentProvider().getAllStates());
+		return users;
 	}
 
 }

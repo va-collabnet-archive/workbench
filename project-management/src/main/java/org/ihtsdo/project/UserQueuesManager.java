@@ -210,6 +210,7 @@ public class UserQueuesManager {
                             instance.setWfDefinition(deserializedWorkListWithMetadata.getWorkflowDefinition());
                             instance.setWorkList(deserializedWorkListWithMetadata);
                             instance.setDestination(user);
+                            instance.setLastChangeTime(promDestRefset.getLastStatusTime(loopMember.getId(), config));
                             items.add(instance);
                         }
                     }

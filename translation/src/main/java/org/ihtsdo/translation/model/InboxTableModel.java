@@ -16,6 +16,7 @@
  */
 package org.ihtsdo.translation.model;
 
+import java.awt.Container;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
@@ -39,7 +40,9 @@ import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.project.ContextualizedDescription;
 import org.ihtsdo.project.I_ContextualizeDescription;
 import org.ihtsdo.project.TerminologyProjectDAO;
+import org.ihtsdo.project.filter.WfCompletionFilter;
 import org.ihtsdo.project.model.I_TerminologyProject;
+import org.ihtsdo.project.model.I_TerminologyProject.Type;
 import org.ihtsdo.project.model.TranslationProject;
 import org.ihtsdo.project.util.WorkflowSearcher;
 import org.ihtsdo.project.view.event.EventMediator;
@@ -469,7 +472,16 @@ public class InboxTableModel extends DefaultTableModel {
 			data = new LinkedList<Object[]>();
 			List<WfInstance> wfInstances = new ArrayList<WfInstance>();
 			try {
-				wfInstances = searcher.searchWfInstances(filterList.values());
+				ConfigTranslationModule cfg = null;
+				cfg = LanguageUtil.getTranslationConfig(Terms.get().getActiveAceFrameConfig());
+				List<WfFilterBI> filters = new ArrayList<WfFilterBI>();
+				if (cfg.getCompletionMode().equals(ConfigTranslationModule.CompletionMode.COMPLETE_INSTANCES)) {
+					filters .add(new WfCompletionFilter(true));
+				} else if (cfg.getCompletionMode().equals(ConfigTranslationModule.CompletionMode.INCOMPLETE_INSTACES)) {
+					filters.add(new WfCompletionFilter(false));
+				}
+				filters.addAll(filterList.values());
+				wfInstances = searcher.searchWfInstances(filters);
 			} catch (Exception e) {
 				if (!(e instanceof InterruptedException)) {
 					e.printStackTrace();
@@ -592,29 +604,34 @@ public class InboxTableModel extends DefaultTableModel {
 			}
 		}
 		String sourcePreferred = "";
+		String defaultDescription = "";
 		TranslationProject translationProject = null;
-		I_TerminologyProject projectConcept;
+		I_TerminologyProject projectConcept = null;
+		I_GetConceptData concept = null;
 		try {
+			concept = Terms.get().getConcept(wfInstance.getComponentId());
+			defaultDescription = concept.toString();
 			List<I_GetConceptData> langRefsets = null;
 			List<ContextualizedDescription> descriptions = new ArrayList<ContextualizedDescription>();
 			projectConcept = TerminologyProjectDAO.getProjectForWorklist(wfInstance.getWorkList(), config);
-			translationProject = TerminologyProjectDAO.getTranslationProject(projectConcept.getConcept(), config);
-			langRefsets = translationProject.getSourceLanguageRefsets();
-			for (I_GetConceptData langRefset : langRefsets) {
-				descriptions = LanguageUtil.getContextualizedDescriptions(Terms.get().getConcept(wfInstance.getComponentId()).getConceptNid(),
-						langRefset.getConceptNid(), true);
-				for (I_ContextualizeDescription description : descriptions) {
-					if (description.getLanguageExtension() != null && description.getLanguageRefsetId() == langRefset.getConceptNid()) {
-						if (description.getAcceptabilityId() == preferred.getConceptNid() && description.getTypeId() == synonym.getConceptNid()) {
-							sourcePreferred = description.getText();
-							if (!sourcePreferred.equals("")) {
-								break;
+			if (projectConcept.getProjectType().equals(Type.TRANSLATION)) {
+				translationProject = TerminologyProjectDAO.getTranslationProject(projectConcept.getConcept(), config);
+				langRefsets = translationProject.getSourceLanguageRefsets();
+				for (I_GetConceptData langRefset : langRefsets) {
+					descriptions = LanguageUtil.getContextualizedDescriptions(concept.getConceptNid(), langRefset.getConceptNid(), true);
+					for (I_ContextualizeDescription description : descriptions) {
+						if (description.getLanguageExtension() != null && description.getLanguageRefsetId() == langRefset.getConceptNid()) {
+							if (description.getAcceptabilityId() == preferred.getConceptNid() && description.getTypeId() == synonym.getConceptNid()) {
+								sourcePreferred = description.getText();
+								if (!sourcePreferred.equals("")) {
+									break;
+								}
 							}
 						}
 					}
-				}
-				if (!sourcePreferred.equals("")) {
-					break;
+					if (!sourcePreferred.equals("")) {
+						break;
+					}
 				}
 			}
 		} catch (Exception e) {
@@ -627,16 +644,18 @@ public class InboxTableModel extends DefaultTableModel {
 		try {
 			I_GetConceptData langRefset = null;
 			List<ContextualizedDescription> descriptions = new ArrayList<ContextualizedDescription>();
-			langRefset = translationProject.getTargetLanguageRefset();
-			descriptions = LanguageUtil.getContextualizedDescriptions(Terms.get().uuidToNative(wfInstance.getComponentId()),
-					langRefset.getConceptNid(), true);
-			for (I_ContextualizeDescription description : descriptions) {
-				if (description.getLanguageExtension() != null && description.getLanguageRefsetId() == langRefset.getConceptNid()) {
+			if (projectConcept != null && projectConcept.getProjectType().equals(Type.TRANSLATION)) {
 
-					if (description.getTypeId() == fsn.getConceptNid()) {
-						targetFSN = description.getText();
-					} else if (description.getAcceptabilityId() == preferred.getConceptNid()) {
-						targetPreferred = description.getText();
+				langRefset = translationProject.getTargetLanguageRefset();
+				descriptions = LanguageUtil.getContextualizedDescriptions(concept.getConceptNid(), langRefset.getConceptNid(), true);
+				for (I_ContextualizeDescription description : descriptions) {
+					if (description.getLanguageExtension() != null && description.getLanguageRefsetId() == langRefset.getConceptNid()) {
+
+						if (description.getTypeId() == fsn.getConceptNid()) {
+							targetFSN = description.getText();
+						} else if (description.getAcceptabilityId() == preferred.getConceptNid()) {
+							targetPreferred = description.getText();
+						}
 					}
 				}
 			}
@@ -653,9 +672,10 @@ public class InboxTableModel extends DefaultTableModel {
 		row[InboxColumn.WORKLIST.getColumnNumber()] = wfInstance.getWorkList().getName();
 		row[InboxColumn.DESTINATION.getColumnNumber()] = wfInstance.getDestination().getUsername();
 		row[InboxColumn.STATUS.getColumnNumber()] = wfInstance.getState().getName();
+		row[InboxColumn.DEFAULT_DESCRIPTION.getColumnNumber()] = defaultDescription;
 		row[InboxColumn.values().length] = wfInstance;
 		return row;
-	};
+	}
 }
 
 class ProgressListener implements PropertyChangeListener {

@@ -22,7 +22,11 @@ import com.mxgraph.util.mxRectangle;
 import com.mxgraph.util.mxUtils;
 import com.mxgraph.view.mxCellState;
 import com.mxgraph.view.mxGraph;
+import java.awt.Color;
+import java.util.ArrayList;
+import java.util.HashMap;
 import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.ihtsdo.tk.api.NidBitSetBI;
 
 public class ArenaEditor extends BasicGraphEditor {
 
@@ -43,6 +47,7 @@ public class ArenaEditor extends BasicGraphEditor {
     private static final long serialVersionUID = -7007225006753337933L;
     private List<? extends ArenaComponentSettings> arenaList;
     boolean forAjudication = false;
+    public static HashMap<Integer, Color> diffColor = new HashMap<>();
 
     public boolean isForAjudication() {
         return forAjudication;
@@ -151,4 +156,10 @@ public class ArenaEditor extends BasicGraphEditor {
         add(new ArenaEditorToolBar(this, JToolBar.HORIZONTAL),
                 BorderLayout.NORTH);
     }
+
+    public void setDiffColor(HashMap<Integer, Color> diffColor) {
+        this.diffColor = diffColor;
+        
+    }
+    
 }

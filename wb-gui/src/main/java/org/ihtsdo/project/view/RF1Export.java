@@ -63,6 +63,7 @@ import org.ihtsdo.idgeneration.IdAssignmentBI;
 import org.ihtsdo.idgeneration.IdAssignmentImpl;
 import org.ihtsdo.project.dataexport.DataforExport;
 import org.ihtsdo.project.help.HelpApi;
+import org.ihtsdo.project.model.I_TerminologyProject;
 import org.ihtsdo.project.model.TranslationProject;
 import org.ihtsdo.project.refset.LanguageMembershipRefset;
 import org.ihtsdo.project.refset.ReleaseUtils;
@@ -114,18 +115,20 @@ public class RF1Export extends JPanel {
 	/**
 	 * Instantiates a new r f1 export.
 	 * 
-	 * @param project
+	 * @param tProj
 	 *            the project
 	 */
-	public RF1Export(TranslationProject project) {
+	public RF1Export(I_TerminologyProject tProj) {
 		initComponents();
 		exportTargetLangHelpLbl.setIcon(IconUtilities.helpIcon);
 		exportTargetLangHelpLbl.setText("");
 		try {
-			this.languageRefset = project.getTargetLanguageRefset();
-			config = Terms.get().getActiveAceFrameConfig();
-			label7.setTransferHandler(new ObjectTransferHandler(Terms.get().getActiveAceFrameConfig(), new GetConceptForLabel(REFSET_LABEL_FOREXPORT)));
-			label5.setTransferHandler(new ObjectTransferHandler(Terms.get().getActiveAceFrameConfig(), new GetConceptForLabel(PATH_LABEL_FOREXPORT)));
+			if(tProj.getProjectType().equals(I_TerminologyProject.Type.TRANSLATION)){
+				this.languageRefset = ((TranslationProject)tProj).getTargetLanguageRefset();
+				config = Terms.get().getActiveAceFrameConfig();
+				label7.setTransferHandler(new ObjectTransferHandler(Terms.get().getActiveAceFrameConfig(), new GetConceptForLabel(REFSET_LABEL_FOREXPORT)));
+				label5.setTransferHandler(new ObjectTransferHandler(Terms.get().getActiveAceFrameConfig(), new GetConceptForLabel(PATH_LABEL_FOREXPORT)));
+			}
 
 		} catch (IOException e) {
 			// TODO Auto-generated catch block

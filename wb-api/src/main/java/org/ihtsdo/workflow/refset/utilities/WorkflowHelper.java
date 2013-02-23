@@ -1,6 +1,7 @@
 package org.ihtsdo.workflow.refset.utilities;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -1459,6 +1460,10 @@ public class WorkflowHelper {
 	}
 
 	public static boolean isWorkflowCapabilityAvailable() {
+		if (new File("sampleProcesses/legacyWorkflowSuspended.txt").exists()) {
+			AceLog.getAppLog().log(Level.INFO, "Legacy Workflow Capability disabled");
+			return false;
+		}
 		if (!wfCapabilitiesInitialized) {
 			try {
 				wfCapabilitiesInitialized = true;

@@ -76,10 +76,11 @@ public class SnoRocketTabPanel extends JPanel implements ActionListener {
     final static String TAB_VIEW = "Version";
     final static String TAB_STATS = "Stats";
 
-    public SnoRocketTabPanel(ACE ace) throws IOException {
+    public SnoRocketTabPanel(I_ConfigAceFrame config) throws IOException {
         super();
-        getClassifyPrefs(ace);
-        getClassifyPrefs(ace);
+        this.config = config;
+//        getClassifyPrefs(ace);
+        getClassifyPrefs();
         config.addPropertyChangeListener("commit", new SnorocketListener());
 
         // COMPONENT BORDER
@@ -172,10 +173,10 @@ public class SnoRocketTabPanel extends JPanel implements ActionListener {
         }
     }
 
-    private void getClassifyPrefs(ACE ace) {
+    private void getClassifyPrefs() {
         tf = Terms.get();
         try {
-            config = ace.getAceFrameConfig();
+//            config = ace.getAceFrameConfig();
             // CHECK CLASSIFIER ISA
             if (config.getClassifierIsaType() == null) {
                 String errStr = "Classification 'Is a' -- not set in Classifier preferences tab!";

@@ -65,6 +65,11 @@ public interface WfProcessInstanceBI {
     WfStateBI getState();
     
     /** 
+     * Gets the time of the last change (state or assignment change) on this instance
+     */
+    Long getLastChangeTime();
+    
+    /** 
      * Sets the current state of this instance
      * @throws Exception 
      */

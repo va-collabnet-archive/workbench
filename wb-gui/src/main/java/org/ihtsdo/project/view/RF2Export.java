@@ -59,6 +59,7 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.project.dataexport.DataforExport;
 import org.ihtsdo.project.help.HelpApi;
+import org.ihtsdo.project.model.I_TerminologyProject;
 import org.ihtsdo.project.model.TranslationProject;
 import org.ihtsdo.project.util.IconUtilities;
 import org.ihtsdo.project.view.dnd.I_GetItemForModel;
@@ -120,15 +121,15 @@ public class RF2Export extends JPanel {
 	public I_GetConceptData namespaceConcept;
 
 	/** The project. */
-	private TranslationProject project;
+	private I_TerminologyProject project;
 	
 	/**
 	 * Instantiates a new r f2 export.
 	 *
-	 * @param project the project
+	 * @param tProj the project
 	 */
-	public RF2Export(TranslationProject project) {
-		this.project=project;
+	public RF2Export(I_TerminologyProject tProj) {
+		this.project=tProj;
 		initComponents();
 		exportTargetLangHelpLbl.setIcon(IconUtilities.helpIcon);
 		exportTargetLangHelpLbl.setText("");
@@ -157,12 +158,13 @@ public class RF2Export extends JPanel {
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 				new Insets(0, 0, 5, 5), 0, 0));
 		try {
-			this.languageRefset=project.getTargetLanguageRefset();
-			config=Terms.get().getActiveAceFrameConfig();
-			label7.setTransferHandler(new ObjectTransferHandler(Terms.get().getActiveAceFrameConfig(), new GetConceptForLabel(REFSET_LABEL_FOREXPORT)));
-			label5.setTransferHandler(new ObjectTransferHandler(Terms.get().getActiveAceFrameConfig(), new GetConceptForLabel(PATH_LABEL_FOREXPORT)));
-			label16.setTransferHandler(new ObjectTransferHandler(Terms.get().getActiveAceFrameConfig(), new GetConceptForLabel(MODULE_LABEL_FOREXPORT)));
-
+			if(tProj.getProjectType().equals(I_TerminologyProject.Type.TRANSLATION)){
+				this.languageRefset=((TranslationProject)tProj).getTargetLanguageRefset();
+				config=Terms.get().getActiveAceFrameConfig();
+				label7.setTransferHandler(new ObjectTransferHandler(Terms.get().getActiveAceFrameConfig(), new GetConceptForLabel(REFSET_LABEL_FOREXPORT)));
+				label5.setTransferHandler(new ObjectTransferHandler(Terms.get().getActiveAceFrameConfig(), new GetConceptForLabel(PATH_LABEL_FOREXPORT)));
+				label16.setTransferHandler(new ObjectTransferHandler(Terms.get().getActiveAceFrameConfig(), new GetConceptForLabel(MODULE_LABEL_FOREXPORT)));
+			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			AceLog.getAppLog().alertAndLogException(e);

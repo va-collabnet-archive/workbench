@@ -19,6 +19,7 @@ package org.ihtsdo.project.search;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.LinkedList;
+import java.util.UUID;
 import java.util.logging.Level;
 
 import javax.swing.SwingUtilities;
@@ -27,7 +28,9 @@ import javax.swing.table.DefaultTableModel;
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.log.AceLog;
+import org.ihtsdo.helper.time.TimeHelper;
 import org.ihtsdo.project.workflow.api.wf2.implementation.WfInstanceContainer;
+import org.ihtsdo.time.TimeUtil;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.workflow.api.WfProcessInstanceBI;
@@ -158,19 +161,19 @@ public class WorkflowInstanceTableModel extends DefaultTableModel implements WfI
 	}
 
 	public boolean isCellEditable(int row, int col) {
-		if (ACE.editMode == false) {
-			return false;
-		}
+//		if (ACE.editMode == false) {
+//			return false;
+//		}
+//
+//		if (row < 0 || row >= getRowCount()) {
+//			return false;
+//		}
+//
+//		if (AceLog.getAppLog().isLoggable(Level.FINER)) {
+//			AceLog.getAppLog().finer("Cell is editable: " + row + " " + col);
+//		}
 
-		if (row < 0 || row >= getRowCount()) {
-			return false;
-		}
-
-		if (AceLog.getAppLog().isLoggable(Level.FINER)) {
-			AceLog.getAppLog().finer("Cell is editable: " + row + " " + col);
-		}
-
-		return true;
+		return false;
 	}
 
 	public void setValueAt(Object value, int row, int col) {
@@ -211,18 +214,21 @@ public class WorkflowInstanceTableModel extends DefaultTableModel implements WfI
 			} else {
 				modeler = "not assigned";
 			}
-			Long dueDate = wfProcessInstanceBI.getDueDate() == null ? Long.MIN_VALUE : wfProcessInstanceBI.getDueDate();
+			Long dueDate = wfProcessInstanceBI.getDueDate();
+			Long lastChangeDate = wfProcessInstanceBI.getLastChangeTime();
 			ConceptChronicleBI conceptFsn = Ts.get().getConcept(wfProcessInstanceBI.getComponentPrimUuid());
-			wisr = new WorkflowInstanceSearchResult(action, state, modeler, dueDate, conceptFsn.toUserString(), conceptFsn.toUserString());
+			wisr = new WorkflowInstanceSearchResult(action, state, modeler, lastChangeDate, conceptFsn.toUserString(), conceptFsn.toUserString());
 			Object[] rowToadd = new Object[WORKFLOW_FIELD.values().length];
-			rowToadd[WORKFLOW_FIELD.FSN.getColumnNumber()] = wisr.getFsn();
+			WorkflowResultItem rItem=new WorkflowResultItem(wfProcessInstanceBI.getComponentPrimUuid(), wisr.getFsn());
+			rowToadd[WORKFLOW_FIELD.FSN.getColumnNumber()] = rItem;
 			rowToadd[WORKFLOW_FIELD.EDITOR.getColumnNumber()] = wisr.getModeler();
 			rowToadd[WORKFLOW_FIELD.STATE.getColumnNumber()] = wisr.getState();
-			rowToadd[WORKFLOW_FIELD.TIMESTAMP.getColumnNumber()] = wisr.getTime();
+			rowToadd[WORKFLOW_FIELD.TIMESTAMP.getColumnNumber()] = TimeHelper.formatDate(wisr.getTime());
 			addRow(rowToadd);
 		} catch (Exception ex) {
 		}
 	}
+	
 
 	public void addRow(Object[] matches2) {
 		data.add(matches2);
@@ -243,6 +249,8 @@ public class WorkflowInstanceTableModel extends DefaultTableModel implements WfI
 
 	public void clearResults() {
 		data.clear();
+		data = null;
+		data = new LinkedList<Object[]>();
 		fireTableDataChanged();
 	}
 
@@ -251,3 +259,4 @@ public class WorkflowInstanceTableModel extends DefaultTableModel implements WfI
 	}
 
 }
+

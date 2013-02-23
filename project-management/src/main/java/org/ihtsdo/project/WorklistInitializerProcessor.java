@@ -192,11 +192,14 @@ public class WorklistInitializerProcessor implements
 											.getUids())));
 			instance.setWfDefinition(workList.getWorkflowDefinition());
 			instance.setWorkList(workList);
+			instance.setLastChangeTime(System.currentTimeMillis());
 			user = interpreter.getNextDestination(instance, workList);
 			if (user == null) {
-				throw new Exception("Cannot set next destination\n");
+				userNid = ArchitectonicAuxiliary.Concept.USER.localize().getNid();
+			} else {
+				userNid = ts.getNidForUuids(user.getId());
 			}
-			userNid = ts.getNidForUuids(user.getId());
+			
 
 		} catch (ValidationException e) {
 			AceLog.getAppLog().alertAndLogException(e);

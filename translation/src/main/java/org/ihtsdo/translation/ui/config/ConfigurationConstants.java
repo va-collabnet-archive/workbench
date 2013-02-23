@@ -60,5 +60,7 @@ public class ConfigurationConstants {
 	
 	/** The Constant PREFERD_TERM_DEFAULT_PANEL. */
 	public static final String PREFERD_TERM_DEFAULT_PANEL = "Preferd term default panel";
+
+	protected static final String COMPLETION_MODE_PANEL = "Completion mode default panel";
 	
 }

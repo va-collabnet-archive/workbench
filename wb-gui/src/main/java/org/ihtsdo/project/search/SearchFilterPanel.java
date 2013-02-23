@@ -12,6 +12,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 
 import javax.swing.ImageIcon;
@@ -25,15 +26,21 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.project.TerminologyProjectDAO;
+import org.ihtsdo.project.filter.WfCompletionFilter;
+import org.ihtsdo.project.filter.WfCompletionFilter.CompletionOption;
 import org.ihtsdo.project.filter.WfDestinationFilter;
+import org.ihtsdo.project.filter.WfProjectFilter;
+import org.ihtsdo.project.filter.WfStateFilter;
 import org.ihtsdo.project.filter.WfWorklistFilter;
 import org.ihtsdo.project.model.I_TerminologyProject;
+import org.ihtsdo.project.model.TranslationProject;
 import org.ihtsdo.project.model.WorkList;
 import org.ihtsdo.project.model.WorkSet;
+import org.ihtsdo.project.workflow.model.WfState;
 import org.ihtsdo.project.workflow.model.WfUser;
 import org.ihtsdo.tk.workflow.api.WfFilterBI;
+import org.ihtsdo.tk.workflow.api.WfStateBI;
 import org.ihtsdo.tk.workflow.api.WfUserBI;
-import org.ihtsdo.tk.workflow.api.WorkListBI;
 
 /**
  * @author Guillermo Reynoso
@@ -55,6 +62,8 @@ public class SearchFilterPanel extends JPanel {
 		filterTypeCombo.addItem("");
 		filterTypeCombo.addItem(new WfDestinationFilter());
 		filterTypeCombo.addItem(new WfWorklistFilter());
+		filterTypeCombo.addItem(new WfStateFilter());
+		filterTypeCombo.addItem(new WfCompletionFilter());
 	}
 
 	private void addButtonActionPerformed(ActionEvent e) {
@@ -70,7 +79,19 @@ public class SearchFilterPanel extends JPanel {
 		if (filterObject instanceof WfDestinationFilter) {
 			return new WfDestinationFilter((WfUser) filterCombo.getSelectedItem());
 		} else if (filterObject instanceof WfWorklistFilter) {
-			return new WfWorklistFilter(((WorkListBI) filterCombo.getSelectedItem()).getUuid());
+			return new WfWorklistFilter(((WorkList) filterCombo.getSelectedItem()).getUuid());
+		} else if (filterObject instanceof WfState) {
+			return new WfStateFilter((WfState) filterCombo.getSelectedItem());
+		} else if (filterObject instanceof WfCompletionFilter) {
+			CompletionOption co = (WfCompletionFilter.CompletionOption) filterCombo.getSelectedItem();
+			if (co.equals(CompletionOption.COMPLETE_INSTANCES)) {
+				return new WfCompletionFilter(true);
+			} else if (co.equals(CompletionOption.INCOMPLETE_INSTACES)) {
+				return new WfCompletionFilter(false);
+			} else {
+				return null;
+			}
+
 		} else {
 			return null;
 		}
@@ -81,9 +102,18 @@ public class SearchFilterPanel extends JPanel {
 			if (e.getItem() instanceof WfDestinationFilter) {
 				filterCombo.removeAllItems();
 				WfDestinationFilter df = (WfDestinationFilter) e.getItem();
-				List<WfUserBI> fitlerOptions = df.getFilterOptions();
+				List<WfUser> fitlerOptions = df.getFilterOptions();
+				Collections.sort(fitlerOptions);
 				for (WfUserBI wfUserBI : fitlerOptions) {
 					filterCombo.addItem(wfUserBI);
+				}
+			} else if (e.getItem() instanceof WfStateFilter) {
+				filterCombo.removeAllItems();
+				WfStateFilter sf = (WfStateFilter) e.getItem();
+				List<WfState> states = sf.getFilterOptions();
+				Collections.sort(states);
+				for (WfStateBI wfStateBI : states) {
+					filterCombo.addItem(wfStateBI);
 				}
 			} else if (e.getItem() instanceof WfWorklistFilter) {
 				filterCombo.removeAllItems();
@@ -94,6 +124,7 @@ public class SearchFilterPanel extends JPanel {
 						List<WorkSet> worksets = TerminologyProjectDAO.getAllWorkSetsForProject(i_TerminologyProject, config);
 						for (WorkSet workSet : worksets) {
 							List<WorkList> worklists = TerminologyProjectDAO.getAllWorklistForWorkset(workSet, config);
+							Collections.sort(worklists);
 							for (WorkList workList : worklists) {
 								filterCombo.addItem(workList);
 							}
@@ -103,6 +134,26 @@ public class SearchFilterPanel extends JPanel {
 					e1.printStackTrace();
 				} catch (IOException e1) {
 					e1.printStackTrace();
+				}
+			} else if (e.getItem() instanceof WfProjectFilter) {
+				filterCombo.removeAllItems();
+				try {
+					I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
+					List<TranslationProject> projects = TerminologyProjectDAO.getAllTranslationProjects(config);
+					Collections.sort(projects);
+					for (TranslationProject project : projects) {
+						filterCombo.addItem(project);
+					}
+				} catch (TerminologyException e1) {
+					e1.printStackTrace();
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
+			} else if (e.getItem() instanceof WfCompletionFilter) {
+				filterCombo.removeAllItems();
+				CompletionOption[] completions = WfCompletionFilter.CompletionOption.values();
+				for (CompletionOption comp : completions) {
+					filterCombo.addItem(comp);
 				}
 			} else {
 				filterCombo.removeAllItems();
@@ -124,7 +175,7 @@ public class SearchFilterPanel extends JPanel {
 		setLayout(new GridBagLayout());
 		((GridBagLayout) getLayout()).columnWidths = new int[] { 0, 0, 0, 0, 0, 0, 0 };
 		((GridBagLayout) getLayout()).rowHeights = new int[] { 0, 0 };
-		((GridBagLayout) getLayout()).columnWeights = new double[] { 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 1.0E-4 };
+		((GridBagLayout) getLayout()).columnWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0E-4 };
 		((GridBagLayout) getLayout()).rowWeights = new double[] { 1.0, 1.0E-4 };
 
 		// ---- addButton ----

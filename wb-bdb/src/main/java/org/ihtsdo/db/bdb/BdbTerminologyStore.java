@@ -8,13 +8,10 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.Query;
-import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.Terms;
 import org.ihtsdo.tk.api.cs.ChangeSetPolicy;
@@ -28,11 +25,11 @@ import org.ihtsdo.tk.api.contradiction.IdentifyAllContradictionStrategy;
 import org.dwfa.vodb.types.Path;
 import org.dwfa.vodb.types.Position;
 import org.ihtsdo.concept.*;
-import org.ihtsdo.concept.component.relationship.Relationship;
-import org.ihtsdo.concept.component.relationship.Relationship.Version;
 import org.ihtsdo.cs.ChangeSetWriterHandler;
 import org.ihtsdo.cs.econcept.EConceptChangeSetWriter;
 import org.ihtsdo.db.change.ChangeNotifier;
+import org.ihtsdo.helper.promote.TerminologyPromoterBI;
+import org.ihtsdo.helper.query.QueryBuilderBI;
 import org.ihtsdo.lucene.LuceneManager;
 import org.ihtsdo.lucene.SearchResult;
 import org.ihtsdo.lucene.WfHxIndexGenerator;
@@ -57,6 +54,7 @@ import org.ihtsdo.tk.contradiction.ContradictionIdentifierBI;
 import org.ihtsdo.tk.db.DbDependency;
 import org.ihtsdo.tk.db.EccsDependency;
 import org.ihtsdo.tk.dto.concept.component.TkRevision;
+import org.ihtsdo.tk.refset.RefsetSpecBuilder;
 import org.ihtsdo.tk.uuid.UuidFactory;
 
 public class BdbTerminologyStore implements TerminologyStoreDI {
@@ -864,4 +862,21 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
         }
         return false;
     }
+    
+    @Override
+    public QueryBuilderBI getQueryBuilder(ViewCoordinate viewCoordinate){
+        return new RefsetSpecBuilder(viewCoordinate.getViewCoordinateWithAllStatusValues());
+    }
+    
+    @Override
+     public TerminologyPromoterBI getTerminologyPromoter(ViewCoordinate sourceViewCoordinate, EditCoordinate sourceEditCoordinate,
+            ViewCoordinate targetViewCoordinate){
+         return new BdbTermPromoter(sourceViewCoordinate, sourceEditCoordinate, targetViewCoordinate);
+     }
+    
+    @Override
+     public TerminologyPromoterBI getTerminologyPromoter(ViewCoordinate sourceViewCoordinate, EditCoordinate sourceEditCoordinate,
+            int pathNid, PositionBI originPosition){
+         return new BdbTermPromoter(sourceViewCoordinate, sourceEditCoordinate, pathNid, originPosition);
+     }
 }

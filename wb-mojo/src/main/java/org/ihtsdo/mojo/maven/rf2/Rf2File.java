@@ -197,16 +197,18 @@ public class Rf2File implements Comparable<Object> {
             return;
         }
         File[] files = root.listFiles();
-        Arrays.sort(files);
-        for (int i = 0; i < files.length; i++) {
-            String name = files[i].getName().toUpperCase();
+        if (files.length > 0) {
+            Arrays.sort(files);
+            for (int i = 0; i < files.length; i++) {
+                String name = files[i].getName().toUpperCase();
 
-            if (files[i].isFile() && name.endsWith(postfix.toUpperCase())
-                    && name.contains(infix.toUpperCase())) {
-                list.add(files[i]);
-            }
-            if (files[i].isDirectory()) {
-                listFilesRecursive(list, files[i], infix, postfix);
+                if (files[i].isFile() && name.endsWith(postfix.toUpperCase())
+                        && name.contains(infix.toUpperCase())) {
+                    list.add(files[i]);
+                }
+                if (files[i].isDirectory()) {
+                    listFilesRecursive(list, files[i], infix, postfix);
+                }
             }
         }
     }

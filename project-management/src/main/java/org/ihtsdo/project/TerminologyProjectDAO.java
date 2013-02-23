@@ -57,6 +57,7 @@ import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.PathSetReadOnly;
+import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.RefsetPropertyMap;
 import org.dwfa.ace.api.RefsetPropertyMap.REFSET_PROPERTY;
 import org.dwfa.ace.api.Terms;
@@ -76,8 +77,10 @@ import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.cement.SNOMED;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.etypes.EConcept;
+import org.ihtsdo.helper.promote.TerminologyPromoterBI;
 import org.ihtsdo.lucene.SearchResult;
 import org.ihtsdo.project.model.I_TerminologyProject;
+import org.ihtsdo.project.model.MappingProject;
 import org.ihtsdo.project.model.Partition;
 import org.ihtsdo.project.model.PartitionMember;
 import org.ihtsdo.project.model.PartitionScheme;
@@ -100,8 +103,12 @@ import org.ihtsdo.project.workflow.model.WfUser;
 import org.ihtsdo.project.workflow.model.WorkflowDefinition;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ContradictionException;
+import org.ihtsdo.tk.api.NidBitSetBI;
+import org.ihtsdo.tk.api.NidSet;
+import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
+import org.ihtsdo.tk.api.PositionSetBI;
 import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.TerminologyBuilderBI;
 import org.ihtsdo.tk.api.TerminologyStoreDI;
@@ -120,6 +127,7 @@ import org.ihtsdo.tk.api.refex.type_nid_string.RefexNidStringVersionBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf1;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 import org.ihtsdo.tk.dto.concept.component.refex.TK_REFEX_TYPE;
+import org.ihtsdo.tk.workflow.api.WfFilterBI;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.json.JettisonMappedXmlDriver;
@@ -155,8 +163,8 @@ public class TerminologyProjectDAO {
 	public static List<I_TerminologyProject> getAllProjects(I_ConfigAceFrame config) {
 		List<I_TerminologyProject> projects = new ArrayList<I_TerminologyProject>();
 		projects.addAll(getAllTranslationProjects(config));
-
 		projects.addAll(getAllTerminologyProjects(config));
+		projects.addAll(getAllMappingProjects(config));
 		return projects;
 	}
 
@@ -225,6 +233,38 @@ public class TerminologyProjectDAO {
 		}
 		return projects;
 	}
+	/**
+	 * Gets the all terminology projects.
+	 * 
+	 * @param config
+	 *            the config
+	 * @return all terminology projects
+	 */
+	public static List<MappingProject> getAllMappingProjects(I_ConfigAceFrame config) {
+		
+		I_TermFactory termFactory = Terms.get();
+		List<MappingProject> projects = new ArrayList<MappingProject>();
+		try {
+			I_GetConceptData projectsRoot = termFactory.getConcept(ArchitectonicAuxiliary.Concept.MAPPING_PROJECTS_ROOT.getUids());
+			I_IntSet allowedDestRelTypes = termFactory.newIntSet();
+			allowedDestRelTypes.add(termFactory.uuidToNative(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()));
+			Set<? extends I_GetConceptData> children = projectsRoot.getDestRelOrigins(config.getAllowedStatus(), allowedDestRelTypes, config.getViewPositionSetReadOnly(), Precedence.TIME, config.getConflictResolutionStrategy());
+			for (I_GetConceptData child : children) {
+				I_ConceptAttributePart lastAttributePart = getLastestAttributePart(child);
+				if (isActive(lastAttributePart.getStatusNid())) {
+					projects.add(getMappingProject(child, config));
+				}
+			}
+			
+		} catch (TerminologyException e) {
+			AceLog.getAppLog().alertAndLogException(e);
+		} catch (IOException e) {
+			AceLog.getAppLog().alertAndLogException(e);
+		} catch (Exception e) {
+			AceLog.getAppLog().alertAndLogException(e);
+		}
+		return projects;
+	}
 	
 	/**
 	 * Gets the all workset target languages map.
@@ -280,7 +320,6 @@ public class TerminologyProjectDAO {
 		return targetLanguagesCache;
 
 	}
-
 	/**
 	 * Creates the new translation project.
 	 * 
@@ -392,7 +431,7 @@ public class TerminologyProjectDAO {
 			}
 
 			termFactory.setActiveAceFrameConfig(config);
-			I_GetConceptData projectsRoot = termFactory.getConcept(ArchitectonicAuxiliary.Concept.TRANSLATION_PROJECTS_ROOT.getUids());
+			I_GetConceptData projectsRoot = termFactory.getConcept(ArchitectonicAuxiliary.Concept.TERMINOLOGY_PROJECTS_ROOT.getUids());
 
 			newConcept = termFactory.newConcept(UUID.randomUUID(), false, config);
 
@@ -428,6 +467,65 @@ public class TerminologyProjectDAO {
 		}
 
 		return project;
+	}
+	/**
+	 * Creates the new project.
+	 * 
+	 * @param projectWithMetadata
+	 *            the project with metadata
+	 * @param config
+	 *            the config
+	 * 
+	 * @return the terminology project
+	 */
+	public static MappingProject createNewMappingProject(MappingProject projectWithMetadata, I_ConfigAceFrame config) {
+		I_TermFactory termFactory = Terms.get();
+		I_TerminologyProject project = null;
+		I_GetConceptData newConcept = null;
+		String projectName = projectWithMetadata.getName() + " (mapping project)";
+		try {
+			if (isConceptDuplicate(projectName)) {
+				JOptionPane.showMessageDialog(new JDialog(), "This name is already in use", "Warning", JOptionPane.WARNING_MESSAGE);
+				throw new Exception("This name is already in use");
+			}
+			
+			termFactory.setActiveAceFrameConfig(config);
+			I_GetConceptData projectsRoot = termFactory.getConcept(ArchitectonicAuxiliary.Concept.MAPPING_PROJECTS_ROOT.getUids());
+			
+			newConcept = termFactory.newConcept(UUID.randomUUID(), false, config);
+			
+			termFactory.newDescription(UUID.randomUUID(), newConcept, "en", projectName, termFactory.getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids()), config);
+			
+			termFactory.newDescription(UUID.randomUUID(), newConcept, "en", projectName, termFactory.getConcept(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids()), config);
+			
+			termFactory.newRelationship(UUID.randomUUID(), newConcept, termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()), projectsRoot, termFactory.getConcept(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids()),
+					termFactory.getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids()), termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()), 0, config);
+			
+			project = new MappingProject(projectWithMetadata.getName(), newConcept.getConceptNid(), newConcept.getUids());
+			
+			termFactory.addUncommittedNoChecks(newConcept);
+			termFactory.commit();
+			
+			// promote(newConcept, config);
+			//
+			// termFactory.addUncommittedNoChecks(newConcept);
+			// termFactory.commit();
+			
+			project = getMappingProject(newConcept, config);
+			
+			String nacWorkSetName = "Maintenance - " + project.getName().replace("(mapping project)", "");
+			WorkSet nacWorkSet = createNewWorkSet(nacWorkSetName, project, config);
+			createNewPartitionScheme("Maintenance - " + project.getName().replace("(mapping project)", ""), nacWorkSet.getUids().iterator().next(), config);
+			
+		} catch (TerminologyException e) {
+			AceLog.getAppLog().alertAndLogException(e);
+		} catch (IOException e) {
+			AceLog.getAppLog().alertAndLogException(e);
+		} catch (Exception e) {
+			AceLog.getAppLog().alertAndLogException(e);
+		}
+		
+		return (MappingProject) project;
 	}
 
 	/**
@@ -470,6 +568,48 @@ public class TerminologyProjectDAO {
 		}
 		return project;
 	}
+
+	/**
+	 * Gets the project.
+	 * 
+	 * @param projectConcept
+	 *            the project concept
+	 * @param config
+	 *            the config
+	 * @return the project
+	 * @throws Exception
+	 *             the exception
+	 */
+	public static MappingProject getMappingProject(I_GetConceptData projectConcept, I_ConfigAceFrame config) throws Exception {
+		
+		MappingProject project = null;
+		I_TermFactory termFactory = Terms.get();
+		try {
+			I_IntSet allowedDestRelTypes = termFactory.newIntSet();
+			allowedDestRelTypes.add(ArchitectonicAuxiliary.Concept.IS_A_REL.localize().getNid());
+			Set<? extends I_GetConceptData> parents = projectConcept.getSourceRelTargets(config.getAllowedStatus(), allowedDestRelTypes, config.getViewPositionSetReadOnly(), Precedence.TIME, config.getConflictResolutionStrategy());
+			
+			if (parents.size() != 1) {
+				throw new Exception("Error: Wrong number of parents in project...");
+			}
+			
+			I_GetConceptData parent = parents.iterator().next();
+			
+			if (parent.getConceptNid() == ArchitectonicAuxiliary.Concept.MAPPING_PROJECTS_ROOT.localize().getNid()) {
+				String name = projectConcept.toString();
+				List<? extends I_DescriptionTuple> descTuples = projectConcept.getDescriptionTuples(config.getAllowedStatus(), config.getDescTypes(), config.getViewPositionSetReadOnly(), Precedence.TIME, config.getConflictResolutionStrategy());
+				for (I_DescriptionTuple tuple : descTuples) {
+					if (tuple.getTypeNid() == ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize().getNid()) {
+						name = tuple.getText();
+					}
+				}
+				project = new MappingProject(name, projectConcept.getConceptNid(), projectConcept.getUids());
+			}
+		} catch (IOException e) {
+			AceLog.getAppLog().alertAndLogException(e);
+		}
+		return project;
+	}
 	/**
 	 * Gets the project.
 	 * 
@@ -489,13 +629,13 @@ public class TerminologyProjectDAO {
 			I_IntSet allowedDestRelTypes = termFactory.newIntSet();
 			allowedDestRelTypes.add(ArchitectonicAuxiliary.Concept.IS_A_REL.localize().getNid());
 			Set<? extends I_GetConceptData> parents = projectConcept.getSourceRelTargets(config.getAllowedStatus(), allowedDestRelTypes, config.getViewPositionSetReadOnly(), Precedence.TIME, config.getConflictResolutionStrategy());
-
+			
 			if (parents.size() != 1) {
 				throw new Exception("Error: Wrong number of parents in project...");
 			}
-
+			
 			I_GetConceptData parent = parents.iterator().next();
-
+			
 			if (parent.getConceptNid() == ArchitectonicAuxiliary.Concept.TERMINOLOGY_PROJECTS_ROOT.localize().getNid()) {
 				String name = projectConcept.toString();
 				List<? extends I_DescriptionTuple> descTuples = projectConcept.getDescriptionTuples(config.getAllowedStatus(), config.getDescTypes(), config.getViewPositionSetReadOnly(), Precedence.TIME, config.getConflictResolutionStrategy());
@@ -678,6 +818,65 @@ public class TerminologyProjectDAO {
 			AceLog.getAppLog().alertAndLogException(e);
 		}
 
+		return project;
+	}
+	/**
+	 * Update project metadata.
+	 * 
+	 * @param projectWithMetadata
+	 *            the project with metadata
+	 * @param config
+	 *            the config
+	 * 
+	 * @return the i_ terminology project
+	 */
+	public static I_TerminologyProject updateProjectMetadata(I_TerminologyProject projectWithMetadata, I_ConfigAceFrame config) {
+		I_TermFactory termFactory = Terms.get();
+		I_TerminologyProject project = null;
+		
+		try {
+			
+			I_TerminologyProject currentVersionOfProject = getProject(projectWithMetadata.getConcept(), config);
+			
+			if (!currentVersionOfProject.getName().equals(projectWithMetadata.getName())) {
+				updatePreferredTerm(projectWithMetadata.getConcept(), projectWithMetadata.getName(), config);
+			}
+			
+			I_GetConceptData projectsRefset = termFactory.getConcept(ArchitectonicAuxiliary.Concept.PROJECT_EXTENSION_REFSET.getUids());
+			
+			I_GetConceptData projectConcept = termFactory.getConcept(projectWithMetadata.getUids());
+			
+			String metadata = serialize(projectWithMetadata);
+			
+			List<I_ExtendByRef> extensions = new ArrayList<I_ExtendByRef>();
+			extensions.addAll(termFactory.getAllExtensionsForComponent(projectConcept.getConceptNid()));
+			for (I_ExtendByRef extension : extensions) {
+				for (PathBI editPath : config.getEditingPathSet()) {
+					if (extension.getRefsetId() == projectsRefset.getConceptNid()) {
+						I_ExtendByRefPart lastPart = getLastExtensionPart(extension);
+						I_ExtendByRefPartStr part = (I_ExtendByRefPartStr) lastPart.makeAnalog(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid(), Long.MAX_VALUE, config.getDbConfig().getUserConcept().getNid(), config.getEditCoordinate().getModuleNid(), editPath.getConceptNid());
+						part.setStringValue(metadata);
+						extension.addVersion(part);
+						termFactory.addUncommittedNoChecks(projectsRefset);
+						termFactory.addUncommittedNoChecks(extension);
+						// termFactory.commit();
+						// promote(extension, config);
+						// termFactory.addUncommittedNoChecks(projectsRefset);
+						// termFactory.addUncommittedNoChecks(extension);
+						// termFactory.commit();
+					}
+				}
+			}
+			project = getProject(projectConcept, config);
+			
+		} catch (TerminologyException e) {
+			AceLog.getAppLog().alertAndLogException(e);
+		} catch (IOException e) {
+			AceLog.getAppLog().alertAndLogException(e);
+		} catch (Exception e) {
+			AceLog.getAppLog().alertAndLogException(e);
+		}
+		
 		return project;
 	}
 
@@ -1354,10 +1553,10 @@ public class TerminologyProjectDAO {
 	 * @param config
 	 *            the config
 	 */
-	public static void setModuleIdRefset(TranslationProject project, I_GetConceptData concept, I_ConfigAceFrame config) {
+	public static void setModuleIdRefset(I_TerminologyProject project, I_GetConceptData concept, I_ConfigAceFrame config) {
 		I_TermFactory termFactory = Terms.get();
 		try {
-			if ((concept != null) && (project.getReleasePath() == null) || (concept.getConceptNid() != project.getReleasePath().getConceptNid())) {
+			if ((concept != null && project != null) && (project.getReleasePath() == null) || (concept != null && concept.getConceptNid() != project.getReleasePath().getConceptNid())) {
 				List<? extends I_RelTuple> targetRefsetRels = null;
 				I_IntSet allowedDestRelTypes = termFactory.newIntSet();
 				// allowedDestRelTypes.add(ArchitectonicAuxiliary.Concept.PATRICIA_HOUGHTON.localize().getNid());
@@ -1409,7 +1608,7 @@ public class TerminologyProjectDAO {
 	 * @param config
 	 *            the config
 	 */
-	public static void setNamespaceRefset(TranslationProject project, String namespaceText, I_ConfigAceFrame config) {
+	public static void setNamespaceRefset(I_TerminologyProject project, String namespaceText, I_ConfigAceFrame config) {
 		try {
 			I_TermFactory termFactory = Terms.get();
 
@@ -1439,10 +1638,10 @@ public class TerminologyProjectDAO {
 	 * @param config
 	 *            the config
 	 */
-	public static void setReleasePathRefset(TranslationProject project, I_GetConceptData concept, I_ConfigAceFrame config) {
+	public static void setReleasePathRefset(I_TerminologyProject project, I_GetConceptData concept, I_ConfigAceFrame config) {
 		I_TermFactory termFactory = Terms.get();
 		try {
-			if ((concept != null) && (project.getReleasePath() == null) || (concept.getConceptNid() != project.getReleasePath().getConceptNid())) {
+			if ((concept != null) && (project.getReleasePath() == null) || ( concept != null && concept.getConceptNid() != project.getReleasePath().getConceptNid())) {
 				List<? extends I_RelTuple> targetRefsetRels = null;
 				I_IntSet allowedDestRelTypes = termFactory.newIntSet();
 				allowedDestRelTypes.add(ArchitectonicAuxiliary.Concept.HAS_RELEASE_PATH_REFSET_ATTRIBUTE.localize().getNid());
@@ -1544,7 +1743,7 @@ public class TerminologyProjectDAO {
 	 * @throws Exception
 	 *             the exception
 	 */
-	public static I_GetConceptData getSourceIssueRepoForProject(TranslationProject project, I_ConfigAceFrame config) throws Exception {
+	public static I_GetConceptData getSourceIssueRepoForProject(I_TerminologyProject project, I_ConfigAceFrame config) throws Exception {
 		List<I_RelTuple> repos = new ArrayList<I_RelTuple>();
 		List<? extends I_RelTuple> reposTuples = null;
 		I_TermFactory termFactory = Terms.get();
@@ -1585,7 +1784,7 @@ public class TerminologyProjectDAO {
 	 * @param config
 	 *            the config
 	 */
-	public static void setSourceIssueRepo(TranslationProject project, I_GetConceptData concept, I_ConfigAceFrame config) {
+	public static void setSourceIssueRepo(I_TerminologyProject project, I_GetConceptData concept, I_ConfigAceFrame config) {
 		I_TermFactory termFactory = Terms.get();
 
 		try {
@@ -1642,7 +1841,7 @@ public class TerminologyProjectDAO {
 	 * @throws Exception
 	 *             the exception
 	 */
-	public static I_GetConceptData getProjectIssueRepoForProject(TranslationProject project, I_ConfigAceFrame config) throws Exception {
+	public static I_GetConceptData getProjectIssueRepoForProject(I_TerminologyProject project, I_ConfigAceFrame config) throws Exception {
 		List<I_RelTuple> repos = new ArrayList<I_RelTuple>();
 		List<? extends I_RelTuple> reposTuples = null;
 		I_TermFactory termFactory = Terms.get();
@@ -1683,7 +1882,7 @@ public class TerminologyProjectDAO {
 	 * @param config
 	 *            the config
 	 */
-	public static void setProjectIssueRepo(TranslationProject project, I_GetConceptData concept, I_ConfigAceFrame config) {
+	public static void setProjectIssueRepo(I_TerminologyProject project, I_GetConceptData concept, I_ConfigAceFrame config) {
 		I_TermFactory termFactory = Terms.get();
 
 		try {
@@ -1784,7 +1983,7 @@ public class TerminologyProjectDAO {
 	 * @throws Exception
 	 *             the exception
 	 */
-	public static I_GetConceptData getReleasePathForProject(TranslationProject project, I_ConfigAceFrame config) throws Exception {
+	public static I_GetConceptData getReleasePathForProject(I_TerminologyProject project, I_ConfigAceFrame config) throws Exception {
 		List<I_RelTuple> targetRefsets = new ArrayList<I_RelTuple>();
 		List<? extends I_RelTuple> targetRefsetsTuples = null;
 		I_TermFactory termFactory = Terms.get();
@@ -1827,7 +2026,7 @@ public class TerminologyProjectDAO {
 	 * @throws Exception
 	 *             the exception
 	 */
-	public static I_GetConceptData getModuleIdRefsetForProject(TranslationProject project, I_ConfigAceFrame config) throws Exception {
+	public static I_GetConceptData getModuleIdRefsetForProject(I_TerminologyProject project, I_ConfigAceFrame config) throws Exception {
 		List<I_RelTuple> targetRefsets = new ArrayList<I_RelTuple>();
 		List<? extends I_RelTuple> targetRefsetsTuples = null;
 		I_TermFactory termFactory = Terms.get();
@@ -1870,7 +2069,7 @@ public class TerminologyProjectDAO {
 	 * @throws Exception
 	 *             the exception
 	 */
-	public static String getNamespaceRefsetForProject(TranslationProject project, I_ConfigAceFrame config) throws Exception {
+	public static String getNamespaceRefsetForProject(I_TerminologyProject project, I_ConfigAceFrame config) throws Exception {
 		List<I_RelTuple> targetRefsets = new ArrayList<I_RelTuple>();
 		List<? extends I_RelTuple> targetRefsetsTuples = null;
 		I_TermFactory termFactory = Terms.get();
@@ -2844,7 +3043,7 @@ public class TerminologyProjectDAO {
 		I_TerminologyProject project = null;
 		try {
 			// System.out.println(concept.toString());
-			project = getTranslationProject(concept, config);
+			project = getProject(concept, config);
 		} catch (Exception e1) {
 			// do nothing
 			// System.out.println(concept.toString());
@@ -2978,7 +3177,7 @@ public class TerminologyProjectDAO {
 	 */
 	public static WorkSet getNonAssignedChangesWorkSet(I_TerminologyProject project, I_ConfigAceFrame config) {
 		WorkSet nacWorkSet = null;
-		String nacWorkSetName = "Maintenance - " + project.getName().replace("(translation project)", "");
+		String nacWorkSetName = "Maintenance - " ;
 
 		for (WorkSet loopWorkSet : project.getWorkSets(config)) {
 			if (loopWorkSet.getName().startsWith(nacWorkSetName)) {
@@ -3096,7 +3295,12 @@ public class TerminologyProjectDAO {
 			wfInstance.setWorkList(workList);
 			wfInstance.setComponentName(concept.toString());
 			wfInstance.setState(provider.statusConceptToWfState(assingStatus));
-			addConceptAsWorkListMember(workListMember, Terms.get().uuidToNative(interpreter.getNextDestination(wfInstance, workList).getId()), config);
+			wfInstance.setLastChangeTime(System.currentTimeMillis());
+			WfUser destination = interpreter.getNextDestination(wfInstance, workList);
+			if (destination == null) {
+				destination = new WfUser("user", ArchitectonicAuxiliary.Concept.USER.getPrimoridalUid());
+			}
+			addConceptAsWorkListMember(workListMember, Terms.get().uuidToNative(destination.getId()), config);
 			Terms.get().commit();
 		} catch (Exception e) {
 			AceLog.getAppLog().alertAndLogException(e);
@@ -3588,11 +3792,14 @@ public class TerminologyProjectDAO {
 				termFactory.addUncommittedNoChecks(workListConcept);
 				I_GetConceptData activityStatusConcept = member.getActivityStatus();
 				promotionRefset.setDestinationAndPromotionStatus(member.getId(), assignedUserId, activityStatusConcept.getConceptNid());
-				TranslationProject transProject = (TranslationProject) getProjectForWorklist(workList, config);
-				if (transProject.getTargetLanguageRefset() != null) {
-					LanguageMembershipRefset targetLanguage = new LanguageMembershipRefset(transProject.getTargetLanguageRefset(), config);
-					PromotionRefset languagePromotionRefset = targetLanguage.getPromotionRefset(config);
-					languagePromotionRefset.setPromotionStatus(member.getId(), activityStatusConcept.getConceptNid());
+				I_TerminologyProject project = getProjectForWorklist(workList, config);
+				if (project.getProjectType().equals(I_TerminologyProject.Type.TRANSLATION)) {
+					TranslationProject transProject = (TranslationProject) project;
+					if(transProject.getTargetLanguageRefset() != null){
+						LanguageMembershipRefset targetLanguage = new LanguageMembershipRefset(transProject.getTargetLanguageRefset(), config);
+						PromotionRefset languagePromotionRefset = targetLanguage.getPromotionRefset(config);
+						languagePromotionRefset.setPromotionStatus(member.getId(), activityStatusConcept.getConceptNid());
+					}
 				}
 			}
 		} catch (TerminologyException e1) {
@@ -4153,6 +4360,7 @@ public class TerminologyProjectDAO {
 	 * @return the all work list members
 	 */
 	public static List<WorkListMember> getAllWorkListMembers(WorkList workList, I_ConfigAceFrame config) {
+		
 		I_TermFactory termFactory = Terms.get();
 		List<WorkListMember> workListMembers = new ArrayList<WorkListMember>();
 		try {
@@ -4220,13 +4428,20 @@ public class TerminologyProjectDAO {
 	 * @throws IOException
 	 *             Signals that an I/O exception has occurred.
 	 */
-	public static HashMap<I_GetConceptData, Integer> getWorkListMemberStatuses(WorkList workList, I_ConfigAceFrame config) throws TerminologyException, IOException {
+	public static HashMap<I_GetConceptData, Integer> getWorkListMemberStatuses(WorkList workList, I_ConfigAceFrame config, List<WfFilterBI> filters) throws TerminologyException, IOException {
 		HashMap<I_GetConceptData, Integer> workListMembersStatuses = new HashMap<I_GetConceptData, Integer>();
 		I_TermFactory tf = Terms.get();
 
 		List<WorkListMember> members = getAllWorkListMembers(workList, config);
 
 		for (WorkListMember loopMember : members) {
+			if(filters != null){
+				for (WfFilterBI filter : filters) {
+					if(!filter.evaluateInstance(loopMember.getWfInstance())){
+						continue;
+					}
+				}
+			}
 			I_GetConceptData activityStatus = loopMember.getActivityStatus();
 			Integer currentCount = workListMembersStatuses.get(activityStatus);
 			if (currentCount == null) {
@@ -4365,11 +4580,14 @@ public class TerminologyProjectDAO {
 			promotionRefset.setPromotionStatus(workListMemberWithMetadata.getId(), activityStatusConcept.getConceptNid());
 
 			// Translation specific concept level promotion refset
-			TranslationProject transProject = (TranslationProject) getProjectForWorklist(workList, config);
-			LanguageMembershipRefset targetLanguage = new LanguageMembershipRefset(transProject.getTargetLanguageRefset(), config);
-			PromotionRefset languagePromotionRefset = targetLanguage.getPromotionRefset(config);
-			languagePromotionRefset.setPromotionStatus(workListMemberWithMetadata.getId(), activityStatusConcept.getConceptNid());
+			I_TerminologyProject project = getProjectForWorklist(workList, config);
+			if(project.getProjectType().equals(I_TerminologyProject.Type.TRANSLATION)){
+				TranslationProject transProject = (TranslationProject)project;
+				LanguageMembershipRefset targetLanguage = new LanguageMembershipRefset(transProject.getTargetLanguageRefset(), config);
+				PromotionRefset languagePromotionRefset = targetLanguage.getPromotionRefset(config);
+				languagePromotionRefset.setPromotionStatus(workListMemberWithMetadata.getId(), activityStatusConcept.getConceptNid());
 			// end
+			}
 
 			workListMember = getWorkListMember(workListMemberWithMetadata.getConcept(), workList, config);
 		} catch (TerminologyException e) {
@@ -5412,15 +5630,25 @@ public class TerminologyProjectDAO {
 		instance.setState(prov.statusConceptToWfState(Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_ASSIGNED_STATUS.getUids())));
 		instance.setWfDefinition(workList.getWorkflowDefinition());
 		instance.setWorkList(workList);
+		instance.setLastChangeTime(System.currentTimeMillis());
 		WorkflowInterpreter interpreter = WorkflowInterpreter.createWorkflowInterpreter(workList.getWorkflowDefinition());
 
 		WfUser user = interpreter.getNextDestination(instance, workList);
-		if (user == null) {
-			throw new Exception("Cannot set next destination\n");
-		}
+//		if (user == null) {
+//			throw new Exception("Cannot set next destination\n");
+//		}
+		
 		TerminologyStoreDI ts = Ts.get();
-		int userNid = ts.getNidForUuids(user.getId());
+		
+		PromotionAndAssignmentRefset promRef = workList.getPromotionRefset(config);
 		ConceptVersionBI concept = ts.getConceptVersion(config.getViewCoordinate(), ts.getNidForUuids(member.getUids()));
+		
+		int userNid = promRef.getDestination(concept.getNid(), config).getNid();
+				
+		if (user != null) {
+			userNid = ts.getNidForUuids(user.getId());
+		}
+		
 		RefexCAB newSpec = new RefexCAB(TK_REFEX_TYPE.CID, concept.getNid(), ts.getNidForUuids(workList.getUids()));
 		int activeNid = SnomedMetadataRf1.CURRENT_RF1.getLenient().getNid();
 		int assignedNid = Terms.get().uuidToNative(ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_ASSIGNED_STATUS.getUids());
@@ -5430,7 +5658,6 @@ public class TerminologyProjectDAO {
 		TerminologyBuilderBI tc = Ts.get().getTerminologyBuilder(config.getEditCoordinate(), config.getViewCoordinate());
 		RefexChronicleBI<?> newRefex = tc.constructIfNotCurrent(newSpec);
 
-		PromotionAndAssignmentRefset promRef = workList.getPromotionRefset(config);
 		RefexCAB newSpecForProm = new RefexCAB(TK_REFEX_TYPE.CID_CID, concept.getNid(), promRef.getRefsetId());
 		newSpecForProm.put(RefexProperty.CNID1, assignedNid);
 		newSpecForProm.put(RefexProperty.CNID2, userNid);
@@ -5542,6 +5769,13 @@ public class TerminologyProjectDAO {
 				
 			}
 		}
+		if (project==null){
+			try {
+				project=getMappingProject(projectConcept, aceFrameConfig);
+			} catch (Exception e) {
+				
+			}
+		}
 		return project;
 	}
 	
@@ -5553,7 +5787,7 @@ public class TerminologyProjectDAO {
 			WfUser user = new WfUser(userConcept.toString(), userConcept.getPrimUuid());
 			
 			I_GetConceptData roleConcept = Terms.get().getConcept(UUID.fromString(fields[2]));
-			WfRole role = new WfRole(userConcept.toString(), userConcept.getPrimUuid());
+			WfRole role = new WfRole(roleConcept.toString(), roleConcept.getPrimUuid());
 			
 			WfMembership member = new WfMembership(UUID.fromString(fields[0]), user, role, Boolean.parseBoolean(fields[3]));
 			members.add(member);
@@ -5570,6 +5804,25 @@ public class TerminologyProjectDAO {
 		}
 		
 		return members;
+	}
+
+	public static I_TerminologyProject createNewMappingProject(String projectName, I_ConfigAceFrame config) {
+		// TODO Auto-generated method stub
+		MappingProject project = new MappingProject(projectName, 0, null);
+		return createNewMappingProject(project, config);
+	}
+	
+	public static void promoteContent(int conceptNid, ViewCoordinate sourceViewCoordinate, int targetPathNid) throws Exception {
+		PathBI snomedCorePath = Terms.get().getPath(ArchitectonicAuxiliary.Concept.SNOMED_CORE.getUids());
+		PositionBI originPosition = Terms.get().newPosition(snomedCorePath, Long.MAX_VALUE);
+        
+        TerminologyPromoterBI promoter = Ts.get().getTerminologyPromoter(sourceViewCoordinate, Terms.get().getActiveAceFrameConfig().getEditCoordinate(), targetPathNid, 
+        		originPosition);
+		
+		NidBitSetBI promotionNids = Ts.get().getEmptyNidSet();
+		promotionNids.setMember(conceptNid);
+		
+		promoter.promote(promotionNids, false);
 	}
 	
 }

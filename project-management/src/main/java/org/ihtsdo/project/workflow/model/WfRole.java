@@ -24,7 +24,7 @@ import org.ihtsdo.tk.workflow.api.WfRoleBI;
 /**
  * The Class WfRole.
  */
-public class WfRole implements Serializable, WfRoleBI {
+public class WfRole implements Serializable, WfRoleBI, Comparable<WfRole>{
 	
 	/**
 	 * 
@@ -103,6 +103,11 @@ public class WfRole implements Serializable, WfRoleBI {
 	@Override
 	public UUID getUuid() {
 		return getId();
+	}
+
+	@Override
+	public int compareTo(WfRole o) {
+		return this.getName().compareTo(o.getName());
 	}
 
 }

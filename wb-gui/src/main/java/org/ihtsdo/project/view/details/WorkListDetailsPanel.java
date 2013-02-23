@@ -79,6 +79,7 @@ import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.project.ProjectPermissionsAPI;
 import org.ihtsdo.project.TerminologyProjectDAO;
 import org.ihtsdo.project.help.HelpApi;
+import org.ihtsdo.project.model.I_TerminologyProject;
 import org.ihtsdo.project.model.TranslationProject;
 import org.ihtsdo.project.model.WorkList;
 import org.ihtsdo.project.model.WorkListMember;
@@ -108,7 +109,7 @@ public class WorkListDetailsPanel extends JPanel {
 	private I_ConfigAceFrame config;
 	
 	/** The transl project. */
-	private TranslationProject translProject;
+	private I_TerminologyProject translProject;
 	
 	/** The members worker. */
 	private WorklistMembersWorker membersWorker;
@@ -131,7 +132,7 @@ public class WorkListDetailsPanel extends JPanel {
 		initComponents();
 		this.workList = workList;
 		this.config = config;
-		translProject = (TranslationProject) TerminologyProjectDAO.getProjectForWorklist(workList, config);
+		translProject =  TerminologyProjectDAO.getProjectForWorklist(workList, config);
 		label13.setIcon(IconUtilities.helpIcon);
 		label13.setText("");
 		pBarW.setVisible(false);
@@ -1462,11 +1463,11 @@ class WorklistMembersWorker extends SwingWorker<String, Object[]> {
 
 	private JTable membersTable;
 	private DefaultTableModel model;
-	private TranslationProject translProject;
+	private I_TerminologyProject translProject;
 	private WorkList workList;
 	private I_ConfigAceFrame config;
 
-	public WorklistMembersWorker(JTable membersTable, DefaultTableModel model, TranslationProject translProject, WorkList workList, I_ConfigAceFrame config) {
+	public WorklistMembersWorker(JTable membersTable, DefaultTableModel model, I_TerminologyProject translProject, WorkList workList, I_ConfigAceFrame config) {
 		super();
 		while (model.getRowCount() > 0) {
 			model.removeRow(0);
@@ -1481,7 +1482,7 @@ class WorklistMembersWorker extends SwingWorker<String, Object[]> {
 	@Override
 	protected String doInBackground() throws Exception {
 		try {
-			translProject = (TranslationProject) TerminologyProjectDAO.getProjectForWorklist(workList, config);
+			translProject = TerminologyProjectDAO.getProjectForWorklist(workList, config);
 
 			List<WorkListMember> members = workList.getWorkListMembers();
 			Collections.sort(members, new Comparator<WorkListMember>() {

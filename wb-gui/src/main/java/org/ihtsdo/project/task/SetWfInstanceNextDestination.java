@@ -40,105 +40,107 @@ import org.ihtsdo.project.workflow.model.WfUser;
  * The Class CreateNewProject.
  */
 @BeanList(specs = {
-    @Spec(directory = "tasks/workflow2", type = BeanType.TASK_BEAN)})
+		@Spec(directory = "tasks/workflow2", type = BeanType.TASK_BEAN)})
 public class SetWfInstanceNextDestination extends AbstractTask {
 
-    /**
-     * The Constant serialVersionUID.
-     */
-    private static final long serialVersionUID = 1;
-    /**
-     * The Constant dataVersion.
-     */
-    private static final int dataVersion = 1;
+	/**
+	 * The Constant serialVersionUID.
+	 */
+	private static final long serialVersionUID = 1;
+	/**
+	 * The Constant dataVersion.
+	 */
+	private static final int dataVersion = 1;
 
-    /**
-     * Write object.
-     *
-     * @param out the out
-     *
-     * @throws IOException Signals that an I/O exception has occurred.
-     */
-    private void writeObject(ObjectOutputStream out) throws IOException {
-        out.writeInt(dataVersion);
-    }
+	/**
+	 * Write object.
+	 *
+	 * @param out the out
+	 *
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
+	private void writeObject(ObjectOutputStream out) throws IOException {
+		out.writeInt(dataVersion);
+	}
 
-    /**
-     * Read object.
-     *
-     * @param in the in
-     *
-     * @throws IOException Signals that an I/O exception has occurred.
-     * @throws ClassNotFoundException the class not found exception
-     */
-    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
-        int objDataVersion = in.readInt();
-        if (objDataVersion == 1) {
-        } else {
-            throw new IOException("Can't handle dataversion: " + objDataVersion);
-        }
+	/**
+	 * Read object.
+	 *
+	 * @param in the in
+	 *
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws ClassNotFoundException the class not found exception
+	 */
+	private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
+		int objDataVersion = in.readInt();
+		if (objDataVersion == 1) {
+		} else {
+			throw new IOException("Can't handle dataversion: " + objDataVersion);
+		}
 
-    }
+	}
 
-    /**
-     * Instantiates a new creates the new project.
-     *
-     * @throws MalformedURLException the malformed url exception
-     */
-    public SetWfInstanceNextDestination() throws MalformedURLException {
-        super();
-    }
+	/**
+	 * Instantiates a new creates the new project.
+	 *
+	 * @throws MalformedURLException the malformed url exception
+	 */
+	public SetWfInstanceNextDestination() throws MalformedURLException {
+		super();
+	}
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.dwfa.bpa.process.I_DefineTask#evaluate(org.dwfa.bpa.process.
-     * I_EncodeBusinessProcess, org.dwfa.bpa.process.I_Work)
-     */
-    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
-        try {
-            I_ConfigAceFrame config = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.dwfa.bpa.process.I_DefineTask#evaluate(org.dwfa.bpa.process.
+	 * I_EncodeBusinessProcess, org.dwfa.bpa.process.I_Work)
+	 */
+	public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
+		try {
+			I_ConfigAceFrame config = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
 
-            WfInstance instance = (WfInstance) process.readAttachement("WfInstance");
+			WfInstance instance = (WfInstance) process.readAttachement("WfInstance");
 
-            WorkflowInterpreter interpreter = WorkflowInterpreter.createWorkflowInterpreter(instance.getWfDefinition());
+			WorkflowInterpreter interpreter = WorkflowInterpreter.createWorkflowInterpreter(instance.getWfDefinition());
 
-            WfUser nextDestination = interpreter.getNextDestination(instance, instance.getWorkList());
+			WfUser nextDestination = interpreter.getNextDestination(instance, instance.getWorkList());
 
-            WfInstance.updateDestination(instance, nextDestination);
+			if (nextDestination != null) {
+				WfInstance.updateDestination(instance, nextDestination);
+			}
 
-            Terms.get().commit();
+			Terms.get().commit();
 
-            return Condition.CONTINUE;
-        } catch (Exception e) {
-            throw new TaskFailedException(e);
-        }
-    }
+			return Condition.CONTINUE;
+		} catch (Exception e) {
+			throw new TaskFailedException(e);
+		}
+	}
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.dwfa.bpa.process.I_DefineTask#complete(org.dwfa.bpa.process.
-     * I_EncodeBusinessProcess, org.dwfa.bpa.process.I_Work)
-     */
-    public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
-    }
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.dwfa.bpa.process.I_DefineTask#complete(org.dwfa.bpa.process.
+	 * I_EncodeBusinessProcess, org.dwfa.bpa.process.I_Work)
+	 */
+	public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
+	}
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.dwfa.bpa.process.I_DefineTask#getConditions()
-     */
-    public Collection<Condition> getConditions() {
-        return CONTINUE_CONDITION;
-    }
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.dwfa.bpa.process.I_DefineTask#getConditions()
+	 */
+	public Collection<Condition> getConditions() {
+		return CONTINUE_CONDITION;
+	}
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.dwfa.bpa.tasks.AbstractTask#getDataContainerIds()
-     */
-    public int[] getDataContainerIds() {
-        return new int[]{};
-    }
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.dwfa.bpa.tasks.AbstractTask#getDataContainerIds()
+	 */
+	public int[] getDataContainerIds() {
+		return new int[]{};
+	}
 }

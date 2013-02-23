@@ -51,6 +51,7 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.project.filter.WfCompletionFilter;
 import org.ihtsdo.project.model.WorkList;
 import org.ihtsdo.project.util.IconUtilities;
 import org.ihtsdo.project.util.WorkflowSearcher;
@@ -73,6 +74,8 @@ import org.ihtsdo.project.view.tag.TagManager;
 import org.ihtsdo.project.workflow.model.WfInstance;
 import org.ihtsdo.project.workflow.model.WfState;
 import org.ihtsdo.project.workflow.model.WfUser;
+import org.ihtsdo.tk.workflow.api.WfFilterBI;
+import org.ihtsdo.translation.LanguageUtil;
 import org.ihtsdo.translation.ui.inbox.event.EmptyInboxItemSelectedEvent;
 import org.ihtsdo.translation.ui.inbox.event.InboxItemSelectedEvent;
 import org.ihtsdo.translation.ui.inbox.event.ItemDestinationChangedEvent;
@@ -768,12 +771,21 @@ public class InboxTreePanel extends JPanel {
 		 * Gets the worklists statuses and size.
 		 * 
 		 * @return the worklists statuses and size
+		 * @throws TerminologyException 
 		 */
-		private void getWorklistsStatusesAndSize() {
+		private void getWorklistsStatusesAndSize() throws TerminologyException {
 			try {
 				WfUser wfUser;
 				wfUser = new WfUser(user.getInitialText(), user.getPrimUuid());
-				HashMap<Object, Integer> worklists = searcher.getCountByWorklistAndState(wfUser);
+				ConfigTranslationModule cfg = null;
+				cfg = LanguageUtil.getTranslationConfig(Terms.get().getActiveAceFrameConfig());
+				List<WfFilterBI> filters = new ArrayList<WfFilterBI>();
+				if(cfg.getCompletionMode().equals(ConfigTranslationModule.CompletionMode.COMPLETE_INSTANCES)){
+					filters.add(new WfCompletionFilter(true));
+				}else if(cfg.getCompletionMode().equals(ConfigTranslationModule.CompletionMode.INCOMPLETE_INSTACES)){
+					filters.add(new WfCompletionFilter(false));
+				}
+				HashMap<Object, Integer> worklists = searcher.getCountByWorklistAndState(wfUser, filters);
 				Set<Object> worklistsAndStates = worklists.keySet();
 				for (Object loopObject : worklistsAndStates) {
 					String icon = "";

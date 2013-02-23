@@ -296,6 +296,7 @@ public String toString() {
 					promAssignRefset.getPromotionStatus(id, config)));
 			wfInstance.setDestination(provider.userConceptToWfUser(
 					promAssignRefset.getDestination(id, config)));
+			wfInstance.setLastChangeTime(promAssignRefset.getLastStatusTime(id, config));
 			
 		} catch (IOException e) {
 			AceLog.getAppLog().alertAndLogException(e);

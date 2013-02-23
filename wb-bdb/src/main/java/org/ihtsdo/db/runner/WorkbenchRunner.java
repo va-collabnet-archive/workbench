@@ -25,6 +25,7 @@ import org.dwfa.util.LogWithAlerts;
 import org.dwfa.util.io.FileIO;
 import org.dwfa.vodb.types.Position;
 import org.ihtsdo.arena.contradiction.ContradictionEditorGenerator;
+import org.ihtsdo.arena.promotion.PromotionEditorGenerator;
 import org.ihtsdo.cs.ChangeSetWriterHandler;
 import org.ihtsdo.cs.econcept.EConceptChangeSetWriter;
 import org.ihtsdo.custom.statics.CustomStatics;
@@ -140,6 +141,7 @@ public class WorkbenchRunner {
             }
 
             OpenFrames.addNewWindowMenuItemGenerator(new ContradictionEditorGenerator());
+            OpenFrames.addNewWindowMenuItemGenerator(new PromotionEditorGenerator());
             System.setProperty("javax.net.ssl.trustStore", "config/cacerts");
 
             long          startTime = System.currentTimeMillis();

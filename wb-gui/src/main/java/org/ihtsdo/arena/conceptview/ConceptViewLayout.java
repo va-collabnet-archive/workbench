@@ -84,6 +84,10 @@ import org.dwfa.swing.SwingTask;
 import org.ihtsdo.helper.bdb.MultiEditorContradictionCase;
 import org.ihtsdo.helper.bdb.MultiEditorContradictionDetector;
 import org.ihtsdo.tk.api.*;
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
+import org.ihtsdo.tk.api.conceptattribute.ConceptAttributeVersionBI;
+import org.ihtsdo.tk.binding.snomed.Snomed;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 
 /**
  *
@@ -111,6 +115,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
     private Map<Integer, Collection<Integer>> componentCountForConflict = new TreeMap<>();
     private List<DragPanelDescription> activeDescriptionPanels;
     private List<DragPanelRel> activeInferredRelPanels;
+    private List<DragPanelRel> activeShortNormRelPanels = new ArrayList<>();
     private List<DragPanelRel> activeStatedRelPanels;
     private ConceptView cView;
     private I_ConfigAceFrame config;
@@ -685,24 +690,44 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
                         cpr.setHistoryCount(cpr.historyCount + inactiveStatedRels.size());
                     }
                     
+                    if(settings.getRelAssertionType().equals(RelAssertionType.SHORT_NORMAL_FORM)){
+                        HashSet<Integer> parentNids = new HashSet<>();
+                        HashSet<RelationshipVersionBI> parentRels = new HashSet<>();
+                        for(RelationshipVersionBI rel : inferredRels){
+                            if (rel.getTypeNid() == Snomed.IS_A.getLenient().getNid()) {
+                                RelationshipVersionBI relParent = findProximalPrimitve(rel);
+                                if (!parentNids.contains(relParent.getTargetNid())) {
+                                    parentNids.add(relParent.getTargetNid());
+                                    parentRels.add(relParent);
+                                }
+                            }
+                        }
+                        
+                        for(RelationshipVersionBI rel : parentRels){
+                            DragPanelRel dragPanel = getRelComponent(rel, cpe, true);
+                            activeShortNormRelPanels.add(dragPanel);
+                        }
+                        
+                    }
+                    
                     boolean relHistoryIsShown = cpr.isShown(DragPanelComponentVersion.SubPanelTypes.HISTORY);
                     
                     cpr.setTemplateCount(0);
                     
                     boolean cprAdded = false;
                     
-                    if (settings.showStated()) {
-                        for (DragPanelRel rc : activeStatedRelPanels) {
+                    if (settings.getRelAssertionType().equals(RelAssertionType.SHORT_NORMAL_FORM)) {
+                        for (DragPanelRel rc : activeShortNormRelPanels) {
                             if (stop) {
                                 return;
                             }
-                            
+
                             if (!cprAdded) {
                                 conceptPanel.add(cpr, gbc);
                                 gbc.gridy++;
                                 cprAdded = true;
                             }
-                            
+
                             setShowConflicts(rc.getComponentVersion(), rc);
                             seperatorComponents.add(rc);
                             cpr.addToggleComponent(rc);
@@ -713,96 +738,121 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
                             cpr.setHistoryCount(cpr.historyCount += rc.getHistorySubpanelCount());
                             cpr.setTemplateCount(cpr.templateCount += rc.getTemplateSubpanelCount());
                         }
-                        
-                        for (DragPanelRel rc : inactiveStatedRelPanels) {
-                            if (stop) {
-                                return;
-                            }
-                            
-                            if (!cprAdded) {
-                                conceptPanel.add(cpr, gbc);
-                                gbc.gridy++;
-                                cprAdded = true;
-                            }
-                            
-                            setShowConflicts(rc.getComponentVersion(), rc);
-                            rc.setVisible(relHistoryIsShown);
-                            seperatorComponents.add(rc);
-                            cpr.addToggleComponent(rc);
-                            cpr.getInactiveComponentPanels().add(rc);
-                            cpr.getRetiredPanels().add(rc);
-                            conceptPanel.add(rc, gbc);
-                            gbc.gridy++;
-                            cpr.setAlertCount(cpr.alertCount += rc.getAlertSubpanelCount());
-                            cpr.setRefexCount(cpr.refexCount += rc.getRefexSubpanelCount());
-                            cpr.setHistoryCount(cpr.historyCount += rc.getHistorySubpanelCount());
-                            cpr.setTemplateCount(cpr.templateCount += rc.getTemplateSubpanelCount());
-                        }
-                    }
-                    
-                    if (settings.showInferred()) {
-                        for (DragPanelRel rc : activeInferredRelPanels) {
-                            if (stop) {
-                                return;
-                            }
-                            
-                            if (!cprAdded) {
-                                conceptPanel.add(cpr, gbc);
-                                gbc.gridy++;
-                                cprAdded = true;
-                            }
-                            
-                            setShowConflicts(rc.getComponentVersion(), rc);
-                            seperatorComponents.add(rc);
-                            cpr.addToggleComponent(rc);
-                            conceptPanel.add(rc, gbc);
-                            gbc.gridy++;
-                            cpr.setAlertCount(cpr.alertCount += rc.getAlertSubpanelCount());
-                            cpr.setRefexCount(cpr.refexCount += rc.getRefexSubpanelCount());
-                            cpr.setHistoryCount(cpr.historyCount += rc.getHistorySubpanelCount());
-                            cpr.setTemplateCount(cpr.templateCount += rc.getTemplateSubpanelCount());
-                        }
-                        
-                        for (DragPanelRel rc : inactiveInferredRelPanels) {
-                            if (stop) {
-                                return;
-                            }
-                            
-                            if (!cprAdded) {
-                                conceptPanel.add(cpr, gbc);
-                                gbc.gridy++;
-                                cprAdded = true;
-                            }
-                            
-                            setShowConflicts(rc.getComponentVersion(), rc);
-                            rc.setVisible(relHistoryIsShown);
-                            seperatorComponents.add(rc);
-                            cpr.addToggleComponent(rc);
-                            cpr.getInactiveComponentPanels().add(rc);
-                            conceptPanel.add(rc, gbc);
-                            gbc.gridy++;
-                            cpr.setAlertCount(cpr.alertCount += rc.getAlertSubpanelCount());
-                            cpr.setRefexCount(cpr.refexCount += rc.getRefexSubpanelCount());
-                            cpr.setHistoryCount(cpr.historyCount += rc.getHistorySubpanelCount());
-                            cpr.setTemplateCount(cpr.templateCount += rc.getTemplateSubpanelCount());
-                        }
-                    }
-                    
-                    try {
+                    } else {
                         if (settings.showStated()) {
-                            if (stop) {
-                                return;
+                            for (DragPanelRel rc : activeStatedRelPanels) {
+                                if (stop) {
+                                    return;
+                                }
+
+                                if (!cprAdded) {
+                                    conceptPanel.add(cpr, gbc);
+                                    gbc.gridy++;
+                                    cprAdded = true;
+                                }
+
+                                setShowConflicts(rc.getComponentVersion(), rc);
+                                seperatorComponents.add(rc);
+                                cpr.addToggleComponent(rc);
+                                conceptPanel.add(rc, gbc);
+                                gbc.gridy++;
+                                cpr.setAlertCount(cpr.alertCount += rc.getAlertSubpanelCount());
+                                cpr.setRefexCount(cpr.refexCount += rc.getRefexSubpanelCount());
+                                cpr.setHistoryCount(cpr.historyCount += rc.getHistorySubpanelCount());
+                                cpr.setTemplateCount(cpr.templateCount += rc.getTemplateSubpanelCount());
                             }
-                            
-                            addRelGroups(statedRelGroups, cprAdded, cpr, gbc);
+
+                            for (DragPanelRel rc : inactiveStatedRelPanels) {
+                                if (stop) {
+                                    return;
+                                }
+
+                                if (!cprAdded) {
+                                    conceptPanel.add(cpr, gbc);
+                                    gbc.gridy++;
+                                    cprAdded = true;
+                                }
+
+                                setShowConflicts(rc.getComponentVersion(), rc);
+                                rc.setVisible(relHistoryIsShown);
+                                seperatorComponents.add(rc);
+                                cpr.addToggleComponent(rc);
+                                cpr.getInactiveComponentPanels().add(rc);
+                                cpr.getRetiredPanels().add(rc);
+                                conceptPanel.add(rc, gbc);
+                                gbc.gridy++;
+                                cpr.setAlertCount(cpr.alertCount += rc.getAlertSubpanelCount());
+                                cpr.setRefexCount(cpr.refexCount += rc.getRefexSubpanelCount());
+                                cpr.setHistoryCount(cpr.historyCount += rc.getHistorySubpanelCount());
+                                cpr.setTemplateCount(cpr.templateCount += rc.getTemplateSubpanelCount());
+                            }
                         }
-                        
+
                         if (settings.showInferred()) {
-                            if (stop) {
-                                return;
+                            for (DragPanelRel rc : activeInferredRelPanels) {
+                                if (stop) {
+                                    return;
+                                }
+
+                                if (!cprAdded) {
+                                    conceptPanel.add(cpr, gbc);
+                                    gbc.gridy++;
+                                    cprAdded = true;
+                                }
+
+                                setShowConflicts(rc.getComponentVersion(), rc);
+                                seperatorComponents.add(rc);
+                                cpr.addToggleComponent(rc);
+                                conceptPanel.add(rc, gbc);
+                                gbc.gridy++;
+                                cpr.setAlertCount(cpr.alertCount += rc.getAlertSubpanelCount());
+                                cpr.setRefexCount(cpr.refexCount += rc.getRefexSubpanelCount());
+                                cpr.setHistoryCount(cpr.historyCount += rc.getHistorySubpanelCount());
+                                cpr.setTemplateCount(cpr.templateCount += rc.getTemplateSubpanelCount());
                             }
-                            
-                            addRelGroups(inferredRelGroups, cprAdded, cpr, gbc);
+
+                            for (DragPanelRel rc : inactiveInferredRelPanels) {
+                                if (stop) {
+                                    return;
+                                }
+
+                                if (!cprAdded) {
+                                    conceptPanel.add(cpr, gbc);
+                                    gbc.gridy++;
+                                    cprAdded = true;
+                                }
+
+                                setShowConflicts(rc.getComponentVersion(), rc);
+                                rc.setVisible(relHistoryIsShown);
+                                seperatorComponents.add(rc);
+                                cpr.addToggleComponent(rc);
+                                cpr.getInactiveComponentPanels().add(rc);
+                                conceptPanel.add(rc, gbc);
+                                gbc.gridy++;
+                                cpr.setAlertCount(cpr.alertCount += rc.getAlertSubpanelCount());
+                                cpr.setRefexCount(cpr.refexCount += rc.getRefexSubpanelCount());
+                                cpr.setHistoryCount(cpr.historyCount += rc.getHistorySubpanelCount());
+                                cpr.setTemplateCount(cpr.templateCount += rc.getTemplateSubpanelCount());
+                            }
+                        }
+                    }
+                    try {
+                        if (!settings.getRelAssertionType().equals(RelAssertionType.SHORT_NORMAL_FORM)) {
+                            if (settings.showStated()) {
+                                if (stop) {
+                                    return;
+                                }
+
+                                addRelGroups(statedRelGroups, cprAdded, cpr, gbc);
+                            }
+
+                            if (settings.showInferred()) {
+                                if (stop) {
+                                    return;
+                                }
+
+                                addRelGroups(inferredRelGroups, cprAdded, cpr, gbc);
+                            }
                         }
                     } catch (ContradictionException e) {
                         AceLog.getAppLog().alertAndLogException(e);
@@ -895,6 +945,33 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
                 }
             }
         });
+    }
+//TODO: need to make sure this is returning the closest parents
+    private RelationshipVersionBI findProximalPrimitve(RelationshipVersionBI rel) throws IOException, ContradictionException{
+        RelationshipVersionBI parentRel = null;
+        ConceptChronicleBI concept = Ts.get().getConcept(rel.getTargetNid());
+        ConceptAttributeVersionBI version = concept.getConceptAttributes().getVersion(coordinate);
+        if(!Ts.get().getConcept(rel.getTargetNid()).getConceptAttributes().getVersion(coordinate).isDefined()){
+            parentRel = rel;
+        }else{
+            parentRel = findNext(rel);
+        }
+        return parentRel;
+    }
+    
+    private RelationshipVersionBI findNext(RelationshipVersionBI rel) throws IOException, ContradictionException{
+        RelationshipVersionBI parentRel = null;
+        ConceptVersionBI concept = Ts.get().getConceptVersion(coordinate, rel.getTargetNid());
+        for(RelationshipVersionBI r : concept.getRelationshipsOutgoingActiveIsa()){
+            if(r.getCharacteristicNid() == SnomedMetadataRfx.getREL_CH_INFERRED_RELATIONSHIP_NID()){
+                if (!Ts.get().getConcept(r.getTargetNid()).getConceptAttributes().getVersion(coordinate).isDefined()) {
+                    return r;
+                } else {
+                    parentRel = findNext(rel);
+                }
+            }
+        }
+        return parentRel;
     }
     
     private void removeContradictions(Collection<? extends ComponentVersionBI> componentVersions) {

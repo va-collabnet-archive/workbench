@@ -1,23 +1,8 @@
-/*
- * Copyright (c) 2010 International Health Terminology Standards Development
- * Organisation
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- * http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package org.ihtsdo.project.view;
 
-import java.awt.Color;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -28,12 +13,13 @@ import java.awt.event.ItemListener;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
-import java.util.Vector;
 
-import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -43,22 +29,21 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
-import javax.swing.JTabbedPane;
+import javax.swing.JSplitPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.ListModel;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingConstants;
+import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.event.TableModelEvent;
-import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
 
-import org.dwfa.ace.api.Terms;
-import org.dwfa.ace.config.AceFrame;
-import org.dwfa.ace.config.AceFrameConfig;
-import org.dwfa.tapi.TerminologyException;
+import org.apache.tools.ant.types.resources.FileResource;
+import org.apache.xmlbeans.ResourceLoader;
+import org.apache.xmlbeans.impl.schema.FileResourceLoader;
 import org.ihtsdo.project.workflow.api.WfComponentProvider;
 import org.ihtsdo.project.workflow.api.WorkflowDefinitionManager;
 import org.ihtsdo.project.workflow.model.WfAction;
@@ -66,1266 +51,1024 @@ import org.ihtsdo.project.workflow.model.WfRole;
 import org.ihtsdo.project.workflow.model.WfState;
 import org.ihtsdo.project.workflow.model.WorkflowDefinition;
 
+import com.googlecode.sardine.model.Collection;
+
 /**
- * The Class WorkflowDefinitionPanel.
- *
- * @author Cesar Zamorano
+ * @author Guillermo Reynoso
  */
-@SuppressWarnings("serial")
 public class WorkflowDefinitionPanel extends JPanel {
-	
-	/** The current action. */
-	private WfAction currentAction;
-	
-	/** The actions. */
-	private HashMap<String,WfAction> actions;
-	
-	/** The drl files. */
-	private List<String> drlFiles;
-	
-	/** The xls files. */
-	private List<String> xlsFiles;
-	
-	/** The sel roles. */
-	private List<WfRole> selRoles;
-	
-	/** The sel states. */
-	private List<WfState> selStates;
-	
-	/** The roles. */
-	private HashMap<String,WfRole> roles;
-	
-	/** The states. */
-	private HashMap<String,WfState> states;
-	
-	/** The workflow definition file. */
-	private File workflowDefinitionFile;
-	
-	/** The selected action. */
-	private int selectedAction=-1;
-	
-	/** The active selection. */
-	private boolean activeSelection= false;
-	
-	/** The action name. */
-	private String actionName;
-
 	private HashMap<String, File> workflowsDefinitions;
-
 	private HashMap<String, File> businessFiles;
-
-	private HashMap<String, File> drlHash;
-
+	private File workflowDefinitionFile;
+	private HashMap<String, WfAction> actions;
 	private HashMap<String, File> xlsHash;
-	
-	/**
-	 * Instantiates a new workflow definition panel.
-	 */
-	public WorkflowDefinitionPanel() {
-		initComponents();
-		WfComponentProvider wp= new WfComponentProvider();
-		List<WfRole> rolesList = wp.getRoles();
-		List<WfState> statesList = wp.getStates();
-		actions= new HashMap<String, WfAction>();
-		roles= new HashMap<String, WfRole>();
-		states= new HashMap<String, WfState>();
-		drlFiles= new ArrayList<String>();
-		xlsFiles= new ArrayList<String>();
-		
-		workflowsDefinitions= new HashMap<String, File>();
-		businessFiles= new HashMap<String, File>();
-		
-		File[] list = new File("sampleProcesses/").listFiles();
-		DefaultComboBoxModel cmodel= new DefaultComboBoxModel();
-		cmodel.addElement("Select a Workflow Definition");
-		for (File file : list) {
-			if(file.getName().substring(file.getName().length()-4).equals(".wfd")){
-				workflowsDefinitions.put(file.getName().substring(0,file.getName().length()-4), file);
-				cmodel.addElement(file.getName().substring(0,file.getName().length()-4));
-			}
-			else
-				if(file.getName().substring(file.getName().length()-3).equals(".bp")){
-					businessFiles.put(file.getName().substring(0,file.getName().length()-3), file);
-					businessTextField.addItem(file.getName().substring(0,file.getName().length()-3));
-				}
-		}
-		workflowNameTextField.setModel(cmodel);
-		workflowNameTextField.setSelectedIndex(0);
-		
-		DefaultTableModel model= (DefaultTableModel) rolesTable.getModel();
-		for (WfRole role : rolesList) {
-			model.addRow(new Object[]{new Boolean(false),role.getName()});
-			roles.put(role.getName(), role);
-		}
-		rolesTable.setModel(model);
-		rolesTable.getTableHeader().setReorderingAllowed(false);
-		model= (DefaultTableModel) statesTable.getModel();
-		for (WfState state : statesList) {
-			model.addRow(new Object[]{new Boolean(false),state.getName()});
-			states.put(state.getName(), state);
-		}
-		statesTable.setModel(model);
-		statesTable.getTableHeader().setReorderingAllowed(false);
+	private HashMap<String, File> drlHash;
+	private WfAction currentAction;
+	private int selectedAction;
+	private boolean activeSelection;
+	/** The states. */
+	private HashMap<String, WfState> statesHash;
+	private List<WfRole> selRoles;
+	private List<WfState> selStates;
+	private HashMap<String, WfRole> rolesHash;
+	private ArrayList<String> drlFilesList;
+	private ArrayList<String> xlsFilesList;
 
-		consequenceComboBox.setSelectedIndex(-1);
-		
-		DefaultListModel drlModel= new DefaultListModel();
-		DefaultListModel xlsModel= new DefaultListModel();
-		drlHash= new HashMap<String, File>();
-		xlsHash= new HashMap<String, File>();
+	public WorkflowDefinitionPanel() {
+		workflowsDefinitions = new HashMap<String, File>();
+		businessFiles = new HashMap<String, File>();
+		rolesHash = new HashMap<String, WfRole>();
+		statesHash = new HashMap<String, WfState>();
+		drlFilesList = new ArrayList<String>();
+		xlsFilesList = new ArrayList<String>();
+		initComponents();
+		initCustomComponents();
+		initWfDefinitionCombo();
+	}
+
+	private void initWfDefinitionCombo() {
+		File[] list = new File("sampleProcesses/").listFiles();
+		List<String> bps = new ArrayList<String>();
+		List<String> wfdefString = new ArrayList<String>();
+		for (File file : list) {
+			if (file.getName().endsWith(".wfd")) {
+				String wfDefName = file.getName().replaceAll(".wfd", "");
+				if (!wfDefName.trim().isEmpty()) {
+					workflowsDefinitions.put(wfDefName, file);
+					wfdefString.add(wfDefName);
+				}
+			} else if (file.getName().endsWith(".bp")) {
+				businessFiles.put(file.getName().replaceAll(".bp", ""), file);
+				bps.add(file.getName().replaceAll(".bp", ""));
+			}
+		}
+		Collections.sort(bps);
+		for (String string : bps) {
+			actionBpCmbo.addItem(string);
+		}
+
+		Collections.sort(wfdefString);
+		wfDefs.removeAllItems();
+		wfDefs.addItem("");
+		for (String string : wfdefString) {
+			wfDefs.addItem(string);
+		}
+	}
+
+	private void initCustomComponents() {
+		statesTable.setModel(new DefaultTableModel(new Object[][] {}, new String[] { "Included", "States" }) {
+			Class<?>[] columnTypes = new Class<?>[] { Boolean.class, Object.class };
+			boolean[] columnEditable = new boolean[] { true, false };
+
+			@Override
+			public Class<?> getColumnClass(int columnIndex) {
+				return columnTypes[columnIndex];
+			}
+
+			@Override
+			public boolean isCellEditable(int rowIndex, int columnIndex) {
+				return columnEditable[columnIndex];
+			}
+		});
+		TableColumnModel cm = statesTable.getColumnModel();
+		cm.getColumn(0).setResizable(false);
+		cm.getColumn(0).setMinWidth(55);
+		cm.getColumn(0).setMaxWidth(55);
+		cm.getColumn(0).setPreferredWidth(55);
+
+		statesTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		statesTable.setRowSelectionAllowed(false);
+
+		rolesTable.setModel(new DefaultTableModel(new Object[][] {}, new String[] { "Included", "Role" }) {
+			Class<?>[] columnTypes = new Class<?>[] { Boolean.class, Object.class };
+			boolean[] columnEditable = new boolean[] { true, false };
+
+			@Override
+			public Class<?> getColumnClass(int columnIndex) {
+				return columnTypes[columnIndex];
+			}
+
+			@Override
+			public boolean isCellEditable(int rowIndex, int columnIndex) {
+				return columnEditable[columnIndex];
+			}
+		});
+		TableColumnModel rcm = rolesTable.getColumnModel();
+		rcm.getColumn(0).setResizable(false);
+		rcm.getColumn(0).setMinWidth(55);
+		rcm.getColumn(0).setMaxWidth(55);
+		rcm.getColumn(0).setPreferredWidth(55);
+
+		rolesTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		rolesTable.setRowSelectionAllowed(false);
+		rolesTable.setMinimumSize(new Dimension(0, 0));
+
+		WfComponentProvider wp = new WfComponentProvider();
+		List<WfRole> rolesList = wp.getRoles();
+		Collections.sort(rolesList);
+		DefaultTableModel model = (DefaultTableModel) rolesTable.getModel();
+		for (WfRole role : rolesList) {
+			model.addRow(new Object[] { new Boolean(false), role.getName() });
+			rolesHash.put(role.getName(), role);
+		}
+
+		List<WfState> states = wp.getAllStates();
+		Collections.sort(states);
+		DefaultTableModel statusModel = (DefaultTableModel) statesTable.getModel();
+		for (WfState state : states) {
+			statusModel.addRow(new Object[] { new Boolean(false), state.getName() });
+			statesHash.put(state.getName(), state);
+		}
+
+		DefaultListModel<String> drlModel = new DefaultListModel<String>();
+		DefaultListModel<String> xlsModel = new DefaultListModel<String>();
+		drlFiles.setModel(drlModel);
+		xlsFiles.setModel(xlsModel);
+		drlHash = new HashMap<String, File>();
+		xlsHash = new HashMap<String, File>();
 		File[] drlList = new File("drools-rules/").listFiles();
 		drlModel.addElement("No selected files");
 		xlsModel.addElement("No selected files");
+		List<String> xlsFileList = new ArrayList<String>();
+		List<String> drlFileList = new ArrayList<String>();
 		for (File file : drlList) {
-			if(file.getName().substring(file.getName().length()-4).equals(".drl")){
-				drlHash.put(file.getName().substring(0,file.getName().length()-4), file);
-				drlModel.addElement(file.getName().substring(0,file.getName().length()-4));
+			if (file.getName().endsWith(".drl")) {
+				String fileName = file.getName().replaceAll(".drl", "");
+				drlHash.put(fileName, file);
+				drlFileList.add(fileName);
+			} else if (file.getName().endsWith(".xls")) {
+				String fileName = file.getName().replaceAll(".xls", "");
+				xlsHash.put(fileName, file);
+				xlsFileList.add(fileName);
 			}
-			else
-				if(file.getName().substring(file.getName().length()-4).equals(".xls")){
-					xlsHash.put(file.getName().substring(0,file.getName().length()-4), file);
-					xlsModel.addElement(file.getName().substring(0,file.getName().length()-4));
-				}
 		}
-		drlTextField.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-		xlsTextField.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-		drlTextField.setModel(drlModel);
-		xlsTextField.setModel(xlsModel);
-		drlTextField.setSelectedIndex(0);
-		xlsTextField.setSelectedIndex(0);
-		
-		
-		newButton.setEnabled(true);
-		editButton.setEnabled(false);
-		removeButton.setEnabled(false);
-		nameTextField.setEnabled(false);
-		businessTextField.setEnabled(false);
-		consequenceComboBox.setEnabled(true);
-		tabbedPane1.setEnabled(false);
-		saveButton.setText("New");
-		cancelButton.setEnabled(false);
+
+		Collections.sort(drlFileList);
+		for (String string : drlFileList) {
+			drlModel.addElement(string);
+		}
+		Collections.sort(xlsFileList);
+		for (String string : xlsFileList) {
+			xlsModel.addElement(string);
+		}
+
+		drlFiles.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+		xlsFiles.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+		drlFiles.setSelectedIndex(0);
+		xlsFiles.setSelectedIndex(0);
+
 	}
 
-	/**
-	 * New button action performed.
-	 *
-	 * @param e the e
-	 */
-	private void newButtonActionPerformed(ActionEvent e) {
-		if(removeButton.getText().equals("Remove")){
-			newButton.setText("Save");
-			removeButton.setText("Cancel");
-			currentAction= new WfAction();
-			UUID id= UUID.randomUUID();
-			currentAction.setId(id);
-			idTextField.setText(id.toString());
-			nameTextField.setText("");
-			businessTextField.setSelectedIndex(-1);
-			consequenceComboBox.setSelectedIndex(-1);
-			selectedAction=-1;
-			activeSelection=false;
-			consequenceComboBox.removeAllItems();
-			for (int i = 0; i < statesTable.getRowCount(); i++) {
-				if(((Boolean)statesTable.getValueAt(i, 0))==true)
-					consequenceComboBox.addItem((String)statesTable.getValueAt(i, 1));
+	protected void wfDefsItemStateChanged(ItemEvent e) {
+		if (e.getStateChange() == ItemEvent.SELECTED && workflowsDefinitions != null) {
+			File file = workflowsDefinitions.get(wfDefs.getSelectedItem());
+			if (workflowDefinitionFile != null && workflowDefinitionFile.equals(file)) {
+				return;
 			}
-			
-			newButton.setEnabled(true);
-			editButton.setEnabled(false);
-			removeButton.setEnabled(true);
-			nameTextField.setEnabled(true);
-			businessTextField.setEnabled(true);
-			consequenceComboBox.setEnabled(true);
+			if (file == null) {
+				return;
+			}
+			workflowDefinitionFile = file;
+			loadFile(workflowDefinitionFile);
 		}
-		else{
-			if(nameTextField.getText()!=null && nameTextField.getText().length()>0){
-				currentAction.setName(nameTextField.getText());
-				File aux= businessFiles.get(businessTextField.getSelectedItem().toString());
-				if(aux.isFile())
+	}
+
+	private void loadFile(File workflowDefinitionFile2) {
+		System.out.println("LOAD: " + workflowDefinitionFile2.getName());
+		WorkflowDefinition wd = WorkflowDefinitionManager.readWfDefinition(workflowDefinitionFile2.getName());
+		actionsList.setModel(new DefaultListModel());
+
+		actions = null;
+		selRoles = new ArrayList<WfRole>();
+		selStates = new ArrayList<WfState>();
+
+		List<WfRole> roles = wd.getRoles();
+		for (int i = 0; i < rolesTable.getRowCount(); i++) {
+			rolesTable.setValueAt(false, i, 0);
+			for (WfRole wfRole : roles) {
+				if (rolesTable.getValueAt(i, 1).equals(wfRole.getName())) {
+					rolesTable.setValueAt(true, i, 0);
+					selRoles.add(wfRole);
+					break;
+				}
+			}
+		}
+		List<WfState> states = wd.getStates();
+		for (int i = 0; i < statesTable.getRowCount(); i++) {
+			statesTable.setValueAt(false, i, 0);
+			for (WfState wfState : states) {
+				if (statesTable.getValueAt(i, 1).equals(wfState.getName())) {
+					statesTable.setValueAt(true, i, 0);
+					selStates.add(wfState);
+				}
+			}
+		}
+
+		actions = (HashMap<String, WfAction>) wd.getActions();
+		actionsListPopulate();
+
+		xlsFiles.clearSelection();
+		List<String> excelFiles = wd.getXlsFileName();
+		ListModel<String> xlsModel = xlsFiles.getModel();
+		List<Integer> vector = new ArrayList<Integer>();
+		for (String excelFile : excelFiles) {
+			String[] split = excelFile.split("/");
+			String key = split[split.length - 1];
+			String replacedKey = key.replaceAll(".xls", "");
+			if (xlsHash.containsKey(replacedKey)) {
+				for (int j = 0; j < xlsModel.getSize(); j++) {
+					File file = xlsHash.get(replacedKey);
+					String string = file.getName().replaceAll(".xls", "");
+					if (xlsModel.getElementAt(j).toString().equals(string)) {
+						vector.add(j);
+						break;
+					}
+				}
+			}
+		}
+		int[] indices = new int[vector.size()];
+		int i = 0;
+		for (Integer j : vector) {
+			indices[i] = j;
+			i++;
+		}
+		xlsFiles.setSelectedIndices(indices);
+		if (excelFiles.size() == 0) {
+			xlsFiles.setSelectedIndex(0);
+		}
+
+		drlFiles.clearSelection();
+		List<String> rulesFiles = wd.getDrlFileName();
+		ListModel<String> drlModel = drlFiles.getModel();
+		List<Integer> vectordrl = new ArrayList<Integer>();
+		for (String drlFile : rulesFiles) {
+			String[] split = drlFile.split("/");
+			String key = split[split.length - 1];
+			String replacedKey = key.replaceAll(".drl", "");
+			if (drlHash.containsKey(replacedKey)) {
+				for (int j = 0; j < drlModel.getSize(); j++) {
+					File file = drlHash.get(replacedKey);
+					String string = file.getName().replaceAll(".drl", "");
+					if (drlModel.getElementAt(j).toString().equals(string)) {
+						vectordrl.add(j);
+						break;
+					}
+				}
+			}
+		}
+		int[] indicesDrl = new int[vectordrl.size()];
+		int idrl = 0;
+		for (Integer j : vectordrl) {
+			indicesDrl[idrl] = j;
+			idrl++;
+		}
+		drlFiles.setSelectedIndices(indicesDrl);
+		if (rulesFiles.size() == 0) {
+			drlFiles.setSelectedIndex(0);
+		}
+
+		actionConsequenceCmbo.setSelectedIndex(-1);
+		activeSelection = false;
+		selectedAction = -1;
+
+		actionBpCmbo.setSelectedIndex(-1);
+
+		revertToInitialState();
+	}
+
+	private void revertToInitialState() {
+		actionNameField.setText("");
+		actionUuidField.setText("");
+		newActionButton.setText("New Action");
+		editActionButton.setText("Edit");
+		removeButton.setText("Remove");
+		actionUuidField.setEnabled(false);
+		actionNameField.setEnabled(false);
+		actionBpCmbo.setEditable(false);
+		actionConsequenceCmbo.setEnabled(false);
+		revertButton.setEnabled(true);
+		removeButton.setEnabled(true);
+		saveButton.setEnabled(true);
+		newActionButton.setEnabled(true);
+		editActionButton.setEnabled(true);
+	}
+
+	private void addWfActionPreformed(ActionEvent e) {
+		String name = JOptionPane.showInputDialog("Enter new Workflow Definition's name:");
+		if (name == null || name.length() == 0) {
+			JOptionPane.showMessageDialog(this, "Error in name, Workflow Definition not created.");
+			return;
+		}
+		File file = new File("sampleProcesses/" + name.concat(".wfd"));
+		WorkflowDefinition wfDefinition = new WorkflowDefinition(new ArrayList<WfRole>(), new ArrayList<WfState>(), new HashMap<String, WfAction>());
+		wfDefinition.setName(name);
+		WorkflowDefinitionManager.writeWfDefinition(wfDefinition);
+		workflowsDefinitions.put(name, file);
+		wfDefs.addItem(name);
+		wfDefs.setSelectedItem(name);
+	}
+
+	protected void editButtonActionPerformed(ActionEvent e) {
+		if (editActionButton.getText().equals("Edit")) {
+			editActionButton.setText("Save");
+			WfAction a = actions.get(actionsList.getSelectedValue().getName());
+			actionUuidField.setText(a.getId().toString());
+			actionNameField.setText(a.getName());
+			if (a.getBusinessProcess() != null) {
+				actionBpCmbo.setSelectedItem(a.getBusinessProcess().getName().replaceAll(".bp", ""));
+			}
+			if (a.getConsequence() != null) {
+				actionConsequenceCmbo.setSelectedItem(a.getConsequence().getName());
+			}
+
+			newActionButton.setEnabled(false);
+			editActionButton.setEnabled(true);
+			removeButton.setEnabled(false);
+			actionNameField.setEnabled(true);
+			actionBpCmbo.setEnabled(true);
+			actionConsequenceCmbo.setEnabled(true);
+		} else {
+			currentAction = new WfAction();
+			currentAction.setId(UUID.fromString(actionUuidField.getText()));
+			currentAction.setName(actionNameField.getText());
+			File aux = businessFiles.get(actionBpCmbo.getSelectedItem().toString());
+			if (aux.isFile()) {
+				currentAction.setBusinessProcess(aux);
+			}
+			currentAction.setConsequence((WfState) statesHash.get(actionConsequenceCmbo.getSelectedItem()));
+			actions.put(currentAction.getName(), currentAction);
+
+			actionUuidField.setText("");
+			actionNameField.setText("");
+			actionBpCmbo.setSelectedIndex(-1);
+			actionConsequenceCmbo.setSelectedIndex(-1);
+
+			newActionButton.setEnabled(true);
+			editActionButton.setEnabled(true);
+			removeButton.setEnabled(true);
+			actionNameField.setEnabled(false);
+			actionBpCmbo.setEnabled(false);
+			actionConsequenceCmbo.setEnabled(false);
+
+			editActionButton.setText("Edit");
+			saveButton.setEnabled(true);
+			revertButton.setEnabled(true);
+		}
+	}
+
+	private void actionsListPopulate() {
+		DefaultListModel<WfAction> lmodel = new DefaultListModel<WfAction>();
+		if (actions != null && actions.size() > 0) {
+			Set<String> keyset = actions.keySet();
+			List<String> keys = new ArrayList<String>();
+			keys = Arrays.asList(keyset.toArray(new String[0]));
+			Collections.sort(keys);
+			for (String act : keys) {
+				lmodel.addElement(actions.get(act));
+			}
+		}
+		actionsList.setModel(lmodel);
+		actionsList.updateUI();
+	}
+
+	private void newActionActionPreformed(ActionEvent e) {
+		if (removeButton.getText().equals("Remove")) {
+			newActionButton.setText("Save");
+			removeButton.setText("Cancel");
+			currentAction = new WfAction();
+			UUID id = UUID.randomUUID();
+			currentAction.setId(id);
+			actionUuidField.setText(id.toString());
+			actionNameField.setText("");
+			actionBpCmbo.setSelectedIndex(-1);
+			actionConsequenceCmbo.setSelectedIndex(-1);
+			selectedAction = -1;
+			activeSelection = false;
+			actionConsequenceCmbo.removeAllItems();
+			List<String> consequenceItems = new ArrayList<String>();
+			for (int i = 0; i < statesTable.getRowCount(); i++) {
+				if (((Boolean) statesTable.getValueAt(i, 0)) == true) {
+					consequenceItems.add((String) statesTable.getValueAt(i, 1));
+				}
+			}
+			Collections.sort(consequenceItems);
+			for (String string : consequenceItems) {
+				actionConsequenceCmbo.addItem(string);
+			}
+
+			newActionButton.setEnabled(true);
+			editActionButton.setEnabled(false);
+			removeButton.setEnabled(true);
+			actionNameField.setEnabled(true);
+			actionBpCmbo.setEnabled(true);
+			actionConsequenceCmbo.setEnabled(true);
+		} else {
+			if (actionNameField.getText() != null && actionNameField.getText().length() > 0) {
+				currentAction.setName(actionNameField.getText());
+				File aux = businessFiles.get(actionBpCmbo.getSelectedItem().toString());
+				if (aux.isFile()) {
 					currentAction.setBusinessProcess(aux);
-				currentAction.setConsequence((WfState) states.get(consequenceComboBox.getSelectedItem()));
-				if(actions.containsKey(currentAction.getName())){
+				}
+				currentAction.setConsequence((WfState) statesHash.get(actionConsequenceCmbo.getSelectedItem()));
+				if (actions.containsKey(currentAction.getName())) {
 					JOptionPane.showMessageDialog(this, "An action with the same name already exist.");
 					return;
-				}else{
+				} else {
 					actions.put(currentAction.getName(), currentAction);
-					DefaultListModel lmodel = new DefaultListModel();
-					if(actions.size()>0)
-						for (Object act : actions.keySet().toArray()) {
-							lmodel.addElement(act.toString());
-						}	
-					actionList.setModel(lmodel);
-					actionList.updateUI();
+					actionsListPopulate();
 				}
-				
-				newButton.setText("New Action");
+
+				newActionButton.setText("New Action");
 				removeButton.setText("Remove");
-				idTextField.setText("");
-				nameTextField.setText("");
-				businessTextField.setSelectedIndex(-1);
-				consequenceComboBox.setSelectedIndex(-1);
-				
-				newButton.setEnabled(true);
-				editButton.setEnabled(false);
+				actionUuidField.setText("");
+				actionNameField.setText("");
+				actionBpCmbo.setSelectedIndex(-1);
+				actionConsequenceCmbo.setSelectedIndex(-1);
+
+				newActionButton.setEnabled(true);
+				editActionButton.setEnabled(false);
 				removeButton.setEnabled(false);
-				nameTextField.setEnabled(false);
-				businessTextField.setEnabled(false);
-				consequenceComboBox.setEnabled(false);
-				
+				actionNameField.setEnabled(false);
+				actionBpCmbo.setEnabled(false);
+				actionConsequenceCmbo.setEnabled(false);
+
 				saveButton.setText("Save");
 				saveButton.setEnabled(true);
-				cancelButton.setEnabled(true);
-			}
-			else
+				revertButton.setEnabled(true);
+			} else {
 				JOptionPane.showMessageDialog(this, "You must write a name for the current Action.");
+			}
 		}
+
 	}
 
-	/**
-	 * Removes the button action performed.
-	 *
-	 * @param e the e
-	 */
-	private void removeButtonActionPerformed(ActionEvent e) {
-		if(removeButton.getText().equals("Remove")){
-			int i=actionList.getSelectedIndex();
-			if(i>-1){
-				actions.remove(actionList.getSelectedValue());
-				actionList.setSelectedIndex(-1);
-				idTextField.setText("");
-				nameTextField.setText("");
-				businessTextField.setSelectedIndex(-1);
-				consequenceComboBox.setSelectedIndex(-1);
-				DefaultListModel lmodel = new DefaultListModel();
-				if(actions.size()>0)
-					for (Object act : actions.keySet().toArray()) {
-						lmodel.addElement(act.toString());
-					}	
-				actionList.setModel(lmodel);
-				actionList.updateUI();
-				activeSelection=false;
-				selectedAction=-1;
-				
+	protected void removeButtonActionPerformed() {
+		if (removeButton.getText().equals("Remove")) {
+			int i = actionsList.getSelectedIndex();
+			if (i > -1) {
+				actions.remove(actionsList.getSelectedValue().getName());
+				actionsList.setSelectedIndex(-1);
+				actionUuidField.setText("");
+				actionNameField.setText("");
+				actionBpCmbo.setSelectedIndex(-1);
+				actionConsequenceCmbo.setSelectedIndex(-1);
+
+				actionsListPopulate();
+
+				activeSelection = false;
+				selectedAction = -1;
+
 				saveButton.setText("Save");
 				saveButton.setEnabled(true);
-				cancelButton.setEnabled(true);
+				revertButton.setEnabled(true);
 			}
-		}
-		else{																						//CANCEL
-			if(!activeSelection){																	//NEW
-				newButton.setText("New Action");
+		} else { // CANCEL
+			if (!activeSelection) { // NEW
+				newActionButton.setText("New Action");
 				removeButton.setText("Remove");
-				idTextField.setText("");
-				nameTextField.setText("");
-				businessTextField.setSelectedIndex(-1);
-				consequenceComboBox.setSelectedIndex(-1);
+				actionUuidField.setText("");
+				actionNameField.setText("");
+				actionBpCmbo.setSelectedIndex(-1);
+				actionConsequenceCmbo.setSelectedIndex(-1);
 
-				newButton.setEnabled(true);
-				editButton.setEnabled(false);
+				newActionButton.setEnabled(true);
+				editActionButton.setEnabled(false);
 				removeButton.setEnabled(false);
-				nameTextField.setEnabled(false);
-				businessTextField.setEnabled(false);
-				consequenceComboBox.setEnabled(false);
-			}
-			else{																					//EDIT
-				editButton.setText("Edit");
+				actionNameField.setEnabled(false);
+				actionBpCmbo.setEnabled(false);
+				actionConsequenceCmbo.setEnabled(false);
+			} else { // EDIT
+				editActionButton.setText("Edit");
 				removeButton.setText("Remove");
-				WfAction a= actions.get(actionList.getSelectedValue());
-				idTextField.setText(a.getId().toString());
-				nameTextField.setText(a.getName());
-				if(a.getBusinessProcess()!=null)
-					businessTextField.setSelectedItem(a.getBusinessProcess().getName().substring(0,a.getBusinessProcess().getName().length()-3));
-				if(a.getConsequence()!=null)
-				consequenceComboBox.setSelectedItem(a.getConsequence().getName());
-				
-				newButton.setEnabled(true);
-				editButton.setEnabled(true);
+				WfAction a = actions.get(actionsList.getSelectedValue().getName());
+				actionUuidField.setText(a.getId().toString());
+				actionNameField.setText(a.getName());
+				if (a.getBusinessProcess() != null) {
+					actionBpCmbo.setSelectedItem(a.getBusinessProcess().getName().replaceAll(".bp", ""));
+				}
+				if (a.getConsequence() != null) {
+					actionConsequenceCmbo.setSelectedItem(a.getConsequence().getName());
+				}
+
+				newActionButton.setEnabled(true);
+				editActionButton.setEnabled(true);
 				removeButton.setEnabled(true);
-				nameTextField.setEnabled(false);
-				businessTextField.setEnabled(false);
-				consequenceComboBox.setEnabled(false);
+				actionNameField.setEnabled(false);
+				actionBpCmbo.setEnabled(false);
+				actionConsequenceCmbo.setEnabled(false);
 			}
 		}
 	}
 
-
-
-	/**
-	 * Check state.
-	 *
-	 * @param row the row
-	 */
-	protected void checkState(int row) {
-		if(actions==null || actions.size()==0) return;
-		boolean value= (Boolean) statesTable.getValueAt(row, 0);
-		UUID uuid = null;
-		if(value) return;
-		WfState state= states.get(statesTable.getValueAt(row,1));
-		if(state==null) return;
-		uuid= state.getId();
-		for (WfAction action : actions.values()) {
-			if(action.getConsequence()!=null)
-			if(action.getConsequence().getId().equals(uuid)){
-				JOptionPane.showMessageDialog(this, "This State is present in one or more actions. Remove it from the actions first.");
-				statesTable.setValueAt(true, row, 0);
-				return;
-			} 
+	protected void actionsListValueChanged(ListSelectionEvent e) {
+		if (actionsList.getSelectedIndex() == -1) {
+			return;
 		}
-	}
-
-	/**
-	 * Action list value changed.
-	 *
-	 * @param e the e
-	 */
-	private void actionListValueChanged(ListSelectionEvent e) {
-		if(actionList.getSelectedIndex()==-1) return;
-		if(newButton.getText().equals("New Action") && newButton.isEnabled()){
-			activeSelection=true;
-			selectedAction=actionList.getSelectedIndex();
-			WfAction a= actions.get(actionList.getSelectedValue());
-			idTextField.setText(a.getId().toString());
-			nameTextField.setText(a.getName());
-			businessTextField.setSelectedItem(-1);
-			if(a.getBusinessProcess()!=null)
-				businessTextField.setSelectedItem(a.getBusinessProcess().getName().substring(0,a.getBusinessProcess().getName().length()-3));
-			consequenceComboBox.removeAllItems();
+		if (newActionButton.getText().equals("New Action") && newActionButton.isEnabled()) {
+			activeSelection = true;
+			selectedAction = actionsList.getSelectedIndex();
+			WfAction a = actions.get(actionsList.getSelectedValue().getName());
+			actionUuidField.setText(a.getId().toString());
+			actionNameField.setText(a.getName());
+			actionBpCmbo.setSelectedItem(-1);
+			if (a.getBusinessProcess() != null) {
+				actionBpCmbo.setSelectedItem(a.getBusinessProcess().getName().replaceAll(".bp", ""));
+			}
+			actionConsequenceCmbo.removeAllItems();
+			List<String> consequenceItems = new ArrayList<String>();
 			for (int i = 0; i < statesTable.getRowCount(); i++) {
-				if(((Boolean)statesTable.getValueAt(i, 0))==true)
-					consequenceComboBox.addItem((String)statesTable.getValueAt(i, 1));
+				if (((Boolean) statesTable.getValueAt(i, 0)) == true) {
+					consequenceItems.add((String) statesTable.getValueAt(i, 1));
+				}
 			}
-			if(a.getConsequence()!=null)
-				consequenceComboBox.setSelectedItem(a.getConsequence().getName());
-			editButton.setEnabled(true);
+			Collections.sort(consequenceItems);
+			for (String string : consequenceItems) {
+				actionConsequenceCmbo.addItem(string);
+			}
+			if (a.getConsequence() != null) {
+				actionConsequenceCmbo.setSelectedItem(a.getConsequence().getName());
+			}
+			editActionButton.setEnabled(true);
 			removeButton.setEnabled(true);
-		}else{
-			if(activeSelection) 
-				actionList.setSelectedIndex(selectedAction);
-			else
-				actionList.setSelectedIndex(-1);
+		} else {
+			if (activeSelection) {
+				actionsList.setSelectedIndex(selectedAction);
+			} else {
+				actionsList.setSelectedIndex(-1);
+			}
 		}
+
 	}
 
-	/**
-	 * Save button action performed.
-	 *
-	 * @param e the e
-	 */
-	private void saveButtonActionPerformed(ActionEvent e) {
-		if(cancelButton.isEnabled()){
-			if(saveFile()){
-				saveButton.setText("New");
-				cancelButton.setEnabled(false);
-			}
-		}
-		else{
-			newFile();
-			saveButton.setText("Save");
-			cancelButton.setEnabled(true);
-		}
+	protected void saveButtonActionPerformed(ActionEvent e) {
+		saveFile();
+	}
+
+	protected void closeButtonActionPerformed(ActionEvent e) {
+		this.getParent().remove(this);
+		this.invalidate();
 	}
 
 	private boolean saveFile() {
-		if(removeButton.getText().equals("Cancel")){
+		if (removeButton.getText().equals("Cancel")) {
 			JOptionPane.showMessageDialog(this, "Before save, please finish Action edition or creation.");
 			return false;
 		}
-		if(workflowNameTextField.getSelectedItem()!=null){
-			selRoles= new ArrayList<WfRole>();
-			selStates= new ArrayList<WfState>();
+		if (wfDefs.getSelectedItem() != null) {
+			selRoles = new ArrayList<WfRole>();
+			selStates = new ArrayList<WfState>();
 			for (int i = 0; i < rolesTable.getRowCount(); i++) {
-				if(((Boolean)rolesTable.getValueAt(i, 0))==true)
-					selRoles.add(roles.get((String)rolesTable.getValueAt(i, 1)));
+				if (((Boolean) rolesTable.getValueAt(i, 0)) == true) {
+					if (rolesHash.get((String) rolesTable.getValueAt(i, 1)) != null) {
+						selRoles.add(rolesHash.get((String) rolesTable.getValueAt(i, 1)));
+					} else {
+						System.out.println("Warning: roles not present");
+					}
+				}
 			}
+			List<String> consequenceItems = new ArrayList<String>();
 			for (int i = 0; i < statesTable.getRowCount(); i++) {
-				if(((Boolean)statesTable.getValueAt(i, 0))==true)
-					selStates.add(states.get((String)statesTable.getValueAt(i, 1)));
+				if (((Boolean) statesTable.getValueAt(i, 0)) == true) {
+					consequenceItems.add((String) statesTable.getValueAt(i, 1));
+					selStates.add(statesHash.get((String) statesTable.getValueAt(i, 1)));
+				}
 			}
-			WorkflowDefinition workflowDefinition = new WorkflowDefinition(selRoles,selStates,actions);
-			workflowDefinition.setName(workflowNameTextField.getSelectedItem().toString());
-			workflowDefinition.setDrlFileName(drlFiles);
-			workflowDefinition.setXlsFileName(xlsFiles);
+			Collections.sort(consequenceItems);
+			for (String string : consequenceItems) {
+				actionConsequenceCmbo.addItem(string);
+			}
+
+			drlFilesList = new ArrayList<String>();
+			ListModel<String> drlFilesModel = drlFiles.getModel();
+			List<String> selectedFiles = drlFiles.getSelectedValuesList();
+			for (String string : selectedFiles) {
+				File drlFile = drlHash.get(string);
+				if (drlFile != null) {
+					drlFilesList.add(drlFile.toString());
+				}
+			}
+			xlsFilesList = new ArrayList<String>();
+			List<String> xlsSelectedFiles = xlsFiles.getSelectedValuesList();
+			for (String string : xlsSelectedFiles) {
+				File xlsFile = xlsHash.get(string);
+				if (xlsFile != null) {
+					xlsFilesList.add(xlsFile.toString());
+				}
+			}
+			File f = new File("file.file");
+			if (f.exists()) {
+				f.delete();
+			}
+
+			WorkflowDefinition workflowDefinition = new WorkflowDefinition(selRoles, selStates, actions);
+			workflowDefinition.setName(wfDefs.getSelectedItem().toString());
+			workflowDefinition.setDrlFileName(drlFilesList);
+			workflowDefinition.setXlsFileName(xlsFilesList);
 			WorkflowDefinitionManager.writeWfDefinition(workflowDefinition);
-			JOptionPane.showMessageDialog(this, "\""+workflowNameTextField.getSelectedItem().toString()+"\" saved.");
-			workflowDefinitionFile= new File("sampleProcesses/"+workflowDefinition.getName()+".wfd");
+			JOptionPane.showMessageDialog(this, "\"" + wfDefs.getSelectedItem().toString() + "\" saved.");
+			workflowDefinitionFile = new File("sampleProcesses/" + workflowDefinition.getName() + ".wfd");
 			return true;
-		}
-		else{
+		} else {
 			JOptionPane.showMessageDialog(this, "Please write a name for the Workflow definition");
 			return false;
 		}
 	}
 
-	/**
-	 * Load file.
-	 */
-	private void loadFile() {
-		
-		WorkflowDefinition workflowDefinition = 
-			WorkflowDefinitionManager.readWfDefinition(workflowsDefinitions.get(workflowNameTextField.getSelectedItem()).getName());
-		actionList.setModel(new DefaultListModel());
-		actions=null;
-		WfComponentProvider wp= new WfComponentProvider();
-		List<WfRole> rolesList = wp.getRoles();
-		List<WfState> statesList = wp.getStates();
-		selRoles= workflowDefinition.getRoles();
-		selStates= workflowDefinition.getStates();
-		roles= new HashMap<String, WfRole>();
-		states= new HashMap<String, WfState>();
-		
-		if(selRoles!=null && selRoles.size()>0)
-		for (WfRole role : selRoles) {
-			if(role!=null && role.getName()!=null)
-			roles.put(role.getName(), role);
-		}
-		if(selStates!=null && selStates.size()>0)
-		for (WfState state : selStates) {
-			if(state!=null && state.getName()!=null)
-			states.put(state.getName(), state);
-		}
-		
-		DefaultTableModel model= (DefaultTableModel) rolesTable.getModel();
-		for (int i = 0; i < model.getRowCount(); i++) {
-			model.setValueAt(false, i, 0);
-		}
-		if(rolesList!=null && rolesList.size()>0)
-		for (WfRole role : rolesList) {
-			if(roles.containsKey(role.getName())){
-				for (int i = 0; i < model.getRowCount(); i++) {
-					String val= (String) model.getValueAt(i, 1);
-					if(role.getName().equalsIgnoreCase(val)){
-						model.setValueAt(true, i, 0);
-						break;
-					}
-				}
-			}
-			else{
-				roles.put(role.getName(), role);
-			}
-		}
-		rolesTable.setModel(model);
-		rolesTable.updateUI();
-		
-		model= (DefaultTableModel) statesTable.getModel();
-		for (int i = 0; i < model.getRowCount(); i++) {
-			model.setValueAt(false, i, 0);
-		}
-		if(statesList!=null && statesList.size()>0)
-		for (WfState state : statesList) {
-			if(states.containsKey(state.getName())){
-				for (int i = 0; i < model.getRowCount(); i++) {
-					String val= (String) model.getValueAt(i, 1);
-					if(state.getName().equalsIgnoreCase(val)){
-						model.setValueAt(true, i, 0);
-						break;
-					}
-				}
-			}
-			else{
-				states.put(state.getName(), state);
-			}
-		}
-		((DefaultTableModel)rolesTable.getModel()).addTableModelListener(new TableModelListener() {
-			@Override
-			public void tableChanged(TableModelEvent e) {
-				saveButton.setText("Save");
-				saveButton.setEnabled(true);
-				cancelButton.setEnabled(true);
-			}
-		    });
-		((DefaultTableModel)statesTable.getModel()).addTableModelListener(new TableModelListener() {
-			@Override
-			public void tableChanged(TableModelEvent e) {
-				checkState(e.getFirstRow());
-				saveButton.setText("Save");
-				saveButton.setEnabled(true);
-				cancelButton.setEnabled(true);
-			}
-		    });
-		statesTable.setModel(model);
-		statesTable.updateUI();
-		consequenceComboBox.removeAllItems();
-		for (int i = 0; i < statesTable.getRowCount(); i++) {
-			if(((Boolean)statesTable.getValueAt(i, 0))==true)
-				consequenceComboBox.addItem((String)statesTable.getValueAt(i, 1));
-		}
-		actions= (HashMap<String,WfAction>)workflowDefinition.getActions();
-		DefaultListModel lmodel = new DefaultListModel();
-		if(actions.size()>0)
-			for (Object act : actions.keySet().toArray()) {
-				lmodel.addElement(act.toString());
-			}	
-		actionList.setModel(lmodel);
-		actionList.updateUI();
-		
-		xlsTextField.clearSelection();
-		List<String> xlsFiles= workflowDefinition.getXlsFileName();
-		ListModel xlsModel= xlsTextField.getModel();
-		Vector<Integer> vector= new Vector<Integer>();
-		for (int i = 0; i < xlsFiles.size(); i++) {
-			String[] split = xlsFiles.get(i).split("/");
-			String key = split[split.length-1].substring(0,split[split.length-1].length()-4);
-			if(xlsHash.containsKey(key)){
-				for (int j = 0; j < xlsModel.getSize(); j++) {
-					File file= xlsHash.get(key);
-					String string= file.getName().substring(0,file.getName().length()-4);
-					if(xlsModel.getElementAt(j).toString().equals(string)){
-						vector.add(j);
-						break;
-					}
-				};
-			}
-		}
-		int[] indices= new int[vector.size()];
-		for (int i=0; i<vector.size(); i++) {
-			indices[i]=vector.get(i);
-		}
-		xlsTextField.setSelectedIndices(indices);
-		if(xlsFiles.size()==0) xlsTextField.setSelectedIndex(0);
+	public static void main(String[] args) {
+		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+		System.out.println(classLoader.getResource(".").getPath());
 
-		drlTextField.clearSelection();
-		List<String> drlFiles= workflowDefinition.getDrlFileName();
-		ListModel drlModel= drlTextField.getModel();
-		vector= new Vector<Integer>();
-		for (int i = 0; i < drlFiles.size(); i++) {
-			String[] split = drlFiles.get(i).split("/");
-			String key = split[split.length-1].substring(0,split[split.length-1].length()-4);
-			if(drlHash.containsKey(key)){
-				for (int j = 0; j < drlModel.getSize(); j++) {
-					File file= drlHash.get(key);
-					String string= file.getName().substring(0,file.getName().length()-4);
-					if(drlModel.getElementAt(j).toString().equals(string)){
-						vector.add(j);
-						break;
-					}
-				};
-			}
-		}
-		indices= new int[vector.size()];
-		for (int i=0; i<vector.size(); i++) {
-			indices[i]=vector.get(i);
-		}
-		drlTextField.setSelectedIndices(indices);
-		if(drlFiles.size()==0) drlTextField.setSelectedIndex(0);
-		
-		consequenceComboBox.setSelectedIndex(-1);
-		activeSelection=false;
-		selectedAction=-1;
-		
-		tabbedPane1.setEnabled(true);
-		tabbedPane1.setSelectedIndex(0);
-		newButton.setEnabled(true);
-		editButton.setEnabled(false);
-		removeButton.setEnabled(false);
-		nameTextField.setEnabled(false);
-		businessTextField.setEnabled(false);
-		consequenceComboBox.setEnabled(false);
-		saveButton.setText("New");
-		cancelButton.setEnabled(false);
-	}
-	
-	private void newFile(){
-		String name= JOptionPane.showInputDialog("Enter new Workflow Definition's name:");
-		if(name==null || name.length()==0){
-			JOptionPane.showMessageDialog(this, "Error in name, Workflow Definition not created.");
-			return;
-		}
-		File file= new File("sampleProcesses/"+name.concat(".wfd"));
-		WorkflowDefinition wfDefinition = new WorkflowDefinition(new ArrayList<WfRole>(), new ArrayList<WfState>(), new HashMap<String, WfAction>());
-		wfDefinition.setName(name);
-		WorkflowDefinitionManager.writeWfDefinition(wfDefinition);
-		workflowsDefinitions.put(name, file);
-		workflowNameTextField.addItem(name);
-		workflowNameTextField.setSelectedItem(name);
-		
 	}
 
-	/**
-	 * Close button action performed.
-	 *
-	 * @param e the e
-	 */
-	private void closeButtonActionPerformed(ActionEvent e) {					//CLOSE
-		try {
-				AceFrameConfig config;
-				config = (AceFrameConfig) Terms.get().getActiveAceFrameConfig();
-				AceFrame ace=config.getAceFrame();
-				JTabbedPane tp=ace.getCdePanel().getLeftTabs();
-				if (tp != null) {
-					int tabCount = tp.getTabCount();
-					for (int i = 0; i < tabCount; i++) {
-						if (tp.getTitleAt(i).equals(TranslationHelperPanel.WORKFLOWDEFINITION_TAB_NAME)) {
-							tp.remove(i);
-							tp.revalidate();
-							tp.repaint();
-						}
-					}
-				}
-			} catch (TerminologyException e1) {
-				e1.printStackTrace();
-			} catch (IOException e1) {
-				e1.printStackTrace();
-			}
-	}
-
-
-	/**
-	 * Cancel button action performed.
-	 *
-	 * @param e the e
-	 */
-	private void cancelButtonActionPerformed(ActionEvent e) {
-		if(workflowDefinitionFile==null){
-			actions= new HashMap<String, WfAction>();
-			actionList.setModel(new DefaultListModel());
-			idTextField.setText("");
-			nameTextField.setText("");
-			consequenceComboBox.setSelectedIndex(-1);
-			consequenceComboBox.removeAllItems();
-			businessTextField.setSelectedIndex(-1);
-			DefaultTableModel model= (DefaultTableModel) rolesTable.getModel();
+	protected void revertButtonActionPerformed(ActionEvent e) {
+		if (workflowDefinitionFile == null) {
+			actions = new HashMap<String, WfAction>();
+			actionsList.setModel(new DefaultListModel());
+			actionUuidField.setText("");
+			actionNameField.setText("");
+			actionConsequenceCmbo.setSelectedIndex(-1);
+			actionConsequenceCmbo.removeAllItems();
+			actionBpCmbo.setSelectedIndex(-1);
+			DefaultTableModel model = (DefaultTableModel) rolesTable.getModel();
 			for (int i = 0; i < model.getRowCount(); i++) {
 				model.setValueAt(false, i, 0);
 			}
 			rolesTable.setModel(model);
-			model= (DefaultTableModel) statesTable.getModel();
-			for (int i = 0; i < model.getRowCount(); i++) {
-				model.setValueAt(false, i, 0);
+			DefaultTableModel statesModel = (DefaultTableModel) statesTable.getModel();
+			for (int i = 0; i < statesModel.getRowCount(); i++) {
+				statesModel.setValueAt(false, i, 0);
 			}
-			statesTable.setModel(model);
-			roles= new HashMap<String, WfRole>();
-			states= new  HashMap<String, WfState>();
-			cancelButton.setEnabled(false);
-			saveButton.setText("New");
-			saveButton.setEnabled(true);
+			statesTable.setModel(statesModel);
+		} else {
+			loadFile(workflowDefinitionFile);
 		}
-		else{
-			loadFile();
-		}
+		revertToInitialState();
 	}
 
-	/**
-	 * Edits the button action performed.
-	 *
-	 * @param e the e
-	 */
-	private void editButtonActionPerformed(ActionEvent e) {
-		if(editButton.getText().equals("Edit")){
-			editButton.setText("Save");
-			removeButton.setText("Cancel");
-			actionName= nameTextField.getText();
-			
-			newButton.setEnabled(false);
-			editButton.setEnabled(true);
-			removeButton.setEnabled(true);
-			nameTextField.setEnabled(true);
-			businessTextField.setEnabled(true);
-			consequenceComboBox.setEnabled(true);
-			}
-		else{
-			if(nameTextField.getText()!=null && nameTextField.getText().length()>0){
-				currentAction= new WfAction();
-				currentAction.setId(UUID.fromString(idTextField.getText()));
-				currentAction.setName(nameTextField.getText());
-				if(businessTextField.getSelectedIndex()!=-1){
-					File aux= businessFiles.get(businessTextField.getSelectedItem());
-					currentAction.setBusinessProcess(aux);
-				}
-				currentAction.setConsequence((WfState) states.get(consequenceComboBox.getSelectedItem()));
-				if(!currentAction.getName().equals(actionName) && actions.containsKey(currentAction.getName())){
-					JOptionPane.showMessageDialog(this, "An action with the same name already exist.");
-					return;
-				}
-				else{
-					actions.remove(actionName);
-					actionName="";
-					actions.put(currentAction.getName(),currentAction);
-					DefaultListModel lmodel = new DefaultListModel();
-					if(actions.size()>0)
-						for (Object act : actions.keySet().toArray()) {
-							lmodel.addElement(act.toString());
-						}	
-					actionList.setModel(lmodel);
-					actionList.updateUI();
-				}
-				editButton.setText("Edit");
-				removeButton.setText("Remove");
-				idTextField.setText("");
-				nameTextField.setText("");
-				businessTextField.setSelectedIndex(-1);
-				consequenceComboBox.setSelectedIndex(-1);
-				
-				newButton.setEnabled(true);
-				editButton.setEnabled(false);
-				removeButton.setEnabled(false);
-				nameTextField.setEnabled(false);
-				businessTextField.setEnabled(false);
-				consequenceComboBox.setEnabled(false);
-				
-				saveButton.setText("Save");
-				saveButton.setEnabled(true);
-				cancelButton.setEnabled(true);
-			}
-			else
-				JOptionPane.showMessageDialog(this, "You must write a name for the current Action.");
-		}
-		
-	}
-
-	private void workflowNameTextFieldItemStateChanged(ItemEvent e) {
-		if(((JComboBox)e.getSource()).getSelectedIndex()<1) return;
-		File file= workflowsDefinitions.get(workflowNameTextField.getSelectedItem());
-		if(workflowDefinitionFile!=null && workflowDefinitionFile.equals(file)) return;
-		workflowDefinitionFile= file;
-		loadFile();
-	}
-
-	private void xlsTextFieldValueChanged(ListSelectionEvent e) {
-		Object[] selection = xlsTextField.getSelectedValues();
-		xlsFiles= new ArrayList<String>();
-		for (int i = 0; i < selection.length; i++) {
-			if(xlsHash.containsKey(selection[i]))
-				xlsFiles.add(xlsHash.get(selection[i]).getAbsolutePath());
-		}
-		saveButton.setText("Save");
-		saveButton.setEnabled(true);
-		cancelButton.setEnabled(true);
-	}
-
-	private void drlTextFieldValueChanged(ListSelectionEvent e) {
-		Object[] selection = drlTextField.getSelectedValues();
-		drlFiles= new ArrayList<String>();
-		for (int i = 0; i < selection.length; i++) {
-			if(drlHash.containsKey(selection[i]))
-				drlFiles.add(drlHash.get(selection[i]).getAbsolutePath());
-		}
-		saveButton.setText("Save");
-		saveButton.setEnabled(true);
-		cancelButton.setEnabled(true);
-	}
-
-	
-
-	/**
-	 * Inits the components.
-	 */
 	private void initComponents() {
-		// JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
-		panel8 = new JPanel();
-		label11 = new JLabel();
-		workflowNameTextField = new JComboBox();
-		separator1 = new JSeparator();
-		tabbedPane1 = new JTabbedPane();
-		panel9 = new JPanel();
-		scrollPane2 = new JScrollPane();
-		rolesTable = new JTable();
-		panel12 = new JPanel();
-		scrollPane3 = new JScrollPane();
-		statesTable = new JTable();
-		panel10 = new JPanel();
-		scrollPane1 = new JScrollPane();
-		actionList = new JList();
+		// JFormDesigner - Component initialization - DO NOT MODIFY
+		// //GEN-BEGIN:initComponents
 		panel1 = new JPanel();
-		panel5 = new JPanel();
-		newButton = new JButton();
-		editButton = new JButton();
-		removeButton = new JButton();
-		label3 = new JLabel();
-		idTextField = new JTextField();
-		label4 = new JLabel();
-		nameTextField = new JTextField();
-		label5 = new JLabel();
-		consequenceComboBox = new JComboBox();
-		label6 = new JLabel();
-		panel6 = new JPanel();
-		businessTextField = new JComboBox();
-		panel11 = new JPanel();
-		panel3 = new JPanel();
-		label9 = new JLabel();
-		scrollPane4 = new JScrollPane();
-		xlsTextField = new JList();
-		panel4 = new JPanel();
-		label10 = new JLabel();
-		scrollPane5 = new JScrollPane();
-		drlTextField = new JList();
-		separator2 = new JSeparator();
-		panel7 = new JPanel();
+		panel2 = new JPanel();
 		saveButton = new JButton();
-		cancelButton = new JButton();
-		closeButton = new JButton();
+		saveButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				saveButtonActionPerformed(e);
+			}
+		});
+		revertButton = new JButton();
+		revertButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				revertButtonActionPerformed(e);
+			}
+		});
+		panel3 = new JPanel();
+		separator1 = new JSeparator();
+		panel5 = new JPanel();
+		label6 = new JLabel();
+		scrollPane4 = new JScrollPane();
+		xlsFiles = new JList<String>();
+		label7 = new JLabel();
+		scrollPane5 = new JScrollPane();
+		drlFiles = new JList<String>();
+		separator2 = new JSeparator();
 
-		//======== this ========
-		setBackground(new Color(238, 238, 238));
-		setLayout(new GridBagLayout());
-		((GridBagLayout)getLayout()).columnWidths = new int[] {25, 305, 20, 0};
-		((GridBagLayout)getLayout()).rowHeights = new int[] {25, 0, 20, 20, 255, 20, 0, 20, 0};
-		((GridBagLayout)getLayout()).columnWeights = new double[] {0.0, 0.0, 0.0, 1.0E-4};
-		((GridBagLayout)getLayout()).rowWeights = new double[] {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0E-4};
+		// ======== this ========
+		setBorder(new EmptyBorder(5, 5, 5, 5));
+		setLayout(new BorderLayout());
+		GridBagLayout gbl_panel1 = new GridBagLayout();
+		gbl_panel1.columnWidths = new int[] { 133, 153, 75, 0, 79, 0 };
+		gbl_panel1.rowHeights = new int[] { 29, 0 };
+		gbl_panel1.columnWeights = new double[] { 0.0, 0.0, 0.0, 1.0, 0.0, Double.MIN_VALUE };
+		gbl_panel1.rowWeights = new double[] { 0.0, Double.MIN_VALUE };
+		panel1.setLayout(gbl_panel1);
+		addWfDef = new JButton();
+		addWfDef.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				addWfActionPreformed(e);
+			}
+		});
+		label1 = new JLabel();
 
-		//======== panel8 ========
+		// ---- label1 ----
+		label1.setText("Workflow Definitions");
+		GridBagConstraints gbc_label1 = new GridBagConstraints();
+		gbc_label1.anchor = GridBagConstraints.WEST;
+		gbc_label1.insets = new Insets(0, 0, 0, 5);
+		gbc_label1.gridx = 0;
+		gbc_label1.gridy = 0;
+		panel1.add(label1, gbc_label1);
+		wfDefs = new JComboBox();
+		wfDefs.addItemListener(new ItemListener() {
+			public void itemStateChanged(ItemEvent e) {
+				wfDefsItemStateChanged(e);
+			}
+		});
+
+		// ======== panel1 ========
 		{
-			panel8.setLayout(new GridBagLayout());
-			((GridBagLayout)panel8.getLayout()).columnWidths = new int[] {25, 205, 255, 0, 0};
-			((GridBagLayout)panel8.getLayout()).rowHeights = new int[] {0, 0};
-			((GridBagLayout)panel8.getLayout()).columnWeights = new double[] {0.0, 0.0, 0.0, 1.0, 1.0E-4};
-			((GridBagLayout)panel8.getLayout()).rowWeights = new double[] {0.0, 1.0E-4};
-
-			//---- label11 ----
-			label11.setText("Name of Workflow Definition:");
-			panel8.add(label11, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 0, 5), 0, 0));
-
-			//---- workflowNameTextField ----
-			workflowNameTextField.addItemListener(new ItemListener() {
-				@Override
-				public void itemStateChanged(ItemEvent e) {
-					workflowNameTextFieldItemStateChanged(e);
-				}
-			});
-			panel8.add(workflowNameTextField, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 0, 5), 0, 0));
+			GridBagConstraints gbc_wfDefs = new GridBagConstraints();
+			gbc_wfDefs.fill = GridBagConstraints.HORIZONTAL;
+			gbc_wfDefs.insets = new Insets(0, 0, 0, 5);
+			gbc_wfDefs.gridx = 1;
+			gbc_wfDefs.gridy = 0;
+			panel1.add(wfDefs, gbc_wfDefs);
 		}
-		add(panel8, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0,
-			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-			new Insets(0, 0, 5, 5), 0, 0));
-		add(separator1, new GridBagConstraints(0, 3, 3, 1, 0.0, 0.0,
-			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-			new Insets(0, 0, 5, 0), 0, 0));
 
-		//======== tabbedPane1 ========
+		// ---- addWfDef ----
+		addWfDef.setText("Add");
+		GridBagConstraints gbc_addWfDef = new GridBagConstraints();
+		gbc_addWfDef.anchor = GridBagConstraints.WEST;
+		gbc_addWfDef.insets = new Insets(0, 0, 0, 5);
+		gbc_addWfDef.gridx = 2;
+		gbc_addWfDef.gridy = 0;
+		panel1.add(addWfDef, gbc_addWfDef);
+		add(panel1, BorderLayout.NORTH);
+
+		// ======== panel2 ========
 		{
+			panel2.setLayout(new FlowLayout(FlowLayout.RIGHT, 2, 2));
 
-			//======== panel9 ========
-			{
-				panel9.setLayout(new GridBagLayout());
-				((GridBagLayout)panel9.getLayout()).columnWidths = new int[] {15, 0, 10, 0};
-				((GridBagLayout)panel9.getLayout()).rowHeights = new int[] {15, 0, 10, 0};
-				((GridBagLayout)panel9.getLayout()).columnWeights = new double[] {0.0, 1.0, 0.0, 1.0E-4};
-				((GridBagLayout)panel9.getLayout()).rowWeights = new double[] {0.0, 1.0, 0.0, 1.0E-4};
+			// ---- saveButton ----
+			saveButton.setText("Save");
+			panel2.add(saveButton);
 
-				//======== scrollPane2 ========
-				{
-
-					//---- rolesTable ----
-					rolesTable.setModel(new DefaultTableModel(
-						new Object[][] {
-						},
-						new String[] {
-							"Included", "Roles"
-						}
-					) {
-						Class<?>[] columnTypes = new Class<?>[] {
-							Boolean.class, String.class
-						};
-						boolean[] columnEditable = new boolean[] {
-							true, false
-						};
-						@Override
-						public Class<?> getColumnClass(int columnIndex) {
-							return columnTypes[columnIndex];
-						}
-						@Override
-						public boolean isCellEditable(int rowIndex, int columnIndex) {
-							return columnEditable[columnIndex];
-						}
-					});
-					{
-						TableColumnModel cm = rolesTable.getColumnModel();
-						cm.getColumn(0).setResizable(false);
-						cm.getColumn(0).setMinWidth(55);
-						cm.getColumn(0).setMaxWidth(55);
-						cm.getColumn(0).setPreferredWidth(55);
-					}
-					rolesTable.setRowSelectionAllowed(false);
-					scrollPane2.setViewportView(rolesTable);
-				}
-				panel9.add(scrollPane2, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0,
-					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-					new Insets(0, 0, 5, 5), 0, 0));
-			}
-			tabbedPane1.addTab("Roles", panel9);
-
-
-			//======== panel12 ========
-			{
-				panel12.setLayout(new GridBagLayout());
-				((GridBagLayout)panel12.getLayout()).columnWidths = new int[] {15, 0, 10, 0};
-				((GridBagLayout)panel12.getLayout()).rowHeights = new int[] {15, 0, 10, 0};
-				((GridBagLayout)panel12.getLayout()).columnWeights = new double[] {0.0, 1.0, 0.0, 1.0E-4};
-				((GridBagLayout)panel12.getLayout()).rowWeights = new double[] {0.0, 1.0, 0.0, 1.0E-4};
-
-				//======== scrollPane3 ========
-				{
-
-					//---- statesTable ----
-					statesTable.setModel(new DefaultTableModel(
-						new Object[][] {
-						},
-						new String[] {
-							"Included", "States"
-						}
-					) {
-						Class<?>[] columnTypes = new Class<?>[] {
-							Boolean.class, Object.class
-						};
-						boolean[] columnEditable = new boolean[] {
-							true, false
-						};
-						@Override
-						public Class<?> getColumnClass(int columnIndex) {
-							return columnTypes[columnIndex];
-						}
-						@Override
-						public boolean isCellEditable(int rowIndex, int columnIndex) {
-							return columnEditable[columnIndex];
-						}
-					});
-					{
-						TableColumnModel cm = statesTable.getColumnModel();
-						cm.getColumn(0).setResizable(false);
-						cm.getColumn(0).setMinWidth(55);
-						cm.getColumn(0).setMaxWidth(55);
-						cm.getColumn(0).setPreferredWidth(55);
-					}
-					statesTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-					statesTable.setRowSelectionAllowed(false);
-					scrollPane3.setViewportView(statesTable);
-				}
-				panel12.add(scrollPane3, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0,
-					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-					new Insets(0, 0, 5, 5), 0, 0));
-			}
-			tabbedPane1.addTab("States", panel12);
-
-
-			//======== panel10 ========
-			{
-				panel10.setLayout(new GridBagLayout());
-				((GridBagLayout)panel10.getLayout()).columnWidths = new int[] {15, 145, 15, 197, 10, 0};
-				((GridBagLayout)panel10.getLayout()).rowHeights = new int[] {15, 0, 10, 0};
-				((GridBagLayout)panel10.getLayout()).columnWeights = new double[] {0.0, 1.0, 0.0, 0.0, 0.0, 1.0E-4};
-				((GridBagLayout)panel10.getLayout()).rowWeights = new double[] {0.0, 0.0, 0.0, 1.0E-4};
-
-				//======== scrollPane1 ========
-				{
-
-					//---- actionList ----
-					actionList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-					actionList.setToolTipText("Actions");
-					actionList.addListSelectionListener(new ListSelectionListener() {
-						@Override
-						public void valueChanged(ListSelectionEvent e) {
-							actionListValueChanged(e);
-							actionListValueChanged(e);
-							actionListValueChanged(e);
-						}
-					});
-					scrollPane1.setViewportView(actionList);
-				}
-				panel10.add(scrollPane1, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0,
-					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-					new Insets(0, 0, 5, 5), 0, 0));
-
-				//======== panel1 ========
-				{
-					panel1.setLayout(new GridBagLayout());
-					((GridBagLayout)panel1.getLayout()).columnWidths = new int[] {55, 80, 0};
-					((GridBagLayout)panel1.getLayout()).rowHeights = new int[] {0, 0, 0, 0, 0, 0};
-					((GridBagLayout)panel1.getLayout()).columnWeights = new double[] {0.0, 1.0, 1.0E-4};
-					((GridBagLayout)panel1.getLayout()).rowWeights = new double[] {0.0, 0.0, 0.0, 0.0, 0.0, 1.0E-4};
-
-					//======== panel5 ========
-					{
-						panel5.setLayout(new GridBagLayout());
-						((GridBagLayout)panel5.getLayout()).columnWidths = new int[] {0, 0, 0, 0};
-						((GridBagLayout)panel5.getLayout()).rowHeights = new int[] {0, 0};
-						((GridBagLayout)panel5.getLayout()).columnWeights = new double[] {1.0, 0.0, 1.0, 1.0E-4};
-						((GridBagLayout)panel5.getLayout()).rowWeights = new double[] {0.0, 1.0E-4};
-
-						//---- newButton ----
-						newButton.setText("New Action");
-						newButton.addActionListener(new ActionListener() {
-							@Override
-							public void actionPerformed(ActionEvent e) {
-								newButtonActionPerformed(e);
-							}
-						});
-						panel5.add(newButton, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-							new Insets(0, 0, 0, 5), 0, 0));
-
-						//---- editButton ----
-						editButton.setText("Edit");
-						editButton.setEnabled(false);
-						editButton.addActionListener(new ActionListener() {
-							@Override
-							public void actionPerformed(ActionEvent e) {
-								editButtonActionPerformed(e);
-							}
-						});
-						panel5.add(editButton, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
-							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-							new Insets(0, 0, 0, 5), 0, 0));
-
-						//---- removeButton ----
-						removeButton.setText("Remove");
-						removeButton.setEnabled(false);
-						removeButton.addActionListener(new ActionListener() {
-							@Override
-							public void actionPerformed(ActionEvent e) {
-								removeButtonActionPerformed(e);
-							}
-						});
-						panel5.add(removeButton, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
-							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-							new Insets(0, 0, 0, 0), 0, 0));
-					}
-					panel1.add(panel5, new GridBagConstraints(0, 0, 2, 1, 0.0, 0.0,
-						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-						new Insets(0, 0, 5, 0), 0, 0));
-
-					//---- label3 ----
-					label3.setText("Id:");
-					panel1.add(label3, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
-						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-						new Insets(0, 0, 5, 5), 0, 0));
-
-					//---- idTextField ----
-					idTextField.setEnabled(false);
-					panel1.add(idTextField, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0,
-						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-						new Insets(0, 0, 5, 0), 0, 0));
-
-					//---- label4 ----
-					label4.setText("Name:");
-					panel1.add(label4, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0,
-						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-						new Insets(0, 0, 5, 5), 0, 0));
-					panel1.add(nameTextField, new GridBagConstraints(1, 2, 1, 1, 0.0, 0.0,
-						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-						new Insets(0, 0, 5, 0), 0, 0));
-
-					//---- label5 ----
-					label5.setText("Consequence:");
-					panel1.add(label5, new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0,
-						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-						new Insets(0, 0, 5, 5), 0, 0));
-
-					//---- consequenceComboBox ----
-					consequenceComboBox.setEnabled(false);
-					panel1.add(consequenceComboBox, new GridBagConstraints(1, 3, 1, 1, 0.0, 0.0,
-						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-						new Insets(0, 0, 5, 0), 0, 0));
-
-					//---- label6 ----
-					label6.setText("Business Process:");
-					panel1.add(label6, new GridBagConstraints(0, 4, 1, 1, 0.0, 0.0,
-						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-						new Insets(0, 0, 0, 5), 0, 0));
-
-					//======== panel6 ========
-					{
-						panel6.setLayout(new GridBagLayout());
-						((GridBagLayout)panel6.getLayout()).columnWidths = new int[] {99, 0};
-						((GridBagLayout)panel6.getLayout()).rowHeights = new int[] {0, 0};
-						((GridBagLayout)panel6.getLayout()).columnWeights = new double[] {1.0, 1.0E-4};
-						((GridBagLayout)panel6.getLayout()).rowWeights = new double[] {0.0, 1.0E-4};
-						panel6.add(businessTextField, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-							GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-							new Insets(0, 0, 0, 0), 0, 0));
-					}
-					panel1.add(panel6, new GridBagConstraints(1, 4, 1, 1, 0.0, 0.0,
-						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-						new Insets(0, 0, 0, 0), 0, 0));
-				}
-				panel10.add(panel1, new GridBagConstraints(3, 1, 1, 1, 0.0, 0.0,
-					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-					new Insets(0, 0, 5, 5), 0, 0));
-			}
-			tabbedPane1.addTab("Actions", panel10);
-
-
-			//======== panel11 ========
-			{
-				panel11.setLayout(new GridBagLayout());
-				((GridBagLayout)panel11.getLayout()).columnWidths = new int[] {25, 0, 0, 0, 0, 20, 0};
-				((GridBagLayout)panel11.getLayout()).rowHeights = new int[] {10, 0, 40, 10, 0, 40, 5, 0};
-				((GridBagLayout)panel11.getLayout()).columnWeights = new double[] {0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0E-4};
-				((GridBagLayout)panel11.getLayout()).rowWeights = new double[] {0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0E-4};
-
-				//======== panel3 ========
-				{
-					panel3.setLayout(new GridBagLayout());
-					((GridBagLayout)panel3.getLayout()).columnWidths = new int[] {85, 0, 0};
-					((GridBagLayout)panel3.getLayout()).rowHeights = new int[] {0, 50, 0};
-					((GridBagLayout)panel3.getLayout()).columnWeights = new double[] {0.0, 1.0, 1.0E-4};
-					((GridBagLayout)panel3.getLayout()).rowWeights = new double[] {0.0, 1.0, 1.0E-4};
-
-					//---- label9 ----
-					label9.setText("XLS File:");
-					panel3.add(label9, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-						new Insets(0, 0, 5, 5), 0, 0));
-
-					//======== scrollPane4 ========
-					{
-
-						//---- xlsTextField ----
-						xlsTextField.addListSelectionListener(new ListSelectionListener() {
-							@Override
-							public void valueChanged(ListSelectionEvent e) {
-								xlsTextFieldValueChanged(e);
-							}
-						});
-						scrollPane4.setViewportView(xlsTextField);
-					}
-					panel3.add(scrollPane4, new GridBagConstraints(1, 0, 1, 2, 0.0, 0.0,
-						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-						new Insets(0, 0, 0, 0), 0, 0));
-				}
-				panel11.add(panel3, new GridBagConstraints(1, 1, 4, 2, 0.0, 0.0,
-					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-					new Insets(0, 0, 5, 5), 0, 0));
-
-				//======== panel4 ========
-				{
-					panel4.setLayout(new GridBagLayout());
-					((GridBagLayout)panel4.getLayout()).columnWidths = new int[] {85, 293, 0};
-					((GridBagLayout)panel4.getLayout()).rowHeights = new int[] {0, 50, 0};
-					((GridBagLayout)panel4.getLayout()).columnWeights = new double[] {0.0, 1.0, 1.0E-4};
-					((GridBagLayout)panel4.getLayout()).rowWeights = new double[] {0.0, 1.0, 1.0E-4};
-
-					//---- label10 ----
-					label10.setText("DRL File:");
-					panel4.add(label10, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0,
-						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-						new Insets(0, 0, 5, 5), 0, 0));
-
-					//======== scrollPane5 ========
-					{
-
-						//---- drlTextField ----
-						drlTextField.addListSelectionListener(new ListSelectionListener() {
-							@Override
-							public void valueChanged(ListSelectionEvent e) {
-								drlTextFieldValueChanged(e);
-							}
-						});
-						scrollPane5.setViewportView(drlTextField);
-					}
-					panel4.add(scrollPane5, new GridBagConstraints(1, 0, 1, 2, 0.0, 0.0,
-						GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-						new Insets(0, 0, 0, 0), 0, 0));
-				}
-				panel11.add(panel4, new GridBagConstraints(1, 4, 4, 2, 0.0, 0.0,
-					GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-					new Insets(0, 0, 5, 5), 0, 0));
-			}
-			tabbedPane1.addTab("Rules Files", panel11);
-
+			// ---- revertButton ----
+			revertButton.setText("Revert");
+			panel2.add(revertButton);
 		}
-		add(tabbedPane1, new GridBagConstraints(1, 4, 1, 1, 0.0, 0.0,
-			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-			new Insets(0, 0, 5, 5), 0, 0));
-		add(separator2, new GridBagConstraints(0, 5, 3, 1, 0.0, 0.0,
-			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-			new Insets(0, 0, 5, 0), 0, 0));
+		add(panel2, BorderLayout.SOUTH);
 
-		//======== panel7 ========
+		btnClose = new JButton("Close");
+		btnClose.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				closeButtonActionPerformed(e);
+			}
+		});
+		panel2.add(btnClose);
+		btnClose.setHorizontalAlignment(SwingConstants.RIGHT);
+
+		// ======== panel3 ========
 		{
-			panel7.setLayout(new GridBagLayout());
-			((GridBagLayout)panel7.getLayout()).columnWidths = new int[] {25, 0, 0, 0, 0, 20, 0};
-			((GridBagLayout)panel7.getLayout()).rowHeights = new int[] {0, 0};
-			((GridBagLayout)panel7.getLayout()).columnWeights = new double[] {0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0E-4};
-			((GridBagLayout)panel7.getLayout()).rowWeights = new double[] {0.0, 1.0E-4};
+			panel3.setLayout(new GridBagLayout());
+			((GridBagLayout) panel3.getLayout()).columnWidths = new int[] { 0, 0 };
+			((GridBagLayout) panel3.getLayout()).rowHeights = new int[] { 16, 0, 0, 9, 0 };
+			((GridBagLayout) panel3.getLayout()).columnWeights = new double[] { 1.0, 1.0E-4 };
+			((GridBagLayout) panel3.getLayout()).rowWeights = new double[] { 0.0, 1.0, 1.0, 0.0, 1.0E-4 };
+			panel3.add(separator1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0,
+					5, 0), 0, 0));
 
-			//---- saveButton ----
-			saveButton.setText("New");
-			saveButton.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					saveButtonActionPerformed(e);
+			splitPane = new JSplitPane();
+			splitPane.setResizeWeight(0.5);
+			GridBagConstraints gbc_splitPane = new GridBagConstraints();
+			gbc_splitPane.insets = new Insets(0, 0, 5, 0);
+			gbc_splitPane.fill = GridBagConstraints.BOTH;
+			gbc_splitPane.gridx = 0;
+			gbc_splitPane.gridy = 1;
+			panel3.add(splitPane, gbc_splitPane);
+
+			panel = new JPanel();
+			splitPane.setLeftComponent(panel);
+			GridBagLayout gbl_panel = new GridBagLayout();
+			gbl_panel.columnWidths = new int[] { 0, 0, 0 };
+			gbl_panel.rowHeights = new int[] { 0, 0, 0 };
+			gbl_panel.columnWeights = new double[] { 1.0, 1.0, Double.MIN_VALUE };
+			gbl_panel.rowWeights = new double[] { 0.0, 1.0, Double.MIN_VALUE };
+			panel.setLayout(gbl_panel);
+			panel.setBorder(new EmptyBorder(5, 5, 5, 5));
+
+			lblRoles = new JLabel("Roles");
+			GridBagConstraints gbc_lblRoles = new GridBagConstraints();
+			gbc_lblRoles.anchor = GridBagConstraints.WEST;
+			gbc_lblRoles.insets = new Insets(0, 0, 5, 5);
+			gbc_lblRoles.gridx = 0;
+			gbc_lblRoles.gridy = 0;
+			panel.add(lblRoles, gbc_lblRoles);
+
+			lblStates = new JLabel("States");
+			GridBagConstraints gbc_lblStates = new GridBagConstraints();
+			gbc_lblStates.anchor = GridBagConstraints.WEST;
+			gbc_lblStates.insets = new Insets(0, 0, 5, 0);
+			gbc_lblStates.gridx = 1;
+			gbc_lblStates.gridy = 0;
+			panel.add(lblStates, gbc_lblStates);
+			scrollPane1 = new JScrollPane();
+			GridBagConstraints gbc_scrollPane1 = new GridBagConstraints();
+			gbc_scrollPane1.fill = GridBagConstraints.BOTH;
+			gbc_scrollPane1.insets = new Insets(0, 0, 0, 5);
+			gbc_scrollPane1.gridx = 0;
+			gbc_scrollPane1.gridy = 1;
+			panel.add(scrollPane1, gbc_scrollPane1);
+			rolesTable = new JTable();
+
+			// ======== scrollPane1 ========
+			{
+
+				// ---- rolesTable ----
+				rolesTable.setMaximumSize(new Dimension(2147483647, 32900));
+				rolesTable.setModel(new DefaultTableModel(new Object[][] { { "asfadsfa", "sdfadsf" }, { "sdfasdfasd", "sdf" }, }, new String[] {
+						null, null }));
+				scrollPane1.setViewportView(rolesTable);
+			}
+			scrollPane2 = new JScrollPane();
+			GridBagConstraints gbc_scrollPane2 = new GridBagConstraints();
+			gbc_scrollPane2.fill = GridBagConstraints.BOTH;
+			gbc_scrollPane2.gridx = 1;
+			gbc_scrollPane2.gridy = 1;
+			panel.add(scrollPane2, gbc_scrollPane2);
+			statesTable = new JTable();
+
+			// ======== scrollPane2 ========
+			{
+
+				// ---- statusTable ----
+				statesTable.setMaximumSize(new Dimension(2147483647, 328888));
+				statesTable.setModel(new DefaultTableModel(new Object[][] { { "sdfadsf", "sdfasdfads" }, { "dfadsfadsf", "sdfasdfasfadsf" }, },
+						new String[] { null, null }));
+				scrollPane2.setViewportView(statesTable);
+			}
+			panel4 = new JPanel();
+			splitPane.setRightComponent(panel4);
+			scrollPane3 = new JScrollPane();
+			actionsList = new JList<WfAction>();
+			actionsList.addListSelectionListener(new ListSelectionListener() {
+				public void valueChanged(ListSelectionEvent e) {
+					actionsListValueChanged(e);
 				}
 			});
-			panel7.add(saveButton, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 0, 5), 0, 0));
-
-			//---- cancelButton ----
-			cancelButton.setText("Cancel");
-			cancelButton.setEnabled(false);
-			cancelButton.addActionListener(new ActionListener() {
-				@Override
+			newActionButton = new JButton();
+			newActionButton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					cancelButtonActionPerformed(e);
+					newActionActionPreformed(e);
 				}
 			});
-			panel7.add(cancelButton, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 0, 5), 0, 0));
-
-			//---- closeButton ----
-			closeButton.setText("Close");
-			closeButton.addActionListener(new ActionListener() {
-				@Override
+			editActionButton = new JButton();
+			editActionButton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					closeButtonActionPerformed(e);
+					editButtonActionPerformed(e);
 				}
 			});
-			panel7.add(closeButton, new GridBagConstraints(4, 0, 1, 1, 0.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 0, 5), 0, 0));
+			removeButton = new JButton();
+			removeButton.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					removeButtonActionPerformed();
+				}
+			});
+			label2 = new JLabel();
+			actionUuidField = new JTextField();
+			actionUuidField.setEnabled(false);
+			label3 = new JLabel();
+			actionNameField = new JTextField();
+			actionNameField.setEnabled(false);
+			label4 = new JLabel();
+			actionConsequenceCmbo = new JComboBox<String>();
+			actionConsequenceCmbo.setEnabled(false);
+			label5 = new JLabel();
+			actionBpCmbo = new JComboBox();
+			actionBpCmbo.setEnabled(false);
+
+			// ======== panel4 ========
+			{
+				panel4.setLayout(new GridBagLayout());
+				((GridBagLayout) panel4.getLayout()).columnWidths = new int[] { 0, 0, 0, 0 };
+				((GridBagLayout) panel4.getLayout()).rowHeights = new int[] { 0, 0, 0, 0, 0, 0, 0 };
+				((GridBagLayout) panel4.getLayout()).columnWeights = new double[] { 0.0, 1.0, 1.0, 1.0E-4 };
+				((GridBagLayout) panel4.getLayout()).rowWeights = new double[] { 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0E-4 };
+
+				// ======== scrollPane3 ========
+				{
+					scrollPane3.setViewportView(actionsList);
+				}
+				panel4.add(scrollPane3, new GridBagConstraints(0, 0, 3, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(
+						0, 0, 5, 0), 0, 0));
+
+				// ---- newActionButton ----
+				newActionButton.setText("New Action");
+				panel4.add(newActionButton, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+						new Insets(0, 0, 5, 5), 0, 0));
+
+				// ---- editActionButton ----
+				editActionButton.setText("Edit");
+				panel4.add(editActionButton, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+						new Insets(0, 0, 5, 5), 0, 0));
+
+				// ---- removeButton ----
+				removeButton.setText("Remove");
+				panel4.add(removeButton, new GridBagConstraints(2, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(
+						0, 0, 5, 0), 0, 0));
+
+				// ---- label2 ----
+				label2.setText("ID");
+				panel4.add(label2, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0,
+						5, 5), 0, 0));
+				panel4.add(actionUuidField, new GridBagConstraints(1, 2, 2, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+						new Insets(0, 0, 5, 0), 0, 0));
+
+				// ---- label3 ----
+				label3.setText("Name");
+				panel4.add(label3, new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0,
+						5, 5), 0, 0));
+				panel4.add(actionNameField, new GridBagConstraints(1, 3, 2, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+						new Insets(0, 0, 5, 0), 0, 0));
+
+				// ---- label4 ----
+				label4.setText("Consequence");
+				panel4.add(label4, new GridBagConstraints(0, 4, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0,
+						5, 5), 0, 0));
+				panel4.add(actionConsequenceCmbo, new GridBagConstraints(1, 4, 2, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+						new Insets(0, 0, 5, 0), 0, 0));
+
+				// ---- label5 ----
+				label5.setText("Business Process");
+				panel4.add(label5, new GridBagConstraints(0, 5, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0,
+						0, 5), 0, 0));
+				panel4.add(actionBpCmbo, new GridBagConstraints(1, 5, 2, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(
+						0, 0, 0, 0), 0, 0));
+			}
+
+			// ======== panel5 ========
+			{
+				panel5.setLayout(new GridBagLayout());
+				((GridBagLayout) panel5.getLayout()).columnWidths = new int[] { 0, 0, 0 };
+				((GridBagLayout) panel5.getLayout()).rowHeights = new int[] { 0, 0, 0, 0, 0 };
+				((GridBagLayout) panel5.getLayout()).columnWeights = new double[] { 0.0, 1.0, 1.0E-4 };
+				((GridBagLayout) panel5.getLayout()).rowWeights = new double[] { 0.0, 1.0, 0.0, 1.0, 1.0E-4 };
+
+				// ---- label6 ----
+				label6.setText("XLS File");
+				panel5.add(label6, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0,
+						5, 5), 0, 0));
+
+				// ======== scrollPane4 ========
+				{
+					scrollPane4.setViewportView(xlsFiles);
+				}
+				panel5.add(scrollPane4, new GridBagConstraints(1, 0, 1, 2, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(
+						0, 0, 5, 0), 0, 0));
+
+				// ---- label7 ----
+				label7.setText("DRL File");
+				panel5.add(label7, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0,
+						5, 5), 0, 0));
+
+				// ======== scrollPane5 ========
+				{
+					scrollPane5.setViewportView(drlFiles);
+				}
+				panel5.add(scrollPane5, new GridBagConstraints(1, 2, 1, 2, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(
+						0, 0, 0, 0), 0, 0));
+			}
+			panel3.add(panel5, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+					new Insets(0, 0, 5, 0), 0, 0));
+			panel3.add(separator2, new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0,
+					0, 0), 0, 0));
 		}
-		add(panel7, new GridBagConstraints(1, 6, 1, 1, 0.0, 0.0,
-			GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-			new Insets(0, 0, 5, 5), 0, 0));
-		// JFormDesigner - End of component initialization  //GEN-END:initComponents
+		add(panel3, BorderLayout.CENTER);
+		// JFormDesigner - End of component initialization
+		// //GEN-END:initComponents
 	}
 
-	// JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
-	private JPanel panel8;
-	private JLabel label11;
-	private JComboBox workflowNameTextField;
-	private JSeparator separator1;
-	private JTabbedPane tabbedPane1;
-	private JPanel panel9;
-	private JScrollPane scrollPane2;
-	private JTable rolesTable;
-	private JPanel panel12;
-	private JScrollPane scrollPane3;
-	private JTable statesTable;
-	private JPanel panel10;
-	private JScrollPane scrollPane1;
-	private JList actionList;
+	// JFormDesigner - Variables declaration - DO NOT MODIFY
+	// //GEN-BEGIN:variables
 	private JPanel panel1;
-	private JPanel panel5;
-	private JButton newButton;
-	private JButton editButton;
-	private JButton removeButton;
-	private JLabel label3;
-	private JTextField idTextField;
-	private JLabel label4;
-	private JTextField nameTextField;
-	private JLabel label5;
-	private JComboBox consequenceComboBox;
-	private JLabel label6;
-	private JPanel panel6;
-	private JComboBox businessTextField;
-	private JPanel panel11;
-	private JPanel panel3;
-	private JLabel label9;
-	private JScrollPane scrollPane4;
-	private JList xlsTextField;
-	private JPanel panel4;
-	private JLabel label10;
-	private JScrollPane scrollPane5;
-	private JList drlTextField;
-	private JSeparator separator2;
-	private JPanel panel7;
+	private JLabel label1;
+	private JComboBox wfDefs;
+	private JButton addWfDef;
+	private JPanel panel2;
 	private JButton saveButton;
-	private JButton cancelButton;
-	private JButton closeButton;
-	// JFormDesigner - End of variables declaration  //GEN-END:variables
+	private JButton revertButton;
+	private JPanel panel3;
+	private JSeparator separator1;
+	private JScrollPane scrollPane1;
+	private JTable rolesTable;
+	private JScrollPane scrollPane2;
+	private JTable statesTable;
+	private JPanel panel4;
+	private JScrollPane scrollPane3;
+	private JList<WfAction> actionsList;
+	private JButton newActionButton;
+	private JButton editActionButton;
+	private JButton removeButton;
+	private JLabel label2;
+	private JTextField actionUuidField;
+	private JLabel label3;
+	private JTextField actionNameField;
+	private JLabel label4;
+	private JComboBox<String> actionConsequenceCmbo;
+	private JLabel label5;
+	private JComboBox actionBpCmbo;
+	private JPanel panel5;
+	private JLabel label6;
+	private JScrollPane scrollPane4;
+	private JList<String> xlsFiles;
+	private JLabel label7;
+	private JScrollPane scrollPane5;
+	private JList<String> drlFiles;
+	private JSeparator separator2;
+	private JSplitPane splitPane;
+	private JPanel panel;
+	private JLabel lblRoles;
+	private JLabel lblStates;
+	private JButton btnClose;
+	// JFormDesigner - End of variables declaration //GEN-END:variables
 }

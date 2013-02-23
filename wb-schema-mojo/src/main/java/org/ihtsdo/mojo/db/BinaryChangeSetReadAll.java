@@ -77,15 +77,14 @@ public class BinaryChangeSetReadAll extends AbstractMojo {
      */
     private File targetDirectory;
 
+    @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         try {
             if (MojoUtil.alreadyRun(getLog(), this.getClass().getCanonicalName() + changeSetDir, this.getClass(),
                 targetDirectory)) {
                 return;
             }
-        } catch (NoSuchAlgorithmException e) {
-            throw new MojoExecutionException(e.getLocalizedMessage(), e);
-        } catch (IOException e) {
+        } catch (NoSuchAlgorithmException | IOException e) {
             throw new MojoExecutionException(e.getLocalizedMessage(), e);
         }
         if (wfLuceneDir != null && wfLuceneDir.length() > 1) {

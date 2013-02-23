@@ -7,7 +7,6 @@ import java.util.List;
 
 import javax.swing.SwingWorker;
 
-import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.Terms;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ConceptFetcherBI;
@@ -23,12 +22,13 @@ public class WfInstanceSearcher extends SwingWorker<List<WfProcessInstanceBI>, W
 	private boolean done = false;
 	private Collection<WfFilterBI> filters;
 	private WfInstanceContainer wfinstanceCont;
-	private I_ConfigAceFrame config;
+	private CancelSearch keepSearching;
 
-	public WfInstanceSearcher(Collection<WfFilterBI> filters, WfInstanceContainer wfinstanceCont) {
+	public WfInstanceSearcher(Collection<WfFilterBI> filters, WfInstanceContainer wfinstanceCont, CancelSearch keepSearchig) {
 		super();
 		this.filters = filters;
 		this.wfinstanceCont = wfinstanceCont;
+		this.keepSearching = keepSearchig;
 	}
 
 	@Override
@@ -41,7 +41,7 @@ public class WfInstanceSearcher extends SwingWorker<List<WfProcessInstanceBI>, W
 
 	@Override
 	public boolean continueWork() {
-		return !isCancelled() && !done;
+		return !isCancelled() && !done && !keepSearching.isCanceled();
 	}
 
 	@Override
@@ -55,11 +55,11 @@ public class WfInstanceSearcher extends SwingWorker<List<WfProcessInstanceBI>, W
 			ConceptChronicleBI concept = fetcher.fetch();
 			if (this.continueWork()) {
 				WorkflowStore wf = new WorkflowStore();
-				Collection<WfProcessInstanceBI> wfinstances = wf.getProcessInstances(concept.getPrimUuid());
+				Collection<WfProcessInstanceBI> wfinstances = wf.getProcessInstances(concept);
 				for (WfProcessInstanceBI wfProcessInstanceBI : wfinstances) {
 					boolean apply = true;
 					for (WfFilterBI filter : filters) {
-						if (filter.evaluateInstance(wfProcessInstanceBI)) {
+						if (!filter.evaluateInstance(wfProcessInstanceBI)) {
 							apply = false;
 							break;
 						}
@@ -69,6 +69,8 @@ public class WfInstanceSearcher extends SwingWorker<List<WfProcessInstanceBI>, W
 					}
 					publish(wfProcessInstanceBI);
 				}
+			} else {
+				cancel(true);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

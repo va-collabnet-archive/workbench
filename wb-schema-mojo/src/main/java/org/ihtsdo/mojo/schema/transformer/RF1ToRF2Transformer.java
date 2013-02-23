@@ -261,6 +261,14 @@ public class RF1ToRF2Transformer extends AbstractTransformer {
                     relationship.setCharacteristicUuid(SnomedMetadataRf2.STATED_RELATIONSHIP_RF2.getLenient().getPrimUuid());
                 }
 
+                if (relationship.getRefinabilityUuid().equals(SnomedMetadataRf1.NOT_REFINABLE_REFINABILITY_TYPE_RF1.getLenient().getPrimUuid())) {
+                    relationship.setRefinabilityUuid(SnomedMetadataRf2.NOT_REFINABLE_RF2.getLenient().getPrimUuid());
+                } else if (relationship.getRefinabilityUuid().equals(SnomedMetadataRf1.OPTIONAL_REFINABILITY_TYPE_RF1.getLenient().getPrimUuid())) {
+                    relationship.setRefinabilityUuid(SnomedMetadataRf2.OPTIONAL_REFINIBILITY_RF2.getLenient().getPrimUuid());
+                } else if (relationship.getRefinabilityUuid().equals(SnomedMetadataRf1.MANDATORY_REFINABILITY_TYPE_RF1.getLenient().getPrimUuid())) {
+                    relationship.setRefinabilityUuid(SnomedMetadataRf2.MANDATORY_REFINIBILITY_RF2.getLenient().getPrimUuid());
+                }
+
                 if (relationship.getAuthorUuid() == null) {
                     relationship.setAuthorUuid(authorUser);
                 }

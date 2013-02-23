@@ -19,6 +19,8 @@
  */
 package org.dwfa.bpa.util;
 
+import org.dwfa.ace.no_jini.Configuration;
+
 import java.awt.Dimension;
 import java.awt.HeadlessException;
 import java.awt.Rectangle;
@@ -66,10 +68,13 @@ public abstract class ComponentFrame extends JFrame implements I_InitComponentMe
 		return sendToBackInsteadOfClose;
 	}
 
-	public void setSendToBackInsteadOfClose(boolean sendToBackInsteadOfClose) {
-		this.sendToBackInsteadOfClose = sendToBackInsteadOfClose;
-	}
+    public void setSendToBackInsteadOfClose(boolean sendToBackInsteadOfClose) {
+        this.sendToBackInsteadOfClose = sendToBackInsteadOfClose;
+    }
 
+    // TODO: Replace with real object.
+    // This is just here to work around the Jini dependencies.
+    protected Configuration config;
     private String[] args;
     protected File menuDir;
 

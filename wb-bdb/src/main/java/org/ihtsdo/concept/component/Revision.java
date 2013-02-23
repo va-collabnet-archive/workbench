@@ -207,7 +207,7 @@ public abstract class Revision<V extends Revision<V, C>, C extends ConceptCompon
             buf.append(" ");
             buf.append(getTime());
         } catch (Throwable e) {
-            buf.append(" !!! Invalid sapNid. Cannot compute path, time, status. !!! ");
+            buf.append(" !!! Invalid STAMP sapNid Cannot compute status, time, author, statuspath, . !!! ");
             buf.append(e.getLocalizedMessage());
         }
 

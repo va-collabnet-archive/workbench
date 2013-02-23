@@ -43,7 +43,7 @@ import org.ihtsdo.tk.workflow.api.WorkListBI;
 /**
  * The Class WorkList.
  */
-public class WorkList extends WorkflowRefset implements Serializable, WorkListBI{
+public class WorkList extends WorkflowRefset implements Serializable, WorkListBI, Comparable<WorkList>{
 
 	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 1L;
@@ -362,5 +362,10 @@ public class WorkList extends WorkflowRefset implements Serializable, WorkListBI
 				Terms.get().getActiveAceFrameConfig());
 		
 		return newMember.getWfInstance();
+	}
+
+	@Override
+	public int compareTo(WorkList o) {
+		return this.name.compareTo(o.getName());
 	}
 }

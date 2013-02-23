@@ -85,7 +85,14 @@ public abstract class ChangeSetImporter implements ActionListener {
                     }
                 }
                 readerSet.add(csr);
-                logger.log(Level.INFO, "Adding reader: {0}\nThis has nextCommitTime() of : {1} ({2})", new Object[]{csf.getAbsolutePath(), csr.nextCommitTime(), new Date(csr.nextCommitTime())});
+                StringBuilder sb = new StringBuilder();
+                sb.append("Adding reader nextCommitTime: ");
+                sb.append(csr.nextCommitTime());
+                sb.append(", ");
+                sb.append((new Date(csr.nextCommitTime())).toString());
+                sb.append(", ");
+                sb.append(csf.getAbsolutePath());
+                AceLog.getEditLog().info(sb.toString());
             }
 
             List<File> importedFileList = new LinkedList<File>();
@@ -196,6 +203,7 @@ public abstract class ChangeSetImporter implements ActionListener {
     public static TreeSet<I_ReadChangeSet> getSortedReaderSet() {
         TreeSet<I_ReadChangeSet> readerSet = new TreeSet<I_ReadChangeSet>(new Comparator<I_ReadChangeSet>() {
 
+            @Override
             public int compare(I_ReadChangeSet r1, I_ReadChangeSet r2) {
                 try {
                     if (r1.nextCommitTime() == r2.nextCommitTime()) {

@@ -177,7 +177,7 @@ public class WorkSet extends WorkflowRefset implements Serializable{
 			AceLog.getAppLog().alertAndLogException(e);
 		}
 
-		project = TerminologyProjectDAO.getTranslationProject(concept, config);
+		project = TerminologyProjectDAO.getProject(concept, config);
 		return project;
 	}
 

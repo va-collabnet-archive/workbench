@@ -322,8 +322,8 @@ public class WfComponentProvider {
 
 		try {
 			Set<I_GetConceptData> allStates = new HashSet<I_GetConceptData>();
-			allStates = ProjectPermissionsAPI.getDescendants(allStates, Terms.get().getConcept(ArchitectonicAuxiliary.Concept.TRANSLATION_STATUS.getUids()));
-
+			allStates.addAll(ProjectPermissionsAPI.getDescendants(allStates, Terms.get().getConcept(ArchitectonicAuxiliary.Concept.TRANSLATION_STATUS.getUids())));
+			allStates.addAll(ProjectPermissionsAPI.getDescendants(allStates, Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_STATES.getUids())));
 			for (I_GetConceptData state : allStates) {
 				returnStates.add(statusConceptToWfState(state));
 			}
@@ -452,8 +452,8 @@ public class WfComponentProvider {
 		List<File> retFiles = new ArrayList<File>();
 		for (File file : fileList) {
 			if (file.isDirectory()) {
-				List<File> tmpFiles = loadFiles(file, endFile);
-				retFiles.addAll(tmpFiles);
+//				List<File> tmpFiles = loadFiles(file, endFile);
+//				retFiles.addAll(tmpFiles);
 			} else {
 				if (!file.isHidden() && file.getName().toLowerCase().endsWith(endFile)) {
 					retFiles.add(file);
