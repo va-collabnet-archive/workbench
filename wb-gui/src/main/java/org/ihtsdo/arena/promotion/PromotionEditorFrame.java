@@ -49,7 +49,6 @@ import org.dwfa.ace.list.PromotionTerminologyTableModel;
 import org.dwfa.ace.list.TerminologyList;
 import org.dwfa.ace.list.TerminologyListModel;
 import org.dwfa.ace.log.AceLog;
-import org.dwfa.ace.no_jini.Configuration;
 import org.dwfa.ace.task.WorkerAttachmentKeys;
 import org.dwfa.ace.task.classify.SnorocketExTask;
 import org.dwfa.bpa.util.ComponentFrame;
@@ -274,10 +273,6 @@ public class PromotionEditorFrame extends ComponentFrame implements PropertyChan
 
     public ConceptPanel getC1Panel() {
         return c1Panel;
-    }
-
-    public Configuration getFrameConfig() {
-        return config;
     }
 
     /**

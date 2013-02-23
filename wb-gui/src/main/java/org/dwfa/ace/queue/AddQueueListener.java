@@ -25,17 +25,17 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FilenameFilter;
+import java.util.UUID;
 
 import org.dwfa.ace.ACE;
-import org.dwfa.ace.api.SubversionData;
 import org.dwfa.ace.log.AceLog;
-import org.dwfa.ace.no_jini.Configuration;
-import org.dwfa.ace.no_jini.ConfigurationProvider;
-import org.dwfa.ace.no_jini.ElectronicAddress;
-import org.dwfa.ace.no_jini.Entry;
 import org.dwfa.queue.QueueServer;
 import org.dwfa.util.io.FileIO;
+import org.ihtsdo.ttk.preferences.TtkPreferences;
+import org.ihtsdo.ttk.queue.QueueAddress;
+import org.ihtsdo.ttk.queue.QueueList;
 import org.ihtsdo.ttk.queue.QueuePreferences;
+import org.ihtsdo.ttk.queue.QueueType;
 
 public class AddQueueListener implements ActionListener {
 
@@ -68,40 +68,21 @@ public class AddQueueListener implements ActionListener {
                 File queueFile = new File(dialog.getDirectory(), dialog.getFile());
                 String workingCopy = FileIO.getRelativePath(queueFile.getParentFile().getAbsoluteFile());
 
-                File queueSvnDir = new File(dialog.getDirectory(), ".svn");
-
                 this.ace.getAceFrameConfig().getDbConfig().getQueues().add(FileIO.getRelativePath(queueFile));
+                
+                QueuePreferences queuePreferences = new QueuePreferences(queueFile.getName(), UUID.randomUUID().toString(), 
+                                                                         queueFile, false, new QueueType());
+                queuePreferences.getServiceItemProperties().add(new QueueAddress(workingCopy));
+                ace.getAceFrameConfig().getQueueAddressesToShow().add(workingCopy);
 
-                // TODO: Replace with real objects.
-                // This is just here to work around the Jini dependencies.
-                Configuration queueConfig = ConfigurationProvider.getInstance(new String[] { queueFile.getAbsolutePath() });
-                Entry[] entries = (Entry[]) queueConfig.getEntry("org.dwfa.queue.QueueServer", "entries",
-                    Entry[].class, new Entry[] {});
-                for (Entry entry : entries) {
-                    if (ElectronicAddress.class.isAssignableFrom(entry.getClass())) {
-                        ElectronicAddress ea = (ElectronicAddress) entry;
-                        this.ace.getAceFrameConfig().getQueueAddressesToShow().add(ea.address);
-                        if (queueSvnDir.exists()) {
-                            SubversionData svd = new SubversionData(null, workingCopy);
-                            this.ace.getAceFrameConfig().svnCompleteRepoInfo(svd);
-                            this.ace.getAceFrameConfig().getSubversionMap().put(ea.address, svd);
-                        }
-                        break;
-                    }
-                }
-                
-                // TODO: Replace with real QueuePreferences.
-                // This just here so class can compile.
-                QueuePreferences queuePreferences = new QueuePreferences();
-                queuePreferences.setQueueDirectory(queueFile);
-                
                 if (QueueServer.started(queuePreferences)) {
                     AceLog.getAppLog().info("Queue already started: " + queueFile.toURI().toURL().toExternalForm());
                 } else {
-                    // TODO: Replace with real logic.
-                    // This just here so class can compile.
-                    //new QueueServer(new String[] { queueFile.getCanonicalPath() }, null);
                     new QueueServer(queuePreferences);
+                    // add to queue list...
+                    QueueList queueList = new QueueList(TtkPreferences.get());
+                    queueList.getQueuePreferences().add(queuePreferences);
+                    TtkPreferences.get().write(queuePreferences);
                 }
             }
 

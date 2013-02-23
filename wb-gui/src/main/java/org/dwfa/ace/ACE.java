@@ -70,6 +70,7 @@ import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Level;
+import javax.naming.ConfigurationException;
 
 import javax.security.auth.login.LoginException;
 import javax.swing.Action;
@@ -148,7 +149,6 @@ import org.dwfa.ace.list.TerminologyListModel;
 import org.dwfa.ace.list.TerminologyTable;
 import org.dwfa.ace.list.TerminologyTableModel;
 import org.dwfa.ace.log.AceLog;
-import org.dwfa.ace.no_jini.Configuration;
 import org.dwfa.ace.path.SelectPathAndPositionPanelWithCombo;
 import org.dwfa.ace.queue.AddQueueListener;
 import org.dwfa.ace.queue.NewQueueListener;
@@ -198,6 +198,8 @@ import org.ihtsdo.tk.api.RelAssertionType;
 import org.ihtsdo.tk.workflow.api.ProjectBI;
 import org.ihtsdo.tk.workflow.api.WorkListBI;
 import org.ihtsdo.tk.workflow.api.WorkflowStoreBI;
+import org.ihtsdo.ttk.preferences.TtkPreferences;
+import org.ihtsdo.ttk.preferences.gui.QueueGuiPreferences;
 import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 
 public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActions {
@@ -2562,13 +2564,8 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         boolean showQueueButtons = false;
 
         try {
-            
-            // TODO: Replace with real object.
-            // This is just here to work around the Jini dependency below.
-            Configuration config = new Configuration();
-            
-            showQueueButtons = (Boolean) config.getEntry(this.getClass().getName(), "showQueueButtons",
-                    Boolean.class, Boolean.FALSE);
+            QueueGuiPreferences queuePreferences = new QueueGuiPreferences(TtkPreferences.get());
+            showQueueButtons = queuePreferences.showQueueButtons();
         } catch (Exception ex) {
             AceLog.getAppLog().alertAndLogException(ex);
         }

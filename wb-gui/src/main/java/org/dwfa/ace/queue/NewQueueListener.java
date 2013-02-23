@@ -29,6 +29,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.UUID;
 
 import javax.swing.JButton;
 import javax.swing.JMenuItem;
@@ -36,13 +37,15 @@ import javax.swing.JPopupMenu;
 
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.log.AceLog;
-import org.dwfa.ace.no_jini.Configuration;
-import org.dwfa.ace.no_jini.ConfigurationProvider;
 import org.dwfa.ace.no_jini.ElectronicAddress;
 import org.dwfa.ace.no_jini.Entry;
 import org.dwfa.queue.QueueServer;
 import org.dwfa.util.io.FileIO;
+import org.ihtsdo.ttk.preferences.TtkPreferences;
+import org.ihtsdo.ttk.queue.QueueAddress;
+import org.ihtsdo.ttk.queue.QueueList;
 import org.ihtsdo.ttk.queue.QueuePreferences;
+import org.ihtsdo.ttk.queue.QueueType;
 
 public class NewQueueListener implements ActionListener {
 
@@ -77,77 +80,44 @@ public class NewQueueListener implements ActionListener {
                     }
 
                     queueDirectory.mkdirs();
+                    String workingCopy = FileIO.getRelativePath(queueDirectory.getAbsoluteFile());
 
-                    String nodeInboxAddress = queueDirectory.getName().toLowerCase().replace(' ', '.');
-                    nodeInboxAddress = nodeInboxAddress.replace("....", ".");
-                    nodeInboxAddress = nodeInboxAddress.replace("...", ".");
-                    nodeInboxAddress = nodeInboxAddress.replace("..", ".");
-
-                    Map<String, String> substutionMap = new TreeMap<String, String>();
-                    substutionMap.put("**queueName**", queueDirectory.getName());
-                    substutionMap.put("**directory**", FileIO.getRelativePath(queueDirectory).replace('\\', '/'));
-                    substutionMap.put("**nodeInboxAddress**", nodeInboxAddress);
-
-                    String fileName = "template.queue.config";
+                    QueueType queuePrefType = new QueueType(QueueType.Types.INBOX);
+                    boolean readInsteadOfTake = false;
                     if (queueType.equals("aging")) {
-                        fileName = "template.queueAging.config";
+                        throw new UnsupportedOperationException();
                     } else if (queueType.equals("archival")) {
-                        fileName = "template.queueArchival.config";
+                        readInsteadOfTake = true;
                     } else if (queueType.equals("compute")) {
-                        fileName = "template.queueCompute.config";
+                        throw new UnsupportedOperationException();
                     } else if (queueType.equals("inbox")) {
-                        substutionMap.put("**mailPop3Host**", "**mailPop3Host**");
-                        substutionMap.put("**mailUsername**", "**mailUsername**");
-                        fileName = "template.queueInbox.config";
+                       
                     } else if (queueType.equals("launcher")) {
-                        fileName = "template.queueLauncher.config";
+                        readInsteadOfTake = true;
                     } else if (queueType.equals("outbox")) {
-                        substutionMap.put("//**allGroups**mailHost", "//**allGroups**mailHost");
-                        substutionMap.put("//**outbox**mailHost", "//**outbox**mailHost");
-                        substutionMap.put("**mailHost**", "**mailHost**");
-                        fileName = "template.queueOutbox.config";
+                        queuePrefType = new QueueType(QueueType.Types.OUTBOX);
                     }
 
-                    File queueConfigTemplate = new File("config", fileName);
-                    String configTemplateString = FileIO.readerToString(new FileReader(queueConfigTemplate));
 
-                    for (String key : substutionMap.keySet()) {
-                        configTemplateString = configTemplateString.replace(key, substutionMap.get(key));
-                    }
+                    ace.getAceFrameConfig().getDbConfig().getQueues().add(FileIO.getRelativePath(queueDirectory));
+                    QueuePreferences queuePreferences = new QueuePreferences(queueDirectory.getName(), UUID.randomUUID().toString(), 
+                                                                         queueDirectory, readInsteadOfTake, queuePrefType);
+                    queuePreferences.getServiceItemProperties().add(new QueueAddress(workingCopy));
+                    ace.getAceFrameConfig().getQueueAddressesToShow().add(workingCopy);
 
-                    File newQueueConfig = new File(queueDirectory, "queue.config");
-                    FileWriter fw = new FileWriter(newQueueConfig);
-                    fw.write(configTemplateString);
-                    fw.close();
-
-                    ace.getAceFrameConfig().getDbConfig().getQueues().add(FileIO.getRelativePath(newQueueConfig));
-
-                    // TODO: Replace with real objects.
-                    // This is just here to work around the Jini dependencies.
-                    Configuration queueConfig = ConfigurationProvider.getInstance(new String[] { newQueueConfig.getAbsolutePath() });
-                    Entry[] entries = (Entry[]) queueConfig.getEntry("org.dwfa.queue.QueueServer", "entries",
-                        Entry[].class, new Entry[] {});
-                    for (Entry entry : entries) {
-                        if (ElectronicAddress.class.isAssignableFrom(entry.getClass())) {
-                            ElectronicAddress ea = (ElectronicAddress) entry;
-                            ace.getAceFrameConfig().getQueueAddressesToShow().add(ea.address);
-                            break;
-                        }
-                    }
-                    
-                    // TODO: Replace with real QueuePreferences.
-                    // This just here so class can compile.
-                    QueuePreferences queuePreferences = new QueuePreferences();
-                    queuePreferences.setQueueDirectory(newQueueConfig);
 
                     if (QueueServer.started(queuePreferences)) {
                         AceLog.getAppLog().info(
-                            "Queue already started: " + newQueueConfig.toURI().toURL().toExternalForm());
+                            "Queue already started: " + queueDirectory.toURI().toURL().toExternalForm());
                     } else {
                         // TODO: Replace with real logic.
                         // This just here so class can compile.
                         //new QueueServer(new String[] { queueFile.getCanonicalPath() }, null);
                         new QueueServer(queuePreferences);
+                    // add to queue list...
+                    QueueList queueList = new QueueList(TtkPreferences.get());
+                    queueList.getQueuePreferences().add(queuePreferences);
+                    TtkPreferences.get().write(queuePreferences);
                     }
 
                 }
