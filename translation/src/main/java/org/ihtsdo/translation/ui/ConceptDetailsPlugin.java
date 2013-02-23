@@ -140,7 +140,7 @@ public class ConceptDetailsPlugin extends AbstractPlugin {
 			}
 //			treeEditorPanel = new ConceptTreeEditor(hostConcept);
 			this.host=host;
-			conceptDetailsPanel = new ConceptDetailsPanel( hostConcept);
+			conceptDetailsPanel = new ConceptDetailsPanel(hostConcept);
 			pluginMark=new PluginContainerFrame(conceptDetailsPanel,"Concept Details");
 			this.host.addPropertyChangeListener("termComponent", this);
 			System.out.println("getcomponent");
