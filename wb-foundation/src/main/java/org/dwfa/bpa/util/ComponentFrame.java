@@ -19,8 +19,6 @@
  */
 package org.dwfa.bpa.util;
 
-import org.dwfa.ace.no_jini.Configuration;
-
 import java.awt.Dimension;
 import java.awt.HeadlessException;
 import java.awt.Rectangle;
@@ -29,7 +27,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.lang.reflect.Constructor;
-import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -50,7 +47,7 @@ public abstract class ComponentFrame extends JFrame implements I_InitComponentMe
 	 * 
 	 */
     private static final long serialVersionUID = 1L;
-    protected static Logger logger = Logger.getLogger(ComponentFrame.class.getName());
+    protected static final Logger logger = Logger.getLogger(ComponentFrame.class.getName());
     protected ComponentFrameBean cfb;
     protected final static int MENU_MASK = getMenuMask();
 
@@ -72,9 +69,6 @@ public abstract class ComponentFrame extends JFrame implements I_InitComponentMe
         this.sendToBackInsteadOfClose = sendToBackInsteadOfClose;
     }
 
-    // TODO: Replace with real object.
-    // This is just here to work around the Jini dependencies.
-    protected Configuration config;
     private String[] args;
     protected File menuDir;
 
@@ -100,6 +94,7 @@ public abstract class ComponentFrame extends JFrame implements I_InitComponentMe
             this.args = args;
         }
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             try {
                 Class<? extends ComponentFrame> classToMake = ComponentFrame.this.getClass();
@@ -138,10 +133,13 @@ public abstract class ComponentFrame extends JFrame implements I_InitComponentMe
         this.cfb.setup();
     }
 
+    @Override
     public abstract void addAppMenus(JMenuBar mainMenuBar) throws Exception;
 
+    @Override
     public abstract JMenu getQuitMenu();
 
+    @Override
     public abstract JMenuItem[] getNewWindowMenu();
 
     public abstract String getNextFrameName();
