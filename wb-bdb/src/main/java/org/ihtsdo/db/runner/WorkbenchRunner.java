@@ -70,6 +70,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
+import org.ihtsdo.ttk.preferences.TtkPreferences;
 
 public class WorkbenchRunner {
     private static final String WB_PROPERTIES            = "wb.properties";
@@ -466,6 +467,7 @@ public class WorkbenchRunner {
         // Load new-style user preferences.        
         String appPrefix = EnumBasedPreferences.getDefaultAppPrefix(appInfoProperties, userName);
         EnumBasedPreferences prefs = new EnumBasedPreferences(appPrefix);
+        TtkPreferences.set(prefs);
         
         // If user preferences don't already exist, load defaults from file.
         if (prefs.childrenNames().length == 0) {
