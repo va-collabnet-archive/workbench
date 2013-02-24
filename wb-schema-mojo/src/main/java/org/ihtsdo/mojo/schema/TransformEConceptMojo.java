@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.Semaphore;
 
 import org.apache.maven.plugin.AbstractMojo;
@@ -75,6 +76,8 @@ extends AbstractMojo
 			TerminologyStoreDI ts = Ts.get();
 			DataOutputStream eConceptDOS;
 
+            System.out.println(":DEBUG:" + Ts.get().getConcept(UUID.fromString("693e7426-8145-53ff-90a7-b43c6aa2e863")).toLongString());
+            
 			TransformersConfigApi api = new TransformersConfigApi(xmlFile);
 
 			String className = api.getValueAt(api.getIntId(transformerId), "class");

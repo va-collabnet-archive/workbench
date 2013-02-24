@@ -3,6 +3,7 @@
  */
 package org.ihtsdo.mojo.schema.transformer;
 
+import edu.emory.mathcs.backport.java.util.Arrays;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -590,8 +591,63 @@ public class RF1ToRF2Transformer extends AbstractTransformer {
      * org.ihtsdo.mojo.schema.AbstractTransformer#postProcessConcept()
      */
     @Override
-    public boolean postProcessConcept() {
+    public boolean postProcessConcept(TkConcept eConcept) {
+        checkForMultipleFsn(eConcept);
         return true;
+    }
+    
+    private void checkForMultipleFsn(TkConcept eConcept) {
+        // check for multiple active FSN descriptions
+        if (eConcept.descriptions != null) {
+            UUID[] fsnUuids = SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getUuids();
+            List<UUID> fsnUuidsList = Arrays.asList(fsnUuids);
+            UUID[] activeUuids = SnomedMetadataRf2.ACTIVE_VALUE_RF2.getUuids();
+            List<UUID> activeUuidsList = Arrays.asList(activeUuids);
+            List<TkDescription> dList = eConcept.getDescriptions();
+            int fsnCount = 0;
+            for (TkDescription tkd : dList) {
+                boolean isActive = false;
+                boolean isFsn = false;
+                long time = tkd.time;
+                if (fsnUuidsList.contains(tkd.typeUuid)
+                        && activeUuidsList.contains(tkd.statusUuid)) {
+                    isActive = true;
+                    isFsn = true;
+                }
+                if (tkd.revisions != null) {
+                    for (TkDescriptionRevision tkdr : tkd.revisions) {
+                        if (tkdr.time > time) {
+                            time = tkdr.time;
+                            if (fsnUuidsList.contains(tkdr.typeUuid)
+                                    && activeUuidsList.contains(tkdr.statusUuid)) {
+                                isFsn = true;
+                                isActive = true;
+                            } else if (fsnUuidsList.contains(tkdr.typeUuid)
+                                    && activeUuidsList.contains(tkdr.statusUuid) == false) {
+                                isFsn = true;
+                                isActive = false;
+                            } else {
+                                isFsn = false;
+                            }
+                        }
+                    }
+                }
+                if (isFsn && isActive) {
+                    fsnCount++;
+                }
+            }
+
+            if (fsnCount > 1) {
+                StringBuilder sb = new StringBuilder();
+                sb.append("\r\n RF1ToRF2Transformer found concept with active FSN count=");
+                sb.append(fsnCount);
+                sb.append(" UUID: ");
+                sb.append(eConcept.primordialUuid.toString());
+                sb.append(" Concept: ");
+                sb.append(eConcept.toString());
+                AceLog.getAppLog().log(Level.INFO, sb.toString());
+            }
+        }
     }
 
     /*
