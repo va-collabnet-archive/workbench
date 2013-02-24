@@ -191,7 +191,7 @@ public class TranslationView extends JPanel {
 			targetTable.populateTable(project, worklistMember, false, translConfig, result, this.readOnlyMode);
 
 			hierarchyNavigator1.setFocusConcept(worklistMember.getConcept());
-			conceptDetailsPanel1.updateDetailsTree(worklistMember.getConcept());
+			conceptDetailsPanel1.updateDetailsTree(worklistMember);
 			comments.updateCommentsPanel(roleConcept, targetLangRefset, worklistMember);
 			if (isOutbox) {
 				comments.setReadOnlyMode(true);
@@ -429,6 +429,7 @@ public class TranslationView extends JPanel {
 							if (tp.getTitleAt(i).equals(TranslationHelperPanel.SEARCH_DOCS_TAB_NAME)) {
 								tp.setSelectedIndex(i);
 								thp.showTabbedPanel();
+								return;
 							}
 						}
 						JPanel panel = new JPanel();

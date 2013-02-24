@@ -25,9 +25,11 @@ import org.ihtsdo.tk.dto.concept.component.TkRevision;
 import org.ihtsdo.tk.dto.concept.component.attribute.TkConceptAttributes;
 import org.ihtsdo.tk.dto.concept.component.attribute.TkConceptAttributesRevision;
 import org.ihtsdo.tk.dto.concept.component.description.TkDescription;
+import org.ihtsdo.tk.dto.concept.component.description.TkDescriptionRevision;
 import org.ihtsdo.tk.dto.concept.component.refex.TkRefexAbstractMember;
 import org.ihtsdo.tk.dto.concept.component.refex.type_uuid.TkRefexUuidMember;
 import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationship;
+import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationshipRevision;
 import org.ihtsdo.tk.spec.ValidationException;
 
 /**
@@ -80,7 +82,17 @@ public class RF1ToRF2Transformer extends AbstractTransformer {
     private UUID gbRefsetUUID;
     private UUID langRefsetUUID;
     private UUID pathUUID;
-    private UUID authorUser = UUID.fromString("f7495b58-6630-3499-a44e-2052b5fcf06c");
+    private final UUID auxPathUUID = UUID.fromString("2faa9260-8fb2-11db-b606-0800200c9a66");
+    private final UUID authorUser = UUID.fromString("f7495b58-6630-3499-a44e-2052b5fcf06c");
+    private final UUID legacyUsDialectRefsetUuid = UUID.fromString("f7495b58-6630-3499-a44e-2052b5fcf06c");
+    private final UUID legacyGbDialectRefsetUuid = UUID.fromString("a0982f18-ec51-56d2-a8b1-6ff8964813dd");
+    private final UUID rf2UsDialectRefsetUuid = UUID.fromString("bca0a686-3516-3daf-8fcf-fe396d13cfad");
+    private final UUID rf2GbDialectRefsetUuid = UUID.fromString("eb9a5e42-3cba-356d-b623-3ed472e20b30");
+    private final UUID rf1PreferredUuid = SnomedMetadataRf1.PREFERRED_ACCEPTABILITY_RF1.getUuids()[0];
+    private final UUID rf1AcceptableUuid = SnomedMetadataRf1.ACCEPTABLE_DESCRIPTION_TYPE_RF1.getUuids()[0];
+    private final UUID rf1SynomymUuid = SnomedMetadataRf1.SYNOMYM_DESCRIPTION_TYPE_RF1.getUuids()[0];
+    private final UUID rf2PreferredUuid = SnomedMetadataRf2.PREFERRED_RF2.getUuids()[0];
+    private final UUID rf2AcceptableUuid = SnomedMetadataRf2.ACCEPTABLE_RF2.getUuids()[0];
 
     /**
      * Instantiates a new transformer.
@@ -100,7 +112,12 @@ public class RF1ToRF2Transformer extends AbstractTransformer {
         ConceptDescriptor gbRefset = api.getConceptDescriptor(api.getIntId(id), "parameters.gbDialectRefset");
         ConceptDescriptor langRefset = api.getConceptDescriptor(api.getIntId(id), "parameters.langRefset");
         ConceptDescriptor path = api.getConceptDescriptor(api.getIntId(id), "parameters.path");
-        this.pathUUID = path.getVerifiedConcept().getPrimUuid();
+        if (path.getUuid() != null) { 
+            this.pathUUID = path.getVerifiedConcept().getPrimUuid();
+        } else {
+            // when path is not configured, the transformer will directly test for SNOMED concepts
+            this.pathUUID = null;
+        }
 
         if (usRefset.getUuid() != null) {
             this.usRefsetUUID = usRefset.getVerifiedConcept().getPrimUuid();
@@ -119,8 +136,9 @@ public class RF1ToRF2Transformer extends AbstractTransformer {
      */
     @Override
     public void transformAttributes(TkConceptAttributes attributes, TkConcept concept) {
-        if (attributes.getPathUuid().equals(pathUUID)) {
-            try {
+        try {
+            if ((pathUUID == null && attributes.pathUuid.compareTo(auxPathUUID) != 0)
+                    || (pathUUID != null && attributes.getPathUuid().equals(pathUUID))) {
                 if (attributes.getStatusUuid().equals(SnomedMetadataRf1.CURRENT_RF1.getLenient().getPrimUuid())) {
                     attributes.setStatusUuid(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getPrimUuid());
                 } else if (attributes.getStatusUuid().equals(SnomedMetadataRf1.RETIRED_INACTIVE_STATUS_RF1.getLenient().getPrimUuid())) {
@@ -136,27 +154,39 @@ public class RF1ToRF2Transformer extends AbstractTransformer {
                 } else if (attributes.getStatusUuid().equals(SnomedMetadataRf1.LIMITED_ACTIVE_STATUS_RF1.getLenient().getPrimUuid())) {
                     attributes.setStatusUuid(SnomedMetadataRf2.LIMITED_COMPONENT_RF2.getLenient().getPrimUuid());
                 }
+            }
+
+            if ((pathUUID == null)
+                    || (pathUUID != null && attributes.getPathUuid().equals(pathUUID))) {
                 if (attributes.getAuthorUuid() == null) {
                     attributes.setAuthorUuid(authorUser);
                 }
                 if (attributes.getModuleUuid() == null) {
                     attributes.setModuleUuid(TkRevision.unspecifiedModuleUuid);
                 }
-            } catch (ValidationException e) {
-                AceLog.getAppLog().log(Level.SEVERE, e.getMessage(), e);
-            } catch (IOException e) {
-                AceLog.getAppLog().log(Level.SEVERE, e.getMessage(), e);
+            }
+        } catch (ValidationException e) {
+            AceLog.getAppLog().log(Level.SEVERE, e.getMessage(), e);
+        } catch (IOException e) {
+            AceLog.getAppLog().log(Level.SEVERE, e.getMessage(), e);
+        }
+        
+        if (concept.getConceptAttributes().getRevisionList() != null) {
+            List<TkConceptAttributesRevision> conceptAttributeList = concept.getConceptAttributes().getRevisionList();
+            for (TkConceptAttributesRevision tkConceptAttributesRevision : conceptAttributeList) {
+                transformAttributesRevision(tkConceptAttributesRevision, concept);
             }
         }
+
     }
 
      /* (non-Javadoc)
 	 * @see org.ihtsdo.mojo.schema.AbstractTransformer#transformAttributesRevision(org.ihtsdo.tk.dto.concept.component.attribute.TkConceptAttributesRevision)
 	 */
-    @Override
-    public void transformAttributesRevision(TkConceptAttributesRevision attributeRevision, TkConcept eConcept) {
-        if (attributeRevision.getPathUuid().equals(pathUUID)) {
-            try {
+    private void transformAttributesRevision(TkConceptAttributesRevision attributeRevision, TkConcept concept) {
+        try {
+            if ((pathUUID == null && attributeRevision.pathUuid.compareTo(auxPathUUID) != 0)
+                    || (pathUUID != null && attributeRevision.getPathUuid().equals(pathUUID))) {
                 if (attributeRevision.getStatusUuid().equals(SnomedMetadataRf1.CURRENT_RF1.getLenient().getPrimUuid())) {
                     attributeRevision.setStatusUuid(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getPrimUuid());
                 } else if (attributeRevision.getStatusUuid().equals(SnomedMetadataRf1.RETIRED_INACTIVE_STATUS_RF1.getLenient().getPrimUuid())) {
@@ -172,17 +202,20 @@ public class RF1ToRF2Transformer extends AbstractTransformer {
                 } else if (attributeRevision.getStatusUuid().equals(SnomedMetadataRf1.LIMITED_ACTIVE_STATUS_RF1.getLenient().getPrimUuid())) {
                     attributeRevision.setStatusUuid(SnomedMetadataRf2.LIMITED_COMPONENT_RF2.getLenient().getPrimUuid());
                 }
+            }
+            if ((pathUUID == null)
+                    || (pathUUID != null && attributeRevision.getPathUuid().equals(pathUUID))) {
                 if (attributeRevision.getAuthorUuid() == null) {
                     attributeRevision.setAuthorUuid(authorUser);
                 }
                 if (attributeRevision.getModuleUuid() == null) {
                     attributeRevision.setModuleUuid(TkRevision.unspecifiedModuleUuid);
                 }
-            } catch (ValidationException e) {
-                AceLog.getAppLog().log(Level.SEVERE, e.getMessage(), e);
-            } catch (IOException e) {
-                AceLog.getAppLog().log(Level.SEVERE, e.getMessage(), e);
             }
+        } catch (ValidationException e) {
+            AceLog.getAppLog().log(Level.SEVERE, e.getMessage(), e);
+        } catch (IOException e) {
+            AceLog.getAppLog().log(Level.SEVERE, e.getMessage(), e);
         }
     }
 
@@ -192,8 +225,9 @@ public class RF1ToRF2Transformer extends AbstractTransformer {
      */
     @Override
     public void transformDescription(TkDescription description, TkConcept concept) {
-        if (description.getPathUuid().equals(pathUUID)) {
-            try {
+        try {
+            if ((pathUUID == null && description.pathUuid.compareTo(auxPathUUID) != 0)
+                    || (pathUUID != null && description.getPathUuid().equals(pathUUID))) {
                 if (description.getStatusUuid().equals(SnomedMetadataRf1.CURRENT_RF1.getLenient().getPrimUuid())) {
                     description.setStatusUuid(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getPrimUuid());
                 } else if (description.getStatusUuid().equals(SnomedMetadataRf1.RETIRED_INACTIVE_STATUS_RF1.getLenient().getPrimUuid())) {
@@ -209,12 +243,27 @@ public class RF1ToRF2Transformer extends AbstractTransformer {
                 } else if (description.getStatusUuid().equals(SnomedMetadataRf1.LIMITED_ACTIVE_STATUS_RF1.getLenient().getPrimUuid())) {
                     description.setStatusUuid(SnomedMetadataRf2.LIMITED_COMPONENT_RF2.getLenient().getPrimUuid());
                 }
+                
+                boolean hasGbAnnotation = false;
+                boolean hasUsAnnotation = false;
+                if (description.getAnnotations() != null) {
+                    for (TkRefexAbstractMember<?> tkram : description.getAnnotations()) {
+                        if (tkram.getRefexUuid().compareTo(rf2GbDialectRefsetUuid) == 0) {
+                            hasGbAnnotation = true;
+                        }
+                        if (tkram.getRefexUuid().compareTo(rf2UsDialectRefsetUuid) == 0) {
+                            hasUsAnnotation = true;
+                        }
+                    }
+                }
 
-                if (langRefsetUUID != null && !description.getLang().equals(LANG_CODE.EN.getFormatedLanguageCode())) {
+                if (hasGbAnnotation || hasUsAnnotation) {
+                    // do not add language refset set
+                } else if (langRefsetUUID != null && !description.getLang().equals(LANG_CODE.EN.getFormatedLanguageCode())) {
                     processLangDescription(description, concept);
                 } else if (usRefsetUUID != null && !DialectHelper.isTextForDialect(description.getText(), Language.EN_US.getLenient().getNid())
-                            && gbRefsetUUID != null && !DialectHelper.isTextForDialect(description.getText(), Language.EN_UK.getLenient().getNid())
-                            && description.getLang().equals(LANG_CODE.EN.getFormatedLanguageCode())) {
+                        && gbRefsetUUID != null && !DialectHelper.isTextForDialect(description.getText(), Language.EN_UK.getLenient().getNid())
+                        && description.getLang().equals(LANG_CODE.EN.getFormatedLanguageCode())) {
                     processEnDescription(description, concept);
                 } else if (usRefsetUUID != null && DialectHelper.isTextForDialect(description.getText(), Language.EN_US.getLenient().getNid())) {
                     processUSDescription(description, concept);
@@ -223,21 +272,64 @@ public class RF1ToRF2Transformer extends AbstractTransformer {
                 } else {
                     throw new UnsupportedDialectOrLanguage("Can't support language or dialect.");
                 }
+            }
 
+            if ((pathUUID == null)
+                    || (pathUUID != null && description.getPathUuid().equals(pathUUID))) {
                 if (description.getAuthorUuid() == null) {
                     description.setAuthorUuid(authorUser);
                 }
                 if (description.getModuleUuid() == null) {
                     description.setModuleUuid(TkRevision.unspecifiedModuleUuid);
                 }
-
-            } catch (UnsupportedDialectOrLanguage e) {
-                AceLog.getAppLog().log(Level.SEVERE, e.getMessage(), e);
-            } catch (ValidationException e) {
-                AceLog.getAppLog().log(Level.SEVERE, e.getMessage(), e);
-            } catch (IOException e) {
-                AceLog.getAppLog().log(Level.SEVERE, e.getMessage(), e);
             }
+            
+        } catch (UnsupportedDialectOrLanguage | IOException e) {
+            AceLog.getAppLog().log(Level.SEVERE, e.getMessage(), e);
+        }
+
+        if (description.getRevisionList() != null) {
+            List<TkDescriptionRevision> revisionList = description.getRevisionList();
+            for (TkDescriptionRevision r : revisionList) {
+                transformDescriptionRevision(r, concept);
+            }
+        }
+    }
+
+    private void transformDescriptionRevision(TkDescriptionRevision revision, TkConcept concept) {
+        try {
+            if ((pathUUID == null && revision.pathUuid.compareTo(auxPathUUID) != 0)
+                    || (pathUUID != null && revision.getPathUuid().equals(pathUUID))) {
+                if (revision.getStatusUuid().equals(SnomedMetadataRf1.CURRENT_RF1.getLenient().getPrimUuid())) {
+                    revision.setStatusUuid(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getPrimUuid());
+                } else if (revision.getStatusUuid().equals(SnomedMetadataRf1.RETIRED_INACTIVE_STATUS_RF1.getLenient().getPrimUuid())) {
+                    revision.setStatusUuid(SnomedMetadataRf2.INACTIVE_VALUE_RF2.getLenient().getPrimUuid());
+                } else if (revision.getStatusUuid().equals(SnomedMetadataRf1.AMBIGUOUS_INACTIVE_STATUS_RF1.getLenient().getPrimUuid())) {
+                    revision.setStatusUuid(SnomedMetadataRf2.AMBIGUOUS_COMPONENT_RF2.getLenient().getPrimUuid());
+                } else if (revision.getStatusUuid().equals(SnomedMetadataRf1.DUPLICATE_INACTIVE_STATUS_RF1.getLenient().getPrimUuid())) {
+                    revision.setStatusUuid(SnomedMetadataRf2.DUPLICATE_COMPONENT_RF2.getLenient().getPrimUuid());
+                } else if (revision.getStatusUuid().equals(SnomedMetadataRf1.ERRONEOUS_INACTIVE_STATUS_RF1.getLenient().getPrimUuid())) {
+                    revision.setStatusUuid(SnomedMetadataRf2.ERRONEOUS_COMPONENT_RF2.getLenient().getPrimUuid());
+                } else if (revision.getStatusUuid().equals(SnomedMetadataRf1.INAPPROPRIATE_INACTIVE_STATUS_RF1.getLenient().getPrimUuid())) {
+                    revision.setStatusUuid(SnomedMetadataRf2.INAPPROPRIATE_COMPONENT_RF2.getLenient().getPrimUuid());
+                } else if (revision.getStatusUuid().equals(SnomedMetadataRf1.LIMITED_ACTIVE_STATUS_RF1.getLenient().getPrimUuid())) {
+                    revision.setStatusUuid(SnomedMetadataRf2.LIMITED_COMPONENT_RF2.getLenient().getPrimUuid());
+                }
+
+            }
+
+            if ((pathUUID == null)
+                    || (pathUUID != null && revision.getPathUuid().equals(pathUUID))) {
+                if (revision.getAuthorUuid() == null) {
+                    revision.setAuthorUuid(authorUser);
+                }
+                if (revision.getModuleUuid() == null) {
+                    revision.setModuleUuid(TkRevision.unspecifiedModuleUuid);
+                }
+            }
+            
+        } catch (IOException e) {
+            AceLog.getAppLog().log(Level.SEVERE, e.getMessage(), e);
         }
     }
 
@@ -247,8 +339,9 @@ public class RF1ToRF2Transformer extends AbstractTransformer {
      */
     @Override
     public void transformRelationship(TkRelationship relationship, TkConcept concept) {
-        if (relationship.getPathUuid().equals(pathUUID)) {
-            try {
+        try {
+            if ((pathUUID == null && relationship.pathUuid.compareTo(auxPathUUID) != 0)
+                    || (pathUUID != null && relationship.getPathUuid().equals(pathUUID))) {
                 if (relationship.getStatusUuid().equals(SnomedMetadataRf1.CURRENT_RF1.getLenient().getPrimUuid())) {
                     relationship.setStatusUuid(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getPrimUuid());
                 } else if (relationship.getStatusUuid().equals(SnomedMetadataRf1.RETIRED_INACTIVE_STATUS_RF1.getLenient().getPrimUuid())) {
@@ -269,15 +362,64 @@ public class RF1ToRF2Transformer extends AbstractTransformer {
                     relationship.setRefinabilityUuid(SnomedMetadataRf2.MANDATORY_REFINIBILITY_RF2.getLenient().getPrimUuid());
                 }
 
-                if (relationship.getAuthorUuid() == null) {
-                    relationship.setAuthorUuid(authorUser);
+                if ((pathUUID == null)
+                        || (pathUUID != null && relationship.getPathUuid().equals(pathUUID))) {
+                    if (relationship.getAuthorUuid() == null) {
+                        relationship.setAuthorUuid(authorUser);
+                    }
+                    if (relationship.getModuleUuid() == null) {
+                        relationship.setModuleUuid(TkRevision.unspecifiedModuleUuid);
+                    }
                 }
-                if (relationship.getModuleUuid() == null) {
-                    relationship.setModuleUuid(TkRevision.unspecifiedModuleUuid);
-                }
-            } catch (IOException e) {
-                AceLog.getAppLog().log(Level.SEVERE, e.getMessage(), e);
             }
+        } catch (IOException e) {
+            AceLog.getAppLog().log(Level.SEVERE, e.getMessage(), e);
+        }
+
+        if (relationship.getRevisionList() != null) {
+            List<TkRelationshipRevision> revisionList = relationship.getRevisionList();
+            for (TkRelationshipRevision r : revisionList) {
+                transformRelationshipRevision(r, concept);
+            }
+        }
+    }
+
+    private void transformRelationshipRevision(TkRelationshipRevision revision, TkConcept concept) {
+        try {
+            if ((pathUUID == null && revision.pathUuid.compareTo(auxPathUUID) != 0)
+                    || (pathUUID != null && revision.getPathUuid().equals(pathUUID))) {
+                if (revision.getStatusUuid().equals(SnomedMetadataRf1.CURRENT_RF1.getLenient().getPrimUuid())) {
+                    revision.setStatusUuid(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getPrimUuid());
+                } else if (revision.getStatusUuid().equals(SnomedMetadataRf1.RETIRED_INACTIVE_STATUS_RF1.getLenient().getPrimUuid())) {
+                    revision.setStatusUuid(SnomedMetadataRf2.INACTIVE_VALUE_RF2.getLenient().getPrimUuid());
+                }
+
+                if (revision.getCharacteristicUuid().equals(SnomedMetadataRf1.DEFINING_CHARACTERISTIC_TYPE_RF1.getLenient().getPrimUuid())) {
+                    revision.setCharacteristicUuid(SnomedMetadataRf2.STATED_RELATIONSHIP_RF2.getLenient().getPrimUuid());
+                } else if (revision.getCharacteristicUuid().equals(SnomedMetadataRf1.STATED_DEFINING_CHARACTERISTIC_TYPE_RF1.getLenient().getPrimUuid())) {
+                    revision.setCharacteristicUuid(SnomedMetadataRf2.STATED_RELATIONSHIP_RF2.getLenient().getPrimUuid());
+                }
+
+                if (revision.getRefinabilityUuid().equals(SnomedMetadataRf1.NOT_REFINABLE_REFINABILITY_TYPE_RF1.getLenient().getPrimUuid())) {
+                    revision.setRefinabilityUuid(SnomedMetadataRf2.NOT_REFINABLE_RF2.getLenient().getPrimUuid());
+                } else if (revision.getRefinabilityUuid().equals(SnomedMetadataRf1.OPTIONAL_REFINABILITY_TYPE_RF1.getLenient().getPrimUuid())) {
+                    revision.setRefinabilityUuid(SnomedMetadataRf2.OPTIONAL_REFINIBILITY_RF2.getLenient().getPrimUuid());
+                } else if (revision.getRefinabilityUuid().equals(SnomedMetadataRf1.MANDATORY_REFINABILITY_TYPE_RF1.getLenient().getPrimUuid())) {
+                    revision.setRefinabilityUuid(SnomedMetadataRf2.MANDATORY_REFINIBILITY_RF2.getLenient().getPrimUuid());
+                }
+
+                if ((pathUUID == null)
+                        || (pathUUID != null && revision.getPathUuid().equals(pathUUID))) {
+                    if (revision.getAuthorUuid() == null) {
+                        revision.setAuthorUuid(authorUser);
+                    }
+                    if (revision.getModuleUuid() == null) {
+                        revision.setModuleUuid(TkRevision.unspecifiedModuleUuid);
+                    }
+                }
+            }
+        } catch (IOException e) {
+            AceLog.getAppLog().log(Level.SEVERE, e.getMessage(), e);
         }
     }
 
@@ -289,24 +431,89 @@ public class RF1ToRF2Transformer extends AbstractTransformer {
     @Override
     public void transformAnnotation(TkRefexAbstractMember<?> annotation,
             TkComponent<?> component) {
-        if (annotation.getPathUuid().equals(pathUUID)) {
-            try {
+        try {
+            if (annotation.refsetUuid.compareTo(legacyGbDialectRefsetUuid) == 0) {
+                UUID uuid1 = ((TkRefexUuidMember) annotation).uuid1;
+                if (uuid1.compareTo(rf1AcceptableUuid) == 0) {
+                    ((TkRefexUuidMember) annotation).uuid1 = rf2AcceptableUuid;
+                } else if (uuid1.compareTo(rf1PreferredUuid) == 0) {
+                    ((TkRefexUuidMember) annotation).uuid1 = rf2PreferredUuid;
+                } else if (uuid1.compareTo(rf1SynomymUuid) == 0) {
+                    ((TkRefexUuidMember) annotation).uuid1 = rf2AcceptableUuid;
+                }
+                ((TkRefexUuidMember) annotation).refsetUuid = rf2GbDialectRefsetUuid;
+            }
+            
+            if (annotation.refsetUuid.compareTo(legacyUsDialectRefsetUuid) == 0) {
+                UUID uuid1 = ((TkRefexUuidMember) annotation).uuid1;
+
+                if (uuid1.compareTo(rf1AcceptableUuid) == 0) {
+                    ((TkRefexUuidMember) annotation).uuid1 = rf2AcceptableUuid;
+                } else if (uuid1.compareTo(rf1PreferredUuid) == 0) {
+                    ((TkRefexUuidMember) annotation).uuid1 = rf2PreferredUuid;
+                } else if (uuid1.compareTo(rf1SynomymUuid) == 0) {
+                    ((TkRefexUuidMember) annotation).uuid1 = rf2AcceptableUuid;
+                }
+                ((TkRefexUuidMember) annotation).refsetUuid = rf2UsDialectRefsetUuid;
+            }
+            
+            if ((pathUUID == null && annotation.pathUuid.compareTo(auxPathUUID) != 0)
+                    || (pathUUID != null && annotation.getPathUuid().equals(pathUUID))) {
                 if (annotation.getStatusUuid().equals(SnomedMetadataRf1.CURRENT_RF1.getLenient().getPrimUuid())) {
                     annotation.setStatusUuid(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getPrimUuid());
                 } else if (annotation.getStatusUuid().equals(SnomedMetadataRf1.RETIRED_INACTIVE_STATUS_RF1.getLenient().getPrimUuid())) {
                     annotation.setStatusUuid(SnomedMetadataRf2.INACTIVE_VALUE_RF2.getLenient().getPrimUuid());
                 }
+            }
+
+            if ((pathUUID == null)
+                    || (pathUUID != null && annotation.getPathUuid().equals(pathUUID))) {
                 if (annotation.getAuthorUuid() == null) {
                     annotation.setAuthorUuid(authorUser);
                 }
                 if (annotation.getModuleUuid() == null) {
                     annotation.setModuleUuid(TkRevision.unspecifiedModuleUuid);
                 }
-            } catch (ValidationException e) {
-                AceLog.getAppLog().log(Level.SEVERE, e.getMessage(), e);
-            } catch (IOException e) {
-                AceLog.getAppLog().log(Level.SEVERE, e.getMessage(), e);
             }
+        } catch (ValidationException e) {
+            AceLog.getAppLog().log(Level.SEVERE, e.getMessage(), e);
+        } catch (IOException e) {
+            AceLog.getAppLog().log(Level.SEVERE, e.getMessage(), e);
+        }
+        
+        if (annotation.getRevisionList() != null) {
+            List<? extends TkRevision> revisionList = annotation.getRevisionList();
+            for (TkRevision r : revisionList) {
+                transformAnnotationRevision(r, component);
+            }
+        }
+    }
+
+    private void transformAnnotationRevision(TkRevision revision, TkComponent<?> component) {
+        try {
+
+            if ((pathUUID == null && revision.pathUuid.compareTo(auxPathUUID) != 0)
+                    || (pathUUID != null && revision.getPathUuid().equals(pathUUID))) {
+                if (revision.getStatusUuid().equals(SnomedMetadataRf1.CURRENT_RF1.getLenient().getPrimUuid())) {
+                    revision.setStatusUuid(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getPrimUuid());
+                } else if (revision.getStatusUuid().equals(SnomedMetadataRf1.RETIRED_INACTIVE_STATUS_RF1.getLenient().getPrimUuid())) {
+                    revision.setStatusUuid(SnomedMetadataRf2.INACTIVE_VALUE_RF2.getLenient().getPrimUuid());
+                }
+            }
+
+            if ((pathUUID == null)
+                    || (pathUUID != null && revision.getPathUuid().equals(pathUUID))) {
+                if (revision.getAuthorUuid() == null) {
+                    revision.setAuthorUuid(authorUser);
+                }
+                if (revision.getModuleUuid() == null) {
+                    revision.setModuleUuid(TkRevision.unspecifiedModuleUuid);
+                }
+            }
+        } catch (ValidationException e) {
+            AceLog.getAppLog().log(Level.SEVERE, e.getMessage(), e);
+        } catch (IOException e) {
+            AceLog.getAppLog().log(Level.SEVERE, e.getMessage(), e);
         }
     }
 
@@ -316,26 +523,65 @@ public class RF1ToRF2Transformer extends AbstractTransformer {
      * org.ihtsdo.tk.dto.concept.TkConcept)
      */
     @Override
-    public void transformMember(TkRefexAbstractMember<?> member,
-            TkConcept concept) {
-        if (member.getPathUuid().equals(pathUUID)) {
-            try {
+    public void transformMember(TkRefexAbstractMember<?> member, TkConcept concept) {
+        try {
+            if ((pathUUID == null && member.pathUuid.compareTo(auxPathUUID) != 0)
+                    || (pathUUID != null && member.getPathUuid().equals(pathUUID))) {
                 if (member.getStatusUuid().equals(SnomedMetadataRf1.CURRENT_RF1.getLenient().getPrimUuid())) {
                     member.setStatusUuid(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getPrimUuid());
                 } else if (member.getStatusUuid().equals(SnomedMetadataRf1.RETIRED_INACTIVE_STATUS_RF1.getLenient().getPrimUuid())) {
                     member.setStatusUuid(SnomedMetadataRf2.INACTIVE_VALUE_RF2.getLenient().getPrimUuid());
                 }
+            }
+
+            if ((pathUUID == null)
+                    || (pathUUID != null && member.getPathUuid().equals(pathUUID))) {
                 if (member.getAuthorUuid() == null) {
                     member.setAuthorUuid(authorUser);
                 }
                 if (member.getModuleUuid() == null) {
                     member.setModuleUuid(TkRevision.unspecifiedModuleUuid);
                 }
-            } catch (ValidationException e) {
-                AceLog.getAppLog().log(Level.SEVERE, e.getMessage(), e);
-            } catch (IOException e) {
-                AceLog.getAppLog().log(Level.SEVERE, e.getMessage(), e);
             }
+        } catch (ValidationException e) {
+            AceLog.getAppLog().log(Level.SEVERE, e.getMessage(), e);
+        } catch (IOException e) {
+            AceLog.getAppLog().log(Level.SEVERE, e.getMessage(), e);
+        }
+        
+        if (member.getRevisionList() != null) {
+            List<? extends TkRevision> revisionList = member.getRevisionList();
+            for (TkRevision r : revisionList) {
+                transformMemberRevision(r, concept);
+            }
+        }
+
+    }
+
+    private void transformMemberRevision(TkRevision revision, TkConcept concept) {
+        try {
+            if ((pathUUID == null && revision.pathUuid.compareTo(auxPathUUID) != 0)
+                    || (pathUUID != null && revision.getPathUuid().equals(pathUUID))) {
+                if (revision.getStatusUuid().equals(SnomedMetadataRf1.CURRENT_RF1.getLenient().getPrimUuid())) {
+                    revision.setStatusUuid(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getPrimUuid());
+                } else if (revision.getStatusUuid().equals(SnomedMetadataRf1.RETIRED_INACTIVE_STATUS_RF1.getLenient().getPrimUuid())) {
+                    revision.setStatusUuid(SnomedMetadataRf2.INACTIVE_VALUE_RF2.getLenient().getPrimUuid());
+                }
+            }
+
+            if ((pathUUID == null)
+                    || (pathUUID != null && revision.getPathUuid().equals(pathUUID))) {
+                if (revision.getAuthorUuid() == null) {
+                    revision.setAuthorUuid(authorUser);
+                }
+                if (revision.getModuleUuid() == null) {
+                    revision.setModuleUuid(TkRevision.unspecifiedModuleUuid);
+                }
+            }
+        } catch (ValidationException e) {
+            AceLog.getAppLog().log(Level.SEVERE, e.getMessage(), e);
+        } catch (IOException e) {
+            AceLog.getAppLog().log(Level.SEVERE, e.getMessage(), e);
         }
     }
 
@@ -473,7 +719,7 @@ public class RF1ToRF2Transformer extends AbstractTransformer {
 
         }
     }
-
+            
     private void processUSDescription(TkDescription description, TkConcept concept) throws ValidationException, IOException {
         List<TkRefexAbstractMember<?>> annotations = description.getAnnotations();
         if (annotations == null) {

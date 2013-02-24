@@ -73,6 +73,7 @@ import org.ihtsdo.tk.api.refex.type_long.RefexLongVersionBI;
 import org.ihtsdo.tk.api.refex.type_member.RefexMemberVersionBI;
 import org.ihtsdo.tk.api.refex.type_string.RefexStringVersionBI;
 import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
+import org.ihtsdo.tk.binding.snomed.Snomed;
 import org.ihtsdo.tk.dto.concept.component.refex.type_array_of_bytearray.TkRefexArrayOfBytearrayMember;
 
 /**
@@ -1003,4 +1004,18 @@ public class TkConcept {
     public void setRelationships(List<TkRelationship> relationships) {
         this.relationships = relationships;
     }
+
+    public boolean hasSnomedIsa() {
+        if (this.relationships != null) {
+            for (TkRelationship tkr : this.relationships) {
+                for (UUID isaUuid : Snomed.IS_A.getUuids()) {
+                    if (tkr.typeUuid.compareTo(isaUuid) == 0) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
 }

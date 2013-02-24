@@ -6,6 +6,8 @@ package org.dwfa.ace.list;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -18,10 +20,14 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.ihtsdo.arena.conceptview.ConceptTemplates;
 import org.ihtsdo.arena.drools.EditPanelKb;
 import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.NidBitSetBI;
 import org.ihtsdo.tk.api.NidBitSetItrBI;
 import org.ihtsdo.tk.api.TermChangeListener;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.api.refex.RefexVersionBI;
+import org.ihtsdo.tk.api.refex.type_nid.RefexNidVersionBI;
 
 /**
  *
@@ -31,9 +37,12 @@ public class PromotionTerminologyTableModel extends AbstractTableModel implement
         ListDataListener {
 
     CopyOnWriteArrayList<ConceptChronicleBI> elements = new CopyOnWriteArrayList<>();
-    HashSet<Integer> changedDesc = new HashSet<>();
-    HashSet<Integer> changedStated = new HashSet<>();
-    HashSet<Integer> changedInferred = new HashSet<>();
+    HashMap<Integer, Integer> changedDesc = new HashMap<>();
+    HashMap<Integer, Integer> changedStated = new HashMap<>();
+    HashMap<Integer, Integer> changedInferred = new HashMap<>();
+    ViewCoordinate mergeVc;
+    int mergePathNid;
+    private ConceptCheckChangeListener tableChangeListener = new ConceptCheckChangeListener();
 //    private ConceptCheckChangeListener listViewChangeListener = new ConceptCheckChangeListener();
 
     public enum MODEL_FIELD {
@@ -42,7 +51,7 @@ public class PromotionTerminologyTableModel extends AbstractTableModel implement
         DESC("changed description"),
         DL_STATED("DL change - stated"),
         DL_INFERRED("DL change - inferred"),
-        SELECT("include");
+        SELECT("reviewed");
         private String columnName;
 
         private MODEL_FIELD(String columnName) {
@@ -62,16 +71,20 @@ public class PromotionTerminologyTableModel extends AbstractTableModel implement
     }
 
     public PromotionTerminologyTableModel(TerminologyList list, NidBitSetBI changedDescNids,
-            NidBitSetBI changedStatedNids, NidBitSetBI changedInferredNids) throws IOException {
+            NidBitSetBI changedStatedNids, NidBitSetBI changedInferredNids,
+            ViewCoordinate mergeVc, int mergePathNid) throws IOException {
         super();
         this.list = list;
         this.list.getModel().addListDataListener(this);
+        Ts.get().addTermChangeListener(tableChangeListener);
+        this.mergeVc = mergeVc;
+        this.mergePathNid = mergePathNid;
         
         if (changedDescNids != null) {
             NidBitSetItrBI descItr = changedDescNids.iterator();
             while (descItr.next()) {
                 int nid = descItr.nid();
-                changedDesc.add(Ts.get().getConceptNidForNid(nid));
+                changedDesc.put(Ts.get().getConceptNidForNid(nid), nid);
             }
         }
 
@@ -79,7 +92,7 @@ public class PromotionTerminologyTableModel extends AbstractTableModel implement
             NidBitSetItrBI statedItr = changedStatedNids.iterator();
             while (statedItr.next()) {
                 int nid = statedItr.nid();
-                changedStated.add(Ts.get().getConceptNidForNid(nid));
+                changedStated.put(Ts.get().getConceptNidForNid(nid), nid);
             }
         }
 
@@ -87,7 +100,7 @@ public class PromotionTerminologyTableModel extends AbstractTableModel implement
             NidBitSetItrBI infItr = changedInferredNids.iterator();
             while (infItr.next()) {
                 int nid = infItr.nid();
-                changedInferred.add(Ts.get().getConceptNidForNid(nid));
+                changedInferred.put(Ts.get().getConceptNidForNid(nid), nid);
             }
         }
         
@@ -128,24 +141,50 @@ public class PromotionTerminologyTableModel extends AbstractTableModel implement
                 return elements.get(row);
             case DESC:
                 int nid = elements.get(row).getConceptNid();
-                if (changedDesc.contains(nid)) {
+                if (changedDesc.containsKey(nid)) {
                     return "<html>&bull;";
                 }
                 return "";
             case DL_STATED:
                 nid = elements.get(row).getConceptNid();
-                if (changedStated.contains(nid)) {
+                if (changedStated.containsKey(nid)) {
                     return "<html>&bull;";
                 }
                 return "";
             case DL_INFERRED:
                 nid = elements.get(row).getConceptNid();
-                if (changedInferred.contains(nid)) {
+                if (changedInferred.containsKey(nid)) {
                     return "<html>&bull;";
                 }
                 return "";
             case SELECT:
-                //return a check box to select to include in promotion
+                nid = elements.get(row).getConceptNid();
+                Collection<? extends RefexVersionBI<?>> refsetMembersActive = null;
+                try {
+                    refsetMembersActive = Ts.get().getConceptVersion(mergeVc, mergePathNid).getRefsetMembersActive();
+
+                    Integer componentNid = null;
+                    if (changedDesc.containsKey(nid)) {
+                        componentNid = changedDesc.get(nid);
+                    } else if (changedStated.containsKey(nid)) {
+                        componentNid = changedStated.get(nid);
+                    } else if (changedInferred.containsKey(nid)) {
+                        componentNid = changedInferred.get(nid);
+                    }
+                    if (refsetMembersActive != null && componentNid != null) {
+                        for (RefexVersionBI member : refsetMembersActive) {
+                            if (member.getReferencedComponentNid() == componentNid) {
+                                RefexNidVersionBI rn = (RefexNidVersionBI) member;
+                                return Ts.get().getConcept(rn.getNid1()).toUserString();
+                            }
+                        }
+                    }
+                } catch (ContradictionException e) {
+//TODO: do something  
+                } catch (IOException e) {
+//TODO: do something                 
+                }
+                
                 return"";
         }
         return null;
@@ -226,37 +265,20 @@ public class PromotionTerminologyTableModel extends AbstractTableModel implement
     
     
 
-//    private class ConceptCheckChangeListener extends TermChangeListener {
-//        @Override
-//        public void changeNotify(long sequence, Set<Integer> originsOfChangedRels, Set<Integer> destinationsOfChangedRels, Set<Integer> referencedComponentsOfChangedRefexs, Set<Integer> changedComponents, Set<Integer> changedComponentAlerts, Set<Integer> changedComponentTemplates, boolean fromClassification) {
-//            int index = 0;
-//            if (!changedComponentTemplates.isEmpty()) {
-//                index = 0;
-//                for (ConceptChronicleBI c : elements) {
-//                    if (changedComponentTemplates.contains(c.getConceptNid())) {
-//                        fireTableRowsUpdated(index, index);
-//                    }
-//                    index++;
-//                }
-//            }
-//            index = 0;
-//            if (!changedComponentAlerts.isEmpty()) {
-//                for (ConceptChronicleBI c : elements) {
-//                    if (changedComponentAlerts.contains(c.getConceptNid())) {
-//                        fireTableRowsUpdated(index, index);
-//                    }
-//                    index++;
-//                }
-//            }
-//
-//        }
-//    }
+    private class ConceptCheckChangeListener extends TermChangeListener {
+        @Override
+        public void changeNotify(long sequence, Set<Integer> originsOfChangedRels, Set<Integer> destinationsOfChangedRels, Set<Integer> referencedComponentsOfChangedRefexs, Set<Integer> changedComponents, Set<Integer> changedComponentAlerts, Set<Integer> changedComponentTemplates, boolean fromClassification) {
+            if(changedComponentAlerts.contains(mergePathNid)){
+                fireTableDataChanged();
+            }
+        }
+    }
 
     public void setChangedDesc(NidBitSetBI changedDesc) throws IOException {
         NidBitSetItrBI itr = changedDesc.iterator();
         this.changedDesc.clear();
         while(itr.next()){
-            this.changedDesc.add(Ts.get().getConceptNidForNid(itr.nid()));
+            this.changedDesc.put(Ts.get().getConceptNidForNid(itr.nid()), itr.nid());
         }
     }
 
@@ -264,7 +286,7 @@ public class PromotionTerminologyTableModel extends AbstractTableModel implement
         NidBitSetItrBI itr = changedStated.iterator();
         this.changedStated.clear();
         while(itr.next()){
-            this.changedStated.add(Ts.get().getConceptNidForNid(itr.nid()));
+            this.changedStated.put(Ts.get().getConceptNidForNid(itr.nid()), itr.nid());
         }
     }
 
@@ -272,7 +294,7 @@ public class PromotionTerminologyTableModel extends AbstractTableModel implement
         NidBitSetItrBI itr = changedInferred.iterator();
         this.changedInferred.clear();
         while(itr.next()){
-            this.changedInferred.add(Ts.get().getConceptNidForNid(itr.nid()));
+            this.changedInferred.put(Ts.get().getConceptNidForNid(itr.nid()), itr.nid());
         }
     }
 }

@@ -72,6 +72,11 @@ public class SctRf2RefsetCToArfMojo extends AbstractMojo implements Serializable
      * @parameter
      */
     private String[] filters;
+    /**
+     * Path to import concepts on. Defaults to SNOMED Core.
+     * @parameter default-value="8c230474-9f11-30ce-9cad-185a96fd03a2"
+     */
+    private String pathUuid;
     String uuidSourceSnomedLongStr;
     String uuidPathStr;
 
@@ -115,7 +120,7 @@ public class SctRf2RefsetCToArfMojo extends AbstractMojo implements Serializable
             getLog().info("::: CONCEPT REFSET FILE: " + outDir + "concept_refsetc_rf2.refset");
             filesIn = Rf2File.getFiles(wDir, targetSubDir, inputDir, inputFile, ".txt");
             for (Rf2File rf2File : filesIn) {
-                Rf2_RefsetCRecord[] members = Rf2_RefsetCRecord.parseRefset(rf2File, exclusions);
+                Rf2_RefsetCRecord[] members = Rf2_RefsetCRecord.parseRefset(rf2File, exclusions, pathUuid);
                 for (Rf2_RefsetCRecord m : members) {
                     m.writeArf(bw);
                 }

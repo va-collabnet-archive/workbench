@@ -110,6 +110,7 @@ public class WfInstanceSearchPanel extends JPanel implements WFSearchFilterConta
 			table1.setCellSelectionEnabled(false);
 			table1.setColumnSelectionAllowed(false);
 			table1.setRowSelectionAllowed(true);
+			table1.setAutoCreateRowSorter(true);
 			table1.setModel(model);
 			DragSource.getDefaultDragSource().createDefaultDragGestureRecognizer(table1, DnDConstants.ACTION_COPY, new DragGestureListenerWithImage(new TermLabelDragSourceListener(), table1));
 

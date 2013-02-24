@@ -38,28 +38,28 @@ import java.util.UUID;
 public interface WfActivityBI {
     
     /** 
-     * Gets the name of the workflow action
+     * Gets the name of the workflow activity
      */
     String getName();
     
     /** 
-     * Gets the UUID of the workflow action
+     * Gets the UUID of the workflow activity
      */
     UUID getUuid();
     
     /** 
-     * Gets an executable object for the workflow action. This can be
+     * Gets an executable object for the workflow activity. This can be
      * implemented as Swing actions, Workbench Business Processes, etc.
      */
     Object getExecutable();
     
     /** 
-     * Performs the action
+     * Performs the activity
      */
     void perform(WfProcessInstanceBI instance) throws Exception;
     
     /** 
-     * When true, the action should be executed automatically by the engine, 
+     * When true, the activity should be executed automatically by the engine, 
      * when false, options will be presented to the user and he will explicitly
      * execute the action
      */

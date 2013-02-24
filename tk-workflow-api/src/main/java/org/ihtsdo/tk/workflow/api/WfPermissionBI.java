@@ -18,10 +18,10 @@ package org.ihtsdo.tk.workflow.api;
 import java.util.UUID;
 
 /**
- * A representation of a workflow user.
+ * A representation of a workflow permission.
  * Example values:
- *  - John
- *  - Mary
+ *  - John is reviewer for clinical findings in the Danish Translation project
+ *  - Mary is editoral board for substances in the Swedish extension project
  *  - etc.
  * 
  * @author alo

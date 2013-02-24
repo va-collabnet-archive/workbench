@@ -21,6 +21,7 @@ import java.rmi.MarshalledObject;
 import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Random;
 import java.util.UUID;
@@ -68,12 +69,14 @@ import org.ihtsdo.helper.query.RelationshipStatedChangedQuery;
 import org.ihtsdo.helper.time.TimeHelper;
 import org.ihtsdo.lang.LANG_CODE;
 import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.ComponentChronicleBI;
 import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.NidBitSetBI;
 import org.ihtsdo.tk.api.NidBitSetItrBI;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.PositionSet;
+import org.ihtsdo.tk.api.PositionSetBI;
 import org.ihtsdo.tk.api.TerminologyBuilderBI;
 import org.ihtsdo.tk.api.blueprint.ConceptCB;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
@@ -81,9 +84,14 @@ import org.ihtsdo.tk.api.blueprint.PathCB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.api.description.DescriptionChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
+import org.ihtsdo.tk.api.refex.type_nid.RefexNidVersionBI;
+import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
+import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 import org.ihtsdo.tk.binding.snomed.RefsetAux;
 import org.ihtsdo.tk.binding.snomed.Snomed;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 import org.ihtsdo.tk.binding.snomed.TermAux;
 import org.ihtsdo.tk.dto.concept.component.refex.TK_REFEX_TYPE;
 import org.ihtsdo.tk.spec.ConceptSpec;
@@ -99,7 +107,7 @@ public class PromotionEditorFrame extends ComponentFrame implements PropertyChan
     private static final Color titleColor = new Color(255, 213, 162);
     private static final Color paneColor = Color.gray;
     protected JMenu promotionMenu;
-    private I_ConfigAceFrame newFrameConfig = null;
+    private I_ConfigAceFrame mergeConfig = null;
     private I_ConfigAceFrame sourceConfig = null;
     private I_ConfigAceFrame targetConfig = null;
     private JSplitPane topSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
@@ -107,7 +115,7 @@ public class PromotionEditorFrame extends ComponentFrame implements PropertyChan
     private ConceptPanel c1Panel;
     private static TerminologyList batchConceptList = null;
     private static PromotionTerminologyTable promotionConceptTable = null;
-    private ViewCoordinate viewCoord;
+    private ViewCoordinate mergeVc;
     private JButton stopButton = new JButton();
     private JPanel resultsPane = new JPanel();
     private JProgressBar progressBar;
@@ -118,10 +126,13 @@ public class PromotionEditorFrame extends ComponentFrame implements PropertyChan
     private Arena mergeArena;
     private Arena sourceArena;
     private Arena targetArena;
+    private ConceptChronicleBI mergePathConcept;
     
     
-    public PromotionEditorFrame(AceFrameConfig origConfig, PathBI sourcePath, PathBI targetPath) throws Exception {
+    public PromotionEditorFrame(AceFrameConfig origConfig,
+            PathBI sourcePath, PathBI targetPath, PathBI mergePath) throws Exception {
         super(new String[]{}, null);
+        batchConceptList = null;
         // Set the title for the frame
         setTitle(getNextFrameName());
         
@@ -131,15 +142,17 @@ public class PromotionEditorFrame extends ComponentFrame implements PropertyChan
         PositionBI targetPos = Ts.get().newPosition(targetPath,
                                          TimeHelper.getTimeFromString("latest", TimeHelper.getFileDateFormat()));
         this.targetConfig = new PromotionTargetConfig(this, origConfig, targetPos);
-        
-        PathBI mergePath = createMergePath(sourcePath, origConfig);
+        if(mergePath == null){
+            mergePath = createMergePath(sourcePath, origConfig);
+        }
+        mergePathConcept = Ts.get().getConcept(mergePath.getConceptNid());
         PositionBI mergePos = Ts.get().newPosition(mergePath,
                                          TimeHelper.getTimeFromString("latest", TimeHelper.getFileDateFormat()));
-        this.newFrameConfig = new PromotionConfig(this, origConfig, mergePos);
+        this.mergeConfig = new PromotionConfig(this, origConfig, mergePos);
         
-        this.newFrameConfig.addPropertyChangeListener(this);
+        this.mergeConfig.addPropertyChangeListener(this);
 
-        this.viewCoord = this.newFrameConfig.getViewCoordinate();
+        this.mergeVc = this.mergeConfig.getViewCoordinate();
 
         // Set the position and size of frame
         setBounds(10, 10, 500, 500);
@@ -163,25 +176,64 @@ public class PromotionEditorFrame extends ComponentFrame implements PropertyChan
             while(allItr.next()){
                 batchListModel.addElement((I_GetConceptData) Ts.get().getConcept(allItr.nid()));
             }
-            batchConceptList = new TerminologyList(batchListModel, true, true, newFrameConfig);
+            batchConceptList = new TerminologyList(batchListModel, true, true, mergeConfig);
 
-            PromotionTerminologyTableModel model = new PromotionTerminologyTableModel(batchConceptList, descChange, statedChange, infChange);
-            promotionConceptTable = new PromotionTerminologyTable(model, newFrameConfig);
+            PromotionTerminologyTableModel model = new PromotionTerminologyTableModel(batchConceptList, descChange, statedChange,
+                    infChange, mergeVc, mergePath.getConceptNid());
+            promotionConceptTable = new PromotionTerminologyTable(model, mergeConfig);
             promotionConceptTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
             promotionConceptTable.getSelectionModel().addListSelectionListener(new SelectionListener());
+            
+            //add values from previous merge
+            TerminologyListModel listModel = (TerminologyListModel) batchConceptList.getModel();
+            Collection<? extends RefexVersionBI<?>> previousMerge = mergePathConcept.getRefsetMembersActive(mergeVc);
+            if (!previousMerge.isEmpty()) {
+                HashMap<Integer, Color> diffColor = new HashMap<>();
+                Random random = new Random();
+                for (RefexVersionBI member : previousMerge) {
+                    ComponentChronicleBI<?> component = Ts.get().getComponent(member.getReferencedComponentNid());
+                    if (DescriptionChronicleBI.class.isAssignableFrom(component.getClass())) {
+                        descChange.setMember(component.getNid());
+                    } else if (RelationshipChronicleBI.class.isAssignableFrom(component.getClass())) {
+                        RelationshipChronicleBI r = (RelationshipChronicleBI) component;
+                        RelationshipVersionBI version = r.getVersion(mergeConfig.getViewCoordinate().getViewCoordinateWithAllStatusValues());
+                        int charNid = version.getCharacteristicNid();
+                        if (charNid == SnomedMetadataRfx.getREL_CH_INFERRED_RELATIONSHIP_NID()) {
+                            infChange.setMember(component.getNid());
+                        } else if (charNid == SnomedMetadataRfx.getREL_CH_STATED_RELATIONSHIP_NID()) {
+                            statedChange.setMember(component.getNid());
+                        }
+                    } else if (ConceptChronicleBI.class.isAssignableFrom(component.getClass())) {
+                        statedChange.setMember(component.getNid());
+                    }
+                    //make colors
+                    float hue = random.nextFloat();
+                    float saturation = (random.nextInt(2000) + 1000) / 10000f;
+                    float luminance = 0.9f;
+                    Color color = Color.getHSBColor(hue, saturation, luminance);
+                    diffColor.put(component.getNid(), color);
+                    listModel.addElement((I_GetConceptData) Ts.get().getConcept(component.getConceptNid()));
+                }
+                mergeArena.getEditor().setDiffColor(diffColor);
+                sourceArena.getEditor().setDiffColor(diffColor);
+                targetArena.getEditor().setDiffColor(diffColor);
+                model.setChangedDesc(descChange);
+                model.setChangedInferred(infChange);
+                model.setChangedStated(statedChange);
+            }
         }
 	     
         createTopComponent();
         
         topSplit.setTopComponent(resultsPane);
         topSplit.setBottomComponent(conceptTabsPane);
-        topSplit.setDividerLocation(350); 
+        topSplit.setDividerLocation(350);
         resultsPane.setMinimumSize(new Dimension(cp.getWidth(), 350));
         SwingUtilities.invokeLater(new Runnable() {
 
             @Override
             public void run() {
-                newFrameConfig.getConceptViewer(1).setTermComponent(null);
+                mergeConfig.getConceptViewer(1).setTermComponent(null);
             }
         });
         addWindowListener(new AceWindowActionListener());
@@ -189,7 +241,6 @@ public class PromotionEditorFrame extends ComponentFrame implements PropertyChan
 
     private void createTopComponent() {
         /* Setting up resultsPane */
-//        JSplitPane progressIndicator = createProgressIndicator();
         resultsPane.setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.BOTH;
@@ -242,12 +293,12 @@ public class PromotionEditorFrame extends ComponentFrame implements PropertyChan
     private void createBottomComponent() throws NoSuchAlgorithmException, IOException, ClassNotFoundException, TerminologyException {
         /* Setting up conceptTabsPane */
         c1Panel = new ConceptPanel(HOST_ENUM.CONCEPT_PANEL_R1,
-                newFrameConfig, LINK_TYPE.UNLINKED,
+                mergeConfig, LINK_TYPE.UNLINKED,
                 conceptTabsPane, 1, "plugins/contradiction");
         conceptTabsPane.add(c1Panel);
-        SnoRocketTabPanel classifierPanel = new SnoRocketTabPanel(newFrameConfig);
+        SnoRocketTabPanel classifierPanel = new SnoRocketTabPanel(mergeConfig);
         conceptTabsPane.add("classifier", classifierPanel);
-        mergeArena = new Arena(newFrameConfig, new File("arena/1-up.mxe"), false);
+        mergeArena = new Arena(mergeConfig, new File("arena/1-up.mxe"), false, true);
         sourceArena = new Arena(sourceConfig, new File("arena/1-up.mxe"), false);
         targetArena = new Arena(targetConfig, new File("arena/1-up.mxe"), false);
         
@@ -283,6 +334,8 @@ public class PromotionEditorFrame extends ComponentFrame implements PropertyChan
         mainMenuBar.add(promotionMenu = new JMenu("Promotion"));
         promotionMenu.add(new ClassifyAction(this));
         promotionMenu.add(new QueryAction(this));
+        promotionMenu.add(new PromoteSelectedWBAction(this));
+        promotionMenu.add(new PromoteSelectedAction(this));
         promotionMenu.add(new PromoteAllWBAction(this));
         promotionMenu.add(new PromoteAllAction(this));
     }
@@ -337,12 +390,11 @@ public class PromotionEditorFrame extends ComponentFrame implements PropertyChan
             PromotionTerminologyTableModel model = (PromotionTerminologyTableModel) promotionConceptTable.getModel();
             try{
                 selectedIndex = promotionConceptTable.convertRowIndexToModel(selectedIndex);
+                I_GetConceptData concept = (I_GetConceptData) model.getValueAt(selectedIndex, 0);
+                c1Panel.setTermComponent(concept);
             } catch(IndexOutOfBoundsException e){
-                selectedIndex = promotionConceptTable.convertRowIndexToModel(promotionConceptTable.getSelectedRow());
-            }
-            
-            I_GetConceptData concept = (I_GetConceptData) model.getValueAt(selectedIndex, 0);
-            c1Panel.setTermComponent(concept);
+//TODO: don't need to do anything, updating on its self
+            } 
         }
     }
 
@@ -382,7 +434,7 @@ public class PromotionEditorFrame extends ComponentFrame implements PropertyChan
     }
 
     public I_ConfigAceFrame getActiveFrameConfig() {
-        return newFrameConfig;
+        return mergeConfig;
     }
 
     public void removeStopActionListener(ActionListener stopListener) {
@@ -405,7 +457,7 @@ public class PromotionEditorFrame extends ComponentFrame implements PropertyChan
 
     private void doWindowActivation() {
         try {
-            Terms.get().setActiveAceFrameConfig(newFrameConfig);
+            Terms.get().setActiveAceFrameConfig(mergeConfig);
         } catch (TerminologyException e1) {
             AceLog.getAppLog().alertAndLogException(e1);
         } catch (IOException e1) {
@@ -452,6 +504,7 @@ public class PromotionEditorFrame extends ComponentFrame implements PropertyChan
         public void actionPerformed(ActionEvent e) {
             try {
                 frame.query();
+                
                 PromotionTerminologyTableModel model = (PromotionTerminologyTableModel) promotionConceptTable.getModel();
                 model.setChangedDesc(descChange);
                 model.setChangedInferred(infChange);
@@ -460,16 +513,27 @@ public class PromotionEditorFrame extends ComponentFrame implements PropertyChan
                 NidBitSetItrBI allItr = allChange.iterator();
                 HashMap<Integer, Color> diffColor = new HashMap<>();
                 Random random = new Random();
+                TerminologyBuilderBI builder = Ts.get().getTerminologyBuilder(mergeConfig.getEditCoordinate(), mergeVc);
                 while (allItr.next()) {
-                    listModel.addElement((I_GetConceptData) Ts.get().getConceptForNid(allItr.nid()));
+                    ConceptChronicleBI concept = Ts.get().getConceptForNid(allItr.nid());
+                    ComponentChronicleBI component = Ts.get().getComponent(allItr.nid());
+                    //add component to promotion refset
+                    RefexCAB promoteBp = new RefexCAB(TK_REFEX_TYPE.CID,
+                            component.getNid(), mergePathConcept.getNid());
+                    promoteBp.put(RefexCAB.RefexProperty.CNID1, TermAux.UNREVIEWED.getLenient().getNid());
+                    builder.construct(promoteBp);
+                    //add to table
+                    listModel.addElement((I_GetConceptData) concept);
+                    
                     //make colors
                     float hue = random.nextFloat();
-                    // Saturation between 0.1 and 0.3
                     float saturation = (random.nextInt(2000) + 1000) / 10000f;
                     float luminance = 0.9f;
                     Color color = Color.getHSBColor(hue, saturation, luminance);
                     diffColor.put(allItr.nid(), color);
                 }
+                Ts.get().addUncommittedNoChecks(mergePathConcept);
+                Ts.get().commit(mergePathConcept);
                 mergeArena.getEditor().setDiffColor(diffColor);
                 sourceArena.getEditor().setDiffColor(diffColor);
                 targetArena.getEditor().setDiffColor(diffColor);
@@ -498,9 +562,22 @@ public class PromotionEditorFrame extends ComponentFrame implements PropertyChan
         @Override
         public void actionPerformed(ActionEvent e) {
             try {
-                NidBitSetBI promotionNids = allChange;
-                promotionNids.andNot(infChange);
-                frame.promote(promotionNids, true);
+                frame.promote(allChange, true);
+                
+                TerminologyBuilderBI builder = Ts.get().getTerminologyBuilder(mergeConfig.getEditCoordinate(), mergeVc);
+                for(RefexVersionBI m : mergePathConcept.getRefsetMembersActive(mergeVc)){
+                    RefexNidVersionBI member = (RefexNidVersionBI) m;
+                    if (member.getNid1() == TermAux.PROMOTE.getLenient().getConceptNid()) {
+                        RefexCAB memberBp = member.makeBlueprint(mergeVc);
+                        memberBp.put(RefexCAB.RefexProperty.CNID1, TermAux.PROMOTED.getLenient().getConceptNid());
+                        memberBp.setMemberUuid(member.getPrimUuid());
+                        builder.construct(memberBp);
+                    }
+                }
+                Ts.get().addUncommitted(mergePathConcept);
+                Ts.get().commit(mergePathConcept);
+                PromotionTerminologyTableModel model = (PromotionTerminologyTableModel) promotionConceptTable.getModel();
+                model.fireTableDataChanged();
             } catch (IOException ex) {
                 Logger.getLogger(PromotionEditorFrame.class.getName()).log(Level.SEVERE, null, ex);
             } catch (ParseException ex) {
@@ -525,7 +602,108 @@ public class PromotionEditorFrame extends ComponentFrame implements PropertyChan
         @Override
         public void actionPerformed(ActionEvent e) {
             try {
-                frame.promote(allChange, false);
+                NidBitSetBI promotionNids = allChange;
+                promotionNids.andNot(infChange);
+                frame.promote(promotionNids, false);
+                
+                TerminologyBuilderBI builder = Ts.get().getTerminologyBuilder(mergeConfig.getEditCoordinate(), mergeVc);
+                for(RefexVersionBI m : mergePathConcept.getRefsetMembersActive(mergeVc)){
+                    RefexNidVersionBI member = (RefexNidVersionBI) m;
+                    if (member.getNid1() == TermAux.PROMOTE.getLenient().getConceptNid()) {
+                        RefexCAB memberBp = member.makeBlueprint(mergeVc);
+                        memberBp.put(RefexCAB.RefexProperty.CNID1, TermAux.PROMOTED.getLenient().getConceptNid());
+                        memberBp.setMemberUuid(member.getPrimUuid());
+                        builder.construct(memberBp);
+                    }
+                }
+                Ts.get().addUncommitted(mergePathConcept);
+                Ts.get().commit(mergePathConcept);
+                PromotionTerminologyTableModel model = (PromotionTerminologyTableModel) promotionConceptTable.getModel();
+                model.fireTableDataChanged();
+            } catch (IOException ex) {
+                Logger.getLogger(PromotionEditorFrame.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (ParseException ex) {
+                Logger.getLogger(PromotionEditorFrame.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (Exception ex) {
+                Logger.getLogger(PromotionEditorFrame.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        
+    }
+    
+    private class PromoteSelectedAction extends AbstractAction{
+        private static final long serialVersionUID = 1L;
+        private PromotionEditorFrame frame;
+
+        public PromoteSelectedAction(PromotionEditorFrame promotionEditorFrame) {
+            super("Promote selected");
+
+            this.frame = promotionEditorFrame;
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            try {
+                Collection<? extends RefexVersionBI<?>> members = mergePathConcept.getRefsetMembersActive(mergeVc);
+                NidBitSetBI nidsToPromote = Ts.get().getEmptyNidSet();
+                TerminologyBuilderBI builder = Ts.get().getTerminologyBuilder(mergeConfig.getEditCoordinate(), mergeVc);
+                for(RefexVersionBI m : members){
+                    RefexNidVersionBI member = (RefexNidVersionBI) m;
+                    if(member.getNid1() == TermAux.PROMOTE.getLenient().getConceptNid()){
+                        RefexCAB memberBp = member.makeBlueprint(mergeVc);
+                        nidsToPromote.setMember(Ts.get().getConceptNidForNid(member.getReferencedComponentNid()));
+                        memberBp.put(RefexCAB.RefexProperty.CNID1, TermAux.PROMOTED.getLenient().getConceptNid());
+                        memberBp.setMemberUuid(member.getPrimUuid());
+                        builder.construct(memberBp);
+                    }
+                }
+                Ts.get().addUncommitted(mergePathConcept);
+                Ts.get().commit(mergePathConcept);
+                frame.promote(nidsToPromote, false);
+                PromotionTerminologyTableModel model = (PromotionTerminologyTableModel) promotionConceptTable.getModel();
+                model.fireTableDataChanged();
+            } catch (IOException ex) {
+                Logger.getLogger(PromotionEditorFrame.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (ParseException ex) {
+                Logger.getLogger(PromotionEditorFrame.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (Exception ex) {
+                Logger.getLogger(PromotionEditorFrame.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        
+    }
+    
+    private class PromoteSelectedWBAction extends AbstractAction{
+        private static final long serialVersionUID = 1L;
+        private PromotionEditorFrame frame;
+
+        public PromoteSelectedWBAction(PromotionEditorFrame promotionEditorFrame) {
+            super("Promote selected - write back");
+
+            this.frame = promotionEditorFrame;
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            try {
+                Collection<? extends RefexVersionBI<?>> members = mergePathConcept.getRefsetMembersActive(mergeVc);
+                NidBitSetBI nidsToPromote = Ts.get().getEmptyNidSet();
+                TerminologyBuilderBI builder = Ts.get().getTerminologyBuilder(mergeConfig.getEditCoordinate(), mergeVc);
+                for(RefexVersionBI m : members){
+                    RefexNidVersionBI member = (RefexNidVersionBI) m;
+                    if(member.getNid1() == TermAux.PROMOTE.getLenient().getConceptNid()){
+                        RefexCAB memberBp = member.makeBlueprint(mergeVc);
+                        nidsToPromote.setMember(Ts.get().getConceptNidForNid(member.getReferencedComponentNid()));
+                        memberBp.put(RefexCAB.RefexProperty.CNID1, TermAux.PROMOTED.getLenient().getConceptNid());
+                        memberBp.setMemberUuid(member.getPrimUuid());
+                        builder.construct(memberBp);
+                    }
+                }
+                Ts.get().addUncommitted(mergePathConcept);
+                Ts.get().commit(mergePathConcept);
+                frame.promote(nidsToPromote, false);
+                PromotionTerminologyTableModel model = (PromotionTerminologyTableModel) promotionConceptTable.getModel();
+                model.fireTableDataChanged();
             } catch (IOException ex) {
                 Logger.getLogger(PromotionEditorFrame.class.getName()).log(Level.SEVERE, null, ex);
             } catch (ParseException ex) {
@@ -551,7 +729,7 @@ public class PromotionEditorFrame extends ComponentFrame implements PropertyChan
         public void actionPerformed(ActionEvent e) {
             try {
                 SnorocketExTask classifier = new SnorocketExTask();
-                classifier.runClassifier(newFrameConfig);
+                classifier.runClassifier(mergeConfig);
                 classifier.commitClassification();
             } catch (IOException ex) {
                 Logger.getLogger(PromotionEditorFrame.class.getName()).log(Level.SEVERE, null, ex);
@@ -565,7 +743,7 @@ public class PromotionEditorFrame extends ComponentFrame implements PropertyChan
     }
     
     private void query() throws IOException, ParseException, Exception{
-            ViewCoordinate vcSource = newFrameConfig.getViewCoordinate();
+            ViewCoordinate vcSource = mergeConfig.getViewCoordinate();
             ViewCoordinate vcTarget = targetConfig.getViewCoordinate();         
             
             //query: added description
@@ -573,7 +751,7 @@ public class PromotionEditorFrame extends ComponentFrame implements PropertyChan
             //query: added stated rel, retired stated rel
             //query: added inferred rel, retired inferred rel
             long startTime = System.currentTimeMillis();
-            QueryBuilderBI builder = Ts.get().getQueryBuilder(newFrameConfig.getViewCoordinate());
+            QueryBuilderBI builder = Ts.get().getQueryBuilder(mergeConfig.getViewCoordinate());
             Query  q1 = new DescriptionChangedQuery(vcTarget, vcSource).getQuery();
             Query  q2 = new RelationshipInferredChangedQuery(vcTarget, vcSource).getQuery();
             Query  q3 = new RelationshipStatedChangedQuery(vcTarget, vcSource).getQuery();
@@ -607,7 +785,7 @@ public class PromotionEditorFrame extends ComponentFrame implements PropertyChan
             long seconds = (elapsedTime % 60000) / 1000;
             System.out.println("Query time: " + minutes + " minutes, " + seconds + " seconds.");
     }
-    
+//TODO: specify origin position    
     private void promote(NidBitSetBI nidsToPromote, boolean writeBack) throws IOException, Exception{
             long startTime = System.currentTimeMillis();
             TerminologyPromoterBI promoter = Ts.get().getTerminologyPromoter(sourceConfig.getViewCoordinate(),

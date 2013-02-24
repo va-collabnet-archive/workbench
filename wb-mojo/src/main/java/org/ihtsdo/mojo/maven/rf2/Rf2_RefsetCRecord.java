@@ -42,7 +42,7 @@ public class Rf2_RefsetCRecord implements Comparable<Rf2_RefsetCRecord> {
     String moduleUuidStr;
 
     public Rf2_RefsetCRecord(String id, String dateStr, boolean active, String moduleUuidStr,
-            long refsetIdL, long referencedComponentIdL, long valueIdL)
+            long refsetIdL, long referencedComponentIdL, long valueIdL, String pathUuid)
             throws ParseException {
         this.id = id;
         this.effDateStr = dateStr;
@@ -54,12 +54,12 @@ public class Rf2_RefsetCRecord implements Comparable<Rf2_RefsetCRecord> {
         this.valueIdL = valueIdL;
 
         // SNOMED Core :NYI: setup path as a POM parameter.
-        this.pathUuidStr = Rf2Defaults.getPathSnomedCoreUuidStr();
+        this.pathUuidStr = pathUuid;
         // this.authorUuidStr = Rf2Defaults.getAuthorUuidStr();
         this.moduleUuidStr = moduleUuidStr;
     }
 
-    static Rf2_RefsetCRecord[] parseRefset(Rf2File f, Long[] exclusions)
+    static Rf2_RefsetCRecord[] parseRefset(Rf2File f, Long[] exclusions, String pathUuid)
             throws IOException, ParseException {
 
         int count = Rf2File.countFileLines(f);
@@ -108,7 +108,8 @@ public class Rf2_RefsetCRecord implements Comparable<Rf2_RefsetCRecord> {
 			            Rf2x.convertSctIdToUuidStr(line[MODULE_ID]),
 			            Long.parseLong(line[REFSET_ID]),
 			            Long.parseLong(line[REFERENCED_COMPONENT_ID]),
-			            Long.parseLong(line[VALUE_ID])));
+			            Long.parseLong(line[VALUE_ID]),
+                                    pathUuid));
 			}
 		} catch (NumberFormatException e) {
 			AceLog.getAppLog().severe("Error parsing Refset recors: File=" + f.file.getName() + " Line=" + currentCount);

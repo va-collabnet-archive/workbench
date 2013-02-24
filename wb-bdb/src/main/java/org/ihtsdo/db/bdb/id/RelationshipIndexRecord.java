@@ -250,7 +250,9 @@ public class RelationshipIndexRecord implements Iterable<RelationshipIndexRecord
                  }
 
                  if (latestStamp != null) {
-                    if (vc.getAllowedStatusNids() ==  null || vc.getAllowedStatusNids().contains(latestStamp.getStatusNid())) {
+                    if(vc.getAllowedStatusNids() == null){
+                        return true; //View Coordinate has all status values allowed
+                    }else if (vc.getAllowedStatusNids().contains(latestStamp.getStatusNid())) {
                        return true;
                     }
                  }

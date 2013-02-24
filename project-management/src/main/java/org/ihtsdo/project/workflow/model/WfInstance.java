@@ -17,7 +17,10 @@
 package org.ihtsdo.project.workflow.model;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -36,7 +39,11 @@ import org.ihtsdo.project.refset.LanguageMembershipRefset;
 import org.ihtsdo.project.refset.PromotionAndAssignmentRefset;
 import org.ihtsdo.project.workflow.api.wf2.implementation.WfActivityInstance;
 import org.ihtsdo.project.workflow.api.wf2.implementation.WfProcessDefinition;
+import org.ihtsdo.project.workflow.api.wf2.implementation.WorkflowInitiator;
 import org.ihtsdo.project.workflow.api.wf2.implementation.WorkflowStore;
+import org.ihtsdo.tk.api.NidSet;
+import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
+import org.ihtsdo.tk.api.changeset.ChangeSetGenerationThreadingPolicy;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.refex.type_nid_nid.RefexNidNidVersionBI;
@@ -260,18 +267,31 @@ public class WfInstance implements Serializable, WfProcessInstanceBI {
 		I_ConfigAceFrame config = tf.getActiveAceFrameConfig();
 		WorkList workList = instance.getWorkList();
 		PromotionAndAssignmentRefset pormAssigRefset = workList.getPromotionRefset(config);
-		pormAssigRefset.setPromotionStatus(tf.uuidToNative(instance.componentId), tf.uuidToNative(newState.getId()));
+		I_GetConceptData concept = tf.getConcept(instance.getComponentId());
+		pormAssigRefset.setPromotionStatus(concept.getNid(), tf.uuidToNative(newState.getId()));
 		instance.setState(newState);
+		if (instance.isCompleted()) {
+			if (WorkflowInitiator.lastComplete != null) {
+				WorkflowInitiator.lastComplete.put(concept.getNid(), System.currentTimeMillis());
+			}
+			if (WorkflowInitiator.alreadySeen != null) {
+				for (NidSet loopMap : WorkflowInitiator.alreadySeen.values()) {
+					loopMap.remove(concept.getNid());
+				}
+			}
+		}
 		I_TerminologyProject project = TerminologyProjectDAO.getProjectForWorklist(workList, config);
 		if (project.getProjectType().equals(Type.TRANSLATION)) {
 			TranslationProject transProject = (TranslationProject) project;
 			I_GetConceptData targetLanguage = TerminologyProjectDAO.getTargetLanguageRefsetForProject(transProject, config);
 			if (targetLanguage != null) {
 				LanguageMembershipRefset targetLangRefset = new LanguageMembershipRefset(targetLanguage, config);
-				targetLangRefset.getPromotionRefset(config).setPromotionStatus(tf.uuidToNative(instance.componentId),
+				targetLangRefset.getPromotionRefset(config).setPromotionStatus(concept.getNid(),
 						tf.uuidToNative(newState.getId()));
 			}
 		}
+		// Experiment to manage workflow restart in the same session
+		concept.commit(ChangeSetGenerationPolicy.INCREMENTAL, ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);
 	}
 
 	/**
@@ -438,6 +458,14 @@ public class WfInstance implements Serializable, WfProcessInstanceBI {
 	public void setHistory(List<WfHistoryEntry> history) {
 		this.history = history;
 	}
+	
+	public class RefexVersionBIComparator implements Comparator<RefexVersionBI>{
+		 
+	    @Override
+	    public int compare(RefexVersionBI o1, RefexVersionBI o2) {
+	        return (o1.getTime()<o2.getTime() ? -1 : (o1.getTime()==o2.getTime() ? 0 : 1));
+	    }
+	}
 
 	@Override
 	public LinkedList<WfActivityInstanceBI> getActivityInstances() {
@@ -448,20 +476,33 @@ public class WfInstance implements Serializable, WfProcessInstanceBI {
 			Collection<? extends RefexChronicleBI<?>> annotations = concept.getAnnotations();
 			for (RefexChronicleBI<?> annot : annotations) {
 				if (annot.getRefexNid() == promotionRefset.getRefsetId()) {
-					Collection<? extends RefexVersionBI> versions = annot.getVersions();
+					Collection<? extends RefexVersionBI> versionsTemp = annot.getVersions();
+					List<RefexVersionBI> versions = new ArrayList<RefexVersionBI>();
+					versions.addAll(versionsTemp);
+					Collections.sort(versions, new RefexVersionBIComparator());
+					int lastStatus = Integer.MIN_VALUE;
+					long lastTime = Long.MIN_VALUE;
 					for (RefexVersionBI vers : versions) {
 						RefexNidNidVersionBI refexNidNid = (RefexNidNidVersionBI) vers;
 						int statusNid = refexNidNid.getNid1();
-						I_GetConceptData statusConcept = Terms.get().getConcept(statusNid);
-
-						WfStateBI state = new WfState(statusConcept.getInitialText(), statusConcept.getPrimUuid());
-						I_GetConceptData authorConcept = Terms.get().getConcept(refexNidNid.getNid2());
-						WfUserBI author = new WfUser(authorConcept.getInitialText(), authorConcept.getPrimUuid());
-						boolean usedOverride = true;
-						boolean automaticAction = true;
 						Long time = refexNidNid.getTime();
-						WfActivityInstanceBI wfActivity = new WfActivityInstance(time, state, author, usedOverride, automaticAction);
-						result.add(wfActivity);
+						long diff = (time - lastTime) * -1;
+						if (statusNid == lastStatus && diff < 30000) {
+							// skip duplicate status line
+						} else {
+							I_GetConceptData statusConcept = Terms.get().getConcept(statusNid);
+
+							WfStateBI state = new WfState(statusConcept.getInitialText(), statusConcept.getPrimUuid());
+							I_GetConceptData authorConcept = Terms.get().getConcept(refexNidNid.getAuthorNid());
+							WfUserBI author = new WfUser(authorConcept.getInitialText(), authorConcept.getPrimUuid());
+							boolean usedOverride = true;
+							boolean automaticAction = true;
+
+							WfActivityInstanceBI wfActivity = new WfActivityInstance(time, state, author, usedOverride, automaticAction);
+							result.add(wfActivity);
+						}
+						lastStatus = statusNid;
+						lastTime = time;
 					}
 				}
 			}
@@ -469,6 +510,7 @@ public class WfInstance implements Serializable, WfProcessInstanceBI {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		
 		return result;
 	}
 

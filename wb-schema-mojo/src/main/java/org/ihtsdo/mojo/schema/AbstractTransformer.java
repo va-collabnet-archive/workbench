@@ -54,14 +54,6 @@ public abstract class AbstractTransformer {
 	 * @param concept the concept
 	 */
 	public abstract void transformAttributes(TkConceptAttributes attributes, TkConcept concept);
-	
-	/**
-	 * Transforms attribute revision.
-	 *
-	 * @param attributes the attributes
-	 * @param concept the concept
-	 */
-	public abstract void transformAttributesRevision(TkConceptAttributesRevision tkConceptAttributesRevision, TkConcept concept);
 
     /**
 	 * Transforms a description.
@@ -122,37 +114,30 @@ public abstract class AbstractTransformer {
 	 */
 	public boolean transform(TkConcept eConcept) {
 		transformAttributes(eConcept.conceptAttributes, eConcept);
-                
-            if (eConcept.getConceptAttributes().getRevisionList() != null) {
-                List<TkConceptAttributesRevision> conceptAttributeList = eConcept.getConceptAttributes().getRevisionList();
-                for (TkConceptAttributesRevision tkConceptAttributesRevision : conceptAttributeList) {
-                    transformAttributesRevision(tkConceptAttributesRevision,eConcept);
-                }
-            }
 
 		if (eConcept.getConceptAttributes().getAnnotations() != null) {
-			List<TkRefexAbstractMember<?>> annotationsReadOnly = new ArrayList<TkRefexAbstractMember<?>>(eConcept.getConceptAttributes().getAnnotations());
+			List<TkRefexAbstractMember<?>> annotationsReadOnly = new ArrayList<>(eConcept.getConceptAttributes().getAnnotations());
 			for (TkRefexAbstractMember<?> loopAnnotation : annotationsReadOnly) {
 				transformAnnotation(loopAnnotation, eConcept.getConceptAttributes());
 			}
 		}
 
-		List<TkDescription> descriptionsReadOnly = new ArrayList<TkDescription>(eConcept.getDescriptions());
+		List<TkDescription> descriptionsReadOnly = new ArrayList<>(eConcept.getDescriptions());
 		for (TkDescription loopDescription : descriptionsReadOnly) {
-			transformDescription(loopDescription, eConcept);
 			if (loopDescription.getAnnotations() != null) {
-				List<TkRefexAbstractMember<?>> annotationsReadOnly = new ArrayList<TkRefexAbstractMember<?>>(loopDescription.getAnnotations());
+				List<TkRefexAbstractMember<?>> annotationsReadOnly = new ArrayList<>(loopDescription.getAnnotations());
 				for (TkRefexAbstractMember<?> loopAnnotation : annotationsReadOnly) {
 					transformAnnotation(loopAnnotation, loopDescription);
 				}
 			}
+			transformDescription(loopDescription, eConcept);
 		}
 
-		List<TkRelationship> relationshipsReadOnly =  new ArrayList<TkRelationship>(eConcept.getRelationships());
+		List<TkRelationship> relationshipsReadOnly =  new ArrayList<>(eConcept.getRelationships());
 		for (TkRelationship loopRelationship : relationshipsReadOnly) {
 			transformRelationship(loopRelationship, eConcept);
 			if (loopRelationship.getAnnotations() != null) {
-				List<TkRefexAbstractMember<?>> annotationsReadOnly = new ArrayList<TkRefexAbstractMember<?>>(loopRelationship.getAnnotations());
+				List<TkRefexAbstractMember<?>> annotationsReadOnly = new ArrayList<>(loopRelationship.getAnnotations());
 				for (TkRefexAbstractMember<?> loopAnnotation : annotationsReadOnly) {
 					transformAnnotation(loopAnnotation, loopRelationship);
 				}
@@ -160,11 +145,11 @@ public abstract class AbstractTransformer {
 		}
 
 		if (eConcept.getRefsetMembers() != null) {
-		List<TkRefexAbstractMember<?>> membersReadOnly = new ArrayList<TkRefexAbstractMember<?>>(eConcept.getRefsetMembers());
+		List<TkRefexAbstractMember<?>> membersReadOnly = new ArrayList<>(eConcept.getRefsetMembers());
 			for (TkRefexAbstractMember<?> loopMember : membersReadOnly) {
 				transformMember(loopMember, eConcept);
 				if (loopMember.getAnnotations() != null) {
-					List<TkRefexAbstractMember<?>> annotationsReadOnly = new ArrayList<TkRefexAbstractMember<?>>(loopMember.getAnnotations());
+					List<TkRefexAbstractMember<?>> annotationsReadOnly = new ArrayList<>(loopMember.getAnnotations());
 					for (TkRefexAbstractMember<?> loopAnnotation : annotationsReadOnly) {
 						transformAnnotation(loopAnnotation, loopMember);
 					}

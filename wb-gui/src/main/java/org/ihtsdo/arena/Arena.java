@@ -25,14 +25,23 @@ public class Arena extends JPanel {
     public Arena(I_ConfigAceFrame config, File defaultLayout) throws IOException {
         super(new BorderLayout());
         
-        editor = new ArenaEditor(config, defaultLayout, false);
+        editor = new ArenaEditor(config, defaultLayout, false, false);
         add(editor, BorderLayout.CENTER);   
     }
     
     public Arena(I_ConfigAceFrame config, File defaultLayout, boolean isForAdjudication) throws IOException {
         super(new BorderLayout());
         
-        editor = new ArenaEditor(config, defaultLayout, isForAdjudication);
+        editor = new ArenaEditor(config, defaultLayout, isForAdjudication, false);
+        add(editor, BorderLayout.CENTER);   
+    }
+    
+    public Arena(I_ConfigAceFrame config, File defaultLayout, 
+            boolean isForAdjudication, boolean isForPromotion) throws IOException {
+        super(new BorderLayout());
+        
+        editor = new ArenaEditor(config, defaultLayout,
+                isForAdjudication, isForPromotion);
         add(editor, BorderLayout.CENTER);   
     }
     

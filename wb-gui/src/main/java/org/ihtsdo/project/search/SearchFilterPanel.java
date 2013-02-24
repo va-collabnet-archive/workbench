@@ -62,6 +62,7 @@ public class SearchFilterPanel extends JPanel {
 		filterTypeCombo.addItem("");
 		filterTypeCombo.addItem(new WfDestinationFilter());
 		filterTypeCombo.addItem(new WfWorklistFilter());
+		// TODO: finish implementation filterTypeCombo.addItem(new WfProjectFilter());
 		filterTypeCombo.addItem(new WfStateFilter());
 		filterTypeCombo.addItem(new WfCompletionFilter());
 	}
@@ -82,8 +83,8 @@ public class SearchFilterPanel extends JPanel {
 			return new WfWorklistFilter(((WorkList) filterCombo.getSelectedItem()).getUuid());
 		} else if (filterObject instanceof WfState) {
 			return new WfStateFilter((WfState) filterCombo.getSelectedItem());
-		} else if (filterObject instanceof WfCompletionFilter) {
-			CompletionOption co = (WfCompletionFilter.CompletionOption) filterCombo.getSelectedItem();
+		} else if (filterObject instanceof CompletionOption) {
+			CompletionOption co = (CompletionOption) filterCombo.getSelectedItem();
 			if (co.equals(CompletionOption.COMPLETE_INSTANCES)) {
 				return new WfCompletionFilter(true);
 			} else if (co.equals(CompletionOption.INCOMPLETE_INSTACES)) {
@@ -139,9 +140,9 @@ public class SearchFilterPanel extends JPanel {
 				filterCombo.removeAllItems();
 				try {
 					I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
-					List<TranslationProject> projects = TerminologyProjectDAO.getAllTranslationProjects(config);
+					List<I_TerminologyProject> projects = TerminologyProjectDAO.getAllProjects(config);
 					Collections.sort(projects);
-					for (TranslationProject project : projects) {
+					for (I_TerminologyProject project : projects) {
 						filterCombo.addItem(project);
 					}
 				} catch (TerminologyException e1) {

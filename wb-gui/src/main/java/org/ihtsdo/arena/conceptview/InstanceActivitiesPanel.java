@@ -82,7 +82,7 @@ public class InstanceActivitiesPanel extends JPanel {
 		gbc_panel.gridy = 0;
 		add(panel, gbc_panel);
 
-		JLabel title = new JLabel("Instance Activities");
+		JLabel title = new JLabel("Workflow history");
 		panel.add(title);
 		
 		scrollPane = new JScrollPane();

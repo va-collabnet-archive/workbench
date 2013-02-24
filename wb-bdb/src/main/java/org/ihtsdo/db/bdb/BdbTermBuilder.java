@@ -749,17 +749,18 @@ public class BdbTermBuilder implements TerminologyBuilderBI {
                 Ts.get().addUncommitted(Ts.get().getConcept(pathOriginRefexOther.getConceptNid()));
                 Ts.get().commit(Ts.get().getConcept(pathOriginRefexOther.getConceptNid()));
             }
-
-            RefexChronicleBI<?> pathOriginRefex = construct(blueprint.getPathOriginRefsetBp());
-            if (pathOriginRefexConcept.isAnnotationStyleRefex()) {
-                Ts.get().addUncommitted(Ts.get().getConcept(pathOriginRefex.getConceptNid()));
-                Ts.get().commit(Ts.get().getConcept(pathOriginRefex.getConceptNid()));
-            } else {
-                Ts.get().addUncommitted(pathOriginRefexConcept);
-                Ts.get().commit(pathOriginRefexConcept);
-            }
         }
         
+        RefexChronicleBI<?> pathOriginRefex = construct(blueprint.getPathOriginRefsetBp());
+        ConceptChronicleBI pathOriginRefexConcept = Ts.get().getConcept(pathOriginRefex.getRefexNid());
+        if (pathOriginRefexConcept.isAnnotationStyleRefex()) {
+            Ts.get().addUncommitted(Ts.get().getConcept(pathOriginRefex.getConceptNid()));
+            Ts.get().commit(Ts.get().getConcept(pathOriginRefex.getConceptNid()));
+        } else {
+            Ts.get().addUncommitted(pathOriginRefexConcept);
+            Ts.get().commit(pathOriginRefexConcept);
+        }
+
         Collection<ConceptChronicleBI> originConcepts = blueprint.getOrigins();
         Collection<PositionBI> origins = new HashSet<PositionBI>();
         for(ConceptChronicleBI origin : originConcepts){

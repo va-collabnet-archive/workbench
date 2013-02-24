@@ -91,7 +91,7 @@ public class ConfigTranslationModule implements Serializable {
 	public ConfigTranslationModule() {
 		super();
 		this.autoOpenNextInboxItem = true;
-		this.enableSpellChecker = true;
+		this.enableSpellChecker = false;
 
 		LinkedHashSet<TreeComponent> treeComponentsPreference = new LinkedHashSet<TreeComponent>();
 		treeComponentsPreference.add(TreeComponent.FSN);
@@ -110,7 +110,7 @@ public class ConfigTranslationModule implements Serializable {
 		this.completionMode = CompletionMode.INCOMPLETE_INSTACES;
 
 		LinkedHashSet<InboxColumn> columns = new LinkedHashSet<InboxColumn>();
-		columns.add(InboxColumn.SOURCE_PREFERRED);
+		columns.add(InboxColumn.DEFAULT_DESCRIPTION);
 		columns.add(InboxColumn.STATUS);
 		this.ColumnsDisplayedInInbox = columns;
 		this.translatorRoles = new HashMap<UUID, EditorMode>();

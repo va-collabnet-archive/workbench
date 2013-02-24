@@ -93,12 +93,7 @@ public class VobdCreateLegacyRefsets extends AbstractMojo {
                     tf.getConcept(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids()),
                     tf.getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids()),
                     tf.getConcept(ArchitectonicAuxiliary.Concept.ACTIVE.getUids()), 0, activeConfig);
-            tf.newRelationship(UUID.randomUUID(), gbSubsetConcept,
-                    tf.getConcept(RefsetAuxiliary.Concept.REFSET_TYPE_REL.getUids()),
-                    tf.getConcept(RefsetAuxiliary.Concept.CONCEPT_EXTENSION.getUids()),
-                    tf.getConcept(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids()),
-                    tf.getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids()),
-                    tf.getConcept(ArchitectonicAuxiliary.Concept.ACTIVE.getUids()), 0, activeConfig);
+    
             tf.commit();
 
             //Concept: "US English Dialect Subset"
@@ -140,12 +135,7 @@ public class VobdCreateLegacyRefsets extends AbstractMojo {
                     tf.getConcept(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids()),
                     tf.getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids()),
                     tf.getConcept(ArchitectonicAuxiliary.Concept.ACTIVE.getUids()), 0, activeConfig);
-            tf.newRelationship(UUID.randomUUID(), usSubsetConcept,
-                    tf.getConcept(RefsetAuxiliary.Concept.REFSET_TYPE_REL.getUids()),
-                    tf.getConcept(RefsetAuxiliary.Concept.CONCEPT_EXTENSION.getUids()),
-                    tf.getConcept(ArchitectonicAuxiliary.Concept.DEFINING_CHARACTERISTIC.getUids()),
-                    tf.getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids()),
-                    tf.getConcept(ArchitectonicAuxiliary.Concept.ACTIVE.getUids()), 0, activeConfig);
+
             tf.commit();
 
         } catch (Exception ex) {

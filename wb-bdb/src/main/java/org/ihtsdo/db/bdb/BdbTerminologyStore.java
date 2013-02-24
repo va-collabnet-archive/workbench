@@ -834,6 +834,11 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
     }
     
     @Override
+    public boolean wasEverKindOf(int childNid, int parentNid, ViewCoordinate vc) throws IOException, ContradictionException {
+        return Bdb.getNidCNidMap().isKindOf(childNid, parentNid, vc.getViewCoordinateWithAllStatusValues());
+    }
+    
+    @Override
     public int[] getIncomingRelationshipsSourceNids(int cNid, NidSetBI relTypes) throws IOException {
         return Bdb.getNidCNidMap().getDestRelNids(cNid, relTypes);
     }

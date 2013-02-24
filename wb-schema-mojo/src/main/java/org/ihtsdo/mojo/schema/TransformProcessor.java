@@ -59,28 +59,20 @@ public class TransformProcessor implements ProcessUnfetchedConceptDataBI{
 			allConcepts = Ts.get().getAllConceptNids();
 			this.transformer = transformer;
 			this.eConceptDOS = eConceptDOS;
-//						watchUuids.add(UUID.fromString("a8dd0021-4994-36b2-a0f5-567b7e007847"));
-//						watchUuids.add(UUID.fromString("0b8e4206-ab03-399d-906c-dedc941a4e5e"));
-//						watchUuids.add(UUID.fromString("b1b1e773-3eb6-3bcc-a6c7-52ac5d0a53be"));
-//						watchUuids.add(UUID.fromString("bca0a686-3516-3daf-8fcf-fe396d13cfad"));
-//						watchUuids.add(UUID.fromString("c259d808-8011-3772-bece-b4fbde18d375"));
-//						watchUuids.add(UUID.fromString("d15fde65-ed52-3a73-926b-8981e9743ee9"));
-//						watchUuids.add(UUID.fromString("eb9a5e42-3cba-356d-b623-3ed472e20b30"));
-//						watchUuids.add(UUID.fromString("1a090a21-28c4-3a87-9d04-766f04600494"));
-//						watchUuids.add(UUID.fromString("3bc6ad17-253e-53a9-bea6-049abfa467c8"));
-//						watchUuids.add(UUID.fromString("5ef10e09-8f16-398e-99b5-55cff5bd820a"));
-//			//			watchUuids.add(UUID.fromString("cec102b0-8562-5167-9d85-c96cae54de2"));
-			//			watchUuids.add(UUID.fromString("846ef00d-6629-5270-bfe0-75338d125831"));
-			//			watchUuids.add(UUID.fromString("1b475397-3c49-3222-b27f-94016283e99d"));
+//            watchUuids.add(UUID.fromString("5e1fe940-8faf-11db-b606-0800200c9a66")); // fully specified name
+            watchUuids.add(UUID.fromString("693e7426-8145-53ff-90a7-b43c6aa2e863")); // Presbylarynx (disorder)
+//            watchUuids.add(UUID.fromString("814b4598-07f1-5548-a887-c5371dbaaf84")); // Cares for sick or handicapped family member
+//            watchUuids.add(UUID.fromString("ae72b74d-92ad-f699-c019-10bbc1fbe0ec")); //
 
-                
-                    watchUuids.add(UUID.fromString("715de8b0-c0a7-452a-b8d0-2dba67eae10c")); // Pathological process (valid targets) refset spec      
-                    watchUuids.add(UUID.fromString("2a190f65-9905-4b15-9f84-8bcb2538e947")); // Has intent (valid targets) refset
-                    watchUuids.add(UUID.fromString("9e378500-9e4b-474a-967b-29c42239b98c")); // Pathological process (valid targets) edit time refset
-                    watchUuids.add(UUID.fromString("1a63ddc4-364f-37c0-9d9b-e35ced3280e3")); // Sedative withdrawal
-                    watchUuids.add(UUID.fromString("4573dfbd-725f-39b4-994c-574d2ca3abf6")); // Malignant hypertensive chronic kidney disease
-                    watchUuids.add(UUID.fromString("6950dccc-acfb-3fd1-9909-54eb620f8901")); // Arthritis of wrist
-                    watchUuids.add(UUID.fromString("b156a72c-00f6-5884-b9f5-4dbb180992ae")); // Arthritis of wrist
+//            watchUuids.add(UUID.fromString("bca0a686-3516-3daf-8fcf-fe396d13cfad")); // United States of America English language reference set
+//            watchUuids.add(UUID.fromString("eb9a5e42-3cba-356d-b623-3ed472e20b30")); // Great Britain English language reference set
+              watchUuids.add(UUID.fromString("29bf812c-7a77-595d-8b12-ea37c473a5e6")); // US English Dialect Subset
+              watchUuids.add(UUID.fromString("e8191494-ce3c-5bd8-803e-31d31c831f8a")); // GB English Dialect Exceptions Subset
+              watchUuids.add(UUID.fromString("a0982f18-ec51-56d2-a8b1-6ff8964813dd")); // GB English Dialect Subset
+
+//            watchUuids.add(UUID.fromString("8c473da3-eb41-5415-9108-6b43adc0a42e")); // Hypothyroidism in pregnancy, antepartum -- KP
+//            watchUuids.add(UUID.fromString("ac4744c9-ea2b-11e0-9572-0800200c9a66")); // Hypothyroidism in pregnancy, antepartum -- SCT
+//            watchUuids.add(UUID.fromString("0313cfbf-a4db-3793-aa8c-595b4e383156")); // Hypothyroidism in pregnancy 
                 } catch (IOException e) {
 			e.printStackTrace();
 		}

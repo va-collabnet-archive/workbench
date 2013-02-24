@@ -102,7 +102,7 @@ class Sct2_DesRecord implements Comparable<Sct2_DesRecord>, Serializable {
             throws ParseException, MojoFailureException {
         ArrayList<Sct2_DesRecord> addedRecords = new ArrayList<>();
         Rf2_RefsetCRecord zeroB = new Rf2_RefsetCRecord("ZERO", "2000-01-01 00:00:00", false,
-                null, Long.MAX_VALUE, Long.MAX_VALUE, Long.MAX_VALUE);
+                null, Long.MAX_VALUE, Long.MAX_VALUE, Long.MAX_VALUE, null);
 
         Arrays.sort(a);
         Arrays.sort(b);

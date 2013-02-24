@@ -130,6 +130,7 @@ import org.ihtsdo.translation.ui.inbox.event.ItemStateChangedEvent;
 import org.ihtsdo.translation.ui.inbox.event.RestFromToDoEvent;
 import org.ihtsdo.translation.ui.translation.TranslationView;
 import org.ihtsdo.translation.workflow.filters.WfComponentFilter;
+import org.ihtsdo.translation.workflow.filters.WfDefaultDescFilter;
 import org.ihtsdo.translation.workflow.filters.WfTargetFsnFilter;
 import org.ihtsdo.translation.workflow.filters.WfTargetPreferredFilter;
 
@@ -523,6 +524,7 @@ public class WfInboxPanel extends JPanel {
 	private void removeFiltersActionPerformed(ActionEvent e) {
 		presentFilters = false;
 		componentFilter.setText("");
+		defaultDescText.setText("");
 		targetPreferredFilter.setText("");
 		targetFsnFilter.setText("");
 		statusFilterCombo.setSelectedIndex(0);
@@ -555,6 +557,19 @@ public class WfInboxPanel extends JPanel {
 	 */
 	private void updateFilters() {
 		presentFilters = false;
+		
+		String defaultText = this.defaultDescText.getText();
+		
+		WfDefaultDescFilter wfDefDescFilter = new WfDefaultDescFilter("");
+		
+		if (!defaultText.equals("")) {
+			wfDefDescFilter = new WfDefaultDescFilter(defaultText);
+			filterList.put(wfDefDescFilter.getType(), wfDefDescFilter);
+			presentFilters = true;
+		} else {
+			filterList.remove(wfDefDescFilter.getType());
+		}
+
 		String componentFilter = this.componentFilter.getText();
 
 		WfComponentFilter wfCompFilter = new WfComponentFilter("");
@@ -1376,37 +1391,53 @@ public class WfInboxPanel extends JPanel {
 						// ======== panel3 ========
 						{
 							panel3.setLayout(new GridBagLayout());
-							((GridBagLayout) panel3.getLayout()).columnWidths = new int[] { 0, 0, 0, 0, 0 };
+							((GridBagLayout) panel3.getLayout()).columnWidths = new int[] { 0, 0, 0, 0, 0, 0 };
 							((GridBagLayout) panel3.getLayout()).rowHeights = new int[] { 0, 0, 0 };
-							((GridBagLayout) panel3.getLayout()).columnWeights = new double[] { 1.0, 1.0, 1.0, 1.0, 1.0E-4 };
+							((GridBagLayout) panel3.getLayout()).columnWeights = new double[] { 1.0, 1.0, 1.0, 1.0, 1.0, 1.0E-4 };
 							((GridBagLayout) panel3.getLayout()).rowWeights = new double[] { 0.0, 0.0, 1.0E-4 };
+							
+							lblDefaultDescription = new JLabel("Default description");
+							GridBagConstraints gbc_lblDefaultDescription = new GridBagConstraints();
+							gbc_lblDefaultDescription.insets = new Insets(0, 0, 5, 5);
+							gbc_lblDefaultDescription.gridx = 0;
+							gbc_lblDefaultDescription.gridy = 0;
+							panel3.add(lblDefaultDescription, gbc_lblDefaultDescription);
 
 							// ---- label4 ----
 							label4.setText("Source preferred");
-							panel3.add(label4, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+							panel3.add(label4, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 									new Insets(0, 0, 5, 5), 0, 0));
 
 							// ---- label2 ----
 							label2.setText("Target preferred");
-							panel3.add(label2, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+							panel3.add(label2, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 									new Insets(0, 0, 5, 5), 0, 0));
 
 							// ---- label3 ----
 							label3.setText("Target FSN");
-							panel3.add(label3, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+							panel3.add(label3, new GridBagConstraints(3, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 									new Insets(0, 0, 5, 5), 0, 0));
 
 							// ---- label6 ----
 							label6.setText("Status");
-							panel3.add(label6, new GridBagConstraints(3, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+							panel3.add(label6, new GridBagConstraints(4, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 									new Insets(0, 0, 5, 0), 0, 0));
-							panel3.add(componentFilter, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER,
+							
+							defaultDescText = new JTextField();
+							GridBagConstraints gbc_defaultDescText = new GridBagConstraints();
+							gbc_defaultDescText.insets = new Insets(0, 0, 0, 5);
+							gbc_defaultDescText.fill = GridBagConstraints.HORIZONTAL;
+							gbc_defaultDescText.gridx = 0;
+							gbc_defaultDescText.gridy = 1;
+							panel3.add(defaultDescText, gbc_defaultDescText);
+							defaultDescText.setColumns(10);
+							panel3.add(componentFilter, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER,
 									GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
-							panel3.add(targetPreferredFilter, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER,
+							panel3.add(targetPreferredFilter, new GridBagConstraints(2, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER,
 									GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
-							panel3.add(targetFsnFilter, new GridBagConstraints(2, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER,
+							panel3.add(targetFsnFilter, new GridBagConstraints(3, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER,
 									GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
-							panel3.add(statusFilterCombo, new GridBagConstraints(3, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER,
+							panel3.add(statusFilterCombo, new GridBagConstraints(4, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER,
 									GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 						}
 						filterPanel.add(panel3, BorderLayout.CENTER);
@@ -1606,6 +1637,8 @@ public class WfInboxPanel extends JPanel {
 	private JMenuItem createNewTag;
 	private JMenuItem removeTagMenuItem;
 	private JMenuItem backToInbox;
+	private JLabel lblDefaultDescription;
+	private JTextField defaultDescText;
 	// JFormDesigner - End of variables declaration //GEN-END:variables
 
 }

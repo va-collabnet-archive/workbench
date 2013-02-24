@@ -50,14 +50,12 @@ public class DateLimitedComponentFilter extends AbstractTransformer {
 		Date date = formatter.parse(strDateLimit);
 		dateLimit = date.getTime();
 		includeRetiredRels = new Boolean(api.getValueAt(api.getIntId(id), "parameters.includeRetiredRels"));
-
-
 	}
 
 	@Override
 	public void transformAttributes(TkConceptAttributes attributes, TkConcept concept) {
 		if (attributes.revisions != null) {
-			List<TkConceptAttributesRevision> attributeRevisions = new ArrayList<TkConceptAttributesRevision>();
+			List<TkConceptAttributesRevision> attributeRevisions = new ArrayList<>();
 			attributeRevisions.addAll(attributes.revisions);
 			for (TkConceptAttributesRevision loopRevision : attributeRevisions) {
 				if (loopRevision.getTime() < dateLimit) {
@@ -68,19 +66,10 @@ public class DateLimitedComponentFilter extends AbstractTransformer {
 
 	}
 
-    /* (non-Javadoc)
-     * @see org.ihtsdo.mojo.schema.AbstractTransformer#transformAttributesRevision(org.ihtsdo.tk.dto.concept.component.attribute.TkConceptAttributesRevision)
-     */
-    @Override
-    public void transformAttributesRevision(TkConceptAttributesRevision attributeRevision, TkConcept eConcept) {
-        // throw new UnsupportedOperationException("Not supported yet.");
-        // do nothing
-    }
-
     @Override
 	public void transformDescription(TkDescription description, TkConcept concept) {
 		if (description.revisions != null) {
-			List<TkDescriptionRevision> descriptionRevisions = new ArrayList<TkDescriptionRevision>();
+			List<TkDescriptionRevision> descriptionRevisions = new ArrayList<>();
 			descriptionRevisions.addAll(description.revisions);
 			for (TkDescriptionRevision loopRevision : descriptionRevisions) {
 				if (loopRevision.getTime() < dateLimit) {
@@ -94,7 +83,7 @@ public class DateLimitedComponentFilter extends AbstractTransformer {
 	public void transformRelationship(TkRelationship relationship, TkConcept concept) {
 		TkRelationshipRevision lastRevision = null;
 		if (relationship.revisions != null) {
-			List<TkRelationshipRevision> relationshipRevisions = new ArrayList<TkRelationshipRevision>();
+			List<TkRelationshipRevision> relationshipRevisions = new ArrayList<>();
 			relationshipRevisions.addAll(relationship.revisions);
 			long lastestTime = Long.MIN_VALUE;
 			for (TkRelationshipRevision loopRevision : relationshipRevisions) {
@@ -119,7 +108,7 @@ public class DateLimitedComponentFilter extends AbstractTransformer {
 	public void transformAnnotation(TkRefexAbstractMember<?> annotation,
 			TkComponent<?> component) {
 		if (annotation.revisions != null) {
-			List<TkRevision> annotationRevisions = new ArrayList<TkRevision>();
+			List<TkRevision> annotationRevisions = new ArrayList<>();
 			annotationRevisions.addAll(annotation.revisions);
 			for (TkRevision loopRevision : annotationRevisions) {
 				if (loopRevision.getTime() < dateLimit) {
@@ -133,7 +122,7 @@ public class DateLimitedComponentFilter extends AbstractTransformer {
 	public void transformMember(TkRefexAbstractMember<?> member,
 			TkConcept concept) {
 		if (member.revisions != null) {
-			List<TkRevision> annotationRevisions = new ArrayList<TkRevision>();
+			List<TkRevision> annotationRevisions = new ArrayList<>();
 			annotationRevisions.addAll(member.revisions);
 			for (TkRevision loopRevision : annotationRevisions) {
 				if (loopRevision.getTime() < dateLimit) {

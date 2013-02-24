@@ -27,6 +27,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -39,6 +40,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
+import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
@@ -58,12 +61,15 @@ import org.ihtsdo.project.model.WorkList;
 import org.ihtsdo.project.model.WorkListMember;
 import org.ihtsdo.project.workflow.api.WfComponentProvider;
 import org.ihtsdo.project.workflow.api.WorkflowInterpreter;
+import org.ihtsdo.project.workflow.api.wf2.implementation.WfActivity;
+import org.ihtsdo.project.workflow.api.wf2.implementation.WfProcessDefinition;
 import org.ihtsdo.project.workflow.model.WfAction;
 import org.ihtsdo.project.workflow.model.WfInstance;
 import org.ihtsdo.project.workflow.model.WfState;
 import org.ihtsdo.project.workflow.model.WfStateComparator;
 import org.ihtsdo.project.workflow.model.WfUser;
 import org.ihtsdo.project.workflow.model.WfUserComparator;
+import org.ihtsdo.tk.workflow.api.WfActivityBI;
 
 /**
  * The Class WorklistMemberReAssignment.
@@ -143,7 +149,9 @@ public class WorklistMemberReAssignment extends JPanel {
 			membersTable2.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 			membersTable2.setAutoCreateRowSorter(true);
 
-			boolean canReassign = permissionApi.checkPermissionForProject(config.getDbConfig().getUserConcept(), tf.getConcept(ArchitectonicAuxiliary.Concept.PROJECTS_ROOT_HIERARCHY.localize().getNid()), tf.getConcept(ArchitectonicAuxiliary.Concept.REASSINGNMENTS_PERMISSION.localize().getNid()));
+			boolean canReassign = permissionApi.checkPermissionForProject(config.getDbConfig().getUserConcept(),
+					tf.getConcept(ArchitectonicAuxiliary.Concept.PROJECTS_ROOT_HIERARCHY.localize().getNid()),
+					tf.getConcept(ArchitectonicAuxiliary.Concept.REASSINGNMENTS_PERMISSION.localize().getNid()));
 
 			if (canReassign) {
 				destinationCombo.setEnabled(true);
@@ -162,7 +170,11 @@ public class WorklistMemberReAssignment extends JPanel {
 			stateProviderWorker = new GetStateWorker();
 			stateProviderWorker.addPropertyChangeListener(new ProgressListener(pBarW));
 			stateProviderWorker.execute();
-
+			WfProcessDefinition wfpd = new WfProcessDefinition(workList.getWorkflowDefinition());
+			Collection<WfActivityBI> activities = wfpd.getActivities();
+			for (WfActivityBI wfActivityBI : activities) {
+				actionsComboBox.addItem(wfActivityBI);
+			}
 		} catch (Exception e) {
 			JOptionPane.showMessageDialog(this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 			AceLog.getAppLog().alertAndLogException(e);
@@ -243,8 +255,10 @@ public class WorklistMemberReAssignment extends JPanel {
 				} catch (TerminologyException e) {
 					AceLog.getAppLog().alertAndLogException(e);
 				}
-			} else if (status == null || user == null || status.toString().trim().equals("") || user.toString().trim().equals("") || status.toString().equalsIgnoreCase("Loading...")) {
-				JOptionPane.showMessageDialog(WorklistMemberReAssignment.this, "Status and Destination required.", "Message", JOptionPane.INFORMATION_MESSAGE);
+			} else if (status == null || user == null || status.toString().trim().equals("") || user.toString().trim().equals("")
+					|| status.toString().equalsIgnoreCase("Loading...")) {
+				JOptionPane.showMessageDialog(WorklistMemberReAssignment.this, "Status and Destination required.", "Message",
+						JOptionPane.INFORMATION_MESSAGE);
 				pBarW.setVisible(false);
 				return;
 			}
@@ -263,7 +277,8 @@ public class WorklistMemberReAssignment extends JPanel {
 						}
 						Terms.get().commit();
 						pBarW.setVisible(false);
-						JOptionPane.showMessageDialog(WorklistMemberReAssignment.this, "Worklist members sent!", "Message", JOptionPane.INFORMATION_MESSAGE);
+						JOptionPane.showMessageDialog(WorklistMemberReAssignment.this, "Worklist members sent!", "Message",
+								JOptionPane.INFORMATION_MESSAGE);
 						// worker.execute(process);
 					} catch (Exception e) {
 						// error getting the workflow
@@ -356,6 +371,10 @@ public class WorklistMemberReAssignment extends JPanel {
 	 *            the e
 	 */
 	private void refreshButtonActionPerformed(ActionEvent e) {
+		DefaultTableModel model = (DefaultTableModel) membersTable2.getModel();
+		while (model.getRowCount() > 0) {
+			model.removeRow(0);
+		}
 		try {
 			getMemberList();
 		} catch (TerminologyException e1) {
@@ -427,165 +446,267 @@ public class WorklistMemberReAssignment extends JPanel {
 		return result;
 	}
 
-	/**
-	 * Inits the components.
-	 */
+	private void performActionActionPerformed(ActionEvent e) {
+		final WfActivity action = (WfActivity) actionsComboBox.getSelectedItem();
+		DefaultTableModel model = (DefaultTableModel) membersTable2.getModel();
+		if (model.getRowCount() > 0) {
+			pBarW.setVisible(true);
+			SwingUtilities.invokeLater(new Runnable() {
+				public void run() {
+					try {
+						DefaultTableModel model = (DefaultTableModel) membersTable2.getModel();
+						while (model.getRowCount() > 0) {
+							WorkListMember wlMember = (WorkListMember) model.getValueAt(0, 0);
+							WfInstance wfInstance = wlMember.getWfInstance();
+							action.performInBatch(wfInstance);
+							model.removeRow(0);
+						}
+						Terms.get().commit();
+						pBarW.setVisible(false);
+						JOptionPane.showMessageDialog(WorklistMemberReAssignment.this, "Worklist members sent!", "Message",
+								JOptionPane.INFORMATION_MESSAGE);
+						// worker.execute(process);
+					} catch (Exception e) {
+						// error getting the workflow
+						pBarW.setVisible(false);
+						AceLog.getAppLog().alertAndLogException(e);
+						JOptionPane.showMessageDialog(WorklistMemberReAssignment.this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+					}
+				}
+			});
+			pBarW.setVisible(false);
+			refreshButtonActionPerformed(null);
+		}
+	}
+
 	private void initComponents() {
 		// JFormDesigner - Component initialization - DO NOT MODIFY
 		// //GEN-BEGIN:initComponents
+		splitPane1 = new JSplitPane();
+		panel4 = new JPanel();
 		label9 = new JLabel();
-		label10 = new JLabel();
 		membersTableScrollPanel = new JScrollPane();
 		membersTable = new JTable();
-		panel1 = new JPanel();
+		panel5 = new JPanel();
+		label10 = new JLabel();
 		bAdd = new JButton();
-		bDel = new JButton();
 		membersTableScrollPanel2 = new JScrollPane();
 		membersTable2 = new JTable();
-		panel2 = new JPanel();
+		bDel = new JButton();
 		refreshButton = new JButton();
+		tabbedPane1 = new JTabbedPane();
+		panel2 = new JPanel();
 		label1 = new JLabel();
 		statusCombo = new JComboBox();
 		label8 = new JLabel();
 		destinationCombo = new JComboBox();
 		sendButton = new JButton();
+		panel3 = new JPanel();
+		actionsComboBox = new JComboBox();
+		performAction = new JButton();
 		pBarW = new JProgressBar();
 
 		// ======== this ========
 		setLayout(new GridBagLayout());
-		((GridBagLayout) getLayout()).columnWidths = new int[] { 0, 0, 0, 0 };
-		((GridBagLayout) getLayout()).rowHeights = new int[] { 0, 0, 0, 16, 0 };
-		((GridBagLayout) getLayout()).columnWeights = new double[] { 1.0, 0.0, 1.0, 1.0E-4 };
-		((GridBagLayout) getLayout()).rowWeights = new double[] { 0.0, 1.0, 0.0, 0.0, 1.0E-4 };
+		((GridBagLayout) getLayout()).columnWidths = new int[] { 0, 0 };
+		((GridBagLayout) getLayout()).rowHeights = new int[] { 0, 0, 16, 0 };
+		((GridBagLayout) getLayout()).columnWeights = new double[] { 1.0, 1.0E-4 };
+		((GridBagLayout) getLayout()).rowWeights = new double[] { 1.0, 0.0, 0.0, 1.0E-4 };
 
-		// ---- label9 ----
-		label9.setText("WorkList members");
-		add(label9, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 5), 0, 0));
-
-		// ---- label10 ----
-		label10.setText("WorkList members to re-assign");
-		add(label10, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
-
-		// ======== membersTableScrollPanel ========
+		// ======== splitPane1 ========
 		{
-			membersTableScrollPanel.setViewportView(membersTable);
-		}
-		add(membersTableScrollPanel, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 5), 0, 0));
+			splitPane1.setResizeWeight(0.5);
 
-		// ======== panel1 ========
+			// ======== panel4 ========
+			{
+				panel4.setLayout(new GridBagLayout());
+				((GridBagLayout) panel4.getLayout()).columnWidths = new int[] { 0, 0 };
+				((GridBagLayout) panel4.getLayout()).rowHeights = new int[] { 0, 0, 0, 30, 0 };
+				((GridBagLayout) panel4.getLayout()).columnWeights = new double[] { 1.0, 1.0E-4 };
+				((GridBagLayout) panel4.getLayout()).rowWeights = new double[] { 0.0, 0.0, 1.0, 0.0, 1.0E-4 };
+
+				// ---- label9 ----
+				label9.setText("WorkList members");
+				panel4.add(label9, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0,
+						5, 0), 0, 0));
+
+				// ======== membersTableScrollPanel ========
+				{
+					membersTableScrollPanel.setViewportView(membersTable);
+				}
+				panel4.add(membersTableScrollPanel, new GridBagConstraints(0, 1, 1, 2, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+						new Insets(0, 0, 5, 0), 0, 0));
+			}
+			splitPane1.setLeftComponent(panel4);
+
+			// ======== panel5 ========
+			{
+				panel5.setLayout(new GridBagLayout());
+				((GridBagLayout) panel5.getLayout()).columnWidths = new int[] { 0, 0, 0 };
+				((GridBagLayout) panel5.getLayout()).rowHeights = new int[] { 0, 0, 0, 0, 0 };
+				((GridBagLayout) panel5.getLayout()).columnWeights = new double[] { 0.0, 1.0, 1.0E-4 };
+				((GridBagLayout) panel5.getLayout()).rowWeights = new double[] { 0.0, 0.0, 1.0, 0.0, 1.0E-4 };
+
+				// ---- label10 ----
+				label10.setText("WorkList members to re-assign");
+				panel5.add(label10, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0,
+						5, 0), 0, 0));
+
+				// ---- bAdd ----
+				bAdd.setText(">");
+				bAdd.addActionListener(new ActionListener() {
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						bAddActionPerformed();
+					}
+				});
+				panel5.add(bAdd, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.NORTH, GridBagConstraints.HORIZONTAL, new Insets(0,
+						0, 5, 5), 0, 0));
+
+				// ======== membersTableScrollPanel2 ========
+				{
+					membersTableScrollPanel2.setViewportView(membersTable2);
+				}
+				panel5.add(membersTableScrollPanel2, new GridBagConstraints(1, 1, 1, 2, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+						new Insets(0, 0, 5, 0), 0, 0));
+
+				// ---- bDel ----
+				bDel.setText("<");
+				bDel.addActionListener(new ActionListener() {
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						bDelActionPerformed();
+					}
+				});
+				panel5.add(bDel, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0, GridBagConstraints.NORTH, GridBagConstraints.HORIZONTAL, new Insets(0,
+						0, 5, 5), 0, 0));
+
+				// ---- refreshButton ----
+				refreshButton.setText("Refresh");
+				refreshButton.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
+				refreshButton.addActionListener(new ActionListener() {
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						refreshButtonActionPerformed(e);
+					}
+				});
+				panel5.add(refreshButton, new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0, GridBagConstraints.NORTHWEST, GridBagConstraints.NONE,
+						new Insets(0, 0, 0, 5), 0, 0));
+			}
+			splitPane1.setRightComponent(panel5);
+		}
+		add(splitPane1,
+				new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
+
+		// ======== tabbedPane1 ========
 		{
-			panel1.setLayout(new GridBagLayout());
-			((GridBagLayout) panel1.getLayout()).columnWidths = new int[] { 0, 0 };
-			((GridBagLayout) panel1.getLayout()).rowHeights = new int[] { 0, 0, 0, 0 };
-			((GridBagLayout) panel1.getLayout()).columnWeights = new double[] { 0.0, 1.0E-4 };
-			((GridBagLayout) panel1.getLayout()).rowWeights = new double[] { 0.0, 0.0, 0.0, 1.0E-4 };
 
-			// ---- bAdd ----
-			bAdd.setText(">");
-			bAdd.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					bAddActionPerformed();
-				}
-			});
-			panel1.add(bAdd, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
+			// ======== panel2 ========
+			{
+				panel2.setLayout(new GridBagLayout());
+				((GridBagLayout) panel2.getLayout()).columnWidths = new int[] { 0, 0, 0, 0, 0, 0 };
+				((GridBagLayout) panel2.getLayout()).rowHeights = new int[] { 0, 0 };
+				((GridBagLayout) panel2.getLayout()).columnWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 1.0E-4 };
+				((GridBagLayout) panel2.getLayout()).rowWeights = new double[] { 0.0, 1.0E-4 };
 
-			// ---- bDel ----
-			bDel.setText("<");
-			bDel.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					bDelActionPerformed();
-				}
-			});
-			panel1.add(bDel, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
+				// ---- label1 ----
+				label1.setText("Status:");
+				panel2.add(label1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0,
+						0, 5), 0, 0));
+
+				// ---- statusCombo ----
+				statusCombo.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
+				statusCombo.addItemListener(new ItemListener() {
+					@Override
+					public void itemStateChanged(ItemEvent e) {
+						statusComboItemStateChanged(e);
+					}
+				});
+				panel2.add(statusCombo, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(
+						0, 0, 0, 5), 0, 0));
+
+				// ---- label8 ----
+				label8.setText("Destination:");
+				panel2.add(label8, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0,
+						0, 5), 0, 0));
+
+				// ---- destinationCombo ----
+				destinationCombo.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
+				panel2.add(destinationCombo, new GridBagConstraints(3, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+						new Insets(0, 0, 0, 5), 0, 0));
+
+				// ---- sendButton ----
+				sendButton.setText("Send");
+				sendButton.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
+				sendButton.addActionListener(new ActionListener() {
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						sendButtonActionPerformed();
+					}
+				});
+				panel2.add(sendButton, new GridBagConstraints(4, 0, 1, 1, 0.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.VERTICAL, new Insets(
+						0, 0, 0, 0), 0, 0));
+			}
+			tabbedPane1.addTab("Status And Destination", panel2);
+
+			// ======== panel3 ========
+			{
+				panel3.setLayout(new GridBagLayout());
+				((GridBagLayout) panel3.getLayout()).columnWidths = new int[] { 0, 0, 0 };
+				((GridBagLayout) panel3.getLayout()).rowHeights = new int[] { 0, 0 };
+				((GridBagLayout) panel3.getLayout()).columnWeights = new double[] { 0.0, 0.0, 1.0E-4 };
+				((GridBagLayout) panel3.getLayout()).rowWeights = new double[] { 0.0, 1.0E-4 };
+				panel3.add(actionsComboBox, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+						new Insets(0, 0, 0, 5), 0, 0));
+
+				// ---- performAction ----
+				performAction.setText("GO");
+				performAction.addActionListener(new ActionListener() {
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						performActionActionPerformed(e);
+					}
+				});
+				panel3.add(performAction, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+						new Insets(0, 0, 0, 0), 0, 0));
+			}
+			tabbedPane1.addTab("Actions", panel3);
+
 		}
-		add(panel1, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 5), 0, 0));
-
-		// ======== membersTableScrollPanel2 ========
-		{
-			membersTableScrollPanel2.setViewportView(membersTable2);
-		}
-		add(membersTableScrollPanel2, new GridBagConstraints(2, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
-
-		// ======== panel2 ========
-		{
-			panel2.setLayout(new GridBagLayout());
-			((GridBagLayout) panel2.getLayout()).columnWidths = new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-			((GridBagLayout) panel2.getLayout()).rowHeights = new int[] { 0, 0 };
-			((GridBagLayout) panel2.getLayout()).columnWeights = new double[] { 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0E-4 };
-			((GridBagLayout) panel2.getLayout()).rowWeights = new double[] { 0.0, 1.0E-4 };
-
-			// ---- refreshButton ----
-			refreshButton.setText("Refresh");
-			refreshButton.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
-			refreshButton.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					refreshButtonActionPerformed(e);
-				}
-			});
-			panel2.add(refreshButton, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.VERTICAL, new Insets(0, 0, 0, 5), 0, 0));
-
-			// ---- label1 ----
-			label1.setText("Status:");
-			panel2.add(label1, new GridBagConstraints(4, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
-
-			// ---- statusCombo ----
-			statusCombo.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
-			statusCombo.addItemListener(new ItemListener() {
-				@Override
-				public void itemStateChanged(ItemEvent e) {
-					statusComboItemStateChanged(e);
-				}
-			});
-			panel2.add(statusCombo, new GridBagConstraints(5, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
-
-			// ---- label8 ----
-			label8.setText("Destination:");
-			panel2.add(label8, new GridBagConstraints(6, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
-
-			// ---- destinationCombo ----
-			destinationCombo.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
-			panel2.add(destinationCombo, new GridBagConstraints(7, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
-
-			// ---- sendButton ----
-			sendButton.setText("Send");
-			sendButton.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
-			sendButton.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					sendButtonActionPerformed();
-				}
-			});
-			panel2.add(sendButton, new GridBagConstraints(8, 0, 1, 1, 0.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.VERTICAL, new Insets(0, 0, 0, 0), 0, 0));
-		}
-		add(panel2, new GridBagConstraints(0, 2, 3, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
+		add(tabbedPane1, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0,
+				0));
 
 		// ---- pBarW ----
 		pBarW.setIndeterminate(true);
-		add(pBarW, new GridBagConstraints(2, 3, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
+		add(pBarW, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
+		// JFormDesigner - End of component initialization
 		// //GEN-END:initComponents
 	}
 
 	// JFormDesigner - Variables declaration - DO NOT MODIFY
 	// //GEN-BEGIN:variables
+	private JSplitPane splitPane1;
+	private JPanel panel4;
 	private JLabel label9;
-	private JLabel label10;
 	private JScrollPane membersTableScrollPanel;
 	private JTable membersTable;
-	private JPanel panel1;
+	private JPanel panel5;
+	private JLabel label10;
 	private JButton bAdd;
-	private JButton bDel;
 	private JScrollPane membersTableScrollPanel2;
 	private JTable membersTable2;
-	private JPanel panel2;
+	private JButton bDel;
 	private JButton refreshButton;
+	private JTabbedPane tabbedPane1;
+	private JPanel panel2;
 	private JLabel label1;
 	private JComboBox statusCombo;
 	private JLabel label8;
 	private JComboBox destinationCombo;
 	private JButton sendButton;
+	private JPanel panel3;
+	private JComboBox actionsComboBox;
+	private JButton performAction;
 	private JProgressBar pBarW;
 
 	// JFormDesigner - End of variables declaration //GEN-END:variables
@@ -644,7 +765,7 @@ public class WorklistMemberReAssignment extends JPanel {
 				get();
 				destinationCombo.removeItemAt(0);
 			} catch (Exception ignore) {
-				//ignorAceLog.getAppLog().alertAndLogException(e);
+				// ignorAceLog.getAppLog().alertAndLogException(e);
 			}
 		}
 

@@ -44,6 +44,15 @@ public class WfActivity implements WfActivityBI {
 			WfInstance.updateInstanceState(((WfInstance)instance), action.getConsequence());
 		}
 	}
+	
+	public void performInBatch(WfProcessInstanceBI instance) throws Exception {
+		MasterWorker worker = Terms.get().getActiveAceFrameConfig().getWorker();
+		if (worker != null) {
+			WorkflowInterpreter.doActionInBatch((WfInstance)instance, new WfRole(), action, worker);
+		} else {
+			WfInstance.updateInstanceState(((WfInstance)instance), action.getConsequence());
+		}
+	}
 
 	@Override
 	public boolean isAutomatic() {

@@ -74,4 +74,8 @@ public class RefsetAux {
     
     public static ConceptSpec WFHX_REFEX = 
             new ConceptSpec("history workflow refset", UUID.fromString("0b6f0e24-5fe2-3869-9342-c18008f53283"));
+    
+    public static ConceptSpec MARKED_PARENT_ISA =
+            new ConceptSpec("marked parent is-a type",
+            UUID.fromString("bb57ffef-ff51-3015-9b81-e37a1cf40acc"));
 }

@@ -692,18 +692,29 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
                     
                     if(settings.getRelAssertionType().equals(RelAssertionType.SHORT_NORMAL_FORM)){
                         HashSet<Integer> parentNids = new HashSet<>();
-                        HashSet<RelationshipVersionBI> parentRels = new HashSet<>();
-                        for(RelationshipVersionBI rel : inferredRels){
-                            if (rel.getTypeNid() == Snomed.IS_A.getLenient().getNid()) {
-                                RelationshipVersionBI relParent = findProximalPrimitve(rel);
-                                if (!parentNids.contains(relParent.getTargetNid())) {
-                                    parentNids.add(relParent.getTargetNid());
-                                    parentRels.add(relParent);
+                        HashSet<RelationshipVersionBI> allParentRels = new HashSet<>();
+                        allParentRels = findProximalPrimitve(inferredRels);
+                        HashSet<RelationshipVersionBI> noDupsParentRels = new HashSet<>();
+                        for(RelationshipVersionBI r : allParentRels){
+                            if(!parentNids.contains(r.getTargetNid())){
+                                parentNids.add(r.getTargetNid());
+                                noDupsParentRels.add(r);
+                            }
+                        }
+                        
+                        HashSet<RelationshipVersionBI> filteredParentRels = new HashSet<>(noDupsParentRels);
+                        for(RelationshipVersionBI childRel : noDupsParentRels){
+                            int childNid = childRel.getTargetNid();
+                            for(RelationshipVersionBI parentRel : noDupsParentRels){
+                                int parentNid = parentRel.getTargetNid();
+                                if(Ts.get().isKindOf(childNid, parentNid, coordinate) &&
+                                        childNid != parentNid){
+                                    filteredParentRels.remove(parentRel);
                                 }
                             }
                         }
                         
-                        for(RelationshipVersionBI rel : parentRels){
+                        for(RelationshipVersionBI rel : filteredParentRels){
                             DragPanelRel dragPanel = getRelComponent(rel, cpe, true);
                             activeShortNormRelPanels.add(dragPanel);
                         }
@@ -947,31 +958,44 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
         });
     }
 //TODO: need to make sure this is returning the closest parents
-    private RelationshipVersionBI findProximalPrimitve(RelationshipVersionBI rel) throws IOException, ContradictionException{
-        RelationshipVersionBI parentRel = null;
-        ConceptChronicleBI concept = Ts.get().getConcept(rel.getTargetNid());
-        ConceptAttributeVersionBI version = concept.getConceptAttributes().getVersion(coordinate);
-        if(!Ts.get().getConcept(rel.getTargetNid()).getConceptAttributes().getVersion(coordinate).isDefined()){
-            parentRel = rel;
-        }else{
-            parentRel = findNext(rel);
-        }
-        return parentRel;
-    }
+//    private RelationshipVersionBI findProximalPrimitve(RelationshipVersionBI rel) throws IOException, ContradictionException{
+//        RelationshipVersionBI parentRel = null;
+//        ConceptChronicleBI concept = Ts.get().getConcept(rel.getTargetNid());
+//        ConceptAttributeVersionBI version = concept.getConceptAttributes().getVersion(coordinate);
+//        if(!Ts.get().getConcept(rel.getTargetNid()).getConceptAttributes().getVersion(coordinate).isDefined()){
+//            parentRel = rel;
+//        }else{
+//            parentRel = findNext(rel);
+//        }
+//        return parentRel;
+//    }
     
-    private RelationshipVersionBI findNext(RelationshipVersionBI rel) throws IOException, ContradictionException{
-        RelationshipVersionBI parentRel = null;
-        ConceptVersionBI concept = Ts.get().getConceptVersion(coordinate, rel.getTargetNid());
-        for(RelationshipVersionBI r : concept.getRelationshipsOutgoingActiveIsa()){
-            if(r.getCharacteristicNid() == SnomedMetadataRfx.getREL_CH_INFERRED_RELATIONSHIP_NID()){
+    private HashSet<RelationshipVersionBI> findProximalPrimitve(Collection<? extends RelationshipVersionBI> rel) throws IOException, ContradictionException{
+        HashSet<RelationshipVersionBI> parentRels = new HashSet<>();
+        for(RelationshipVersionBI r : rel){
+            if(r.getCharacteristicNid() == SnomedMetadataRfx.getREL_CH_INFERRED_RELATIONSHIP_NID() 
+                    && r.getTypeNid() == Snomed.IS_A.getLenient().getNid()){
                 if (!Ts.get().getConcept(r.getTargetNid()).getConceptAttributes().getVersion(coordinate).isDefined()) {
-                    return r;
-                } else {
-                    parentRel = findNext(rel);
+                    parentRels.add(r);
+                } 
+            }
+        }
+        if(!parentRels.isEmpty()){
+            return parentRels;
+        }else{
+        //move up another level
+            for(RelationshipVersionBI r : rel){
+                if(r.getCharacteristicNid() == SnomedMetadataRfx.getREL_CH_INFERRED_RELATIONSHIP_NID() 
+                    && r.getTypeNid() == Snomed.IS_A.getLenient().getNid()){
+                    ConceptVersionBI concept = Ts.get().getConceptVersion(coordinate, r.getTargetNid());
+                    Collection<? extends RelationshipVersionBI> nextRels = concept.getRelationshipsOutgoingActiveIsa();
+                    HashSet<RelationshipVersionBI> found = findProximalPrimitve(nextRels);
+                    parentRels.addAll(found);
                 }
             }
         }
-        return parentRel;
+
+        return parentRels;
     }
     
     private void removeContradictions(Collection<? extends ComponentVersionBI> componentVersions) {

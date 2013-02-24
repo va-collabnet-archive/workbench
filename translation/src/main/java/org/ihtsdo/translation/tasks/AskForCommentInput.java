@@ -102,6 +102,8 @@ public class AskForCommentInput extends AbstractTask {
 			System.out.println("Config null?" + (config==null));
 			WfInstance instance = (WfInstance) process.readAttachement("WfInstance");
 			WfRole wfrole = (WfRole) process.readAttachement("WfRole");
+			String comment = (String) process.readAttachement("BatchMessage");
+			
 			
 			I_GetConceptData concept=Terms.get().getConcept(instance.getComponentId());
 			
@@ -109,16 +111,21 @@ public class AskForCommentInput extends AbstractTask {
 		
 			CommentsRefset commentsRefset = workList.getCommentsRefset(config);
 			I_GetConceptData commentType = tf.getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_COMMENT.getPrimoridalUid());
-			HashMap<I_GetConceptData,String> reason = new CommentPopUpDialog("Enter comment", commentType).showDialog();
+			HashMap<I_GetConceptData,String> reason =  new HashMap<I_GetConceptData,String>();
+			if(comment != null && !comment.trim().equals("")){
+				reason.put(Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_STANDARD_COMMENT.localize().getNid()), comment);
+			}else{
+				reason = new CommentPopUpDialog("Enter comment", commentType).showDialog();
+			}
 			if(reason!= null && !reason.isEmpty()){
 				Set<I_GetConceptData> a = reason.keySet();
 				I_GetConceptData rejReason = a.iterator().next();
 				String fullName= config.getDbConfig().getFullName();
-				String comment = wfrole.getName() + HEADER_SEPARATOR + fullName + COMMENT_HEADER_SEP + reason.get(rejReason);
-				commentsRefset.addComment(concept.getNid(), commentType.getNid() , rejReason.getNid(),comment);
+				String commentx = wfrole.getName() + HEADER_SEPARATOR + fullName + COMMENT_HEADER_SEP + reason.get(rejReason);
+				commentsRefset.addComment(concept.getNid(), commentType.getNid() , rejReason.getNid(),commentx);
 				
 			}else{
-				throw new TaskFailedException("Comment is null or empty");
+				return Condition.ITEM_CANCELED;
 			}
 
 		} catch (Exception e) {

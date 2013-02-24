@@ -26,7 +26,7 @@ package org.ihtsdo.tk.workflow.api;
 public interface WfActivityInstanceBI {
     
     /** 
-     * Gets the timestamp of the entry
+     * Gets the timestamp of the activity instance
      */
     Long getTime();
     
@@ -36,7 +36,7 @@ public interface WfActivityInstanceBI {
     WfStateBI getState();
     
     /** 
-     * Gets the user that executed the action that created the entry
+     * Gets the user that executed the action that created the activity instance
      */
     WfUserBI getAuthor();
     

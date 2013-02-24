@@ -44,6 +44,7 @@ import org.dwfa.ace.log.AceLog;
 import org.ihtsdo.arena.ArenaComponentSettings;
 import org.ihtsdo.arena.PreferencesNode;
 import org.ihtsdo.arena.contradiction.ContradictionConfig;
+import org.ihtsdo.arena.promotion.PromotionConfig;
 import org.ihtsdo.taxonomy.TaxonomyHelper;
 import org.ihtsdo.taxonomy.TaxonomyMouseListener;
 import org.ihtsdo.taxonomy.TaxonomyTree;
@@ -63,7 +64,7 @@ import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 public class ConceptViewSettings extends ArenaComponentSettings {
 
 	public static final int NAVIGATOR_WIDTH = 400;
-	private static final int dataVersion = 4;
+	private static final int dataVersion = 5;
 	/**
      *
      */
@@ -71,6 +72,7 @@ public class ConceptViewSettings extends ArenaComponentSettings {
 	private static ImageIcon statedView = new ImageIcon(ConceptViewRenderer.class.getResource("/16x16/plain/graph_edge.png"));
 	private static ImageIcon inferredView = new ImageIcon(ConceptViewRenderer.class.getResource("/16x16/plain/chrystal_ball.png"));
 	private static ImageIcon inferredAndStatedView = new ImageIcon(ConceptViewRenderer.class.getResource("/16x16/plain/inferred-then-stated.png"));
+        private static ImageIcon shortNormalView = new ImageIcon(ConceptViewRenderer.class.getResource("/16x16/plain/pin_green.png"));
 	public static HashMap<Integer, Set<WeakReference>> arenaPanelMap = new HashMap<>();
 	// ~--- fields
 	// --------------------------------------------------------------
@@ -88,6 +90,8 @@ public class ConceptViewSettings extends ArenaComponentSettings {
 	private DescType c1Refex = DescType.FULLY_SPECIFIED;
 	// dataversion = 4
 	private RelAssertionType relAssertionType = RelAssertionType.STATED;
+        // dataversion = 5
+        private boolean forPromotion = false;
 	// /
 	private transient ConceptChangedListener conceptChangedListener;
 	private transient JToggleButton navButton;
@@ -109,17 +113,18 @@ public class ConceptViewSettings extends ArenaComponentSettings {
 	// ~--- constructors
 	// --------------------------------------------------------
 	public ConceptViewSettings() {
-		this(false, 0);
+		this(false,false,  0);
 	}
 
-	public ConceptViewSettings(boolean forAdjudication) {
-		this(forAdjudication, 0);
+	public ConceptViewSettings(boolean forAdjudication, boolean forPromotion) {
+		this(forAdjudication, forPromotion, 0);
 	}
 
-	public ConceptViewSettings(boolean forAdjudication, Integer linkedTab) {
+	public ConceptViewSettings(boolean forAdjudication, boolean forPromotion, Integer linkedTab) {
 		super();
 		this.linkedTab = linkedTab;
 		this.forAdjudication = forAdjudication;
+                this.forPromotion = forPromotion;
 	}
 
 	// ~--- enums
@@ -208,6 +213,10 @@ public class ConceptViewSettings extends ArenaComponentSettings {
 
 			if (config instanceof ContradictionConfig) {
 				view.getSettings().setForAdjudication(true);
+			}
+                        
+                        if (config instanceof PromotionConfig) {
+				view.getSettings().setForPromotion(true);
 			}
 
 			try {
@@ -336,6 +345,11 @@ public class ConceptViewSettings extends ArenaComponentSettings {
 			} else {
 				relAssertionType = RelAssertionType.STATED;
 			}
+                        if (dataVersion >= 5) {
+				forPromotion = (boolean) in.readObject();
+			} else {
+				forPromotion = false;
+			}
 		} else {
 			throw new IOException("Can't handle dataversion: " + objDataVersion);
 		}
@@ -393,6 +407,7 @@ public class ConceptViewSettings extends ArenaComponentSettings {
 		out.writeObject(c3Refex);
 		out.writeObject(refexName);
 		out.writeObject(relAssertionType);
+                out.writeBoolean(forPromotion);
 	}
 
 	// ~--- get methods
@@ -711,8 +726,7 @@ public class ConceptViewSettings extends ArenaComponentSettings {
 					break;
 				case INFERRED_THEN_STATED:
 					relAssertionType = RelAssertionType.SHORT_NORMAL_FORM;
-//TODO: need icon
-					button.setIcon(inferredAndStatedView);
+					button.setIcon(shortNormalView);
 					button.setToolTipText("showing short normal form, toggle to show stated...");
 					fireConceptChanged();
 
@@ -780,6 +794,10 @@ public class ConceptViewSettings extends ArenaComponentSettings {
 	public boolean isForAdjudication() {
 		return forAdjudication;
 	}
+        
+        public boolean isForPromotion() {
+		return forPromotion;
+	}
 
 	public boolean isNavigatorSetup() {
 		if (navigator == null) {
@@ -801,6 +819,10 @@ public class ConceptViewSettings extends ArenaComponentSettings {
 	// ---------------------------------------------------------
 	public void setForAdjudication(boolean forAdjudication) {
 		this.forAdjudication = forAdjudication;
+	}
+        
+        public void setForPromotion(boolean forPromotion) {
+		this.forPromotion = forPromotion;
 	}
 
 	public void setLinkedTab(Integer linkedTab) {
