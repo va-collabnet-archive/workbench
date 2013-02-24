@@ -23,6 +23,8 @@ import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -35,8 +37,9 @@ import org.dwfa.ace.log.AceLog;
 public class Sct2_IdLookUp {
 
     private long sctIdArray[];
-    private long uuidMsbArray[];
-    private long uuidLsbArray[];
+    private long uuidMsbArray[][];
+    private long uuidLsbArray[][];
+    private HashMap<UUID, Long> reverseMap = new HashMap<UUID, Long>();
 
     public Sct2_IdLookUp(String filePathName)
             throws IOException {
@@ -64,56 +67,24 @@ public class Sct2_IdLookUp {
     }
 
     private void setupArrays(ArrayList<Sct2_IdCompact> idList) {
-        int countSctDuplicates = 0;
-        int countSctPairUuidChanged = 0;
         StringBuilder sb = new StringBuilder();
         Collections.sort(idList); // required for binarySearch
-        for (int i = 0; i < idList.size() - 1; i++) {
-            if (idList.get(i).sctIdL == idList.get(i + 1).sctIdL) {
-                countSctDuplicates++;
-                boolean isNotChanged = true;
-                if (idList.get(i).uuidMsbL != idList.get(i + 1).uuidMsbL
-                        || idList.get(i).uuidLsbL != idList.get(i + 1).uuidLsbL) {
-                    countSctPairUuidChanged++;
-                    isNotChanged = false;
-                }
-                if (countSctDuplicates < 200) {
-                    if (isNotChanged) {
-                        sb.append("\r\nAMBIGUOUS PRIMORDIAL UUID ====\r\n");
-                    } else {
-                        sb.append("\r\nAMBIGUOUS PRIMORDIAL UUID\r\n");
-                    }
-                    sb.append(idList.get(i).sctIdL);
-                    sb.append("\r\n");
-                    UUID uuid1 = new UUID(idList.get(i).uuidMsbL,
-                            idList.get(i).uuidLsbL);
-                    UUID uuid2 = new UUID(idList.get(i + 1).uuidMsbL,
-                            idList.get(i + 1).uuidLsbL);
-                    sb.append(uuid1.toString());
-                    sb.append("\r\n");
-                    sb.append(uuid2.toString());
-                    sb.append("\r\n");
-                }
-            }
-        }
-        sb.append("\r\n::: countSctDuplicates = ");
-        sb.append(countSctDuplicates);
-        sb.append("\r\n::: countSctPairUuidChanged = ");
-        sb.append(countSctPairUuidChanged);
-        sb.append("\r\n");
-        AceLog.getAppLog().log(Level.INFO, sb.toString());
-        if (countSctDuplicates > 0) {
-            throw new UnsupportedOperationException("duplicate sctids not supported");
-        }
         this.sctIdArray = new long[idList.size()];
-        this.uuidMsbArray = new long[idList.size()];
-        this.uuidLsbArray = new long[idList.size()];
+        this.uuidMsbArray = new long[idList.size()][0];
+        this.uuidLsbArray = new long[idList.size()][0];
         for (int i = 0; i < idList.size(); i++) {
             Sct2_IdCompact sct2_IdCompact = idList.get(i);
             this.sctIdArray[i] = sct2_IdCompact.sctIdL;
-            this.uuidMsbArray[i] = sct2_IdCompact.uuidMsbL;
-            this.uuidLsbArray[i] = sct2_IdCompact.uuidLsbL;
+            this.uuidMsbArray[i] = addToArray(this.uuidMsbArray[i], sct2_IdCompact.uuidMsbL);
+            this.uuidLsbArray[i] = addToArray(this.uuidLsbArray[i], sct2_IdCompact.uuidLsbL);
+            reverseMap.put(new UUID(sct2_IdCompact.uuidMsbL, sct2_IdCompact.uuidLsbL), sct2_IdCompact.sctIdL);
         }
+    }
+
+    private long[] addToArray(long[] sigBitsArray, long sigBits) {
+        sigBitsArray = Arrays.copyOf(sigBitsArray, sigBitsArray.length + 1);
+        sigBitsArray[sigBitsArray.length - 1] = sigBits;
+        return sigBitsArray;
     }
 
     public UUID getUuid(String sctIdString) {
@@ -123,11 +94,23 @@ public class Sct2_IdLookUp {
     public UUID getUuid(long sctId) {
         int idx = Arrays.binarySearch(sctIdArray, sctId);
         if (idx >= 0) {
-            long msb = uuidMsbArray[idx];
-            long lsb = uuidLsbArray[idx];
-            return new UUID(msb, lsb);
+            long[] msb = uuidMsbArray[idx];
+            long[] lsb = uuidLsbArray[idx];                        
+            return new UUID(msb[0], lsb[0]);
         } else {
             return null;
         }
+    }
+
+    public boolean containsSctid(long sctId) {
+        int idx = Arrays.binarySearch(sctIdArray, sctId);
+        if (idx >= 0) {
+            return true;
+        }
+        return false;
+    }
+
+    public boolean containsUuid(UUID uuid) {
+        return reverseMap.containsKey(uuid);        
     }
 }

@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -227,9 +228,13 @@ public class Sct2_IdRecord implements Serializable {
             BufferedWriter arfWriter,
             Sct2_IdLookUp idLookUp, UUID pathUuid, UUID authorUuid)
             throws Exception {
+        // Type3 UUID scheme
+        UUID uuidScheme = ArchitectonicAuxiliary.Concept.SNOMED_T3_UUID.getPrimoridalUid();
+        String uuidSchemeSctid = "900000000000002006";
         // SNOMED integer id
-        UUID sourceSystemUuid = ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.getPrimoridalUid();
-        if (sourceSystemUuid == null) {
+        UUID sctidScheme = ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.getPrimoridalUid();
+        String sctidSchemeSctid = "900000000000294009";
+        if (sctidScheme == null || uuidScheme == null) {
             throw new Exception("Source System ID not found in ID lookup");
         }
 
@@ -240,6 +245,8 @@ public class Sct2_IdRecord implements Serializable {
         int ACTIVE = 3; // active 1
         int MODULE_ID = 4; // moduleSctId 900000000000207008
         int REFERENCED_COMPONENT_ID = 5; // referencedComponentId 100000000
+
+        List<String[]> alternateSctids = new ArrayList<String[]>();
 
         for (Rf2File f : fList) {
             BufferedReader br = new BufferedReader(
@@ -256,40 +263,82 @@ public class Sct2_IdRecord implements Serializable {
                     System.err.println("not parsed: " + tempLine);
                     continue;
                 }
-                // SCTID
-                String componentSctIdString = line[REFERENCED_COMPONENT_ID];
-                UUID sctIdUuid = idLookUp.getUuid(componentSctIdString);
-                // PRIMARY_UUID
-                UUID pUuid = UUID.fromString(line[ALTERNATE_IDENTIFIER]);
-                if (sctIdUuid == null || pUuid.compareTo(sctIdUuid) != 0) {
-                    throw new Exception("ALTERNATE_IDENTIFIER not found in cache");
+
+                if (line[IDENTIFIER_SCHEME_ID].equalsIgnoreCase(uuidSchemeSctid)) {
+
+                        if (!idLookUp.getUuid(line[REFERENCED_COMPONENT_ID]).equals(UUID.fromString(line[ALTERNATE_IDENTIFIER]))) {
+
+                            AceLog.getAppLog().warning("IDENTIFIER [" + line[REFERENCED_COMPONENT_ID] + "] already found in cache. " +
+                                "Assuming we are dealing with an alternate UUID");
+
+                            processMapping(arfWriter, idLookUp, pathUuid, authorUuid, uuidScheme,
+                                idLookUp.getUuid(line[REFERENCED_COMPONENT_ID]).toString(), line[EFFECTIVE_TIME],
+                                line[ACTIVE], line[MODULE_ID], line[ALTERNATE_IDENTIFIER]);    
+
+                        } else {
+                            
+                            processMapping(arfWriter, idLookUp, pathUuid, authorUuid, sctidScheme, line[ALTERNATE_IDENTIFIER],
+                                line[EFFECTIVE_TIME], line[ACTIVE], line[MODULE_ID], line[REFERENCED_COMPONENT_ID]);
+                        }
+
+                } else if (line[IDENTIFIER_SCHEME_ID].equalsIgnoreCase(sctidSchemeSctid)) {
+                    alternateSctids.add(line);
                 }
-
-                // yyyy-MM-dd HH:mm:ss
-                String dateStr = Rf2x.convertEffectiveTimeToDate(line[EFFECTIVE_TIME]);
-
-                // module uuid
-                UUID moduleUuid = idLookUp.getUuid(line[MODULE_ID]);
-                if (moduleUuid == null) {
-                    throw new Exception("MODULE_ID not in id cache");
-                }
-
-                // Write to ARF file
-                writeArf(arfWriter,
-                        pUuid, // PRIMARY_UUID = 0
-                        sourceSystemUuid, // SOURCE_SYSTEM_UUID = 1
-                        line[REFERENCED_COMPONENT_ID], // ID_FROM_SOURCE_SYSTEM
-                        line[ACTIVE], // STATUS_UUID = 3
-                        dateStr, // EFFECTIVE_DATE = 4; yyyy-MM-dd HH:mm:ss
-                        pathUuid, // PATH_UUID = 5;
-                        authorUuid, // AUTHOR_UUID = 6;
-                        moduleUuid); // MODULE_UUID = 7;
             }
+
             StringBuilder sb = new StringBuilder();
             sb.append("\n::: parseIdsToArf() FILE: ");
             sb.append(f.file.toURI().toString());
             AceLog.getAppLog().info(sb.toString());
         }
+
+        // Go back and map any alternate SCTIDs
+        for (String[] line : alternateSctids) {            
+            processMapping(arfWriter, idLookUp, pathUuid, authorUuid, sctidScheme,
+                    idLookUp.getUuid(line[REFERENCED_COMPONENT_ID]).toString(), line[EFFECTIVE_TIME],
+                    line[ACTIVE], line[MODULE_ID], line[ALTERNATE_IDENTIFIER]);
+        }
+    }
+
+    private static void processMapping(BufferedWriter arfWriter, Sct2_IdLookUp idLookUp, UUID pathUuid, UUID authorUuid,
+           UUID schemeUuid, String primaryUuid, String effectiveTime, String active, String moduleSctid, String altId)
+            throws Exception {
+
+        // PRIMARY_UUID
+        UUID pUuid = UUID.fromString(primaryUuid);
+
+        if (schemeUuid.equals(ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.getPrimoridalUid())) {
+            // SCTID
+            UUID sctIdUuid = idLookUp.getUuid(altId);
+            if (sctIdUuid == null || pUuid.compareTo(sctIdUuid) != 0) {
+                if (idLookUp.containsUuid(pUuid)) {
+                    AceLog.getAppLog().warning("IDENTIFIER [" + altId + "] not found in cache. " +
+                            "Assuming it is an alternate SCTID, since the UUID does exist in cache");
+                } else {
+                    throw new Exception("ALTERNATE_IDENTIFIER [" + altId + "] not found in cache");
+                }
+            }
+        } 
+
+        // yyyy-MM-dd HH:mm:ss
+        String dateStr = Rf2x.convertEffectiveTimeToDate(effectiveTime);
+
+        // module uuid
+        UUID moduleUuid = idLookUp.getUuid(moduleSctid);
+        if (moduleUuid == null) {
+            throw new Exception("MODULE_ID not in id cache");
+        }
+
+        // Write to ARF file
+        writeArf(arfWriter,
+                pUuid, // PRIMARY_UUID = 0
+                schemeUuid, // SOURCE_SYSTEM_UUID = 1
+                altId, // ID_FROM_SOURCE_SYSTEM
+                active, // STATUS_UUID = 3
+                dateStr, // EFFECTIVE_DATE = 4; yyyy-MM-dd HH:mm:ss
+                pathUuid, // PATH_UUID = 5;
+                authorUuid, // AUTHOR_UUID = 6;
+                moduleUuid); // MODULE_UUID = 7;
     }
 
     // writeSctSnomedLongId
