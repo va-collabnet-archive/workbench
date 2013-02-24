@@ -75,8 +75,6 @@ extends AbstractMojo
 			I_TermFactory tf = Terms.get();
 			TerminologyStoreDI ts = Ts.get();
 			DataOutputStream eConceptDOS;
-
-            System.out.println(":DEBUG:" + Ts.get().getConcept(UUID.fromString("693e7426-8145-53ff-90a7-b43c6aa2e863")).toLongString());
             
 			TransformersConfigApi api = new TransformersConfigApi(xmlFile);
 
