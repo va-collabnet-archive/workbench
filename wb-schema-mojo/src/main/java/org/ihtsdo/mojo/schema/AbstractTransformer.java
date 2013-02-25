@@ -10,7 +10,6 @@ import java.util.List;
 import org.ihtsdo.tk.dto.concept.TkConcept;
 import org.ihtsdo.tk.dto.concept.component.TkComponent;
 import org.ihtsdo.tk.dto.concept.component.attribute.TkConceptAttributes;
-import org.ihtsdo.tk.dto.concept.component.attribute.TkConceptAttributesRevision;
 import org.ihtsdo.tk.dto.concept.component.description.TkDescription;
 import org.ihtsdo.tk.dto.concept.component.refex.TkRefexAbstractMember;
 import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationship;
@@ -90,9 +89,9 @@ public abstract class AbstractTransformer {
 	/**
 	 * Post process concept.
 	 *
-	 * @return true, if the concept should be writen now to the output jbin file. False for saving skipping.
+	 * @return true, if the concept should be written now to the output jbin file. False for saving skipping.
 	 */
-	public abstract boolean postProcessConcept();
+	public abstract boolean postProcessConcept(TkConcept eConcept);
 	
 	/**
 	 * Pre process iteration.
@@ -157,6 +156,6 @@ public abstract class AbstractTransformer {
 			}
 		}
 
-		return postProcessConcept();
+		return postProcessConcept(eConcept);
 	}
 }

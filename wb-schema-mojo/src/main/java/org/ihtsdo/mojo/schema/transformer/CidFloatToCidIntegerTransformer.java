@@ -276,7 +276,7 @@ public class CidFloatToCidIntegerTransformer extends AbstractTransformer {
 	 * @see org.ihtsdo.mojo.schema.AbstractTransformer#postProcessConcept()
 	 */
 	@Override
-	public boolean postProcessConcept() {
+	public boolean postProcessConcept(TkConcept eConcept) {
 		return true;
 	}
 

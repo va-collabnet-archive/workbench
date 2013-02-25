@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.Semaphore;
 
 import org.apache.maven.plugin.AbstractMojo;
@@ -74,7 +75,7 @@ extends AbstractMojo
 			I_TermFactory tf = Terms.get();
 			TerminologyStoreDI ts = Ts.get();
 			DataOutputStream eConceptDOS;
-
+            
 			TransformersConfigApi api = new TransformersConfigApi(xmlFile);
 
 			String className = api.getValueAt(api.getIntId(transformerId), "class");

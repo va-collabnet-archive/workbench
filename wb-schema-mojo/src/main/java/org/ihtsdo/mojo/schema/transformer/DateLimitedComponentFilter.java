@@ -133,7 +133,7 @@ public class DateLimitedComponentFilter extends AbstractTransformer {
 	}
 
 	@Override
-	public boolean postProcessConcept() {
+	public boolean postProcessConcept(TkConcept eConcept) {
 		return true;
 	}
 
