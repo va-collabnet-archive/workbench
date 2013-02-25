@@ -33,7 +33,7 @@ public class WfCompletionFilter implements WfFilterBI {
 	private final String TYPE = "WF_STATE_FILTER";
 
 	/** The state. */
-	private Boolean isCompleted;
+	private CompletionOption completion;
 
 	public WfCompletionFilter() {
 		super();
@@ -45,17 +45,17 @@ public class WfCompletionFilter implements WfFilterBI {
 	 * @param state
 	 *            the state
 	 */
-	public WfCompletionFilter(Boolean isCompleted) {
+	public WfCompletionFilter(CompletionOption completion) {
 		super();
-		this.isCompleted = isCompleted;
+		this.completion = completion;
 	}
 
-	public Boolean getIsCompleted() {
-		return isCompleted;
+	public CompletionOption getCompletionOption() {
+		return completion;
 	}
 
-	public void setIsCompleted(Boolean isComplete) {
-		this.isCompleted = isComplete;
+	public void setCompletionOption(CompletionOption completion) {
+		this.completion = completion;
 	}
 
 	/*
@@ -67,7 +67,15 @@ public class WfCompletionFilter implements WfFilterBI {
 	 */
 	@Override
 	public boolean evaluateInstance(WfProcessInstanceBI instance) {
-		return instance.isCompleted() == isCompleted;
+		switch (completion){
+		case INCOMPLETE_INSTACES:
+			return !instance.isCompleted();
+		case COMPLETE_INSTANCES:
+			return instance.isCompleted();
+		case ALL_INSTANCES:
+			return true;
+		}
+		return false;
 	}
 
 	/*
