@@ -16,6 +16,7 @@
  */
 package org.ihtsdo.project.workflow.model;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -30,11 +31,13 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.project.TerminologyProjectDAO;
 import org.ihtsdo.project.model.I_TerminologyProject;
 import org.ihtsdo.project.model.I_TerminologyProject.Type;
 import org.ihtsdo.project.model.TranslationProject;
 import org.ihtsdo.project.model.WorkList;
+import org.ihtsdo.project.refset.Comment;
 import org.ihtsdo.project.refset.LanguageMembershipRefset;
 import org.ihtsdo.project.refset.PromotionAndAssignmentRefset;
 import org.ihtsdo.project.workflow.api.wf2.implementation.WfActivityInstance;
@@ -49,6 +52,7 @@ import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.refex.type_nid_nid.RefexNidNidVersionBI;
 import org.ihtsdo.tk.workflow.api.WfActivityBI;
 import org.ihtsdo.tk.workflow.api.WfActivityInstanceBI;
+import org.ihtsdo.tk.workflow.api.WfCommentBI;
 import org.ihtsdo.tk.workflow.api.WfProcessDefinitionBI;
 import org.ihtsdo.tk.workflow.api.WfProcessInstanceBI;
 import org.ihtsdo.tk.workflow.api.WfStateBI;
@@ -458,13 +462,13 @@ public class WfInstance implements Serializable, WfProcessInstanceBI {
 	public void setHistory(List<WfHistoryEntry> history) {
 		this.history = history;
 	}
-	
+
 	public class RefexVersionBIComparator implements Comparator<RefexVersionBI>{
-		 
-	    @Override
-	    public int compare(RefexVersionBI o1, RefexVersionBI o2) {
-	        return (o1.getTime()<o2.getTime() ? -1 : (o1.getTime()==o2.getTime() ? 0 : 1));
-	    }
+
+		@Override
+		public int compare(RefexVersionBI o1, RefexVersionBI o2) {
+			return (o1.getTime()<o2.getTime() ? -1 : (o1.getTime()==o2.getTime() ? 0 : 1));
+		}
 	}
 
 	@Override
@@ -510,7 +514,7 @@ public class WfInstance implements Serializable, WfProcessInstanceBI {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
+
 		return result;
 	}
 
@@ -530,6 +534,33 @@ public class WfInstance implements Serializable, WfProcessInstanceBI {
 
 	public void setLastChangeTime(Long time) {
 		this.changeTime = time;
+	}
+
+	@Override
+	public Collection<WfCommentBI> getComments() {
+		List<WfCommentBI> comments=new ArrayList<WfCommentBI>();
+		try {
+			I_TermFactory tf = Terms.get();
+			I_ConfigAceFrame config = tf.getActiveAceFrameConfig();
+
+			LinkedList<Comment> commentsList = getWorkList().getCommentsRefset(config).getFullComments(tf.uuidToNative(componentId));
+			for (Comment comment:commentsList){
+				comments.add(new WfComment(comment));
+			}
+			 Collections.sort(comments);
+			 return comments;
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (TerminologyException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	@Override
+	public Collection<WfCommentBI> setComments(Collection<WfCommentBI> comments) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }
