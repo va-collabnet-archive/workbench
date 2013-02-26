@@ -105,6 +105,16 @@ public interface WfProcessInstanceBI {
     LinkedList<WfActivityInstanceBI> getActivityInstances() throws Exception;
     
     /** 
+     * Gets comments for instance
+     */
+    Collection<WfCommentBI> getComments();
+    
+    /** 
+     * Sets comments for instance
+     */
+    Collection<WfCommentBI> setComments(Collection<WfCommentBI> comments);
+    
+    /** 
      * Gets the due date for this instance
      */
     Long getDueDate();
