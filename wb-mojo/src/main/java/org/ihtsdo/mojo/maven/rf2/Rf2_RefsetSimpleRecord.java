@@ -162,4 +162,8 @@ public class Rf2_RefsetSimpleRecord implements Comparable<Rf2_RefsetSimpleRecord
         }
         return 0; // instance == received
     }
+    
+    public void setPath(String pathStr) {
+    	this.pathUuidStr = pathStr;
+    }
 }

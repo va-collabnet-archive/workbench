@@ -42,7 +42,7 @@ public class Rf2_RefsetCRecord implements Comparable<Rf2_RefsetCRecord> {
     String moduleUuidStr;
 
     public Rf2_RefsetCRecord(String id, String dateStr, boolean active, String moduleUuidStr,
-            long refsetIdL, long referencedComponentIdL, long valueIdL, String pathUuid)
+            long refsetIdL, long referencedComponentIdL, long valueIdL)
             throws ParseException {
         this.id = id;
         this.effDateStr = dateStr;
@@ -54,12 +54,12 @@ public class Rf2_RefsetCRecord implements Comparable<Rf2_RefsetCRecord> {
         this.valueIdL = valueIdL;
 
         // SNOMED Core :NYI: setup path as a POM parameter.
-        this.pathUuidStr = pathUuid;
+        this.pathUuidStr = Rf2Defaults.getPathSnomedCoreUuidStr();
         // this.authorUuidStr = Rf2Defaults.getAuthorUuidStr();
         this.moduleUuidStr = moduleUuidStr;
     }
 
-    static Rf2_RefsetCRecord[] parseRefset(Rf2File f, Long[] exclusions, String pathUuid)
+    static Rf2_RefsetCRecord[] parseRefset(Rf2File f, Long[] exclusions)
             throws IOException, ParseException {
 
         int count = Rf2File.countFileLines(f);
@@ -95,6 +95,7 @@ public class Rf2_RefsetCRecord implements Comparable<Rf2_RefsetCRecord> {
 			                found = true;
 			            }
 			        }
+    
 			    }
 			    if (found) {
 			        countExludedMembers++;
@@ -108,8 +109,7 @@ public class Rf2_RefsetCRecord implements Comparable<Rf2_RefsetCRecord> {
 			            Rf2x.convertSctIdToUuidStr(line[MODULE_ID]),
 			            Long.parseLong(line[REFSET_ID]),
 			            Long.parseLong(line[REFERENCED_COMPONENT_ID]),
-			            Long.parseLong(line[VALUE_ID]),
-                                    pathUuid));
+			            Long.parseLong(line[VALUE_ID])));
 			}
 		} catch (NumberFormatException e) {
 			AceLog.getAppLog().severe("Error parsing Refset recors: File=" + f.file.getName() + " Line=" + currentCount);
@@ -219,5 +219,9 @@ public class Rf2_RefsetCRecord implements Comparable<Rf2_RefsetCRecord> {
             }
         }
         return 0; // instance == received
+    }
+    
+    public void setPath(String pathStr) {
+    	this.pathUuidStr = pathStr;
     }
 }

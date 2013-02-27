@@ -30,7 +30,7 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
-
+import org.ihtsdo.mojo.mojo.ConceptDescriptor;
 /**
  * @author Marc E. Campbell
  *
@@ -75,6 +75,13 @@ public class SctRf2TextDefToArfMojo extends AbstractMojo implements Serializable
      */
     private String outputDir;
     /**
+     * Path on which to load data. Defaults to SNOMED Core.
+     *
+     * @parameter 
+     */
+    private ConceptDescriptor pathConcept = new ConceptDescriptor("8c230474-9f11-30ce-9cad-185a96fd03a2","SNOMED Core");
+ 
+    /**
      * Path to import concepts on. Defaults to SNOMED Core.
      * @parameter default-value="8c230474-9f11-30ce-9cad-185a96fd03a2"
      */
@@ -93,6 +100,19 @@ public class SctRf2TextDefToArfMojo extends AbstractMojo implements Serializable
         getLog().info("    POM Target Sub Directory: " + targetSubDir);
         getLog().info("    POM Target Sub Data Directory: " + inputDir);
 
+        String pathStr = null;
+        try {
+        	pathStr = pathConcept.getUuid();
+        	// If either pathUuid is not the default and pathStr is, override with pathUuid
+        	if (!pathUuid.equals("8c230474-9f11-30ce-9cad-185a96fd03a2") &&
+        			pathStr.equals("8c230474-9f11-30ce-9cad-185a96fd03a2"))
+        		pathStr = pathUuid;
+        } catch (RuntimeException e) {
+        	getLog().error("Poorly configured path concept, at least one UUID must be specified", e);
+        	throw e;
+        }
+        getLog().info("    Path UUID: " + pathStr);
+        
         try {
             Rf2x.setupIdCache(targetDirectory.getAbsolutePath());
 
@@ -114,7 +134,7 @@ public class SctRf2TextDefToArfMojo extends AbstractMojo implements Serializable
 
             // :NYI: extended status implementation does not multiple version years
             filesInStatus = Rf2File.getFiles(wDir, targetSubDir, statusDir, "AttributeValue", ".txt");
-            Rf2_RefsetCRecord[] statusRecords = Rf2_RefsetCRecord.parseRefset(filesInStatus.get(0), null, pathUuid); // hardcoded
+            Rf2_RefsetCRecord[] statusRecords = Rf2_RefsetCRecord.parseRefset(filesInStatus.get(0), null); // hardcoded
 
             // TEXTDEFINITION FILES "sct2_TextDefinition"
             BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(
@@ -122,10 +142,11 @@ public class SctRf2TextDefToArfMojo extends AbstractMojo implements Serializable
             getLog().info("::: TEXTDEFINITIONS FILE: " + outDir + "textdefinitions_rf2.txt");
             filesIn = Rf2File.getFiles(wDir, targetSubDir, inputDir, "sct2_TextDefinition", ".txt");
             for (Rf2File rf2File : filesIn) {
-                Sct2_DesRecord[] textdefinitions = Sct2_DesRecord.parseDescriptions(rf2File, pathUuid);
+                Sct2_DesRecord[] textdefinitions = Sct2_DesRecord.parseDescriptions(rf2File, pathStr);
                 textdefinitions = Sct2_DesRecord.attachStatus(textdefinitions, statusRecords);
                 for (Sct2_DesRecord d : textdefinitions) {
                     d.writeArf(bw);
+                    d.setPath(pathStr);
                     if (Rf2x.isSctIdInUuidCache(d.desSnoIdL) == false) {
                         writeSctSnomedLongId(bwIds, d.desSnoIdL, d.effDateStr, d.pathUuidStr);
                     }
