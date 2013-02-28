@@ -108,6 +108,7 @@ public final class BatchActionEditorPanel extends javax.swing.JPanel {
                         BatchActionEvent.BatchActionEventType.EVENT_NOOP,
                         "ALL BATCH EDITS CANCELED BY USER"));
                 resultsTextArea.setText(BatchActionEventReporter.createReportHTML());
+                AceLog.getAppLog().alertAndLog(Level.INFO, "Batch edits canceled by user.", null);
 
             } else {
                 sb.append(BatchActionEventReporter.createReportTSV());
@@ -115,6 +116,7 @@ public final class BatchActionEditorPanel extends javax.swing.JPanel {
                         BatchActionEditorPanel.class.getName()).log(Level.INFO, sb.toString());
                 resultsTextArea.setText(BatchActionEventReporter.createReportHTML());
                 gui.setProgressInfoLower("batch edits completed");
+                AceLog.getAppLog().alertAndLog(Level.INFO, "Batch edits completed.", null);
             }
             try {
                 gui.complete();
