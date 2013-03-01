@@ -43,6 +43,7 @@ import org.ihtsdo.helper.dto.DtoExtract;
 import org.ihtsdo.helper.dto.DtoToText;
 import org.ihtsdo.helper.export.ActiveOnlyExport;
 import org.ihtsdo.helper.io.FileIO;
+import org.ihtsdo.project.workflow.api.wf2.implementation.WorkflowStore;
 import org.ihtsdo.rules.RulesLibrary;
 import org.ihtsdo.rules.testmodel.TerminologyHelperDroolsWorkbench;
 import org.ihtsdo.tk.Ts;
@@ -137,6 +138,7 @@ public class ProgrammersPopupListener extends MouseAdapter implements ActionList
         EXPORT_ACTIVE_ONLY("Export active only from view"),
         PATCH_MSMITH("Patch msmith#80#"),
         TEST_ISA_CACHE("Test isa cache"),
+        LAUNCH_WF_CHANGES_INIT("Launch workflow initiator on changes..."),
         LAUNCH_BP("Launch Business Process...");
         //J+
         String menuText;
@@ -258,6 +260,10 @@ public class ProgrammersPopupListener extends MouseAdapter implements ActionList
             case LAUNCH_BP:
                 launchBp();
                 break;
+                
+            case LAUNCH_WF_CHANGES_INIT:
+            	lauchWfChangesInit();
+            	break;
 
 
             default:
@@ -266,7 +272,43 @@ public class ProgrammersPopupListener extends MouseAdapter implements ActionList
         }
     }
 
-    private void addToWatch() {
+    private void lauchWfChangesInit() {
+    	WorkflowStore wf = new WorkflowStore();
+		try {
+			String start = (String) JOptionPane.showInputDialog(
+                    null,
+                    "Enter start date as MM/dd/yy hh:mm:ss",
+                    "Start Date",
+                    JOptionPane.PLAIN_MESSAGE,
+                    null,
+                    null,
+                    "");
+			
+			if (start == null || start.trim().isEmpty()) {
+				start = "02/25/13 00:00:00";
+			}
+			
+			String end = (String) JOptionPane.showInputDialog(
+                    null,
+                    "Enter end date as MM/dd/yy hh:mm:ss",
+                    "End Date",
+                    JOptionPane.PLAIN_MESSAGE,
+                    null,
+                    null,
+                    "");
+			
+			if (end == null || end.trim().isEmpty()) {
+				end = "03/01/13 00:00:00";
+			}
+
+			wf.sendAllChangesInTimeRangeToDefaultWorkflow(start, end);
+		} catch (Exception e1) {
+			AceLog.getAppLog().alertAndLogException(e1);
+		}
+		
+	}
+
+	private void addToWatch() {
         I_GetConceptData igcd = (I_GetConceptData) this.conceptPanel.getTermComponent();
 
         Terms.get().addToWatchList(igcd);
