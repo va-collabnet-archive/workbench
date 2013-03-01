@@ -1,6 +1,7 @@
 package org.ihtsdo.project.workflow.model;
 
 import java.text.SimpleDateFormat;
+import java.util.UUID;
 
 import org.ihtsdo.helper.time.TimeHelper;
 import org.ihtsdo.project.refset.Comment;
@@ -27,7 +28,7 @@ public class WfComment implements WfCommentBI {
 	
 	private String role;
 	
-	private String author;
+	private WfUser author;
 	
 	private Long date;
 	
@@ -42,19 +43,19 @@ public class WfComment implements WfCommentBI {
 		String[] arrComm = comm.split(COMMENT_HEADER_SEP);
 		String header = arrComm[0];
 		String[] headerComp = header.split(HEADER_SEPARATOR);
-		author = "";
+		String authorStr = "";
 		role = "";
 		if (headerComp.length > 0) {
 			role = headerComp[0];
 			if (headerComp.length > 1) {
-				author = headerComp[1];
+				authorStr = headerComp[1];
 			}
 		}
 		comment=arrComm[1];
-
+		author=new WfUser(authorStr,UUID.randomUUID());
 	}
 	@Override
-	public String getAuthor() {
+	public WfUser getAuthor() {
 		return author;
 	}
 
@@ -67,7 +68,6 @@ public class WfComment implements WfCommentBI {
 	public String getComment() {
 		return comment;
 	}
-	@Override
 	public String getRole() {
 		return role;
 	}
@@ -79,6 +79,6 @@ public class WfComment implements WfCommentBI {
 
 	@Override
 	public String toString() {
-		return (role==null || role.equals("null") || role.equals("")? "author":role) + ": " +  author + " - " + comment + " - " + TimeHelper.formatDate(date);
+		return comment + " - author: " +  author + " - " + TimeHelper.formatDate(date);
 	}
 }

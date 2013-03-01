@@ -547,8 +547,8 @@ public class WfInstance implements Serializable, WfProcessInstanceBI {
 			for (Comment comment:commentsList){
 				comments.add(new WfComment(comment));
 			}
-			 Collections.sort(comments);
-			 return comments;
+			Collections.sort(comments);
+			return comments;
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (TerminologyException e) {
@@ -557,10 +557,31 @@ public class WfInstance implements Serializable, WfProcessInstanceBI {
 		return null;
 	}
 
+
 	@Override
-	public Collection<WfCommentBI> setComments(Collection<WfCommentBI> comments) {
-		// TODO Auto-generated method stub
-		return null;
+	public Collection<WfCommentBI> addComments(Collection<WfCommentBI> comments) {
+
+		for (WfCommentBI comment:comments){
+			addComment( comment);
+		}
+		return getComments();
+	}
+
+	@Override
+	public void addComment(WfCommentBI comment) {
+		try {
+
+			I_TermFactory tf = Terms.get();
+			I_ConfigAceFrame config = tf.getActiveAceFrameConfig();
+			getWorkList().getCommentsRefset(config).addComment(tf.uuidToNative(componentId), comment.getComment());
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (TerminologyException e) {
+			e.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 }
