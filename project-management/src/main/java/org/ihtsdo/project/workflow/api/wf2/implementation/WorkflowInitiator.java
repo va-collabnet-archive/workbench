@@ -43,7 +43,7 @@ public class WorkflowInitiator implements WorkflowInitiatiorBI {
 
 	public WorkflowInitiator() {
 		alreadySeen = new HashMap<Integer,NidSet>();
-		lastComplete = Collections.synchronizedMap(new LruCache<Integer, Long>(100));
+		lastComplete = Collections.synchronizedMap(new LruCache<Integer, Long>(1000));
 	}
 
 	@Override
@@ -159,7 +159,7 @@ public class WorkflowInitiator implements WorkflowInitiatiorBI {
 				} else {
 					workList.createInstanceForComponent(concept.getPrimUuid(), new WfProcessDefinition(workList.getWorkflowDefinition()));
 				}
-				concept.commit(ChangeSetGenerationPolicy.INCREMENTAL, ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);
+				//concept.commit(ChangeSetGenerationPolicy.INCREMENTAL, ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);
 				return true;
 			} else {
 				return false;
