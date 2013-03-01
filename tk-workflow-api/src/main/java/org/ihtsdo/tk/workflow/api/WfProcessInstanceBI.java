@@ -110,10 +110,14 @@ public interface WfProcessInstanceBI {
     Collection<WfCommentBI> getComments();
     
     /** 
-     * Sets comments for instance
+     * Add comment for instance
      */
-    Collection<WfCommentBI> setComments(Collection<WfCommentBI> comments);
+    void addComment(WfCommentBI comment);
     
+    /** 
+     * Add a comment list for instance
+     */
+	Collection<WfCommentBI> addComments(Collection<WfCommentBI> comments);
     /** 
      * Gets the due date for this instance
      */
@@ -152,5 +156,6 @@ public interface WfProcessInstanceBI {
 	 * True when is promoted, False when is not.
 	 */
 	boolean isPromoted();
+
     
 }
