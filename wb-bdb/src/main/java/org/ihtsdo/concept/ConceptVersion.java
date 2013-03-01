@@ -578,7 +578,9 @@ public class ConceptVersion implements ConceptVersionBI, Comparable<ConceptVersi
                 pathList.add(nidPath);
             } else {
                 for (ConceptVersionBI parent : parents) {
-                    pathList.addAll(((ConceptVersion) parent).getNidPathsToRoot(new ArrayList(nidPath)));
+                    if (parent.getNid() != getNid()) {
+                        pathList.addAll(((ConceptVersion) parent).getNidPathsToRoot(new ArrayList(nidPath)));
+                    }
                 }
             }
         } catch (ContradictionException ex) {
