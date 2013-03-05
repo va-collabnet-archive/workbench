@@ -18,8 +18,7 @@ package org.ihtsdo.helper.query;
 import java.util.ArrayList;
 
 /**
- *
- * @author aimeefurber
+ * The class <code>Clause</code> represents the clause of a query. A clause can contain another clause.
  */
 public class Clause implements Statement{
     private Statement[] statements;
@@ -29,6 +28,11 @@ public class Clause implements Statement{
         
     }
     
+    /**
+     * Creates a clause with an OR grouping.
+     * @param clauses the statements of the clause
+     * @return a clause with the specified grouping and statements
+     */
     public static Clause or(Statement... clauses){
         Clause c = new Clause();
         c.grouping = Grouping.OR;
@@ -36,6 +40,11 @@ public class Clause implements Statement{
         return c;
     }
     
+    /**
+     * Creates a clause with an AND grouping.
+     * @param clauses the statements of the clause
+     * @return a clause with the specified grouping and statements
+     */
     public static Clause and(Statement... clauses){
         Clause c = new Clause();
         c.grouping = Grouping.AND;
@@ -43,10 +52,18 @@ public class Clause implements Statement{
         return c;
     }
 
+    /**
+     * Gets the statements contained in the clause.
+     * @return the statements contained in the clause
+     */
     public Statement[] getStatements() {
         return statements;
     }
 
+    /**
+     * Get the grouping type of the clause. OR or AND.
+     * @return the grouping type of the clause
+     */
     public Grouping getGrouping() {
         return grouping;
     }

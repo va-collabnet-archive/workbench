@@ -18,19 +18,29 @@ package org.ihtsdo.helper.query;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 
 /**
- *
- * @author aimeefurber
+ * The class <code>DescriptionChangedQuery</code> represents a query asking for
+ * descriptions which have been added or changed between two positions.
  */
 public class DescriptionChangedQuery {
     private Query query;
-
+    
+    /**
+     * Constructs a description changed query using the interval represented
+     * by the two given <code>ViewCoordinates</code>.
+     * @param v1 the <code>ViewCoordinate</code> representing the starting position
+     * @param v2 the <code>ViewCoordinate</code> representing the ending position
+     */
     public DescriptionChangedQuery(ViewCoordinate v1, ViewCoordinate v2) {
         v1 = v1.getViewCoordinateWithAllStatusValues();
         v2 = v2.getViewCoordinateWithAllStatusValues();
         query = Query.or(Description.added(true, v1, v2),
                          Description.changed(true, v1, v2));
     }
-
+    
+    /**
+     * Gets a <code>Query></code> object represented by this class.
+     * @return a <code>Query></code> object represented by this class
+     */
     public Query getQuery() {
         return query;
     }

@@ -17,15 +17,39 @@ package org.ihtsdo.helper.query;
 
 /**
  *
- * @author aimeefurber
+ * The Enumeration <code>TOKENS</code> represents types of query statements.
  */
 public enum TOKENS {
+    /**
+     * Represents added relationship.
+     */
     ADDED_RELATIONSHIP,
+    /**
+     * Represents changed relationship status.
+     */
     CHANGED_RELATIONSHIP_STATUS,
+    /**
+     * Represents relationship characteristic.
+     */
     REL_CHARACTERISTIC,
+    /**
+     * Represents relationship status.
+     */
     REL_STATUS,
+    /**
+     * Represents added description.
+     */
     ADDED_DESCRIPTION,
+    /**
+     * Represents changed description status.
+     */
     CHANGED_DESCRIPTION_STATUS,
+    /**
+     * Represents description status.
+     */
     DESC_STATUS,
+    /**
+     * Represents changed concept definition.
+     */
     CHANGED_DEFINED;
 }

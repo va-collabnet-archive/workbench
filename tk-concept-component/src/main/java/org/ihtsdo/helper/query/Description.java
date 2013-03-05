@@ -19,8 +19,8 @@ import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 
 
 /**
- * Null clauses for difference report: any
- * @author aimeefurber
+ * The class <code>Description</code> represents query branches specific to descriptions. 
+ * If no clauses are specified, the difference report returns any that meet the Description clause.
  */
 public class Description implements Branch{
     private Clause[] clauses;
@@ -33,6 +33,13 @@ public class Description implements Branch{
         
     }
 
+    /**
+     * Creates a query branch asking for descriptions which have been added.
+     * @param trueStatement set to <code>false</code> if using negation, <code>true</code> otherwise
+     * @param v1 the <code>ViewCoordinate<code> representing the first position
+     * @param v2 the <code>ViewCoordinate<code> representing the second position
+     * @return returns a branch representing the specified query
+     */
     public static Description added(Boolean trueStatement, 
             ViewCoordinate v1, ViewCoordinate v2) {
         Description r = new Description();
@@ -43,6 +50,14 @@ public class Description implements Branch{
         return r;
     }
     
+    /**
+     * Creates a query branch asking for descriptions which have been added.
+     * @param trueStatement set to <code>false</code> if using negation, <code>true</code> otherwise
+     * @param v1 the <code>ViewCoordinate<code> representing the first position
+     * @param v2 the <code>ViewCoordinate<code> representing the second position
+     * @param clauses one or more clauses to further filter the query
+     * @return returns a branch representing the specified query
+     */
     public static Description added(Boolean trueStatement, 
             ViewCoordinate v1, ViewCoordinate v2,
             Clause... clauses) {
@@ -55,6 +70,14 @@ public class Description implements Branch{
         return r;
     }
 
+    /**
+     * Creates a query branch asking for descriptions which have been modified. 
+     * E.g. the description status has changed from Active to Inactive.
+     * @param trueStatement set to <code>false</code> if using negation, <code>true</code> otherwise
+     * @param v1 the <code>ViewCoordinate<code> representing the first position
+     * @param v2 the <code>ViewCoordinate<code> representing the second position
+     * @return returns a branch representing the specified query
+     */
     public static Description changed(Boolean trueStatement,
             ViewCoordinate v1, ViewCoordinate v2) {
         Description r = new Description();
@@ -65,6 +88,15 @@ public class Description implements Branch{
         return r;
     }
     
+    /**
+     * Creates a query branch asking for descriptions which have been modified. 
+     * E.g. the description status has changed from Active to Inactive.
+     * @param trueStatement set to <code>false</code> if using negation, <code>true</code> otherwise
+     * @param v1 the <code>ViewCoordinate<code> representing the first position
+     * @param v2 the <code>ViewCoordinate<code> representing the second position
+     * @param clauses one or more clauses to further filter the query
+     * @return returns a branch representing the specified query
+     */
     public static Description changed(Boolean trueStatement,
             ViewCoordinate v1, ViewCoordinate v2,
             Clause... clauses) {
@@ -77,22 +109,42 @@ public class Description implements Branch{
         return r;
     }
 
+    /**
+     * The clauses further specifying the query.
+     * @return and array of <code>Clauses</code> further specifying the query
+     */
     public Clause[] getClauses() {
         return clauses;
     }
 
+    /**
+     * Returns <code>true</code> if not using negation, otherwise <code>false</code>.
+     * @return <code>true</code> if not using negation, otherwise <code>false</code>
+     */
     public Boolean getTrueStatement() {
         return trueStatement;
     }
 
+    /**
+     *The token representing the type of description query.
+     * @return a <code>TOKEN</code> representing the type of description query
+     */
     public TOKENS getToken() {
         return token;
     }
 
+    /**
+     * Gets the <code>ViewCoordinate</code> of the first position.
+     * @return the <code>ViewCoordinate</code> of the first position
+     */
     public ViewCoordinate getV1() {
         return v1;
     }
 
+    /**
+     * Gets the <code>ViewCoordinate</code> of the second position.
+     * @return the <code>ViewCoordinate</code> of the second position
+     */
     public ViewCoordinate getV2() {
         return v2;
     }

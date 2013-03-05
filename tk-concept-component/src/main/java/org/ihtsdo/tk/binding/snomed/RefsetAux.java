@@ -65,16 +65,24 @@ public class RefsetAux {
     public static ConceptSpec DA_REFEX =
             new ConceptSpec("Danish language reference set (foundation metadata concept)",
             UUID.fromString("be446b41-0eda-3d36-84e4-ae196f05858b"));
-    
+    /**
+     * Represents the metadata refset: Commit record.
+     */
     public static ConceptSpec COMMIT_REFEX = 
             new ConceptSpec("Commit Record", UUID.fromString("ea34d82a-a645-337b-88f4-77740dd683b9"));
-    
+    /**
+     * Represents the metadata refset: Adjudication record.
+     */
     public static ConceptSpec ADJ_REFEX = 
             new ConceptSpec("Adjudication Record", UUID.fromString("dfe2c9dd-2da8-3980-879c-518c1a38907f"));
-    
+    /**
+     * Represents the metadata refset: History workflow refset.
+     */
     public static ConceptSpec WFHX_REFEX = 
             new ConceptSpec("history workflow refset", UUID.fromString("0b6f0e24-5fe2-3869-9342-c18008f53283"));
-    
+    /**
+     * Represents the refset metadata parent type: marked parent is-a type.
+     */
     public static ConceptSpec MARKED_PARENT_ISA =
             new ConceptSpec("marked parent is-a type",
             UUID.fromString("bb57ffef-ff51-3015-9b81-e37a1cf40acc"));

@@ -18,14 +18,24 @@ package org.ihtsdo.helper.query;
 import java.io.IOException;
 import java.util.ArrayList;
 import org.ihtsdo.tk.api.NidBitSetBI;
+import org.ihtsdo.tk.api.TerminologyStoreDI;
 
 /**
- *
- * @author aimeefurber
+ * The interface <code>QueryBuilderBI</code> represents methods for getting results
+ * from one or more <code>Queries</code>. Use TerminologyStoreDI.getQueryBuilder method
+ * to get a <code>QueryBuilderBI</code> object.
+ * @see TerminologyStoreDI
  */
 public interface QueryBuilderBI {
     
-    
+    /**
+     * Gets a list of result concept nids that meet the specified queries. The list of result sets are ordered to 
+     * according to the order of the queries.
+     * @param queries one or more <code>Queries</code> to find results for
+     * @return an <code>ArrayList</code> of result sets containing the matching concept nids
+     * @throws IOException signals that an I/O exception has occurred
+     * @throws Exception indicates an exception has occurred
+     */
     public ArrayList<NidBitSetBI> getResults(Query... queries) throws IOException, Exception;
     
 }

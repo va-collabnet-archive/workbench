@@ -16,8 +16,8 @@
 package org.ihtsdo.helper.query;
 
 /**
- * Implicit AND between branches and statements.
- * @author aimeefurber
+ * The interface <code>Statement</code> represents a generic query statement. 
+ * There is an implicit AND between branches and statements.
  */
 public abstract interface Statement {
 

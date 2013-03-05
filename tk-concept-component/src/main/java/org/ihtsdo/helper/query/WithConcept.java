@@ -18,8 +18,8 @@ package org.ihtsdo.helper.query;
 import org.ihtsdo.tk.spec.ConceptSpec;
 
 /**
- *
- * @author aimeefurber
+ * The class <code>WithConcept</code> represents concept type query statements. 
+ * These can be used to refine a clause of a query.
  */
 public class WithConcept implements Statement {
     private StatementPart s;
@@ -27,6 +27,13 @@ public class WithConcept implements Statement {
         
     }
 
+    /**
+     * Creates a concept statement for refining a query by a type of concept status.
+     * @param trueStatement set to <code>false</code> if using negation, <code>true</code> otherwise
+     * @param subsumption the <code>Subsumption</code> being used
+     * @param status the <code>ConceptSpec</code> representing the desired concept status
+     * @return the concept statement representing the desired status
+     */
     public static WithConcept status(Boolean trueStatement,
             Subsumption subsumption,
             ConceptSpec status){
@@ -39,6 +46,10 @@ public class WithConcept implements Statement {
         return d;
     }
 
+    /**
+     * Gets the statement part of the concept statement.
+     * @return the <code>StatementPart</code> representing the concept statement
+     */
     public StatementPart getStatementPart() {
         return s;
     }

@@ -16,12 +16,23 @@
 package org.ihtsdo.helper.query;
 
 /**
- *
- * @author aimeefurber
+ * The Euumeration <code>Subsumption</code> represents the different types of subsumption used in a query.
  */
 public enum Subsumption {
+    /**
+     *Represents "is".
+     */
     IS,
+    /**
+     *Represents "is kind of".
+     */
     IS_KIND_OF,
+    /**
+     *Represents "is child of".
+     */
     IS_CHILD_OF,
-    IS_DECENDANT_OF
+    /**
+     *Represents "is descendant of".
+     */
+    IS_DESCENDANT_OF
 }

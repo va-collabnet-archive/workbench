@@ -18,8 +18,7 @@ package org.ihtsdo.helper.query;
 import org.ihtsdo.tk.spec.ConceptSpec;
 
 /**
- *
- * @author aimeefurber
+ * The class <code>StatementPart</code> represents a query statement.
  */
 public class StatementPart {
     private Boolean trueStatement;
@@ -27,6 +26,13 @@ public class StatementPart {
     private Subsumption subsumption;
     private ConceptSpec concept;
     
+    /**
+     * Creates a statement part of a query.
+     * @param trueStatement set to <code>false</code> if using negation, <code>true</code> otherwise
+     * @param token the <code>TOKEN</code> representing the statement
+     * @param subsumption the <code>Subsumption</code> being used
+     * @param concept the <code>ConceptSpec</code> representing the concept in the statement
+     */
     public StatementPart(Boolean trueStatement,
             TOKENS token, 
             Subsumption subsumption, 
@@ -37,18 +43,34 @@ public class StatementPart {
         this.concept = concept;
     }
 
+    /**
+     * Gets a boolean representing if the statement is true  or using negation.
+     * @return <code>false</code> if using negation, <code>true</code> otherwise
+     */
     public Boolean getTrueStatement() {
         return trueStatement;
     }
 
+    /**
+     * Gets the <code>TOKEN</code> representing the statement.
+     * @return the <code>TOKEN</code> representing the statement
+     */
     public TOKENS getToken() {
         return token;
     }
 
+    /**
+     * Gets the <code>subsumption</code> used in the statement.
+     * @return the <code>subsumption</code> used in the statement
+     */
     public Subsumption getSubsumption() {
         return subsumption;
     }
 
+    /**
+     * Gets the concept used in the statement.
+     * @return the <code>ConceptSpec</code> representing the concept used in the statement.
+     */
     public ConceptSpec getConcept() {
         return concept;
     }

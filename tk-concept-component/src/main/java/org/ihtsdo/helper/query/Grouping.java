@@ -16,10 +16,15 @@
 package org.ihtsdo.helper.query;
 
 /**
- *
- * @author aimeefurber
+ * The enumeration Grouping represents the grouping type of a query clause.
  */
 public enum Grouping {
+    /**
+     * Represents an AND grouping.
+     */
     AND,
+    /**
+     * Represents an OR grouping.
+     */
     OR
 }

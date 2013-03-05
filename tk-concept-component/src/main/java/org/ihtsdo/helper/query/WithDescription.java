@@ -18,8 +18,8 @@ package org.ihtsdo.helper.query;
 import org.ihtsdo.tk.spec.ConceptSpec;
 
 /**
- *
- * @author aimeefurber
+ * The class <code>WithDescription</code> represents description type query statements. 
+ * These can be used to refine a clause of a query.
  */
 public class WithDescription implements Statement {
     private StatementPart s;
@@ -27,6 +27,13 @@ public class WithDescription implements Statement {
         
     }
 
+    /**
+     * Creates a description statement for refining a query by a type of description status.
+     * @param trueStatement set to <code>false</code> if using negation, <code>true</code> otherwise
+     * @param subsumption the <code>Subsumption</code> being used
+     * @param status the <code>ConceptSpec</code> representing the desired description status
+     * @return the description statement representing the desired status
+     */
     public static WithDescription status(Boolean trueStatement,
             Subsumption subsumption,
             ConceptSpec status){
@@ -39,6 +46,10 @@ public class WithDescription implements Statement {
         return d;
     }
 
+    /**
+     * Gets the statement part of the description statement.
+     * @return the <code>StatementPart</code> representing the description statement
+     */
     public StatementPart getStatementPart() {
         return s;
     }

@@ -19,8 +19,7 @@ import java.util.ArrayList;
 
 
 /**
- *
- * @author aimeefurber
+ * The class <code>Query</code> represents a Query. 
  */
 public class Query implements Branch{
     private Branch[] branches;
@@ -30,6 +29,11 @@ public class Query implements Branch{
         
     }
     
+    /**
+     * Creates a query with a top level OR grouping.
+     * @param branches the branches of the query
+     * @return a query with the specified grouping and branches
+     */
     public static Query or(Branch... branches){
         Query q = new Query();
         q.grouping = Grouping.OR;
@@ -37,6 +41,11 @@ public class Query implements Branch{
         return q;
     }
     
+    /**
+     * Creates a query with a top level AND grouping.
+     * @param branches the branches of the query
+     * @return a query with the specified grouping and branches
+     */
     public static Query and(Branch... branches){
         Query q = new Query();
         q.grouping = Grouping.AND;
@@ -44,10 +53,18 @@ public class Query implements Branch{
         return q;
     }
 
+    /**
+     * Gets the branches contained in the query.
+     * @return the branches contained in the query
+     */
     public Branch[] getBranches() {
         return branches;
     }
 
+    /**
+     * Gets the grouping type of the clause. OR or AND.
+     * @return the grouping type of the clause
+     */
     public Grouping getGrouping() {
         return grouping;
     }

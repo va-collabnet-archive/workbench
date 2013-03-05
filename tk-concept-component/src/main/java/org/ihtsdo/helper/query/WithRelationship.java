@@ -18,8 +18,8 @@ package org.ihtsdo.helper.query;
 import org.ihtsdo.tk.spec.ConceptSpec;
 
 /**
- *
- * @author aimeefurber
+ * The class <code>WithConcept</code> represents relationship type query statements. 
+ * These can be used to refine a clause of a query.
  */
 public class WithRelationship implements Statement {
     private StatementPart s;
@@ -27,6 +27,13 @@ public class WithRelationship implements Statement {
         
     }
 
+    /**
+     * Creates a relationship statement for refining a query by a type of relationship characteristic.
+     * @param trueStatement set to <code>false</code> if using negation, <code>true</code> otherwise
+     * @param subsumption the <code>Subsumption</code> being used
+     * @param characteristic the <code>ConceptSpec</code> representing the desired relationship characteristic
+     * @return the concept statement representing the desired status
+     */
     public static WithRelationship characteristic(
             Boolean trueStatement,
             Subsumption subsumption,
@@ -40,6 +47,13 @@ public class WithRelationship implements Statement {
         return r;
     }
 
+    /**
+     * Creates a relationship statement for refining a query by a type of relationship status.
+     * @param trueStatement set to <code>false</code> if using negation, <code>true</code> otherwise
+     * @param subsumption the <code>Subsumption</code> being used
+     * @param status the <code>ConceptSpec</code> representing the desired relationship status
+     * @return the concept statement representing the desired status
+     */
     public static WithRelationship status(Boolean trueStatement,
             Subsumption subsumption,
             ConceptSpec status){
@@ -52,6 +66,10 @@ public class WithRelationship implements Statement {
         return r;
     }
 
+    /**
+     * Gets the statement part of the relationship statement.
+     * @return the <code>StatementPart</code> representing the relationship statement
+     */
     public StatementPart getStatementPart() {
         return s;
     }
