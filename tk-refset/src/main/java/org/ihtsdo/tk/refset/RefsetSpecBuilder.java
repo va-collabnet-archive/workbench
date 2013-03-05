@@ -420,7 +420,7 @@ public class RefsetSpecBuilder implements QueryBuilderBI{
             }else if(t.equals(TOKENS.DESC_STATUS)){
                 tokenNid = QUERY_TOKENS.DESC_STATUS_IS_CHILD_OF.nid;
             }
-        }else if(s != null && s.equals(Subsumption.IS_DECENDANT_OF)){
+        }else if(s != null && s.equals(Subsumption.IS_DESCENDANT_OF)){
             if(t.equals(TOKENS.REL_CHARACTERISTIC)){
                 tokenNid = QUERY_TOKENS.REL_CHARACTERISTIC_IS_DESCENDENT_OF.nid;
             }else if(t.equals(TOKENS.REL_STATUS)){
