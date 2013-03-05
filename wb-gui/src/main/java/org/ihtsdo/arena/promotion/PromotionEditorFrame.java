@@ -282,9 +282,9 @@ public class PromotionEditorFrame extends ComponentFrame implements PropertyChan
         // Setup Concept List
         JScrollPane conceptList = new JScrollPane(promotionConceptTable);
         // Setup conceptListPanel
-        JSplitPane conceptListPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, resultsLabel, conceptList);
-
+        JSplitPane conceptListPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, conceptList, resultsLabel);
         conceptListPane.setDividerSize(3);
+        conceptListPane.setDividerLocation(310);
         conceptListPane.setEnabled(false);
 
         return conceptListPane;
