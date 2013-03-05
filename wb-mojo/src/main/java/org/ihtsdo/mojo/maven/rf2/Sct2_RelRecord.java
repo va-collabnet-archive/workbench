@@ -114,7 +114,7 @@ class Sct2_RelRecord implements Comparable<Sct2_RelRecord>, Serializable {
             throws ParseException, MojoFailureException {
         ArrayList<Sct2_RelRecord> addedRecords = new ArrayList<>();
         Rf2_RefsetCRecord zeroB = new Rf2_RefsetCRecord("ZERO", "2000-01-01 00:00:00", false,
-                null, Long.MAX_VALUE, Long.MAX_VALUE, Long.MAX_VALUE, null);
+                null, Long.MAX_VALUE, Long.MAX_VALUE, Long.MAX_VALUE);
 
         Arrays.sort(a);
         Arrays.sort(b);
@@ -412,6 +412,10 @@ class Sct2_RelRecord implements Comparable<Sct2_RelRecord>, Serializable {
         writer.append(this.moduleUuidStr + LINE_TERMINATOR);
     }
 
+    public void setPath(String pathStr) {
+    	this.pathUuidStr = pathStr;
+    }
+    
     @Override
     public int compareTo(Sct2_RelRecord t) {
         if (this.relSnoId < t.relSnoId) {

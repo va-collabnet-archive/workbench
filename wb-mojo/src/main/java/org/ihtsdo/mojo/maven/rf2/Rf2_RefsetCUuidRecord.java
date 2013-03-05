@@ -212,4 +212,8 @@ public class Rf2_RefsetCUuidRecord implements Comparable<Rf2_RefsetCUuidRecord> 
         }
         return 0; // instance == received
     }
+    
+    public void setPath(String pathStr) {
+    	this.pathUuidStr = pathStr;
+    }
 }

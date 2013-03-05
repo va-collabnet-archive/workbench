@@ -1,5 +1,6 @@
-/*
- * Copyright 2011 International Health Terminology Standards Development Organisation.
+/**
+ * Copyright (c) 2012 International Health Terminology Standards Development
+ * Organisation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +27,7 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
-
+import org.ihtsdo.mojo.mojo.ConceptDescriptor;
 /**
  * @author Marc E. Campbell
  *
@@ -70,6 +71,14 @@ public class SctRf2ToArfMojo extends AbstractMojo implements Serializable {
      * @parameter default-value="generated-arf"
      */
     private String outputDir;
+    
+    /**
+     * Path on which to load data. Defaults to SNOMED Core.
+     *
+     * @parameter 
+     */
+    private ConceptDescriptor pathConcept = new ConceptDescriptor("8c230474-9f11-30ce-9cad-185a96fd03a2","SNOMED Core");
+    
     /**
      * Path to import concepts on. Defaults to SNOMED Core.
      * @parameter default-value="8c230474-9f11-30ce-9cad-185a96fd03a2"
@@ -88,6 +97,19 @@ public class SctRf2ToArfMojo extends AbstractMojo implements Serializable {
         getLog().info("    POM Target Directory: " + targetDirectory.getAbsolutePath());
         getLog().info("    POM Target Sub Directory: " + targetSubDir);
         getLog().info("    POM Target Sub Data Directory: " + inputDir);
+
+        String pathStr = null;
+        try {
+        	pathStr = pathConcept.getUuid();
+        	// If either pathUuid is not the default and pathStr is, override with pathUuid
+        	if (!pathUuid.equals("8c230474-9f11-30ce-9cad-185a96fd03a2") &&
+        			pathStr.equals("8c230474-9f11-30ce-9cad-185a96fd03a2"))
+        		pathStr = pathUuid;
+        } catch (RuntimeException e) {
+        	getLog().error("Poorly configured path concept, at least one UUID must be specified", e);
+        	throw e;
+        }
+        getLog().info("    Path UUID: " + pathStr);
 
         try {
             Rf2x.setupIdCache(targetDirectory.getAbsolutePath());
@@ -114,7 +136,7 @@ public class SctRf2ToArfMojo extends AbstractMojo implements Serializable {
             ArrayList<Rf2_RefsetCRecord[]> rf2_RefsetCRecordArray = new ArrayList<>();
             int arrayCont = 0;
             for (Rf2File rf2File : filesInStatus) {
-                rf2_RefsetCRecordArray.add(Rf2_RefsetCRecord.parseRefset(rf2File, null, pathUuid));
+                rf2_RefsetCRecordArray.add(Rf2_RefsetCRecord.parseRefset(rf2File, null));
             }
             for (Rf2_RefsetCRecord[] rf2_RefsetCRecordTmp : rf2_RefsetCRecordArray) {
                 arrayCont += rf2_RefsetCRecordTmp.length;
@@ -138,9 +160,10 @@ public class SctRf2ToArfMojo extends AbstractMojo implements Serializable {
             filesIn = Rf2File.getFiles(wDir, targetSubDir, inputDir, "sct2_Concept", ".txt");
             for (Rf2File rf2File : filesIn) {
                 getLog().info("    ... " + rf2File.file.getName());
-                Sct2_ConRecord[] concepts = Sct2_ConRecord.parseConcepts(rf2File, pathUuid);
+                Sct2_ConRecord[] concepts = Sct2_ConRecord.parseConcepts(rf2File, pathStr);
                 concepts = Sct2_ConRecord.attachStatus(concepts, statusRecords);
                 for (Sct2_ConRecord c : concepts) {
+                    c.setPath(pathStr);
                     c.writeArf(bw);
                     if (Rf2x.isSctIdInUuidCache(c.conSnoIdL) == false) {
                         writeSctSnomedLongId(bwIds, c.conSnoIdL, c.effDateStr, c.pathUuidStr,
@@ -158,9 +181,10 @@ public class SctRf2ToArfMojo extends AbstractMojo implements Serializable {
             filesIn = Rf2File.getFiles(wDir, targetSubDir, inputDir, "sct2_Description", ".txt");
             for (Rf2File rf2File : filesIn) {
                 getLog().info("    ... " + rf2File.file.getName());
-                Sct2_DesRecord[] descriptions = Sct2_DesRecord.parseDescriptions(rf2File, pathUuid);
+                Sct2_DesRecord[] descriptions = Sct2_DesRecord.parseDescriptions(rf2File, pathStr);
                 descriptions = Sct2_DesRecord.attachStatus(descriptions, statusRecords);
                 for (Sct2_DesRecord d : descriptions) {
+                	d.setPath(pathStr);
                     d.writeArf(bw);
                     if (Rf2x.isSctIdInUuidCache(d.desSnoIdL) == false) {
                         writeSctSnomedLongId(bwIds, d.desSnoIdL, d.effDateStr, d.pathUuidStr,
@@ -179,9 +203,10 @@ public class SctRf2ToArfMojo extends AbstractMojo implements Serializable {
             filesIn.addAll(Rf2File.getFiles(wDir, targetSubDir, inputDir, "res2_RetiredIsaRelationship", ".txt"));
             for (Rf2File rf2File : filesIn) {
                 getLog().info("    ... " + rf2File.file.getName());
-                Sct2_RelRecord[] rels = Sct2_RelRecord.parseRelationships(rf2File, true, pathUuid);
+                Sct2_RelRecord[] rels = Sct2_RelRecord.parseRelationships(rf2File, true, pathStr);
                 rels = Sct2_RelRecord.attachStatus(rels, statusRecords);
                 for (Sct2_RelRecord r : rels) {
+                	r.setPath(pathStr);
                     r.writeArf(bw);
                     if (Rf2x.isSctIdInUuidCache(r.relSnoId) == false) {
                         writeSctSnomedLongId(bwIds, r.relSnoId, r.effDateStr, r.pathUuidStr,
@@ -194,8 +219,9 @@ public class SctRf2ToArfMojo extends AbstractMojo implements Serializable {
             filesIn.addAll(Rf2File.getFiles(wDir, targetSubDir, inputDir, "res2_RetiredStatedIsaRelationship", ".txt"));
             for (Rf2File rf2File : filesIn) {
                 getLog().info("    ... " + rf2File.file.getName());
-                Sct2_RelRecord[] rels = Sct2_RelRecord.parseRelationships(rf2File, false, pathUuid);
+                Sct2_RelRecord[] rels = Sct2_RelRecord.parseRelationships(rf2File, false, pathStr);
                 for (Sct2_RelRecord r : rels) {
+                	r.setPath(pathStr);
                     r.writeArf(bw);
                     if (Rf2x.isSctIdInUuidCache(r.relSnoId) == false) {
                         writeSctSnomedLongId(bwIds, r.relSnoId, r.effDateStr, r.pathUuidStr,

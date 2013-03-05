@@ -25,7 +25,7 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
-
+import org.ihtsdo.mojo.mojo.ConceptDescriptor;
 /**
  * @author Marc E. Campbell
  *
@@ -73,10 +73,12 @@ public class SctRf2RefsetCToArfMojo extends AbstractMojo implements Serializable
      */
     private String[] filters;
     /**
-     * Path to import concepts on. Defaults to SNOMED Core.
-     * @parameter default-value="8c230474-9f11-30ce-9cad-185a96fd03a2"
+     * Path on which to load data. Defaults to SNOMED Core.
+     *
+     * @parameter 
      */
-    private String pathUuid;
+    private ConceptDescriptor pathConcept = new ConceptDescriptor("8c230474-9f11-30ce-9cad-185a96fd03a2","SNOMED Core");
+    
     String uuidSourceSnomedLongStr;
     String uuidPathStr;
 
@@ -91,6 +93,15 @@ public class SctRf2RefsetCToArfMojo extends AbstractMojo implements Serializable
         getLog().info("    POM Target Sub Directory: " + targetSubDir);
         getLog().info("    POM Target Sub Data Directory: " + inputDir);
 
+        String pathStr = null;
+        try {
+        	pathStr = pathConcept.getUuid();
+        } catch (RuntimeException e) {
+        	getLog().error("Poorly configured path concept, at least one UUID must be specified", e);
+        	throw e;
+        }
+        getLog().info("    Path UUID: " + pathStr);
+        
         try {
             // SETUP CONSTANTS
             uuidSourceSnomedLongStr =
@@ -120,8 +131,9 @@ public class SctRf2RefsetCToArfMojo extends AbstractMojo implements Serializable
             getLog().info("::: CONCEPT REFSET FILE: " + outDir + "concept_refsetc_rf2.refset");
             filesIn = Rf2File.getFiles(wDir, targetSubDir, inputDir, inputFile, ".txt");
             for (Rf2File rf2File : filesIn) {
-                Rf2_RefsetCRecord[] members = Rf2_RefsetCRecord.parseRefset(rf2File, exclusions, pathUuid);
+                Rf2_RefsetCRecord[] members = Rf2_RefsetCRecord.parseRefset(rf2File, exclusions);
                 for (Rf2_RefsetCRecord m : members) {
+                	m.setPath(pathStr);
                     m.writeArf(bw);
                 }
             }

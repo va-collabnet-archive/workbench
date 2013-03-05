@@ -179,4 +179,8 @@ public class Rf2_CrossmapRecord {
         // Module UUID String
         writer.append(this.moduleUuidStr + LINE_TERMINATOR);
     }
+    
+    public void setPath(String pathStr) {
+    	this.pathUuidStr = pathStr;
+    }
 }

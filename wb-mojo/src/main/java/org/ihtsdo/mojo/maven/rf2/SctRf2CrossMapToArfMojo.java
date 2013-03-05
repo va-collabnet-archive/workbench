@@ -31,7 +31,7 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
-
+import org.ihtsdo.mojo.mojo.ConceptDescriptor;
 /**
  *
  * @author marc
@@ -70,6 +70,13 @@ public class SctRf2CrossMapToArfMojo extends AbstractMojo implements Serializabl
      */
     private String outputDir;
 
+    /**
+     * Path on which to load data. Defaults to SNOMED Core.
+     *
+     * @parameter 
+     */
+    private ConceptDescriptor pathConcept = new ConceptDescriptor("8c230474-9f11-30ce-9cad-185a96fd03a2","SNOMED Core");
+    
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         BufferedWriter bwIds;
@@ -81,6 +88,16 @@ public class SctRf2CrossMapToArfMojo extends AbstractMojo implements Serializabl
         getLog().info("    POM Target Sub Directory: " + targetSubDir);
         getLog().info("    POM Target Sub Data Directory: " + inputDir);
 
+        
+        String pathStr = null;
+        try {
+        	pathStr = pathConcept.getUuid();
+        } catch (RuntimeException e) {
+        	getLog().error("Poorly configured path concept, at least one UUID must be specified", e);
+        	throw e;
+        }
+        getLog().info("    Path UUID: " + pathStr);
+        
         try {
             Rf2x.setupIdCache(targetDirectory.getAbsolutePath());
 
@@ -120,6 +137,7 @@ public class SctRf2CrossMapToArfMojo extends AbstractMojo implements Serializabl
             for (Rf2File rf2File : filesIn) {
                 Rf2_CrossmapRecord[] members = Rf2_CrossmapRecord.parseCrossmapFile(rf2File);
                 for (Rf2_CrossmapRecord m : members) {
+                	m.setPath(pathStr);
                     // 446608001 ICD-O
                     // 900000000000498005 SNOMED RT
                     // 900000000000497000 CTV3
