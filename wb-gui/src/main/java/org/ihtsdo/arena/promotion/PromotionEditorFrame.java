@@ -17,7 +17,6 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.IOException;
-import java.rmi.MarshalledObject;
 import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -33,7 +32,6 @@ import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.table.TableModel;
 
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_ConfigAceFrame;
@@ -42,7 +40,6 @@ import org.dwfa.ace.api.I_HostConceptPlugins.HOST_ENUM;
 import org.dwfa.ace.api.I_HostConceptPlugins.LINK_TYPE;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.classifier.SnoRocketTabPanel;
-import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.ace.gui.concept.ConceptPanel;
 import org.dwfa.ace.list.PromotionTerminologyTable;
@@ -50,12 +47,10 @@ import org.dwfa.ace.list.PromotionTerminologyTableModel;
 import org.dwfa.ace.list.TerminologyList;
 import org.dwfa.ace.list.TerminologyListModel;
 import org.dwfa.ace.log.AceLog;
-import org.dwfa.ace.task.WorkerAttachmentKeys;
 import org.dwfa.ace.task.classify.SnorocketExTask;
 import org.dwfa.bpa.util.ComponentFrame;
 import org.dwfa.bpa.util.OpenFramesWindowListener;
 import org.dwfa.cement.ArchitectonicAuxiliary;
-import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.id.Type5UuidFactory;
 import org.ihtsdo.arena.Arena;
@@ -75,8 +70,6 @@ import org.ihtsdo.tk.api.NidBitSetBI;
 import org.ihtsdo.tk.api.NidBitSetItrBI;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
-import org.ihtsdo.tk.api.PositionSet;
-import org.ihtsdo.tk.api.PositionSetBI;
 import org.ihtsdo.tk.api.TerminologyBuilderBI;
 import org.ihtsdo.tk.api.blueprint.ConceptCB;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
@@ -90,11 +83,9 @@ import org.ihtsdo.tk.api.refex.type_nid.RefexNidVersionBI;
 import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 import org.ihtsdo.tk.binding.snomed.RefsetAux;
-import org.ihtsdo.tk.binding.snomed.Snomed;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 import org.ihtsdo.tk.binding.snomed.TermAux;
 import org.ihtsdo.tk.dto.concept.component.refex.TK_REFEX_TYPE;
-import org.ihtsdo.tk.spec.ConceptSpec;
 
 /**
  *
@@ -108,6 +99,7 @@ public class PromotionEditorFrame extends ComponentFrame implements PropertyChan
     private static final Color paneColor = Color.gray;
     protected JMenu promotionMenu;
     private I_ConfigAceFrame mergeConfig = null;
+    private I_ConfigAceFrame origConfig = null;
     private I_ConfigAceFrame sourceConfig = null;
     private I_ConfigAceFrame targetConfig = null;
     private JSplitPane topSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
@@ -133,6 +125,7 @@ public class PromotionEditorFrame extends ComponentFrame implements PropertyChan
             PathBI sourcePath, PathBI targetPath, PathBI mergePath) throws Exception {
         super(new String[]{}, null);
         batchConceptList = null;
+        this.origConfig = origConfig;
         // Set the title for the frame
         setTitle(getNextFrameName());
         
@@ -144,6 +137,10 @@ public class PromotionEditorFrame extends ComponentFrame implements PropertyChan
         this.targetConfig = new PromotionTargetConfig(this, origConfig, targetPos);
         if(mergePath == null){
             mergePath = createMergePath(sourcePath, origConfig);
+            //run classifier before opening window
+            SnorocketExTask classifier = new SnorocketExTask();
+            classifier.runClassifier(this.origConfig);
+            classifier.commitClassification();
         }
         mergePathConcept = Ts.get().getConcept(mergePath.getConceptNid());
         PositionBI mergePos = Ts.get().newPosition(mergePath,
@@ -503,13 +500,16 @@ public class PromotionEditorFrame extends ComponentFrame implements PropertyChan
         @Override
         public void actionPerformed(ActionEvent e) {
             try {
+                PromotionTerminologyTableModel model = (PromotionTerminologyTableModel) promotionConceptTable.getModel();
+                //clear old first?
+                allChange.clear();
                 frame.query();
                 
-                PromotionTerminologyTableModel model = (PromotionTerminologyTableModel) promotionConceptTable.getModel();
                 model.setChangedDesc(descChange);
                 model.setChangedInferred(infChange);
                 model.setChangedStated(statedChange);
                 TerminologyListModel listModel = (TerminologyListModel) batchConceptList.getModel();
+                listModel.clear();
                 NidBitSetItrBI allItr = allChange.iterator();
                 HashMap<Integer, Color> diffColor = new HashMap<>();
                 Random random = new Random();
@@ -564,10 +564,19 @@ public class PromotionEditorFrame extends ComponentFrame implements PropertyChan
             try {
                 frame.promote(allChange, true);
                 
+                //run classifier
+                SnorocketExTask classifier = new SnorocketExTask();
+                classifier.runClassifier(origConfig);
+                classifier.commitClassification();
+                SnorocketExTask classifierMerge = new SnorocketExTask();
+                classifierMerge.runClassifier(mergeConfig);
+                classifierMerge.commitClassification();
+                
                 TerminologyBuilderBI builder = Ts.get().getTerminologyBuilder(mergeConfig.getEditCoordinate(), mergeVc);
                 for(RefexVersionBI m : mergePathConcept.getRefsetMembersActive(mergeVc)){
                     RefexNidVersionBI member = (RefexNidVersionBI) m;
-                    if (member.getNid1() == TermAux.PROMOTE.getLenient().getConceptNid()) {
+                    if (member.getNid1() == TermAux.PROMOTE.getLenient().getConceptNid() ||
+                            member.getNid1() == TermAux.UNREVIEWED.getLenient().getConceptNid()) {
                         RefexCAB memberBp = member.makeBlueprint(mergeVc);
                         memberBp.put(RefexCAB.RefexProperty.CNID1, TermAux.PROMOTED.getLenient().getConceptNid());
                         memberBp.setMemberUuid(member.getPrimUuid());
@@ -606,10 +615,19 @@ public class PromotionEditorFrame extends ComponentFrame implements PropertyChan
                 promotionNids.andNot(infChange);
                 frame.promote(promotionNids, false);
                 
+                //run classifier
+                SnorocketExTask classifier = new SnorocketExTask();
+                classifier.runClassifier(origConfig);
+                classifier.commitClassification();
+                SnorocketExTask classifierMerge = new SnorocketExTask();
+                classifierMerge.runClassifier(mergeConfig);
+                classifierMerge.commitClassification();
+                
                 TerminologyBuilderBI builder = Ts.get().getTerminologyBuilder(mergeConfig.getEditCoordinate(), mergeVc);
                 for(RefexVersionBI m : mergePathConcept.getRefsetMembersActive(mergeVc)){
                     RefexNidVersionBI member = (RefexNidVersionBI) m;
-                    if (member.getNid1() == TermAux.PROMOTE.getLenient().getConceptNid()) {
+                    if (member.getNid1() == TermAux.PROMOTE.getLenient().getConceptNid()||
+                            member.getNid1() == TermAux.UNREVIEWED.getLenient().getConceptNid()) {
                         RefexCAB memberBp = member.makeBlueprint(mergeVc);
                         memberBp.put(RefexCAB.RefexProperty.CNID1, TermAux.PROMOTED.getLenient().getConceptNid());
                         memberBp.setMemberUuid(member.getPrimUuid());
@@ -660,6 +678,15 @@ public class PromotionEditorFrame extends ComponentFrame implements PropertyChan
                 Ts.get().addUncommitted(mergePathConcept);
                 Ts.get().commit(mergePathConcept);
                 frame.promote(nidsToPromote, false);
+                
+                //run classifier
+                SnorocketExTask classifier = new SnorocketExTask();
+                classifier.runClassifier(origConfig);
+                classifier.commitClassification();
+                SnorocketExTask classifierMerge = new SnorocketExTask();
+                classifierMerge.runClassifier(mergeConfig);
+                classifierMerge.commitClassification();
+                
                 PromotionTerminologyTableModel model = (PromotionTerminologyTableModel) promotionConceptTable.getModel();
                 model.fireTableDataChanged();
             } catch (IOException ex) {
@@ -702,6 +729,15 @@ public class PromotionEditorFrame extends ComponentFrame implements PropertyChan
                 Ts.get().addUncommitted(mergePathConcept);
                 Ts.get().commit(mergePathConcept);
                 frame.promote(nidsToPromote, false);
+                
+                //run classifier
+                SnorocketExTask classifier = new SnorocketExTask();
+                classifier.runClassifier(origConfig);
+                classifier.commitClassification();
+                SnorocketExTask classifierMerge = new SnorocketExTask();
+                classifierMerge.runClassifier(mergeConfig);
+                classifierMerge.commitClassification();
+                
                 PromotionTerminologyTableModel model = (PromotionTerminologyTableModel) promotionConceptTable.getModel();
                 model.fireTableDataChanged();
             } catch (IOException ex) {
