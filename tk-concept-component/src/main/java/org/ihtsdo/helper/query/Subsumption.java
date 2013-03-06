@@ -16,7 +16,7 @@
 package org.ihtsdo.helper.query;
 
 /**
- * The Euumeration <code>Subsumption</code> represents the different types of subsumption used in a query.
+ * The Enumeration <code>Subsumption</code> represents the different types of subsumption used in a query.
  */
 public enum Subsumption {
     /**
