@@ -37,7 +37,6 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.jar.JarEntry;
@@ -147,45 +146,9 @@ public class ExportAnnotatedBeans extends AbstractMojo implements ExceptionListe
      */
     private File targetDirectory;
 
-    private Set<String> beanNamesToSkip = new HashSet<>();
-
     public ExportAnnotatedBeans() {
         super();
         
-        // Skip these files, which cannot be de-serialized post-Jini
-        // because they have fields of type org.dwfa.jini.TermEntry.
-        // A java.io.InvalidClassException will be thrown with 
-        // message "class invalid for de-serialization".
-        beanNamesToSkip.add("org.dwfa.ace.task.ebr.CountExtensionsInRefset.task");
-        beanNamesToSkip.add("org.dwfa.ace.task.path.NewEditPathForUser.task");
-        beanNamesToSkip.add("org.dwfa.ace.task.path.NewPath.task");
-        beanNamesToSkip.add("org.dwfa.ace.task.path.SetEditPath.task");
-        beanNamesToSkip.add("org.dwfa.ace.task.path.SetEditPathForProfile.task");
-        beanNamesToSkip.add("org.dwfa.ace.task.profile.AddRootToProfile.task");
-        beanNamesToSkip.add("org.dwfa.ace.task.profile.EditPopupAdd.task");
-        beanNamesToSkip.add("org.dwfa.ace.task.profile.EditSetDefault.task");
-        beanNamesToSkip.add("org.dwfa.ace.task.prop.SetPropertyToTermEntry.task");
-        beanNamesToSkip.add("org.dwfa.ace.task.prop.SetSingleUuidPropertyFromTermEntry.task");
-        beanNamesToSkip.add("org.dwfa.ace.task.prop.SetUuidPropertyFromTermEntry.task");
-        beanNamesToSkip.add("org.dwfa.ace.task.refset.grouping.GetNewRefsetGroupingPanelDataTask.task");
-        beanNamesToSkip.add("org.dwfa.ace.task.refset.members.AddConceptInArenaToRefset.task");
-        beanNamesToSkip.add("org.dwfa.ace.task.refset.members.RemoveConceptInArenaFromRefset.task");
-        beanNamesToSkip.add("org.dwfa.ace.task.refset.spec.create.GetDataFromCreateRefsetPanel.task");
-        beanNamesToSkip.add("org.dwfa.ace.task.refset.spec.CreateRefsetMetaDataTask.task");
-        beanNamesToSkip.add("org.dwfa.ace.task.refset.spec.importexport.ExportRefsetSpecForManualReviewTask.task");
-        beanNamesToSkip.add("org.dwfa.ace.task.refset.spec.status.UpdateRefsetSpecStatusTask.task");
-        beanNamesToSkip.add("org.dwfa.ace.task.rel.CreateRelationship.task");
-        beanNamesToSkip.add("org.dwfa.ace.task.search.HasStatus.task");
-        beanNamesToSkip.add("org.dwfa.ace.task.search.IsKindOf.task");
-        beanNamesToSkip.add("org.dwfa.ace.task.search.refset.RefsetContainsConcept.task");
-        beanNamesToSkip.add("org.dwfa.ace.task.search.RefsetMatch.task");
-        beanNamesToSkip.add("org.dwfa.ace.task.search.RelSubsumptionMatch.task");
-        beanNamesToSkip.add("org.dwfa.ace.task.status.AddAllowedStatusToProfile.task");
-        beanNamesToSkip.add("org.dwfa.ace.task.status.ChangeRelsOfTypeToStatus.task");
-        beanNamesToSkip.add("org.dwfa.ace.task.status.ChangeRolesToStatus.task");
-        beanNamesToSkip.add("org.dwfa.ace.task.status.ChangeConceptStatus.task");
-        beanNamesToSkip.add("org.dwfa.ace.task.view.SetViewPosition.task");
-        beanNamesToSkip.add("org.ihtsdo.ace.task.workflow.search.PathWorkflowHistory.task");
     }
 
     @SuppressWarnings("unchecked")
@@ -382,21 +345,12 @@ public class ExportAnnotatedBeans extends AbstractMojo implements ExceptionListe
                     beanFile = new File(beanDir, s.beanName() + suffix);
                 }
 
-                if (beanNamesToSkip.contains(beanFile.getName())) {
-                    if (FAIL) {
-                        throw new UnsupportedOperationException("TODO: Remove Jini.");
-                    } else {
-                        getLog().info(" Skipping: " + beanFile.getName());
-                        return;
-                    } 
-                }
-                
                 getLog().info(" Writing: " + beanFile.getName());              
                 FileOutputStream fos = new FileOutputStream(beanFile);
                 BufferedOutputStream bos = new BufferedOutputStream(fos);
-                ObjectOutputStream oos = new ObjectOutputStream(bos);
-                oos.writeObject(obj);
-                oos.close();
+                try (ObjectOutputStream oos = new ObjectOutputStream(bos)) {
+                    oos.writeObject(obj);
+                }
             } catch (InstantiationException e) {
                 System.err.println("Processing: " + beanClass + " Spec: " + s + " resulted in: " + e.getLocalizedMessage());
             }
