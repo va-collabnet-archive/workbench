@@ -52,6 +52,7 @@ import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.project.filter.WfCompletionFilter;
+import org.ihtsdo.project.filter.WfCompletionFilter.CompletionOption;
 import org.ihtsdo.project.model.WorkList;
 import org.ihtsdo.project.util.IconUtilities;
 import org.ihtsdo.project.util.WorkflowSearcher;
@@ -781,9 +782,9 @@ public class InboxTreePanel extends JPanel {
 				cfg = LanguageUtil.getTranslationConfig(Terms.get().getActiveAceFrameConfig());
 				List<WfFilterBI> filters = new ArrayList<WfFilterBI>();
 				if(cfg.getCompletionMode() != null && cfg.getCompletionMode().equals(ConfigTranslationModule.CompletionMode.COMPLETE_INSTANCES)){
-					filters.add(new WfCompletionFilter(true));
+					filters.add(new WfCompletionFilter(CompletionOption.COMPLETE_INSTANCES));
 				}else if(cfg.getCompletionMode() == null || cfg.getCompletionMode().equals(ConfigTranslationModule.CompletionMode.INCOMPLETE_INSTACES)){
-					filters.add(new WfCompletionFilter(false));
+					filters.add(new WfCompletionFilter(CompletionOption.INCOMPLETE_INSTACES));
 				}
 				HashMap<Object, Integer> worklists = searcher.getCountByWorklistAndState(wfUser, filters);
 				Set<Object> worklistsAndStates = worklists.keySet();

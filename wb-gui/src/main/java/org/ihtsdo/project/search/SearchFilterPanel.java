@@ -14,6 +14,7 @@ import java.awt.event.ItemListener;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -33,7 +34,6 @@ import org.ihtsdo.project.filter.WfProjectFilter;
 import org.ihtsdo.project.filter.WfStateFilter;
 import org.ihtsdo.project.filter.WfWorklistFilter;
 import org.ihtsdo.project.model.I_TerminologyProject;
-import org.ihtsdo.project.model.TranslationProject;
 import org.ihtsdo.project.model.WorkList;
 import org.ihtsdo.project.model.WorkSet;
 import org.ihtsdo.project.workflow.model.WfState;
@@ -62,7 +62,7 @@ public class SearchFilterPanel extends JPanel {
 		filterTypeCombo.addItem("");
 		filterTypeCombo.addItem(new WfDestinationFilter());
 		filterTypeCombo.addItem(new WfWorklistFilter());
-		// TODO: finish implementation filterTypeCombo.addItem(new WfProjectFilter());
+		filterTypeCombo.addItem(new WfProjectFilter());
 		filterTypeCombo.addItem(new WfStateFilter());
 		filterTypeCombo.addItem(new WfCompletionFilter());
 	}
@@ -83,16 +83,12 @@ public class SearchFilterPanel extends JPanel {
 			return new WfWorklistFilter(((WorkList) filterCombo.getSelectedItem()).getUuid());
 		} else if (filterObject instanceof WfState) {
 			return new WfStateFilter((WfState) filterCombo.getSelectedItem());
+		} else if (filterObject instanceof I_TerminologyProject) {
+			UUID uid=((I_TerminologyProject) filterCombo.getSelectedItem()).getUids().iterator().next();
+			return new WfProjectFilter(uid);
 		} else if (filterObject instanceof CompletionOption) {
 			CompletionOption co = (CompletionOption) filterCombo.getSelectedItem();
-			if (co.equals(CompletionOption.COMPLETE_INSTANCES)) {
-				return new WfCompletionFilter(true);
-			} else if (co.equals(CompletionOption.INCOMPLETE_INSTACES)) {
-				return new WfCompletionFilter(false);
-			} else {
-				return null;
-			}
-
+			return new WfCompletionFilter(co);
 		} else {
 			return null;
 		}

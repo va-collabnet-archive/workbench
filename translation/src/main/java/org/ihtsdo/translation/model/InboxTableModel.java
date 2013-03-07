@@ -41,6 +41,7 @@ import org.ihtsdo.project.ContextualizedDescription;
 import org.ihtsdo.project.I_ContextualizeDescription;
 import org.ihtsdo.project.TerminologyProjectDAO;
 import org.ihtsdo.project.filter.WfCompletionFilter;
+import org.ihtsdo.project.filter.WfCompletionFilter.CompletionOption;
 import org.ihtsdo.project.model.I_TerminologyProject;
 import org.ihtsdo.project.model.I_TerminologyProject.Type;
 import org.ihtsdo.project.model.TranslationProject;
@@ -476,9 +477,9 @@ public class InboxTableModel extends DefaultTableModel {
 				cfg = LanguageUtil.getTranslationConfig(Terms.get().getActiveAceFrameConfig());
 				List<WfFilterBI> filters = new ArrayList<WfFilterBI>();
 				if (cfg.getCompletionMode().equals(ConfigTranslationModule.CompletionMode.COMPLETE_INSTANCES)) {
-					filters .add(new WfCompletionFilter(true));
+					filters .add(new WfCompletionFilter(CompletionOption.COMPLETE_INSTANCES));
 				} else if (cfg.getCompletionMode().equals(ConfigTranslationModule.CompletionMode.INCOMPLETE_INSTACES)) {
-					filters.add(new WfCompletionFilter(false));
+					filters.add(new WfCompletionFilter(CompletionOption.INCOMPLETE_INSTACES));
 				}
 				filters.addAll(filterList.values());
 				wfInstances = searcher.searchWfInstances(filters);

@@ -105,6 +105,20 @@ public interface WfProcessInstanceBI {
     LinkedList<WfActivityInstanceBI> getActivityInstances() throws Exception;
     
     /** 
+     * Gets comments for instance
+     */
+    Collection<WfCommentBI> getComments();
+    
+    /** 
+     * Add comment for instance
+     */
+    void addComment(WfCommentBI comment);
+    
+    /** 
+     * Add a comment list for instance
+     */
+	Collection<WfCommentBI> addComments(Collection<WfCommentBI> comments);
+    /** 
      * Gets the due date for this instance
      */
     Long getDueDate();
@@ -142,5 +156,6 @@ public interface WfProcessInstanceBI {
 	 * True when is promoted, False when is not.
 	 */
 	boolean isPromoted();
+
     
 }

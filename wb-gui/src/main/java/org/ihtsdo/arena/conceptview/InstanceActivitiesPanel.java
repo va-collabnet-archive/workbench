@@ -32,6 +32,7 @@ import org.ihtsdo.arena.conceptview.ConceptViewSettings.SIDE;
 import org.ihtsdo.project.model.WorkList;
 import org.ihtsdo.project.workflow.api.wf2.implementation.WorkflowStore;
 import org.ihtsdo.tk.workflow.api.WfActivityInstanceBI;
+import org.ihtsdo.tk.workflow.api.WfCommentBI;
 import org.ihtsdo.tk.workflow.api.WfProcessInstanceBI;
 import org.ihtsdo.tk.workflow.api.WorkListBI;
 
@@ -129,13 +130,25 @@ public class InstanceActivitiesPanel extends JPanel {
 				HashMap<String, DefaultMutableTreeNode> wlNodes = new HashMap<String, DefaultMutableTreeNode>();
 				for (WfProcessInstanceBI wfProcessInstanceBI : instances) {
 					WorkListBI wl = wfProcessInstanceBI.getWorkList();
+					Collection<WfCommentBI> comments = wfProcessInstanceBI.getComments();
 					if (!wlNodes.containsKey(wl.getName())) {
 						DefaultMutableTreeNode wlNode = new DefaultMutableTreeNode(wl);
 						root.add(wlNode);
 						wlNodes.put(wl.getName(), wlNode);
 					}
 					LinkedList<WfActivityInstanceBI> activities = wfProcessInstanceBI.getActivityInstances();
+					long lastAdded=Long.MIN_VALUE;
 					for (WfActivityInstanceBI wfActivityInstanceBI : activities) {
+						for (WfCommentBI comment: comments){
+							if (comment.getDate()>lastAdded){
+								if (wfActivityInstanceBI.getTime()>comment.getDate()){
+									wlNodes.get(wl.getName()).add(new DefaultMutableTreeNode(comment));
+									lastAdded=comment.getDate();
+								}else{
+									break;
+								}
+							}
+						}
 						wlNodes.get(wl.getName()).add(new DefaultMutableTreeNode(wfActivityInstanceBI));
 					}
 				}
@@ -161,12 +174,25 @@ public class InstanceActivitiesPanel extends JPanel {
 			if (isWorklist(value)) {
 				setIcon(new ImageIcon("icons/table.png"));
 				setToolTipText(value.toString());
-			} else {
+			} else if (isComment(value)){
+				setIcon(new ImageIcon("icons/message.png"));
+				setToolTipText(value.toString());
+				
+			}else{
 				setIcon(new ImageIcon("icons/element_next.png"));
 				setToolTipText(value.toString());
 			}
 
 			return this;
+		}
+
+		private boolean isComment(Object value) {
+			DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
+			Object nodeInfo = (Object) (node.getUserObject());
+			if (nodeInfo instanceof WfCommentBI) {
+				return true;
+			}
+			return false;
 		}
 
 		protected boolean isWorklist(Object value) {
