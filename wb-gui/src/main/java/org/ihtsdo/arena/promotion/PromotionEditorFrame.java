@@ -48,9 +48,11 @@ import org.dwfa.ace.list.TerminologyList;
 import org.dwfa.ace.list.TerminologyListModel;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.classify.SnorocketExTask;
+import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.util.ComponentFrame;
 import org.dwfa.bpa.util.OpenFramesWindowListener;
 import org.dwfa.cement.ArchitectonicAuxiliary;
+import org.dwfa.tapi.ComputationCanceled;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.id.Type5UuidFactory;
 import org.ihtsdo.arena.Arena;
@@ -119,34 +121,32 @@ public class PromotionEditorFrame extends ComponentFrame implements PropertyChan
     private Arena sourceArena;
     private Arena targetArena;
     private ConceptChronicleBI mergePathConcept;
-    
-    
-    public PromotionEditorFrame(AceFrameConfig origConfig,
+    private boolean classifierDone = true;
+    private boolean reportDone = true;
+    private boolean promoteDone = true;
+
+    public PromotionEditorFrame(final AceFrameConfig origConfig,
             PathBI sourcePath, PathBI targetPath, PathBI mergePath) throws Exception {
         super(new String[]{}, null);
         batchConceptList = null;
         this.origConfig = origConfig;
         // Set the title for the frame
         setTitle(getNextFrameName());
-        
+
         PositionBI sourcePos = Ts.get().newPosition(sourcePath,
-                                         TimeHelper.getTimeFromString("latest", TimeHelper.getFileDateFormat()));
+                TimeHelper.getTimeFromString("latest", TimeHelper.getFileDateFormat()));
         this.sourceConfig = new PromotionSourceConfig(this, origConfig, sourcePos);
         PositionBI targetPos = Ts.get().newPosition(targetPath,
-                                         TimeHelper.getTimeFromString("latest", TimeHelper.getFileDateFormat()));
+                TimeHelper.getTimeFromString("latest", TimeHelper.getFileDateFormat()));
         this.targetConfig = new PromotionTargetConfig(this, origConfig, targetPos);
-        if(mergePath == null){
+        if (mergePath == null) {
             mergePath = createMergePath(sourcePath, origConfig);
-            //run classifier before opening window
-            SnorocketExTask classifier = new SnorocketExTask();
-            classifier.runClassifier(this.origConfig);
-            classifier.commitClassification();
         }
         mergePathConcept = Ts.get().getConcept(mergePath.getConceptNid());
         PositionBI mergePos = Ts.get().newPosition(mergePath,
-                                         TimeHelper.getTimeFromString("latest", TimeHelper.getFileDateFormat()));
+                TimeHelper.getTimeFromString("latest", TimeHelper.getFileDateFormat()));
         this.mergeConfig = new PromotionConfig(this, origConfig, mergePos);
-        
+
         this.mergeConfig.addPropertyChangeListener(this);
 
         this.mergeVc = this.mergeConfig.getViewCoordinate();
@@ -160,7 +160,7 @@ public class PromotionEditorFrame extends ComponentFrame implements PropertyChan
         // Setup Right Side
         cp.add(topSplit);
         createBottomComponent();
-        
+
         descChange = Ts.get().getEmptyNidSet();
         statedChange = Ts.get().getEmptyNidSet();
         infChange = Ts.get().getEmptyNidSet();
@@ -170,7 +170,7 @@ public class PromotionEditorFrame extends ComponentFrame implements PropertyChan
         if (batchConceptList == null) {
             TerminologyListModel batchListModel = new TerminologyListModel();
             NidBitSetItrBI allItr = allChange.iterator();
-            while(allItr.next()){
+            while (allItr.next()) {
                 batchListModel.addElement((I_GetConceptData) Ts.get().getConcept(allItr.nid()));
             }
             batchConceptList = new TerminologyList(batchListModel, true, true, mergeConfig);
@@ -180,7 +180,7 @@ public class PromotionEditorFrame extends ComponentFrame implements PropertyChan
             promotionConceptTable = new PromotionTerminologyTable(model, mergeConfig);
             promotionConceptTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
             promotionConceptTable.getSelectionModel().addListSelectionListener(new SelectionListener());
-            
+
             //add values from previous merge
             TerminologyListModel listModel = (TerminologyListModel) batchConceptList.getModel();
             Collection<? extends RefexVersionBI<?>> previousMerge = mergePathConcept.getRefsetMembersActive(mergeVc);
@@ -219,15 +219,14 @@ public class PromotionEditorFrame extends ComponentFrame implements PropertyChan
                 model.setChangedStated(statedChange);
             }
         }
-	     
+
         createTopComponent();
-        
+
         topSplit.setTopComponent(resultsPane);
         topSplit.setBottomComponent(conceptTabsPane);
         topSplit.setDividerLocation(350);
         resultsPane.setMinimumSize(new Dimension(cp.getWidth(), 350));
         SwingUtilities.invokeLater(new Runnable() {
-
             @Override
             public void run() {
                 mergeConfig.getConceptViewer(1).setTermComponent(null);
@@ -259,17 +258,17 @@ public class PromotionEditorFrame extends ComponentFrame implements PropertyChan
         JLabel sourceLabel = new JLabel(sourcePath.toString(),
                 JLabel.LEFT);
         Border outside = BorderFactory.createLineBorder(sourceConfig.getColorForPath(sourcePath.getConceptNid()), 2);
-	Border inside = BorderFactory.createEmptyBorder(1, 2, 1, 2);
-	Border border = BorderFactory.createCompoundBorder(outside, inside);
+        Border inside = BorderFactory.createEmptyBorder(1, 2, 1, 2);
+        Border border = BorderFactory.createCompoundBorder(outside, inside);
         sourceLabel.setBorder(border);
-        
+
         PathBI targetPath = targetConfig.getViewCoordinate().getPositionSet().iterator().next().getPath();
         JLabel targetLabel = new JLabel(targetPath.toString(), JLabel.RIGHT);
         outside = BorderFactory.createLineBorder(targetConfig.getColorForPath(targetPath.getConceptNid()), 2);
-	inside = BorderFactory.createEmptyBorder(1, 2, 1, 2);
-	border = BorderFactory.createCompoundBorder(outside, inside);
+        inside = BorderFactory.createEmptyBorder(1, 2, 1, 2);
+        border = BorderFactory.createCompoundBorder(outside, inside);
         targetLabel.setBorder(border);
-        
+
         JPanel resultsLabel = new JPanel();
         resultsLabel.add(sourceLabel);
         resultsLabel.add(resultsTitle);
@@ -298,7 +297,7 @@ public class PromotionEditorFrame extends ComponentFrame implements PropertyChan
         mergeArena = new Arena(mergeConfig, new File("arena/1-up.mxe"), false, true);
         sourceArena = new Arena(sourceConfig, new File("arena/1-up.mxe"), false);
         targetArena = new Arena(targetConfig, new File("arena/1-up.mxe"), false);
-        
+
         JPanel arenaHolder = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.BOTH;
@@ -346,7 +345,8 @@ public class PromotionEditorFrame extends ComponentFrame implements PropertyChan
     }
 
     /**
-     * @see org.dwfa.bpa.util.I_InitComponentMenus#addInternalFrames(javax.swing.JMenu)
+     * @see
+     * org.dwfa.bpa.util.I_InitComponentMenus#addInternalFrames(javax.swing.JMenu)
      */
     @Override
     public void addInternalFrames(JMenu menu) {
@@ -381,17 +381,18 @@ public class PromotionEditorFrame extends ComponentFrame implements PropertyChan
 
     /* SelectionListener */
     private class SelectionListener implements ListSelectionListener {
+
         @Override
-        public void valueChanged(ListSelectionEvent lse) {           
+        public void valueChanged(ListSelectionEvent lse) {
             int selectedIndex = promotionConceptTable.getSelectedRow();
             PromotionTerminologyTableModel model = (PromotionTerminologyTableModel) promotionConceptTable.getModel();
-            try{
+            try {
                 selectedIndex = promotionConceptTable.convertRowIndexToModel(selectedIndex);
                 I_GetConceptData concept = (I_GetConceptData) model.getValueAt(selectedIndex, 0);
                 c1Panel.setTermComponent(concept);
-            } catch(IndexOutOfBoundsException e){
+            } catch (IndexOutOfBoundsException e) {
 //TODO: don't need to do anything, updating on its self
-            } 
+            }
         }
     }
 
@@ -487,7 +488,9 @@ public class PromotionEditorFrame extends ComponentFrame implements PropertyChan
             doWindowActivation();
         }
     }
-    private class QueryAction extends AbstractAction{
+
+    private class QueryAction extends AbstractAction {
+
         private static final long serialVersionUID = 1L;
         private PromotionEditorFrame frame;
 
@@ -499,57 +502,73 @@ public class PromotionEditorFrame extends ComponentFrame implements PropertyChan
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            try {
-                PromotionTerminologyTableModel model = (PromotionTerminologyTableModel) promotionConceptTable.getModel();
-                //clear old first?
-                allChange.clear();
-                frame.query();
-                
-                model.setChangedDesc(descChange);
-                model.setChangedInferred(infChange);
-                model.setChangedStated(statedChange);
-                TerminologyListModel listModel = (TerminologyListModel) batchConceptList.getModel();
-                listModel.clear();
-                NidBitSetItrBI allItr = allChange.iterator();
-                HashMap<Integer, Color> diffColor = new HashMap<>();
-                Random random = new Random();
-                TerminologyBuilderBI builder = Ts.get().getTerminologyBuilder(mergeConfig.getEditCoordinate(), mergeVc);
-                while (allItr.next()) {
-                    ConceptChronicleBI concept = Ts.get().getConceptForNid(allItr.nid());
-                    ComponentChronicleBI component = Ts.get().getComponent(allItr.nid());
-                    //add component to promotion refset
-                    RefexCAB promoteBp = new RefexCAB(TK_REFEX_TYPE.CID,
-                            component.getNid(), mergePathConcept.getNid());
-                    promoteBp.put(RefexCAB.RefexProperty.CNID1, TermAux.UNREVIEWED.getLenient().getNid());
-                    builder.construct(promoteBp);
-                    //add to table
-                    listModel.addElement((I_GetConceptData) concept);
-                    
-                    //make colors
-                    float hue = random.nextFloat();
-                    float saturation = (random.nextInt(2000) + 1000) / 10000f;
-                    float luminance = 0.9f;
-                    Color color = Color.getHSBColor(hue, saturation, luminance);
-                    diffColor.put(allItr.nid(), color);
-                }
-                Ts.get().addUncommittedNoChecks(mergePathConcept);
-                Ts.get().commit(mergePathConcept);
-                mergeArena.getEditor().setDiffColor(diffColor);
-                sourceArena.getEditor().setDiffColor(diffColor);
-                targetArena.getEditor().setDiffColor(diffColor);
-                model.fireTableDataChanged();
-            } catch (IOException ex) {
-                Logger.getLogger(PromotionEditorFrame.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (ParseException ex) {
-                Logger.getLogger(PromotionEditorFrame.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (Exception ex) {
-                Logger.getLogger(PromotionEditorFrame.class.getName()).log(Level.SEVERE, null, ex);
+            if (classifierDone == true && reportDone == true && promoteDone == true) {
+                new Thread(
+                        new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            reportDone = false;
+                            PromotionTerminologyTableModel model = (PromotionTerminologyTableModel) promotionConceptTable.getModel();
+                            //clear old first?
+                            allChange.clear();
+                            frame.query();
+
+                            model.setChangedDesc(descChange);
+                            model.setChangedInferred(infChange);
+                            model.setChangedStated(statedChange);
+                            TerminologyListModel listModel = (TerminologyListModel) batchConceptList.getModel();
+                            listModel.clear();
+                            NidBitSetItrBI allItr = allChange.iterator();
+                            HashMap<Integer, Color> diffColor = new HashMap<>();
+                            Random random = new Random();
+                            TerminologyBuilderBI builder = Ts.get().getTerminologyBuilder(mergeConfig.getEditCoordinate(), mergeVc);
+                            while (allItr.next()) {
+                                ConceptChronicleBI concept = Ts.get().getConceptForNid(allItr.nid());
+                                ComponentChronicleBI component = Ts.get().getComponent(allItr.nid());
+                                //add component to promotion refset
+                                RefexCAB promoteBp = new RefexCAB(TK_REFEX_TYPE.CID,
+                                        component.getNid(), mergePathConcept.getNid());
+                                promoteBp.put(RefexCAB.RefexProperty.CNID1, TermAux.UNREVIEWED.getLenient().getNid());
+                                builder.construct(promoteBp);
+                                //add to table
+                                listModel.addElement((I_GetConceptData) concept);
+
+                                //make colors
+                                float hue = random.nextFloat();
+                                float saturation = (random.nextInt(2000) + 1000) / 10000f;
+                                float luminance = 0.9f;
+                                Color color = Color.getHSBColor(hue, saturation, luminance);
+                                diffColor.put(allItr.nid(), color);
+                            }
+                            Ts.get().addUncommittedNoChecks(mergePathConcept);
+                            Ts.get().commit(mergePathConcept);
+                            mergeArena.getEditor().setDiffColor(diffColor);
+                            sourceArena.getEditor().setDiffColor(diffColor);
+                            targetArena.getEditor().setDiffColor(diffColor);
+                            model.fireTableDataChanged();
+                            reportDone = true;
+                        } catch (IOException ex) {
+                            Logger.getLogger(PromotionEditorFrame.class.getName()).log(Level.SEVERE, null, ex);
+                        } catch (ParseException ex) {
+                            Logger.getLogger(PromotionEditorFrame.class.getName()).log(Level.SEVERE, null, ex);
+                        } catch (Exception ex) {
+                            Logger.getLogger(PromotionEditorFrame.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                    }
+                }).start();
+            } else if (classifierDone == false) {
+                JOptionPane.showMessageDialog(null, "Please wait for classification to finish.", "please wait", JOptionPane.INFORMATION_MESSAGE);
+            } else if (reportDone == false) {
+                JOptionPane.showMessageDialog(null, "Please wait for difference finder to finish.", "please wait", JOptionPane.INFORMATION_MESSAGE);
+            } else if (promoteDone == false) {
+                JOptionPane.showMessageDialog(null, "Please wait for promotion to finish.", "please wait", JOptionPane.INFORMATION_MESSAGE);
             }
         }
-        
     }
-    
-    private class PromoteAllWBAction extends AbstractAction{
+
+    private class PromoteAllWBAction extends AbstractAction {
+
         private static final long serialVersionUID = 1L;
         private PromotionEditorFrame frame;
 
@@ -561,44 +580,60 @@ public class PromotionEditorFrame extends ComponentFrame implements PropertyChan
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            try {
-                frame.promote(allChange, true);
-                
-                //run classifier
-                SnorocketExTask classifier = new SnorocketExTask();
-                classifier.runClassifier(origConfig);
-                classifier.commitClassification();
-                SnorocketExTask classifierMerge = new SnorocketExTask();
-                classifierMerge.runClassifier(mergeConfig);
-                classifierMerge.commitClassification();
-                
-                TerminologyBuilderBI builder = Ts.get().getTerminologyBuilder(mergeConfig.getEditCoordinate(), mergeVc);
-                for(RefexVersionBI m : mergePathConcept.getRefsetMembersActive(mergeVc)){
-                    RefexNidVersionBI member = (RefexNidVersionBI) m;
-                    if (member.getNid1() == TermAux.PROMOTE.getLenient().getConceptNid() ||
-                            member.getNid1() == TermAux.UNREVIEWED.getLenient().getConceptNid()) {
-                        RefexCAB memberBp = member.makeBlueprint(mergeVc);
-                        memberBp.put(RefexCAB.RefexProperty.CNID1, TermAux.PROMOTED.getLenient().getConceptNid());
-                        memberBp.setMemberUuid(member.getPrimUuid());
-                        builder.construct(memberBp);
+            if (classifierDone == true && reportDone == true && promoteDone == true) {
+                new Thread(
+                        new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            promoteDone = false;
+                            frame.promote(allChange, true);
+
+                            //run classifier
+                            SnorocketExTask classifier = new SnorocketExTask();
+                            classifier.runClassifier(origConfig);
+                            classifier.commitClassification();
+                            SnorocketExTask classifierMerge = new SnorocketExTask();
+                            classifierMerge.runClassifier(mergeConfig);
+                            classifierMerge.commitClassification();
+
+                            TerminologyBuilderBI builder = Ts.get().getTerminologyBuilder(mergeConfig.getEditCoordinate(), mergeVc);
+                            for (RefexVersionBI m : mergePathConcept.getRefsetMembersActive(mergeVc)) {
+                                RefexNidVersionBI member = (RefexNidVersionBI) m;
+                                if (member.getNid1() == TermAux.PROMOTE.getLenient().getConceptNid()
+                                        || member.getNid1() == TermAux.UNREVIEWED.getLenient().getConceptNid()) {
+                                    RefexCAB memberBp = member.makeBlueprint(mergeVc);
+                                    memberBp.put(RefexCAB.RefexProperty.CNID1, TermAux.PROMOTED.getLenient().getConceptNid());
+                                    memberBp.setMemberUuid(member.getPrimUuid());
+                                    builder.construct(memberBp);
+                                }
+                            }
+                            Ts.get().addUncommitted(mergePathConcept);
+                            Ts.get().commit(mergePathConcept);
+                            PromotionTerminologyTableModel model = (PromotionTerminologyTableModel) promotionConceptTable.getModel();
+                            model.fireTableDataChanged();
+                            promoteDone = true;
+                        } catch (IOException ex) {
+                            Logger.getLogger(PromotionEditorFrame.class.getName()).log(Level.SEVERE, null, ex);
+                        } catch (ParseException ex) {
+                            Logger.getLogger(PromotionEditorFrame.class.getName()).log(Level.SEVERE, null, ex);
+                        } catch (Exception ex) {
+                            Logger.getLogger(PromotionEditorFrame.class.getName()).log(Level.SEVERE, null, ex);
+                        }
                     }
-                }
-                Ts.get().addUncommitted(mergePathConcept);
-                Ts.get().commit(mergePathConcept);
-                PromotionTerminologyTableModel model = (PromotionTerminologyTableModel) promotionConceptTable.getModel();
-                model.fireTableDataChanged();
-            } catch (IOException ex) {
-                Logger.getLogger(PromotionEditorFrame.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (ParseException ex) {
-                Logger.getLogger(PromotionEditorFrame.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (Exception ex) {
-                Logger.getLogger(PromotionEditorFrame.class.getName()).log(Level.SEVERE, null, ex);
+                }).start();
+            } else if (classifierDone == false) {
+                JOptionPane.showMessageDialog(null, "Please wait for classification to finish.", "please wait", JOptionPane.INFORMATION_MESSAGE);
+            } else if (reportDone == false) {
+                JOptionPane.showMessageDialog(null, "Please wait for difference finder to finish.", "please wait", JOptionPane.INFORMATION_MESSAGE);
+            } else if (promoteDone == false) {
+                JOptionPane.showMessageDialog(null, "Please wait for promotion to finish.", "please wait", JOptionPane.INFORMATION_MESSAGE);
             }
         }
-        
     }
-    
-    private class PromoteAllAction extends AbstractAction{
+
+    private class PromoteAllAction extends AbstractAction {
+
         private static final long serialVersionUID = 1L;
         private PromotionEditorFrame frame;
 
@@ -610,46 +645,62 @@ public class PromotionEditorFrame extends ComponentFrame implements PropertyChan
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            try {
-                NidBitSetBI promotionNids = allChange;
-                promotionNids.andNot(infChange);
-                frame.promote(promotionNids, false);
-                
-                //run classifier
-                SnorocketExTask classifier = new SnorocketExTask();
-                classifier.runClassifier(origConfig);
-                classifier.commitClassification();
-                SnorocketExTask classifierMerge = new SnorocketExTask();
-                classifierMerge.runClassifier(mergeConfig);
-                classifierMerge.commitClassification();
-                
-                TerminologyBuilderBI builder = Ts.get().getTerminologyBuilder(mergeConfig.getEditCoordinate(), mergeVc);
-                for(RefexVersionBI m : mergePathConcept.getRefsetMembersActive(mergeVc)){
-                    RefexNidVersionBI member = (RefexNidVersionBI) m;
-                    if (member.getNid1() == TermAux.PROMOTE.getLenient().getConceptNid()||
-                            member.getNid1() == TermAux.UNREVIEWED.getLenient().getConceptNid()) {
-                        RefexCAB memberBp = member.makeBlueprint(mergeVc);
-                        memberBp.put(RefexCAB.RefexProperty.CNID1, TermAux.PROMOTED.getLenient().getConceptNid());
-                        memberBp.setMemberUuid(member.getPrimUuid());
-                        builder.construct(memberBp);
+            if (classifierDone == true && reportDone == true && promoteDone == true) {
+                new Thread(
+                        new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            promoteDone = false;
+                            NidBitSetBI promotionNids = allChange;
+                            promotionNids.andNot(infChange);
+                            frame.promote(promotionNids, false);
+
+                            //run classifier
+                            SnorocketExTask classifier = new SnorocketExTask();
+                            classifier.runClassifier(origConfig);
+                            classifier.commitClassification();
+                            SnorocketExTask classifierMerge = new SnorocketExTask();
+                            classifierMerge.runClassifier(mergeConfig);
+                            classifierMerge.commitClassification();
+
+                            TerminologyBuilderBI builder = Ts.get().getTerminologyBuilder(mergeConfig.getEditCoordinate(), mergeVc);
+                            for (RefexVersionBI m : mergePathConcept.getRefsetMembersActive(mergeVc)) {
+                                RefexNidVersionBI member = (RefexNidVersionBI) m;
+                                if (member.getNid1() == TermAux.PROMOTE.getLenient().getConceptNid()
+                                        || member.getNid1() == TermAux.UNREVIEWED.getLenient().getConceptNid()) {
+                                    RefexCAB memberBp = member.makeBlueprint(mergeVc);
+                                    memberBp.put(RefexCAB.RefexProperty.CNID1, TermAux.PROMOTED.getLenient().getConceptNid());
+                                    memberBp.setMemberUuid(member.getPrimUuid());
+                                    builder.construct(memberBp);
+                                }
+                            }
+                            Ts.get().addUncommitted(mergePathConcept);
+                            Ts.get().commit(mergePathConcept);
+                            PromotionTerminologyTableModel model = (PromotionTerminologyTableModel) promotionConceptTable.getModel();
+                            model.fireTableDataChanged();
+                            promoteDone = true;
+                        } catch (IOException ex) {
+                            Logger.getLogger(PromotionEditorFrame.class.getName()).log(Level.SEVERE, null, ex);
+                        } catch (ParseException ex) {
+                            Logger.getLogger(PromotionEditorFrame.class.getName()).log(Level.SEVERE, null, ex);
+                        } catch (Exception ex) {
+                            Logger.getLogger(PromotionEditorFrame.class.getName()).log(Level.SEVERE, null, ex);
+                        }
                     }
-                }
-                Ts.get().addUncommitted(mergePathConcept);
-                Ts.get().commit(mergePathConcept);
-                PromotionTerminologyTableModel model = (PromotionTerminologyTableModel) promotionConceptTable.getModel();
-                model.fireTableDataChanged();
-            } catch (IOException ex) {
-                Logger.getLogger(PromotionEditorFrame.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (ParseException ex) {
-                Logger.getLogger(PromotionEditorFrame.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (Exception ex) {
-                Logger.getLogger(PromotionEditorFrame.class.getName()).log(Level.SEVERE, null, ex);
+                }).start();
+            } else if (classifierDone == false) {
+                JOptionPane.showMessageDialog(null, "Please wait for classification to finish.", "please wait", JOptionPane.INFORMATION_MESSAGE);
+            } else if (reportDone == false) {
+                JOptionPane.showMessageDialog(null, "Please wait for difference finder to finish.", "please wait", JOptionPane.INFORMATION_MESSAGE);
+            } else if (promoteDone == false) {
+                JOptionPane.showMessageDialog(null, "Please wait for promotion to finish.", "please wait", JOptionPane.INFORMATION_MESSAGE);
             }
         }
-        
     }
-    
-    private class PromoteSelectedAction extends AbstractAction{
+
+    private class PromoteSelectedAction extends AbstractAction {
+
         private static final long serialVersionUID = 1L;
         private PromotionEditorFrame frame;
 
@@ -661,46 +712,62 @@ public class PromotionEditorFrame extends ComponentFrame implements PropertyChan
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            try {
-                Collection<? extends RefexVersionBI<?>> members = mergePathConcept.getRefsetMembersActive(mergeVc);
-                NidBitSetBI nidsToPromote = Ts.get().getEmptyNidSet();
-                TerminologyBuilderBI builder = Ts.get().getTerminologyBuilder(mergeConfig.getEditCoordinate(), mergeVc);
-                for(RefexVersionBI m : members){
-                    RefexNidVersionBI member = (RefexNidVersionBI) m;
-                    if(member.getNid1() == TermAux.PROMOTE.getLenient().getConceptNid()){
-                        RefexCAB memberBp = member.makeBlueprint(mergeVc);
-                        nidsToPromote.setMember(Ts.get().getConceptNidForNid(member.getReferencedComponentNid()));
-                        memberBp.put(RefexCAB.RefexProperty.CNID1, TermAux.PROMOTED.getLenient().getConceptNid());
-                        memberBp.setMemberUuid(member.getPrimUuid());
-                        builder.construct(memberBp);
+            if (classifierDone == true && reportDone == true && promoteDone == true) {
+                new Thread(
+                        new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            promoteDone = false;
+                            Collection<? extends RefexVersionBI<?>> members = mergePathConcept.getRefsetMembersActive(mergeVc);
+                            NidBitSetBI nidsToPromote = Ts.get().getEmptyNidSet();
+                            TerminologyBuilderBI builder = Ts.get().getTerminologyBuilder(mergeConfig.getEditCoordinate(), mergeVc);
+                            for (RefexVersionBI m : members) {
+                                RefexNidVersionBI member = (RefexNidVersionBI) m;
+                                if (member.getNid1() == TermAux.PROMOTE.getLenient().getConceptNid()) {
+                                    RefexCAB memberBp = member.makeBlueprint(mergeVc);
+                                    nidsToPromote.setMember(Ts.get().getConceptNidForNid(member.getReferencedComponentNid()));
+                                    memberBp.put(RefexCAB.RefexProperty.CNID1, TermAux.PROMOTED.getLenient().getConceptNid());
+                                    memberBp.setMemberUuid(member.getPrimUuid());
+                                    builder.construct(memberBp);
+                                }
+                            }
+                            Ts.get().addUncommitted(mergePathConcept);
+                            Ts.get().commit(mergePathConcept);
+                            frame.promote(nidsToPromote, false);
+
+                            //run classifier
+                            SnorocketExTask classifier = new SnorocketExTask();
+                            classifier.runClassifier(origConfig);
+                            classifier.commitClassification();
+                            SnorocketExTask classifierMerge = new SnorocketExTask();
+                            classifierMerge.runClassifier(mergeConfig);
+                            classifierMerge.commitClassification();
+
+                            PromotionTerminologyTableModel model = (PromotionTerminologyTableModel) promotionConceptTable.getModel();
+                            model.fireTableDataChanged();
+                            promoteDone = true;
+                        } catch (IOException ex) {
+                            Logger.getLogger(PromotionEditorFrame.class.getName()).log(Level.SEVERE, null, ex);
+                        } catch (ParseException ex) {
+                            Logger.getLogger(PromotionEditorFrame.class.getName()).log(Level.SEVERE, null, ex);
+                        } catch (Exception ex) {
+                            Logger.getLogger(PromotionEditorFrame.class.getName()).log(Level.SEVERE, null, ex);
+                        }
                     }
-                }
-                Ts.get().addUncommitted(mergePathConcept);
-                Ts.get().commit(mergePathConcept);
-                frame.promote(nidsToPromote, false);
-                
-                //run classifier
-                SnorocketExTask classifier = new SnorocketExTask();
-                classifier.runClassifier(origConfig);
-                classifier.commitClassification();
-                SnorocketExTask classifierMerge = new SnorocketExTask();
-                classifierMerge.runClassifier(mergeConfig);
-                classifierMerge.commitClassification();
-                
-                PromotionTerminologyTableModel model = (PromotionTerminologyTableModel) promotionConceptTable.getModel();
-                model.fireTableDataChanged();
-            } catch (IOException ex) {
-                Logger.getLogger(PromotionEditorFrame.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (ParseException ex) {
-                Logger.getLogger(PromotionEditorFrame.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (Exception ex) {
-                Logger.getLogger(PromotionEditorFrame.class.getName()).log(Level.SEVERE, null, ex);
+                }).start();
+            } else if (classifierDone == false) {
+                JOptionPane.showMessageDialog(null, "Please wait for classification to finish.", "please wait", JOptionPane.INFORMATION_MESSAGE);
+            } else if (reportDone == false) {
+                JOptionPane.showMessageDialog(null, "Please wait for difference finder to finish.", "please wait", JOptionPane.INFORMATION_MESSAGE);
+            } else if (promoteDone == false) {
+                JOptionPane.showMessageDialog(null, "Please wait for promotion to finish.", "please wait", JOptionPane.INFORMATION_MESSAGE);
             }
         }
-        
     }
-    
-    private class PromoteSelectedWBAction extends AbstractAction{
+
+    private class PromoteSelectedWBAction extends AbstractAction {
+
         private static final long serialVersionUID = 1L;
         private PromotionEditorFrame frame;
 
@@ -712,46 +779,62 @@ public class PromotionEditorFrame extends ComponentFrame implements PropertyChan
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            try {
-                Collection<? extends RefexVersionBI<?>> members = mergePathConcept.getRefsetMembersActive(mergeVc);
-                NidBitSetBI nidsToPromote = Ts.get().getEmptyNidSet();
-                TerminologyBuilderBI builder = Ts.get().getTerminologyBuilder(mergeConfig.getEditCoordinate(), mergeVc);
-                for(RefexVersionBI m : members){
-                    RefexNidVersionBI member = (RefexNidVersionBI) m;
-                    if(member.getNid1() == TermAux.PROMOTE.getLenient().getConceptNid()){
-                        RefexCAB memberBp = member.makeBlueprint(mergeVc);
-                        nidsToPromote.setMember(Ts.get().getConceptNidForNid(member.getReferencedComponentNid()));
-                        memberBp.put(RefexCAB.RefexProperty.CNID1, TermAux.PROMOTED.getLenient().getConceptNid());
-                        memberBp.setMemberUuid(member.getPrimUuid());
-                        builder.construct(memberBp);
+            if (classifierDone == true && reportDone == true && promoteDone == true) {
+                new Thread(
+                        new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            promoteDone = false;
+                            Collection<? extends RefexVersionBI<?>> members = mergePathConcept.getRefsetMembersActive(mergeVc);
+                            NidBitSetBI nidsToPromote = Ts.get().getEmptyNidSet();
+                            TerminologyBuilderBI builder = Ts.get().getTerminologyBuilder(mergeConfig.getEditCoordinate(), mergeVc);
+                            for (RefexVersionBI m : members) {
+                                RefexNidVersionBI member = (RefexNidVersionBI) m;
+                                if (member.getNid1() == TermAux.PROMOTE.getLenient().getConceptNid()) {
+                                    RefexCAB memberBp = member.makeBlueprint(mergeVc);
+                                    nidsToPromote.setMember(Ts.get().getConceptNidForNid(member.getReferencedComponentNid()));
+                                    memberBp.put(RefexCAB.RefexProperty.CNID1, TermAux.PROMOTED.getLenient().getConceptNid());
+                                    memberBp.setMemberUuid(member.getPrimUuid());
+                                    builder.construct(memberBp);
+                                }
+                            }
+                            Ts.get().addUncommitted(mergePathConcept);
+                            Ts.get().commit(mergePathConcept);
+                            frame.promote(nidsToPromote, false);
+
+                            //run classifier
+                            SnorocketExTask classifier = new SnorocketExTask();
+                            classifier.runClassifier(origConfig);
+                            classifier.commitClassification();
+                            SnorocketExTask classifierMerge = new SnorocketExTask();
+                            classifierMerge.runClassifier(mergeConfig);
+                            classifierMerge.commitClassification();
+
+                            PromotionTerminologyTableModel model = (PromotionTerminologyTableModel) promotionConceptTable.getModel();
+                            model.fireTableDataChanged();
+                            promoteDone = true;
+                        } catch (IOException ex) {
+                            Logger.getLogger(PromotionEditorFrame.class.getName()).log(Level.SEVERE, null, ex);
+                        } catch (ParseException ex) {
+                            Logger.getLogger(PromotionEditorFrame.class.getName()).log(Level.SEVERE, null, ex);
+                        } catch (Exception ex) {
+                            Logger.getLogger(PromotionEditorFrame.class.getName()).log(Level.SEVERE, null, ex);
+                        }
                     }
-                }
-                Ts.get().addUncommitted(mergePathConcept);
-                Ts.get().commit(mergePathConcept);
-                frame.promote(nidsToPromote, false);
-                
-                //run classifier
-                SnorocketExTask classifier = new SnorocketExTask();
-                classifier.runClassifier(origConfig);
-                classifier.commitClassification();
-                SnorocketExTask classifierMerge = new SnorocketExTask();
-                classifierMerge.runClassifier(mergeConfig);
-                classifierMerge.commitClassification();
-                
-                PromotionTerminologyTableModel model = (PromotionTerminologyTableModel) promotionConceptTable.getModel();
-                model.fireTableDataChanged();
-            } catch (IOException ex) {
-                Logger.getLogger(PromotionEditorFrame.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (ParseException ex) {
-                Logger.getLogger(PromotionEditorFrame.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (Exception ex) {
-                Logger.getLogger(PromotionEditorFrame.class.getName()).log(Level.SEVERE, null, ex);
+                }).start();
+            } else if (classifierDone == false) {
+                JOptionPane.showMessageDialog(null, "Please wait for classification to finish.", "please wait", JOptionPane.INFORMATION_MESSAGE);
+            } else if (reportDone == false) {
+                JOptionPane.showMessageDialog(null, "Please wait for difference finder to finish.", "please wait", JOptionPane.INFORMATION_MESSAGE);
+            } else if (promoteDone == false) {
+                JOptionPane.showMessageDialog(null, "Please wait for promotion to finish.", "please wait", JOptionPane.INFORMATION_MESSAGE);
             }
         }
-        
     }
-    
-    private class ClassifyAction extends AbstractAction{
+
+    private class ClassifyAction extends AbstractAction {
+
         private static final long serialVersionUID = 1L;
         private PromotionEditorFrame frame;
 
@@ -763,79 +846,95 @@ public class PromotionEditorFrame extends ComponentFrame implements PropertyChan
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            try {
-                SnorocketExTask classifier = new SnorocketExTask();
-                classifier.runClassifier(mergeConfig);
-                classifier.commitClassification();
-            } catch (IOException ex) {
-                Logger.getLogger(PromotionEditorFrame.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (ParseException ex) {
-                Logger.getLogger(PromotionEditorFrame.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (Exception ex) {
-                Logger.getLogger(PromotionEditorFrame.class.getName()).log(Level.SEVERE, null, ex);
+            if (classifierDone == true && reportDone == true && promoteDone == true) {
+                new Thread(
+                        new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            classifierDone = false;
+                            SnorocketExTask classifier = new SnorocketExTask();
+                            classifier.runClassifier(mergeConfig);
+                            classifier.commitClassification();
+                            classifierDone = true;
+                        } catch (IOException ex) {
+                            Logger.getLogger(PromotionEditorFrame.class.getName()).log(Level.SEVERE, null, ex);
+                        } catch (ParseException ex) {
+                            Logger.getLogger(PromotionEditorFrame.class.getName()).log(Level.SEVERE, null, ex);
+                        } catch (Exception ex) {
+                            Logger.getLogger(PromotionEditorFrame.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                    }
+                }).start();
+            } else if (classifierDone == false) {
+                JOptionPane.showMessageDialog(null, "Please wait for classification to finish.", "please wait", JOptionPane.INFORMATION_MESSAGE);
+            } else if (reportDone == false) {
+                JOptionPane.showMessageDialog(null, "Please wait for difference finder to finish.", "please wait", JOptionPane.INFORMATION_MESSAGE);
+            } else if (promoteDone == false) {
+                JOptionPane.showMessageDialog(null, "Please wait for promotion to finish.", "please wait", JOptionPane.INFORMATION_MESSAGE);
             }
         }
-        
     }
-    
-    private void query() throws IOException, ParseException, Exception{
-            ViewCoordinate vcSource = mergeConfig.getViewCoordinate();
-            ViewCoordinate vcTarget = targetConfig.getViewCoordinate();         
-            
-            //query: added description
-            //query: retired description
-            //query: added stated rel, retired stated rel
-            //query: added inferred rel, retired inferred rel
-            long startTime = System.currentTimeMillis();
-            QueryBuilderBI builder = Ts.get().getQueryBuilder(mergeConfig.getViewCoordinate());
-            Query  q1 = new DescriptionChangedQuery(vcTarget, vcSource).getQuery();
-            Query  q2 = new RelationshipInferredChangedQuery(vcTarget, vcSource).getQuery();
-            Query  q3 = new RelationshipStatedChangedQuery(vcTarget, vcSource).getQuery();
-            Query  q4 = new ConceptDefinedChangedQuery(vcTarget, vcSource).getQuery();
 
-            //results
-            ArrayList<NidBitSetBI> results = builder.getResults(q1, q2, q3, q4);
+    private void query() throws IOException, ParseException, Exception {
+        ViewCoordinate vcSource = mergeConfig.getViewCoordinate();
+        ViewCoordinate vcTarget = targetConfig.getViewCoordinate();
+
+        //query: added description
+        //query: retired description
+        //query: added stated rel, retired stated rel
+        //query: added inferred rel, retired inferred rel
+        long startTime = System.currentTimeMillis();
+        QueryBuilderBI builder = Ts.get().getQueryBuilder(mergeConfig.getViewCoordinate());
+        Query q1 = new DescriptionChangedQuery(vcTarget, vcSource).getQuery();
+        Query q2 = new RelationshipInferredChangedQuery(vcTarget, vcSource).getQuery();
+        Query q3 = new RelationshipStatedChangedQuery(vcTarget, vcSource).getQuery();
+        Query q4 = new ConceptDefinedChangedQuery(vcTarget, vcSource).getQuery();
+
+        //results
+        ArrayList<NidBitSetBI> results = builder.getResults(q1, q2, q3, q4);
 //TODO: do this better            
-            int count = 0;
-            for(NidBitSetBI result : results){
-                System.out.println(result);
-                if(count == 0){
-                    descChange = result;
-                    allChange.or(result);
-                }else if(count == 1){
-                    infChange = result;
-                    allChange.or(result);
-                }else if(count == 2){
-                    statedChange = result;
-                    allChange.or(result);
-                }else if(count == 3){
-                    //need to combine stated rel changes with concept defined change
-                    statedChange.or(result);
-                    allChange.or(result);
-                }
-                count++;
+        int count = 0;
+        for (NidBitSetBI result : results) {
+            System.out.println(result);
+            if (count == 0) {
+                descChange = result;
+                allChange.or(result);
+            } else if (count == 1) {
+                infChange = result;
+                allChange.or(result);
+            } else if (count == 2) {
+                statedChange = result;
+                allChange.or(result);
+            } else if (count == 3) {
+                //need to combine stated rel changes with concept defined change
+                statedChange.or(result);
+                allChange.or(result);
             }
-            
-            long elapsedTime = System.currentTimeMillis() - startTime;
-            long minutes = elapsedTime / 60000;
-            long seconds = (elapsedTime % 60000) / 1000;
-            System.out.println("Query time: " + minutes + " minutes, " + seconds + " seconds.");
+            count++;
+        }
+
+        long elapsedTime = System.currentTimeMillis() - startTime;
+        long minutes = elapsedTime / 60000;
+        long seconds = (elapsedTime % 60000) / 1000;
+        System.out.println("Query time: " + minutes + " minutes, " + seconds + " seconds.");
     }
 //TODO: specify origin position    
-    private void promote(NidBitSetBI nidsToPromote, boolean writeBack) throws IOException, Exception{
-            long startTime = System.currentTimeMillis();
-            TerminologyPromoterBI promoter = Ts.get().getTerminologyPromoter(sourceConfig.getViewCoordinate(),
-                    targetConfig.getEditCoordinate(), 
-                    targetConfig.getViewCoordinate());
-            promoter.promote(nidsToPromote, writeBack);
-            long elapsedTime = System.currentTimeMillis() - startTime;
-            long minutes = elapsedTime / 60000;
-            long seconds = (elapsedTime % 60000) / 1000;
-            System.out.println("Promotion time: " + minutes + " minutes, " + seconds + " seconds.");
+
+    private void promote(NidBitSetBI nidsToPromote, boolean writeBack) throws IOException, Exception {
+        long startTime = System.currentTimeMillis();
+        TerminologyPromoterBI promoter = Ts.get().getTerminologyPromoter(sourceConfig.getViewCoordinate(),
+                targetConfig.getEditCoordinate(),
+                targetConfig.getViewCoordinate());
+        promoter.promote(nidsToPromote, writeBack);
+        long elapsedTime = System.currentTimeMillis() - startTime;
+        long minutes = elapsedTime / 60000;
+        long seconds = (elapsedTime % 60000) / 1000;
+        System.out.println("Promotion time: " + minutes + " minutes, " + seconds + " seconds.");
     }
-    
-    private PathBI createMergePath(PathBI originPath, I_ConfigAceFrame origConfig) throws IOException, TerminologyException, InvalidCAB, ContradictionException, Exception{
-        String pathName = "Merge Path " + TimeHelper.formatDate(System.currentTimeMillis()) ;
+
+    private PathBI createMergePath(PathBI originPath, I_ConfigAceFrame origConfig) throws IOException, TerminologyException, InvalidCAB, ContradictionException, Exception {
+        String pathName = "Merge Path " + TimeHelper.formatDate(System.currentTimeMillis());
         //make path concept
         UUID pathUUID = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, pathName);
         ConceptCB pathConceptBp = new ConceptCB(
@@ -845,7 +944,7 @@ public class PromotionEditorFrame extends ComponentFrame implements PropertyChan
                 ArchitectonicAuxiliary.Concept.IS_A_REL.getPrimoridalUid(),
                 ArchitectonicAuxiliary.Concept.RELEASE.getPrimoridalUid());
         pathConceptBp.setComponentUuid(pathUUID);
-        
+
         RefexCAB pathRefexBp = new RefexCAB(TK_REFEX_TYPE.CID,
                 TermAux.PATH.getLenient().getConceptNid(),
                 RefsetAux.PATH_REFSET.getLenient().getNid());
@@ -858,15 +957,15 @@ public class PromotionEditorFrame extends ComponentFrame implements PropertyChan
         pathOriginRefexBp.put(RefexCAB.RefexProperty.UUID1, Ts.get().getUuidPrimordialForNid(originPath.getConceptNid()));
         pathOriginRefexBp.put(RefexCAB.RefexProperty.INTEGER1, Integer.MAX_VALUE);
         pathRefexBp.setMemberUuid(UUID.randomUUID());
-        
+
         PathCB pathBp = new PathCB(pathConceptBp,
                 pathRefexBp,
                 pathOriginRefexBp,
                 Ts.get().getConcept(originPath.getConceptNid()));
-        
+
         TerminologyBuilderBI builder = Ts.get().getTerminologyBuilder(origConfig.getEditCoordinate(), origConfig.getViewCoordinate());
         PathBI mergePath = builder.construct(pathBp);;
-        
+
         return mergePath;
     }
 }

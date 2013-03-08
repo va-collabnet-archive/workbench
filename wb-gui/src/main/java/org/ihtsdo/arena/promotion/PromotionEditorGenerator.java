@@ -8,10 +8,13 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 import java.rmi.MarshalledObject;
 import java.util.Comparator;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
@@ -26,7 +29,11 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.ace.log.AceLog;
+import org.dwfa.ace.task.classify.SnorocketExTask;
+import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.util.I_InitComponentMenus;
+import org.dwfa.tapi.ComputationCanceled;
+import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.PathBI;
 
@@ -155,14 +162,40 @@ public class PromotionEditorGenerator implements I_InitComponentMenus{
             if (activeConfig != null) {
                 MarshalledObject<I_ConfigAceFrame> marshalledFrame =
                         new MarshalledObject<I_ConfigAceFrame>(AceConfig.config.getActiveConfig());
-                AceFrameConfig newFrameConfig = (AceFrameConfig) marshalledFrame.get();
+                final AceFrameConfig newFrameConfig = (AceFrameConfig) marshalledFrame.get();
                 newFrameConfig.setAceFrame(((AceFrameConfig) activeConfig).getAceFrame());
                 newFrameConfig.setDbConfig(activeConfig.getDbConfig());
                 newFrameConfig.setWorker(activeConfig.getWorker());
 
-                PromotionEditorFrame newFrame = new PromotionEditorFrame(newFrameConfig,
+                final PromotionEditorFrame newFrame = new PromotionEditorFrame(newFrameConfig,
                         sourcePath, targetPath, mergePath);
-                newFrame.setVisible(true);
+                if (mergePath == null) {
+                    //run classifier before opening window
+                    new Thread(
+                            new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                SnorocketExTask classifier = new SnorocketExTask();
+                                classifier.runClassifier(newFrameConfig);
+                                classifier.commitClassification();
+                                newFrame.setVisible(true);
+                            } catch (ComputationCanceled ex) {
+                                Logger.getLogger(PromotionEditorFrame.class.getName()).log(Level.SEVERE, null, ex);
+                            } catch (TerminologyException ex) {
+                                Logger.getLogger(PromotionEditorFrame.class.getName()).log(Level.SEVERE, null, ex);
+                            } catch (IOException ex) {
+                                Logger.getLogger(PromotionEditorFrame.class.getName()).log(Level.SEVERE, null, ex);
+                            } catch (TaskFailedException ex) {
+                                Logger.getLogger(PromotionEditorFrame.class.getName()).log(Level.SEVERE, null, ex);
+                            } catch (Exception ex) {
+                                Logger.getLogger(PromotionEditorFrame.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                        }
+                    }).start();
+                } else {
+                    newFrame.setVisible(true);
+                }
             }
         } else if (JOptionPane.CANCEL_OPTION != value && (sourcePath == null || targetPath == null)) {                   
             doPathSelection("Please set paths before contiuing");
