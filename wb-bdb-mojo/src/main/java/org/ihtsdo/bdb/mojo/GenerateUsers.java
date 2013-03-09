@@ -97,6 +97,7 @@ import java.util.UUID;
 import java.util.logging.Level;
 
 import javax.swing.JOptionPane;
+import org.ihtsdo.ttk.queue.QueueAddress;
 
 /**
  * Goal which generated the users for the application.
@@ -1092,6 +1093,7 @@ NEXT_WHILE:
       QueuePreferences queuePrefs     = new QueuePreferences(inboxName, id,
                                            queueDirectory, Boolean.FALSE,
                                            queueType);
+      queuePrefs.getServiceItemProperties().add(new QueueAddress(inboxName));
 
       queueList.getQueuePreferences().add(queuePrefs);
    }
@@ -1105,6 +1107,7 @@ NEXT_WHILE:
       QueuePreferences queuePrefs     = new QueuePreferences(outboxName, id,
                                            queueDirectory, Boolean.FALSE,
                                            queueType);
+      queuePrefs.getServiceItemProperties().add(new QueueAddress(outboxName));
 
       queueList.getQueuePreferences().add(queuePrefs);
    }
