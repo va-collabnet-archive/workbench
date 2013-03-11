@@ -34,7 +34,7 @@ import java.util.Properties;
  * @requiresDependencyResolution runtime
  * 
  */
-public class AppInfo extends AbstractMojo {
+public class AppInfoMojo extends AbstractMojo {
 
     /**
      * Location of the workbench bundle directory.
