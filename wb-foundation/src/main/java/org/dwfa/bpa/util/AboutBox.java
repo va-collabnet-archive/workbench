@@ -79,7 +79,7 @@ public class AboutBox {
 
         // As a convenience, JDialog adds to the contentPane directly.
         aboutBox.add(aboutLabel, BorderLayout.CENTER);
-        String version = "1.0-basic-site-SNAPSHOT";  // TODO: Get dynamically.
+        String version = AppInfo.getProperty("version");
         JLabel siteLink = createSiteLink(version);
         aboutBox.add(siteLink, BorderLayout.SOUTH);
         aboutBox.pack();
