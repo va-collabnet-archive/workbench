@@ -129,6 +129,9 @@ public class DialectHelper {
             int dialectNid, ViewCoordinate vc) throws IOException,
             ContradictionException, UnsupportedDialectOrLanguage {
         lazyInit(dialectNid);
+        if(!desc.getLang().equals("en")){
+            return false;
+        }
         if (isTextForDialect(desc.getText(), dialectNid)) {
             return false;
         }
