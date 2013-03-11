@@ -79,8 +79,7 @@ public class AboutBox {
 
         // As a convenience, JDialog adds to the contentPane directly.
         aboutBox.add(aboutLabel, BorderLayout.CENTER);
-        String version = AppInfo.getProperty("version");
-        JLabel siteLink = createSiteLink(version);
+        JLabel siteLink = createSiteLink();
         aboutBox.add(siteLink, BorderLayout.SOUTH);
         aboutBox.pack();
         aboutBox.setModal(true);
@@ -111,14 +110,19 @@ public class AboutBox {
         return title;
     }
 
-    private static JLabel createSiteLink(String version) {
-        // TODO: Get from appinfo.properties.
-        final String href = "https://csfe.aceworkspace.net/svn/repos/cmt-rf2-archetypes/branches/basic-site/site/index.html";
+    private static JLabel createSiteLink() {
+        // Get from properties from AppInfo.
+        // TODO: Factor keys out as constants somewhere. 
+        String site_url = AppInfo.getProperty("siteURL"); 
+        String version = AppInfo.getProperty("version");
+        
+        // Build a link label.
+        final String href = site_url + "index.html";
         String text = "Version " + version;
         JLabel label = new JLabel("<html><a href=\"" + href + "\">" + text + "</a></html>");
         label.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
-        // Help center within dialog. 
+        // Center label within dialog. 
         label.setHorizontalAlignment(SwingConstants.CENTER);
         label.setVerticalAlignment(SwingConstants.CENTER);
         label.setBorder(new EmptyBorder(0, 0, 5, 0));  // Padding on bottom.

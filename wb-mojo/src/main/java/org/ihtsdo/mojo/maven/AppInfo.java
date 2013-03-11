@@ -68,6 +68,14 @@ public class AppInfo extends AbstractMojo {
      */
     private String version;
 
+    /**
+     * The site URL.
+     *
+     * @parameter expression="${project.distributionManagement.site.url}"
+     * @required
+     */
+    private String siteURL;
+
     public void execute() throws MojoExecutionException, MojoFailureException {
         try {
             Properties appInfoProperties = exportAppInfoProperties();
@@ -84,6 +92,9 @@ public class AppInfo extends AbstractMojo {
        appInfoProperties.setProperty(EnumBasedPreferences.GROUP_ID, groupId);
        appInfoProperties.setProperty(EnumBasedPreferences.ARTIFACT_ID, artifactId);
        appInfoProperties.setProperty(EnumBasedPreferences.VERSION, version);
+
+       // Set workbench site properties.
+       appInfoProperties.setProperty("siteURL", siteURL);  // TODO: Factor key out as constant somewhere. 
 
        // Write out to file.
        File profileRoot = new File(wbBundleDir, "profiles");
