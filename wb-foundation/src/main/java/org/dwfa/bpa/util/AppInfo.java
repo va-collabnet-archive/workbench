@@ -34,6 +34,16 @@ public final class AppInfo {
     }
     
     /**
+     * Convenience method for getting a property from the internal instance.
+     * If properties have not been loaded yet, an {@link IllegalStateException}
+     * will be thrown.
+     * @param key The property to look up. 
+     */
+    public static String getProperty(String key) {
+        return getProperties().getProperty(key);
+    }
+    
+    /**
      * Load properties from the specified file into a {@link Properties} object,
      * and return it when complete.
      * If properties have already been loaded, an {@link IllegalStateException}
