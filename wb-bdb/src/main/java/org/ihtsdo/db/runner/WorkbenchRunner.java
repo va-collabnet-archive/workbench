@@ -15,6 +15,7 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.svn.SvnPrompter;
 import org.dwfa.app.DwfaEnv;
 import org.dwfa.bpa.process.TaskFailedException;
+import org.dwfa.bpa.util.AppInfo;
 import org.dwfa.bpa.util.ComponentFrameBean;
 import org.dwfa.bpa.util.OpenFrames;
 import org.dwfa.cement.ArchitectonicAuxiliary;
@@ -456,13 +457,11 @@ public class WorkbenchRunner {
 
     private EnumBasedPreferences loadUserPreferences(String userName) throws BackingStoreException,
             FileNotFoundException, IOException,
-            InvalidPreferencesFormatException, Exception {
+            InvalidPreferencesFormatException {
         
         // Load app info properties from XML.
-        Properties appInfoProperties = new Properties();
         File profileRoot = new File("profiles");
-        File appInfoPropertiesFile = new File(profileRoot, "appinfo.properties");
-        appInfoProperties.loadFromXML(new FileInputStream(appInfoPropertiesFile));
+        Properties appInfoProperties = AppInfo.loadProperties(profileRoot, "appinfo.properties");
         
         // Load new-style user preferences.        
         String appPrefix = EnumBasedPreferences.getDefaultAppPrefix(appInfoProperties, userName);

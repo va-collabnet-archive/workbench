@@ -631,35 +631,11 @@ NEXT_WHILE:
                getLog().info("db closed");
             }
          }
-
-         // Finally, export the groupId, artifactId, version to a properties file.
-         // This will be queried when the workbench launches to load user pref's.
-         exportAppInfoProperties();
       } catch (Exception ex) {
          throw new MojoExecutionException(ex.getLocalizedMessage(), ex);
       } catch (Throwable ex) {
          throw new MojoExecutionException(ex.getLocalizedMessage(), ex);
       }
-   }
-
-   private void exportAppInfoProperties()
-           throws FileNotFoundException, IOException {
-      Properties appInfoProperties = new Properties();
-
-      // Set workbench build properties.
-      appInfoProperties.setProperty(EnumBasedPreferences.GROUP_ID, groupId);
-      appInfoProperties.setProperty(EnumBasedPreferences.ARTIFACT_ID,
-                                    artifactId);
-      appInfoProperties.setProperty(EnumBasedPreferences.VERSION, version);
-
-      // Write out to file.
-      File   profileRoot           = new File(wbBundleDir, PROFILE_ROOT);
-      File   appInfoPropertiesFile = new File(profileRoot,
-                                        "appinfo.properties");
-      String comment               = "App Info";
-
-      appInfoProperties.storeToXML(new FileOutputStream(appInfoPropertiesFile),
-                                   comment);
    }
 
    private ConceptVersionBI identifyExistingEditorCategory(String[] columns,
