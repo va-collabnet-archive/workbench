@@ -159,6 +159,12 @@ public class WorkbenchRunner {
                     System.exit(0);
                 }
             });
+            
+            // Load AppInfo properties prior to adding the activity,
+            // because downstream the ActivityViewer will need them.
+            File profileDir = new File("profiles");
+            AppInfo.loadProperties(profileDir, "appinfo.properties");
+
             ActivityViewer.addActivity(activity);
 
             if ((System.getProperty("viewer") != null) && System.getProperty("viewer").toLowerCase().startsWith("t")) {
@@ -194,8 +200,6 @@ public class WorkbenchRunner {
 
             // Check to see if there is a custom Properties file
             checkCustom();
-
-            File profileDir = new File("profiles");
 
             if (((profileDir.exists() == false) && initializeFromSubversion) || (svnUpdateOnStart != null)) {
                 Svn.setConnectedToSvn(true);
@@ -459,11 +463,8 @@ public class WorkbenchRunner {
             FileNotFoundException, IOException,
             InvalidPreferencesFormatException {
         
-        // Load app info properties from XML.
-        File profileRoot = new File("profiles");
-        Properties appInfoProperties = AppInfo.loadProperties(profileRoot, "appinfo.properties");
-        
-        // Load new-style user preferences.        
+        // Load new-style user preferences.
+        Properties appInfoProperties = AppInfo.getProperties();
         String appPrefix = EnumBasedPreferences.getDefaultAppPrefix(appInfoProperties, userName);
         EnumBasedPreferences prefs = new EnumBasedPreferences(appPrefix);
         TtkPreferences.set(prefs);
