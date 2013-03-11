@@ -19,14 +19,10 @@
  */
 package org.dwfa.bpa.util;
 
-import org.dwfa.app.I_ManageStandardAppFunctions;
-
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Desktop;
 import java.awt.Dimension;
-import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.event.MouseAdapter;
@@ -36,15 +32,12 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.util.logging.Logger;
-
 import javax.swing.ImageIcon;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
-import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
-import javax.swing.border.LineBorder;
 
 /**
  * @author kec
@@ -53,7 +46,7 @@ import javax.swing.border.LineBorder;
  */
 public class AboutBox {
     
-    private static Logger logger = Logger.getLogger(AboutBox.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(AboutBox.class.getName());
 
     private static final String GRAPHIC_PROPERTY = "org.dwfa.AboutBoxGraphic";
     private static final String TITLE_PROPERTY = "org.dwfa.AboutBoxTitle";
@@ -137,7 +130,8 @@ public class AboutBox {
                 try {
                     Desktop.getDesktop().browse(new URI(href));
                 } catch (Exception ex) {
-                    
+                    LOGGER.warning("Could not open link '" + href + "': " +
+                            ex.getLocalizedMessage());
                 }
             }
         });
