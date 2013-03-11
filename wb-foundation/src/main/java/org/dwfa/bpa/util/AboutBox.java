@@ -113,8 +113,8 @@ public class AboutBox {
     private static JLabel createSiteLink() {
         // Get from properties from AppInfo.
         // TODO: Factor keys out as constants somewhere. 
-        String site_url = AppInfo.getProperty("siteURL"); 
-        String version = AppInfo.getProperty("version");
+        String site_url = AppInfoProperties.getProperty("siteURL"); 
+        String version = AppInfoProperties.getProperty("version");
         
         // Build a link label.
         final String href = site_url + "index.html";

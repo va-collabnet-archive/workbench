@@ -15,7 +15,7 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.svn.SvnPrompter;
 import org.dwfa.app.DwfaEnv;
 import org.dwfa.bpa.process.TaskFailedException;
-import org.dwfa.bpa.util.AppInfo;
+import org.dwfa.bpa.util.AppInfoProperties;
 import org.dwfa.bpa.util.ComponentFrameBean;
 import org.dwfa.bpa.util.OpenFrames;
 import org.dwfa.cement.ArchitectonicAuxiliary;
@@ -163,7 +163,7 @@ public class WorkbenchRunner {
             // Load AppInfo properties prior to adding the activity,
             // because downstream the ActivityViewer will need them.
             File profileDir = new File("profiles");
-            AppInfo.loadProperties(profileDir, "appinfo.properties");
+            AppInfoProperties.loadProperties(profileDir, "appinfo.properties");
 
             ActivityViewer.addActivity(activity);
 
@@ -464,7 +464,7 @@ public class WorkbenchRunner {
             InvalidPreferencesFormatException {
         
         // Load new-style user preferences.
-        Properties appInfoProperties = AppInfo.getProperties();
+        Properties appInfoProperties = AppInfoProperties.getProperties();
         String appPrefix = EnumBasedPreferences.getDefaultAppPrefix(appInfoProperties, userName);
         EnumBasedPreferences prefs = new EnumBasedPreferences(appPrefix);
         TtkPreferences.set(prefs);

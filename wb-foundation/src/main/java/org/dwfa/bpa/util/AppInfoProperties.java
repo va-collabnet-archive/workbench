@@ -14,7 +14,7 @@ import java.util.Properties;
  * 
  * @author ocarlsen
  */
-public final class AppInfo {
+public final class AppInfoProperties {
 
     private static final Properties APP_INFO = new Properties();
     
