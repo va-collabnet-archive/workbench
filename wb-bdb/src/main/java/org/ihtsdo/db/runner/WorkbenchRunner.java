@@ -163,7 +163,7 @@ public class WorkbenchRunner {
             // Load AppInfo properties prior to adding the activity,
             // because downstream the ActivityViewer will need them.
             File profileDir = new File("profiles");
-            AppInfoProperties.loadProperties(profileDir, "appinfo.properties");
+            AppInfoProperties.loadFromXML(profileDir, "appinfo.properties");
 
             ActivityViewer.addActivity(activity);
 

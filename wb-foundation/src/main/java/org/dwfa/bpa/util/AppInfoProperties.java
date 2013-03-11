@@ -53,7 +53,7 @@ public final class AppInfoProperties {
      * @throws FileNotFoundException 
      * @throws InvalidPropertiesFormatException 
      */
-    public static Properties loadProperties(File appInfoPropertiesFile)
+    public static Properties loadFromXML(File appInfoPropertiesFile)
             throws InvalidPropertiesFormatException, FileNotFoundException, IOException {
         // Throw IllegalStateException if already loaded.
         if (loaded) {
@@ -76,10 +76,10 @@ public final class AppInfoProperties {
      * @throws FileNotFoundException 
      * @throws InvalidPropertiesFormatException 
      */
-    public static Properties loadProperties(File parentDir, String propertiesFilename)
+    public static Properties loadFromXML(File parentDir, String propertiesFilename)
             throws InvalidPropertiesFormatException, FileNotFoundException, IOException {
         File appInfoPropertiesFile = new File(parentDir, propertiesFilename);
-        return loadProperties(appInfoPropertiesFile);
+        return loadFromXML(appInfoPropertiesFile);
     }
    
     /**
@@ -91,7 +91,7 @@ public final class AppInfoProperties {
         String propertiesFilename = args[0];
         File propertiesFile = new File(propertiesFilename);
         
-        Properties p = loadProperties(propertiesFile);
+        Properties p = loadFromXML(propertiesFile);
         System.out.println(p.getProperty("version"));
     }
 }
