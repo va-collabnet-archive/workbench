@@ -465,7 +465,8 @@ public class WorklistMemberReAssignment extends JPanel {
 						pBarW.setVisible(false);
 						JOptionPane.showMessageDialog(WorklistMemberReAssignment.this, "Worklist members sent!", "Message",
 								JOptionPane.INFORMATION_MESSAGE);
-						// worker.execute(process);
+						pBarW.setVisible(false);
+						refreshButtonActionPerformed(null);
 					} catch (Exception e) {
 						// error getting the workflow
 						pBarW.setVisible(false);
@@ -474,8 +475,6 @@ public class WorklistMemberReAssignment extends JPanel {
 					}
 				}
 			});
-			pBarW.setVisible(false);
-			refreshButtonActionPerformed(null);
 		}
 	}
 
