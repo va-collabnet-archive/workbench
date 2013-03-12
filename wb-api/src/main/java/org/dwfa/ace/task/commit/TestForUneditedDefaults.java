@@ -78,11 +78,6 @@ public class TestForUneditedDefaults extends AbstractConceptTest {
                     AlertToDataConstraintFailure alert = new AlertToDataConstraintFailure(alertType, alertString,
                         concept);
 
-                    if (part.getText().equalsIgnoreCase("New Description")) {
-                        AbortDescriptionPart fixup = new AbortDescriptionPart(concept, desc, part);
-                        alert.getFixOptions().add(fixup);
-                    }
-
                     ArrayList<AlertToDataConstraintFailure> alertList = new ArrayList<AlertToDataConstraintFailure>();
                     alertList.add(alert);
                     return alertList;
