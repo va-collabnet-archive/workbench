@@ -437,7 +437,7 @@ public class WorklistMemberReAssignment extends JPanel {
 				wfInstance.setDestination(wfUser);
 				wfInstance.setWfDefinition(workList.getWorkflowDefinition());
 				List<WfAction> posibleActions = interpreter.getPossibleActions(wfInstance, wfUser);
-				if (posibleActions != null && !posibleActions.isEmpty()) {
+				if (posibleActions != null && !posibleActions.isEmpty() && !result.contains(wfUser)) {
 					result.add(wfUser);
 				}
 			}
