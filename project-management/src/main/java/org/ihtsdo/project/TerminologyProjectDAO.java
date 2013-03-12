@@ -3114,6 +3114,8 @@ public class TerminologyProjectDAO {
 		try {
 			I_IntSet allowedDestRelTypes = termFactory.newIntSet();
 			allowedDestRelTypes.add(ArchitectonicAuxiliary.Concept.IS_A_REL.localize().getNid());
+			I_IntSet allowedStatuses = config.getAllowedStatus();
+			allowedStatuses.remove(ArchitectonicAuxiliary.Concept.INACTIVE.localize().getNid());
 			Set<? extends I_GetConceptData> parents = workListConcept.getSourceRelTargets(config.getAllowedStatus(), allowedDestRelTypes, config.getViewPositionSetReadOnly(), Precedence.TIME, config.getConflictResolutionStrategy());
 
 			if (parents.size() != 1) {
