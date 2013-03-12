@@ -31,6 +31,7 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JDialog;
@@ -79,8 +80,8 @@ public class AboutBox {
 
         // As a convenience, JDialog adds to the contentPane directly.
         aboutBox.add(aboutLabel, BorderLayout.CENTER);
-        JLabel siteLink = createSiteLink();
-        aboutBox.add(siteLink, BorderLayout.SOUTH);
+        JLabel versionLabel = createVersionLabel();
+        aboutBox.add(versionLabel, BorderLayout.SOUTH);
         aboutBox.pack();
         aboutBox.setModal(true);
         return aboutBox;
@@ -110,22 +111,34 @@ public class AboutBox {
         return title;
     }
 
-    private static JLabel createSiteLink() {
+    private static JLabel createVersionLabel() {
         // Get from properties from AppInfo.
         // TODO: Factor keys out as constants somewhere. 
         String site_url = AppInfoProperties.getProperty("siteURL"); 
         String version = AppInfoProperties.getProperty("version");
         
-        // Build a link label.
-        final String href = site_url + "index.html";
-        String text = "Version " + version;
-        JLabel label = new JLabel("<html><a href=\"" + href + "\">" + text + "</a></html>");
-        label.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        JLabel label = null;
+        String labelText = "Version " + version;
+
+        // Build a link label if site is specified, a plain old label otherwise.
+        if (site_url != null) {
+            label = createLinkLabel(site_url, labelText);           
+        } else {
+            label = new JLabel(labelText);
+        }
 
         // Center label within dialog. 
         label.setHorizontalAlignment(SwingConstants.CENTER);
         label.setVerticalAlignment(SwingConstants.CENTER);
         label.setBorder(new EmptyBorder(0, 0, 5, 0));  // Padding on bottom.
+        
+        return label;
+    }
+
+    private static JLabel createLinkLabel(String siteURL, String labelText) {
+        final String href = siteURL + "index.html";
+        JLabel label = new JLabel("<html><a href=\"" + href + "\">" + labelText + "</a></html>");
+        label.setCursor(new Cursor(Cursor.HAND_CURSOR));
         
         // Open browser on mouse click.
         label.addMouseListener(new MouseAdapter() {
@@ -134,8 +147,8 @@ public class AboutBox {
                 try {
                     Desktop.getDesktop().browse(new URI(href));
                 } catch (Exception ex) {
-                    LOGGER.warning("Could not open link '" + href + "': " +
-                            ex.getLocalizedMessage());
+                    String msg = "Could not open link: " + href;
+                    LOGGER.log(Level.WARNING, msg, ex);  // Will print stack trace.
                 }
             }
         });
