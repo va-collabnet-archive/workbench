@@ -5782,7 +5782,7 @@ public class TerminologyProjectDAO {
 	public static List<WfMembership> convertToMembershipList(List<String> list) throws Exception {
 		List<WfMembership> members = new ArrayList<WfMembership>();
 		for (String line : list) {
-			String[] fields = line.split("|");
+			String[] fields = line.split("\\|");
 			I_GetConceptData userConcept = Terms.get().getConcept(UUID.fromString(fields[1]));
 			WfUser user = new WfUser(userConcept.toString(), userConcept.getPrimUuid());
 			
