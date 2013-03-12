@@ -236,10 +236,12 @@ public class ImportOwlConcepts extends AbstractTask {
                                         + owl.getFsn());
                             }
                         }
-                        //retire exisitng rels that aren't part of definition
+                        //retire exisitng is-a rels that aren't part of definition
                         ConceptVersionBI conceptVersion = concept.getVersion(config.getViewCoordinate());
                         for (RelationshipVersionBI rel : conceptVersion.getRelationshipsOutgoingActiveIsa()) {
-                            if (!relsSeen.contains(rel.getPrimUuid()) && rel.getCharacteristicNid() != SnomedMetadataRfx.getREL_CH_INFERRED_RELATIONSHIP_NID()) {
+                            if (!relsSeen.contains(rel.getPrimUuid()) 
+                                    && rel.getCharacteristicNid() != SnomedMetadataRfx.getREL_CH_INFERRED_RELATIONSHIP_NID()
+                                    && rel.getTypeNid() == Snomed.IS_A.getLenient().getConceptNid()) {
                                 RelationshipCAB relBp = rel.makeBlueprint(config.getViewCoordinate());
                                 relBp.setRetired();
                                 relBp.setComponentUuidNoRecompute(rel.getPrimUuid());
