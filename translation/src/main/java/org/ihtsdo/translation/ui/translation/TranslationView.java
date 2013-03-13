@@ -57,11 +57,12 @@ import org.ihtsdo.project.workflow.model.WfPermission;
 import org.ihtsdo.project.workflow.model.WfRole;
 import org.ihtsdo.project.workflow.model.WfUser;
 import org.ihtsdo.project.workflow.model.WorkflowDefinition;
-import org.ihtsdo.qa.gui.viewers.ui.HierarchyNavigator;
 import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.translation.LanguageUtil;
 import org.ihtsdo.translation.ui.ConfigTranslationModule;
 import org.ihtsdo.translation.ui.ConfigTranslationModule.EditorMode;
+import org.ihtsdo.translation.ui.HierarchyNavigator;
 import org.ihtsdo.translation.ui.SimilarityPanel;
 import org.ihtsdo.translation.ui.TranslationWlstMemberLogPanel;
 import org.ihtsdo.translation.ui.event.ClearAllPanelEvent;
@@ -145,9 +146,9 @@ public class TranslationView extends JPanel {
 		descriptionPanel1.clearForm();
 		sourceTable.clearAll();
 		targetTable.clearAll();
-		I_GetConceptData c = null;
+		ConceptVersionBI c = null;
 		hierarchyNavigator1.setFocusConcept(c);
-		conceptDetailsPanel1.updateDetailsTree(null);
+		conceptDetailsPanel1.updateDetailsTree(c);
 		translationPanelMenu1.updateTranslationPanelMenue(true, translConfig);
 		comments.clearComments();
 	}
@@ -190,7 +191,7 @@ public class TranslationView extends JPanel {
 			}
 			targetTable.populateTable(project, worklistMember, false, translConfig, result, this.readOnlyMode);
 
-			hierarchyNavigator1.setFocusConcept(worklistMember.getConcept());
+			hierarchyNavigator1.setFocusConcept(Ts.get().getConceptVersion(config.getViewCoordinate(), worklistMember.getConcept().getConceptNid()));
 			conceptDetailsPanel1.updateDetailsTree(worklistMember);
 			comments.updateCommentsPanel(roleConcept, targetLangRefset, worklistMember);
 			if (isOutbox) {

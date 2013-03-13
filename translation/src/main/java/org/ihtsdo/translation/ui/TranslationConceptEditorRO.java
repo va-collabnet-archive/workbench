@@ -100,6 +100,7 @@ import org.ihtsdo.project.refset.CommentsRefset;
 import org.ihtsdo.project.refset.LanguageMembershipRefset;
 import org.ihtsdo.project.util.IconUtilities;
 import org.ihtsdo.project.view.issue.IssuesListPanel2;
+import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 import org.ihtsdo.translation.LanguageUtil;
 import org.ihtsdo.translation.SimilarityMatchedItem;
@@ -2098,7 +2099,7 @@ public class TranslationConceptEditorRO extends JPanel {
 			populateSourceTree();
 			populateTargetTree();
 			populateDetailsTree();
-			hierarchyNavigator1.setFocusConcept(concept);
+			hierarchyNavigator1.setFocusConcept(Ts.get().getConceptVersion(config.getViewCoordinate(), concept.getConceptNid()));
 
 			getPreviousComments();
 			getWebReferences();

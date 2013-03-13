@@ -130,6 +130,7 @@ import org.ihtsdo.project.workflow.model.WfPermission;
 import org.ihtsdo.project.workflow.model.WfRole;
 import org.ihtsdo.project.workflow.model.WfUser;
 import org.ihtsdo.project.workflow.model.WorkflowDefinition;
+import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.RelAssertionType;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 import org.ihtsdo.translation.FSNGenerationException;
@@ -3473,7 +3474,7 @@ public class TranslationPanel extends JPanel {
 				public void run() {
 					try {
 						hierarchyNavigator1.setContainerPanel(tabbedPane3);
-						hierarchyNavigator1.setFocusConcept(concept);
+						hierarchyNavigator1.setFocusConcept(Ts.get().getConceptVersion(Terms.get().getActiveAceFrameConfig().getViewCoordinate(), concept.getConceptNid()));
 					} catch (Exception e) {
 						e.printStackTrace();
 					}

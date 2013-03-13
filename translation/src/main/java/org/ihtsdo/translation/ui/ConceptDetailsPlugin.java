@@ -22,14 +22,15 @@ import java.util.UUID;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 
-import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.api.I_HostConceptPlugins.TOGGLES;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.gui.concept.AbstractPlugin;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.translation.ConceptDetailsPanel;
+import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.translation.ui.translation.ConceptDetailsPanel;
 
 /**
  * The Class SimilarityPlugintst.
@@ -101,11 +102,11 @@ public class ConceptDetailsPlugin extends AbstractPlugin {
 	@Override
 	public void update() throws IOException {
 		System.out.println("");
-		I_GetConceptData hostConcept = null;
+		ConceptVersionBI hostConcept = null;
 		if (host!=null){
 		if (host.getTermComponent() != null) {
 			try {
-				hostConcept = Terms.get().getConcept(host.getTermComponent().getNid());
+				hostConcept = Ts.get().getConceptVersion(Terms.get().getActiveAceFrameConfig().getViewCoordinate(),host.getTermComponent().getNid());
 			} catch (TerminologyException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -115,7 +116,7 @@ public class ConceptDetailsPlugin extends AbstractPlugin {
 			}
 		}
 		System.out.println("updating --------------------" );
-		conceptDetailsPanel.update(hostConcept);
+		conceptDetailsPanel.updateDetailsTree(hostConcept);
 		}
 	}
 
@@ -126,21 +127,20 @@ public class ConceptDetailsPlugin extends AbstractPlugin {
 		AceLog.getAppLog().info("Getting component for tree editor");
 		
 		if (conceptDetailsPanel == null) {
-			I_GetConceptData hostConcept = null;
+			ConceptVersionBI hostConcept = null;
 			if (host.getTermComponent() != null) {
 				try {
-					hostConcept = Terms.get().getConcept(host.getTermComponent().getNid());
+					hostConcept = Ts.get().getConceptVersion(Terms.get().getActiveAceFrameConfig().getViewCoordinate(),host.getTermComponent().getNid());
 				} catch (TerminologyException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
 //			treeEditorPanel = new ConceptTreeEditor(hostConcept);
 			this.host=host;
-			conceptDetailsPanel = new ConceptDetailsPanel(hostConcept);
+			conceptDetailsPanel = new ConceptDetailsPanel();
+			conceptDetailsPanel.updateDetailsTree(hostConcept);
 			pluginMark=new PluginContainerFrame(conceptDetailsPanel,"Concept Details");
 			this.host.addPropertyChangeListener("termComponent", this);
 			System.out.println("getcomponent");
