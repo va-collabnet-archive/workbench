@@ -34,6 +34,7 @@ import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 
 public class TermLabelMaker {
 
@@ -167,6 +168,81 @@ public class TermLabelMaker {
         }
         LabelForTuple ldt = new LabelForDescriptionTuple(desc, showLongForm, showStatus);
         return makeLabel(ldt, labelHtml, toolTipHtml);
+    }
+   
+    public static I_ImplementActiveLabel newLabel(DescriptionVersionBI desc, boolean showLongForm, boolean showStatus)
+    		throws IOException {
+    	I_GetConceptData typeBean = null;
+    	I_GetConceptData statusBean = null;
+    	String text = "null desc";
+    	if (desc != null) {
+    		text = desc.getText();
+    		try {
+    			typeBean = Terms.get().getConcept(desc.getTypeNid());
+    			statusBean = Terms.get().getConcept(desc.getStatusNid());
+    		} catch (TerminologyException e) {
+    			throw new IOException(e);
+    		}
+    	}
+    	StringBuffer labelBuff = new StringBuffer();
+    	StringBuffer toolTipBuff = new StringBuffer();
+    	if (BasicHTML.isHTMLString(text)) {
+    		text = text.substring(6);
+    	}
+    	labelBuff.append("<html>");
+    	labelBuff.append("<font face='Dialog' size='3'>");
+    	labelBuff.append(text);
+    	labelBuff.append(" &nbsp;</font>");
+    	toolTipBuff.append("<html>");
+    	StringBuffer writeBuff = labelBuff;
+    	if (showLongForm) {
+    		writeBuff = labelBuff;
+    		writeBuff.append("<br>");
+    	} else {
+    		writeBuff = toolTipBuff;
+    	}
+    	writeBuff.append("<font face='Dialog' size='2' color='#00008B'>&nbsp;");
+    	if (typeBean != null) {
+    		writeBuff.append(typeBean.getInitialText());
+    	}
+    	writeBuff.append(" (");
+    	if (desc != null) {
+    		writeBuff.append(desc.getLang());
+    	} else {
+    		writeBuff.append("null lang");
+    	}
+    	writeBuff.append(")</font> &#151 <font face='Dialog' size='2' color='#00008B'>");
+    	if (desc != null) {
+    		if (desc.isInitialCaseSignificant()) {
+    			writeBuff.append("fixed case&nbsp;");
+    		} else {
+    			writeBuff.append("changable case&nbsp;");
+    		}
+    	}
+    	writeBuff.append("</font>");
+    	
+    	if (showStatus) {
+    		writeBuff = labelBuff;
+    		writeBuff.append("<br>");
+    	} else {
+    		writeBuff = toolTipBuff;
+    		if (showLongForm == false) {
+    			writeBuff.append("<br>");
+    		}
+    	}
+    	writeBuff.append("<font face='Dialog' size='2' color='#00008B'>&nbsp;");
+    	if (statusBean != null) {
+    		writeBuff.append(statusBean.getInitialText());
+    	}
+    	writeBuff.append("</font>&nbsp;");
+    	
+    	String labelHtml = labelBuff.toString();
+    	String toolTipHtml = toolTipBuff.toString();
+    	if (desc == null) {
+    		
+    	}
+    	LabelForTuple ldt = new LabelForDescriptionVersion(desc, showLongForm, showStatus);
+    	return makeLabel(ldt, labelHtml, toolTipHtml);
     }
 
     public static I_ImplementActiveLabel newLabel(I_RelTuple rel, boolean showLongForm, boolean showStatus)
