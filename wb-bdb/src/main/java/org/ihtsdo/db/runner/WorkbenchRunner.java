@@ -15,6 +15,7 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.svn.SvnPrompter;
 import org.dwfa.app.DwfaEnv;
 import org.dwfa.bpa.process.TaskFailedException;
+import org.dwfa.bpa.util.AppInfoProperties;
 import org.dwfa.bpa.util.ComponentFrameBean;
 import org.dwfa.bpa.util.OpenFrames;
 import org.dwfa.cement.ArchitectonicAuxiliary;
@@ -158,6 +159,12 @@ public class WorkbenchRunner {
                     System.exit(0);
                 }
             });
+            
+            // Load AppInfo properties prior to adding the activity,
+            // because downstream the ActivityViewer will need them.
+            File profileDir = new File("profiles");
+            AppInfoProperties.loadFromXML(profileDir, "appinfo.properties");
+
             ActivityViewer.addActivity(activity);
 
             if ((System.getProperty("viewer") != null) && System.getProperty("viewer").toLowerCase().startsWith("t")) {
@@ -193,8 +200,6 @@ public class WorkbenchRunner {
 
             // Check to see if there is a custom Properties file
             checkCustom();
-
-            File profileDir = new File("profiles");
 
             if (((profileDir.exists() == false) && initializeFromSubversion) || (svnUpdateOnStart != null)) {
                 Svn.setConnectedToSvn(true);
@@ -456,15 +461,10 @@ public class WorkbenchRunner {
 
     private EnumBasedPreferences loadUserPreferences(String userName) throws BackingStoreException,
             FileNotFoundException, IOException,
-            InvalidPreferencesFormatException, Exception {
+            InvalidPreferencesFormatException {
         
-        // Load app info properties from XML.
-        Properties appInfoProperties = new Properties();
-        File profileRoot = new File("profiles");
-        File appInfoPropertiesFile = new File(profileRoot, "appinfo.properties");
-        appInfoProperties.loadFromXML(new FileInputStream(appInfoPropertiesFile));
-        
-        // Load new-style user preferences.        
+        // Load new-style user preferences.
+        Properties appInfoProperties = AppInfoProperties.getProperties();
         String appPrefix = EnumBasedPreferences.getDefaultAppPrefix(appInfoProperties, userName);
         EnumBasedPreferences prefs = new EnumBasedPreferences(appPrefix);
         TtkPreferences.set(prefs);

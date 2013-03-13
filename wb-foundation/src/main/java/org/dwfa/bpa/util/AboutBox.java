@@ -19,38 +19,35 @@
  */
 package org.dwfa.bpa.util;
 
-import java.awt.GridLayout;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.Toolkit;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
-
 import javax.swing.ImageIcon;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.SwingConstants;
+import javax.swing.border.EmptyBorder;
 
 /**
  * @author kec
- * 
+ * @author ocarlsen
  */
 public class AboutBox {
+    
+    private static final String GRAPHIC_PROPERTY = "org.dwfa.AboutBoxGraphic";
+    private static final String TITLE_PROPERTY = "org.dwfa.AboutBoxTitle";
+
     private static JDialog setupAbout(JFrame parent) {
 
-        String title = "About the IHTSDO Editor";
-
-        if (System.getProperty("org.dwfa.AboutBoxTitle") != null
-            && System.getProperty("org.dwfa.AboutBoxTitle").length() > 3) {
-            title = removeQuotes(System.getProperty("org.dwfa.AboutBoxTitle"));
-        }
+        String title = getTitle();
         JDialog aboutBox = new JDialog(parent, title);
 
-        String graphic = "config/about-box/ihtsdo_aboutbox.jpg";
-        if (System.getProperty("org.dwfa.AboutBoxGraphic") != null
-            && System.getProperty("org.dwfa.AboutBoxGraphic").length() > 3) {
-            graphic = removeQuotes(System.getProperty("org.dwfa.AboutBoxGraphic"));
-        }
+        String graphic = getGraphic();
         URL aboutBoxUrl = aboutBox.getClass().getResource(graphic);
         Toolkit tk = aboutBox.getToolkit();
         JLabel aboutLabel;
@@ -70,11 +67,54 @@ public class AboutBox {
         } else {
             aboutLabel = new JLabel("Cannot find " + graphic);
         }
-        aboutBox.getContentPane().setLayout(new GridLayout(1, 1));
-        aboutBox.getContentPane().add(aboutLabel);
+
+        // As a convenience, JDialog adds to the contentPane directly.
+        aboutBox.add(aboutLabel, BorderLayout.CENTER);
+        JLabel versionLabel = createVersionLabel();
+        aboutBox.add(versionLabel, BorderLayout.SOUTH);
         aboutBox.pack();
         aboutBox.setModal(true);
         return aboutBox;
+    }
+
+    private static String getGraphic() {
+        String graphic = "config/about-box/ihtsdo_aboutbox.jpg";
+        
+        // Look for property override.
+        if (System.getProperty(GRAPHIC_PROPERTY) != null
+            && System.getProperty(GRAPHIC_PROPERTY).length() > 3) {
+            graphic = removeQuotes(System.getProperty(GRAPHIC_PROPERTY));
+        }
+        
+        return graphic;
+    }
+
+    private static String getTitle() {
+        String title = "About the IHTSDO Editor";
+
+        // Look for property override.
+        if (System.getProperty(TITLE_PROPERTY) != null
+            && System.getProperty(TITLE_PROPERTY).length() > 3) {
+            title = removeQuotes(System.getProperty(TITLE_PROPERTY));
+        }
+        
+        return title;
+    }
+
+    private static JLabel createVersionLabel() {
+        // Get from properties from AppInfo.
+        // TODO: Factor keys out as constants somewhere. 
+        String version = AppInfoProperties.getProperty("version");
+        
+        String labelText = "Version " + version;
+        JLabel label = new JLabel(labelText);
+
+        // Center label within dialog. 
+        label.setHorizontalAlignment(SwingConstants.CENTER);
+        label.setVerticalAlignment(SwingConstants.CENTER);
+        label.setBorder(new EmptyBorder(0, 0, 5, 0));  // Padding on bottom.
+        
+        return label;
     }
 
     public static String removeQuotes(String str) {
@@ -89,5 +129,28 @@ public class AboutBox {
 
     public static JDialog getAboutBox(JFrame parent) {
         return setupAbout(parent);
+    }
+    
+    /**
+     * Helpful for testing outside an editor bundle.
+     */
+    public static void main(String[] args) {
+        // Configure image from command-line args.
+        String pathToGraphic = args[0];
+        System.setProperty(GRAPHIC_PROPERTY, pathToGraphic);
+        
+        JFrame frame = new JFrame(getTitle());
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setPreferredSize(new Dimension(400, 400));
+        frame.pack();
+        frame.setVisible(true);
+        
+        // This logic copied from ComponentFrameBean#about().
+        JDialog aboutBox = AboutBox.getAboutBox(frame);
+        aboutBox.pack();
+        aboutBox.setLocation((int) frame.getLocation().getX() + 22, (int) frame.getLocation().getY() + 22);
+        aboutBox.setResizable(false);
+        aboutBox.setVisible(true);
+        aboutBox.toFront();
     }
 }
