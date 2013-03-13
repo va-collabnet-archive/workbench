@@ -3238,7 +3238,9 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
                 getLog().info("!!! --- concept SNOMED id =" + conList.get(0).conSnoId);
 
                 getLog().info("!!! --- concept counter   #" + countCon);
-                getLog().info("!!! --- description       \"" + desList.get(0).termText + "\"");
+                if(!desList.isEmpty()){
+                    getLog().info("!!! --- description       \"" + desList.get(0).termText + "\"");
+                }
                 getLog().info("!!! \r\n");
 //                throw new MojoFailureException("Case not implemented -- executeMojoStep7()");
             }

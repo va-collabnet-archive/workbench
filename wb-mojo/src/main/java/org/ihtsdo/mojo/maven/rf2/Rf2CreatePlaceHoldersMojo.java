@@ -334,19 +334,22 @@ public class Rf2CreatePlaceHoldersMojo extends AbstractMojo implements Serializa
         int tbm = 0;
         for (int m = 0; m < mergedData.length; m++) {
             if (a == dataA.length) {
-                mergedData[m] = toBeMerged[tbm];
-                tbm++;
-            } else if (dataA[a] < toBeMerged[tbm]) {
+                    mergedData[m] = toBeMerged[tbm];
+                        tbm++;
+            } else if(tbm >= toBeMerged.length){
+                mergedData[m] = dataA[a];
+                a++;
+            }else if (dataA[a] < toBeMerged[tbm]) {
                 mergedData[m] = dataA[a];
                 a++;
             } else if (dataA[a] == toBeMerged[tbm]) {
                 throw new MojoFailureException(
                         "dataA[a] and toBeMerged[tbm] must be mutually exclusive");
             } else {
-                mergedData[m] = toBeMerged[tbm];
-                tbm++;
-            }
-        }
+                    mergedData[m] = toBeMerged[tbm];
+                        tbm++;
+                    }
+                }
         if (a < dataA.length || tbm < toBeMerged.length) {
             throw new MojoFailureException("mergeConceptArrays failed completion check");
         }
