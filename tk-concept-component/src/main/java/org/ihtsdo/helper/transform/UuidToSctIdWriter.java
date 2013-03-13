@@ -22,22 +22,34 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import org.ihtsdo.country.COUNTRY_CODE;
 import org.ihtsdo.helper.rf2.Rf2File;
+import static org.ihtsdo.helper.rf2.Rf2File.IdentifiersFileFields.ACTIVE;
+import static org.ihtsdo.helper.rf2.Rf2File.IdentifiersFileFields.ALTERNATE_IDENTIFIER;
+import static org.ihtsdo.helper.rf2.Rf2File.IdentifiersFileFields.EFFECTIVE_TIME;
+import static org.ihtsdo.helper.rf2.Rf2File.IdentifiersFileFields.IDENTIFIER_SCHEME_ID;
+import static org.ihtsdo.helper.rf2.Rf2File.IdentifiersFileFields.MODULE_ID;
+import static org.ihtsdo.helper.rf2.Rf2File.IdentifiersFileFields.REFERENCED_COMPONENT_ID;
 import org.ihtsdo.helper.rf2.Rf2File.ReleaseType;
 import org.ihtsdo.helper.time.TimeHelper;
 import org.ihtsdo.lang.LANG_CODE;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ComponentChronicleBI;
+import org.ihtsdo.tk.api.ComponentVersionBI;
+import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.TerminologyStoreDI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.description.DescriptionChronicleBI;
 import org.ihtsdo.tk.api.id.IdBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
+import org.ihtsdo.tk.binding.snomed.Snomed;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf1;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 import org.ihtsdo.tk.binding.snomed.TermAux;
+import org.ihtsdo.tk.spec.ConceptSpec;
 import org.ihtsdo.tk.spec.ValidationException;
 
 /**
@@ -87,6 +99,9 @@ public class UuidToSctIdWriter {
     private COUNTRY_CODE countryCode;
     private Date effectiveDate;
     private File content;
+    private ConceptSpec uuidIdScheme = new ConceptSpec("SNOMED CT universally unique identifier (core metadata concept)",
+            UUID.fromString("680f3f6c-7a2a-365d-b527-8c9a96dd1a94"));
+    private ViewCoordinate vc;
 
     /**
      * Instantiates a new uuid to sct id writer for release files from the
@@ -104,7 +119,8 @@ public class UuidToSctIdWriter {
     public UuidToSctIdWriter(String namespace, String module,
             File directory, UuidSnomedMapHandler handler,
             ReleaseType releaseType, COUNTRY_CODE countryCode,
-            Date effectiveDate) {
+            Date effectiveDate,
+            ViewCoordinate releaseViewCoordinate) {
         this.namespace = namespace;
         this.module = module;
         this.directory = directory;
@@ -113,6 +129,7 @@ public class UuidToSctIdWriter {
         this.releaseType = releaseType;
         this.countryCode = countryCode;
         this.effectiveDate = effectiveDate;
+        this.vc = releaseViewCoordinate;
     }
 
     /**
@@ -158,7 +175,7 @@ public class UuidToSctIdWriter {
      *
      * @throws IOException signals that an I/O exception has occurred
      */
-    public void write() throws IOException {
+    public void write() throws IOException, ContradictionException {
         setup();
 
         String moduleId = module;
@@ -245,20 +262,24 @@ public class UuidToSctIdWriter {
             refsetDescLine = refsetDescReader.readLine();
         }
 
-        String idLine = identifiersReader.readLine();
-        idLine = identifiersReader.readLine();
-        while (idLine != null) {
-            processIdentifiers(idLine, identifiersWriter);
-            idLine = identifiersReader.readLine();
-        }
-
-        if (privateIdentifiersReader != null && privateIdentifiersWriter != null) {
-            String privateIdLine = privateIdentifiersReader.readLine();
-            privateIdLine = privateIdentifiersReader.readLine();
-            while (privateIdLine != null) {
-                processIdentifiers(privateIdLine, privateIdentifiersWriter);
-                privateIdLine = privateIdentifiersReader.readLine();
-            }
+//        String idLine = identifiersReader.readLine();
+//        idLine = identifiersReader.readLine();
+//        while (idLine != null) {
+//            processIdentifiers(idLine, identifiersWriter);
+//            idLine = identifiersReader.readLine();
+//        }
+//
+//        if (privateIdentifiersReader != null && privateIdentifiersWriter != null) {
+//            String privateIdLine = privateIdentifiersReader.readLine();
+//            privateIdLine = privateIdentifiersReader.readLine();
+//            while (privateIdLine != null) {
+//                processIdentifiers(privateIdLine, privateIdentifiersWriter);
+//                privateIdLine = privateIdentifiersReader.readLine();
+//            }
+//        }
+        processIdentifiers(identifiersWriter);
+        if(privateIdentifiersWriter != null){
+            processIdentifiers(privateIdentifiersWriter);
         }
         processSimpleRefsets();
         processUuidToSctMap();
@@ -511,6 +532,8 @@ public class UuidToSctIdWriter {
                         String conceptSctId = getExistingSctId(concept);
                         if (conceptSctId == null) {
                             conceptSctId = handler.getWithGeneration(UUID.fromString(concept), SctIdGenerator.TYPE.CONCEPT).toString();
+                        }
+                        if(!uuidToSctMap.containsKey(UUID.fromString(concept))){
                             this.uuidToSctMap.put(UUID.fromString(concept), conceptSctId);
                         }
                         conceptsWriter.write(conceptSctId + field.seperator);
@@ -555,9 +578,10 @@ public class UuidToSctIdWriter {
                         String descSctId = getExistingSctId(desc);
                         if (descSctId == null) {
                             descSctId = handler.getWithGeneration(UUID.fromString(desc), SctIdGenerator.TYPE.DESCRIPTION).toString();
+                        }
+                        if(!uuidToSctMap.containsKey(UUID.fromString(desc))){
                             this.uuidToSctMap.put(UUID.fromString(desc), descSctId);
                         }
-
                         descriptionsWriter.write(descSctId + field.seperator);
 
                         break;
@@ -572,6 +596,8 @@ public class UuidToSctIdWriter {
                         String conceptSctId = getExistingSctId(conceptId);
                         if (conceptSctId == null) {
                             conceptSctId = handler.getWithGeneration(UUID.fromString(conceptId), SctIdGenerator.TYPE.CONCEPT).toString();
+                        }
+                        if(!uuidToSctMap.containsKey(UUID.fromString(conceptId))){
                             this.uuidToSctMap.put(UUID.fromString(conceptId), conceptSctId);
                         }
                         descriptionsWriter.write(conceptSctId + field.seperator);
@@ -589,9 +615,10 @@ public class UuidToSctIdWriter {
                         String descTypeSctId = getExistingSctId(descType);
                         if (descTypeSctId == null) {
                             descTypeSctId = handler.getWithGeneration(UUID.fromString(descType), SctIdGenerator.TYPE.CONCEPT).toString();
+                        }
+                        if(!uuidToSctMap.containsKey(UUID.fromString(descType))){
                             this.uuidToSctMap.put(UUID.fromString(descType), descTypeSctId);
                         }
-
                         descriptionsWriter.write(descTypeSctId + field.seperator);
 
                         break;
@@ -646,6 +673,8 @@ public class UuidToSctIdWriter {
                         String relSctId = getExistingSctId(rel);
                         if (relSctId == null) {
                             relSctId = handler.getWithGeneration(UUID.fromString(rel), SctIdGenerator.TYPE.RELATIONSHIP).toString();
+                        }
+                        if(!uuidToSctMap.containsKey(UUID.fromString(rel))){
                             this.uuidToSctMap.put(UUID.fromString(rel), relSctId);
                         }
                         relationshipsWriter.write(relSctId + field.seperator);
@@ -662,6 +691,8 @@ public class UuidToSctIdWriter {
                         String sourceSctId = getExistingSctId(source);
                         if (sourceSctId == null) {
                             sourceSctId = handler.getWithGeneration(UUID.fromString(source), SctIdGenerator.TYPE.CONCEPT).toString();
+                        }
+                        if(!uuidToSctMap.containsKey(UUID.fromString(source))){
                             this.uuidToSctMap.put(UUID.fromString(source), sourceSctId);
                         }
                         relationshipsWriter.write(sourceSctId + field.seperator);
@@ -674,6 +705,8 @@ public class UuidToSctIdWriter {
                         String destSctId = getExistingSctId(dest);
                         if (destSctId == null) {
                             destSctId = handler.getWithGeneration(UUID.fromString(dest), SctIdGenerator.TYPE.CONCEPT).toString();
+                        }
+                        if(!uuidToSctMap.containsKey(UUID.fromString(dest))){
                             this.uuidToSctMap.put(UUID.fromString(dest), destSctId);
                         }
                         relationshipsWriter.write(destSctId + field.seperator);
@@ -691,6 +724,8 @@ public class UuidToSctIdWriter {
                         String typeSctId = getExistingSctId(type);
                         if (typeSctId == null) {
                             typeSctId = handler.getWithGeneration(UUID.fromString(type), SctIdGenerator.TYPE.CONCEPT).toString();
+                        }
+                        if(!uuidToSctMap.containsKey(UUID.fromString(type))){
                             this.uuidToSctMap.put(UUID.fromString(type), typeSctId);
                         }
                         relationshipsWriter.write(typeSctId + field.seperator);
@@ -702,6 +737,8 @@ public class UuidToSctIdWriter {
                         String relCharSctId = getExistingSctId(relChar);
                         if (relCharSctId == null) {
                             relCharSctId = handler.getWithGeneration(UUID.fromString(relChar), SctIdGenerator.TYPE.CONCEPT).toString();
+                        }
+                        if(!uuidToSctMap.containsKey(UUID.fromString(relChar))){
                             this.uuidToSctMap.put(UUID.fromString(relChar), relCharSctId);
                         }
                         relationshipsWriter.write(relCharSctId + field.seperator);
@@ -713,6 +750,8 @@ public class UuidToSctIdWriter {
                         String modifierSctId = getExistingSctId(modifier);
                         if (modifierSctId == null) {
                             modifierSctId = handler.getWithGeneration(UUID.fromString(modifier), SctIdGenerator.TYPE.CONCEPT).toString();
+                        }
+                        if(!uuidToSctMap.containsKey(UUID.fromString(modifier))){
                             this.uuidToSctMap.put(UUID.fromString(modifier), modifierSctId);
                         }
                         relationshipsWriter.write(modifierSctId
@@ -752,6 +791,8 @@ public class UuidToSctIdWriter {
                         String relSctId = getExistingSctId(rel);
                         if (relSctId == null) {
                             relSctId = handler.getWithGeneration(UUID.fromString(rel), SctIdGenerator.TYPE.RELATIONSHIP).toString();
+                        }
+                        if(!uuidToSctMap.containsKey(UUID.fromString(rel))){
                             this.uuidToSctMap.put(UUID.fromString(rel), relSctId);
                         }
                         relationshipsStatedWriter.write(relSctId + field.seperator);
@@ -768,6 +809,8 @@ public class UuidToSctIdWriter {
                         String sourceSctId = getExistingSctId(source);
                         if (sourceSctId == null) {
                             sourceSctId = handler.getWithGeneration(UUID.fromString(source), SctIdGenerator.TYPE.CONCEPT).toString();
+                        }
+                        if(!uuidToSctMap.containsKey(UUID.fromString(source))){
                             this.uuidToSctMap.put(UUID.fromString(source), sourceSctId);
                         }
                         relationshipsStatedWriter.write(sourceSctId + field.seperator);
@@ -780,6 +823,8 @@ public class UuidToSctIdWriter {
                         String destSctId = getExistingSctId(dest);
                         if (destSctId == null) {
                             destSctId = handler.getWithGeneration(UUID.fromString(dest), SctIdGenerator.TYPE.CONCEPT).toString();
+                        }
+                        if(!uuidToSctMap.containsKey(UUID.fromString(dest))){
                             this.uuidToSctMap.put(UUID.fromString(dest), destSctId);
                         }
                         relationshipsStatedWriter.write(destSctId + field.seperator);
@@ -797,6 +842,8 @@ public class UuidToSctIdWriter {
                         String typeSctId = getExistingSctId(type);
                         if (typeSctId == null) {
                             typeSctId = handler.getWithGeneration(UUID.fromString(type), SctIdGenerator.TYPE.CONCEPT).toString();
+                        }
+                        if(!uuidToSctMap.containsKey(UUID.fromString(type))){
                             this.uuidToSctMap.put(UUID.fromString(type), typeSctId);
                         }
                         relationshipsStatedWriter.write(typeSctId + field.seperator);
@@ -808,6 +855,8 @@ public class UuidToSctIdWriter {
                         String relCharSctId = getExistingSctId(relChar);
                         if (relCharSctId == null) {
                             relCharSctId = handler.getWithGeneration(UUID.fromString(relChar), SctIdGenerator.TYPE.CONCEPT).toString();
+                        }
+                        if(!uuidToSctMap.containsKey(UUID.fromString(relChar))){
                             this.uuidToSctMap.put(UUID.fromString(relChar), relCharSctId);
                         }
                         relationshipsStatedWriter.write(relCharSctId + field.seperator);
@@ -819,6 +868,8 @@ public class UuidToSctIdWriter {
                         String modifierSctId = getExistingSctId(modifier);
                         if (modifierSctId == null) {
                             modifierSctId = handler.getWithGeneration(UUID.fromString(modifier), SctIdGenerator.TYPE.CONCEPT).toString();
+                        }
+                        if(!uuidToSctMap.containsKey(UUID.fromString(modifier))){
                             this.uuidToSctMap.put(UUID.fromString(modifier), modifierSctId);
                         }
                         relationshipsStatedWriter.write(modifierSctId
@@ -837,49 +888,96 @@ public class UuidToSctIdWriter {
      * @param writer the output file writer
      * @throws IOException signals that an I/O exception has occurred
      */
-    private void processIdentifiers(String line, Writer writer) throws IOException {
-        if (line != null) {
-            String[] parts = line.split("\t");
+    private void processIdentifiers(Writer writer) throws IOException, ContradictionException {
+        String date = TimeHelper.getShortFileDateFormat().format(effectiveDate);
+        HashMap<UUID, String> additionalIds = new HashMap<>();
+        for (UUID key : uuidToSctMap.keySet()) {
             for (Rf2File.IdentifiersFileFields field : Rf2File.IdentifiersFileFields.values()) {
-
                 switch (field) {
                     case IDENTIFIER_SCHEME_ID:
-                        String schemeId = parts[Rf2File.IdentifiersFileFields.IDENTIFIER_SCHEME_ID.ordinal()];
-                        String schemeSctId = handler.getWithGeneration(UUID.fromString(schemeId), SctIdGenerator.TYPE.CONCEPT).toString();
+                        String schemeSctId = handler.getWithGeneration(uuidIdScheme.getLenient().getPrimUuid(),
+                                SctIdGenerator.TYPE.CONCEPT).toString();
                         writer.write(schemeSctId + field.seperator);
 
                         break;
 
                     case ALTERNATE_IDENTIFIER:
-                        String primUuid = parts[Rf2File.IdentifiersFileFields.ALTERNATE_IDENTIFIER.ordinal()];
+                        String primUuid = key.toString();
                         writer.write(primUuid + field.seperator);
 
                         break;
 
                     case EFFECTIVE_TIME:
-                        String effectiveDateString = parts[Rf2File.IdentifiersFileFields.EFFECTIVE_TIME.ordinal()];
-                        writer.write(effectiveDateString + field.seperator);
+                        writer.write(date + field.seperator);
 
                         break;
 
                     case ACTIVE:
-                        String status = parts[Rf2File.IdentifiersFileFields.ACTIVE.ordinal()];
-                        writer.write(convertStatus(status) + field.seperator);
+                        writer.write(1 + field.seperator);
 
                         break;
 
                     case MODULE_ID:
-                        writer.write(module + field.seperator);
+                        ComponentVersionBI component = Ts.get().getComponentVersion(vc.getViewCoordinateWithAllStatusValues(), key);
+                        UUID moduleUuid = Ts.get().getUuidPrimordialForNid(component.getModuleNid());
+                        String moduleSctId = getExistingSctId(moduleUuid.toString());
+                        if (moduleSctId == null) {
+                            moduleSctId = handler.getWithGeneration(moduleUuid, SctIdGenerator.TYPE.CONCEPT).toString();
+                        }
+                        if (!uuidToSctMap.containsKey(moduleUuid)) {
+                            additionalIds.put(moduleUuid, moduleSctId);
+                        }
+                        writer.write(moduleSctId + field.seperator);
 
                         break;
 
                     case REFERENCED_COMPONENT_ID:
-                        String rc = parts[Rf2File.IdentifiersFileFields.REFERENCED_COMPONENT_ID.ordinal()];
-                        String rcSctId = getExistingSctId(rc);
-                        if (rcSctId == null) {
-                            rcSctId = handler.getWithGeneration(UUID.fromString(rc), SctIdGenerator.TYPE.CONCEPT).toString();
-                            this.uuidToSctMap.put(UUID.fromString(rc), rcSctId);
+                        String rcSctId = uuidToSctMap.get(key);
+                        writer.write(rcSctId + field.seperator);
+
+                        break;
+                }
+            }
+        }
+        for (UUID key : additionalIds.keySet()) {
+            for (Rf2File.IdentifiersFileFields field : Rf2File.IdentifiersFileFields.values()) {
+                switch (field) {
+                    case IDENTIFIER_SCHEME_ID:
+                        String schemeSctId = handler.getWithGeneration(uuidIdScheme.getLenient().getPrimUuid(),
+                                SctIdGenerator.TYPE.CONCEPT).toString();
+                        writer.write(schemeSctId + field.seperator);
+
+                        break;
+
+                    case ALTERNATE_IDENTIFIER:
+                        String primUuid = key.toString();
+                        writer.write(primUuid + field.seperator);
+
+                        break;
+
+                    case EFFECTIVE_TIME:
+                        writer.write(date + field.seperator);
+
+                        break;
+
+                    case ACTIVE:
+                        writer.write(1 + field.seperator);
+
+                        break;
+
+                    case MODULE_ID:
+                        ComponentVersionBI component = Ts.get().getComponentVersion(vc.getViewCoordinateWithAllStatusValues(), key);
+                        UUID moduleUuid = Ts.get().getUuidPrimordialForNid(component.getModuleNid());
+                        String moduleSctId = getExistingSctId(moduleUuid.toString());
+                        if (moduleSctId == null) {
+                            moduleSctId = handler.getWithGeneration(moduleUuid, SctIdGenerator.TYPE.CONCEPT).toString();
                         }
+                        writer.write(moduleSctId + field.seperator);
+
+                        break;
+
+                    case REFERENCED_COMPONENT_ID:
+                        String rcSctId = uuidToSctMap.get(key);
                         writer.write(rcSctId + field.seperator);
 
                         break;
@@ -920,7 +1018,9 @@ public class UuidToSctIdWriter {
                         String refsetId = parts[Rf2File.AssociationRefsetFileFields.REFSET_ID.ordinal()];
                         String refsetSctId = getExistingSctId(refsetId);
                         if (refsetSctId == null) {
-                            refsetSctId = handler.getWithGeneration(UUID.fromString(refsetId), SctIdGenerator.TYPE.CONCEPT).toString(); //TODO akf: subset?
+                            refsetSctId = handler.getWithGeneration(UUID.fromString(refsetId), SctIdGenerator.TYPE.CONCEPT).toString();
+                        }
+                        if(!uuidToSctMap.containsKey(UUID.fromString(refsetId))){
                             this.uuidToSctMap.put(UUID.fromString(refsetId), refsetSctId);
                         }
                         associationWriter.write(refsetSctId + field.seperator);
@@ -937,6 +1037,8 @@ public class UuidToSctIdWriter {
                         String targetSctId = getExistingSctId(targetId);
                         if (targetSctId == null) {
                             targetSctId = handler.getWithGeneration(UUID.fromString(targetId), SctIdGenerator.TYPE.CONCEPT).toString();
+                        }
+                        if(!uuidToSctMap.containsKey(UUID.fromString(targetId))){
                             this.uuidToSctMap.put(UUID.fromString(targetId), targetSctId);
                         }
                         associationWriter.write(targetSctId + field.seperator);
@@ -979,7 +1081,9 @@ public class UuidToSctIdWriter {
                         String refsetId = parts[Rf2File.AttribValueRefsetFileFields.REFSET_ID.ordinal()];
                         String refsetSctId = getExistingSctId(refsetId);
                         if (refsetSctId == null) {
-                            refsetSctId = handler.getWithGeneration(UUID.fromString(refsetId), SctIdGenerator.TYPE.CONCEPT).toString(); //TODO akf: subset?
+                            refsetSctId = handler.getWithGeneration(UUID.fromString(refsetId), SctIdGenerator.TYPE.CONCEPT).toString();
+                        }
+                        if(!uuidToSctMap.containsKey(UUID.fromString(refsetId))){
                             this.uuidToSctMap.put(UUID.fromString(refsetId), refsetSctId);
                         }
                         attributeValueWriter.write(refsetSctId + field.seperator);
@@ -996,7 +1100,9 @@ public class UuidToSctIdWriter {
                     String valueId = parts[Rf2File.AttribValueRefsetFileFields.REFSET_ID.ordinal()];
                         String valueSctId = getExistingSctId(valueId);
                         if (valueSctId == null) {
-                            valueSctId = handler.getWithGeneration(UUID.fromString(valueId), SctIdGenerator.TYPE.CONCEPT).toString(); //TODO akf: subset?
+                            valueSctId = handler.getWithGeneration(UUID.fromString(valueId), SctIdGenerator.TYPE.CONCEPT).toString();
+                        }
+                        if(!uuidToSctMap.containsKey(UUID.fromString(valueId))){
                             this.uuidToSctMap.put(UUID.fromString(valueId), valueSctId);
                         }
                         attributeValueWriter.write(valueSctId + field.seperator);
@@ -1045,7 +1151,9 @@ public class UuidToSctIdWriter {
                         String refsetId = parts[Rf2File.LanguageRefsetFileFields.REFSET_ID.ordinal()];
                         String refsetSctId = getExistingSctId(refsetId);
                         if (refsetSctId == null) {
-                            refsetSctId = handler.getWithGeneration(UUID.fromString(refsetId), SctIdGenerator.TYPE.CONCEPT).toString(); //TODO akf: subset?
+                            refsetSctId = handler.getWithGeneration(UUID.fromString(refsetId), SctIdGenerator.TYPE.CONCEPT).toString();
+                        }
+                        if(!uuidToSctMap.containsKey(UUID.fromString(refsetId))){
                             this.uuidToSctMap.put(UUID.fromString(refsetId), refsetSctId);
                         }
                         langRefsetsWriter.write(refsetSctId + field.seperator);
@@ -1057,6 +1165,8 @@ public class UuidToSctIdWriter {
                         String rcSctId = getExistingSctId(rc);
                         if (rcSctId == null) {
                             rcSctId = handler.getWithGeneration(UUID.fromString(rc), SctIdGenerator.TYPE.CONCEPT).toString();
+                        }
+                        if(!uuidToSctMap.containsKey(UUID.fromString(rc))){
                             this.uuidToSctMap.put(UUID.fromString(rc), rcSctId);
                         }
                         langRefsetsWriter.write(rcSctId + field.seperator);
@@ -1068,6 +1178,8 @@ public class UuidToSctIdWriter {
                         String acceptSctId = getExistingSctId(accept);
                         if (acceptSctId == null) {
                             acceptSctId = handler.getWithGeneration(UUID.fromString(accept), SctIdGenerator.TYPE.CONCEPT).toString();
+                        }
+                        if(!uuidToSctMap.containsKey(UUID.fromString(accept))){
                             this.uuidToSctMap.put(UUID.fromString(accept), acceptSctId);
                         }
                         langRefsetsWriter.write(acceptSctId + field.seperator);
@@ -1116,7 +1228,9 @@ public class UuidToSctIdWriter {
                         String refsetId = parts[Rf2File.LanguageRefsetFileFields.REFSET_ID.ordinal()];
                         String refsetSctId = getExistingSctId(refsetId);
                         if (refsetSctId == null) {
-                            refsetSctId = handler.getWithGeneration(UUID.fromString(refsetId), SctIdGenerator.TYPE.CONCEPT).toString(); //TODO akf: subset?
+                            refsetSctId = handler.getWithGeneration(UUID.fromString(refsetId), SctIdGenerator.TYPE.CONCEPT).toString();
+                        }
+                        if(!uuidToSctMap.containsKey(UUID.fromString(refsetId))){
                             this.uuidToSctMap.put(UUID.fromString(refsetId), refsetSctId);
                         }
                         otherLangRefsetsWriter.write(refsetSctId + field.seperator);
@@ -1128,6 +1242,8 @@ public class UuidToSctIdWriter {
                         String rcSctId = getExistingSctId(rc);
                         if (rcSctId == null) {
                             rcSctId = handler.getWithGeneration(UUID.fromString(rc), SctIdGenerator.TYPE.CONCEPT).toString();
+                        }
+                        if(!uuidToSctMap.containsKey(UUID.fromString(rc))){
                             this.uuidToSctMap.put(UUID.fromString(rc), rcSctId);
                         }
                         otherLangRefsetsWriter.write(rcSctId + field.seperator);
@@ -1139,6 +1255,8 @@ public class UuidToSctIdWriter {
                         String acceptSctId = getExistingSctId(accept);
                         if (acceptSctId == null) {
                             acceptSctId = handler.getWithGeneration(UUID.fromString(accept), SctIdGenerator.TYPE.CONCEPT).toString();
+                        }
+                        if(!uuidToSctMap.containsKey(UUID.fromString(accept))){
                             this.uuidToSctMap.put(UUID.fromString(accept), acceptSctId);
                         }
                         otherLangRefsetsWriter.write(acceptSctId + field.seperator);
@@ -1188,7 +1306,9 @@ public class UuidToSctIdWriter {
                         String refsetSctId = getExistingSctId(refsetId);
                         if (refsetSctId == null) {
                             refsetSctId = handler.getWithGeneration(UUID.fromString(refsetId),
-                                    SctIdGenerator.TYPE.CONCEPT).toString(); //TODO akf: subset?
+                                    SctIdGenerator.TYPE.CONCEPT).toString();
+                        }
+                        if(!uuidToSctMap.containsKey(UUID.fromString(refsetId))){
                             this.uuidToSctMap.put(UUID.fromString(refsetId), refsetSctId);
                         }
                         modDependWriter.write(refsetSctId + field.seperator);
@@ -1200,6 +1320,8 @@ public class UuidToSctIdWriter {
                         String rcSctId = getExistingSctId(rc);
                         if (rcSctId == null) {
                             rcSctId = handler.getWithGeneration(UUID.fromString(rc), SctIdGenerator.TYPE.CONCEPT).toString();
+                        }
+                        if(!uuidToSctMap.containsKey(UUID.fromString(rc))){
                             this.uuidToSctMap.put(UUID.fromString(rc), rcSctId);
                         }
                         modDependWriter.write(rcSctId + field.seperator);
@@ -1260,7 +1382,9 @@ public class UuidToSctIdWriter {
                         String refsetId = parts[Rf2File.DescTypeFileFields.REFSET_ID.ordinal()];
                         String refsetSctId = getExistingSctId(refsetId);
                         if (refsetSctId == null) {
-                            refsetSctId = handler.getWithGeneration(UUID.fromString(refsetId), SctIdGenerator.TYPE.CONCEPT).toString(); //TODO akf: subset?
+                            refsetSctId = handler.getWithGeneration(UUID.fromString(refsetId), SctIdGenerator.TYPE.CONCEPT).toString();
+                        }
+                        if(!uuidToSctMap.containsKey(UUID.fromString(refsetId))){
                             this.uuidToSctMap.put(UUID.fromString(refsetId), refsetSctId);
                         }
                         descTypeWriter.write(refsetSctId + field.seperator);
@@ -1272,6 +1396,8 @@ public class UuidToSctIdWriter {
                         String rcSctId = getExistingSctId(rc);
                         if (rcSctId == null) {
                             rcSctId = handler.getWithGeneration(UUID.fromString(rc), SctIdGenerator.TYPE.CONCEPT).toString();
+                        }
+                        if(!uuidToSctMap.containsKey(UUID.fromString(rc))){
                             this.uuidToSctMap.put(UUID.fromString(rc), rcSctId);
                         }
                         descTypeWriter.write(rcSctId + field.seperator);
@@ -1283,6 +1409,8 @@ public class UuidToSctIdWriter {
                         String formatSctId = getExistingSctId(format);
                         if (formatSctId == null) {
                             formatSctId = handler.getWithGeneration(UUID.fromString(format), SctIdGenerator.TYPE.CONCEPT).toString();
+                        }
+                        if(!uuidToSctMap.containsKey(UUID.fromString(format))){
                             this.uuidToSctMap.put(UUID.fromString(format), formatSctId);
                         }
                         descTypeWriter.write(formatSctId + field.seperator);
@@ -1337,7 +1465,9 @@ public class UuidToSctIdWriter {
                         String refsetId = parts[Rf2File.RefsetDescriptorFileFields.REFSET_ID.ordinal()];
                         String refsetSctId = getExistingSctId(refsetId);
                         if (refsetSctId == null) {
-                            refsetSctId = handler.getWithGeneration(UUID.fromString(refsetId), SctIdGenerator.TYPE.CONCEPT).toString(); //TODO akf: subset?
+                            refsetSctId = handler.getWithGeneration(UUID.fromString(refsetId), SctIdGenerator.TYPE.CONCEPT).toString();
+                        }
+                        if(!uuidToSctMap.containsKey(UUID.fromString(refsetId))){
                             this.uuidToSctMap.put(UUID.fromString(refsetId), refsetSctId);
                         }
                         refsetDescWriter.write(refsetSctId + field.seperator);
@@ -1349,6 +1479,8 @@ public class UuidToSctIdWriter {
                         String rcSctId = getExistingSctId(rc);
                         if (rcSctId == null) {
                             rcSctId = handler.getWithGeneration(UUID.fromString(rc), SctIdGenerator.TYPE.CONCEPT).toString();
+                        }
+                        if(!uuidToSctMap.containsKey(UUID.fromString(rc))){
                             this.uuidToSctMap.put(UUID.fromString(rc), rcSctId);
                         }
                         refsetDescWriter.write(rcSctId + field.seperator);
@@ -1360,6 +1492,8 @@ public class UuidToSctIdWriter {
                         String descSctId = getExistingSctId(desc);
                         if (descSctId == null) {
                             descSctId = handler.getWithGeneration(UUID.fromString(desc), SctIdGenerator.TYPE.CONCEPT).toString();
+                        }
+                        if(!uuidToSctMap.containsKey(UUID.fromString(desc))){
                             this.uuidToSctMap.put(UUID.fromString(desc), descSctId);
                         }
                         refsetDescWriter.write(descSctId + field.seperator);
@@ -1371,6 +1505,8 @@ public class UuidToSctIdWriter {
                         String typeSctId = getExistingSctId(type);
                         if (typeSctId == null) {
                             typeSctId = handler.getWithGeneration(UUID.fromString(type), SctIdGenerator.TYPE.CONCEPT).toString();
+                        }
+                        if(!uuidToSctMap.containsKey(UUID.fromString(type))){
                             this.uuidToSctMap.put(UUID.fromString(type), typeSctId);
                         }
                         refsetDescWriter.write(typeSctId + field.seperator);
@@ -1437,7 +1573,9 @@ public class UuidToSctIdWriter {
                                 String refsetId = parts[Rf2File.SimpleRefsetFileFields.REFSET_ID.ordinal()];
                                 String refsetSctId = getExistingSctId(refsetId);
                                 if (refsetSctId == null) {
-                                    refsetSctId = handler.getWithGeneration(UUID.fromString(refsetId), SctIdGenerator.TYPE.CONCEPT).toString(); //TODO akf: subset?
+                                    refsetSctId = handler.getWithGeneration(UUID.fromString(refsetId), SctIdGenerator.TYPE.CONCEPT).toString();
+                                }
+                                if(!uuidToSctMap.containsKey(UUID.fromString(refsetId))){
                                     this.uuidToSctMap.put(UUID.fromString(refsetId), refsetSctId);
                                 }
                                 simpleRefsetWriter.write(refsetSctId + field.seperator);
@@ -1449,6 +1587,8 @@ public class UuidToSctIdWriter {
                                 String rcSctId = getExistingSctId(rc);
                                 if (rcSctId == null) {
                                     rcSctId = handler.getWithGeneration(UUID.fromString(rc), SctIdGenerator.TYPE.CONCEPT).toString();
+                                }
+                                if(!uuidToSctMap.containsKey(UUID.fromString(rc))){
                                     this.uuidToSctMap.put(UUID.fromString(rc), rcSctId);
                                 }
                                 simpleRefsetWriter.write(rcSctId + field.seperator);

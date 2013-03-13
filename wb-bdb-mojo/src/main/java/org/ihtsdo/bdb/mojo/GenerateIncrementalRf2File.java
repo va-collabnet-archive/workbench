@@ -391,7 +391,7 @@ public class GenerateIncrementalRf2File extends AbstractMojo {
             UuidToSctIdWriter writer = new UuidToSctIdWriter(namespace, moduleId.toString(),
                     output, handler, releaseType, COUNTRY_CODE.valueOf(countryCode),
                     new Date(TimeHelper.getTimeFromString(effectiveDate,
-                    TimeHelper.getAltFileDateFormat())));
+                    TimeHelper.getAltFileDateFormat())), vc);
             writer.write();
             writer.close();
             }
