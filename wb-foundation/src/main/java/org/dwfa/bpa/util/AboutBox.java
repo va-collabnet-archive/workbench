@@ -117,8 +117,8 @@ public class AboutBox {
         String site_url = AppInfoProperties.getProperty("siteURL"); 
         String version = AppInfoProperties.getProperty("version");
         
-        JLabel label = null;
         String labelText = "Version " + version;
+        JLabel label = null;
 
         // Build a link label if site is specified, a plain old label otherwise.
         if (site_url != null) {
