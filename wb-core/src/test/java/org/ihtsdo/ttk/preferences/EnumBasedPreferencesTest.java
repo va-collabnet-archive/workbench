@@ -15,6 +15,11 @@
  */
 package org.ihtsdo.ttk.preferences;
 
+import static org.dwfa.bpa.util.AppInfoProperties.ARTIFACT_ID;
+import static org.dwfa.bpa.util.AppInfoProperties.GROUP_ID;
+import static org.dwfa.bpa.util.AppInfoProperties.VERSION;
+
+import org.dwfa.bpa.util.AppInfoProperties;
 import org.ihtsdo.ttk.queue.QueueAddress;
 import org.ihtsdo.ttk.queue.QueueList;
 import org.ihtsdo.ttk.queue.QueuePreferences;
@@ -88,9 +93,9 @@ public class EnumBasedPreferencesTest extends TestCase {
 
         // Set them on a Properties object.
         Properties appInfoProperties = new Properties();
-        appInfoProperties.setProperty(EnumBasedPreferences.GROUP_ID, groupId);
-        appInfoProperties.setProperty(EnumBasedPreferences.ARTIFACT_ID, artifactId);
-        appInfoProperties.setProperty(EnumBasedPreferences.VERSION, version);
+        appInfoProperties.setProperty(GROUP_ID, groupId);
+        appInfoProperties.setProperty(ARTIFACT_ID, artifactId);
+        appInfoProperties.setProperty(VERSION, version);
         
         // Confirm app prefix is calculated as expected.
         String expectedAppPrefix = groupId + ";" + artifactId + ";" + version + ";" + userName;

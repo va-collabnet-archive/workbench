@@ -15,6 +15,12 @@
  */
 package org.ihtsdo.ttk.preferences;
 
+import static org.dwfa.bpa.util.AppInfoProperties.ARTIFACT_ID;
+import static org.dwfa.bpa.util.AppInfoProperties.GROUP_ID;
+import static org.dwfa.bpa.util.AppInfoProperties.VERSION;
+
+import org.dwfa.bpa.util.AppInfoProperties;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.Constructor;
@@ -39,10 +45,6 @@ import java.util.prefs.Preferences;
  * @author ocarlsen
  */
 public class EnumBasedPreferences {
-
-    public static final String GROUP_ID = "groupId";
-    public static final String ARTIFACT_ID = "artifactId";
-    public static final String VERSION = "version";
 
     private Preferences preferences;
     private String appPrefix;

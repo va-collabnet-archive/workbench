@@ -16,10 +16,14 @@
  */
 package org.ihtsdo.mojo.maven;
 
+import static org.dwfa.bpa.util.AppInfoProperties.ARTIFACT_ID;
+import static org.dwfa.bpa.util.AppInfoProperties.GROUP_ID;
+import static org.dwfa.bpa.util.AppInfoProperties.VERSION;
+
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.ihtsdo.ttk.preferences.EnumBasedPreferences;
+import org.dwfa.bpa.util.AppInfoProperties;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -76,6 +80,30 @@ public class AppInfoMojo extends AbstractMojo {
      */
     private String siteURL;
 
+    /**
+     * The groupId of the archetype which generated this project.
+     *
+     * @parameter expression="${project.properties.archetypeGroupId}"
+     * @required
+     */
+    private String archetypeGroupId;
+
+    /**
+     * The artifactId of the archetype which generated this project.
+     *
+     * @parameter expression="${project.properties.archetypeArtifactId}"
+     * @required
+     */
+    private String archetypeArtifactId;
+
+    /**
+     * The version of the archetype which generated this project.
+     *
+     * @parameter expression="${project.properties.archetypeVersion}"
+     * @required
+     */
+    private String archetypeVersion;
+
     public void execute() throws MojoExecutionException, MojoFailureException {
         try {
             Properties appInfoProperties = exportAppInfoProperties();
@@ -89,13 +117,20 @@ public class AppInfoMojo extends AbstractMojo {
        Properties appInfoProperties = new Properties();
 
        // Set workbench build properties.
-       appInfoProperties.setProperty(EnumBasedPreferences.GROUP_ID, groupId);
-       appInfoProperties.setProperty(EnumBasedPreferences.ARTIFACT_ID, artifactId);
-       appInfoProperties.setProperty(EnumBasedPreferences.VERSION, version);
+       appInfoProperties.setProperty(GROUP_ID, groupId);
+       appInfoProperties.setProperty(ARTIFACT_ID, artifactId);
+       appInfoProperties.setProperty(VERSION, version);
 
        // Set workbench site properties.
-       appInfoProperties.setProperty("siteURL", siteURL);  // TODO: Factor key out as constant somewhere. 
+       // TODO: Factor key out as constant somewhere.
+       appInfoProperties.setProperty("siteURL", siteURL); 
 
+       // Archetype properties.
+       // TODO: Factor keys out as constant somewhere.
+       appInfoProperties.setProperty("archetypeGroupId", archetypeGroupId);
+       appInfoProperties.setProperty("archetypeArtifactId", archetypeArtifactId);
+       appInfoProperties.setProperty("archetypeVersion", archetypeVersion);
+       
        // Write out to file.
        File profileRoot = new File(wbBundleDir, "profiles");
        File appInfoPropertiesFile = new File(profileRoot, "appinfo.properties");
