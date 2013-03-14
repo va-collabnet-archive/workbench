@@ -83,7 +83,7 @@ public class AppInfoMojo extends AbstractMojo {
     /**
      * The groupId of the archetype which generated this project.
      *
-     * @parameter expression="${project.properties.archetypeGroupId}"
+     * @parameter expression="${archetypeGroupId}"
      * @required
      */
     private String archetypeGroupId;
@@ -91,7 +91,7 @@ public class AppInfoMojo extends AbstractMojo {
     /**
      * The artifactId of the archetype which generated this project.
      *
-     * @parameter expression="${project.properties.archetypeArtifactId}"
+     * @parameter expression="${archetypeArtifactId}"
      * @required
      */
     private String archetypeArtifactId;
@@ -99,7 +99,7 @@ public class AppInfoMojo extends AbstractMojo {
     /**
      * The version of the archetype which generated this project.
      *
-     * @parameter expression="${project.properties.archetypeVersion}"
+     * @parameter expression="${archetypeVersion}"
      * @required
      */
     private String archetypeVersion;
