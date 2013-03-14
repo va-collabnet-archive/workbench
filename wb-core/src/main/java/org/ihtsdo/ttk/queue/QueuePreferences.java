@@ -65,7 +65,7 @@ public class QueuePreferences implements Comparable<QueuePreferences>, Preferenc
     }
 
     public enum Fields implements PreferenceWithDefaultEnumBI<Object> {
-        DISPLAY_NAME("unnamed queue"), ID("00000000-0000-0000-c000-000000000046"), QUEUE_DIRECTORY("queue/inbox"),
+        DISPLAY_NAME("unnamed queue"), ID("00000000-0000-0000-c000-000000000046"), QUEUE_DIRECTORY("queues/queue.inbox"),
         QUEUE_INSTANCE_PROPERTIES_LIST(0), READ_INSTEAD_OF_TAKE(Boolean.FALSE);
 
         final Object defaultValue;
@@ -112,7 +112,10 @@ public class QueuePreferences implements Comparable<QueuePreferences>, Preferenc
     public void exportFields(EnumBasedPreferences preferences) {
         preferences.put(Fields.DISPLAY_NAME, displayName);
         preferences.put(Fields.ID, id);
-        preferences.put(Fields.QUEUE_DIRECTORY, queueDirectory.getPath());
+        String path = queueDirectory.getPath();
+        int indexOf = path.indexOf("queues");
+        String relativePath = path.substring(indexOf);
+        preferences.put(Fields.QUEUE_DIRECTORY, relativePath);
         preferences.putList(Fields.QUEUE_INSTANCE_PROPERTIES_LIST, serviceItemProperties);
         preferences.putBoolean(Fields.READ_INSTEAD_OF_TAKE, readInsteadOfTake);
     }
