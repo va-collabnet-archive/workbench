@@ -16,10 +16,14 @@
  */
 package org.ihtsdo.mojo.maven;
 
+import static org.dwfa.bpa.util.AppInfoProperties.ARTIFACT_ID;
+import static org.dwfa.bpa.util.AppInfoProperties.GROUP_ID;
+import static org.dwfa.bpa.util.AppInfoProperties.VERSION;
+
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.ihtsdo.ttk.preferences.EnumBasedPreferences;
+import org.dwfa.bpa.util.AppInfoProperties;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -81,9 +85,9 @@ public class AppInfoMojo extends AbstractMojo {
        Properties appInfoProperties = new Properties();
 
        // Set workbench build properties.
-       appInfoProperties.setProperty(EnumBasedPreferences.GROUP_ID, groupId);
-       appInfoProperties.setProperty(EnumBasedPreferences.ARTIFACT_ID, artifactId);
-       appInfoProperties.setProperty(EnumBasedPreferences.VERSION, version);
+       appInfoProperties.setProperty(GROUP_ID, groupId);
+       appInfoProperties.setProperty(ARTIFACT_ID, artifactId);
+       appInfoProperties.setProperty(VERSION, version);
 
        // Write out to file.
        File profileRoot = new File(wbBundleDir, "profiles");

@@ -20,6 +20,10 @@ package org.ihtsdo.bdb.mojo;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import static org.dwfa.bpa.util.AppInfoProperties.ARTIFACT_ID;
+import static org.dwfa.bpa.util.AppInfoProperties.GROUP_ID;
+import static org.dwfa.bpa.util.AppInfoProperties.VERSION;
+
 import org.apache.lucene.document.Document;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -39,6 +43,7 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.commit.AlertToDataConstraintFailure;
 import org.dwfa.bpa.process.TaskFailedException;
+import org.dwfa.bpa.util.AppInfoProperties;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.id.Type5UuidFactory;
@@ -534,10 +539,9 @@ NEXT_WHILE:
       Properties appInfoProperties = new Properties();
 
       // Set workbench build properties.
-      appInfoProperties.setProperty(EnumBasedPreferences.GROUP_ID, groupId);
-      appInfoProperties.setProperty(EnumBasedPreferences.ARTIFACT_ID,
-                                    artifactId);
-      appInfoProperties.setProperty(EnumBasedPreferences.VERSION, version);
+      appInfoProperties.setProperty(GROUP_ID, groupId);
+      appInfoProperties.setProperty(ARTIFACT_ID, artifactId);
+      appInfoProperties.setProperty(VERSION, version);
 
       // Write out to file.
       File   profileRoot           = new File(wbBundleDir, PROFILE_ROOT);

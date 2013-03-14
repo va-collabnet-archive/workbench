@@ -16,6 +16,10 @@ import java.util.Properties;
  */
 public final class AppInfoProperties {
 
+    public static final String GROUP_ID = "groupId";
+    public static final String ARTIFACT_ID = "artifactId";
+    public static final String VERSION = "version";
+
     private static final Properties APP_INFO = new Properties();
     
     private static boolean loaded = false;

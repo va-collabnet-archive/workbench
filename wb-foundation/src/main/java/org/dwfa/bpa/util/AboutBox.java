@@ -19,6 +19,8 @@
  */
 package org.dwfa.bpa.util;
 
+import static org.dwfa.bpa.util.AppInfoProperties.VERSION;
+
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Image;
@@ -103,8 +105,7 @@ public class AboutBox {
 
     private static JLabel createVersionLabel() {
         // Get from properties from AppInfo.
-        // TODO: Factor keys out as constants somewhere. 
-        String version = AppInfoProperties.getProperty("version");
+        String version = AppInfoProperties.getProperty(VERSION);
         
         String labelText = "Version " + version;
         JLabel label = new JLabel(labelText);
