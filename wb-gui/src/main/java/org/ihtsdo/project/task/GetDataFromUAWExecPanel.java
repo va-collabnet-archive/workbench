@@ -190,7 +190,6 @@ public class GetDataFromUAWExecPanel extends AbstractTask {
 				// Create worklist member for unassigned work
 				WorkListMember member = TerminologyProjectDAO.addConceptAsNacWorklistMember(selectedWorkList, selectedConcept, config);
 				
-				//JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null), "The concept has been sent to translation.", "", JOptionPane.INFORMATION_MESSAGE);
 				config.setStatusMessage("Concept sent to workflow");
 				return Condition.ITEM_COMPLETE;
 			}
