@@ -521,7 +521,7 @@ public class HierarchyNavigator extends JPanel {
 			try {
 				ConceptVersionBI parentCpt = Ts.get().getConceptVersion(config.getViewCoordinate(), ancestor.getTargetNid());
 				ConceptAttributeVersionBI conceptAttrs = parentCpt.getConceptAttributesActive();
-				if (conceptAttrs.isActive(config.getViewCoordinate())) {
+				if (!conceptAttrs.isActive(config.getViewCoordinate())) {
 					newParent = new DefaultMutableTreeNode(new TreeObj(String.valueOf(IconUtilities.getInactiveParent()), parentCpt.toUserString() + " (" + getParents(parentCpt).size() + ")", parentCpt.getDescriptionPreferred()));
 				} else if (conceptAttrs.isDefined()) {
 					newParent = new DefaultMutableTreeNode(new TreeObj(String.valueOf(IconUtilities.getDefinedParent()), parentCpt.toUserString() + " (" + getParents(parentCpt).size() + ")", parentCpt.getDescriptionPreferred()));
@@ -585,7 +585,7 @@ public class HierarchyNavigator extends JPanel {
 				ConceptVersionBI childCpt = Ts.get().getConceptVersion(config.getViewCoordinate(), child.getSourceNid());
 				ConceptAttributeVersionBI conceptAttrs = childCpt.getConceptAttributesActive();
 				if (conceptAttrs != null) {
-					if (conceptAttrs.isActive(config.getViewCoordinate())) {
+					if (!conceptAttrs.isActive(config.getViewCoordinate())) {
 						newChild = new DefaultMutableTreeNode(new TreeObj(String.valueOf(IconUtilities.getInactive()), childCpt.toUserString() + " (" + getChildren(childCpt).size() + ")", childCpt.getDescriptionPreferred()));
 					} else if (conceptAttrs.isDefined()) {
 						newChild = new DefaultMutableTreeNode(new TreeObj(String.valueOf(IconUtilities.getDefined()), childCpt.toUserString() + " (" + getChildren(childCpt).size() + ")", childCpt.getDescriptionPreferred()));
