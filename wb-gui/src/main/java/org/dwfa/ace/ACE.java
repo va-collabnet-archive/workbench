@@ -50,6 +50,7 @@ import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.lang.ref.WeakReference;
 import java.lang.reflect.InvocationTargetException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivilegedActionException;
@@ -69,6 +70,7 @@ import java.util.TreeSet;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import javax.naming.ConfigurationException;
 
@@ -325,6 +327,8 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
     private JPanel                           workflowPanel;
     private JComboBox worklistCCSelectCombo;
     private WorkflowStoreBI wfStore;
+    private static AtomicBoolean active = new AtomicBoolean(true);
+    private static ArrayList<WeakReference<ListenForDataChecks>> dataChecks = new ArrayList<>();
 
     //~--- constructors --------------------------------------------------------
 
@@ -3333,8 +3337,28 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         }
     }
 
+    public static void resumeDatacheckDisplay() {
+        active.set(true);
+        for(WeakReference wr : dataChecks){
+            ListenForDataChecks listener = (ListenForDataChecks) wr.get();
+            listener.layoutAlerts();
+        }
+    }
 
+    public static void suspendDatacheckDisplay() {
+        active.set(false);
+    }
+    
+    public static boolean datachecksRunning(){
+        return active.get();
+    }
+    
     public class ListenForDataChecks implements ListDataListener, ActionListener {
+
+        public ListenForDataChecks() {
+            dataChecks.add(new WeakReference(this));
+        }
+        
         @Override
         public void actionPerformed(ActionEvent evt) {
             JComboBox comboBox = (JComboBox) evt.getSource();
@@ -3399,28 +3423,33 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
         @Override
         public void contentsChanged(ListDataEvent listEvt) {
-            layoutAlerts();
+            if(active.get()){
+                layoutAlerts();
+            }
         }
 
         @Override
         public void intervalAdded(ListDataEvent arg0) {
-            layoutAlerts();
+            if(active.get()){
+                layoutAlerts();
+            }
         }
 
         @Override
         public void intervalRemoved(ListDataEvent arg0) {
-            layoutAlerts();
+            if(active.get()){
+                layoutAlerts();
+            }
         }
 
         private void layoutAlerts() {
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {
-                    if (editMode) {
+                    if (editMode && active.get()) {
                         if (dataCheckListPanel == null) {
                             getDataCheckListScroller();
                         }
-
                         for (Component component : dataCheckListPanel.getComponents()) {
                             dataCheckListPanel.remove(component);
                         }

@@ -16,7 +16,6 @@ import org.ihtsdo.tk.spec.RelationshipSpec;
 import org.ihtsdo.tk.spec.SpecFactory;
 
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
-import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 import org.ihtsdo.tk.binding.snomed.Language;
 import org.ihtsdo.tk.binding.snomed.Snomed;
 import org.ihtsdo.tk.binding.snomed.SnomedConstraints;
@@ -240,8 +239,8 @@ rule "missing Dialect description EN_US"
 	when
 		$c : ConceptVersionBI(this isMissingDescFor Language.EN_US);
                 $dv : DescriptionVersionBI(isUncommitted() == true, 
-                            getTypeNid() != SnomedMetadataRfx.DES_FULL_SPECIFIED_NAME_NID,
-                            getStatusNid() != SnomedMetadataRfx.getSTATUS_LIMITED_NID()) from $c.getDescriptionsActive
+                            getTypeNid() != SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getLenient().getNid(),
+                            getStatusNid() != SnomedMetadataRf2.LIMITED_COMPONENT_RF2.getLenient().getNid()) from $c.getDescriptionsActive
 	then 
                 if (DialectHelper.isMissingDescForDialect($dv,
                     Language.EN_US.get($c.getViewCoordinate()).getNid(), $c.getViewCoordinate())) {
@@ -255,8 +254,8 @@ rule "missing Dialect description EN_UK"
 	when
 		$c : ConceptVersionBI(this isMissingDescFor Language.EN_UK);
                 $dv : DescriptionVersionBI(isUncommitted() == true, 
-                            getTypeNid() != SnomedMetadataRfx.DES_FULL_SPECIFIED_NAME_NID,
-                            getStatusNid() != SnomedMetadataRfx.getSTATUS_LIMITED_NID()) from $c.getDescriptionsActive
+                            getTypeNid() != SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getLenient().getNid(),
+                            getStatusNid() != SnomedMetadataRf2.LIMITED_COMPONENT_RF2.getLenient().getNid()) from $c.getDescriptionsActive
 	then 
                 if (DialectHelper.isMissingDescForDialect($dv,
                     Language.EN_UK.get($c.getViewCoordinate()).getNid(), $c.getViewCoordinate())) {

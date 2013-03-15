@@ -996,4 +996,8 @@ public interface TerminologyStoreDI extends TerminologyDI {
      */
     TerminologyPromoterBI getTerminologyPromoter(ViewCoordinate sourceViewCoordinate, EditCoordinate sourceEditCoordinate,
             int targetPath, PositionBI originPosition);
+    /**
+     * Can call to wait until all datachecks are finished running.
+     */
+    public void waitTillDatachecksFinished();
 }

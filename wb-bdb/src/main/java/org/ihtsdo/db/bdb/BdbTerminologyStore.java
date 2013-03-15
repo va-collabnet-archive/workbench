@@ -884,4 +884,9 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
             int pathNid, PositionBI originPosition){
          return new BdbTermPromoter(sourceViewCoordinate, sourceEditCoordinate, pathNid, originPosition);
      }
+    
+    @Override
+    public void waitTillDatachecksFinished(){
+        BdbCommitManager.waitTillDatachecksFinished();
+    }
 }
