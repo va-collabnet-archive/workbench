@@ -90,7 +90,7 @@ public class WfCompletionFilter implements WfFilterBI {
 
 	@Override
 	public String toString() {
-		return "Completion";
+		return "completion";
 	}
 
 	public List<CompletionOption> getFilterOptions() {

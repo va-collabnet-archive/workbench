@@ -16,61 +16,34 @@
  */
 package org.ihtsdo.project.filter;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.io.IOException;
 
-import org.ihtsdo.project.workflow.api.WfComponentProvider;
-import org.ihtsdo.project.workflow.model.WfUser;
+import org.dwfa.ace.api.Terms;
+import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.project.workflow.model.WfInstance;
+import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.ContradictionException;
+import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.workflow.api.WfFilterBI;
 import org.ihtsdo.tk.workflow.api.WfProcessInstanceBI;
-import org.ihtsdo.tk.workflow.api.WfUserBI;
 
 /**
- * The Class WfDestinationFilter.
+ * The Class WfStringFilter.
  */
-public class WfDestinationFilter implements WfFilterBI {
+public class WfStringFilter implements WfFilterBI {
 
 	/** The TYPE. */
-	public final String TYPE = "WF_DESTIANTION_FILTER";
+	private final String TYPE = "WF_STRING_FILTER";
 
-	/** The destination. */
-	private WfUser destination;
+	/** The worklist uuid. */
+	private String string;
 
-	/**
-	 * Instantiates a new wf destination filter.
-	 */
-	public WfDestinationFilter() {
+	public WfStringFilter() {
+	}
+
+	public WfStringFilter(String string) {
 		super();
-	}
-
-	/**
-	 * Instantiates a new wf destination filter.
-	 * 
-	 * @param destination
-	 *            the destination
-	 */
-	public WfDestinationFilter(WfUser destination) {
-		super();
-		this.destination = destination;
-	}
-
-	/**
-	 * Gets the destination.
-	 * 
-	 * @return the destination
-	 */
-	public WfUser getDestination() {
-		return destination;
-	}
-
-	/**
-	 * Sets the destination.
-	 * 
-	 * @param destination
-	 *            the new destination
-	 */
-	public void setDestination(WfUser destination) {
-		this.destination = destination;
+		this.string = string;
 	}
 
 	/*
@@ -82,7 +55,21 @@ public class WfDestinationFilter implements WfFilterBI {
 	 */
 	@Override
 	public boolean evaluateInstance(WfProcessInstanceBI instance) {
-		return instance.getAssignedUser().equals(destination);
+		try {
+			ConceptVersionBI concept = Ts.get().getConceptVersion(Terms.get().getActiveAceFrameConfig().getViewCoordinate(), instance.getComponentPrimUuid());
+			return concept.getDescriptionPreferred().toUserString().toLowerCase().contains(string.toLowerCase());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
+
+	public String getParentNid() {
+		return string;
+	}
+
+	public void setParentNid(String string) {
+		this.string = string;
 	}
 
 	/*
@@ -97,13 +84,7 @@ public class WfDestinationFilter implements WfFilterBI {
 
 	@Override
 	public String toString() {
-		return "assigned to";
-	}
-
-	public List<WfUser> getFilterOptions() {
-		List<WfUser> users = new ArrayList<WfUser>();
-		users.addAll(new WfComponentProvider().getUsers());
-		return users;
+		return "term";
 	}
 
 }

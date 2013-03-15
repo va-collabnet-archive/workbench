@@ -44,6 +44,7 @@ import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.SwingWorker;
+import javax.swing.border.EmptyBorder;
 
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.TermLabelMaker;
@@ -71,7 +72,7 @@ public class WfInstanceSearchPanel extends JPanel implements WFSearchFilterConta
 	private WorkflowInstanceTableModel model;
 	private ArrayList<WfFilterBI> filters;
 	private JButton stopButton;
-    private CancelSearch keepSearching;
+	private CancelSearch keepSearching;
 
 	public WfInstanceSearchPanel() {
 		initComponents();
@@ -105,8 +106,7 @@ public class WfInstanceSearchPanel extends JPanel implements WFSearchFilterConta
 			} catch (Exception e) {
 
 			}
-			model = new WorkflowInstanceTableModel(new WORKFLOW_FIELD[] { WORKFLOW_FIELD.FSN, WORKFLOW_FIELD.EDITOR, WORKFLOW_FIELD.STATE,
-					WORKFLOW_FIELD.TIMESTAMP }, config);
+			model = new WorkflowInstanceTableModel(new WORKFLOW_FIELD[] { WORKFLOW_FIELD.FSN, WORKFLOW_FIELD.EDITOR, WORKFLOW_FIELD.STATE, WORKFLOW_FIELD.TIMESTAMP }, config);
 			table1.setCellSelectionEnabled(false);
 			table1.setColumnSelectionAllowed(false);
 			table1.setRowSelectionAllowed(true);
@@ -127,59 +127,76 @@ public class WfInstanceSearchPanel extends JPanel implements WFSearchFilterConta
 		stopButton.setVisible(false);
 		stopButton.setToolTipText("stop the current search");
 		stopButton.addActionListener(new StopActionListener());
-		panel1.add(stopButton, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-				new Insets(0, 0, 0, 0), 0, 0));
+		panel1.add(stopButton, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 
 	}
 
 	/**
-	 * The listener interface for receiving termLabelDragSource events.
-	 * The class that is interested in processing a termLabelDragSource
-	 * event implements this interface, and the object created
-	 * with that class is registered with a component using the
-	 * component's <code>addTermLabelDragSourceListener<code> method. When
+	 * The listener interface for receiving termLabelDragSource events. The
+	 * class that is interested in processing a termLabelDragSource event
+	 * implements this interface, and the object created with that class is
+	 * registered with a component using the component's
+	 * <code>addTermLabelDragSourceListener<code> method. When
 	 * the termLabelDragSource event occurs, that object's appropriate
 	 * method is invoked.
-	 *
+	 * 
 	 * @see TermLabelDragSourceEvent
 	 */
 	private class TermLabelDragSourceListener implements DragSourceListener {
 
-		/* (non-Javadoc)
-		 * @see java.awt.dnd.DragSourceListener#dragDropEnd(java.awt.dnd.DragSourceDropEvent)
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see java.awt.dnd.DragSourceListener#dragDropEnd(java.awt.dnd.
+		 * DragSourceDropEvent)
 		 */
 		public void dragDropEnd(DragSourceDropEvent dsde) {
 			// TODO Auto-generated method stub
 		}
 
-		/* (non-Javadoc)
-		 * @see java.awt.dnd.DragSourceListener#dragEnter(java.awt.dnd.DragSourceDragEvent)
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see java.awt.dnd.DragSourceListener#dragEnter(java.awt.dnd.
+		 * DragSourceDragEvent)
 		 */
 		public void dragEnter(DragSourceDragEvent dsde) {
 			// TODO Auto-generated method stub
 		}
 
-		/* (non-Javadoc)
-		 * @see java.awt.dnd.DragSourceListener#dragExit(java.awt.dnd.DragSourceEvent)
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * java.awt.dnd.DragSourceListener#dragExit(java.awt.dnd.DragSourceEvent
+		 * )
 		 */
 		public void dragExit(DragSourceEvent dse) {
 			// TODO Auto-generated method stub
 		}
 
-		/* (non-Javadoc)
-		 * @see java.awt.dnd.DragSourceListener#dragOver(java.awt.dnd.DragSourceDragEvent)
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * java.awt.dnd.DragSourceListener#dragOver(java.awt.dnd.DragSourceDragEvent
+		 * )
 		 */
 		public void dragOver(DragSourceDragEvent dsde) {
 			// TODO Auto-generated method stub
 		}
 
-		/* (non-Javadoc)
-		 * @see java.awt.dnd.DragSourceListener#dropActionChanged(java.awt.dnd.DragSourceDragEvent)
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see java.awt.dnd.DragSourceListener#dropActionChanged(java.awt.dnd.
+		 * DragSourceDragEvent)
 		 */
 		public void dropActionChanged(DragSourceDragEvent dsde) {
 			// TODO Auto-generated method stub
 		}
 	}
+
 	/**
 	 * The Class DragGestureListenerWithImage.
 	 */
@@ -187,15 +204,17 @@ public class WfInstanceSearchPanel extends JPanel implements WFSearchFilterConta
 
 		/** The dsl. */
 		DragSourceListener dsl;
-		
+
 		/** The j tree. */
 		JTable jTable;
 
 		/**
 		 * Instantiates a new drag gesture listener with image.
-		 *
-		 * @param dsl the dsl
-		 * @param jTree the j tree
+		 * 
+		 * @param dsl
+		 *            the dsl
+		 * @param jTree
+		 *            the j tree
 		 */
 		public DragGestureListenerWithImage(DragSourceListener dsl, JTable jTable) {
 
@@ -204,19 +223,23 @@ public class WfInstanceSearchPanel extends JPanel implements WFSearchFilterConta
 			this.dsl = dsl;
 		}
 
-		/* (non-Javadoc)
-		 * @see java.awt.dnd.DragGestureListener#dragGestureRecognized(java.awt.dnd.DragGestureEvent)
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * java.awt.dnd.DragGestureListener#dragGestureRecognized(java.awt.dnd
+		 * .DragGestureEvent)
 		 */
 		public void dragGestureRecognized(DragGestureEvent dge) {
 			int selRow = jTable.getSelectedRow();
 			if (selRow != -1) {
-				WorkflowInstanceTableModel tModel= (WorkflowInstanceTableModel)jTable.getModel();
+				WorkflowInstanceTableModel tModel = (WorkflowInstanceTableModel) jTable.getModel();
 				try {
-					Object obj=(Object)tModel.getValueAt(selRow, WorkflowInstanceTableModel.WORKFLOW_FIELD.FSN.getColumnNumber());
-					if (obj instanceof WorkflowResultItem){
-						WorkflowResultItem rItem=(WorkflowResultItem)obj;
-						I_GetConceptData concept=Terms.get().getConcept(rItem.getConceptUuid());
-						if (concept !=null) {
+					Object obj = (Object) tModel.getValueAt(selRow, WorkflowInstanceTableModel.WORKFLOW_FIELD.FSN.getColumnNumber());
+					if (obj instanceof WorkflowResultItem) {
+						WorkflowResultItem rItem = (WorkflowResultItem) obj;
+						I_GetConceptData concept = Terms.get().getConcept(rItem.getConceptUuid());
+						if (concept != null) {
 							Image dragImage = getDragImage(concept);
 							Point imageOffset = new Point(-10, -(dragImage.getHeight(jTable) + 1));
 							dge.startDrag(DragSource.DefaultCopyDrop, dragImage, imageOffset, getTransferable(concept), dsl);
@@ -232,11 +255,14 @@ public class WfInstanceSearchPanel extends JPanel implements WFSearchFilterConta
 
 		/**
 		 * Gets the transferable.
-		 *
-		 * @param obj the obj
+		 * 
+		 * @param obj
+		 *            the obj
 		 * @return the transferable
-		 * @throws TerminologyException the terminology exception
-		 * @throws IOException Signals that an I/O exception has occurred.
+		 * @throws TerminologyException
+		 *             the terminology exception
+		 * @throws IOException
+		 *             Signals that an I/O exception has occurred.
 		 */
 		private Transferable getTransferable(I_GetConceptData obj) throws TerminologyException, IOException {
 			return new ConceptTransferable(Terms.get().getConcept(obj.getConceptNid()));
@@ -244,10 +270,12 @@ public class WfInstanceSearchPanel extends JPanel implements WFSearchFilterConta
 
 		/**
 		 * Gets the drag image.
-		 *
-		 * @param obj the obj
+		 * 
+		 * @param obj
+		 *            the obj
 		 * @return the drag image
-		 * @throws IOException Signals that an I/O exception has occurred.
+		 * @throws IOException
+		 *             Signals that an I/O exception has occurred.
 		 */
 		public Image getDragImage(I_GetConceptData obj) throws IOException {
 
@@ -272,15 +300,15 @@ public class WfInstanceSearchPanel extends JPanel implements WFSearchFilterConta
 	private class StopActionListener implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
-            stopButton.setVisible(false);
-            searchButton.setVisible(true);
-            keepSearching.cancel(false);
+			stopButton.setVisible(false);
+			searchButton.setVisible(true);
+			keepSearching.cancel(false);
 		}
 	}
 
 	private void searchButtonActionPerformed(ActionEvent e) {
 		model.clearResults();
-
+		keepSearching.cancel(true);
 		searchButton.setVisible(false);
 		stopButton.setVisible(true);
 		filters = new ArrayList<WfFilterBI>();
@@ -299,7 +327,7 @@ public class WfInstanceSearchPanel extends JPanel implements WFSearchFilterConta
 				}
 			}
 		}
-		filters.add(((SearchFilterPanel)searchFilterPanel).getWfFilter());
+		filters.add(((SearchFilterPanel) searchFilterPanel).getWfFilter());
 
 		WorkflowStore ws = new WorkflowStore();
 		ProgressListener propertyChangeListener = new ProgressListener(progressBar1);
@@ -377,9 +405,8 @@ public class WfInstanceSearchPanel extends JPanel implements WFSearchFilterConta
 				gbc_searchFilterPanel.gridx = 0;
 				gbc_searchFilterPanel.gridy = 0;
 				panel1.add(searchFilterPanel, gbc_searchFilterPanel);
-				panel1.add(progressBar1, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(
-						0, 0, 0, 5), 0, 0));
-
+				panel1.add(progressBar1, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
+				progressBar1.setBorder(new EmptyBorder(0, 0, 0, 0));
 				// ---- searchButton ----
 				searchButton.addActionListener(new ActionListener() {
 					@Override
@@ -387,8 +414,7 @@ public class WfInstanceSearchPanel extends JPanel implements WFSearchFilterConta
 						searchButtonActionPerformed(e);
 					}
 				});
-				panel1.add(searchButton, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(
-						0, 0, 0, 0), 0, 0));
+				panel1.add(searchButton, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 			}
 			filterPanel.add(panel1, BorderLayout.PAGE_START);
 

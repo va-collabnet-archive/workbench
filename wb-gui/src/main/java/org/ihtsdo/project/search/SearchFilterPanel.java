@@ -4,6 +4,7 @@
 
 package org.ihtsdo.project.search;
 
+import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -20,7 +21,9 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.ListCellRenderer;
 
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_ConfigAceFrame;
@@ -30,17 +33,23 @@ import org.ihtsdo.project.TerminologyProjectDAO;
 import org.ihtsdo.project.filter.WfCompletionFilter;
 import org.ihtsdo.project.filter.WfCompletionFilter.CompletionOption;
 import org.ihtsdo.project.filter.WfDestinationFilter;
+import org.ihtsdo.project.filter.WfIsKindOfFilter;
 import org.ihtsdo.project.filter.WfProjectFilter;
 import org.ihtsdo.project.filter.WfStateFilter;
+import org.ihtsdo.project.filter.WfStringFilter;
 import org.ihtsdo.project.filter.WfWorklistFilter;
 import org.ihtsdo.project.model.I_TerminologyProject;
 import org.ihtsdo.project.model.WorkList;
 import org.ihtsdo.project.model.WorkSet;
 import org.ihtsdo.project.workflow.model.WfState;
 import org.ihtsdo.project.workflow.model.WfUser;
+import org.ihtsdo.qa.gui.ObjectTransferHandler;
+import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.workflow.api.WfFilterBI;
 import org.ihtsdo.tk.workflow.api.WfStateBI;
 import org.ihtsdo.tk.workflow.api.WfUserBI;
+import javax.swing.JTextField;
+import java.awt.Dimension;
 
 /**
  * @author Guillermo Reynoso
@@ -65,6 +74,8 @@ public class SearchFilterPanel extends JPanel {
 		filterTypeCombo.addItem(new WfProjectFilter());
 		filterTypeCombo.addItem(new WfStateFilter());
 		filterTypeCombo.addItem(new WfCompletionFilter());
+		filterTypeCombo.addItem(new WfIsKindOfFilter());
+		filterTypeCombo.addItem(new WfStringFilter());
 	}
 
 	private void addButtonActionPerformed(ActionEvent e) {
@@ -79,23 +90,65 @@ public class SearchFilterPanel extends JPanel {
 		Object filterObject = filterCombo.getSelectedItem();
 		if (filterObject instanceof WfDestinationFilter) {
 			return new WfDestinationFilter((WfUser) filterCombo.getSelectedItem());
-		} else if (filterObject instanceof WfWorklistFilter) {
+		} else if (filterObject instanceof WorkList) {
 			return new WfWorklistFilter(((WorkList) filterCombo.getSelectedItem()).getUuid());
 		} else if (filterObject instanceof WfState) {
 			return new WfStateFilter((WfState) filterCombo.getSelectedItem());
 		} else if (filterObject instanceof I_TerminologyProject) {
-			UUID uid=((I_TerminologyProject) filterCombo.getSelectedItem()).getUids().iterator().next();
+			UUID uid = ((I_TerminologyProject) filterCombo.getSelectedItem()).getUids().iterator().next();
 			return new WfProjectFilter(uid);
 		} else if (filterObject instanceof CompletionOption) {
 			CompletionOption co = (CompletionOption) filterCombo.getSelectedItem();
 			return new WfCompletionFilter(co);
+		} else if (filterObject instanceof String) {
+			String string = textField.getText();
+			if(!string.trim().equals("")){
+				return new WfStringFilter(string);
+			}
+		} else if (filterObject instanceof ConceptVersionBI) {
+			ConceptVersionBI parentConcept = (ConceptVersionBI) filterCombo.getSelectedItem();
+			return new WfIsKindOfFilter(parentConcept.getConceptNid());
 		} else {
 			return null;
+		}
+		return null;
+	}
+
+	class ComboBoxRenderer extends JLabel implements ListCellRenderer {
+		public ComboBoxRenderer() {
+			setOpaque(true);
+		}
+
+		/*
+		 * This method finds the image and text corresponding to the selected
+		 * value and returns the label, set up to display the text and image.
+		 */
+		public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+			// Get the selected index. (The index param isn't
+			// always valid, so just use the value.)
+			ConceptVersionBI selectedIndex = (ConceptVersionBI) value;
+			if (selectedIndex != null) {
+				setText(selectedIndex.toUserString());
+			}
+			if (isSelected) {
+				setBackground(list.getSelectionBackground());
+				setForeground(list.getSelectionForeground());
+			} else {
+				setBackground(list.getBackground());
+				setForeground(list.getForeground());
+			}
+
+			// Set the icon and text. If icon was null, say so.
+			return this;
 		}
 	}
 
 	private void filterTypeComboItemStateChanged(ItemEvent e) {
 		if (e.getStateChange() == ItemEvent.SELECTED) {
+			filterCombo.setVisible(true);
+			textField.setVisible(false);
+			filterCombo.setTransferHandler(null);
+			filterCombo.setRenderer(new JComboBox<>().getRenderer());
 			if (e.getItem() instanceof WfDestinationFilter) {
 				filterCombo.removeAllItems();
 				WfDestinationFilter df = (WfDestinationFilter) e.getItem();
@@ -146,6 +199,17 @@ public class SearchFilterPanel extends JPanel {
 				} catch (IOException e1) {
 					e1.printStackTrace();
 				}
+			} else if (e.getItem() instanceof WfIsKindOfFilter) {
+				filterCombo.removeAllItems();
+				try {
+					filterCombo.setTransferHandler(new ObjectTransferHandler(Terms.get().getActiveAceFrameConfig(), null));
+					filterCombo.setRenderer(new ComboBoxRenderer());
+				} catch (TerminologyException | IOException e1) {
+					e1.printStackTrace();
+				}
+			} else if (e.getItem() instanceof WfStringFilter) {
+				filterCombo.setVisible(false);
+				textField.setVisible(true);
 			} else if (e.getItem() instanceof WfCompletionFilter) {
 				filterCombo.removeAllItems();
 				CompletionOption[] completions = WfCompletionFilter.CompletionOption.values();
@@ -182,7 +246,7 @@ public class SearchFilterPanel extends JPanel {
 				addButtonActionPerformed(e);
 			}
 		});
-		add(addButton, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.VERTICAL, new Insets(0, 0, 0, 0), 0, 0));
+		add(addButton, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.VERTICAL, new Insets(0, 0, 0, 5), 0, 0));
 
 		// ---- removeButton ----
 		removeButton.addActionListener(new ActionListener() {
@@ -191,7 +255,7 @@ public class SearchFilterPanel extends JPanel {
 				removeButtonActionPerformed(e);
 			}
 		});
-		add(removeButton, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.VERTICAL, new Insets(0, 0, 0, 0), 0, 0));
+		add(removeButton, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.WEST, GridBagConstraints.VERTICAL, new Insets(0, 0, 0, 5), 0, 0));
 
 		// ---- filterTypeCombo ----
 		filterTypeCombo.addItemListener(new ItemListener() {
@@ -200,9 +264,20 @@ public class SearchFilterPanel extends JPanel {
 				filterTypeComboItemStateChanged(e);
 			}
 		});
-		add(filterTypeCombo, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
-		add(label1, new GridBagConstraints(3, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
-		add(filterCombo, new GridBagConstraints(4, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
+		add(filterTypeCombo, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
+		add(label1, new GridBagConstraints(3, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
+		add(filterCombo, new GridBagConstraints(4, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
+		
+		textField = new JTextField();
+		textField.setPreferredSize(new Dimension(300, 28));
+		textField.setMinimumSize(new Dimension(300, 28));
+		textField.setVisible(false);
+		GridBagConstraints gbc_textField = new GridBagConstraints();
+		gbc_textField.fill = GridBagConstraints.HORIZONTAL;
+		gbc_textField.gridx = 5;
+		gbc_textField.gridy = 0;
+		add(textField, gbc_textField);
+		textField.setColumns(10);
 		// JFormDesigner - End of component initialization
 		// //GEN-END:initComponents
 	}
@@ -214,5 +289,6 @@ public class SearchFilterPanel extends JPanel {
 	private JComboBox filterTypeCombo;
 	private JLabel label1;
 	private JComboBox filterCombo;
+	private JTextField textField;
 	// JFormDesigner - End of variables declaration //GEN-END:variables
 }
