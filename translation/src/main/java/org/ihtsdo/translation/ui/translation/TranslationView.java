@@ -158,8 +158,10 @@ public class TranslationView extends JPanel {
 			HashMap<UUID, EditorMode> roles = translConfig.getTranslatorRoles();
 			if (wfRole != null) {
 				EditorMode editorMode = roles.get(wfRole.getId());
-				if (editorMode.equals(EditorMode.READ_ONLY)) {
+				if (editorMode != null && editorMode.equals(EditorMode.READ_ONLY)) {
 					this.readOnlyMode = true;
+				} else {
+					this.readOnlyMode = true && readOnlyMode;
 				}
 			} else {
 				this.readOnlyMode = true && readOnlyMode;
