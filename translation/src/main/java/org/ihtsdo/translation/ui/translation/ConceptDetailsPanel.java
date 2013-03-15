@@ -90,7 +90,7 @@ public class ConceptDetailsPanel extends JPanel {
 						IconUtilities.ID, concpetID));
 				top.add(conceptIdNode);
 				
-				Collection<? extends RelationshipVersionBI> relationships = concept.getRelationshipsIncomingActive();
+				Collection<? extends RelationshipVersionBI> relationships = concept.getRelationshipsOutgoingActive();
 
 				List<DefaultMutableTreeNode> nodesToAdd = new ArrayList<DefaultMutableTreeNode>();
 
@@ -100,7 +100,7 @@ public class ConceptDetailsPanel extends JPanel {
 				for (RelationshipVersionBI relationship : relationships) {
 					ConceptVersionBI targetConcept = Ts.get().getConceptVersion(config.getViewCoordinate(), relationship.getTargetNid());
 					ConceptVersionBI typeConcept = Ts.get().getConceptVersion(config.getViewCoordinate(), relationship.getTypeNid());
-					String label = typeConcept + ": " + targetConcept.getDescriptionPreferred();
+					String label = typeConcept.toUserString() + ": " + targetConcept.getDescriptionPreferred().toUserString();
 
 					if (relationship.getPrimUuid().equals(UUID.fromString("c93a30b9-ba77-3adb-a9b8-4589c9f8fb25"))) {
 						DefaultMutableTreeNode supertypeNode = new DefaultMutableTreeNode(new TreeEditorObjectWrapper(label, TreeEditorObjectWrapper.SUPERTYPE, relationship));
