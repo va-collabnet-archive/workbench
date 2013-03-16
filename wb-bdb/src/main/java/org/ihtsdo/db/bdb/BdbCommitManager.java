@@ -103,6 +103,7 @@ public class BdbCommitManager {
     private static long lastCancel = Integer.MIN_VALUE;
     private static Semaphore dbWriterPermit = new Semaphore(PERMIT_COUNT);
     private static Semaphore dbCheckerPermit = new Semaphore(DATACHECK_PERMIT_COUNT);
+    private static Semaphore dbCheckerPermit2 = new Semaphore(DATACHECK_PERMIT_COUNT);
     private static ReentrantReadWriteLock dataCheckLock = new ReentrantReadWriteLock();
     private static List<I_TestDataConstraints> creationTests =
             new ArrayList<I_TestDataConstraints>();
@@ -175,13 +176,14 @@ public class BdbCommitManager {
             dbWriterService.execute(new SetNidsForCid(concept));
             dbWriterService.execute(new ConceptWriter(concept));
             dbCheckerPermit.acquire();
+            dbCheckerPermit2.acquire();
             dbCheckerService.execute(new DataChecker(concept));
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }finally{
-            dbCheckerPermit.acquireUninterruptibly(PERMIT_COUNT);
+            dbCheckerPermit.acquireUninterruptibly(DATACHECK_PERMIT_COUNT);
             readLock.unlock();
-            dbCheckerPermit.release(PERMIT_COUNT);
+            dbCheckerPermit.release(DATACHECK_PERMIT_COUNT);
         }
     }
     
@@ -224,6 +226,7 @@ public class BdbCommitManager {
                     throw new RuntimeException(e);
                 }
             }
+           dbCheckerPermit.release();
            return testsDone;
        }
 
@@ -231,7 +234,7 @@ public class BdbCommitManager {
        protected void done() {
            UpdateFrames updateFrames = new UpdateFrames(concept);
            updateFrames.run();
-           dbCheckerPermit.release();
+           dbCheckerPermit2.release();
        }
         
     }
@@ -1352,7 +1355,9 @@ public class BdbCommitManager {
     
     public static void waitTillDatachecksFinished() {
         dbCheckerPermit.acquireUninterruptibly(DATACHECK_PERMIT_COUNT);
+        dbCheckerPermit2.acquireUninterruptibly(DATACHECK_PERMIT_COUNT);
         dbCheckerPermit.release(DATACHECK_PERMIT_COUNT);
+        dbCheckerPermit2.release(DATACHECK_PERMIT_COUNT);
     }
 
     public static void writeImmediate(Concept concept) {
