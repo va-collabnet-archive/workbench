@@ -8,6 +8,8 @@ import junit.framework.TestCase;
 import org.ihtsdo.rf2.core.factory.RF2ConceptFactory;
 import org.ihtsdo.rf2.util.Config;
 import org.ihtsdo.rf2.util.JAXBUtil;
+import org.junit.Ignore;
+import org.junit.Test;
 
 public class ConceptExporterMojoTest extends TestCase {
 
@@ -22,6 +24,7 @@ public class ConceptExporterMojoTest extends TestCase {
 	 *            name of the test case
 	 * @return
 	 */
+        @Ignore @Test
 	public void testApp() {
 		System.out.println("**************Starting Data Extraction Program************" + (new Timestamp(new Date().getTime())));
 		System.out.println("ConceptExporterMojoTest Test Cases");
