@@ -4,6 +4,8 @@ import java.util.UUID;
 
 
 import junit.framework.TestCase;
+import org.ihtsdo.idgeneration.IdAssignmentBI;
+import org.ihtsdo.idgeneration.IdAssignmentImpl;
 
 public class TestIdAssignmentImplTextDefinitionPreRelease extends TestCase {
 	public void testApi() {

@@ -14,8 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.ihtsdo.project.view;
+package org.ihtsdo.project.wizard;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -31,7 +33,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 
 import junit.framework.TestCase;
 
@@ -40,7 +45,6 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_ImplementTermFactory;
-import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.cement.ArchitectonicAuxiliary;
@@ -48,62 +52,107 @@ import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.project.workflow.model.WfAction;
 import org.ihtsdo.project.workflow.model.WfRole;
 import org.ihtsdo.project.workflow.model.WfState;
+import org.ihtsdo.project.workflow.model.WfUser;
 import org.ihtsdo.project.workflow.model.WorkflowDefinition;
 import org.ihtsdo.tk.api.Precedence;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
+import org.junit.Ignore;
+import org.junit.Test;
 
 /**
- * The Class TestWorkflowDefinitionPanel.
+ * The Class TestDataGridCollectorFromList.
  */
-public class TestWorkflowDefinitionPanel extends TestCase {
-	/** The vodb directory. */
-	File vodbDirectory;
-
-	/** The read only. */
-	boolean readOnly = false;
-
-	/** The cache size. */
-	Long cacheSize = Long.getLong("600000000");
-
-	/** The db setup config. */
-	DatabaseSetupConfig dbSetupConfig;
-
-	/** The config. */
-	I_ConfigAceFrame config;
+public class TestDataGridCollectorFromList extends TestCase {
 
 	/** The tf. */
-	I_TermFactory tf;
-
-	/** The new project concept. */
-	I_GetConceptData newProjectConcept;
-
-	/** The allowed statuses with retired. */
-	I_IntSet allowedStatusesWithRetired;
+	private I_TermFactory tf;
+	
+	/** The vodb directory. */
+	private File vodbDirectory;
+	
+	/** The db setup config. */
+	private DatabaseSetupConfig dbSetupConfig;
+	
+	/** The read only. */
+	private boolean readOnly;
+	
+	/** The cache size. */
+	private Long cacheSize;
+	
+	/** The config. */
+	private I_ConfigAceFrame config;
+	
+	/** The wfdf. */
+	private WorkflowDefinition wfdf;
 
 	/* (non-Javadoc)
 	 * @see junit.framework.TestCase#setUp()
 	 */
 	protected void setUp() throws Exception {
 		super.setUp();
-		System.out.println("Deleting test fixture");
-		deleteDirectory(new File("berkeley-db"));
-		System.out.println("Creating test fixture");
-		copyDirectory(new File("/Users/termmed/Desktop/wb-bundle/berkeley-db"), new File("berkeley-db"));
-		vodbDirectory = new File("berkeley-db");
-		dbSetupConfig = new DatabaseSetupConfig();
-		System.out.println("Opening database");
-		Terms.createFactory(vodbDirectory, readOnly, cacheSize, dbSetupConfig);
-		tf = (I_ImplementTermFactory) Terms.get();
-		config = getTestConfig();
-		tf.setActiveAceFrameConfig(config);
+//		System.out.println("Deleting test fixture");
+//		deleteDirectory(new File("berkeley-db"));
+//		System.out.println("Creating test fixture");
+////		copyDirectory(new File("/Users/termmed/Desktop/wb-bundle/berkeley-db"), new File("berkeley-db"));
+//		vodbDirectory = new File("berkeley-db");
+//		dbSetupConfig = new DatabaseSetupConfig();
+//		System.out.println("Opening database");
+////		Terms.createFactory(vodbDirectory, readOnly, cacheSize, dbSetupConfig);
+////		tf = (I_ImplementTermFactory) Terms.get();
+////		config = getTestConfig();
+////		tf.setActiveAceFrameConfig(config);
 	}
-
+	
+	
 	/**
-	 * Test create workflow definition.
+	 * Test.
 	 */
-	public void testCreateWorkflowDefinition(){
+    @Ignore("Ignored becuase setup has user specific class paths...") @Test
+	public void test(){
+
+//		createWorkflowDefinition();
+//		List<WfUser> b= new ArrayList<WfUser>();
+//		b.add(new WfUser("Cesar",UUID.randomUUID()));
+//		b.add(new WfUser("Alo",UUID.randomUUID()));
+//		b.add(new WfUser("Guille",UUID.randomUUID()));
+//		b.add(new WfUser("Vahram",UUID.randomUUID()));
+//		b.add(new WfUser("Patri",UUID.randomUUID()));
+//		List<WfRole> c = wfdf.getRoles();
+//		final DataGridCollectorFromList grid= new DataGridCollectorFromList(c,b);
+//		
+//		final JFrame frame= new JFrame("lalalalala");
+//		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+//		frame.setSize(600,400);
+//		JButton button= new JButton();
+//		button.addActionListener(new ActionListener() {
+//			
+//			@Override
+//			public void actionPerformed(ActionEvent arg0) {
+//				grid.setKey("Resultado");
+//				try {
+//					grid.getData();
+//				} catch (Exception e) {
+//					JOptionPane.showMessageDialog(frame, e.getMessage());
+//				}
+//			}
+//		});
+//		JPanel panel= new JPanel();
+//		panel.add(grid);
+//		panel.add(button);
+//		frame.add(panel);
+//		frame.pack();
+//		frame.setVisible(true);
+//		while(true);
+//		
+	}
+	
+	
+	/**
+	 * Creates the workflow definition.
+	 */
+	public void createWorkflowDefinition(){
 
 		WfState state0 = new WfState();
 		state0.setId(ArchitectonicAuxiliary.Concept.APPROVED_FOR_PUBLICATION_STATUS.getUids().iterator().next());
@@ -241,7 +290,7 @@ public class TestWorkflowDefinitionPanel extends TestCase {
 			actions.put("Review",action8);
 			actions.put("Translate",action9);
 
-			WorkflowDefinition wfdf=new WorkflowDefinition();
+			wfdf=new WorkflowDefinition();
 			wfdf.setName("testWfDefinition3");
 			wfdf.setRoles(roles);
 			wfdf.setStates(states);
@@ -259,14 +308,6 @@ public class TestWorkflowDefinitionPanel extends TestCase {
 			e.printStackTrace();
 		}
 		
-		JFrame frame= new JFrame("lalalalala");
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setSize(600,400);
-		WorkflowDefinitionPanel panel= new WorkflowDefinitionPanel();
-		frame.add(panel);
-		frame.pack();
-		frame.setVisible(true);
-		while(true);
 		
 	}
 

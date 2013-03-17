@@ -27,11 +27,6 @@
     <url> https://mgr.servers.aceworkspace.net/pbl/cubitci/pub/vodb/site/index.html </url>
     <inceptionYear>2005</inceptionYear>
     <description>Workbench Editor GUI </description>
-    <licenses>
-        <license>
-            <name>Informatics, Inc. End User License Agreement</name>
-        </license>
-    </licenses>
     <dependencies>
         <dependency>
             <groupId>org.ihtsdo</groupId>
@@ -99,6 +94,7 @@
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.7</version>
+            <scope>test</scope>
             <type>jar</type>
             <optional>false</optional>
         </dependency>
