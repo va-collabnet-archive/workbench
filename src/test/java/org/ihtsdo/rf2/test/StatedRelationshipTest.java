@@ -102,7 +102,7 @@ public class StatedRelationshipTest extends TestCase {
 				Config config = null;
 			
 			    config = JAXBUtil.getConfig("/org/ihtsdo/rf2/config/statedrelationship.xml");
-				config.setOutputFolderName("export");
+				config.setOutputFolderName("target/export");
 				config.setReleaseDate("20120131");
 				config.setRf2Format("true");
 				config.setFlushCount(10000);

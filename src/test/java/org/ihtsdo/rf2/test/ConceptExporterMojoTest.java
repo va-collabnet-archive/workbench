@@ -35,7 +35,7 @@ public class ConceptExporterMojoTest extends TestCase {
 			config.setReleaseDate("20020731");
 			config.setFileExtension("txt");
 
-			config.setOutputFolderName("export");
+			config.setOutputFolderName("target/export");
 			config.setDefaults();
 			
 			config.setDroolsDrlFile("org/ihtsdo/rf2/core/drools/rules/ConceptReleaseRules.drl");
