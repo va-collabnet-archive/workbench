@@ -7,7 +7,7 @@
 		</layout>
 	</appender>
 	<appender name="A1" class="org.apache.log4j.RollingFileAppender">
-		<param name="file" value="logs/rf2-export.log"/>
+		<param name="file" value="target/logs/rf2-export.log"/>
 		<param name="MaxFileSize" value="100MB"/>
 		<param name="MaxBackupIndex" value="25"/>
 		<layout class="org.apache.log4j.PatternLayout">
