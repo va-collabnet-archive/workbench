@@ -35,7 +35,7 @@ public class DataExtractionTest extends TestCase {
 			config.setReleaseDate("20100731");
 			config.setFileExtension("txt");
 
-			config.setOutputFolderName("export");
+			config.setOutputFolderName("target/export");
 			config.setDroolsDrlFile("org/ihtsdo/rf2/core/drools/rules/ConceptReleaseRules.drl");
 
 			RF2ConceptFactory factory = new RF2ConceptFactory(config);
