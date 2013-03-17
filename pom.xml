@@ -48,10 +48,6 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.antlr</groupId>
-            <artifactId>antlr-runtime</artifactId>
-        </dependency>
-        <dependency>
             <artifactId>xercesImpl</artifactId>
             <groupId>xerces</groupId>
             <version>2.9.1</version>
