@@ -1,0 +1,38 @@
+<project xmlns:artifact="antlib:org.apache.maven.artifact.ant" xmlns:rsel="antlib:org.apache.tools.ant.types.resources.selectors" xmlns:ac="antlib:net.sf.antcontrib">
+
+    <property name="lib.dir" value="${basedir}/dependency" />
+
+    <path id="dependency.classpath">
+        <fileset dir="${lib.dir}">
+            <include name="*.jar" />
+        </fileset>
+    </path>
+
+    <taskdef classpathref="dependency.classpath" resource="tasks.properties" />
+
+    <target name="instrument">
+        <echo message="Instrumenting classes for code coverage ..." />
+
+        <cobertura-instrument todir="instrumented-classes">
+            <fileset dir="coverage-classes">
+                <include name="**/*.class" />
+                <exclude name="**/org/dwfa/ace/task/**"/>
+            </fileset>
+        </cobertura-instrument>
+    </target>
+    
+    <target name="report">
+        <echo message="Generating test result and code coverage reports ..." />
+        
+        <cobertura-report srcdir="source-files" destdir="classes/coverage-report"/>
+        
+        <mkdir dir="classes/test-report/html"/>
+        <junitreport todir="classes/test-report">
+            <fileset dir="surefire-reports">
+                <include name="TEST-*.xml"/>
+            </fileset>
+            <report todir="classes/test-report" format="frames"/>
+        </junitreport>
+    </target>
+
+</project>

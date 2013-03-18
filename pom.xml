@@ -235,6 +235,8 @@ the specific language governing permissions and limitations under the License. -
         </plugins>
     </reporting>
     <modules>
+        <module>api-test-cases</module>
+        <module>api-test-execution</module>
         <module>wb-foundation</module>
         <module>wb-core</module>
         <module>wb-api</module>
