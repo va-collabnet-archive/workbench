@@ -236,7 +236,6 @@ the specific language governing permissions and limitations under the License. -
     </reporting>
     <modules>
         <module>api-test-cases</module>
-        <module>api-test-execution</module>
         <module>wb-foundation</module>
         <module>wb-core</module>
         <module>wb-api</module>
@@ -270,4 +269,15 @@ the specific language governing permissions and limitations under the License. -
         <module>document-management</module>
         <module>translation</module>
     </modules>
+    <profiles>
+		<profile>
+			<id>integration-tests</id>
+			<activation>
+				<activeByDefault>false</activeByDefault>
+			</activation>
+			<modules>
+				<module>api-test-execution</module>
+			</modules>
+		</profile>
+	</profiles>
 </project>
