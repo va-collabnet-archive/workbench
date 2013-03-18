@@ -82,7 +82,6 @@ public class CreateDescriptionsDiffRefsets extends AbstractTask {
 				public void run() {
 					try {
 						dialog = new DescriptionDiffAttrDialog(CreateDescriptionsDiffRefsets.this);
-						dialog.setAlwaysOnTop(true);
 						dialog.createAndShowGui();
 					} catch (Exception e) {
 						e.printStackTrace();
