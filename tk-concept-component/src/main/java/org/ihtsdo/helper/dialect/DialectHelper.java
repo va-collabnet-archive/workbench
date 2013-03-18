@@ -209,11 +209,13 @@ public class DialectHelper {
         String[] tokens = text.split("\\s+");
         Set<String> dialectVariants = variantSetMap.get(languageNid);
         for (String token : tokens) {
-            if(!token.substring(token.length() - 1, token.length()).matches("\\w")){
-                token = token.substring(0, token.length() - 1);
-            }
-            if (dialectVariants.contains(token.toLowerCase())) {
-                return true;
+            if (token.length() >= 1) {
+                if (!token.substring(token.length() - 1, token.length()).matches("\\w")) {
+                    token = token.substring(0, token.length() - 1);
+                }
+                if (dialectVariants.contains(token.toLowerCase())) {
+                    return true;
+                }
             }
         }
         return false;
@@ -238,11 +240,13 @@ public class DialectHelper {
         String[] tokens = text.split("\\s+");
         Map<String, String> dialectVariants = variantMap.get(dialectNid);
         for (String token : tokens) {
-            if(!token.substring(token.length() - 1, token.length()).matches("\\w")){
+            if(token.length() >= 1){
+                if(!token.substring(token.length() - 1, token.length()).matches("\\w")){
                 token = token.substring(0, token.length() - 1);
             }
             if (dialectVariants.containsKey(token.toLowerCase())) {
                 return false;
+            }
             }
         }
         return true;
@@ -268,9 +272,11 @@ public class DialectHelper {
         for (int i = 0; i < tokens.length; i++) {
             String word = tokens[i];
             String punctuation = null;
-            if(!word.substring(word.length() - 1, word.length()).matches("\\w")){
-                punctuation = word.substring(word.length() - 1);
-                word = word.substring(0, word.length() - 1);
+            if(word.length() >= 1){
+                if(!word.substring(word.length() - 1, word.length()).matches("\\w")){
+                    punctuation = word.substring(word.length() - 1);
+                    word = word.substring(0, word.length() - 1);
+                }
             }
             if (dialectVariants.containsKey(word.toLowerCase())) {
                 boolean upperCase = Character.isUpperCase(word.charAt(0));
