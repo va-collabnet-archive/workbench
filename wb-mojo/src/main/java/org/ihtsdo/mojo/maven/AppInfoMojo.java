@@ -18,6 +18,7 @@ package org.ihtsdo.mojo.maven;
 
 import static org.dwfa.bpa.util.AppInfoProperties.ARTIFACT_ID;
 import static org.dwfa.bpa.util.AppInfoProperties.GROUP_ID;
+import static org.dwfa.bpa.util.AppInfoProperties.SITE_URL;
 import static org.dwfa.bpa.util.AppInfoProperties.VERSION;
 
 import org.apache.maven.plugin.AbstractMojo;
@@ -122,8 +123,7 @@ public class AppInfoMojo extends AbstractMojo {
        appInfoProperties.setProperty(VERSION, version);
 
        // Set workbench site properties.
-       // TODO: Factor key out as constant somewhere.
-       appInfoProperties.setProperty("siteURL", siteURL); 
+       appInfoProperties.setProperty(SITE_URL, siteURL); 
 
        // Archetype properties.
        // TODO: Factor keys out as constant somewhere.

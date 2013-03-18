@@ -21,6 +21,7 @@ package org.dwfa.bpa.util;
 
 import static org.dwfa.bpa.util.AppInfoProperties.ARTIFACT_ID;
 import static org.dwfa.bpa.util.AppInfoProperties.GROUP_ID;
+import static org.dwfa.bpa.util.AppInfoProperties.SITE_URL;
 import static org.dwfa.bpa.util.AppInfoProperties.VERSION;
 
 import java.awt.BorderLayout;
@@ -120,7 +121,7 @@ public class AboutBox {
         String groupId = AppInfoProperties.getProperty(GROUP_ID);
         String artifactId = AppInfoProperties.getProperty(ARTIFACT_ID);
         String version = AppInfoProperties.getProperty(VERSION);
-        String site_url = AppInfoProperties.getProperty("siteURL");  // TODO: Factor out to AppInfoProperties.
+        String site_url = AppInfoProperties.getProperty(SITE_URL);
         
         String labelText = "Version " + groupId + ":" + artifactId + ":" + version;
         JLabel label = null;
