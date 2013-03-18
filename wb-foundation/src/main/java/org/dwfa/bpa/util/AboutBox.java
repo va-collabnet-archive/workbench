@@ -48,7 +48,6 @@ import javax.swing.border.EmptyBorder;
 /**
  * @author kec
  * @author ocarlsen
- * 
  */
 public class AboutBox {
     

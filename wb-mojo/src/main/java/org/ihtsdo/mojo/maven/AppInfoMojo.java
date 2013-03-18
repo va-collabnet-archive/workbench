@@ -74,10 +74,9 @@ public class AppInfoMojo extends AbstractMojo {
     private String version;
 
     /**
-     * The site URL.
+     * The site URL.  Allowed to be null.
      *
-     * @parameter expression="${project.distributionManagement.site.url}"
-     * @required
+     * @parameter expression="${siteURL}"
      */
     private String siteURL;
 
@@ -122,21 +121,23 @@ public class AppInfoMojo extends AbstractMojo {
        appInfoProperties.setProperty(ARTIFACT_ID, artifactId);
        appInfoProperties.setProperty(VERSION, version);
 
-       // Set workbench site properties.
-       appInfoProperties.setProperty(SITE_URL, siteURL); 
+       // Set workbench site properties, if specified.
+       if (siteURL != null) {
+           appInfoProperties.setProperty(SITE_URL, siteURL); 
+       }
 
        // Archetype properties.
        // TODO: Factor keys out as constant somewhere.
        appInfoProperties.setProperty("archetypeGroupId", archetypeGroupId);
        appInfoProperties.setProperty("archetypeArtifactId", archetypeArtifactId);
        appInfoProperties.setProperty("archetypeVersion", archetypeVersion);
-       
+
        // Write out to file.
        File profileRoot = new File(wbBundleDir, "profiles");
        File appInfoPropertiesFile = new File(profileRoot, "appinfo.properties");
        String comment = "App Info";
        appInfoProperties.storeToXML(new FileOutputStream(appInfoPropertiesFile), comment);
-       
+
        return appInfoProperties;
     }
 }
