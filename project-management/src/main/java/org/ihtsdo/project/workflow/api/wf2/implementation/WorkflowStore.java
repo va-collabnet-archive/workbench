@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -262,6 +263,7 @@ public class WorkflowStore implements WorkflowStoreBI {
 	 */
 	private void getInstancesForProjectFilter(Collection<WfFilterBI> filters, Collection<WfProcessInstanceBI> result) throws TerminologyException,
 			IOException, Exception {
+		Set<WfProcessInstanceBI> set = new HashSet<WfProcessInstanceBI>();
 		for (WfFilterBI wfFilterBI : filters) {
 			if (wfFilterBI instanceof WfWorklistFilter) {
 				WfWorklistFilter wlfilter = (WfWorklistFilter) wfFilterBI;
@@ -276,7 +278,7 @@ public class WorkflowStore implements WorkflowStoreBI {
 						}
 					}
 					if (passed) {
-						result.add(wfProcessInstanceBI);
+						set.add(wfProcessInstanceBI);
 					}
 
 				}
@@ -290,13 +292,14 @@ public class WorkflowStore implements WorkflowStoreBI {
 					for (WfFilterBI filter : filters) {
 						for (WfProcessInstanceBI wfProcessInstanceBI : instances) {
 							if (filter.evaluateInstance(wfProcessInstanceBI)) {
-								result.add(wfProcessInstanceBI);
+								set.add(wfProcessInstanceBI);
 							}
 						}
 					}
 				}
 			}
 		}
+		result.addAll(set);
 	}
 
 	/* (non-Javadoc)
