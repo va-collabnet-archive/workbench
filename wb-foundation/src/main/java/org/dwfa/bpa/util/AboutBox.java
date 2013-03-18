@@ -19,6 +19,8 @@
  */
 package org.dwfa.bpa.util;
 
+import static org.dwfa.bpa.util.AppInfoProperties.ARTIFACT_ID;
+import static org.dwfa.bpa.util.AppInfoProperties.GROUP_ID;
 import static org.dwfa.bpa.util.AppInfoProperties.VERSION;
 
 import java.awt.BorderLayout;
@@ -105,9 +107,11 @@ public class AboutBox {
 
     private static JLabel createVersionLabel() {
         // Get from properties from AppInfo.
+        String groupId = AppInfoProperties.getProperty(GROUP_ID);
+        String artifactId = AppInfoProperties.getProperty(ARTIFACT_ID);
         String version = AppInfoProperties.getProperty(VERSION);
         
-        String labelText = "Version " + version;
+        String labelText = "Version " + groupId + ":" + artifactId + ":" + version;
         JLabel label = new JLabel(labelText);
 
         // Center label within dialog. 
@@ -135,17 +139,23 @@ public class AboutBox {
     /**
      * Helpful for testing outside an editor bundle.
      */
-    public static void main(String[] args) {
-        // Configure image from command-line args.
-        String pathToGraphic = args[0];
-        System.setProperty(GRAPHIC_PROPERTY, pathToGraphic);
-        
+    public static void main(String[] args) throws Exception {
+        // Configure image location via System property. 
+        // (See getGraphic() method above.) 
+
+        // Configure path to "profiles" directory from command-line.
+        String pathToProfiles = args[0];
+
+        // Load AppInfo properties because downstream the AboutBox will need them.
+        File profileDir = new File(pathToProfiles);
+        AppInfoProperties.loadFromXML(profileDir, "appinfo.properties");
+
         JFrame frame = new JFrame(getTitle());
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setPreferredSize(new Dimension(400, 400));
         frame.pack();
         frame.setVisible(true);
-        
+
         // This logic copied from ComponentFrameBean#about().
         JDialog aboutBox = AboutBox.getAboutBox(frame);
         aboutBox.pack();
