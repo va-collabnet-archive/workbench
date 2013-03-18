@@ -354,6 +354,23 @@ public class WfInstance implements Serializable, WfProcessInstanceBI {
 	public void setActionReport(ActionReport actionReport) {
 		this.actionReport = actionReport;
 	}
+	
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((actionReport == null) ? 0 : actionReport.hashCode());
+		result = prime * result + ((changeTime == null) ? 0 : changeTime.hashCode());
+		result = prime * result + ((componentId == null) ? 0 : componentId.hashCode());
+		result = prime * result + ((componentName == null) ? 0 : componentName.hashCode());
+		result = prime * result + ((destination == null) ? 0 : destination.hashCode());
+		result = prime * result + ((history == null) ? 0 : history.hashCode());
+		result = prime * result + ((properties == null) ? 0 : properties.hashCode());
+		result = prime * result + ((status == null) ? 0 : status.hashCode());
+		result = prime * result + ((wfDefinition == null) ? 0 : wfDefinition.hashCode());
+		result = prime * result + ((workList == null) ? 0 : workList.hashCode());
+		return result;
+	}
 
 	/*
 	 * (non-Javadoc)
@@ -365,9 +382,7 @@ public class WfInstance implements Serializable, WfProcessInstanceBI {
 		if (obj instanceof WfInstance) {
 			WfInstance instance = (WfInstance) obj;
 			try {
-				return instance.getComponentId().equals(this.componentId) && instance.getComponentName().equals(this.componentName)
-						&& instance.getWorkList().equals(this.workList) && instance.workList.getName().equals(this.workList.getName())
-						&& instance.getDestination().equals(this.destination) && instance.getActionReport().equals(this.actionReport);
+				return instance.getComponentId().equals(this.componentId) && instance.getWorkList().equals(this.workList);
 			} catch (NullPointerException npx) {
 				return false;
 			}
@@ -583,5 +598,6 @@ public class WfInstance implements Serializable, WfProcessInstanceBI {
 			e.printStackTrace();
 		}
 	}
+	
 
 }
