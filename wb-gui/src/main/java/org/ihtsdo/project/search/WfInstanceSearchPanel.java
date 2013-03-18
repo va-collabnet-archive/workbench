@@ -314,15 +314,11 @@ public class WfInstanceSearchPanel extends JPanel implements WFSearchFilterConta
 		filters = new ArrayList<WfFilterBI>();
 
 		Component[] components = filtersWrapper.getComponents();
-		boolean worklistOrProjectFilter = false;
 		for (Component component : components) {
 			if (component instanceof SearchFilterPanel) {
 				SearchFilterPanel sfp = (SearchFilterPanel) component;
 				WfFilterBI filter = sfp.getWfFilter();
 				if (filter != null) {
-					if (filter instanceof WfWorklistFilter || filter instanceof WfProjectFilter) {
-						worklistOrProjectFilter = true;
-					}
 					filters.add(filter);
 				}
 			}
