@@ -18,6 +18,7 @@ package org.ihtsdo.mojo.maven;
 
 import static org.dwfa.bpa.util.AppInfoProperties.ARTIFACT_ID;
 import static org.dwfa.bpa.util.AppInfoProperties.GROUP_ID;
+import static org.dwfa.bpa.util.AppInfoProperties.SITE_URL;
 import static org.dwfa.bpa.util.AppInfoProperties.VERSION;
 
 import org.apache.maven.plugin.AbstractMojo;
@@ -72,6 +73,13 @@ public class AppInfoMojo extends AbstractMojo {
      */
     private String version;
 
+    /**
+     * The site URL.  Allowed to be null.
+     *
+     * @parameter expression="${siteURL}"
+     */
+    private String siteURL;
+
     public void execute() throws MojoExecutionException, MojoFailureException {
         try {
             Properties appInfoProperties = exportAppInfoProperties();
@@ -89,12 +97,17 @@ public class AppInfoMojo extends AbstractMojo {
        appInfoProperties.setProperty(ARTIFACT_ID, artifactId);
        appInfoProperties.setProperty(VERSION, version);
 
+       // Set workbench site properties, if specified.
+       if (siteURL != null) {
+           appInfoProperties.setProperty(SITE_URL, siteURL); 
+       }
+
        // Write out to file.
        File profileRoot = new File(wbBundleDir, "profiles");
        File appInfoPropertiesFile = new File(profileRoot, "appinfo.properties");
        String comment = "App Info";
        appInfoProperties.storeToXML(new FileOutputStream(appInfoPropertiesFile), comment);
-       
+
        return appInfoProperties;
     }
 }

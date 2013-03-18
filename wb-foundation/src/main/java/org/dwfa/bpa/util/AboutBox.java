@@ -21,15 +21,23 @@ package org.dwfa.bpa.util;
 
 import static org.dwfa.bpa.util.AppInfoProperties.ARTIFACT_ID;
 import static org.dwfa.bpa.util.AppInfoProperties.GROUP_ID;
+import static org.dwfa.bpa.util.AppInfoProperties.SITE_URL;
 import static org.dwfa.bpa.util.AppInfoProperties.VERSION;
 
 import java.awt.BorderLayout;
+import java.awt.Cursor;
+import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.Toolkit;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
@@ -43,6 +51,8 @@ import javax.swing.border.EmptyBorder;
  */
 public class AboutBox {
     
+    private static final Logger LOGGER = Logger.getLogger(AboutBox.class.getName());
+
     private static final String GRAPHIC_PROPERTY = "org.dwfa.AboutBoxGraphic";
     private static final String TITLE_PROPERTY = "org.dwfa.AboutBoxTitle";
 
@@ -110,14 +120,43 @@ public class AboutBox {
         String groupId = AppInfoProperties.getProperty(GROUP_ID);
         String artifactId = AppInfoProperties.getProperty(ARTIFACT_ID);
         String version = AppInfoProperties.getProperty(VERSION);
+        String site_url = AppInfoProperties.getProperty(SITE_URL);
         
         String labelText = "Version " + groupId + ":" + artifactId + ":" + version;
-        JLabel label = new JLabel(labelText);
+        JLabel label = null;
+
+        // Build a link label if site is specified, a plain old label otherwise.
+        if (site_url != null) {
+            label = createLinkLabel(site_url, labelText);           
+        } else {
+            label = new JLabel(labelText);
+        }
 
         // Center label within dialog. 
         label.setHorizontalAlignment(SwingConstants.CENTER);
         label.setVerticalAlignment(SwingConstants.CENTER);
         label.setBorder(new EmptyBorder(0, 0, 5, 0));  // Padding on bottom.
+        
+        return label;
+    }
+
+    private static JLabel createLinkLabel(String siteURL, String labelText) {
+        final String href = siteURL + "index.html";
+        JLabel label = new JLabel("<html><a href=\"" + href + "\">" + labelText + "</a></html>");
+        label.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        
+        // Open browser on mouse click.
+        label.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                try {
+                    Desktop.getDesktop().browse(new URI(href));
+                } catch (Exception ex) {
+                    String msg = "Could not open link: " + href;
+                    LOGGER.log(Level.WARNING, msg, ex);  // Will print stack trace.
+                }
+            }
+        });
         
         return label;
     }
