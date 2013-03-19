@@ -57,6 +57,7 @@ import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.RelAssertionType;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
+import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.refex.type_nid.RefexNidVersionBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
@@ -90,13 +91,18 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 	/** The refsets cache. */
 	private static Map<String, I_GetConceptData> refsetsCache = new HashMap<String, I_GetConceptData>();
 
+	private int fsnRf2Nid;
+	private final MetadataConversor metadataConversor;
+
 	/**
 	 * Instantiates a new terminology helper drools workbench.
 	 */
 	public TerminologyHelperDroolsWorkbench(){
 		super();
+		metadataConversor = new MetadataConversor();
 		try {
 			semtagsRoot = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.SEMTAGS_ROOT.getUids());
+			fsnRf2Nid = SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getLenient().getNid();
 		} catch (TerminologyException e) {
 			AceLog.getAppLog().alertAndLogException(e);
 		} catch (IOException e) {
@@ -256,6 +262,93 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 		return result;
 	}
 
+	@Override
+	public boolean isDescriptionTextNotUniqueInProvidedHierarchy(String descText, String conceptUuid, 
+			String hierarchyConceptUuid) throws Exception {
+		I_TermFactory tf = Terms.get();
+		SearchResult result = Terms.get().doLuceneSearch(QueryParser.escape(descText));
+		int conceptNid = Terms.get().uuidToNative(UUID.fromString(conceptUuid));
+		boolean unique = true;
+		if (result.topDocs.totalHits == 0) {
+			unique = true;
+		} else {
+			NidSetBI allowedStatusNids = Terms.get().getActiveAceFrameConfig().getViewCoordinate().getAllowedStatusNids();
+			search: 
+				for (int i = 0; i < result.topDocs.totalHits; i++) {
+					Document doc = result.searcher.doc(result.topDocs.scoreDocs[i].doc);
+					int cnid = Integer.parseInt(doc.get("cnid"));
+					int dnid = Integer.parseInt(doc.get("dnid"));
+					if (cnid != conceptNid) {
+						I_DescriptionVersioned<?> potential_match = Terms.get().getDescription(dnid, cnid);
+						
+						int pfdn = Integer.MAX_VALUE;
+
+						try {
+							pfdn = Terms.get().uuidToNative(UUID.fromString("084283a0-b7ca-5626-b604-6dd69fb5ff2d"));
+						} catch (Exception e) {
+							// ignore, no pfdn in this environment
+						}
+						// if its not null and not "patient friendly preferred term" type and not preferred term type
+						if (potential_match != null && potential_match.getTypeNid() != pfdn && 
+								potential_match.getTypeNid() != Terms.get().uuidToNative(UUID.fromString("d8e3b37d-7c11-33ef-b1d0-8769e2264d44"))) {
+							boolean preferredInUs = false;
+
+							for (RefexChronicleBI annot : potential_match.getAnnotations()) {
+								// has an US refset extension (annotated)
+								if (annot.getRefexNid() == Terms.get().uuidToNative(UUID.fromString("29bf812c-7a77-595d-8b12-ea37c473a5e6"))) {
+									RefexNidVersionBI langAnnot = (RefexNidVersionBI) annot.getVersion(Terms.get().getActiveAceFrameConfig().getViewCoordinate());
+									// has preferred acceptability value
+									if (langAnnot != null && langAnnot.getNid1() == Terms.get().uuidToNative(UUID.fromString("15877c09-60d7-3464-bed8-635a98a7e5b2"))) {
+										preferredInUs = true;
+									}
+
+								}
+							}
+
+							if (preferredInUs) {
+								for (DescriptionVersionBI part_search : 
+									potential_match.getVersions(Terms.get().getActiveAceFrameConfig().getViewCoordinate())) {
+									String part_searchText1 = "";
+									String descText2 = "";
+
+									//                            if (part_search.getText().contains("(") && part_search.getText().indexOf("(") > 2) {
+									//                                text1 = part_search.getText().substring(0, part_search.getText().lastIndexOf("(")-1).toLowerCase().trim();
+									//                            } else {
+									//                                text1 = part_search.getText().toLowerCase().trim();
+									//                            }
+									//                            
+									//                            if (descText.contains("(")  && descText.indexOf("(") > 2) {
+									//                                text2 = descText.substring(0, descText.lastIndexOf("(")-1).toLowerCase().trim();
+									//                            } else {
+									//                                text2 = descText.toLowerCase().trim();
+									//                            }
+
+									if (descText.contains("(")  
+											&& descText.indexOf("(") > 2
+											&& descText.endsWith(")")) {
+										descText2 = descText.substring(0, descText.lastIndexOf("(")-1).toLowerCase().trim();
+									} else {
+										descText2 = descText.toLowerCase().trim();
+									}
+
+									if (allowedStatusNids.contains(part_search.getStatusNid())
+											&& (part_search.getText().toLowerCase().equals(descText.toLowerCase()) 
+													|| part_searchText1.equals(descText2)
+													|| part_search.getText().toLowerCase().equals(descText2)
+													|| part_searchText1.equals(descText.toLowerCase()))
+													&& isParentOf(hierarchyConceptUuid, tf.nidToUuid(cnid).toString())) { 
+										unique = false;
+										break search;
+									}
+								}
+							}
+						}
+					}
+				}
+		}
+		return !unique;
+	}
+
 	/* (non-Javadoc)
 	 * @see org.ihtsdo.tk.helper.TerminologyHelperDrools#isDescriptionTextNotUniqueInHierarchy(java.lang.String, java.lang.String)
 	 */
@@ -350,7 +443,8 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 	 */
 	@Override
 	public boolean isFsnTextNotUnique(String fsn, String conceptUuid, String langCode) throws Exception{
-		SearchResult result = Terms.get().doLuceneSearch(fsn);
+		SearchResult result = Terms.get().doLuceneSearch(QueryParser.escape(fsn));
+		int conceptNid = Terms.get().uuidToNative(UUID.fromString(conceptUuid));
 		boolean unique = true;
 		if (result.topDocs.totalHits == 0) {
 			unique = true;
@@ -361,15 +455,16 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 					Document doc = result.searcher.doc(result.topDocs.scoreDocs[i].doc);
 					int cnid = Integer.parseInt(doc.get("cnid"));
 					int dnid = Integer.parseInt(doc.get("dnid"));
-
-					I_DescriptionVersioned<?> potential_fsn = Terms.get().getDescription(dnid, cnid);
-					if (potential_fsn != null) {
-						for (I_DescriptionPart part_search : potential_fsn.getMutableParts()) {
-							if (allowedStatusNids.contains(part_search.getStatusNid())
-									&& part_search.getText().equals(fsn)) {
-								unique = false;
-								break search;
-							} 
+					if (cnid != conceptNid) {
+						I_DescriptionVersioned<?> potential_fsn = Terms.get().getDescription(dnid, cnid);
+						if (potential_fsn != null) {
+							for (I_DescriptionPart part_search : potential_fsn.getMutableParts()) {
+								if (allowedStatusNids.contains(part_search.getStatusNid())
+										&& part_search.getText().toLowerCase().equals(fsn.toLowerCase())) {
+									unique = false;
+									break search;
+								} 
+							}
 						}
 					}
 				}
