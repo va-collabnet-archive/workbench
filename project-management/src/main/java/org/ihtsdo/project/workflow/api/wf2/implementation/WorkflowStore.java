@@ -285,7 +285,6 @@ public class WorkflowStore implements WorkflowStoreBI {
 	private void getInstancesForProjectFilter(Collection<WfFilterBI> filters, Collection<WfProcessInstanceBI> result) throws TerminologyException, IOException, Exception {
 		Set<WfProcessInstanceBI> projectSet = new HashSet<WfProcessInstanceBI>();
 		Set<WfProcessInstanceBI> worklistSet = new HashSet<WfProcessInstanceBI>();
-		Set<WfProcessInstanceBI> resultSet = new HashSet<WfProcessInstanceBI>();
 
 		Set<UUID> projects = new HashSet<UUID>();
 		for (WfFilterBI wfFilterBI : filters) {
@@ -306,7 +305,7 @@ public class WorkflowStore implements WorkflowStoreBI {
 			for (WfProcessInstanceBI wfProcessInstanceBI : instances) {
 				boolean passed = true;
 				for (WfFilterBI filter : filters) {
-					if (!(filter instanceof WfProjectFilter) && !filter.evaluateInstance(wfProcessInstanceBI)) {
+					if (!filter.evaluateInstance(wfProcessInstanceBI)) {
 						passed = false;
 					}
 				}
@@ -322,15 +321,15 @@ public class WorkflowStore implements WorkflowStoreBI {
 			Collection<WorkListBI> worklists = project.getWorkLists();
 			for (WorkListBI workListBI : worklists) {
 				Collection<WfProcessInstanceBI> instances = workListBI.getInstances();
-				for (WfFilterBI filter : filters) {
-					for (WfProcessInstanceBI wfProcessInstanceBI : instances) {
-						boolean passed = true;
-						if (!(filter instanceof WfWorklistFilter) && !filter.evaluateInstance(wfProcessInstanceBI)) {
+				for (WfProcessInstanceBI wfProcessInstanceBI : instances) {
+					boolean passed = true;
+					for (WfFilterBI filter : filters) {
+						if (!filter.evaluateInstance(wfProcessInstanceBI)) {
 							passed = false;
 						}
-						if (passed) {
-							projectSet.add(wfProcessInstanceBI);
-						}
+					}
+					if (passed) {
+						projectSet.add(wfProcessInstanceBI);
 					}
 				}
 			}

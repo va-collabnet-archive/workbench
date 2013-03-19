@@ -55,8 +55,6 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.dnd.ConceptTransferable;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.project.filter.WfProjectFilter;
-import org.ihtsdo.project.filter.WfWorklistFilter;
 import org.ihtsdo.project.search.WorkflowInstanceTableModel.WORKFLOW_FIELD;
 import org.ihtsdo.project.workflow.api.wf2.implementation.CancelSearch;
 import org.ihtsdo.project.workflow.api.wf2.implementation.WorkflowStore;

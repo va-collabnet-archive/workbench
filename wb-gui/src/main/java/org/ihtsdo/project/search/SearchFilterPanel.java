@@ -87,8 +87,13 @@ public class SearchFilterPanel extends JPanel {
 	}
 
 	public WfFilterBI getWfFilter() {
-		Object filterObject = filterCombo.getSelectedItem();
-		if (filterObject instanceof WfDestinationFilter) {
+		Object filterObject = null;
+		if(filterTypeCombo.getSelectedItem() instanceof WfStringFilter){
+			filterObject = textField.getText();
+		}else{
+			filterObject = filterCombo.getSelectedItem();
+		}
+		if (filterObject instanceof WfUser) {
 			return new WfDestinationFilter((WfUser) filterCombo.getSelectedItem());
 		} else if (filterObject instanceof WorkList) {
 			return new WfWorklistFilter(((WorkList) filterCombo.getSelectedItem()).getUuid());
@@ -234,9 +239,9 @@ public class SearchFilterPanel extends JPanel {
 
 		// ======== this ========
 		setLayout(new GridBagLayout());
-		((GridBagLayout) getLayout()).columnWidths = new int[] { 0, 0, 0, 0, 0, 0, 0 };
+		((GridBagLayout) getLayout()).columnWidths = new int[] { 0, 0, 0, 0, 0, 0, 0, 0 };
 		((GridBagLayout) getLayout()).rowHeights = new int[] { 0, 0 };
-		((GridBagLayout) getLayout()).columnWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0E-4 };
+		((GridBagLayout) getLayout()).columnWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0E-4 };
 		((GridBagLayout) getLayout()).rowWeights = new double[] { 1.0, 1.0E-4 };
 
 		// ---- addButton ----
@@ -269,10 +274,11 @@ public class SearchFilterPanel extends JPanel {
 		add(filterCombo, new GridBagConstraints(4, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
 		
 		textField = new JTextField();
-		textField.setPreferredSize(new Dimension(300, 28));
-		textField.setMinimumSize(new Dimension(300, 28));
+		textField.setPreferredSize(new Dimension(400, 28));
+		textField.setMinimumSize(new Dimension(400, 28));
 		textField.setVisible(false);
 		GridBagConstraints gbc_textField = new GridBagConstraints();
+		gbc_textField.insets = new Insets(0, 0, 0, 5);
 		gbc_textField.fill = GridBagConstraints.HORIZONTAL;
 		gbc_textField.gridx = 5;
 		gbc_textField.gridy = 0;
