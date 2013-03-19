@@ -24,7 +24,6 @@ import static org.dwfa.bpa.util.AppInfoProperties.VERSION;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.dwfa.bpa.util.AppInfoProperties;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -34,6 +33,9 @@ import java.util.Properties;
 
 /**
  * Goal which writes project properties to a properties file.
+ * 
+ * @see {@link org.dwfa.bpa.util.AppInfoProperties} For an API to read the
+ * file into memory and provide access to the properties.
  * 
  * @goal app-info
  * @requiresDependencyResolution runtime
