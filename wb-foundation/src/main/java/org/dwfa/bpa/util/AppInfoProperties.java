@@ -12,6 +12,9 @@ import java.util.Properties;
  * generated from a Mojo).  Provides a singleton for all application
  * classes to access the properties after being loaded once.
  * 
+ * @see {@link org.ihtsdo.mojo.mavenAppInfoMojo} For a Mojo which writes the
+ * project properties to a properties file
+ * 
  * @author ocarlsen
  */
 public final class AppInfoProperties {
