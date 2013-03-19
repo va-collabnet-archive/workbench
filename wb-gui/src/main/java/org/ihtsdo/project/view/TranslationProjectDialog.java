@@ -47,11 +47,11 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.ihtsdo.project.TerminologyProjectDAO;
-import org.ihtsdo.project.model.TranslationProject;
+import org.ihtsdo.project.model.I_TerminologyProject;
 
 /**
  * The Class TranslationProjectDialog.
- *
+ * 
  * @author Guillermo Reynoso
  */
 public class TranslationProjectDialog extends JDialog {
@@ -64,15 +64,15 @@ public class TranslationProjectDialog extends JDialog {
 
 	/** The config. */
 	private I_ConfigAceFrame config;
-	
+
 	/** The root node. */
 	private DefaultMutableTreeNode rootNode;
-	
+
 	/** The tree model. */
 	private DefaultTreeModel treeModel;
-	
+
 	/** The selected project. */
-	private TranslationProject selectedProject = null;
+	private I_TerminologyProject selectedProject = null;
 
 	/**
 	 * Instantiates a new translation project dialog.
@@ -93,10 +93,10 @@ public class TranslationProjectDialog extends JDialog {
 
 	/**
 	 * Show modal dialog.
-	 *
+	 * 
 	 * @return the translation project
 	 */
-	public TranslationProject showModalDialog() {
+	public I_TerminologyProject showModalDialog() {
 		setModal(true);
 		pack();
 		setVisible(true);
@@ -105,10 +105,11 @@ public class TranslationProjectDialog extends JDialog {
 
 	/**
 	 * Close.
-	 *
-	 * @param canceled the canceled
+	 * 
+	 * @param canceled
+	 *            the canceled
 	 */
-	private void close(TranslationProject canceled) {
+	private void close(I_TerminologyProject canceled) {
 		this.selectedProject = canceled;
 		dispose();
 	}
@@ -147,8 +148,9 @@ public class TranslationProjectDialog extends JDialog {
 
 	/**
 	 * Ok button action performed.
-	 *
-	 * @param e the e
+	 * 
+	 * @param e
+	 *            the e
 	 */
 	private void okButtonActionPerformed(ActionEvent e) {
 		DefaultMutableTreeNode node = (DefaultMutableTreeNode) jTree1.getLastSelectedPathComponent();
@@ -159,13 +161,14 @@ public class TranslationProjectDialog extends JDialog {
 		}
 		Object nodeInfo = node.getUserObject();
 		TreeObj proj = (TreeObj) nodeInfo;
-		close((TranslationProject) proj.getAtrValue());
+		close((I_TerminologyProject) proj.getAtrValue());
 	}
 
 	/**
 	 * J tree1 mouse clicked.
-	 *
-	 * @param e the e
+	 * 
+	 * @param e
+	 *            the e
 	 */
 	private void jTree1MouseClicked(MouseEvent e) {
 		if (e.getClickCount() == 2) {
@@ -180,7 +183,7 @@ public class TranslationProjectDialog extends JDialog {
 				}
 				Object nodeInfo = node.getUserObject();
 				TreeObj proj = (TreeObj) nodeInfo;
-				close((TranslationProject) proj.getAtrValue());
+				close((I_TerminologyProject) proj.getAtrValue());
 			}
 		}
 	}
@@ -199,15 +202,15 @@ public class TranslationProjectDialog extends JDialog {
 		jTree1 = new JTree();
 		errorLabel = new JLabel();
 
-		//======== this ========
+		// ======== this ========
 		Container contentPane = getContentPane();
 		contentPane.setLayout(new BorderLayout());
 
-		//======== panel1 ========
+		// ======== panel1 ========
 		{
 			panel1.setLayout(new FlowLayout(FlowLayout.RIGHT));
 
-			//---- okButton ----
+			// ---- okButton ----
 			okButton.setText("Ok");
 			okButton.addActionListener(new ActionListener() {
 				@Override
@@ -217,21 +220,21 @@ public class TranslationProjectDialog extends JDialog {
 			});
 			panel1.add(okButton);
 
-			//---- cancelButton ----
+			// ---- cancelButton ----
 			cancelButton.setText("Cancel");
 			panel1.add(cancelButton);
 		}
 		contentPane.add(panel1, BorderLayout.SOUTH);
 
-		//======== panel2 ========
+		// ======== panel2 ========
 		{
 			panel2.setBorder(new EmptyBorder(5, 5, 5, 5));
 			panel2.setLayout(new BorderLayout());
 
-			//======== scrollPane1 ========
+			// ======== scrollPane1 ========
 			{
 
-				//---- jTree1 ----
+				// ---- jTree1 ----
 				jTree1.addMouseListener(new MouseAdapter() {
 					@Override
 					public void mouseClicked(MouseEvent e) {
@@ -253,30 +256,32 @@ public class TranslationProjectDialog extends JDialog {
 	// //GEN-BEGIN:variables
 	/** The panel1. */
 	private JPanel panel1;
-	
+
 	/** The ok button. */
 	private JButton okButton;
-	
+
 	/** The cancel button. */
 	private JButton cancelButton;
-	
+
 	/** The panel2. */
 	private JPanel panel2;
-	
+
 	/** The scroll pane1. */
 	private JScrollPane scrollPane1;
-	
+
 	/** The j tree1. */
 	private JTree jTree1;
-	
+
 	/** The error label. */
 	private JLabel errorLabel;
+
 	// JFormDesigner - End of variables declaration //GEN-END:variables
 
 	/**
 	 * Load projects.
-	 *
-	 * @throws Exception the exception
+	 * 
+	 * @throws Exception
+	 *             the exception
 	 */
 	private void loadProjects() throws Exception {
 		int i;
@@ -287,7 +292,7 @@ public class TranslationProjectDialog extends JDialog {
 		jTree1.setRootVisible(false);
 		config = Terms.get().getActiveAceFrameConfig();
 
-		List<TranslationProject> projects = TerminologyProjectDAO.getAllTranslationProjects(config);
+		List<I_TerminologyProject> projects = TerminologyProjectDAO.getAllProjects(config);
 
 		for (i = 0; i < projects.size(); i++) {
 			addProjectToTree(rootNode, projects.get(i), false);
@@ -300,25 +305,32 @@ public class TranslationProjectDialog extends JDialog {
 
 	/**
 	 * Adds the project to tree.
-	 *
-	 * @param node the node
-	 * @param project the project
-	 * @param visibleChildren the visible children
+	 * 
+	 * @param node
+	 *            the node
+	 * @param i_TerminologyProject
+	 *            the project
+	 * @param visibleChildren
+	 *            the visible children
 	 * @return the default mutable tree node
-	 * @throws Exception the exception
+	 * @throws Exception
+	 *             the exception
 	 */
-	private DefaultMutableTreeNode addProjectToTree(DefaultMutableTreeNode node, TranslationProject project, boolean visibleChildren) throws Exception {
+	private DefaultMutableTreeNode addProjectToTree(DefaultMutableTreeNode node, I_TerminologyProject i_TerminologyProject, boolean visibleChildren) throws Exception {
 		DefaultMutableTreeNode tNode;
-		tNode = addObject(node, new TreeObj(PROJECTNODE, project.getName(), project), visibleChildren);
+		tNode = addObject(node, new TreeObj(PROJECTNODE, i_TerminologyProject.getName(), i_TerminologyProject), visibleChildren);
 		return tNode;
 	}
 
 	/**
 	 * Adds the object.
-	 *
-	 * @param parent the parent
-	 * @param child the child
-	 * @param shouldBeVisible the should be visible
+	 * 
+	 * @param parent
+	 *            the parent
+	 * @param child
+	 *            the child
+	 * @param shouldBeVisible
+	 *            the should be visible
 	 * @return the default mutable tree node
 	 */
 	private DefaultMutableTreeNode addObject(DefaultMutableTreeNode parent, Object child, boolean shouldBeVisible) {
