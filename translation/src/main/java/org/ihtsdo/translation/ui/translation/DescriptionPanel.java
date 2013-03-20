@@ -689,8 +689,8 @@ public class DescriptionPanel extends JPanel {
 				descriptionInEditor.persistChanges(true, false);
 
 				WfAction action = (WfAction) cmbActions.getSelectedItem();
-				lastAction = action.getName();
 				if (action != null) {
+					lastAction = action.getName();
 
 					I_Work worker = null;
 					if (!commitInstance()) {
