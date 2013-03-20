@@ -60,6 +60,7 @@ import org.ihtsdo.project.workflow.api.wf2.implementation.CancelSearch;
 import org.ihtsdo.project.workflow.api.wf2.implementation.WorkflowStore;
 import org.ihtsdo.tk.workflow.api.WfFilterBI;
 import org.ihtsdo.tk.workflow.api.WfProcessInstanceBI;
+import javax.swing.ListSelectionModel;
 
 /**
  * @author Guillermo Reynoso
@@ -378,6 +379,7 @@ public class WfInstanceSearchPanel extends JPanel implements WFSearchFilterConta
 		tableContainer = new JPanel();
 		scrollPane1 = new JScrollPane();
 		table1 = new JTable();
+		table1.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
 		// ======== this ========
 		setLayout(new BorderLayout());
