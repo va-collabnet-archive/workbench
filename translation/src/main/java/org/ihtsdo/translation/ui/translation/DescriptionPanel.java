@@ -32,6 +32,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+import javax.swing.JRootPane;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JTextArea;
@@ -209,6 +210,9 @@ public class DescriptionPanel extends JPanel {
 
 			configureDescriptionPanel();
 
+			panel2.getRootPane().setDefaultButton(bLaunch);
+			panel19.getRootPane().setDefaultButton(bLaunch);			
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
