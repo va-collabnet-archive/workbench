@@ -53,6 +53,7 @@ public class LinguisticGuidelinesInterpreter {
 	private LinguisticGuidelinesInterpreter() {
 		super();
 		// kbase and ksession are singletons
+		try {
 		if (kbase == null || ksession == null) {
 			// Crate knowledge base with decision table
 			DecisionTableConfiguration dtableconfiguration = KnowledgeBuilderFactory.newDecisionTableConfiguration();
@@ -63,7 +64,7 @@ public class LinguisticGuidelinesInterpreter {
 
 			ReaderInputStream ris = null;
 			try {
-				ris = new ReaderInputStream(new FileReader(new File("linguisticGuidelinesRulesFile")), "UTF-8");
+				ris = new ReaderInputStream(new FileReader(new File("drools-rules/linguistic-guidelines.xls")), "UTF-8");
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			}
@@ -77,6 +78,10 @@ public class LinguisticGuidelinesInterpreter {
 
 			kbase.addKnowledgePackages(kbuilder.getKnowledgePackages());
 			ksession = kbase.newStatelessKnowledgeSession();
+		}
+		} catch (Exception e) {
+			// no linguistic guidelines
+			// TODO: report
 		}
 	}
 
@@ -99,15 +104,17 @@ public class LinguisticGuidelinesInterpreter {
 	 * @return the possible actions
 	 */
 	public List<String> getLinguisticGuidelines(I_ContextualizeDescription sourcePreferredDescription, I_ContextualizeDescription sourceFsnDescription) {
-		LinguistcGuidelineFacts linguisticGuidelinesFacts = new LinguistcGuidelineFacts(sourceFsnDescription.getText(), sourcePreferredDescription.getText(), sourceFsnDescription.getConcept()
-				.getPrimUuid());
-		KnowledgeRuntimeLoggerFactory.newConsoleLogger(ksession);
 		guidelines = new ArrayList<String>();
-		ksession.setGlobal("guidelines", guidelines);
-		ksession.setGlobal("kindOfComputer", new SimpleKindOfComputer());
-		ArrayList<Object> facts = new ArrayList<Object>();
-		facts.add(linguisticGuidelinesFacts);
-		ksession.execute(facts);
+		if (ksession != null) {
+			LinguistcGuidelineFacts linguisticGuidelinesFacts = new LinguistcGuidelineFacts(sourceFsnDescription.getText(), sourcePreferredDescription.getText(), sourceFsnDescription.getConcept()
+					.getPrimUuid());
+			KnowledgeRuntimeLoggerFactory.newConsoleLogger(ksession);
+			ksession.setGlobal("guidelines", guidelines);
+			ksession.setGlobal("kindOfComputer", new SimpleKindOfComputer());
+			ArrayList<Object> facts = new ArrayList<Object>();
+			facts.add(linguisticGuidelinesFacts);
+			ksession.execute(facts);
+		}
 		return guidelines;
 	}
 }
