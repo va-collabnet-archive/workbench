@@ -665,7 +665,7 @@ public class DescriptionPanel extends JPanel {
 								e.printStackTrace();
 							}
 						}
-						descriptionInEditor = null;
+						//descriptionInEditor = null;
 						targetTextField.setText("");
 						return;
 					}
