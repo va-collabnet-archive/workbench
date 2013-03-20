@@ -185,7 +185,9 @@ public class HierarchyNavigator extends JPanel {
 			// Get the selected index. (The index param isn't
 			// always valid, so just use the value.)
 			ConceptVersionBI selectedIndex = (ConceptVersionBI) value;
-			setText(selectedIndex.toUserString());
+			if(selectedIndex != null){
+				setText(selectedIndex.toUserString());
+			}
 			if (isSelected) {
 				setBackground(list.getSelectionBackground());
 				setForeground(list.getSelectionForeground());
