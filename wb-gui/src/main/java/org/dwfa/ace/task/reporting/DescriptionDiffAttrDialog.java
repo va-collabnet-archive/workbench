@@ -257,7 +257,6 @@ public class DescriptionDiffAttrDialog extends JDialog {
 		pathList = new JList();
 
 		// ======== this ========
-		setAlwaysOnTop(true);
 		Container contentPane = getContentPane();
 		contentPane.setLayout(new BorderLayout());
 
