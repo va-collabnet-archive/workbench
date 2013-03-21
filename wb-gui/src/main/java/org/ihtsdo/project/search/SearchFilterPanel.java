@@ -78,6 +78,18 @@ public class SearchFilterPanel extends JPanel {
 		filterTypeCombo.addItem(new WfStringFilter());
 	}
 
+	public SearchFilterPanel(WFSearchFilterContainerBI wfInstanceSearchPanel, List<WfFilterBI> filters) {
+		initComponents();
+		this.container = wfInstanceSearchPanel;
+		addButton.setIcon(new ImageIcon(ACE.class.getResource("/16x16/plain/add2.png")));
+		removeButton.setIcon(new ImageIcon(ACE.class.getResource("/16x16/plain/delete2.png")));
+
+		filterTypeCombo.addItem("");
+		for (WfFilterBI wfFilterBI : filters) {
+			filterTypeCombo.addItem(wfFilterBI);
+		}
+	}
+
 	private void addButtonActionPerformed(ActionEvent e) {
 		container.addNewFilterPanel();
 	}
@@ -88,9 +100,9 @@ public class SearchFilterPanel extends JPanel {
 
 	public WfFilterBI getWfFilter() {
 		Object filterObject = null;
-		if(filterTypeCombo.getSelectedItem() instanceof WfStringFilter){
+		if (filterTypeCombo.getSelectedItem() instanceof WfStringFilter) {
 			filterObject = textField.getText();
-		}else{
+		} else {
 			filterObject = filterCombo.getSelectedItem();
 		}
 		if (filterObject instanceof WfUser) {
@@ -107,7 +119,7 @@ public class SearchFilterPanel extends JPanel {
 			return new WfCompletionFilter(co);
 		} else if (filterObject instanceof String) {
 			String string = textField.getText();
-			if(!string.trim().equals("")){
+			if (!string.trim().equals("")) {
 				return new WfStringFilter(string);
 			}
 		} else if (filterObject instanceof ConceptVersionBI) {
@@ -119,7 +131,9 @@ public class SearchFilterPanel extends JPanel {
 		return null;
 	}
 
-	class ComboBoxRenderer extends JLabel implements ListCellRenderer {
+	class ComboBoxRenderer extends JLabel implements ListCellRenderer<Object> {
+		private static final long serialVersionUID = -1305398231576147755L;
+
 		public ComboBoxRenderer() {
 			setOpaque(true);
 		}
@@ -233,9 +247,9 @@ public class SearchFilterPanel extends JPanel {
 		// //GEN-BEGIN:initComponents
 		addButton = new JButton();
 		removeButton = new JButton();
-		filterTypeCombo = new JComboBox();
+		filterTypeCombo = new JComboBox<Object>();
 		label1 = new JLabel();
-		filterCombo = new JComboBox();
+		filterCombo = new JComboBox<Object>();
 
 		// ======== this ========
 		setLayout(new GridBagLayout());
@@ -272,7 +286,7 @@ public class SearchFilterPanel extends JPanel {
 		add(filterTypeCombo, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
 		add(label1, new GridBagConstraints(3, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
 		add(filterCombo, new GridBagConstraints(4, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
-		
+
 		textField = new JTextField();
 		textField.setPreferredSize(new Dimension(400, 28));
 		textField.setMinimumSize(new Dimension(400, 28));
@@ -292,9 +306,9 @@ public class SearchFilterPanel extends JPanel {
 	// //GEN-BEGIN:variables
 	private JButton addButton;
 	private JButton removeButton;
-	private JComboBox filterTypeCombo;
+	private JComboBox<Object> filterTypeCombo;
 	private JLabel label1;
-	private JComboBox filterCombo;
+	private JComboBox<Object> filterCombo;
 	private JTextField textField;
 	// JFormDesigner - End of variables declaration //GEN-END:variables
 }

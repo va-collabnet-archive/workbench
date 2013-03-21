@@ -32,6 +32,7 @@ import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -43,6 +44,7 @@ import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
 import javax.swing.SwingWorker;
 import javax.swing.border.EmptyBorder;
 
@@ -55,12 +57,13 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.dnd.ConceptTransferable;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.project.filter.WfProjectFilter;
+import org.ihtsdo.project.filter.WfWorklistFilter;
 import org.ihtsdo.project.search.WorkflowInstanceTableModel.WORKFLOW_FIELD;
 import org.ihtsdo.project.workflow.api.wf2.implementation.CancelSearch;
 import org.ihtsdo.project.workflow.api.wf2.implementation.WorkflowStore;
 import org.ihtsdo.tk.workflow.api.WfFilterBI;
 import org.ihtsdo.tk.workflow.api.WfProcessInstanceBI;
-import javax.swing.ListSelectionModel;
 
 /**
  * @author Guillermo Reynoso
@@ -395,7 +398,10 @@ public class WfInstanceSearchPanel extends JPanel implements WFSearchFilterConta
 				((GridBagLayout) panel1.getLayout()).rowHeights = new int[] { 21, 0 };
 				((GridBagLayout) panel1.getLayout()).columnWeights = new double[] { 0.0, 0.0, 0.0, 1.0E-4 };
 				((GridBagLayout) panel1.getLayout()).rowWeights = new double[] { 0.0, 1.0E-4 };
-				searchFilterPanel = new SearchFilterPanel(this);
+				List<WfFilterBI> filters = new ArrayList<WfFilterBI>();
+				filters.add(new WfProjectFilter());
+				filters.add(new WfWorklistFilter());
+				searchFilterPanel = new SearchFilterPanel(this,filters);
 				GridBagConstraints gbc_searchFilterPanel = new GridBagConstraints();
 				gbc_searchFilterPanel.insets = new Insets(0, 0, 0, 5);
 				gbc_searchFilterPanel.gridx = 0;
