@@ -686,7 +686,9 @@ public class DescriptionPanel extends JPanel {
 					}
 				}
 
-				descriptionInEditor.persistChanges(true, false);
+				if(descriptionInEditor != null){
+					descriptionInEditor.persistChanges(true, false);
+				}
 
 				WfAction action = (WfAction) cmbActions.getSelectedItem();
 				if (action != null) {
@@ -698,23 +700,6 @@ public class DescriptionPanel extends JPanel {
 						setReadOnlyMode(readOnlyMode);
 						saveing = false;
 						return;
-					}
-
-					List<ContextualizedDescription> targetDescriptions = LanguageUtil.getContextualizedDescriptions(instance.getConcept().getConceptNid(), targetLangRefset.getRefsetId(), true);
-
-					boolean hasTargetDescriptions = false;
-					for (ContextualizedDescription loopDescription : targetDescriptions) {
-						if (LanguageUtil.isActive(loopDescription.getDescriptionStatusId()) && LanguageUtil.isActive(loopDescription.getExtensionStatusId())) {
-							hasTargetDescriptions = true;
-							break;
-						}
-					}
-					if (!hasTargetDescriptions) {
-						Object[] options = { "Send empty translation", "Cancel" };
-						int n = JOptionPane.showOptionDialog(null, "There is no translation in target language, would you like to continue?", "Unsaved data", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[1]);
-						if (n == 1) {
-							return;
-						}
 					}
 
 					worker = Terms.get().getActiveAceFrameConfig().getWorker();
@@ -810,11 +795,11 @@ public class DescriptionPanel extends JPanel {
 	private void cancelButtonActionPerformed() {
 		try {
 			I_GetConceptData cToCancel = instance.getConcept();
-			EventMediator.getInstance().fireEvent(new CancelAllPanelEvent());
+			//EventMediator.getInstance().fireEvent(new CancelAllPanelEvent());
 			cToCancel.cancel();
-			Ts.get().cancel();
-			clearForm();
-			setReadOnlyMode(true);
+			updateDescriptionInEditor();
+			//clearForm();
+			//setReadOnlyMode(true);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
