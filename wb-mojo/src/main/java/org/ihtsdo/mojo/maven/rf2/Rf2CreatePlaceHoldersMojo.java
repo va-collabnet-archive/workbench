@@ -133,8 +133,43 @@ public class Rf2CreatePlaceHoldersMojo extends AbstractMojo implements Serializa
             filesIn = getRF2Files(targetDirectory, targetSubDir, rf2Dirs, "sct2_Concept", ".txt");
             for (Rf2File file : filesIn) {
                 int CONCEPTID = 0; // Column in RF2 Concept File
-                knownConcepts = parseForConceptIds(file, CONCEPTID);
+                if (knownConcepts == null) {
+                    knownConcepts = parseForConceptIds(file, CONCEPTID);
+                } else {
+                    long[] additionalConcepts = parseForConceptIds(file, CONCEPTID);
+
+                    long[] both = new long[knownConcepts.length + additionalConcepts.length];
+                    System.arraycopy(knownConcepts, 0, both, 0, knownConcepts.length);
+                    System.arraycopy(additionalConcepts, 0, both, knownConcepts.length, additionalConcepts.length);
+
+                    Arrays.sort(both);
+
+                    // REMOVE DUPLICATES
+                    int countDups = 0;
+                    for (int i = 0; i < both.length - 1; i++) {
+                        if (both[i] == both[i + 1]) {
+                            countDups++;
+                        }
+                    }
+
+                    if (countDups > 0) {
+                        long[] b = new long[both.length - countDups];
+                        int j = 0;
+                        for (int i = 0; i < both.length - 1; i++) {
+                            if (both[i] != both[i + 1]) {
+                                b[j] = both[i];
+                                j++;
+                            }
+                        }
+                        if (j < b.length) { // if one remaining unique value
+                            b[j] = both[both.length - 1];
+                        }
+                        both = b;
+                    }
+                    knownConcepts = both;
+                }
             }
+            getLog().info("    Total known concepts: " + knownConcepts.length);
 
             // PROCESS DESCRIPTIONS
             filesIn = getRF2Files(targetDirectory, targetSubDir, rf2Dirs, "sct2_Description", ".txt");
