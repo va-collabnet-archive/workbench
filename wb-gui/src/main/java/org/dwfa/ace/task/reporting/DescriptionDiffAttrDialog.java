@@ -195,8 +195,8 @@ public class DescriptionDiffAttrDialog extends JDialog {
 		}
 		Calendar initTimeItem = initTimeCombo.getSelectedDate();
 		Calendar endTimeItem = laterTimeCombo.getSelectedDate();
-		this.initTime = initTimeItem.toString();
-		this.laterTime = endTimeItem.toString();
+		this.initTime = cstFormat.format(initTimeItem.getTime()) + " CST";
+		this.laterTime = cstFormat.format(endTimeItem.getTime()) + " CST";
 		I_GetConceptData pathConcept = (I_GetConceptData) pathListModel.getElementAt(0);
 		this.uuid1 = pathConcept.getPrimUuid();
 		this.uuid2 = pathConcept.getPrimUuid();
