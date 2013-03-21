@@ -26,6 +26,7 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.lucene.queryParser.ParseException;
+import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
@@ -320,14 +321,17 @@ public class ProcessDescriptionSubmissions extends AbstractTask {
                 }
             }
             process.setProperty(uuidListListPropName, uuidList);
+            ACE.suspendDatacheckDisplay();
             for(ConceptChronicleBI concept : conceptsToCommit){
                 Ts.get().addUncommitted(concept);
             }
+            Ts.get().waitTillDatachecksFinished();
+            ACE.resumeDatacheckDisplay();
             if (!duplicateDescriptions.isEmpty()) {
                 worker.getLogger().info("NOT ADDING. Found " + duplicateDescriptions.size() + " existing descriptions matching. ");
                 int count1 = 1;
                 for (String dup : duplicateDescriptions) {
-                    worker.getLogger().info("DUP " + count1 + " - " + dup);
+                    System.out.println("DUP " + count1 + " - " + dup);
                     count1++;
                 }
             }
@@ -335,7 +339,7 @@ public class ProcessDescriptionSubmissions extends AbstractTask {
                 int count1 = 1;
                 worker.getLogger().info("NOT ADDING. Found " + descMissingParentConcept.size() + " descriptions with a parent concept that did not exist. ");
                 for (String missing : descMissingParentConcept) {
-                    worker.getLogger().info("MISSING PARENT " + count1 + " - " + missing);
+                    System.out.println("MISSING PARENT " + count1 + " - " + missing);
                     count1++;
                 }
             }

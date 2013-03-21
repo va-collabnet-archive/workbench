@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -69,24 +70,24 @@ import org.ihtsdo.tk.workflow.api.WorkflowStoreBI;
 import org.ihtsdo.tk.workflow.api.ProjectBI.ProjectType;
 
 /**
- * <describe the purpose of this class>
- * <br><br>
+ * <describe the purpose of this class> <br>
+ * <br>
  * Use: <describe its use if not obvious, otherwise remove>.
  */
 public class WorkflowStore implements WorkflowStoreBI {
 
 	/** The ts. */
 	TerminologyStoreDI ts;
-	
+
 	/** The worklists root. */
 	ConceptChronicleBI worklistsRoot;
-	
+
 	/** The wf component provider. */
 	WfComponentProvider wfComponentProvider;
-	
+
 	/** The config. */
 	I_ConfigAceFrame config;
-	
+
 	/** The permissions api. */
 	ProjectPermissionsAPI permissionsApi;
 
@@ -105,8 +106,12 @@ public class WorkflowStore implements WorkflowStoreBI {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.ihtsdo.tk.workflow.api.WorkflowStoreBI#getProcessInstance(org.ihtsdo.tk.workflow.api.WorkListBI, java.util.UUID)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.ihtsdo.tk.workflow.api.WorkflowStoreBI#getProcessInstance(org.ihtsdo
+	 * .tk.workflow.api.WorkListBI, java.util.UUID)
 	 */
 	@Override
 	public WfProcessInstanceBI getProcessInstance(WorkListBI workList, UUID componentUuid) throws Exception {
@@ -120,8 +125,12 @@ public class WorkflowStore implements WorkflowStoreBI {
 		return null;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.ihtsdo.tk.workflow.api.WorkflowStoreBI#getProcessInstances(java.util.UUID)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.ihtsdo.tk.workflow.api.WorkflowStoreBI#getProcessInstances(java.util
+	 * .UUID)
 	 */
 	@Override
 	public Collection<WfProcessInstanceBI> getProcessInstances(UUID componentUuid) throws Exception {
@@ -134,8 +143,7 @@ public class WorkflowStore implements WorkflowStoreBI {
 			if (ts.isKindOf(refset.getConceptNid(), worklistsRoot.getConceptNid(), config.getViewCoordinate())) {
 				I_IntSet allowedTypes = tf.newIntSet();
 				allowedTypes.add(RefsetAuxiliary.Concept.PROMOTION_REL.localize().getNid());
-				Set<? extends I_GetConceptData> sources = refset.getDestRelOrigins(config.getAllowedStatus(), allowedTypes,
-						config.getViewPositionSetReadOnly(), config.getPrecedence(), config.getConflictResolutionStrategy());
+				Set<? extends I_GetConceptData> sources = refset.getDestRelOrigins(config.getAllowedStatus(), allowedTypes, config.getViewPositionSetReadOnly(), config.getPrecedence(), config.getConflictResolutionStrategy());
 
 				if (!sources.isEmpty()) {
 					I_GetConceptData wRefset = sources.iterator().next();
@@ -152,10 +160,12 @@ public class WorkflowStore implements WorkflowStoreBI {
 
 	/**
 	 * Gets the {@link Collection} representing the process instances.
-	 *
-	 * @param concept the concept
+	 * 
+	 * @param concept
+	 *            the concept
 	 * @return the {@link Collection}
-	 * @throws Exception the exception
+	 * @throws Exception
+	 *             the exception
 	 */
 	public Collection<WfProcessInstanceBI> getProcessInstances(ConceptChronicleBI concept) throws Exception {
 		Collection<WfProcessInstanceBI> instances = new ArrayList<WfProcessInstanceBI>();
@@ -166,8 +176,7 @@ public class WorkflowStore implements WorkflowStoreBI {
 			if (ts.isKindOf(refset.getConceptNid(), worklistsRoot.getConceptNid(), config.getViewCoordinate())) {
 				I_IntSet allowedTypes = tf.newIntSet();
 				allowedTypes.add(RefsetAuxiliary.Concept.PROMOTION_REL.localize().getNid());
-				Set<? extends I_GetConceptData> sources = refset.getDestRelOrigins(config.getAllowedStatus(), allowedTypes,
-						config.getViewPositionSetReadOnly(), config.getPrecedence(), config.getConflictResolutionStrategy());
+				Set<? extends I_GetConceptData> sources = refset.getDestRelOrigins(config.getAllowedStatus(), allowedTypes, config.getViewPositionSetReadOnly(), config.getPrecedence(), config.getConflictResolutionStrategy());
 
 				if (!sources.isEmpty()) {
 					I_GetConceptData wRefset = sources.iterator().next();
@@ -182,8 +191,11 @@ public class WorkflowStore implements WorkflowStoreBI {
 		return instances;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.ihtsdo.tk.workflow.api.WorkflowStoreBI#searchWorkflow(java.util.Collection)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.ihtsdo.tk.workflow.api.WorkflowStoreBI#searchWorkflow(java.util.
+	 * Collection)
 	 */
 	@Override
 	public Collection<WfProcessInstanceBI> searchWorkflow(Collection<WfFilterBI> filters) throws Exception {
@@ -207,8 +219,9 @@ public class WorkflowStore implements WorkflowStoreBI {
 
 	/**
 	 * Checks if is project filter.
-	 *
-	 * @param filters the filters
+	 * 
+	 * @param filters
+	 *            the filters
 	 * @return true, if is project filter
 	 */
 	private boolean isProjectFilter(Collection<WfFilterBI> filters) {
@@ -224,17 +237,21 @@ public class WorkflowStore implements WorkflowStoreBI {
 	/**
 	 * Asynchronously searches workflow instances to workflow instance
 	 * container.
-	 *
-	 * @param filters for workflow instances.
-	 * @param wfinstanceCont WfInstanceContainer used to add Asynchronously the filtered
-	 * instances.
-	 * @param propertyChangeListener Progress listener to update search progress.
-	 * @param keepSearching the keep searching
+	 * 
+	 * @param filters
+	 *            for workflow instances.
+	 * @param wfinstanceCont
+	 *            WfInstanceContainer used to add Asynchronously the filtered
+	 *            instances.
+	 * @param propertyChangeListener
+	 *            Progress listener to update search progress.
+	 * @param keepSearching
+	 *            the keep searching
 	 * @return whatever.
-	 * @throws Exception the exception
+	 * @throws Exception
+	 *             the exception
 	 */
-	public Collection<WfProcessInstanceBI> searchWorkflow(Collection<WfFilterBI> filters, WfInstanceContainer wfinstanceCont,
-			PropertyChangeListener propertyChangeListener, CancelSearch keepSearching) throws Exception {
+	public Collection<WfProcessInstanceBI> searchWorkflow(Collection<WfFilterBI> filters, WfInstanceContainer wfinstanceCont, PropertyChangeListener propertyChangeListener, CancelSearch keepSearching) throws Exception {
 		boolean worklistOrProjectFilter = isProjectFilter(filters);
 
 		if (worklistOrProjectFilter) {
@@ -252,22 +269,58 @@ public class WorkflowStore implements WorkflowStoreBI {
 
 	/**
 	 * Gets the {@link void} representing the instances for project filter.
-	 *
-	 * @param filters the filters
-	 * @param result the result
+	 * 
+	 * @param filters
+	 *            the filters
+	 * @param result
+	 *            the result
 	 * @return the {@link void}
-	 * @throws TerminologyException the terminology exception
-	 * @throws IOException Signals that an I/O exception has occurred.
-	 * @throws Exception the exception
+	 * @throws TerminologyException
+	 *             the terminology exception
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
+	 * @throws Exception
+	 *             the exception
 	 */
-	private void getInstancesForProjectFilter(Collection<WfFilterBI> filters, Collection<WfProcessInstanceBI> result) throws TerminologyException,
-			IOException, Exception {
+	private void getInstancesForProjectFilter(Collection<WfFilterBI> filters, Collection<WfProcessInstanceBI> result) throws TerminologyException, IOException, Exception {
+		Set<WfProcessInstanceBI> projectSet = new HashSet<WfProcessInstanceBI>();
+		Set<WfProcessInstanceBI> worklistSet = new HashSet<WfProcessInstanceBI>();
+
+		Set<UUID> projects = new HashSet<UUID>();
+		for (WfFilterBI wfFilterBI : filters) {
+			if (wfFilterBI instanceof WfProjectFilter) {
+				projects.add(((WfProjectFilter) wfFilterBI).getProjectUUID());
+			}
+		}
+
+		Set<UUID> wlUuids = new HashSet<UUID>();
 		for (WfFilterBI wfFilterBI : filters) {
 			if (wfFilterBI instanceof WfWorklistFilter) {
-				WfWorklistFilter wlfilter = (WfWorklistFilter) wfFilterBI;
-				UUID wluuid = wlfilter.getWorklistUUID();
-				WorkListBI worklist = getWorklist(wluuid);
-				Collection<WfProcessInstanceBI> instances = worklist.getInstances();
+				wlUuids.add(((WfWorklistFilter) wfFilterBI).getWorklistUUID());
+			}
+		}
+		for (UUID wlUuid : wlUuids) {
+			WorkListBI worklist = getWorklist(wlUuid);
+			Collection<WfProcessInstanceBI> instances = worklist.getInstances();
+			for (WfProcessInstanceBI wfProcessInstanceBI : instances) {
+				boolean passed = true;
+				for (WfFilterBI filter : filters) {
+					if (!filter.evaluateInstance(wfProcessInstanceBI)) {
+						passed = false;
+					}
+				}
+				if (passed) {
+					worklistSet.add(wfProcessInstanceBI);
+				}
+
+			}
+		}
+
+		for (UUID uuid : projects) {
+			ProjectBI project = getProject(uuid);
+			Collection<WorkListBI> worklists = project.getWorkLists();
+			for (WorkListBI workListBI : worklists) {
+				Collection<WfProcessInstanceBI> instances = workListBI.getInstances();
 				for (WfProcessInstanceBI wfProcessInstanceBI : instances) {
 					boolean passed = true;
 					for (WfFilterBI filter : filters) {
@@ -276,30 +329,28 @@ public class WorkflowStore implements WorkflowStoreBI {
 						}
 					}
 					if (passed) {
-						result.add(wfProcessInstanceBI);
+						projectSet.add(wfProcessInstanceBI);
 					}
-
 				}
-			} else if (wfFilterBI instanceof WfProjectFilter) {
-				WfProjectFilter pFilter = (WfProjectFilter) wfFilterBI;
-				UUID puuid = pFilter.getProjectUUID();
-				ProjectBI project = getProject(puuid);
-				Collection<WorkListBI> worklists = project.getWorkLists();
-				for (WorkListBI workListBI : worklists) {
-					Collection<WfProcessInstanceBI> instances = workListBI.getInstances();
-					for (WfFilterBI filter : filters) {
-						for (WfProcessInstanceBI wfProcessInstanceBI : instances) {
-							if (filter.evaluateInstance(wfProcessInstanceBI)) {
-								result.add(wfProcessInstanceBI);
-							}
-						}
-					}
+			}
+		}
+
+		if (worklistSet.isEmpty()) {
+			result.addAll(projectSet);
+		} else if (projectSet.isEmpty()) {
+			result.addAll(worklistSet);
+		} else {
+			for (WfProcessInstanceBI projectInstance : projectSet) {
+				if (worklistSet.contains(projectInstance)) {
+					result.add(projectInstance);
 				}
 			}
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.ihtsdo.tk.workflow.api.WorkflowStoreBI#getAllUsers()
 	 */
 	@Override
@@ -309,7 +360,9 @@ public class WorkflowStore implements WorkflowStoreBI {
 		return users;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.ihtsdo.tk.workflow.api.WorkflowStoreBI#getAllStates()
 	 */
 	@Override
@@ -319,7 +372,9 @@ public class WorkflowStore implements WorkflowStoreBI {
 		return states;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.ihtsdo.tk.workflow.api.WorkflowStoreBI#getAllActivities()
 	 */
 	@Override
@@ -329,7 +384,9 @@ public class WorkflowStore implements WorkflowStoreBI {
 		return activities;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.ihtsdo.tk.workflow.api.WorkflowStoreBI#getAllRoles()
 	 */
 	@Override
@@ -339,8 +396,11 @@ public class WorkflowStore implements WorkflowStoreBI {
 		return roles;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.ihtsdo.tk.workflow.api.WorkflowStoreBI#getAllProcessDefinitions()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.ihtsdo.tk.workflow.api.WorkflowStoreBI#getAllProcessDefinitions()
 	 */
 	@Override
 	public Collection<WfProcessDefinitionBI> getAllProcessDefinitions() {
@@ -352,7 +412,9 @@ public class WorkflowStore implements WorkflowStoreBI {
 		return definitions;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.ihtsdo.tk.workflow.api.WorkflowStoreBI#getAllProjects()
 	 */
 	@Override
@@ -364,8 +426,12 @@ public class WorkflowStore implements WorkflowStoreBI {
 		return projects;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.ihtsdo.tk.workflow.api.WorkflowStoreBI#getActiveProcessInstances(java.util.UUID)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.ihtsdo.tk.workflow.api.WorkflowStoreBI#getActiveProcessInstances(
+	 * java.util.UUID)
 	 */
 	@Override
 	public Collection<WfProcessInstanceBI> getActiveProcessInstances(UUID componentUuid) throws Exception {
@@ -378,8 +444,12 @@ public class WorkflowStore implements WorkflowStoreBI {
 		return instances;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.ihtsdo.tk.workflow.api.WorkflowStoreBI#getIncompleteProcessInstances(java.util.UUID)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.ihtsdo.tk.workflow.api.WorkflowStoreBI#getIncompleteProcessInstances
+	 * (java.util.UUID)
 	 */
 	@Override
 	public Collection<WfProcessInstanceBI> getIncompleteProcessInstances(UUID componentUuid) throws Exception {
@@ -392,8 +462,12 @@ public class WorkflowStore implements WorkflowStoreBI {
 		return instances;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.ihtsdo.tk.workflow.api.WorkflowStoreBI#createProject(java.lang.String, org.ihtsdo.tk.workflow.api.ProjectBI.ProjectType)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.ihtsdo.tk.workflow.api.WorkflowStoreBI#createProject(java.lang.String
+	 * , org.ihtsdo.tk.workflow.api.ProjectBI.ProjectType)
 	 */
 	@Override
 	public ProjectBI createProject(String name, ProjectBI.ProjectType type) throws Exception {
@@ -410,17 +484,23 @@ public class WorkflowStore implements WorkflowStoreBI {
 
 	/**
 	 * Creates the translation project.
-	 *
-	 * @param name the name
+	 * 
+	 * @param name
+	 *            the name
 	 * @return the project bi
-	 * @throws Exception the exception
+	 * @throws Exception
+	 *             the exception
 	 */
 	public ProjectBI createTranslationProject(String name) throws Exception {
 		return new Project(TerminologyProjectDAO.createNewTerminologyProject(name, config));
 	}
 
-	/* (non-Javadoc)
-	 * @see org.ihtsdo.tk.workflow.api.WorkflowStoreBI#getActivities(org.ihtsdo.tk.workflow.api.WfProcessInstanceBI, org.ihtsdo.tk.workflow.api.WfUserBI)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.ihtsdo.tk.workflow.api.WorkflowStoreBI#getActivities(org.ihtsdo.tk
+	 * .workflow.api.WfProcessInstanceBI, org.ihtsdo.tk.workflow.api.WfUserBI)
 	 */
 	@Override
 	public Collection<WfActivityBI> getActivities(WfProcessInstanceBI instance, WfUserBI user) throws Exception {
@@ -448,29 +528,36 @@ public class WorkflowStore implements WorkflowStoreBI {
 		return activities;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.ihtsdo.tk.workflow.api.WorkflowStoreBI#getWorklist(java.util.UUID)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.ihtsdo.tk.workflow.api.WorkflowStoreBI#getWorklist(java.util.UUID)
 	 */
 	@Override
 	public WorkListBI getWorklist(UUID worklistUuid) throws Exception {
 		return TerminologyProjectDAO.getWorkList(Terms.get().getConcept(worklistUuid), config);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.ihtsdo.tk.workflow.api.WorkflowStoreBI#getProject(java.util.UUID)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.ihtsdo.tk.workflow.api.WorkflowStoreBI#getProject(java.util.UUID)
 	 */
 	@Override
 	public ProjectBI getProject(UUID projectUuid) throws Exception {
 		return new Project(TerminologyProjectDAO.getProject(Terms.get().getConcept(projectUuid), config));
 	}
-	
-	
+
 	/**
 	 * Send all changes in range to workflow.
-	 *
-	 * @param startTime the time and date, in the form MM/dd/yy HH:mm:ss
-	 * @param endTime the time and date, in the form MM/dd/yy HH:mm:ss
-	 * @throws Exception 
+	 * 
+	 * @param startTime
+	 *            the time and date, in the form MM/dd/yy HH:mm:ss
+	 * @param endTime
+	 *            the time and date, in the form MM/dd/yy HH:mm:ss
+	 * @throws Exception
 	 */
 	public void sendAllChangesInTimeRangeToDefaultWorkflow(String startTime, String endTime) throws Exception {
 		WorkflowInitiator initiator = new WorkflowInitiator();

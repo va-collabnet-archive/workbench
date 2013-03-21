@@ -97,7 +97,7 @@ public class WfDestinationFilter implements WfFilterBI {
 
 	@Override
 	public String toString() {
-		return "Destination";
+		return "assigned to";
 	}
 
 	public List<WfUser> getFilterOptions() {

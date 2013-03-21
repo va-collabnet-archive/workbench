@@ -141,7 +141,7 @@ public class AboutBox {
     }
 
     private static JLabel createLinkLabel(String siteURL, String labelText) {
-        final String href = siteURL + "index.html";
+        final String href = buildHref(siteURL);
         JLabel label = new JLabel("<html><a href=\"" + href + "\">" + labelText + "</a></html>");
         label.setCursor(new Cursor(Cursor.HAND_CURSOR));
         
@@ -159,6 +159,15 @@ public class AboutBox {
         });
         
         return label;
+    }
+
+    private static String buildHref(String siteURL) {
+        // Prevent double-slash URLs, which break generated site.
+        if (siteURL.endsWith("/")) {
+            return siteURL + "index.html";
+        } else {
+            return siteURL + "/index.html";
+        }
     }
 
     public static String removeQuotes(String str) {

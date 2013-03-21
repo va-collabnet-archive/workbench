@@ -51,6 +51,7 @@ import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.document.report.model.UserStatusCount;
 import org.ihtsdo.document.report.model.UserStatusCountComparator;
 import org.ihtsdo.project.TerminologyProjectDAO;
+import org.ihtsdo.project.model.I_TerminologyProject;
 import org.ihtsdo.project.model.TranslationProject;
 import org.ihtsdo.project.model.WorkList;
 import org.ihtsdo.project.model.WorkListMember;
@@ -71,10 +72,10 @@ public class AccumulatedStatusChanges extends SwingWorker<File, String> implemen
 
 	/** The formatter. */
 	private SimpleDateFormat formatter;
-	
+
 	/** The tf. */
 	private I_TermFactory tf;
-	
+
 	/** The user roles cache. */
 	private HashMap<I_GetConceptData, String> userRolesCache;
 
@@ -88,7 +89,9 @@ public class AccumulatedStatusChanges extends SwingWorker<File, String> implemen
 		tf = Terms.get();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.ihtsdo.document.report.I_Report#getExcelSourceWorkbook()
 	 */
 	@Override
@@ -188,7 +191,9 @@ public class AccumulatedStatusChanges extends SwingWorker<File, String> implemen
 		return reportCopy;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.ihtsdo.document.report.I_Report#getCsv()
 	 */
 	@Override
@@ -203,7 +208,7 @@ public class AccumulatedStatusChanges extends SwingWorker<File, String> implemen
 			pw.append("project|workset|worklist|date|role|author|status|count");
 			pw.println();
 
-			TranslationProject project = new TranslationProjectDialog().showModalDialog();
+			I_TerminologyProject project = new TranslationProjectDialog().showModalDialog();
 			if (project != null) {
 				String projectName = project.getName();
 
@@ -231,14 +236,12 @@ public class AccumulatedStatusChanges extends SwingWorker<File, String> implemen
 												I_GetConceptData statusConcept = tf.getConcept(version.getNid1());
 												boolean sameDestinationAndAuthor = version.getNid2() != version.getAuthorNid();
 												I_GetConceptData previousStatus = wlPromRefset.getPreviousPromotionStatus(wlMemberConcept.getConceptNid(), config);
-												if(previousStatus == null){
+												if (previousStatus == null) {
 													continue;
 												}
 												I_GetConceptData wlMemeberActivityStatus = member.getActivityStatus();
 												boolean sameStatus = previousStatus.getConceptNid() == wlMemeberActivityStatus.getConceptNid();
-												if (!statusConcept.getUids().iterator().next().equals(
-														ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_ASSIGNED_STATUS.getUids().iterator().next())
-														&& (!sameDestinationAndAuthor || !sameStatus)) {
+												if (!statusConcept.getUids().iterator().next().equals(ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_ASSIGNED_STATUS.getUids().iterator().next()) && (!sameDestinationAndAuthor || !sameStatus)) {
 													dataFound = true;
 													UserStatusCount current = new UserStatusCount();
 													current.setDate(formatter.format(new Date(version.getTime())));
@@ -311,12 +314,16 @@ public class AccumulatedStatusChanges extends SwingWorker<File, String> implemen
 
 	/**
 	 * Gets the user role.
-	 *
-	 * @param workList the work list
-	 * @param user the user
+	 * 
+	 * @param workList
+	 *            the work list
+	 * @param user
+	 *            the user
 	 * @return the user role
-	 * @throws IOException Signals that an I/O exception has occurred.
-	 * @throws TerminologyException the terminology exception
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
+	 * @throws TerminologyException
+	 *             the terminology exception
 	 */
 	private String getUserRole(WorkList workList, I_GetConceptData user) throws IOException, TerminologyException {
 		if (userRolesCache.containsKey(user)) {
@@ -324,8 +331,7 @@ public class AccumulatedStatusChanges extends SwingWorker<File, String> implemen
 		} else {
 			Set<WfRole> roles = getRolesForUser(user, workList);
 			if (roles.size() > 1) {
-				AceLog.getAppLog().alertAndLog(Level.WARNING, "User: " + user.toString() + " has more then one role, using the first one in report.",
-						new Exception("User: " + user.toString() + " has more then one role, using the first one in report."));
+				AceLog.getAppLog().alertAndLog(Level.WARNING, "User: " + user.toString() + " has more then one role, using the first one in report.", new Exception("User: " + user.toString() + " has more then one role, using the first one in report."));
 			} else if (roles.size() < 1) {
 				AceLog.getAppLog().alertAndLog(Level.WARNING, "User: " + user.toString() + " has no roles in this project.", new Exception("User: " + user.toString() + " has no roles in this project."));
 				userRolesCache.put(user, "No role");
@@ -342,12 +348,16 @@ public class AccumulatedStatusChanges extends SwingWorker<File, String> implemen
 
 	/**
 	 * Gets the roles for user.
-	 *
-	 * @param user the user
-	 * @param worklist the worklist
+	 * 
+	 * @param user
+	 *            the user
+	 * @param worklist
+	 *            the worklist
 	 * @return the roles for user
-	 * @throws IOException Signals that an I/O exception has occurred.
-	 * @throws TerminologyException the terminology exception
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
+	 * @throws TerminologyException
+	 *             the terminology exception
 	 */
 	private Set<WfRole> getRolesForUser(I_GetConceptData user, WorkList worklist) throws IOException, TerminologyException {
 		Set<WfRole> returnRoles = new HashSet<WfRole>();
@@ -359,7 +369,9 @@ public class AccumulatedStatusChanges extends SwingWorker<File, String> implemen
 		return returnRoles;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.ihtsdo.document.report.I_Report#getExcelPivotTableWorkBook()
 	 */
 	@Override
@@ -368,7 +380,9 @@ public class AccumulatedStatusChanges extends SwingWorker<File, String> implemen
 		return null;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.ihtsdo.document.report.I_Report#getReportPanel()
 	 */
 	@Override
@@ -377,14 +391,18 @@ public class AccumulatedStatusChanges extends SwingWorker<File, String> implemen
 		return null;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Object#toString()
 	 */
 	public String toString() {
 		return "Accumulated status changes report";
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.ihtsdo.document.report.I_Report#cancelReporting()
 	 */
 	@Override
@@ -394,7 +412,9 @@ public class AccumulatedStatusChanges extends SwingWorker<File, String> implemen
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see javax.swing.SwingWorker#doInBackground()
 	 */
 	@Override

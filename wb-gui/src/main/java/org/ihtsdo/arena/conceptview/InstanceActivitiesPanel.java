@@ -8,16 +8,25 @@ import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
 import javax.swing.ScrollPaneConstants;
@@ -25,12 +34,15 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeModel;
+import javax.swing.tree.TreePath;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.ihtsdo.arena.conceptview.ConceptViewSettings.SIDE;
 import org.ihtsdo.project.model.WorkList;
+import org.ihtsdo.project.refset.Comment;
 import org.ihtsdo.project.workflow.api.wf2.implementation.WorkflowStore;
+import org.ihtsdo.project.workflow.model.WfComment;
 import org.ihtsdo.tk.workflow.api.WfActivityInstanceBI;
 import org.ihtsdo.tk.workflow.api.WfCommentBI;
 import org.ihtsdo.tk.workflow.api.WfProcessInstanceBI;
@@ -46,6 +58,9 @@ public class InstanceActivitiesPanel extends JPanel {
 	private TreeModel model;
 	public I_GetConceptData concept;
 	private JScrollPane scrollPane;
+	private JPopupMenu popupMenu;
+	private WorkListBI worklist;
+	private JMenuItem mntmAddComment;
 
 	public InstanceActivitiesPanel(I_ConfigAceFrame config, ConceptView view) {
 		initComponents();
@@ -85,7 +100,7 @@ public class InstanceActivitiesPanel extends JPanel {
 
 		JLabel title = new JLabel("Workflow history");
 		panel.add(title);
-		
+
 		scrollPane = new JScrollPane();
 		GridBagConstraints gbc_scrollPane = new GridBagConstraints();
 		gbc_scrollPane.fill = GridBagConstraints.BOTH;
@@ -94,8 +109,31 @@ public class InstanceActivitiesPanel extends JPanel {
 		add(scrollPane, gbc_scrollPane);
 
 		tree = new JTree();
+
 		scrollPane.setViewportView(tree);
 		tree.setCellRenderer(new MyRenderer());
+
+		popupMenu = new JPopupMenu();
+		addPopup(tree, popupMenu);
+
+		mntmAddComment = new JMenuItem("Add comment");
+		mntmAddComment.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if (worklist != null) {
+					WorkflowStore wfs = new WorkflowStore();
+					try {
+						String comment = JOptionPane.showInputDialog(InstanceActivitiesPanel.this, "", "Comment", JOptionPane.PLAIN_MESSAGE);
+						if (comment != null && !comment.equals("")) {
+							wfs.getProcessInstance(worklist, concept.getPrimUuid()).addComment(new WfComment(comment));
+							updateActivityInstances(concept);
+						}
+					} catch (Exception e1) {
+						e1.printStackTrace();
+					}
+				}
+			}
+		});
+		popupMenu.add(mntmAddComment);
 	}
 
 	public void setDropSide(SIDE side) {
@@ -120,6 +158,7 @@ public class InstanceActivitiesPanel extends JPanel {
 	}
 
 	public void updateActivityInstances(I_GetConceptData concept) {
+		this.concept = concept;
 		try {
 			WorkflowStore ws = new WorkflowStore();
 			Collection<WfProcessInstanceBI> instances = ws.getProcessInstances(concept);
@@ -137,19 +176,24 @@ public class InstanceActivitiesPanel extends JPanel {
 						wlNodes.put(wl.getName(), wlNode);
 					}
 					LinkedList<WfActivityInstanceBI> activities = wfProcessInstanceBI.getActivityInstances();
-					long lastAdded=Long.MIN_VALUE;
+					long lastAdded = Long.MIN_VALUE;
+					List<WfCommentBI> comentsAcumul =  new ArrayList<WfCommentBI>();
 					for (WfActivityInstanceBI wfActivityInstanceBI : activities) {
-						for (WfCommentBI comment: comments){
-							if (comment.getDate()>lastAdded){
-								if (wfActivityInstanceBI.getTime()>comment.getDate()){
+						comentsAcumul =  new ArrayList<WfCommentBI>();
+						for (WfCommentBI comment : comments) {
+							if (comment.getDate() > lastAdded) {
+								if (wfActivityInstanceBI.getTime() > comment.getDate()) {
 									wlNodes.get(wl.getName()).add(new DefaultMutableTreeNode(comment));
-									lastAdded=comment.getDate();
-								}else{
-									break;
+									lastAdded = comment.getDate();
+								} else {
+									comentsAcumul.add(comment);
 								}
 							}
 						}
 						wlNodes.get(wl.getName()).add(new DefaultMutableTreeNode(wfActivityInstanceBI));
+					}
+					for (WfCommentBI wfCommentBI : comentsAcumul) {
+						wlNodes.get(wl.getName()).add(new DefaultMutableTreeNode(wfCommentBI));
 					}
 				}
 				for (int i = 0; i < tree.getRowCount(); i++) {
@@ -174,11 +218,11 @@ public class InstanceActivitiesPanel extends JPanel {
 			if (isWorklist(value)) {
 				setIcon(new ImageIcon("icons/table.png"));
 				setToolTipText(value.toString());
-			} else if (isComment(value)){
+			} else if (isComment(value)) {
 				setIcon(new ImageIcon("icons/message.png"));
 				setToolTipText(value.toString());
-				
-			}else{
+
+			} else {
 				setIcon(new ImageIcon("icons/element_next.png"));
 				setToolTipText(value.toString());
 			}
@@ -203,5 +247,38 @@ public class InstanceActivitiesPanel extends JPanel {
 			}
 			return false;
 		}
+	}
+
+	private void addPopup(JTree component, final JPopupMenu popup) {
+		component.addMouseListener(new MouseAdapter() {
+			public void mousePressed(MouseEvent e) {
+				if (e.isPopupTrigger()) {
+					showMenu(e);
+				}
+			}
+
+			public void mouseReleased(MouseEvent e) {
+				if (e.isPopupTrigger()) {
+					showMenu(e);
+				}
+			}
+
+			private void showMenu(MouseEvent e) {
+				try {
+					TreePath path = tree.getPathForLocation(e.getX(), e.getY());
+					if (path != null) {
+						tree.setSelectionPath(path);
+						DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
+						if (selectedNode.getUserObject() instanceof WorkListBI) {
+							worklist = (WorkListBI) selectedNode.getUserObject();
+							popup.show(e.getComponent(), e.getX(), e.getY());
+						}
+
+					}
+				} catch (Exception e1) {
+					e1.printStackTrace();
+				}
+			}
+		});
 	}
 }

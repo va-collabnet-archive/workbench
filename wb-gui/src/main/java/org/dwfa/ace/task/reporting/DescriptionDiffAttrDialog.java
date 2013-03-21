@@ -4,8 +4,18 @@
 
 package org.dwfa.ace.task.reporting;
 
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Container;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.HeadlessException;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -16,7 +26,6 @@ import java.util.UUID;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
-import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -33,6 +42,7 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.task.util.DatePicker;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.qa.gui.ObjectTransferHandler;
@@ -88,26 +98,26 @@ public class DescriptionDiffAttrDialog extends JDialog {
 
 	private void initCustomComponents() {
 		try {
-			// Set release dates
-			for (int i = 2002; i <= 2012; i++) {
-				Calendar c0 = new GregorianCalendar(cstTime);
-				Calendar c3 = new GregorianCalendar(cstTime);
-				Calendar c6 = new GregorianCalendar(cstTime);
-				Calendar c9 = new GregorianCalendar(cstTime);
-				c0.set(i, 0, 31, 23, 59, 59);
-				c3.set(i, 3, 30, 23, 59, 59);
-				c6.set(i, 6, 31, 23, 59, 59);
-				c9.set(i, 9, 31, 23, 59, 59);
-				
-				initTimeCombo.addItem(new TimeItem(c0));
-				initTimeCombo.addItem(new TimeItem(c3));
-				initTimeCombo.addItem(new TimeItem(c6));
-				initTimeCombo.addItem(new TimeItem(c9));
-				laterTimeCombo.addItem(new TimeItem(c0));
-				laterTimeCombo.addItem(new TimeItem(c3));
-				laterTimeCombo.addItem(new TimeItem(c6));
-				laterTimeCombo.addItem(new TimeItem(c9));
-			}
+//			// Set release dates
+//			for (int i = 2002; i <= 2012; i++) {
+//				Calendar c0 = new GregorianCalendar(cstTime);
+//				Calendar c3 = new GregorianCalendar(cstTime);
+//				Calendar c6 = new GregorianCalendar(cstTime);
+//				Calendar c9 = new GregorianCalendar(cstTime);
+//				c0.set(i, 0, 31, 23, 59, 59);
+//				c3.set(i, 3, 30, 23, 59, 59);
+//				c6.set(i, 6, 31, 23, 59, 59);
+//				c9.set(i, 9, 31, 23, 59, 59);
+//				
+//				initTimeCombo.addItem(new TimeItem(c0));
+//				initTimeCombo.addItem(new TimeItem(c3));
+//				initTimeCombo.addItem(new TimeItem(c6));
+//				initTimeCombo.addItem(new TimeItem(c9));
+//				laterTimeCombo.addItem(new TimeItem(c0));
+//				laterTimeCombo.addItem(new TimeItem(c3));
+//				laterTimeCombo.addItem(new TimeItem(c6));
+//				laterTimeCombo.addItem(new TimeItem(c9));
+//			}
 
 			ObjectTransferHandler oth = new ObjectTransferHandler(config, null);
 			pathListModel = new DefaultListModel();
@@ -183,10 +193,10 @@ public class DescriptionDiffAttrDialog extends JDialog {
 			errorLabel.setVisible(true);
 			return;
 		}
-		TimeItem initTimeItem = (TimeItem) initTimeCombo.getSelectedItem();
-		TimeItem endTimeItem = (TimeItem) laterTimeCombo.getSelectedItem();
-		this.initTime = initTimeItem.toString();
-		this.laterTime = endTimeItem.toString();
+		Calendar initTimeItem = initTimeCombo.getSelectedDate();
+		Calendar endTimeItem = laterTimeCombo.getSelectedDate();
+		this.initTime = cstFormat.format(initTimeItem.getTime()) + " CST";
+		this.laterTime = cstFormat.format(endTimeItem.getTime()) + " CST";
 		I_GetConceptData pathConcept = (I_GetConceptData) pathListModel.getElementAt(0);
 		this.uuid1 = pathConcept.getPrimUuid();
 		this.uuid2 = pathConcept.getPrimUuid();
@@ -207,10 +217,10 @@ public class DescriptionDiffAttrDialog extends JDialog {
 	}
 
 	private boolean isDatesOk() {
-		if (initTimeCombo.getSelectedItem() != null && laterTimeCombo.getSelectedItem() != null) {
-			TimeItem initTimeItem = (TimeItem) initTimeCombo.getSelectedItem();
-			TimeItem endTimeItem = (TimeItem) laterTimeCombo.getSelectedItem();
-			if (initTimeItem.getC().after(endTimeItem.getC()) || initTimeItem.getC().equals(endTimeItem.getC())) {
+		if (initTimeCombo.getSelectedDate() != null && laterTimeCombo.getSelectedDate() != null) {
+			Calendar initTimeItem = initTimeCombo.getSelectedDate();
+			Calendar endTimeItem = laterTimeCombo.getSelectedDate();
+			if (initTimeItem.after(endTimeItem) || initTimeItem.equals(endTimeItem)) {
 				return false;
 			}
 		}
@@ -235,15 +245,18 @@ public class DescriptionDiffAttrDialog extends JDialog {
 		cancelButton = new JButton();
 		panel1 = new JPanel();
 		label1 = new JLabel();
-		initTimeCombo = new JComboBox();
+		GregorianCalendar minDate = new GregorianCalendar();
+		minDate.setTimeInMillis(1);
+		// date picker
+		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+		initTimeCombo = new DatePicker(minDate, Calendar.getInstance(), dateFormat);
 		label2 = new JLabel();
-		laterTimeCombo = new JComboBox();
+		laterTimeCombo = new DatePicker(minDate, Calendar.getInstance(), dateFormat);
 		label3 = new JLabel();
 		scrollPane1 = new JScrollPane();
 		pathList = new JList();
 
 		// ======== this ========
-		setAlwaysOnTop(true);
 		Container contentPane = getContentPane();
 		contentPane.setLayout(new BorderLayout());
 
@@ -299,12 +312,6 @@ public class DescriptionDiffAttrDialog extends JDialog {
 				panel1.add(label1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 5), 0, 0));
 
 				// ---- initTimeCombo ----
-				initTimeCombo.addItemListener(new ItemListener() {
-					@Override
-					public void itemStateChanged(ItemEvent e) {
-						initTimeComboItemStateChanged(e);
-					}
-				});
 				panel1.add(initTimeCombo, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
 
 				// ---- label2 ----
@@ -312,12 +319,6 @@ public class DescriptionDiffAttrDialog extends JDialog {
 				panel1.add(label2, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 5), 0, 0));
 
 				// ---- laterTimeCombo ----
-				laterTimeCombo.addItemListener(new ItemListener() {
-					@Override
-					public void itemStateChanged(ItemEvent e) {
-						laterTimeComboItemStateChanged(e);
-					}
-				});
 				panel1.add(laterTimeCombo, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
 
 				// ---- label3 ----
@@ -352,9 +353,9 @@ public class DescriptionDiffAttrDialog extends JDialog {
 	private JButton cancelButton;
 	private JPanel panel1;
 	private JLabel label1;
-	private JComboBox initTimeCombo;
+	private DatePicker initTimeCombo;
 	private JLabel label2;
-	private JComboBox laterTimeCombo;
+	private DatePicker laterTimeCombo;
 	private JLabel label3;
 	private JScrollPane scrollPane1;
 	private JList pathList;

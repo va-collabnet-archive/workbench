@@ -87,6 +87,7 @@ import org.ihtsdo.tk.api.TerminologyStoreDI;
 public class BdbCommitManager {
 
     private static final int PERMIT_COUNT = 50;
+    private static final int DATACHECK_PERMIT_COUNT = 300;
     public static String pluginRoot = "plugins";
     private static final AtomicInteger writerCount = new AtomicInteger(0);
     private static boolean writeChangeSets = true;
@@ -101,7 +102,8 @@ public class BdbCommitManager {
     private static long lastCommit = Bdb.gVersion.incrementAndGet();
     private static long lastCancel = Integer.MIN_VALUE;
     private static Semaphore dbWriterPermit = new Semaphore(PERMIT_COUNT);
-    private static Semaphore dbCheckerPermit = new Semaphore(PERMIT_COUNT);
+    private static Semaphore dbCheckerPermit = new Semaphore(DATACHECK_PERMIT_COUNT);
+    private static Semaphore dbCheckerPermit2 = new Semaphore(DATACHECK_PERMIT_COUNT);
     private static ReentrantReadWriteLock dataCheckLock = new ReentrantReadWriteLock();
     private static List<I_TestDataConstraints> creationTests =
             new ArrayList<I_TestDataConstraints>();
@@ -174,13 +176,14 @@ public class BdbCommitManager {
             dbWriterService.execute(new SetNidsForCid(concept));
             dbWriterService.execute(new ConceptWriter(concept));
             dbCheckerPermit.acquire();
+            dbCheckerPermit2.acquire();
             dbCheckerService.execute(new DataChecker(concept));
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }finally{
-            dbCheckerPermit.acquireUninterruptibly(PERMIT_COUNT);
+            dbCheckerPermit.acquireUninterruptibly(DATACHECK_PERMIT_COUNT);
             readLock.unlock();
-            dbCheckerPermit.release(PERMIT_COUNT);
+            dbCheckerPermit.release(DATACHECK_PERMIT_COUNT);
         }
     }
     
@@ -229,8 +232,9 @@ public class BdbCommitManager {
 
        @Override
        protected void done() {
-            UpdateFrames updateFrames = new UpdateFrames(concept);
-            updateFrames.run();
+           UpdateFrames updateFrames = new UpdateFrames(concept);
+           updateFrames.run();
+           dbCheckerPermit2.release();
        }
         
     }
@@ -820,7 +824,7 @@ public class BdbCommitManager {
 
                         aceInstance.getDataCheckListScroller();
                         aceInstance.getUncommittedListModel().clear();
-
+                        
                         for (Collection<AlertToDataConstraintFailure> alerts : dataCheckMap.values()) {
                             aceInstance.getUncommittedListModel().addAll(alerts);
                         }
@@ -1324,8 +1328,8 @@ public class BdbCommitManager {
 
             @Override
             public void run() {
-                doUpdate();
-            }
+                    doUpdate();
+                }
         });
     }
 
@@ -1334,8 +1338,8 @@ public class BdbCommitManager {
 
             @Override
             public void run() {
-                doUpdate();
-            }
+                    doUpdate();
+                }
         });
     }
 
@@ -1347,6 +1351,13 @@ public class BdbCommitManager {
                 dbWriterPermit.release(PERMIT_COUNT);
             }
         }
+    }
+    
+    public static void waitTillDatachecksFinished() {
+        dbCheckerPermit.acquireUninterruptibly(DATACHECK_PERMIT_COUNT);
+        dbCheckerPermit2.acquireUninterruptibly(DATACHECK_PERMIT_COUNT);
+        dbCheckerPermit.release(DATACHECK_PERMIT_COUNT);
+        dbCheckerPermit2.release(DATACHECK_PERMIT_COUNT);
     }
 
     public static void writeImmediate(Concept concept) {
@@ -1669,7 +1680,6 @@ public class BdbCommitManager {
             if (canceled) {
                 return;
             }
-
             doUpdate();
         }
 
@@ -1771,8 +1781,9 @@ public class BdbCommitManager {
         @Override
         public void run() {
             if (getActiveFrame() != null) {
-                updateAlerts();
-
+                if(ACE.datachecksRunning()){
+                    updateAlerts();
+                }
                 I_ConfigAceFrame activeFrame = getActiveFrame();
 
                 for (Frame f : OpenFrames.getFrames()) {

@@ -110,8 +110,7 @@ public class LoadBdbMulti extends AbstractMojo {
       new LinkedBlockingQueue<>();
    private int runtimeConverterSize =
       Runtime.getRuntime().availableProcessors() * 2;
-   private int                               converterSize      =
-      runtimeConverterSize;
+   private int                               converterSize      = 1;
    ConcurrentSkipListSet<Object>             watchSet           =
       new ConcurrentSkipListSet<>();
    ConcurrentSkipListSet<ConceptChronicleBI> indexedAnnotations =

@@ -3,9 +3,9 @@
  */
 package org.ihtsdo.mojo.schema.transformer;
 
-import edu.emory.mathcs.backport.java.util.Arrays;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import java.util.logging.Level;

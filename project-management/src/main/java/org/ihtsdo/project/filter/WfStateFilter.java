@@ -94,7 +94,7 @@ public class WfStateFilter implements WfFilterBI {
 
 	@Override
 	public String toString() {
-		return "State";
+		return "current state";
 	}
 
 	public List<WfState> getFilterOptions() {

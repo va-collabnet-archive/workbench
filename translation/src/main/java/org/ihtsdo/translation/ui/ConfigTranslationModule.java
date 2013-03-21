@@ -104,7 +104,7 @@ public class ConfigTranslationModule implements Serializable {
 		this.selectedEditorMode = EditorMode.PREFERRED_TERM_EDITOR;
 		this.editingPanelOpenMode = EditingPanelOpenMode.FSN_TERM_MODE;
 		this.defaultSimilaritySearchOption = DefaultSimilaritySearchOption.FSN;
-		this.selectedFsnGenStrategy = FsnGenerationStrategy.COPY_SOURCE_LANGUAGE;
+		this.selectedFsnGenStrategy = FsnGenerationStrategy.NONE;
 		this.selectedIcsGenerationStrategy = IcsGenerationStrategy.NONE;
 		this.selectedPrefTermDefault = PreferredTermDefault.BLANK;
 		this.completionMode = CompletionMode.INCOMPLETE_INSTACES;

@@ -664,9 +664,9 @@ public class InboxTableModel extends DefaultTableModel {
 			e.printStackTrace();
 		}
 
+		
 		row = new Object[InboxColumn.values().length + 1];
-		String componentStr = tagStr + sourcePreferred;
-		row[InboxColumn.SOURCE_PREFERRED.getColumnNumber()] = componentStr;
+		row[InboxColumn.SOURCE_PREFERRED.getColumnNumber()] = sourcePreferred;
 		row[InboxColumn.TARGET_FSN.getColumnNumber()] = targetFSN;
 		// row[InboxColumn.STATUS_DATE.getColumnNumber()] = targetPreferred;
 		row[InboxColumn.TARGET_PREFERRED.getColumnNumber()] = targetPreferred;
@@ -675,6 +675,7 @@ public class InboxTableModel extends DefaultTableModel {
 		row[InboxColumn.STATUS.getColumnNumber()] = wfInstance.getState().getName();
 		row[InboxColumn.DEFAULT_DESCRIPTION.getColumnNumber()] = defaultDescription;
 		row[InboxColumn.values().length] = wfInstance;
+		row[columns.iterator().next().getColumnNumber()] = tagStr + row[columns.iterator().next().getColumnNumber()]; 
 		return row;
 	}
 }

@@ -8,6 +8,8 @@ import java.util.UUID;
 import org.ihtsdo.idgeneration.IdAssignmentBI.IDENTIFIER;
 
 import junit.framework.TestCase;
+import org.ihtsdo.idgeneration.IdAssignmentBI;
+import org.ihtsdo.idgeneration.IdAssignmentImpl;
 
 
 public class TestIdAssignmentImpl extends TestCase {

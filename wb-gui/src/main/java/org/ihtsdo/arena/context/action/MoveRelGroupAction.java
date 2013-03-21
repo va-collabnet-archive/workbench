@@ -44,6 +44,7 @@ public class MoveRelGroupAction extends AbstractAction {
 
         try {
             I_GetConceptData concept = Terms.get().getConceptForNid(targetComponent.getNid());
+            I_GetConceptData retireConcept = Terms.get().getConceptForNid(sourceComponent.getNid());
 
             //get group number of sourceComponent
             RelationshipGroupVersionBI relGroup = (RelationshipGroupVersionBI) sourceComponent;
@@ -93,7 +94,7 @@ public class MoveRelGroupAction extends AbstractAction {
                         pathItr.next().getConceptNid(),
                         Long.MAX_VALUE);
 
-                Terms.get().addUncommitted(concept);
+                
 
                 //retire from source 
                 if (I_AmPart.class.isAssignableFrom(component.getClass())) {
@@ -106,10 +107,10 @@ public class MoveRelGroupAction extends AbstractAction {
                                 config.getEditCoordinate().getModuleNid(), 
                                 ep.getConceptNid());
                     }
-                    I_GetConceptData retireConcept = Terms.get().getConceptForNid(componentVersion.getNid());
-                    Terms.get().addUncommitted(retireConcept);
                 }
             }
+            Terms.get().addUncommitted(concept);
+            Terms.get().addUncommitted(retireConcept);
 
         } catch (TerminologyException e1) {
             AceLog.getAppLog().alertAndLogException(e1);

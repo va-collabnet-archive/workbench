@@ -173,6 +173,9 @@ public class DialectHelper {
             int dialectNid, ViewCoordinate viewCoordinate) throws IOException,
             ContradictionException, UnsupportedDialectOrLanguage {
         lazyInit(dialectNid);
+        if(!description.getLang().equals("en")){
+            return false;
+        }
         if (isTextForDialect(description.getText(), dialectNid)) {
             return false;
         }
@@ -206,8 +209,13 @@ public class DialectHelper {
         String[] tokens = text.split("\\s+");
         Set<String> dialectVariants = variantSetMap.get(languageNid);
         for (String token : tokens) {
-            if (dialectVariants.contains(token.toLowerCase())) {
-                return true;
+            if (token.length() >= 1) {
+                if (!token.substring(token.length() - 1, token.length()).matches("\\w")) {
+                    token = token.substring(0, token.length() - 1);
+                }
+                if (dialectVariants.contains(token.toLowerCase())) {
+                    return true;
+                }
             }
         }
         return false;
@@ -232,8 +240,13 @@ public class DialectHelper {
         String[] tokens = text.split("\\s+");
         Map<String, String> dialectVariants = variantMap.get(dialectNid);
         for (String token : tokens) {
+            if(token.length() >= 1){
+                if(!token.substring(token.length() - 1, token.length()).matches("\\w")){
+                token = token.substring(0, token.length() - 1);
+            }
             if (dialectVariants.containsKey(token.toLowerCase())) {
                 return false;
+            }
             }
         }
         return true;
@@ -257,11 +270,23 @@ public class DialectHelper {
         String[] tokens = text.split("\\s+");
         Map<String, String> dialectVariants = variantMap.get(dialectNid);
         for (int i = 0; i < tokens.length; i++) {
-            if (dialectVariants.containsKey(tokens[i].toLowerCase())) {
-                boolean upperCase = Character.isUpperCase(tokens[i].charAt(0));
-                tokens[i] = dialectVariants.get(tokens[i].toLowerCase());
+            String word = tokens[i];
+            String punctuation = null;
+            if(word.length() >= 1){
+                if(!word.substring(word.length() - 1, word.length()).matches("\\w")){
+                    punctuation = word.substring(word.length() - 1);
+                    word = word.substring(0, word.length() - 1);
+                }
+            }
+            if (dialectVariants.containsKey(word.toLowerCase())) {
+                boolean upperCase = Character.isUpperCase(word.charAt(0));
+                if(punctuation != null){
+                    tokens[i] = dialectVariants.get(word.toLowerCase()) + punctuation;
+                }else{
+                    tokens[i] = dialectVariants.get(word.toLowerCase());
+                }
                 if (upperCase) {
-                    if (Character.isLowerCase(tokens[i].charAt(0))) {
+                    if (Character.isLowerCase(word.charAt(0))) {
                         tokens[i] = Character.toUpperCase(tokens[i].charAt(0))
                                 + tokens[i].substring(1);
                     }

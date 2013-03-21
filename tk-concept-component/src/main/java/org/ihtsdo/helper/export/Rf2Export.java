@@ -455,7 +455,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
         if (concept.getDescriptions() != null) {
             for (DescriptionChronicleBI d : concept.getDescriptions()) {
                 processDescription(d);
-                processIdentifiers(d.getPrimUuid(), d.getPrimordialVersion().getStampNid());
+//                processIdentifiers(d.getPrimUuid(), d.getPrimordialVersion().getStampNid());
                 if (d.getAnnotations() != null) {
                     for (RefexChronicleBI annot : d.getAnnotations()) {
                         int refexNid = annot.getRefexNid();
@@ -626,8 +626,8 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                 }
             }
             if (write) {
-                processIdentifiers(conceptAttributeChronicle.getPrimUuid(),
-                        conceptAttributeChronicle.getPrimordialVersion().getStampNid());
+//                processIdentifiers(conceptAttributeChronicle.getPrimUuid(),
+//                        conceptAttributeChronicle.getPrimordialVersion().getStampNid());
                 for (ConceptAttributeVersionBI car : versions) {
                     if (stampNids.contains(car.getStampNid())) {
                         for (Rf2File.ConceptsFileFields field : Rf2File.ConceptsFileFields.values()) {
@@ -798,10 +798,10 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                         }
                     }
                 }
-                if (inTaxonomy) { //only need to write once if a relationship was added
-                    processIdentifiers(relationshipChronicle.getPrimUuid(),
-                            relationshipChronicle.getPrimordialVersion().getStampNid());
-                }
+//                if (inTaxonomy) { //only need to write once if a relationship was added
+//                    processIdentifiers(relationshipChronicle.getPrimUuid(),
+//                            relationshipChronicle.getPrimordialVersion().getStampNid());
+//                }
             }
         }
     }
@@ -1069,43 +1069,39 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
      * @throws IOException signals that an I/O exception has occurred
      * @see Rf2File.IdentifiersFileFields
      */
-    private void processIdentifiers(UUID primordialUuid, int primordialStampNid) throws IOException {
-        if (primordialUuid != null) {
-            if (stampNids.contains(primordialStampNid)) {
-                for (Rf2File.IdentifiersFileFields field : Rf2File.IdentifiersFileFields.values()) {
+    private void processIdentifiers(UUID primordialUuid) throws IOException {
+        for (Rf2File.IdentifiersFileFields field : Rf2File.IdentifiersFileFields.values()) {
 
-                    switch (field) {
-                        case IDENTIFIER_SCHEME_ID:
-                            identifiersWriter.write(uuidIdScheme.getLenient().getPrimUuid() + field.seperator);
+            switch (field) {
+                case IDENTIFIER_SCHEME_ID:
+                    identifiersWriter.write(uuidIdScheme.getLenient().getPrimUuid() + field.seperator);
 
-                            break;
+                    break;
 
-                        case ALTERNATE_IDENTIFIER:
-                            identifiersWriter.write(primordialUuid + field.seperator);
+                case ALTERNATE_IDENTIFIER:
+                    identifiersWriter.write(primordialUuid + field.seperator);
 
-                            break;
+                    break;
 
-                        case EFFECTIVE_TIME:
-                            identifiersWriter.write(effectiveDateString + field.seperator);
+                case EFFECTIVE_TIME:
+                    identifiersWriter.write(effectiveDateString + field.seperator);
 
-                            break;
+                    break;
 
-                        case ACTIVE:
-                            identifiersWriter.write(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getPrimUuid() + field.seperator);
+                case ACTIVE:
+                    identifiersWriter.write(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getPrimUuid() + field.seperator);
 
-                            break;
+                    break;
 
-                        case MODULE_ID:
-                            identifiersWriter.write(module + field.seperator);
+                case MODULE_ID:
+                    identifiersWriter.write(module + field.seperator);
 
-                            break;
+                    break;
 
-                        case REFERENCED_COMPONENT_ID:
-                            identifiersWriter.write(primordialUuid + field.seperator);
+                case REFERENCED_COMPONENT_ID:
+                    identifiersWriter.write(primordialUuid + field.seperator);
 
-                            break;
-                    }
-                }
+                    break;
             }
         }
     }

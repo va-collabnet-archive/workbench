@@ -47,229 +47,220 @@ import org.ihtsdo.project.model.WorkListMember;
 
 /**
  * The Class GetDataFromUAWPanel.
- *
+ * 
  * @author ALO
  * @version 1.0, June 2010
  */
-@BeanList(specs = {
-    @Spec(directory = "tasks/translation tasks", type = BeanType.TASK_BEAN)})
+@BeanList(specs = { @Spec(directory = "tasks/translation tasks", type = BeanType.TASK_BEAN) })
 public class GetDataFromUAWPanel extends AbstractTask {
 
-    /*
-     * -----------------------
-     * Properties
-     * -----------------------
-     */
-    // Serialization Properties
-    /**
-     * The Constant serialVersionUID.
-     */
-    private static final long serialVersionUID = 1L;
-    /**
-     * The Constant dataVersion.
-     */
-    private static final int dataVersion = 2;
-    // Task Attribute Properties
-    /**
-     * The profile prop name.
-     */
-    private String profilePropName = ProcessAttachmentKeys.WORKING_PROFILE.getAttachmentKey();
-    /**
-     * The member prop name.
-     */
-    private String memberPropName = ProcessAttachmentKeys.WORKLIST_MEMBER.getAttachmentKey();
-    // Other Properties
-    /**
-     * The term factory.
-     */
-    private I_TermFactory termFactory;
+	/*
+	 * ----------------------- Properties -----------------------
+	 */
+	// Serialization Properties
+	/**
+	 * The Constant serialVersionUID.
+	 */
+	private static final long serialVersionUID = 1L;
+	/**
+	 * The Constant dataVersion.
+	 */
+	private static final int dataVersion = 2;
+	// Task Attribute Properties
+	/**
+	 * The profile prop name.
+	 */
+	private String profilePropName = ProcessAttachmentKeys.WORKING_PROFILE.getAttachmentKey();
+	/**
+	 * The member prop name.
+	 */
+	private String memberPropName = ProcessAttachmentKeys.WORKLIST_MEMBER.getAttachmentKey();
+	// Other Properties
+	/**
+	 * The term factory.
+	 */
+	private I_TermFactory termFactory;
 
-    /*
-     * -----------------------
-     * Serialization Methods
-     * -----------------------
-     */
-    /**
-     * Write object.
-     *
-     * @param out the out
-     * @throws IOException Signals that an I/O exception has occurred.
-     */
-    private void writeObject(ObjectOutputStream out) throws IOException {
-        out.writeInt(dataVersion);
-        out.writeObject(profilePropName);
-        out.writeObject(memberPropName);
-    }
+	/*
+	 * ----------------------- Serialization Methods -----------------------
+	 */
+	/**
+	 * Write object.
+	 * 
+	 * @param out
+	 *            the out
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
+	 */
+	private void writeObject(ObjectOutputStream out) throws IOException {
+		out.writeInt(dataVersion);
+		out.writeObject(profilePropName);
+		out.writeObject(memberPropName);
+	}
 
-    /**
-     * Read object.
-     *
-     * @param in the in
-     * @throws IOException Signals that an I/O exception has occurred.
-     * @throws ClassNotFoundException the class not found exception
-     */
-    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
-        int objDataVersion = in.readInt();
+	/**
+	 * Read object.
+	 * 
+	 * @param in
+	 *            the in
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
+	 * @throws ClassNotFoundException
+	 *             the class not found exception
+	 */
+	private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+		int objDataVersion = in.readInt();
 
-        if (objDataVersion <= dataVersion) {
-            if (objDataVersion >= 1) {
-                // Read version 1 data fields...
-                profilePropName = (String) in.readObject();
-                memberPropName = (String) in.readObject();
-            }
-            // Initialize transient properties
-        } else {
-            throw new IOException("Can't handle dataversion: " + objDataVersion);
-        }
-    }
+		if (objDataVersion <= dataVersion) {
+			if (objDataVersion >= 1) {
+				// Read version 1 data fields...
+				profilePropName = (String) in.readObject();
+				memberPropName = (String) in.readObject();
+			}
+			// Initialize transient properties
+		} else {
+			throw new IOException("Can't handle dataversion: " + objDataVersion);
+		}
+	}
 
-    /**
-     * Handles actions required by the task after normal task completion (such
-     * as moving a process to another user's input queue).
-     *
-     * @param process The currently executing Workflow process
-     * @param worker The worker currently executing this task
-     * @return void
-     * @throws TaskFailedException Thrown if a task fails for any reason.
-     * @see
-     * org.dwfa.bpa.process.I_DefineTask#complete(org.dwfa.bpa.process.I_EncodeBusinessProcess,
-     * org.dwfa.bpa.process.I_Work)
-     */
-    public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
-        // Nothing to do
-    }
+	/**
+	 * Handles actions required by the task after normal task completion (such
+	 * as moving a process to another user's input queue).
+	 * 
+	 * @param process
+	 *            The currently executing Workflow process
+	 * @param worker
+	 *            The worker currently executing this task
+	 * @return void
+	 * @throws TaskFailedException
+	 *             Thrown if a task fails for any reason.
+	 * @see org.dwfa.bpa.process.I_DefineTask#complete(org.dwfa.bpa.process.I_EncodeBusinessProcess,
+	 *      org.dwfa.bpa.process.I_Work)
+	 */
+	public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
+		// Nothing to do
+	}
 
-    /**
-     * Performs the primary action of the task, which in this case is to gather
-     * and validate data that has been entered by the user on the Workflow
-     * Details Sheet.
-     *
-     * @param process The currently executing Workflow process
-     * @param worker The worker currently executing this task
-     * @return The exit condition of the task
-     * @throws TaskFailedException Thrown if a task fails for any reason.
-     * @see
-     * org.dwfa.bpa.process.I_DefineTask#evaluate(org.dwfa.bpa.process.I_EncodeBusinessProcess,
-     * org.dwfa.bpa.process.I_Work)
-     */
-    public Condition evaluate(final I_EncodeBusinessProcess process, final I_Work worker) throws TaskFailedException {
+	/**
+	 * Performs the primary action of the task, which in this case is to gather
+	 * and validate data that has been entered by the user on the Workflow
+	 * Details Sheet.
+	 * 
+	 * @param process
+	 *            The currently executing Workflow process
+	 * @param worker
+	 *            The worker currently executing this task
+	 * @return The exit condition of the task
+	 * @throws TaskFailedException
+	 *             Thrown if a task fails for any reason.
+	 * @see org.dwfa.bpa.process.I_DefineTask#evaluate(org.dwfa.bpa.process.I_EncodeBusinessProcess,
+	 *      org.dwfa.bpa.process.I_Work)
+	 */
+	public Condition evaluate(final I_EncodeBusinessProcess process, final I_Work worker) throws TaskFailedException {
 
-        try {
+		try {
 
-            termFactory = Terms.get();
-            // TODO: move to read from profile
-            I_ConfigAceFrame config = termFactory.getActiveAceFrameConfig();
+			termFactory = Terms.get();
+			// TODO: move to read from profile
+			I_ConfigAceFrame config = termFactory.getActiveAceFrameConfig();
 
-            JPanel workflowDetailsSheet = config.getWorkflowDetailsSheet();
+			JPanel workflowDetailsSheet = config.getWorkflowDetailsSheet();
 
-            GetInforForUnassignedWork panel = null;
+			GetInforForUnassignedWork panel = null;
 
-            for (Component c : workflowDetailsSheet.getComponents()) {
-                if (GetInforForUnassignedWork.class.isAssignableFrom(c.getClass())) {
-                    panel = (GetInforForUnassignedWork) c;
-                }
-            }
+			for (Component c : workflowDetailsSheet.getComponents()) {
+				if (GetInforForUnassignedWork.class.isAssignableFrom(c.getClass())) {
+					panel = (GetInforForUnassignedWork) c;
+				}
+			}
 
-            if (panel != null) {
-                I_TerminologyProject selectedProject = panel.getSelectedProject();
-                WorkList selectedWorkList = panel.getSelectedWorkList();
-                if (selectedWorkList == null) {
-                    JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
-                            "The worklist is null.' panel. \n " + "Canceling the task. ", "",
-                            JOptionPane.ERROR_MESSAGE);
-                    return Condition.ITEM_CANCELED;
-                }
-                I_GetConceptData selectedConcept = config.getHierarchySelection();
+			if (panel != null) {
+				I_TerminologyProject selectedProject = panel.getSelectedProject();
+				WorkList selectedWorkList = panel.getSelectedWorkList();
+				if (selectedWorkList == null) {
+					JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null), "The worklist is null.' panel. \n " + "Canceling the task. ", "", JOptionPane.ERROR_MESSAGE);
+					return Condition.ITEM_CANCELED;
+				}
+				I_GetConceptData selectedConcept = config.getHierarchySelection();
 
-                int n = JOptionPane.showConfirmDialog(
-                        null,
-                        "You are going to send the concept \"" + selectedConcept.toString() + "\"\n"
-                        + "to a change workflow in the worklist \"" + selectedWorkList.getName() + "\"\n"
-                        + "Are you sure?",
-                        "Confirm",
-                        JOptionPane.YES_NO_OPTION);
-                if (n == JOptionPane.YES_OPTION) {
-                    // Create worklist member for unassigned work
-                    WorkListMember member = TerminologyProjectDAO.addConceptAsNacWorklistMember(
-                            selectedWorkList, selectedConcept,
-                            config);
-//					TerminologyProjectDAO.initializeWorkflowForMember( member, selectedWorkList, config);
+				// Create worklist member for unassigned work
+				WorkListMember member = TerminologyProjectDAO.addConceptAsNacWorklistMember(selectedWorkList, selectedConcept, config);
+				// TerminologyProjectDAO.initializeWorkflowForMember( member,
+				// selectedWorkList, config);
 
-//					process.setProperty(memberPropName, workListMember);
-//					process.setProperty(memberPropName, workListMember);
+				// process.setProperty(memberPropName, workListMember);
+				// process.setProperty(memberPropName, workListMember);
 
-                    return Condition.ITEM_COMPLETE;
-                } else {
-                    return Condition.ITEM_CANCELED;
-                }
-            }
+				return Condition.ITEM_COMPLETE;
+			}
 
-            // If we got here we could not find the PanelRefsetAndParameters panel
-            // so warn the user and cancel the task.
-            JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
-                    "Could not locate the 'GetInforForUnassignedWork' panel. \n " + "Canceling the task. ", "",
-                    JOptionPane.ERROR_MESSAGE);
-            return Condition.ITEM_CANCELED;
+			// If we got here we could not find the PanelRefsetAndParameters
+			// panel
+			// so warn the user and cancel the task.
+			JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null), "Could not locate the 'GetInforForUnassignedWork' panel. \n " + "Canceling the task. ", "", JOptionPane.ERROR_MESSAGE);
+			return Condition.ITEM_CANCELED;
 
-        } catch (Exception e) {
-            AceLog.getAppLog().alertAndLogException(e);
-            throw new TaskFailedException(e.getMessage());
-        }
-    }
+		} catch (Exception e) {
+			AceLog.getAppLog().alertAndLogException(e);
+			throw new TaskFailedException(e.getMessage());
+		}
+	}
 
-    /**
-     * This method overrides: getDataContainerIds() in AbstractTask.
-     *
-     * @return The data container identifiers used by this task.
-     */
-    public int[] getDataContainerIds() {
-        return new int[]{};
-    }
+	/**
+	 * This method overrides: getDataContainerIds() in AbstractTask.
+	 * 
+	 * @return The data container identifiers used by this task.
+	 */
+	public int[] getDataContainerIds() {
+		return new int[] {};
+	}
 
-    /**
-     * This method implements the interface method specified by: getConditions()
-     * in I_DefineTask.
-     *
-     * @return The possible evaluation conditions for this task.
-     * @see org.dwfa.bpa.process.I_DefineTask#getConditions()
-     */
-    public Collection<Condition> getConditions() {
-        return AbstractTask.ITEM_CANCELED_OR_COMPLETE;
-    }
+	/**
+	 * This method implements the interface method specified by: getConditions()
+	 * in I_DefineTask.
+	 * 
+	 * @return The possible evaluation conditions for this task.
+	 * @see org.dwfa.bpa.process.I_DefineTask#getConditions()
+	 */
+	public Collection<Condition> getConditions() {
+		return AbstractTask.ITEM_CANCELED_OR_COMPLETE;
+	}
 
-    /**
-     * Gets the profile prop name.
-     *
-     * @return the profile prop name
-     */
-    public String getProfilePropName() {
-        return profilePropName;
-    }
+	/**
+	 * Gets the profile prop name.
+	 * 
+	 * @return the profile prop name
+	 */
+	public String getProfilePropName() {
+		return profilePropName;
+	}
 
-    /**
-     * Sets the profile prop name.
-     *
-     * @param profilePropName the new profile prop name
-     */
-    public void setProfilePropName(String profilePropName) {
-        this.profilePropName = profilePropName;
-    }
+	/**
+	 * Sets the profile prop name.
+	 * 
+	 * @param profilePropName
+	 *            the new profile prop name
+	 */
+	public void setProfilePropName(String profilePropName) {
+		this.profilePropName = profilePropName;
+	}
 
-    /**
-     * Gets the member prop name.
-     *
-     * @return the member prop name
-     */
-    public String getMemberPropName() {
-        return memberPropName;
-    }
+	/**
+	 * Gets the member prop name.
+	 * 
+	 * @return the member prop name
+	 */
+	public String getMemberPropName() {
+		return memberPropName;
+	}
 
-    /**
-     * Sets the member prop name.
-     *
-     * @param memberPropName the new member prop name
-     */
-    public void setMemberPropName(String memberPropName) {
-        this.memberPropName = memberPropName;
-    }
+	/**
+	 * Sets the member prop name.
+	 * 
+	 * @param memberPropName
+	 *            the new member prop name
+	 */
+	public void setMemberPropName(String memberPropName) {
+		this.memberPropName = memberPropName;
+	}
 }

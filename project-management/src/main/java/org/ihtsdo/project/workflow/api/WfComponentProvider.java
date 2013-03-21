@@ -47,6 +47,7 @@ import org.ihtsdo.project.workflow.model.WfRole;
 import org.ihtsdo.project.workflow.model.WfState;
 import org.ihtsdo.project.workflow.model.WfUser;
 import org.ihtsdo.project.workflow.model.WorkflowDefinition;
+import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
@@ -60,16 +61,16 @@ public class WfComponentProvider {
 
 	/** The users cache. */
 	public static Map<UUID, WfUser> usersCache = new HashMap<UUID, WfUser>();
-	
+
 	/** The states cache. */
 	public static Map<UUID, WfState> statesCache = new HashMap<UUID, WfState>();
-	
+
 	/** The roles cache. */
 	public static Map<UUID, WfRole> rolesCache = new HashMap<UUID, WfRole>();
 
 	/**
 	 * Gets the users.
-	 *
+	 * 
 	 * @return the users
 	 */
 	public List<WfUser> getUsers() {
@@ -81,8 +82,8 @@ public class WfComponentProvider {
 			I_HelpSpecRefset helper = Terms.get().getSpecRefsetHelper(Terms.get().getActiveAceFrameConfig());
 			Set<Integer> currentStatuses = helper.getCurrentStatusIds();
 
-			Set<? extends I_GetConceptData> allUsers = roleParent.getDestRelOrigins(Terms.get().getActiveAceFrameConfig().getAllowedStatus(), allowedTypes, Terms.get().getActiveAceFrameConfig()
-					.getViewPositionSetReadOnly(), Precedence.TIME, Terms.get().getActiveAceFrameConfig().getConflictResolutionStrategy());
+			Set<? extends I_GetConceptData> allUsers = roleParent.getDestRelOrigins(Terms.get().getActiveAceFrameConfig().getAllowedStatus(), allowedTypes, Terms.get().getActiveAceFrameConfig().getViewPositionSetReadOnly(), Precedence.TIME, Terms.get().getActiveAceFrameConfig()
+					.getConflictResolutionStrategy());
 
 			for (I_GetConceptData user : allUsers) {
 
@@ -90,8 +91,8 @@ public class WfComponentProvider {
 				if (TerminologyProjectDAO.isActive(attr.getStatusNid())) {
 					wfUsers.add(new WfUser(user.toUserString(), user.getUids().iterator().next(), null));
 
-					Set<? extends I_GetConceptData> allDescUsers = user.getDestRelOrigins(Terms.get().getActiveAceFrameConfig().getAllowedStatus(), allowedTypes, Terms.get().getActiveAceFrameConfig()
-							.getViewPositionSetReadOnly(), Precedence.TIME, Terms.get().getActiveAceFrameConfig().getConflictResolutionStrategy());
+					Set<? extends I_GetConceptData> allDescUsers = user.getDestRelOrigins(Terms.get().getActiveAceFrameConfig().getAllowedStatus(), allowedTypes, Terms.get().getActiveAceFrameConfig().getViewPositionSetReadOnly(), Precedence.TIME, Terms.get().getActiveAceFrameConfig()
+							.getConflictResolutionStrategy());
 					for (I_GetConceptData descUser : allDescUsers) {
 
 						attr = descUser.getConAttrs();
@@ -112,8 +113,9 @@ public class WfComponentProvider {
 
 	/**
 	 * Gets the preferred term from auxiliary hier.
-	 *
-	 * @param concept the concept
+	 * 
+	 * @param concept
+	 *            the concept
 	 * @return the preferred term from auxiliary hier
 	 */
 	private String getPreferredTermFromAuxiliaryHier(I_GetConceptData concept) {
@@ -121,9 +123,9 @@ public class WfComponentProvider {
 		I_ConfigAceFrame config;
 		try {
 			config = Terms.get().getActiveAceFrameConfig();
-			
+
 			ConceptVersionBI conceptBi = ((ConceptChronicleBI) concept).getVersion(config.getViewCoordinate());
-			
+
 			for (DescriptionVersionBI loopDesc : conceptBi.getDescriptionsActive()) {
 				if (loopDesc.getTypeNid() == ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize().getNid()) {
 					return loopDesc.getText();
@@ -141,40 +143,30 @@ public class WfComponentProvider {
 
 	/**
 	 * Gets the user by uuid.
-	 *
-	 * @param id the id
+	 * 
+	 * @param id
+	 *            the id
 	 * @return the user by uuid
 	 */
 	public WfUser getUserByUUID(UUID id) {
 		WfUser wfUser = null;
+		ConceptVersionBI userConcept;
 		try {
-			I_GetConceptData roleParent = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.IHTSDO.getUids());
-
-			I_IntSet allowedTypes = Terms.get().getActiveAceFrameConfig().getDestRelTypes();
-			I_HelpSpecRefset helper = Terms.get().getSpecRefsetHelper(Terms.get().getActiveAceFrameConfig());
-			Set<Integer> currentStatuses = helper.getCurrentStatusIds();
-
-			Set<? extends I_GetConceptData> allUsers = roleParent.getDestRelOrigins(Terms.get().getActiveAceFrameConfig().getAllowedStatus(), allowedTypes, Terms.get().getActiveAceFrameConfig()
-					.getViewPositionSetReadOnly(), Precedence.TIME, Terms.get().getActiveAceFrameConfig().getConflictResolutionStrategy());
-
-			for (I_GetConceptData user : allUsers) {
-				I_ConceptAttributeVersioned attr = user.getConAttrs();
-				if (TerminologyProjectDAO.isActive(attr.getStatusNid()) && user.getUids().contains(id)) {
-					wfUser = new WfUser();
-					wfUser = new WfUser(attr.toUserString(), user.getUids().iterator().next(), null);
-					break;
-				}
-			}
-
-		} catch (Exception e) {
-			AceLog.getAppLog().alertAndLogException(e);
+			userConcept = Ts.get().getConceptVersion(Terms.get().getActiveAceFrameConfig().getViewCoordinate(), id);
+			wfUser = new WfUser(userConcept.getDescriptionPreferred().getText(), userConcept.getPrimUuid(), null);
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (TerminologyException e) {
+			e.printStackTrace();
+		} catch (ContradictionException e) {
+			e.printStackTrace();
 		}
 		return wfUser;
 	}
 
 	/**
 	 * Gets the roles.
-	 *
+	 * 
 	 * @return the roles
 	 */
 	public List<WfRole> getRoles() {
@@ -187,7 +179,7 @@ public class WfComponentProvider {
 			for (I_GetConceptData role : translationRoles) {
 				returnRoles.add(roleConceptToWfRole(role));
 			}
-			
+
 			Set<I_GetConceptData> wfRoles = new HashSet<I_GetConceptData>();
 			wfRoles = ProjectPermissionsAPI.getDescendants(wfRoles, Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_ROLES.getUids()));
 
@@ -206,7 +198,7 @@ public class WfComponentProvider {
 
 	/**
 	 * Gets the all states.
-	 *
+	 * 
 	 * @return the all states
 	 */
 	public List<WfState> getAllStates() {
@@ -215,8 +207,9 @@ public class WfComponentProvider {
 
 	/**
 	 * Gets the wf instance.
-	 *
-	 * @param instanceUUID the instance uuid
+	 * 
+	 * @param instanceUUID
+	 *            the instance uuid
 	 * @return the wf instance
 	 */
 	public static WfInstance getWfInstance(UUID instanceUUID) {
@@ -252,8 +245,9 @@ public class WfComponentProvider {
 
 	/**
 	 * Gets the permissions for user.
-	 *
-	 * @param user the user
+	 * 
+	 * @param user
+	 *            the user
 	 * @return the permissions for user
 	 */
 	public List<WfPermission> getPermissionsForUser(WfUser user) {
@@ -281,7 +275,7 @@ public class WfComponentProvider {
 
 	/**
 	 * Gets the permissions.
-	 *
+	 * 
 	 * @return the permissions
 	 */
 	public List<WfPermission> getPermissions() {
@@ -314,7 +308,7 @@ public class WfComponentProvider {
 
 	/**
 	 * Gets the states.
-	 *
+	 * 
 	 * @return the states
 	 */
 	public List<WfState> getStates() {
@@ -327,11 +321,9 @@ public class WfComponentProvider {
 			for (I_GetConceptData state : allStates) {
 				returnStates.add(statusConceptToWfState(state));
 			}
-                        
-                        returnStates.add(statusConceptToWfState(
-                                Terms.get().getConcept(
-                                        ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_ASSIGNED_STATUS.getUids())));
-                        
+
+			returnStates.add(statusConceptToWfState(Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_ASSIGNED_STATUS.getUids())));
+
 		} catch (TerminologyException e) {
 			AceLog.getAppLog().alertAndLogException(e);
 		} catch (IOException e) {
@@ -343,8 +335,9 @@ public class WfComponentProvider {
 
 	/**
 	 * Role concept to wf role.
-	 *
-	 * @param role the role
+	 * 
+	 * @param role
+	 *            the role
 	 * @return the wf role
 	 */
 	public WfRole roleConceptToWfRole(I_GetConceptData role) {
@@ -359,8 +352,9 @@ public class WfComponentProvider {
 
 	/**
 	 * User concept to wf user.
-	 *
-	 * @param user the user
+	 * 
+	 * @param user
+	 *            the user
 	 * @return the wf user
 	 */
 	public WfUser userConceptToWfUser(I_GetConceptData user) {
@@ -382,8 +376,9 @@ public class WfComponentProvider {
 
 	/**
 	 * Status concept to wf state.
-	 *
-	 * @param status the status
+	 * 
+	 * @param status
+	 *            the status
 	 * @return the wf state
 	 */
 	public WfState statusConceptToWfState(I_GetConceptData status) {
@@ -406,45 +401,47 @@ public class WfComponentProvider {
 
 	/**
 	 * Gets the workflow definition files.
-	 *
+	 * 
 	 * @return the workflow definition files
 	 */
 	public static List<File> getWorkflowDefinitionFiles() {
 		File folder = new File("./sampleProcesses");
 		return getWorkflowDefinitionFiles(folder);
 	}
-	
+
 	/**
 	 * Gets the workflow definition files.
-	 *
+	 * 
 	 * @return the workflow definition files
 	 */
 	public static List<File> getWorkflowDefinitionFiles(File folder) {
 		List<File> retFiles = loadFiles(folder, END_FILE);
 		return retFiles;
 	}
-	
+
 	/**
 	 * Gets the workflow definitions.
-	 *
+	 * 
 	 * @return the workflow definitions
 	 */
 	public static List<WorkflowDefinition> getWorkflowDefinitions(File folder) {
 		List<WorkflowDefinition> definitions = new ArrayList<WorkflowDefinition>();
 		List<File> retFiles = loadFiles(folder, END_FILE);
-		
+
 		for (File loopFile : retFiles) {
 			definitions.add(TestXstream.readWfDefinition(loopFile));
 		}
-		
+
 		return definitions;
 	}
 
 	/**
 	 * Load files.
-	 *
-	 * @param folder the folder
-	 * @param endFile the end file
+	 * 
+	 * @param folder
+	 *            the folder
+	 * @param endFile
+	 *            the end file
 	 * @return the list
 	 */
 	private static List<File> loadFiles(File folder, String endFile) {
@@ -452,8 +449,8 @@ public class WfComponentProvider {
 		List<File> retFiles = new ArrayList<File>();
 		for (File file : fileList) {
 			if (file.isDirectory()) {
-//				List<File> tmpFiles = loadFiles(file, endFile);
-//				retFiles.addAll(tmpFiles);
+				// List<File> tmpFiles = loadFiles(file, endFile);
+				// retFiles.addAll(tmpFiles);
 			} else {
 				if (!file.isHidden() && file.getName().toLowerCase().endsWith(endFile)) {
 					retFiles.add(file);

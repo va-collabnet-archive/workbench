@@ -25,9 +25,11 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.ace.task.WorkerAttachmentKeys;
@@ -54,9 +56,11 @@ import org.ihtsdo.tk.api.blueprint.RelationshipCAB;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.description.DescriptionChronicleBI;
+import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 import org.ihtsdo.tk.binding.snomed.Language;
 import org.ihtsdo.tk.binding.snomed.Snomed;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationshipType;
 import org.ihtsdo.tk.spec.ConceptSpec;
 import org.ihtsdo.tk.spec.ValidationException;
@@ -98,8 +102,25 @@ public class ImportOwlConcepts extends AbstractTask {
     }
 
     @Override
-    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException, ContradictionException {
+    public Condition evaluate(final I_EncodeBusinessProcess process, final I_Work worker) throws TaskFailedException, ContradictionException {
+
+        new Thread(
+                new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    doImport(process, worker);
+                } catch (TaskFailedException ex) {
+                    worker.getLogger().log(Level.SEVERE, null, ex);
+                }
+            }
+        }).start();
+        return Condition.CONTINUE;
+    }
+
+    private void doImport(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         try {
+            Ts.get().suspendChangeNotifications();
             I_ConfigAceFrame config = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
             String fileName = (String) process.getProperty(
                     ProcessAttachmentKeys.DEFAULT_FILE.getAttachmentKey());
@@ -109,7 +130,7 @@ public class ImportOwlConcepts extends AbstractTask {
             ConceptVersionBI topParent = Ts.get().getConceptVersion(config.getViewCoordinate(), topParentUuid);
             semanticTag = topParent.getDescriptionFullySpecified().getText();
             semanticTag = semanticTag.substring(semanticTag.lastIndexOf("("), semanticTag.lastIndexOf(")") + 1);
-            
+
             //get concepts in OWL to import
             OwlConceptConverter converter = new OwlConceptConverter(file);
             converter.convert();
@@ -122,6 +143,7 @@ public class ImportOwlConcepts extends AbstractTask {
                     Set<ConceptChronicleBI> concepts = Ts.get().getConceptChronicle(owl.getSctId().toString());
                     if (concepts.size() == 1) {
                         ConceptChronicleBI concept = concepts.iterator().next();
+                        HashSet<UUID> relsSeen = new HashSet<>();
                         //get parents
                         for (String parentId : owl.getParents()) {
                             OwlConcept parentOwl = owlConcepts.get(parentId);
@@ -137,23 +159,25 @@ public class ImportOwlConcepts extends AbstractTask {
                                         //check if relationship exists
                                         ConceptVersionBI conceptVersion = concept.getVersion(config.getViewCoordinate());
                                         boolean addRel = true;
-                                        for(RelationshipVersionBI rel : conceptVersion.getRelationshipsOutgoingActiveIsa()){
-                                            if(rel.getTargetNid() == parent.getConceptNid()){
+                                        for (RelationshipVersionBI rel : conceptVersion.getRelationshipsOutgoingActiveIsa()) {
+                                            if (rel.getTargetNid() == parent.getConceptNid()) {
                                                 addRel = false;
                                                 existingRels++;
+                                                relsSeen.add(rel.getPrimUuid());
                                                 break;
                                             }
                                         }
                                         //add new
-                                        if(addRel){
+                                        if (addRel) {
                                             RelationshipCAB rel = new RelationshipCAB(
                                                     concept.getConceptNid(),
                                                     Snomed.IS_A.getLenient().getConceptNid(),
                                                     parent.getConceptNid(),
                                                     0,
                                                     TkRelationshipType.STATED_HIERARCHY);
-                                            builder.construct(rel);
-                                            Ts.get().addUncommittedNoChecks(Ts.get().getConcept(rel.getSourceNid()));
+                                            RelationshipChronicleBI newRel = builder.construct(rel);
+                                            relsSeen.add(newRel.getPrimUuid());
+//                                        Ts.get().addUncommittedNoChecks(Ts.get().getConcept(rel.getSourceNid()));
                                             importCount++;
                                         }
                                     } else {
@@ -172,42 +196,59 @@ public class ImportOwlConcepts extends AbstractTask {
                                             0,
                                             TkRelationshipType.STATED_HIERARCHY);
                                     //check for previously imported
-                                    if(!Ts.get().hasUuid(relBp.getComponentUuid())){
+                                    if (!Ts.get().hasUuid(relBp.getComponentUuid())) {
                                         builder.construct(relBp);
-                                        Ts.get().addUncommittedNoChecks(Ts.get().getConcept(relBp.getSourceNid()));
+                                        relsSeen.add(relBp.getComponentUuid());
+//                                    Ts.get().addUncommittedNoChecks(Ts.get().getConcept(relBp.getSourceNid()));
                                         importCount++;
-                                    }else{
+                                    } else {
+                                        relsSeen.add(relBp.getComponentUuid());
                                         existingRels++;
                                     }
                                 }
-                            }else if(parentId.equalsIgnoreCase("thing")) {
+                            } else if (parentId.equalsIgnoreCase("thing")) {
                                 //check if relationship exists
                                 ConceptVersionBI conceptVersion = concept.getVersion(config.getViewCoordinate());
                                 boolean addRel = true;
                                 for (RelationshipVersionBI rel : conceptVersion.getRelationshipsOutgoingActiveIsa()) {
                                     if (rel.getTargetNid() == Ts.get().getNidForUuids(topParentUuid)) {
                                         addRel = false;
+                                        relsSeen.add(rel.getPrimUuid());
                                         existingRels++;
                                         break;
                                     }
                                 }
                                 //add new
-                                if(addRel){
+                                if (addRel) {
                                     RelationshipCAB relBp = new RelationshipCAB(
-                                                concept.getConceptNid(),
-                                                Snomed.IS_A.getLenient().getConceptNid(),
-                                                Ts.get().getNidForUuids(topParentUuid),
-                                                0,
-                                                TkRelationshipType.STATED_HIERARCHY);
-                                    builder.construct(relBp);
-                                    Ts.get().addUncommittedNoChecks(Ts.get().getConcept(relBp.getSourceNid()));
+                                            concept.getConceptNid(),
+                                            Snomed.IS_A.getLenient().getConceptNid(),
+                                            Ts.get().getNidForUuids(topParentUuid),
+                                            0,
+                                            TkRelationshipType.STATED_HIERARCHY);
+                                    RelationshipChronicleBI newRel = builder.construct(relBp);
+                                    relsSeen.add(newRel.getPrimUuid());
+//                                Ts.get().addUncommittedNoChecks(Ts.get().getConcept(relBp.getSourceNid()));
                                     importCount++;
                                 }
-                            }else {
+                            } else {
                                 worker.getLogger().info("No parent concepts in file. For concept "
                                         + owl.getFsn());
                             }
                         }
+                        //retire exisitng is-a rels that aren't part of definition
+                        ConceptVersionBI conceptVersion = concept.getVersion(config.getViewCoordinate());
+                        for (RelationshipVersionBI rel : conceptVersion.getRelationshipsOutgoingActiveIsa()) {
+                            if (!relsSeen.contains(rel.getPrimUuid()) 
+                                    && rel.getCharacteristicNid() != SnomedMetadataRfx.getREL_CH_INFERRED_RELATIONSHIP_NID()
+                                    && rel.getTypeNid() == Snomed.IS_A.getLenient().getConceptNid()) {
+                                RelationshipCAB relBp = rel.makeBlueprint(config.getViewCoordinate());
+                                relBp.setRetired();
+                                relBp.setComponentUuidNoRecompute(rel.getPrimUuid());
+                                RelationshipChronicleBI construct = builder.construct(relBp);
+                            }
+                        }
+                        Ts.get().addUncommittedNoChecks(conceptVersion);
                     } else if (concepts.isEmpty()) {
                         worker.getLogger().info("No concepts found for SCT ID: "
                                 + owl.getSctId());
@@ -222,32 +263,17 @@ public class ImportOwlConcepts extends AbstractTask {
                     }
                 }
             }
+            Ts.get().resumeChangeNotifications();
             Ts.get().commit();
-            config.setStatusMessage("Import complete. Total imported: " + importCount +
-                    " Existing rels: " + existingRels + " Existing concepts: " + existingConcepts);
+            config.setStatusMessage("Import complete. Total imported: " + importCount
+                    + " Existing rels: " + existingRels + " Existing concepts: " + existingConcepts);
             importCount = 0;
             existingRels = 0;
             existingConcepts = 0;
-            return Condition.CONTINUE;
-        } catch (IntrospectionException e) {
-            throw new TaskFailedException(e);
-        } catch (IllegalArgumentException e) {
-            throw new TaskFailedException(e);
-        } catch (IllegalAccessException e) {
-            throw new TaskFailedException(e);
-        } catch (InvocationTargetException e) {
-            throw new TaskFailedException(e);
-        } catch (ParseException e) {
-            throw new TaskFailedException(e);
-        } catch (IOException e) {
-            throw new TaskFailedException(e);
-        } catch (InvalidCAB e) {
-            throw new TaskFailedException(e);
-        } catch (UnsupportedDialectOrLanguage e) {
-            throw new TaskFailedException(e);
-        } catch (NoSuchAlgorithmException e) {
-            throw new TaskFailedException(e);
+        } catch (IntrospectionException | IllegalArgumentException | IllegalAccessException | InvocationTargetException | IOException | ContradictionException | ParseException | InvalidCAB | TaskFailedException | UnsupportedDialectOrLanguage | NoSuchAlgorithmException ex) {
+            throw new TaskFailedException(ex);
         }
+
     }
 
     private UUID addNewConcept(OwlConcept owl, I_Work worker, TerminologyBuilderBI builder) throws IOException,
@@ -383,7 +409,7 @@ public class ImportOwlConcepts extends AbstractTask {
     public void setFileProp(String fileProp) {
         this.fileProp = fileProp;
     }
-    
+
     public String getParentConceptPropName() {
         return parentConceptPropName;
     }

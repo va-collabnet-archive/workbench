@@ -493,22 +493,25 @@ public class ConceptViewSettings extends ArenaComponentSettings {
 
 	protected ConceptNavigator getNavigator() {
 
-		if (getHost() != null) {
-			if (getHost().getTermComponent() != null) {
-				SwingUtilities.invokeLater(new Runnable() {
-					@Override
-					public void run() {
-						try {
-							PathExpander epl = new PathExpander(navigatorTree, config, (ConceptChronicleBI) getHost().getTermComponent());
-
-							ACE.threadPool.submit(epl);
-						} catch (IOException e) {
-							AceLog.getAppLog().alertAndLogException(e);
-						}
-					}
-				});
-			}
-		}
+//Commenting out for now, is slowing down the view of the history panel when working with retired concepts
+//as navigator is trying to show the concept in the taxonomy.
+            
+//		if (getHost() != null) {
+//			if (getHost().getTermComponent() != null) {
+//				SwingUtilities.invokeLater(new Runnable() {
+//					@Override
+//					public void run() {
+//						try {
+//							PathExpander epl = new PathExpander(navigatorTree, config, (ConceptChronicleBI) getHost().getTermComponent());
+//
+//							ACE.threadPool.submit(epl);
+//						} catch (IOException e) {
+//							AceLog.getAppLog().alertAndLogException(e);
+//						}
+//					}
+//				});
+//			}
+//		}
 
 		return navigator;
 	}

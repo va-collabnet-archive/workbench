@@ -43,7 +43,12 @@ public class TranslationTermChangeListener extends TermChangeListener {
 
     @Override
     public void changeNotify(long sequence, Set<Integer> sourcesOfChangedRels, Set<Integer> targetsOfChangedRels, Set<Integer> referencedComponentsOfChangedRefexs, Set<Integer> changedComponents, Set<Integer> changedComponentAlerts, Set<Integer> changedComponentTypes, boolean fromClassification) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    	ChangeListenerSwingWorker worker = new ChangeListenerSwingWorker(sequence, 
+    			sourcesOfChangedRels, 
+    			targetsOfChangedRels, 
+                referencedComponentsOfChangedRefexs, 
+                changedComponents);
+		worker.execute();
     }
 
 	private class ChangeListenerSwingWorker extends SwingWorker<Boolean, Boolean> {

@@ -168,7 +168,7 @@ public class EnumBasedPreferencesTest extends TestCase {
         // Construct a custom QueuePreferences object with some service item properties.
         final String queueDisplayName = "some other display";
         final String queueId = getRandomString(STRING_LENGTH);
-        final File queueDirectory = new File("some other location");
+        final File queueDirectory = new File("queues/some other location");
         final Boolean readInsteadOfTake = Boolean.TRUE;
         final QueueType queueType = new QueueType(QueueType.Types.OUTBOX);
         QueuePreferences qp1 = new QueuePreferences(queueDisplayName, queueId, queueDirectory,

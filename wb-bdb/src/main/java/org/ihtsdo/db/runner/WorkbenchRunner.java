@@ -71,6 +71,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
+import org.ihtsdo.batch.BatchActionEditorPanel;
 import org.ihtsdo.ttk.preferences.TtkPreferences;
 
 public class WorkbenchRunner {
@@ -183,7 +184,11 @@ public class WorkbenchRunner {
                 wbProperties.loadFromXML(new FileInputStream(wbPropertiesFile));
                 initialized = Boolean.parseBoolean((String) wbProperties.get("initialized"));
             }
-
+            ChangeSetWriterHandler.writeCommitRecord = true;
+            ACE.refsetOnly = false;
+            EConceptChangeSetWriter.writeDebugFiles = false;
+            BatchActionEditorPanel.batchEditingDisabled = false;
+            
             SvnHelper svnHelper = new SvnHelper(WorkbenchRunner.class);
 
             if ((acePropertiesFileExists == false) || (initialized == false)) {

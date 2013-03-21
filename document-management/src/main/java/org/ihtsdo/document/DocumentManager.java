@@ -50,6 +50,7 @@ import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
+import org.apache.lucene.index.IndexNotFoundException;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
@@ -94,6 +95,7 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.ComputationCanceled;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.document.DictionaryResultsDialog;
 import org.ihtsdo.helper.time.TimeHelper;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.TerminologyBuilderBI;
@@ -385,11 +387,13 @@ public class DocumentManager {
 				}
 			}
 
+		} catch (IndexNotFoundException e) {
+			// no translation memory, return empty results
 		} catch (IOException e) {
 			AceLog.getAppLog().alertAndLogException(e);
 		} catch (ParseException e) {
 			AceLog.getAppLog().alertAndLogException(e);
-		}
+		} 
 		return results;
 	}
 

@@ -368,4 +368,28 @@ public class WorkList extends WorkflowRefset implements Serializable, WorkListBI
 	public int compareTo(WorkList o) {
 		return this.name.compareTo(o.getName());
 	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + id;
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		WorkList other = (WorkList) obj;
+		if (id != other.id)
+			return false;
+		return true;
+	}
+	
+	
 }

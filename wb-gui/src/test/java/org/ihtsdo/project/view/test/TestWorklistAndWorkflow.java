@@ -54,11 +54,13 @@ import org.ihtsdo.project.workflow.model.WfState;
 import org.ihtsdo.project.workflow.model.WfUser;
 import org.ihtsdo.project.workflow.model.WorkflowDefinition;
 import org.ihtsdo.tk.api.Precedence;
+import org.junit.Ignore;
+import org.junit.Test;
 
 /**
  * The Class TestTerminologyProjectDAOForWorkSetsCRUD.
  */
-public class TestExport extends TestCase {
+public class TestWorklistAndWorkflow extends TestCase {
 
     /**
      * The vodb directory.
@@ -102,27 +104,27 @@ public class TestExport extends TestCase {
      */
     protected void setUp() throws Exception {
         super.setUp();
-        System.out.println("Deleting test fixture");
-        deleteDirectory(new File("berkeley-db"));
-        System.out.println("Creating test fixture");
-        copyDirectory(new File("/Users/alo/Desktop/berkeley-db"), new File("berkeley-db"));
-        vodbDirectory = new File("berkeley-db");
-        dbSetupConfig = new DatabaseSetupConfig();
-        System.out.println("Opening database");
-        Terms.createFactory(vodbDirectory, readOnly, cacheSize, dbSetupConfig);
-        tf = (I_ImplementTermFactory) Terms.get();
-        config = getTestConfig();
-        tf.setActiveAceFrameConfig(config);
-
-        I_GetConceptData projectConcept = null;
-        try {
-            projectConcept = tf.getConcept(new UUID[]{UUID.fromString("3efb77c9-1369-3728-a001-faa7ac668efd")});
-        } catch (TerminologyException e) {
-            AceLog.getAppLog().alertAndLogException(e);
-        } catch (IOException e) {
-            AceLog.getAppLog().alertAndLogException(e);
-        }
-        project = TerminologyProjectDAO.getTranslationProject(projectConcept, config);
+//        System.out.println("Deleting test fixture");
+//        deleteDirectory(new File("berkeley-db"));
+//        System.out.println("Creating test fixture");
+////        copyDirectory(new File("/Users/alo/Desktop/berkeley-db"), new File("berkeley-db"));
+//        vodbDirectory = new File("berkeley-db");
+//        dbSetupConfig = new DatabaseSetupConfig();
+//        System.out.println("Opening database");
+//        Terms.createFactory(vodbDirectory, readOnly, cacheSize, dbSetupConfig);
+//        tf = (I_ImplementTermFactory) Terms.get();
+//        config = getTestConfig();
+//        tf.setActiveAceFrameConfig(config);
+//
+//        I_GetConceptData projectConcept = null;
+//        try {
+//            projectConcept = tf.getConcept(new UUID[]{UUID.fromString("3efb77c9-1369-3728-a001-faa7ac668efd")});
+//        } catch (TerminologyException e) {
+//            AceLog.getAppLog().alertAndLogException(e);
+//        } catch (IOException e) {
+//            AceLog.getAppLog().alertAndLogException(e);
+//        }
+//        project = TerminologyProjectDAO.getTranslationProject(projectConcept, config);
     }
 
     /* (non-Javadoc)
@@ -135,30 +137,31 @@ public class TestExport extends TestCase {
     /**
      * Test new workflow.
      */
+    @Ignore("Ignored becuase setup has user specific class paths...") @Test
     public void testCreateNewProject() {
-        try {
-            I_GetConceptData partitionConcept = tf.getConcept(UUID.fromString("d88283f4-53c2-4b8b-ae37-428264feaeba"));
-            Partition partition = TerminologyProjectDAO.getPartition(partitionConcept, config);
-            WorkflowDefinition wfDef = getWfDefinition();
-            WorkList workList = TerminologyProjectDAO.generateWorkListFromPartition(partition,
-                    wfDef, getWorkflowMembers(wfDef), "Worklist test 1", config,
-                    Terms.get().newActivityPanel(true, config, "<html>Generating Worklist from partition", true));
-            Terms.get().commit();
-            WorkListMember member = workList.getWorkListMembers().iterator().next();
-
-            WorkflowInterpreter wfInt = WorkflowInterpreter.createWorkflowInterpreter(wfDef);
-
-            System.out.println(wfInt.getNextDestination(member.getWfInstance(), workList));
-            //workList.getPromotionRefset(config).setPromotionStatus(member.getId(), statusConceptId)
-
-
-        } catch (TerminologyException e) {
-            AceLog.getAppLog().alertAndLogException(e);
-        } catch (IOException e) {
-            AceLog.getAppLog().alertAndLogException(e);
-        } catch (Exception e) {
-            AceLog.getAppLog().alertAndLogException(e);
-        }
+//        try {
+//            I_GetConceptData partitionConcept = tf.getConcept(UUID.fromString("d88283f4-53c2-4b8b-ae37-428264feaeba"));
+//            Partition partition = TerminologyProjectDAO.getPartition(partitionConcept, config);
+//            WorkflowDefinition wfDef = getWfDefinition();
+//            WorkList workList = TerminologyProjectDAO.generateWorkListFromPartition(partition,
+//                    wfDef, getWorkflowMembers(wfDef), "Worklist test 1", config,
+//                    Terms.get().newActivityPanel(true, config, "<html>Generating Worklist from partition", true));
+//            Terms.get().commit();
+//            WorkListMember member = workList.getWorkListMembers().iterator().next();
+//
+//            WorkflowInterpreter wfInt = WorkflowInterpreter.createWorkflowInterpreter(wfDef);
+//
+//            System.out.println(wfInt.getNextDestination(member.getWfInstance(), workList));
+//            //workList.getPromotionRefset(config).setPromotionStatus(member.getId(), statusConceptId)
+//
+//
+//        } catch (TerminologyException e) {
+//            AceLog.getAppLog().alertAndLogException(e);
+//        } catch (IOException e) {
+//            AceLog.getAppLog().alertAndLogException(e);
+//        } catch (Exception e) {
+//            AceLog.getAppLog().alertAndLogException(e);
+//        }
     }
 
     /**

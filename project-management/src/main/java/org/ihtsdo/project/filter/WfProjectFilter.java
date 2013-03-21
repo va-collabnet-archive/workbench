@@ -16,8 +16,14 @@
  */
 package org.ihtsdo.project.filter;
 
+import java.io.IOException;
 import java.util.UUID;
 
+import org.dwfa.ace.api.Terms;
+import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.project.TerminologyProjectDAO;
+import org.ihtsdo.project.model.I_TerminologyProject;
+import org.ihtsdo.project.model.WorkList;
 import org.ihtsdo.tk.workflow.api.WfFilterBI;
 import org.ihtsdo.tk.workflow.api.WfProcessInstanceBI;
 
@@ -27,7 +33,7 @@ import org.ihtsdo.tk.workflow.api.WfProcessInstanceBI;
 public class WfProjectFilter implements WfFilterBI {
 
 	/** The TYPE. */
-	private final String TYPE = "WF_WORKLIST_FILTER";
+	private final String TYPE = "WF_PROJECT_FILTER";
 
 	/** The worklist uuid. */
 	private UUID projectUUID;
@@ -49,8 +55,15 @@ public class WfProjectFilter implements WfFilterBI {
 	 */
 	@Override
 	public boolean evaluateInstance(WfProcessInstanceBI instance) {
-		//return this.projectUUID.equals(instance.getWorkList().getUuid());
-		return true;
+		try {
+			I_TerminologyProject project = TerminologyProjectDAO.getProjectForWorklist((WorkList)instance.getWorkList(), Terms.get().getActiveAceFrameConfig());
+			return projectUUID.equals(project.getUids().iterator().next());
+		} catch (TerminologyException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return false;
 	}
 
 	public UUID getProjectUUID() {

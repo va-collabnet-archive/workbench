@@ -500,4 +500,9 @@ public class TerminologyHelperDrools {
 		return false;
 	}
 	
+    public boolean isDescriptionTextNotUniqueInProvidedHierarchy(String descText, String conceptUuid, 
+            String hierarchyConceptUuid) throws Exception {
+    	return false;
+    }
+	
 }

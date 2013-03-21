@@ -40,7 +40,7 @@ import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 import org.ihtsdo.project.ProjectPermissionsAPI;
-import org.ihtsdo.project.model.TranslationProject;
+import org.ihtsdo.project.model.I_TerminologyProject;
 import org.ihtsdo.project.view.TranslationProjectDialog;
 
 /**
@@ -127,7 +127,7 @@ public class GetTranslationProject extends AbstractTask {
             }
 
             TranslationProjectDialog dialog = new TranslationProjectDialog();
-            TranslationProject project = dialog.showModalDialog();
+            I_TerminologyProject project = dialog.showModalDialog();
             if (project != null) {
                 process.setProperty(projectPropName, project);
             } else {

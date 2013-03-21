@@ -93,7 +93,7 @@ public class AddUuidListListToListView extends AbstractTask {
 
             final List<List<UUID>> idListList = (ArrayList<List<UUID>>) process.getProperty(uuidListListPropName);
             AceLog.getAppLog().info("Adding list of size: " + idListList.size());
-
+            config.setStatusMessage("Adding list of size: " + idListList.size());
             SwingUtilities.invokeAndWait(new Runnable() {
 
                 public void run() {
@@ -112,7 +112,7 @@ public class AddUuidListListToListView extends AbstractTask {
                 }
 
             });
-
+            config.setStatusMessage("");
             return Condition.CONTINUE;
         } catch (IntrospectionException e) {
             throw new TaskFailedException(e);

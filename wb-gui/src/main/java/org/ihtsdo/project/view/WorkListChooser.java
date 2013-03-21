@@ -49,6 +49,7 @@ import javax.swing.event.ListSelectionListener;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.ihtsdo.project.TerminologyProjectDAO;
 import org.ihtsdo.project.model.I_TerminologyProject;
+import org.ihtsdo.project.model.TranslationProject;
 import org.ihtsdo.project.model.WorkList;
 import org.ihtsdo.project.model.WorkSet;
 
@@ -98,7 +99,7 @@ public class WorkListChooser extends JDialog {
 		workListModel = new DefaultListModel();
 		workListList.setModel(workListModel);
 		
-		List<I_TerminologyProject> projects = TerminologyProjectDAO.getAllProjects(config);
+		List<TranslationProject> projects = TerminologyProjectDAO.getAllTranslationProjects(config);
 		projectComboModel.addElement("");
 		for (I_TerminologyProject iTerminologyProject : projects) {
 			projectComboModel.addElement(iTerminologyProject);
