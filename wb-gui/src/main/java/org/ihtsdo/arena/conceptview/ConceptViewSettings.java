@@ -196,10 +196,17 @@ public class ConceptViewSettings extends ArenaComponentSettings {
 
 		if (navButton.isSelected()) {
 			navButton.doClick();
-
 			return true;
 		}
 
+		return false;
+	}
+	
+	public boolean hideAiNavigator(){
+		if(aiButton.isSelected()){
+			aiButton.doClick();
+			return true;
+		}
 		return false;
 	}
 
@@ -660,7 +667,7 @@ public class ConceptViewSettings extends ArenaComponentSettings {
 
 		button.setPreferredSize(new Dimension(21, 16));
 		button.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-		button.setToolTipText("show wl navigator");
+		button.setToolTipText("show workflow history");
 		button.setOpaque(false);
 		button.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
 
