@@ -106,14 +106,7 @@ public class EConcept extends TkConcept implements I_AmChangeSetObject {
          media.add(eImage);
       }
 
-      boolean addRefsetMembers = false;
-        if(!c.isAnnotationStyleRefex()){
-            addRefsetMembers = true;
-        }else if(c.isAnnotationStyleRefex() && c.isAnnotationIndex()){
-            addRefsetMembers = true;
-            System.out.println("*** FOUND indexed annotation: " + c.toLongString());
-        }
-        if (addRefsetMembers) {
+      if (!c.isAnnotationStyleRefex()) {
          Collection<? extends I_ExtendByRef> members = getRefsetMembers(c.getNid());
 
          if (members != null) {
