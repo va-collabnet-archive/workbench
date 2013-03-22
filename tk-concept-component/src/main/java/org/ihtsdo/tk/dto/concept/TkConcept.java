@@ -190,8 +190,14 @@ public class TkConcept {
             TkMedia tkMedia = new TkMedia(mediaChronicle);
             media.add(tkMedia);
         }
-
-        if (!conceptChronicle.isAnnotationStyleRefex()) {
+        boolean addRefsetMembers = false;
+        if(!conceptChronicle.isAnnotationStyleRefex()){
+            addRefsetMembers = true;
+        }else if(conceptChronicle.isAnnotationStyleRefex() && conceptChronicle.isAnnotationIndex()){
+            addRefsetMembers = true;
+            System.out.println("*** FOUND indexed annotation: " + conceptChronicle.toLongString());
+        }
+        if (addRefsetMembers) {
             Collection<? extends RefexChronicleBI> members = conceptChronicle.getRefsetMembers();
 
             if (members != null) {
