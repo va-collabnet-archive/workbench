@@ -1,6 +1,5 @@
 variant|text
 abetalipoproteinaemia|abetalipoproteinemia
-acanthamoeba|acanthameba
 acanthamoebiasis|acanthamebiasis
 acatalasaemia|acatalasemia
 acidaemia|acidemia
@@ -23,7 +22,6 @@ alphalipoproteinaemia|alphalipoproteinemia
 aluminium|aluminum
 amenorrhoea|amenorrhea
 aminolaevulinate|aminolevulinate
-amoebae|amebae
 amoeba|ameba
 amoebiasis|amebiasis
 amoebicides|amebicides
@@ -111,7 +109,6 @@ chequebook|checkbook
 cheques|checks
 cheque|check
 chilli|chili
-chimaera|chimera
 chloridorrhoea|chloridorrhea
 cholaemia|cholemia
 cholecystoenteric|cholecystenteric
@@ -160,7 +157,6 @@ devascularisation|devascularization
 devitalising|devitalizing
 diarrhoea|diarrhea
 dienoestrol|dienestrol
-dientamoeba|dientameba
 digitalised|digitalized
 dimethylsulphoxide|dimethylsulfoxide
 dioptre|diopter
@@ -194,7 +190,6 @@ encephalocoele|encephalocele
 endotoxaemia|endotoxemia
 energiser|energizer
 enquire|inquire
-entamoeba|entameba
 enterohaemorrhagic|enterohemorrhagic
 epimenorrhoea|epimenorrhea
 epithelialisation|epithelialization
@@ -229,7 +224,6 @@ floatation|flotation
 foetal|fetal
 foetoscope|fetoscope
 foetoscopic|fetoscopic
-foetus|fetus
 fraenal|frenal
 fraenectomy|frenectomy
 fraenoplasty|frenoplasty
@@ -250,7 +244,6 @@ glycinaemia|glycinemia
 goitre|goiter
 goldsodiumthiosulphate|goldsodiumthiosulfate
 gonococcaemia|gonococcemia
-gonorrhoeae|gonorrheae
 gonorrhoea|gonorrhea
 grammes|grams
 gramme|gram
@@ -275,7 +268,6 @@ haemangiosarcoma|hemangiosarcoma
 haemarthrosis|hemarthrosis
 haematemesis|hematemesis
 haematinic|hematinic
-haematobium|hematobium
 haematocele|hematocele
 haematocoele|hematocele
 haematocolpos|hematocolpos
@@ -319,7 +311,6 @@ haemopexin|hemopexin
 haemophiliac|hemophiliac
 haemophilia|hemophilia
 haemophilic|hemophilic
-haemophilus|hemophilus
 haemophthalmos|hemophthalmos
 haemopneumothorax|hemopneumothorax
 haemopoietic|hemopoietic
@@ -632,7 +623,6 @@ otorrhoea|otorrhea
 outmanoeuvre|outmaneuver
 oxidised|oxidized
 oxyhaemoglobin|oxyhemoglobin
-ozaena|ozena
 paediatrician|pediatrician
 paediatric|pediatric
 paediatrics|pediatrics
@@ -644,7 +634,6 @@ panelling|paneling
 panellist|panelist
 papilloedema|papilledema
 paraesthesia|paresthesia
-parahaemolyticus|parahemolyticus
 paraoesophageal|paraesophageal
 paraproteinaemia|paraproteinemia
 penalisation|penalization
@@ -732,7 +721,6 @@ spermatocoele|spermatocele
 spiralled|spiraled
 spirochaetal|spirochetal
 spirochaetes|spirochetes
-spirochaete|spirochete
 stabilisation|stabilization
 stabilised|stabilized
 stabiliser|stabilizer
