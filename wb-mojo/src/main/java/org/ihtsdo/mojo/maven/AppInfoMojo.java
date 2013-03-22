@@ -16,6 +16,9 @@
  */
 package org.ihtsdo.mojo.maven;
 
+import static org.dwfa.bpa.util.AppInfoProperties.ARCHETYPE_ARTIFACT_ID;
+import static org.dwfa.bpa.util.AppInfoProperties.ARCHETYPE_GROUP_ID;
+import static org.dwfa.bpa.util.AppInfoProperties.ARCHETYPE_VERSION;
 import static org.dwfa.bpa.util.AppInfoProperties.ARTIFACT_ID;
 import static org.dwfa.bpa.util.AppInfoProperties.GROUP_ID;
 import static org.dwfa.bpa.util.AppInfoProperties.SITE_URL;
@@ -76,7 +79,8 @@ public class AppInfoMojo extends AbstractMojo {
     private String version;
 
     /**
-     * The site URL.  Allowed to be null.
+     * The site URL.
+     * May be {@code null}.
      *
      * @parameter expression="${siteURL}"
      */
@@ -84,25 +88,25 @@ public class AppInfoMojo extends AbstractMojo {
 
     /**
      * The groupId of the archetype which generated this project.
-     *
+     * May be {@code null}.
+     * 
      * @parameter expression="${archetypeGroupId}"
-     * @required
      */
     private String archetypeGroupId;
 
     /**
      * The artifactId of the archetype which generated this project.
+     * May be {@code null}.
      *
      * @parameter expression="${archetypeArtifactId}"
-     * @required
      */
     private String archetypeArtifactId;
 
     /**
      * The version of the archetype which generated this project.
+     * May be {@code null}.
      *
      * @parameter expression="${archetypeVersion}"
-     * @required
      */
     private String archetypeVersion;
 
@@ -129,10 +133,9 @@ public class AppInfoMojo extends AbstractMojo {
        }
 
        // Archetype properties.
-       // TODO: Factor keys out as constant somewhere.
-       appInfoProperties.setProperty("archetypeGroupId", archetypeGroupId);
-       appInfoProperties.setProperty("archetypeArtifactId", archetypeArtifactId);
-       appInfoProperties.setProperty("archetypeVersion", archetypeVersion);
+       appInfoProperties.setProperty(ARCHETYPE_GROUP_ID, archetypeGroupId);
+       appInfoProperties.setProperty(ARCHETYPE_ARTIFACT_ID, archetypeArtifactId);
+       appInfoProperties.setProperty(ARCHETYPE_VERSION, archetypeVersion);
 
        // Write out to file.
        File profileRoot = new File(wbBundleDir, "profiles");

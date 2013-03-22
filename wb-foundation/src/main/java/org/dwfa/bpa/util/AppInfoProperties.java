@@ -18,11 +18,16 @@ import java.util.Properties;
  * @author ocarlsen
  */
 public final class AppInfoProperties {
-
+    
     public static final String GROUP_ID = "groupId";
     public static final String ARTIFACT_ID = "artifactId";
     public static final String VERSION = "version";
+    
     public static final String SITE_URL = "siteURL";
+
+    public static final String ARCHETYPE_GROUP_ID = "archetypeGroupId";
+    public static final String ARCHETYPE_ARTIFACT_ID = "archetypeArtifactId";
+    public static final String ARCHETYPE_VERSION = "archetypeVersion";
 
     private static final Properties APP_INFO = new Properties();
     
