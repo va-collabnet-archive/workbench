@@ -132,10 +132,16 @@ public class AppInfoMojo extends AbstractMojo {
            appInfoProperties.setProperty(SITE_URL, siteURL); 
        }
 
-       // Archetype properties.
-       appInfoProperties.setProperty(ARCHETYPE_GROUP_ID, archetypeGroupId);
-       appInfoProperties.setProperty(ARCHETYPE_ARTIFACT_ID, archetypeArtifactId);
-       appInfoProperties.setProperty(ARCHETYPE_VERSION, archetypeVersion);
+       // Archetype properties, if specified.
+       if (archetypeGroupId != null) {
+           appInfoProperties.setProperty(ARCHETYPE_GROUP_ID, archetypeGroupId);
+       }
+       if (archetypeArtifactId != null) {
+           appInfoProperties.setProperty(ARCHETYPE_ARTIFACT_ID, archetypeArtifactId);
+       }
+       if (archetypeVersion != null) {
+           appInfoProperties.setProperty(ARCHETYPE_VERSION, archetypeVersion);
+       }
 
        // Write out to file.
        File profileRoot = new File(wbBundleDir, "profiles");
