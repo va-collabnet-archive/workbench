@@ -19,6 +19,9 @@
  */
 package org.dwfa.bpa.util;
 
+import static org.dwfa.bpa.util.AppInfoProperties.ARCHETYPE_ARTIFACT_ID;
+import static org.dwfa.bpa.util.AppInfoProperties.ARCHETYPE_GROUP_ID;
+import static org.dwfa.bpa.util.AppInfoProperties.ARCHETYPE_VERSION;
 import static org.dwfa.bpa.util.AppInfoProperties.ARTIFACT_ID;
 import static org.dwfa.bpa.util.AppInfoProperties.GROUP_ID;
 import static org.dwfa.bpa.util.AppInfoProperties.SITE_URL;
@@ -36,6 +39,7 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
+import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.ImageIcon;
@@ -44,6 +48,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
 
 /**
  * @author kec
@@ -116,33 +121,59 @@ public class AboutBox {
     }
 
     private static JLabel createVersionLabel() {
-        // Get from properties from AppInfo.
-        String groupId = AppInfoProperties.getProperty(GROUP_ID);
-        String artifactId = AppInfoProperties.getProperty(ARTIFACT_ID);
-        String version = AppInfoProperties.getProperty(VERSION);
-        String site_url = AppInfoProperties.getProperty(SITE_URL);
-        
-        String labelText = "Version " + groupId + ":" + artifactId + ":" + version;
-        JLabel label = null;
+        Properties appInfoProperties = AppInfoProperties.getProperties();
+        String projectId = buildProjectId(appInfoProperties); 
+        String archetypeId = buildArchetypeId(appInfoProperties); 
+
+        // Get site URL properties from AppInfo.
+        // These are not required, and may be null.
+        String siteURL = AppInfoProperties.getProperty(SITE_URL);
 
         // Build a link label if site is specified, a plain old label otherwise.
-        if (site_url != null) {
-            label = createLinkLabel(site_url, labelText);           
+        JLabel label = null;
+        if (siteURL != null) {
+            label = createLinkLabel(siteURL, projectId, archetypeId);           
         } else {
-            label = new JLabel(labelText);
+            label = createPlainLabel(projectId, archetypeId);
         }
 
         // Center label within dialog. 
-        label.setHorizontalAlignment(SwingConstants.CENTER);
         label.setVerticalAlignment(SwingConstants.CENTER);
         label.setBorder(new EmptyBorder(0, 0, 5, 0));  // Padding on bottom.
         
         return label;
     }
 
-    private static JLabel createLinkLabel(String siteURL, String labelText) {
+    static String buildProjectId(Properties appInfoProperties) {
+        // Get project properties from AppInfo.
+        // These are @required in AppInfoMojo.
+        String groupId = appInfoProperties.getProperty(GROUP_ID);
+        String artifactId = appInfoProperties.getProperty(ARTIFACT_ID);
+        String version = appInfoProperties.getProperty(VERSION);
+        
+        return groupId + ":" + artifactId + ":" + version;
+    }
+
+    static String buildArchetypeId(Properties appInfoProperties) {
+        // Get archetype properties from AppInfo.
+        // These are not required, and may be null.
+        String archetypeGroupId = appInfoProperties.getProperty(ARCHETYPE_GROUP_ID);
+        String archetypeArtifactId = appInfoProperties.getProperty(ARCHETYPE_ARTIFACT_ID);
+        String archetypeVersion = appInfoProperties.getProperty(ARCHETYPE_VERSION);
+        
+        // Some older POMs may not have archetype information embedded.
+        // If any of these properties are null, abort.
+        if ((archetypeGroupId == null) || (archetypeArtifactId == null) || (archetypeVersion == null)) {
+            return null;
+        }
+        
+        return archetypeGroupId+ ":" + archetypeArtifactId + ":" + archetypeVersion;
+    }
+
+    private static JLabel createLinkLabel(final String siteURL, String projectId, String archetypeId) {
         final String href = buildHref(siteURL);
-        JLabel label = new JLabel("<html><a href=\"" + href + "\">" + labelText + "</a></html>");
+        String labelText = buildLabelText(href, projectId, archetypeId);
+        JLabel label = new JLabel(labelText);
         label.setCursor(new Cursor(Cursor.HAND_CURSOR));
         
         // Open browser on mouse click.
@@ -161,6 +192,11 @@ public class AboutBox {
         return label;
     }
 
+    private static JLabel createPlainLabel(String projectId, String archetypeId) {
+        String labelText = buildLabelText(null, projectId, archetypeId);
+        return new JLabel(labelText);
+    }
+
     private static String buildHref(String siteURL) {
         // Prevent double-slash URLs, which break generated site.
         if (siteURL.endsWith("/")) {
@@ -168,6 +204,26 @@ public class AboutBox {
         } else {
             return siteURL + "/index.html";
         }
+    }
+
+    static String buildLabelText(String href, String projectId, String archetypeId) {
+        StringBuilder labelTextBuilder = new StringBuilder("<html><blockquote>");
+        
+        // Link project version if href is not null.
+        if (href != null) {
+            labelTextBuilder.append("Project version <a href=\"" + href + "\">" + projectId + "</a>");
+        } else {
+            labelTextBuilder.append("Project version " + projectId);
+        }
+        
+        // Append archetype text if not null.
+        if (archetypeId != null) {
+            labelTextBuilder.append("<br>Built from " + archetypeId);
+        }
+        
+        labelTextBuilder.append("</blockquote></html>");
+       
+        return labelTextBuilder.toString();
     }
 
     public static String removeQuotes(String str) {
