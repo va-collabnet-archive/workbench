@@ -86,7 +86,6 @@ import org.dwfa.tapi.ComputationCanceled;
 import org.ihtsdo.project.ProjectPermissionsAPI;
 import org.ihtsdo.project.TerminologyProjectDAO;
 import org.ihtsdo.project.help.HelpApi;
-import org.ihtsdo.project.model.PartitionMember;
 import org.ihtsdo.project.model.PartitionScheme;
 import org.ihtsdo.project.model.WorkSet;
 import org.ihtsdo.project.model.WorkSetMember;

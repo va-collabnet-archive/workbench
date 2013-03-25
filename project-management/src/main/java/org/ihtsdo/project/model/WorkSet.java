@@ -211,6 +211,17 @@ public class WorkSet extends WorkflowRefset implements Serializable{
 		I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
 		return TerminologyProjectDAO.getAllWorkSetMembers(this, config);
 	}
+	/**
+	 * Gets the work set members.
+	 *
+	 * @return the work set members
+	 * @throws TerminologyException the terminology exception
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
+	public List<WorkSetMember> getWorkSetMembers(int count) throws TerminologyException, IOException {
+		I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
+		return TerminologyProjectDAO.getAllWorkSetMembers(this, config);
+	}
 
 	/**
 	 * Gets the serial version uid.

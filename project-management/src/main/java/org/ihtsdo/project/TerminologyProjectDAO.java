@@ -2888,11 +2888,41 @@ public class TerminologyProjectDAO {
 		List<WorkSetMember> workSetMembers = new ArrayList<WorkSetMember>();
 		try {
 			Collection<? extends I_ExtendByRef> membersExtensions = termFactory.getRefsetExtensionMembers(workset.getId());
-			Thread.sleep(100);
 			for (I_ExtendByRef extension : membersExtensions) {
 				I_ExtendByRefPart lastPart = getLastExtensionPart(extension);
 				if (isActive(lastPart.getStatusNid())) {
 					workSetMembers.add(getWorkSetMember(termFactory.getConcept(extension.getComponentNid()), workset.getId(), config));
+				}
+			}
+		} catch (Exception e) {
+			AceLog.getAppLog().alertAndLogException(e);
+		}
+		return workSetMembers;
+	}
+	/**
+	 * Gets the all work set members.
+	 * 
+	 * @param workset
+	 *            the workset
+	 * @param config
+	 *            the config
+	 * 
+	 * @return the all work set members
+	 */
+	public static List<WorkSetMember> getWorkSetMembersByCount(WorkSet workset, I_ConfigAceFrame config, int count) {
+		I_TermFactory termFactory = Terms.get();
+		List<WorkSetMember> workSetMembers = new ArrayList<WorkSetMember>();
+		try {
+			Collection<? extends I_ExtendByRef> membersExtensions = termFactory.getRefsetExtensionMembers(workset.getId());
+			int i = 0;
+			for (I_ExtendByRef extension : membersExtensions) {
+				I_ExtendByRefPart lastPart = getLastExtensionPart(extension);
+				if (isActive(lastPart.getStatusNid())) {
+					workSetMembers.add(getWorkSetMember(termFactory.getConcept(extension.getComponentNid()), workset.getId(), config));
+					i++;
+				}
+				if(i == count){
+					break;
 				}
 			}
 		} catch (Exception e) {
@@ -4732,28 +4762,6 @@ public class TerminologyProjectDAO {
 			I_GetConceptData partitionMemberConcept = partitionMember.getConcept();
 			ViewCoordinate vc = config.getViewCoordinate();
 			TerminologyBuilderBI tc = Ts.get().getTerminologyBuilder(config.getEditCoordinate(), config.getViewCoordinate());
-			// int inactiveNid =
-			// SnomedMetadataRf1.RETIRED_INACTIVE_STATUS_RF1.getLenient().getNid();
-			// UUID inactiveUuid =
-			// SnomedMetadataRf1.RETIRED_INACTIVE_STATUS_RF1.getLenient().getPrimUuid();
-
-			// Collection<? extends I_ExtendByRef> extensions =
-			// termFactory.getAllExtensionsForComponent(partitionMemberConcept.getConceptNid());
-			// Collection<? extends RefexChronicleBI<?>> extensions =
-			// partitionMemberConcept.getRefsetMembers();
-			//
-			//
-			// for (RefexChronicleBI<?> extension : extensions) {
-			// if (extension.getRefexNid() ==
-			// partitionConcept.getConceptNid()) {
-			// RefexCAB newSpec = new RefexCAB(TK_REFEX_TYPE.CID,
-			// extension.getReferencedComponentNid(),
-			// partitionConcept.getNid());
-			// newSpec.put(RefexProperty.CNID1, inactiveNid);
-			// newSpec.setStatusUuid(inactiveUuid);
-			// RefexChronicleBI<?> newRefex = tc.constructIfNotCurrent(newSpec);
-			// }
-			// }
 
 			Collection<? extends RefexChronicleBI<?>> extensions = partitionMemberConcept.getRefexes();
 			for (RefexChronicleBI<?> extensionBI : extensions) {
@@ -4763,7 +4771,7 @@ public class TerminologyProjectDAO {
 					I_ExtendByRefPartStr part = (I_ExtendByRefPartStr) lastPart;
 					for (PathBI editPath : config.getEditingPathSet()) {
 						part.makeAnalog(SnomedMetadataRf2.INACTIVE_VALUE_RF2.getLenient().getNid(), Long.MAX_VALUE, config.getDbConfig().getUserConcept().getNid(), config.getEditCoordinate().getModuleNid(), editPath.getConceptNid());
-						if (part instanceof RefexVersionBI) {
+						if (part instanceof RefexVersionBI && !part.getClass().toString().contains("StrMember")) {
 							extension.addVersion(part);
 						}
 					}
