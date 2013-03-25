@@ -19,7 +19,10 @@ package org.dwfa.ace.task.reporting;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.Calendar;
 import java.util.Collection;
+import java.util.GregorianCalendar;
+import java.util.Locale;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -92,7 +95,8 @@ public class CreateDescriptionsDiffRefsets extends AbstractTask {
 				this.waitTillDone(worker.getLogger());
 			}
 			if (!canceled) {
-				String refsetNamePrefix = "Comparison Jan 12 to Jul 11";
+				Calendar c = new GregorianCalendar();
+				String refsetNamePrefix = c.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.US) + " "  +c.get(Calendar.YEAR);
 				String initialTime1 = dialog.getInitTime();// "2011.01.31 23:59:59 CST";
 				String laterTime2 = dialog.getLaterTime();// "2011.07.31 23:59:59 CST";
 				UUID path1UUID = dialog.getUUID1();// UUID.fromString("8c230474-9f11-30ce-9cad-185a96fd03a2");
