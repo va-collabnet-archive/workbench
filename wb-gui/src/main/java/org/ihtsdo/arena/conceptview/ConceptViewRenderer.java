@@ -119,7 +119,7 @@ public class ConceptViewRenderer extends JLayeredPane {
 	private final JButton cancelButton;
 	private final JButton commitButton;
 	private final JButton acceptButton;
-        private final JButton promoteButton;
+	private final JButton promoteButton;
 	private final JButton conflictButton;
 	private WfHxDetailsPanelHandler wfHxDetails;
 	private final JLabel workflowStatusLabel;
@@ -204,6 +204,7 @@ public class ConceptViewRenderer extends JLayeredPane {
 		@Override
 		public void ancestorRemoved(AncestorEvent event) {
 			settings.hideNavigator();
+			settings.hideAiNavigator();
 			wfHxDetails.hideWfHxDetailsPanel();
 			setWorkflowStatusLabel();
 		}
@@ -211,6 +212,7 @@ public class ConceptViewRenderer extends JLayeredPane {
 		@Override
 		public void ancestorAdded(AncestorEvent event) {
 			settings.hideNavigator();
+			settings.hideAiNavigator();
 			wfHxDetails.hideWfHxDetailsPanel();
 			setWorkflowStatusLabel(settings.getConcept());
 		}
@@ -250,8 +252,7 @@ public class ConceptViewRenderer extends JLayeredPane {
 	private JSplitPane workflowPanel = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
 	private JPanel applicationWorkflowPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
 	private JPanel conceptWorkflowPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
-	private JScrollPane workflowScrollPane = new JScrollPane(workflowPanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
-			ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+	private JScrollPane workflowScrollPane = new JScrollPane(workflowPanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 	private WizardPanel wizardPanel;
 	private JScrollPane wizardScrollPane;
 	private JScrollPane conceptScrollPane;
@@ -276,8 +277,7 @@ public class ConceptViewRenderer extends JLayeredPane {
 	public ConceptViewRenderer(Object cellObj, final mxGraphComponent graphContainer, I_ConfigAceFrame config) {
 
 		wizardPanel = new WizardPanel(new FlowLayout(FlowLayout.LEADING, 10, 10), this);
-		wizardScrollPane = new JScrollPane(wizardPanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
-				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+		wizardScrollPane = new JScrollPane(wizardPanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		this.kbFiles.add(new File("drools-rules/ContextualConceptActionsPanel.drl"));
 		if (new File("drools-rules/extras/ContextualConceptActionsPanelXtra.drl").exists()) {
 			kbFiles.add(new File("drools-rules/extras/ContextualConceptActionsPanelXtra.drl"));
@@ -422,11 +422,11 @@ public class ConceptViewRenderer extends JLayeredPane {
 
 									JComboBox<WfActivityBI> jcombo = new JComboBox<WfActivityBI>();
 									Set<WfActivityBI> activiteisSet = new HashSet<WfActivityBI>();
- 									for (WfActivityBI wfActivityBI : activities) {
- 										activiteisSet.add(wfActivityBI);
+									for (WfActivityBI wfActivityBI : activities) {
+										activiteisSet.add(wfActivityBI);
 									}
- 									for (WfActivityBI wfActivityBI2 : activiteisSet) {
- 										jcombo.addItem(wfActivityBI2);
+									for (WfActivityBI wfActivityBI2 : activiteisSet) {
+										jcombo.addItem(wfActivityBI2);
 									}
 									JButton advanceWorkflowButton = new JButton("GO");
 									advanceWorkflowButton.addActionListener(new WorkflowActionListener(jcombo, wfProcessInstanceBI));
@@ -446,10 +446,7 @@ public class ConceptViewRenderer extends JLayeredPane {
 					}
 
 				} else {
-					AceLog.getAppLog().log(
-							Level.WARNING,
-							"Unable to find AdvanceWorkflow.bp file at path specified: " + advanceWorkflowActionPath + File.separator
-									+ advanceWorkflowActionFile);
+					AceLog.getAppLog().log(Level.WARNING, "Unable to find AdvanceWorkflow.bp file at path specified: " + advanceWorkflowActionPath + File.separator + advanceWorkflowActionFile);
 				}
 
 				workflowPanel.setTopComponent(applicationWorkflowPanel);
@@ -493,9 +490,7 @@ public class ConceptViewRenderer extends JLayeredPane {
 									actualPossibilities[counter++] = s;
 								}
 
-								String s = (String) JOptionPane.showInputDialog(selectedOverrideButton.getParent(), "Select a workflow state:",
-										"Override", JOptionPane.PLAIN_MESSAGE,
-										new ImageIcon(BatchMonitor.class.getResource("/24x24/plain/flag_green.png")), actualPossibilities,
+								String s = (String) JOptionPane.showInputDialog(selectedOverrideButton.getParent(), "Select a workflow state:", "Override", JOptionPane.PLAIN_MESSAGE, new ImageIcon(BatchMonitor.class.getResource("/24x24/plain/flag_green.png")), actualPossibilities,
 										actualPossibilities[0]);
 
 								if ((s != null) && (s.length() > 0)) {
@@ -512,8 +507,7 @@ public class ConceptViewRenderer extends JLayeredPane {
 									// TODO: REMOVE HARD CODING!!!
 									// TODO: Override Action Handler. . . Not
 									// sure how used
-									worker.writeAttachment(ProcessAttachmentKeys.SELECTED_WORKFLOW_ACTION.name(),
-											ArchitectonicAuxiliary.Concept.WORKFLOW_OVERRIDE_ACTION.getPrimoridalUid());
+									worker.writeAttachment(ProcessAttachmentKeys.SELECTED_WORKFLOW_ACTION.name(), ArchitectonicAuxiliary.Concept.WORKFLOW_OVERRIDE_ACTION.getPrimoridalUid());
 
 									I_GetConceptData selectedConcept = settings.getConcept();
 
@@ -596,8 +590,7 @@ public class ConceptViewRenderer extends JLayeredPane {
 
 						action.perform(wfInstance);
 
-						WorkflowInterpreter wi = WorkflowInterpreter.createWorkflowInterpreter(((WfProcessDefinition) wfInstance
-								.getProcessDefinition()).getDefinition());
+						WorkflowInterpreter wi = WorkflowInterpreter.createWorkflowInterpreter(((WfProcessDefinition) wfInstance.getProcessDefinition()).getDefinition());
 						WfUser nextDestination = wi.getNextDestination((WfInstance) wfInstance, (WorkList) wfInstance.getWorkList());
 
 						if (nextDestination != null) {
@@ -610,14 +603,16 @@ public class ConceptViewRenderer extends JLayeredPane {
 						for (WfActivityBI wfActivityBI : activities) {
 							combo.addItem(wfActivityBI);
 						}
+						if (settings.activityInstanceNav != null && settings.activityInstanceNav.isVisible()) {
+							settings.activityInstanceNav.updateActivityInstances(Terms.get().getConcept(wfInstance.getComponentPrimUuid()));
+						}
 					} catch (Exception ex) {
 						ex.printStackTrace();
 					}
 				}
 			}
 
-			private void capWorkflowSetup(boolean capWorkflow, Collection<UUID> availableActions, File wfBpFile,
-					final Collection<? extends WorkflowHistoryJavaBeanBI> possibleActions) {
+			private void capWorkflowSetup(boolean capWorkflow, Collection<UUID> availableActions, File wfBpFile, final Collection<? extends WorkflowHistoryJavaBeanBI> possibleActions) {
 
 				try {
 					if (capWorkflow) {
@@ -625,21 +620,14 @@ public class ConceptViewRenderer extends JLayeredPane {
 
 						for (final UUID action : availableActions) {
 							I_GetConceptData actionConcept = Terms.get().getConcept(action);
-							List<RelationshipVersionBI<?>> relList = WorkflowHelper.getWorkflowRelationship(actionConcept.getVersion(viewCoord),
-									ArchitectonicAuxiliary.Concept.WORKFLOW_ACTION_VALUE);
+							List<RelationshipVersionBI<?>> relList = WorkflowHelper.getWorkflowRelationship(actionConcept.getVersion(viewCoord), ArchitectonicAuxiliary.Concept.WORKFLOW_ACTION_VALUE);
 
 							for (RelationshipVersionBI<?> rel : relList) {
-								if (rel != null
-										&& rel.getTargetNid() == Terms.get()
-												.getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_USER_ACTION.getPrimoridalUid()).getConceptNid()) {
+								if (rel != null && rel.getTargetNid() == Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_USER_ACTION.getPrimoridalUid()).getConceptNid()) {
 									JButton advanceWorkflowButton = new JButton();
 
 									BpAction a = (BpAction) actionFactory.make(wfBpFile);
-									a.getExtraAttachments().put(
-											ProcessAttachmentKeys.SELECTED_WORKFLOW_ACTION.name(),
-											WorkflowHelper.lookupAction(
-													WorkflowHelper.identifyPrefTerm(actionConcept.getConceptNid(), viewCoord)
-															+ WORKFLOW_ACTION_SUFFIX, viewCoord).getPrimUuid());
+									a.getExtraAttachments().put(ProcessAttachmentKeys.SELECTED_WORKFLOW_ACTION.name(), WorkflowHelper.lookupAction(WorkflowHelper.identifyPrefTerm(actionConcept.getConceptNid(), viewCoord) + WORKFLOW_ACTION_SUFFIX, viewCoord).getPrimUuid());
 									a.getExtraAttachments().put(ProcessAttachmentKeys.POSSIBLE_WF_ACTIONS_LIST.name(), possibleActions);
 
 									advanceWorkflowButton.setAction(a);
@@ -825,8 +813,8 @@ public class ConceptViewRenderer extends JLayeredPane {
 			acceptButton.setCursor(Cursor.getDefaultCursor());
 			footerPanel.add(acceptButton, gbc);
 		}
-                
-                promoteButton = new JButton(new ImageIcon(ACE.class.getResource("/16x16/plain/navigate_check.png")));
+
+		promoteButton = new JButton(new ImageIcon(ACE.class.getResource("/16x16/plain/navigate_check.png")));
 		if (settings.isForPromotion()) {
 			gbc.gridx++;
 			promoteButton.setToolTipText("mark as ready for promotion");
@@ -947,7 +935,7 @@ public class ConceptViewRenderer extends JLayeredPane {
 				if (settings.isForAdjudication()) {
 					acceptButton.setVisible(false);
 				}
-                                if (settings.isForPromotion()) {
+				if (settings.isForPromotion()) {
 					promoteButton.setVisible(false);
 				}
 			} else {
@@ -956,7 +944,7 @@ public class ConceptViewRenderer extends JLayeredPane {
 				if (settings.isForAdjudication()) {
 					acceptButton.setVisible(true);
 				}
-                                if (settings.isForPromotion()) {
+				if (settings.isForPromotion()) {
 					promoteButton.setVisible(true);
 				}
 
