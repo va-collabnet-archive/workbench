@@ -47,8 +47,7 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
-import javax.swing.border.EmptyBorder;
-import javax.swing.border.LineBorder;
+import javax.swing.SwingUtilities;
 
 /**
  * @author kec
@@ -64,7 +63,7 @@ public class AboutBox {
     private static JDialog setupAbout(JFrame parent) {
 
         String title = getTitle();
-        JDialog aboutBox = new JDialog(parent, title);
+        final JDialog aboutBox = new JDialog(parent, title);
 
         String graphic = getGraphic();
         URL aboutBoxUrl = aboutBox.getClass().getResource(graphic);
@@ -87,12 +86,36 @@ public class AboutBox {
             aboutLabel = new JLabel("Cannot find " + graphic);
         }
 
+        // On some platforms, changing the resizable state affects
+        // the insets of the Dialog.  As a result, multiple calls
+        // to pack() can change the size of the dialog.  Fix that here
+        // by preemptively calling setResizeable before the first pack().
+        aboutBox.setResizable(false);
+
         // As a convenience, JDialog adds to the contentPane directly.
         aboutBox.add(aboutLabel, BorderLayout.CENTER);
-        JLabel versionLabel = createVersionLabel();
+        final JLabel versionLabel = createVersionLabel();
         aboutBox.add(versionLabel, BorderLayout.SOUTH);
         aboutBox.pack();
         aboutBox.setModal(true);
+
+        // Listen for mouse clicks on aboutLabel to show versionLabel.
+        aboutLabel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent ev) {
+                // Require Ctrl + "left click".
+                if (ev.isControlDown() && SwingUtilities.isLeftMouseButton(ev)) {
+                    
+                    // Toggle visibility.
+                    boolean visible = versionLabel.isVisible();
+                    versionLabel.setVisible(! visible);
+                    
+                    // Update dialog bounds to accommodate new component.
+                    aboutBox.pack();
+                }
+            }
+        });
+
         return aboutBox;
     }
 
@@ -139,8 +162,10 @@ public class AboutBox {
 
         // Center label within dialog. 
         label.setVerticalAlignment(SwingConstants.CENTER);
-        label.setBorder(new EmptyBorder(0, 0, 5, 0));  // Padding on bottom.
-        
+
+        // Make invisible until activated by user.
+        label.setVisible(false);
+
         return label;
     }
 
