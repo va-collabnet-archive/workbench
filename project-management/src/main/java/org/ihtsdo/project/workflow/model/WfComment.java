@@ -65,7 +65,7 @@ public class WfComment implements WfCommentBI {
 		comment = formatComment(string + " - Time: " + date);
 		role = "Commenter";
 		try {
-			author = new WfUser(Terms.get().getActiveAceFrameConfig().getUsername(), UUID.randomUUID());
+			author = new WfUser(Terms.get().getActiveAceFrameConfig().getDbConfig().getUsername(), UUID.randomUUID());
 		} catch (TerminologyException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
