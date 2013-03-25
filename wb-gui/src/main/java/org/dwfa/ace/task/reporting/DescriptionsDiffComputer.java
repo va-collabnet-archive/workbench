@@ -215,7 +215,7 @@ public class DescriptionsDiffComputer {
 				String desc = descriptionVersionBI.toUserString();
 				if(desc.contains(refsetNamePrefix) && desc.contains("_")){
 					String[] splited = desc.split("_");
-					String[] splited2 = splited[1].split("(");
+					String[] splited2 = splited[1].split("\\(");
 					Integer currentNum = Integer.parseInt(splited2[0].trim());
 					if(currentNum >  num){
 						num = currentNum + 1;
