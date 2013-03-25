@@ -208,7 +208,7 @@ public class DescriptionsDiffComputer {
 		Collection<I_ConceptualizeUniversally> types;
 		ConceptVersionBI refsetIdentity = ts.getConceptVersion(config.getViewCoordinate(),RefsetAuxiliary.Concept.REFSET_IDENTITY.getPrimoridalUid());
 		Collection<? extends ConceptVersionBI> relationships = refsetIdentity.getRelationshipsIncomingSourceConceptsActive();
-		Integer num = 1;
+		Integer num = 0;
 		for (ConceptVersionBI conceptVersionBI : relationships) {
 			Collection<? extends DescriptionVersionBI> fsns = conceptVersionBI.getDescriptionsFullySpecifiedActive();
 			for (DescriptionVersionBI descriptionVersionBI : fsns) {
@@ -217,7 +217,7 @@ public class DescriptionsDiffComputer {
 					String[] splited = desc.split("_");
 					String[] splited2 = splited[1].split("\\(");
 					Integer currentNum = Integer.parseInt(splited2[0].trim());
-					if(currentNum >  num){
+					if(currentNum >=  num){
 						num = currentNum + 1;
 					}
 				}else if(desc.contains(refsetNamePrefix) && !desc.contains("_")){
