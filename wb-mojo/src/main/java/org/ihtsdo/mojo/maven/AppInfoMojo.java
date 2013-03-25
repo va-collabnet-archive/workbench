@@ -16,6 +16,9 @@
  */
 package org.ihtsdo.mojo.maven;
 
+import static org.dwfa.bpa.util.AppInfoProperties.ARCHETYPE_ARTIFACT_ID;
+import static org.dwfa.bpa.util.AppInfoProperties.ARCHETYPE_GROUP_ID;
+import static org.dwfa.bpa.util.AppInfoProperties.ARCHETYPE_VERSION;
 import static org.dwfa.bpa.util.AppInfoProperties.ARTIFACT_ID;
 import static org.dwfa.bpa.util.AppInfoProperties.GROUP_ID;
 import static org.dwfa.bpa.util.AppInfoProperties.SITE_URL;
@@ -76,11 +79,36 @@ public class AppInfoMojo extends AbstractMojo {
     private String version;
 
     /**
-     * The site URL.  Allowed to be null.
+     * The site URL.
+     * May be {@code null}.
      *
      * @parameter expression="${siteURL}"
      */
     private String siteURL;
+
+    /**
+     * The groupId of the archetype which generated this project.
+     * May be {@code null}.
+     * 
+     * @parameter expression="${archetypeGroupId}"
+     */
+    private String archetypeGroupId;
+
+    /**
+     * The artifactId of the archetype which generated this project.
+     * May be {@code null}.
+     *
+     * @parameter expression="${archetypeArtifactId}"
+     */
+    private String archetypeArtifactId;
+
+    /**
+     * The version of the archetype which generated this project.
+     * May be {@code null}.
+     *
+     * @parameter expression="${archetypeVersion}"
+     */
+    private String archetypeVersion;
 
     public void execute() throws MojoExecutionException, MojoFailureException {
         try {
@@ -102,6 +130,17 @@ public class AppInfoMojo extends AbstractMojo {
        // Set workbench site properties, if specified.
        if (siteURL != null) {
            appInfoProperties.setProperty(SITE_URL, siteURL); 
+       }
+
+       // Archetype properties, if specified.
+       if (archetypeGroupId != null) {
+           appInfoProperties.setProperty(ARCHETYPE_GROUP_ID, archetypeGroupId);
+       }
+       if (archetypeArtifactId != null) {
+           appInfoProperties.setProperty(ARCHETYPE_ARTIFACT_ID, archetypeArtifactId);
+       }
+       if (archetypeVersion != null) {
+           appInfoProperties.setProperty(ARCHETYPE_VERSION, archetypeVersion);
        }
 
        // Write out to file.
