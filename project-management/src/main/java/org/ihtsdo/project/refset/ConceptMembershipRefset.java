@@ -26,6 +26,8 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
+import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
+import org.ihtsdo.tk.api.changeset.ChangeSetGenerationThreadingPolicy;
 
 /**
  * The Class ConceptMembershipRefset.
@@ -90,7 +92,7 @@ public class ConceptMembershipRefset extends ConceptRefset {
 
             tf.addUncommittedNoChecks(newMembershipConcept);
 
-            tf.commit();
+            newMembershipConcept.commit(ChangeSetGenerationPolicy.INCREMENTAL, ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);
 
             newConceptMembershipRefset = new ConceptMembershipRefset(newMembershipConcept);
 

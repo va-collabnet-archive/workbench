@@ -29,6 +29,8 @@ import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.TerminologyBuilderBI;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB.RefexProperty;
+import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
+import org.ihtsdo.tk.api.changeset.ChangeSetGenerationThreadingPolicy;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.refex.type_nid_nid.RefexNidNidVersionBI;
@@ -245,7 +247,7 @@ public class PromotionAndAssignmentRefset extends PromotionRefset {
             RefexNidNidVersionBI oldStatusCC = (RefexNidNidVersionBI) oldStatus;
             // dual revision prevention
             if (oldStatus.getTime() == Long.MAX_VALUE) {
-                termFactory.commit();
+            	component.commit(ChangeSetGenerationPolicy.INCREMENTAL, ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);
             }
             RefexCAB newSpec = new RefexCAB(
                     TK_REFEX_TYPE.CID_CID,
@@ -347,7 +349,7 @@ public class PromotionAndAssignmentRefset extends PromotionRefset {
             statusAlreadyPresent = true;
             // dual revision prevention
             if (oldStatus.getTime() == Long.MAX_VALUE) {
-                termFactory.commit();
+            	component.commit(ChangeSetGenerationPolicy.INCREMENTAL, ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);
             }
             RefexCAB newSpec = new RefexCAB(
                     TK_REFEX_TYPE.CID_CID,
@@ -438,7 +440,7 @@ public class PromotionAndAssignmentRefset extends PromotionRefset {
             RefexNidNidVersionBI oldStatusCC = (RefexNidNidVersionBI) oldStatus;
             // dual revision prevention
             if (oldStatus.getTime() == Long.MAX_VALUE) {
-                termFactory.commit();
+            	component.commit(ChangeSetGenerationPolicy.INCREMENTAL, ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);
             }
             RefexCAB newSpec = new RefexCAB(
                     TK_REFEX_TYPE.CID_CID,

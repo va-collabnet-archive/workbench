@@ -41,6 +41,8 @@ import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.Precedence;
+import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
+import org.ihtsdo.tk.api.changeset.ChangeSetGenerationThreadingPolicy;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 
 /**
@@ -98,7 +100,7 @@ public class ProjectPermissionsAPI {
                 tf.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()), 0, config);
 
         tf.addUncommittedNoChecks(user);
-        tf.commit();
+        permission.commit(ChangeSetGenerationPolicy.INCREMENTAL, ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);
     }
 
     /**
@@ -144,7 +146,7 @@ public class ProjectPermissionsAPI {
                     editPath.getConceptNid());
             relationship.getFixedPart().addVersion(newPart);
             tf.addUncommittedNoChecks(concept);
-            tf.commit();
+            concept.commit(ChangeSetGenerationPolicy.INCREMENTAL, ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);
         }
 
     }

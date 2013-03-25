@@ -144,7 +144,7 @@ public class CommentsRefset extends Refset {
             }
             termFactory.addUncommittedNoChecks(concept);
             termFactory.addUncommittedNoChecks(commentstMember);
-            termFactory.commit();
+            concept.commit(ChangeSetGenerationPolicy.INCREMENTAL, ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);
         } catch (TerminologyException e) {
             AceLog.getAppLog().alertAndLogException(e);
         } catch (IOException e) {

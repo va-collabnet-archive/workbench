@@ -114,6 +114,7 @@ import org.ihtsdo.tk.api.TerminologyBuilderBI;
 import org.ihtsdo.tk.api.TerminologyStoreDI;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB.RefexProperty;
+import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
 import org.ihtsdo.tk.api.changeset.ChangeSetGenerationThreadingPolicy;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
@@ -384,7 +385,7 @@ public class TerminologyProjectDAO {
 			project = new TranslationProject(projectWithMetadata.getName(), newConcept.getConceptNid(), newConcept.getUids());
 
 			termFactory.addUncommittedNoChecks(newConcept);
-			termFactory.commit();
+			newConcept.commit(ChangeSetGenerationPolicy.INCREMENTAL, ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);
 
 			// promote(newConcept, config);
 			//
@@ -445,7 +446,7 @@ public class TerminologyProjectDAO {
 			project = new TerminologyProject(projectWithMetadata.getName(), newConcept.getConceptNid(), newConcept.getUids());
 
 			termFactory.addUncommittedNoChecks(newConcept);
-			termFactory.commit();
+			newConcept.commit(ChangeSetGenerationPolicy.INCREMENTAL, ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);
 
 			// promote(newConcept, config);
 			//
@@ -504,7 +505,7 @@ public class TerminologyProjectDAO {
 			project = new MappingProject(projectWithMetadata.getName(), newConcept.getConceptNid(), newConcept.getUids());
 			
 			termFactory.addUncommittedNoChecks(newConcept);
-			termFactory.commit();
+			newConcept.commit(ChangeSetGenerationPolicy.INCREMENTAL, ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);
 			
 			// promote(newConcept, config);
 			//
@@ -978,14 +979,15 @@ public class TerminologyProjectDAO {
 			termFactory.addUncommittedNoChecks(newConcept);
 			termFactory.addUncommittedNoChecks(newCommentsConcept);
 			termFactory.addUncommittedNoChecks(newPromotionConcept);
-			termFactory.commit();
 			// promote(newConcept, config);
 			// promote(newCommentsConcept, config);
 			// promote(newPromotionConcept, config);
 			// termFactory.addUncommittedNoChecks(newConcept);
 			// termFactory.addUncommittedNoChecks(newCommentsConcept);
 			// termFactory.addUncommittedNoChecks(newPromotionConcept);
-			termFactory.commit();
+			newConcept.commit(ChangeSetGenerationPolicy.INCREMENTAL, ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);
+			newCommentsConcept.commit(ChangeSetGenerationPolicy.INCREMENTAL, ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);
+			newPromotionConcept.commit(ChangeSetGenerationPolicy.INCREMENTAL, ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);
 
 		} catch (TerminologyException e) {
 			AceLog.getAppLog().alertAndLogException(e);
@@ -1227,7 +1229,6 @@ public class TerminologyProjectDAO {
 						relVersioned.addVersion(newPart);
 					}
 					termFactory.addUncommittedNoChecks(refset);
-					termFactory.commit();
 					// //promote(relVersioned, config);
 					// termFactory.addUncommittedNoChecks(refset);
 					// termFactory.commit();
@@ -1235,7 +1236,7 @@ public class TerminologyProjectDAO {
 			}
 			// promote(refset, config);
 			// termFactory.addUncommittedNoChecks(refset);
-			termFactory.commit();
+			refset.commit(ChangeSetGenerationPolicy.INCREMENTAL, ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);
 		} catch (TerminologyException e) {
 			AceLog.getAppLog().alertAndLogException(e);
 		} catch (IOException e) {
@@ -1272,7 +1273,6 @@ public class TerminologyProjectDAO {
 						relVersioned.addVersion(newPart);
 					}
 					termFactory.addUncommittedNoChecks(project.getConcept());
-					termFactory.commit();
 					// promote(relVersioned, config);
 					// termFactory.addUncommittedNoChecks(project.getConcept());
 					// termFactory.commit();
@@ -1280,7 +1280,7 @@ public class TerminologyProjectDAO {
 			}
 			// promote(project.getConcept(), config);
 			// termFactory.addUncommittedNoChecks(project.getConcept());
-			// termFactory.commit();
+			project.getConcept().commit(ChangeSetGenerationPolicy.INCREMENTAL, ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);
 		} catch (TerminologyException e) {
 			AceLog.getAppLog().alertAndLogException(e);
 		} catch (IOException e) {
@@ -1317,7 +1317,6 @@ public class TerminologyProjectDAO {
 						relVersioned.addVersion(newPart);
 					}
 					termFactory.addUncommittedNoChecks(project.getConcept());
-					termFactory.commit();
 					// promote(relVersioned, config);
 					// termFactory.addUncommittedNoChecks(project.getConcept());
 					// termFactory.commit();
@@ -1325,7 +1324,7 @@ public class TerminologyProjectDAO {
 			}
 			// promote(project.getConcept(),config);
 			// termFactory.addUncommittedNoChecks(project.getConcept());
-			// termFactory.commit();
+			project.getConcept().commit(ChangeSetGenerationPolicy.INCREMENTAL, ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);
 		} catch (TerminologyException e) {
 			AceLog.getAppLog().alertAndLogException(e);
 		} catch (IOException e) {
@@ -1363,10 +1362,10 @@ public class TerminologyProjectDAO {
 						termFactory.getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids()), termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()), 0, config);
 
 				termFactory.addUncommittedNoChecks(refset);
-				termFactory.commit();
+				refset.commit(ChangeSetGenerationPolicy.INCREMENTAL, ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);
 				// promote(refset, config);
 				// termFactory.addUncommittedNoChecks(refset);
-				// termFactory.commit();
+				refset.commit(ChangeSetGenerationPolicy.INCREMENTAL, ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);
 			} catch (TerminologyException e) {
 				AceLog.getAppLog().alertAndLogException(e);
 			} catch (IOException e) {
@@ -1433,7 +1432,7 @@ public class TerminologyProjectDAO {
 						termFactory.getConcept(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids()), termFactory.getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids()), termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()), 0, config);
 
 				termFactory.addUncommittedNoChecks(project.getConcept());
-				termFactory.commit();
+				project.getConcept().commit(ChangeSetGenerationPolicy.INCREMENTAL, ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);
 				// promote(project.getConcept(), config);
 				// termFactory.addUncommittedNoChecks(project.getConcept());
 				// termFactory.commit();
@@ -1474,8 +1473,7 @@ public class TerminologyProjectDAO {
 						termFactory.getConcept(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids()), termFactory.getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids()), termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()), 0, config);
 
 				termFactory.addUncommittedNoChecks(project.getConcept());
-				termFactory.commit();
-				Thread.sleep(100);
+				project.getConcept().commit(ChangeSetGenerationPolicy.INCREMENTAL, ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);
 				// promote(project.getConcept(), config);
 				// termFactory.addUncommittedNoChecks(project.getConcept());
 				// termFactory.commit();
@@ -1517,7 +1515,6 @@ public class TerminologyProjectDAO {
 						relVersioned.addVersion(newPart);
 					}
 					termFactory.addUncommittedNoChecks(workSet.getConcept());
-					termFactory.commit();
 					// promote(relVersioned, config);
 					// termFactory.addUncommittedNoChecks(workSet.getConcept());
 					// termFactory.commit();
@@ -1530,7 +1527,7 @@ public class TerminologyProjectDAO {
 					termFactory.getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids()), termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()), 0, config);
 
 			termFactory.addUncommittedNoChecks(workSet.getConcept());
-			termFactory.commit();
+			workSet.getConcept().commit(ChangeSetGenerationPolicy.INCREMENTAL, ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);
 			// promote(workSet.getConcept(), config);
 			// termFactory.addUncommittedNoChecks(workSet.getConcept());
 			// termFactory.commit();
@@ -1571,7 +1568,7 @@ public class TerminologyProjectDAO {
 							relVersioned.addVersion(newPart);
 						}
 						termFactory.addUncommittedNoChecks(project.getConcept());
-						termFactory.commit();
+						//termFactory.commit();
 					}
 				}
 				// I_RelVersioned newRelationship =
@@ -1587,7 +1584,7 @@ public class TerminologyProjectDAO {
 						termFactory.getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids()), termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()), 0, config);
 
 				termFactory.addUncommittedNoChecks(project.getConcept());
-				termFactory.commit();
+				project.getConcept().commit(ChangeSetGenerationPolicy.INCREMENTAL, ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);
 			}
 		} catch (TerminologyException e) {
 			AceLog.getAppLog().alertAndLogException(e);
@@ -1622,7 +1619,7 @@ public class TerminologyProjectDAO {
 			newBluePrint.put(RefexProperty.STRING1, namespaceText);
 			Ts.get().getTerminologyBuilder(config.getEditCoordinate(), config.getViewCoordinate()).constructIfNotCurrent(newBluePrint);
 			termFactory.addUncommittedNoChecks(namespaceRefset);
-			termFactory.commit();
+			namespaceRefset.commit(ChangeSetGenerationPolicy.INCREMENTAL, ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);
 		} catch (Exception e) {
 			AceLog.getAppLog().alertAndLogException(e);
 		}
@@ -1655,14 +1652,13 @@ public class TerminologyProjectDAO {
 							relVersioned.addVersion(newPart);
 						}
 						termFactory.addUncommittedNoChecks(project.getConcept());
-						termFactory.commit();
 					}
 				}
 				I_RelVersioned newRelationship = termFactory.newRelationship(UUID.randomUUID(), project.getConcept(), termFactory.getConcept(ArchitectonicAuxiliary.Concept.HAS_RELEASE_PATH_REFSET_ATTRIBUTE.getUids()), concept,
 						termFactory.getConcept(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids()), termFactory.getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids()), termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()), 0, config);
 
 				termFactory.addUncommittedNoChecks(project.getConcept());
-				termFactory.commit();
+				project.getConcept().commit(ChangeSetGenerationPolicy.INCREMENTAL, ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);
 			}
 		} catch (TerminologyException e) {
 			AceLog.getAppLog().alertAndLogException(e);
@@ -1701,7 +1697,6 @@ public class TerminologyProjectDAO {
 							relVersioned.addVersion(newPart);
 						}
 						termFactory.addUncommittedNoChecks(project.getConcept());
-						termFactory.commit();
 						// Thread.sleep(100);
 						// // promote(project.getConcept(), config);
 						// //
@@ -1716,7 +1711,7 @@ public class TerminologyProjectDAO {
 						termFactory.getConcept(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids()), termFactory.getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids()), termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()), 0, config);
 
 				termFactory.addUncommittedNoChecks(project.getConcept());
-				termFactory.commit();
+				project.getConcept().commit(ChangeSetGenerationPolicy.INCREMENTAL, ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);
 				// Thread.sleep(100);
 				// promote(project.getConcept(), config);
 				// termFactory.addUncommittedNoChecks(project.getConcept());
@@ -1802,7 +1797,6 @@ public class TerminologyProjectDAO {
 							relVersioned.addVersion(newPart);
 						}
 						termFactory.addUncommittedNoChecks(project.getConcept());
-						termFactory.commit();
 						// promote(relVersioned, config);
 						// termFactory.addUncommittedNoChecks(project.getConcept());
 						// termFactory.commit();
@@ -1815,7 +1809,7 @@ public class TerminologyProjectDAO {
 						termFactory.getConcept(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids()), termFactory.getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids()), termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()), 0, config);
 
 				termFactory.addUncommittedNoChecks(project.getConcept());
-				termFactory.commit();
+				project.getConcept().commit(ChangeSetGenerationPolicy.INCREMENTAL, ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);
 				// promote(project.getConcept(), config);
 				// termFactory.addUncommittedNoChecks(project.getConcept());
 				// termFactory.commit();
@@ -1900,7 +1894,6 @@ public class TerminologyProjectDAO {
 							relVersioned.addVersion(newPart);
 						}
 						termFactory.addUncommittedNoChecks(project.getConcept());
-						termFactory.commit();
 						// promote(relVersioned, config);
 						// termFactory.addUncommittedNoChecks(project.getConcept());
 						// termFactory.commit();
@@ -1913,7 +1906,7 @@ public class TerminologyProjectDAO {
 						termFactory.getConcept(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids()), termFactory.getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids()), termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()), 0, config);
 
 				termFactory.addUncommittedNoChecks(project.getConcept());
-				termFactory.commit();
+				project.getConcept().commit(ChangeSetGenerationPolicy.INCREMENTAL, ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);
 				// promote(project.getConcept(), config);
 				// termFactory.addUncommittedNoChecks(project.getConcept());
 				// termFactory.commit();
@@ -2645,11 +2638,10 @@ public class TerminologyProjectDAO {
 					}
 					termFactory.addUncommittedNoChecks(workSetExtensionRefset);
 					termFactory.addUncommittedNoChecks(extension);
-					termFactory.commit();
 					// promote(extension, config);
 					// termFactory.addUncommittedNoChecks(workSetExtensionRefset);
 					// termFactory.addUncommittedNoChecks(extension);
-					termFactory.commit();
+					workSetExtensionRefset.commit(ChangeSetGenerationPolicy.INCREMENTAL, ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);
 				}
 			}
 			workSet = getWorkSet(workSetConcept, config);
@@ -3268,7 +3260,7 @@ public class TerminologyProjectDAO {
 			initializeWorkList(nacWorkListPartition, returnWorkList, config, updater);
 		}
 		Terms.get().addUncommittedNoChecks(returnWorkList.getConcept());
-		Terms.get().commit();
+		returnWorkList.getConcept().commit(ChangeSetGenerationPolicy.INCREMENTAL, ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);
 
 		TerminologyProjectDAO.workListCache.put(returnWorkList.getUids().iterator().next(), returnWorkList);
 
@@ -3316,7 +3308,6 @@ public class TerminologyProjectDAO {
 			Partition partition = workList.getPartition();
 			addConceptAsPartitionMember(concept, partition, config);
 			Terms.get().addUncommitted(partition.getConcept());
-			partition.getConcept().commit(config.getDbConfig().getUserChangesChangeSetPolicy().convert(), ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);
 			I_GetConceptData assingStatus = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_ASSIGNED_STATUS.getUids());
 			WorkListMember workListMember = new WorkListMember(concept.toString(), concept.getConceptNid(), concept.getUids(), workList.getUids().iterator().next(), assingStatus, new java.util.Date().getTime());
 			WorkflowInterpreter interpreter = WorkflowInterpreter.createWorkflowInterpreter(workList.getWorkflowDefinition());
@@ -3333,7 +3324,10 @@ public class TerminologyProjectDAO {
 				destination = new WfUser("user", ArchitectonicAuxiliary.Concept.USER.getPrimoridalUid());
 			}
 			addConceptAsWorkListMember(workListMember, Terms.get().uuidToNative(destination.getId()), config);
-			Terms.get().commit();
+			concept.commit(ChangeSetGenerationPolicy.INCREMENTAL, ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);
+			nacWorkSet.getConcept().commit(ChangeSetGenerationPolicy.INCREMENTAL, ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);
+			partition.getConcept().commit(ChangeSetGenerationPolicy.INCREMENTAL, ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);
+			workList.getConcept().commit(ChangeSetGenerationPolicy.INCREMENTAL, ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);
 		} catch (Exception e) {
 			AceLog.getAppLog().alertAndLogException(e);
 		}
@@ -3418,7 +3412,6 @@ public class TerminologyProjectDAO {
 		termFactory.addUncommittedNoChecks(workListRefset);
 		termFactory.addUncommittedNoChecks(newCommentsConcept);
 		termFactory.addUncommittedNoChecks(newPromotionConcept);
-		termFactory.commit();
 		// promote(newConcept, config);
 		// promote(newCommentsConcept, config);
 		// promote(newPromotionConcept, config);
@@ -3433,14 +3426,14 @@ public class TerminologyProjectDAO {
 			if (extension.getComponentNid() == newConcept.getConceptNid() && extension.getMutableParts().iterator().next().getTime() == Long.MAX_VALUE) {
 				termFactory.addUncommittedNoChecks(workListRefset);
 				termFactory.addUncommittedNoChecks(extension);
-				termFactory.commit();
 				// promote(extension, config);
 				// termFactory.addUncommittedNoChecks(workListRefset);
 				// termFactory.addUncommittedNoChecks(extension);
 				// termFactory.commit();
 			}
 		}
-
+		
+		workList.getConcept().commit(ChangeSetGenerationPolicy.INCREMENTAL, ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);
 		TerminologyProjectDAO.workListCache.put(workList.getUids().iterator().next(), workList);
 		return workList;
 	}
@@ -3680,7 +3673,7 @@ public class TerminologyProjectDAO {
 			partition.setConcept(newConcept);
 
 			termFactory.addUncommittedNoChecks(newConcept);
-			termFactory.commit();
+			newConcept.commit(ChangeSetGenerationPolicy.INCREMENTAL, ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);
 
 		} catch (TerminologyException e) {
 			AceLog.getAppLog().alertAndLogException(e);
@@ -3760,7 +3753,7 @@ public class TerminologyProjectDAO {
 			partitionScheme = new PartitionScheme(partitionSchemeWithMetadata.getName(), newConcept.getConceptNid(), newConcept.getUids(), partitionSchemeWithMetadata.getSourceRefsetUUID());
 
 			termFactory.addUncommittedNoChecks(newConcept);
-			termFactory.commit();
+			newConcept.commit(ChangeSetGenerationPolicy.INCREMENTAL, ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);
 			// promote(newConcept, config);
 			// termFactory.addUncommittedNoChecks(newConcept);
 			// termFactory.commit();
@@ -4811,7 +4804,7 @@ public class TerminologyProjectDAO {
 				conceptToRetireUpdatedFromDB.getConAttrs().addVersion(newAttributeVersion);
 			}
 			termFactory.addUncommittedNoChecks(conceptToRetireUpdatedFromDB);
-			termFactory.commit();
+			conceptToRetireUpdatedFromDB.commit(ChangeSetGenerationPolicy.INCREMENTAL, ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);
 			// promote(conceptToRetireUpdatedFromDB.getConceptAttributes(),
 			// config);
 			// promote(conceptToRetire, config);
@@ -4940,7 +4933,7 @@ public class TerminologyProjectDAO {
 		refsetHelper = Terms.get().getRefsetHelper(config);
 		initializeWorkSet(workSet, config, updater);
 		Terms.get().addUncommittedNoChecks(workSet.getConcept());
-		Terms.get().commit();
+		workSet.getConcept().commit(ChangeSetGenerationPolicy.INCREMENTAL, ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);
 		refsetHelper = null;
 		updater.finish();
 		return;
@@ -5160,7 +5153,7 @@ public class TerminologyProjectDAO {
 			initializeWorkList(partition, workList, config, updater);
 		}
 		Terms.get().addUncommittedNoChecks(workList.getConcept());
-		Terms.get().commit();
+		workList.getConcept().commit(ChangeSetGenerationPolicy.INCREMENTAL, ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);
 
 		TerminologyProjectDAO.workListCache.put(workList.getUids().iterator().next(), workList);
 		JOptionPane.showMessageDialog(null, "WorkList created!", "Success", JOptionPane.INFORMATION_MESSAGE);

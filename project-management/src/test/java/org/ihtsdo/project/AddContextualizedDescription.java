@@ -27,6 +27,8 @@ import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_ProcessConcepts;
 import org.dwfa.ace.api.Terms;
 import org.ihtsdo.project.ContextualizedDescription;
+import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
+import org.ihtsdo.tk.api.changeset.ChangeSetGenerationThreadingPolicy;
 
 /**
  * The Class AddContextualizedDescription.
@@ -84,7 +86,7 @@ public class AddContextualizedDescription implements I_ProcessConcepts {
 //		newDescription6.setText(UUID.randomUUID().toString());
 		Terms.get().addUncommittedNoChecks(loopConcept);
 		System.out.println(count + " - " + loopConcept);
-		Terms.get().commit();
+		loopConcept.commit(ChangeSetGenerationPolicy.INCREMENTAL, ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);
 	}
 
 }

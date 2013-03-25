@@ -30,6 +30,8 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
+import org.ihtsdo.tk.api.changeset.ChangeSetGenerationThreadingPolicy;
 
 /**
  * The Class LanguageMembershipRefset.
@@ -137,7 +139,7 @@ public class LanguageMembershipRefset extends WorkflowRefset {
             tf.addUncommittedNoChecks(newCommentsConcept);
             tf.addUncommittedNoChecks(newPromotionConcept);
 
-            tf.commit();
+            newMembershipConcept.commit(ChangeSetGenerationPolicy.INCREMENTAL, ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);
 
             newLanguageMembershipRerset = new LanguageMembershipRefset(newMembershipConcept, config);
 
@@ -215,13 +217,7 @@ public class LanguageMembershipRefset extends WorkflowRefset {
             tf.addUncommittedNoChecks(newMembershipConcept);
             tf.addUncommittedNoChecks(newCommentsConcept);
             tf.addUncommittedNoChecks(newPromotionConcept);
-            tf.commit();
-
-            tf.addUncommittedNoChecks(newMembershipConcept);
-            tf.addUncommittedNoChecks(newCommentsConcept);
-            tf.addUncommittedNoChecks(newPromotionConcept);
-
-            tf.commit();
+            newMembershipConcept.commit(ChangeSetGenerationPolicy.INCREMENTAL, ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);
 
             newLanguageMembershipRerset = new LanguageMembershipRefset(newMembershipConcept, config);
 
