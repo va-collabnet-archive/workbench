@@ -29,12 +29,15 @@ import org.dwfa.ace.task.commit.AlertToDataConstraintFailure;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
-import org.dwfa.cement.SNOMED;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 import org.ihtsdo.rules.RulesLibrary;
 import org.ihtsdo.rules.RulesLibrary.INFERRED_VIEW_ORIGIN;
+import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.RelAssertionType;
+import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 
 
 /**
@@ -87,10 +90,20 @@ public class TestUsingPreCommitContext extends AbstractConceptTest {
 			boolean forCommit) throws TaskFailedException {
 		List<AlertToDataConstraintFailure> alertList = new ArrayList<AlertToDataConstraintFailure>();
 		try {
+			ViewCoordinate myVc = new ViewCoordinate(Terms.get().getActiveAceFrameConfig().getViewCoordinate());
+			myVc.setRelationshipAssertionType(RelAssertionType.STATED);
+			ConceptVersionBI archAux = Ts.get().getConceptVersion(myVc, ArchitectonicAuxiliary.Concept.ARCHITECTONIC_ROOT_CONCEPT.getPrimoridalUid());
+			ConceptVersionBI refAux = Ts.get().getConceptVersion(myVc, RefsetAuxiliary.Concept.REFSET_AUXILIARY.getPrimoridalUid());
+			ConceptVersionBI prjAux = Ts.get().getConceptVersion(myVc, ArchitectonicAuxiliary.Concept.PROJECTS_ROOT_HIERARCHY.getPrimoridalUid());
+			ConceptVersionBI conceptv = Ts.get().getConceptVersion(myVc, concept.getConceptNid());
 			
 			if (RulesLibrary.rulesDisabled ||
 					RefsetAuxiliary.Concept.COMMIT_RECORD.getUids().contains(concept.getPrimUuid()) ||
-					RefsetAuxiliary.Concept.CONFLICT_RECORD.getUids().contains(concept.getPrimUuid())) {
+					RefsetAuxiliary.Concept.CONFLICT_RECORD.getUids().contains(concept.getPrimUuid()) ||
+					conceptv.isKindOf(archAux) ||
+					conceptv.isKindOf(refAux) ||
+					conceptv.isKindOf(prjAux)
+					) {
 				return alertList;
 			}
 			
