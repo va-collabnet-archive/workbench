@@ -21,9 +21,9 @@ import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.refex.type_nid.RefexNidAnalogBI;
 import org.ihtsdo.tk.api.refex.type_nid.RefexNidVersionBI;
+import org.ihtsdo.tk.binding.snomed.RefsetAux;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 import org.ihtsdo.tk.drools.facts.DescFact;
-
 
 public class MakeAcceptableAction extends AbstractAction {
 
@@ -31,6 +31,7 @@ public class MakeAcceptableAction extends AbstractAction {
     DescriptionVersionBI desc;
     LANG_CODE dialect;
     I_ConfigAceFrame config;
+    int evalRefsetNid;
 
     public MakeAcceptableAction(String actionName, DescFact fact, LANG_CODE dialect, I_ConfigAceFrame config) {
         super(actionName);
@@ -50,91 +51,53 @@ public class MakeAcceptableAction extends AbstractAction {
                     desc.getRefexesActive(vc);
 
             if (dialect.equals(LANG_CODE.EN_US)) {
-                int evalRefsetNid = SnomedMetadataRfx.getUS_DIALECT_REFEX_NID();
-                
-                int acceptabilityNid = SnomedMetadataRfx.getDESC_ACCEPTABLE_NID();
-                
-                if (refexes != null) {
-                    for (RefexChronicleBI refex : refexes) {
-                        if (refex.getRefexNid() == evalRefsetNid) {
-                            if (refex.isUncommitted()) {
-                                RefexNidAnalogBI refexAnalog = (RefexNidAnalogBI) refex;
-                                refexAnalog.setNid1(acceptabilityNid);
-                                I_GetConceptData concept = Terms.get().getConceptForNid(refex.getNid());
-                                Terms.get().addUncommitted(concept);
-                            } else {
-                                //make analog
-                                componentVersion = (I_AmPart) refex;
-                                AnalogBI analog = null;
-                                for (PathBI ep : config.getEditingPathSet()) {
-                                    analog = componentVersion.makeAnalog(
-                                            SnomedMetadataRfx.getSTATUS_CURRENT_NID(),
-                                            Long.MAX_VALUE,
-                                            config.getEditCoordinate().getAuthorNid(),
-                                            config.getEditCoordinate().getModuleNid(), 
-                                            ep.getConceptNid());
-                                }
-                                RefexVersionBI<?> newRefex = (RefexVersionBI<?>) analog;
-                                //test member type
-                                if (RefexNidVersionBI.class.isAssignableFrom(newRefex.getClass())) {
-                                    RefexNidVersionBI rcv = (RefexNidVersionBI) newRefex;
-                                    RefexNidAnalogBI rca = (RefexNidAnalogBI) rcv;
-
-                                    rca.setNid1(acceptabilityNid);
-
-                                    I_GetConceptData concept = Terms.get().getConceptForNid(newRefex.getNid());
-                                    Terms.get().addUncommitted(concept);
-                                } else {
-                                    throw new UnsupportedOperationException("Can't convert: RefexCnidVersionBI");
-                                }
-                            }
-                        }
-                    }
-                }
+                evalRefsetNid = SnomedMetadataRfx.getUS_DIALECT_REFEX_NID();
             } else if (dialect.equals(LANG_CODE.EN_GB)) {
-                int evalRefsetNid = SnomedMetadataRfx.getGB_DIALECT_REFEX_NID();
-                
-                int acceptabilityNid = SnomedMetadataRfx.getDESC_ACCEPTABLE_NID();
-                
-                if (refexes != null) {
-                    for (RefexChronicleBI refex : refexes) {
-                        if (refex.getRefexNid() == evalRefsetNid) {
-                            if (refex.isUncommitted()) {
-                                RefexNidAnalogBI refexAnalog = (RefexNidAnalogBI) refex;
-                                refexAnalog.setNid1(acceptabilityNid);
-                                I_GetConceptData concept = Terms.get().getConceptForNid(refex.getNid());
-                                Terms.get().addUncommitted(concept);
-                            } else {
-                                //make analog
-                                componentVersion = (I_AmPart) refex;
-                                AnalogBI analog = null;
-                                for (PathBI ep : config.getEditingPathSet()) {
-                                    analog = componentVersion.makeAnalog(
-                                            SnomedMetadataRfx.getSTATUS_CURRENT_NID(),
-                                            Long.MAX_VALUE,
-                                            config.getEditCoordinate().getAuthorNid(),
-                                            config.getEditCoordinate().getModuleNid(), 
-                                            ep.getConceptNid());
-                                }
-                                RefexVersionBI<?> newRefex = (RefexVersionBI<?>) analog;
-                                //test member type
-                                if (RefexNidVersionBI.class.isAssignableFrom(newRefex.getClass())) {
-                                    RefexNidVersionBI rcv = (RefexNidVersionBI) newRefex;
-                                    RefexNidAnalogBI rca = (RefexNidAnalogBI) rcv;
-
-                                    rca.setNid1(acceptabilityNid);
-
-                                    I_GetConceptData concept = Terms.get().getConceptForNid(newRefex.getNid());
-                                    Terms.get().addUncommitted(concept);
-                                } else {
-                                    throw new UnsupportedOperationException("Can't convert: RefexCnidVersionBI");
-                                }
-                            }
-                        }
-                    }
-                }
+                evalRefsetNid = SnomedMetadataRfx.getGB_DIALECT_REFEX_NID();
+            } else if (dialect.equals(LANG_CODE.DA)) {
+                evalRefsetNid = RefsetAux.DA_REFEX.getLenient().getNid();
             } else {
                 throw new UnsupportedOperationException("Dialect not supported");
+            }
+
+            int acceptabilityNid = SnomedMetadataRfx.getDESC_ACCEPTABLE_NID();
+
+            if (refexes != null) {
+                for (RefexChronicleBI refex : refexes) {
+                    if (refex.getRefexNid() == evalRefsetNid) {
+                        if (refex.isUncommitted()) {
+                            RefexNidAnalogBI refexAnalog = (RefexNidAnalogBI) refex;
+                            refexAnalog.setNid1(acceptabilityNid);
+                            I_GetConceptData concept = Terms.get().getConceptForNid(refex.getNid());
+                            Terms.get().addUncommitted(concept);
+                        } else {
+                            //make analog
+                            componentVersion = (I_AmPart) refex;
+                            AnalogBI analog = null;
+                            for (PathBI ep : config.getEditingPathSet()) {
+                                analog = componentVersion.makeAnalog(
+                                        SnomedMetadataRfx.getSTATUS_CURRENT_NID(),
+                                        Long.MAX_VALUE,
+                                        config.getEditCoordinate().getAuthorNid(),
+                                        config.getEditCoordinate().getModuleNid(),
+                                        ep.getConceptNid());
+                            }
+                            RefexVersionBI<?> newRefex = (RefexVersionBI<?>) analog;
+                            //test member type
+                            if (RefexNidVersionBI.class.isAssignableFrom(newRefex.getClass())) {
+                                RefexNidVersionBI rcv = (RefexNidVersionBI) newRefex;
+                                RefexNidAnalogBI rca = (RefexNidAnalogBI) rcv;
+
+                                rca.setNid1(acceptabilityNid);
+
+                                I_GetConceptData concept = Terms.get().getConceptForNid(newRefex.getNid());
+                                Terms.get().addUncommitted(concept);
+                            } else {
+                                throw new UnsupportedOperationException("Can't convert: RefexCnidVersionBI");
+                            }
+                        }
+                    }
+                }
             }
 
 
