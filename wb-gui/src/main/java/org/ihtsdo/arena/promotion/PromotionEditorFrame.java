@@ -38,6 +38,7 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HostConceptPlugins.HOST_ENUM;
 import org.dwfa.ace.api.I_HostConceptPlugins.LINK_TYPE;
+import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.classifier.SnoRocketTabPanel;
 import org.dwfa.ace.config.AceFrameConfig;
@@ -503,6 +504,7 @@ public class PromotionEditorFrame extends ComponentFrame implements PropertyChan
         @Override
         public void actionPerformed(ActionEvent e) {
             if (classifierDone == true && reportDone == true && promoteDone == true) {
+                final I_ShowActivity activity = Terms.get().newActivityPanel(true, mergeConfig, "Starting difference finder.", true);
                 new Thread(
                         new Runnable() {
                     @Override
@@ -513,7 +515,9 @@ public class PromotionEditorFrame extends ComponentFrame implements PropertyChan
                             //clear old first?
                             allChange.clear();
                             frame.query();
-
+                            activity.setProgressInfoLower("compelete");
+                            activity.complete();
+                            I_ShowActivity activity1 = Terms.get().newActivityPanel(true, mergeConfig, "Finished query, processing results.", true);
                             model.setChangedDesc(descChange);
                             model.setChangedInferred(infChange);
                             model.setChangedStated(statedChange);
@@ -548,6 +552,11 @@ public class PromotionEditorFrame extends ComponentFrame implements PropertyChan
                             targetArena.getEditor().setDiffColor(diffColor);
                             model.fireTableDataChanged();
                             reportDone = true;
+                            activity1.setProgressInfoLower("compelete");
+                            activity1.complete();
+                            I_ShowActivity activity2 = Terms.get().newActivityPanel(true, mergeConfig, "Difference finder complete", true);
+                            activity2.setProgressInfoLower("compelete");
+                            activity2.complete();
                         } catch (IOException ex) {
                             Logger.getLogger(PromotionEditorFrame.class.getName()).log(Level.SEVERE, null, ex);
                         } catch (ParseException ex) {
