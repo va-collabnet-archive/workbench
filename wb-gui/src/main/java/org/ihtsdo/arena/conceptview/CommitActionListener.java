@@ -16,6 +16,7 @@ import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
 import javax.swing.SwingWorker;
+import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.list.TerminologyList;
 import org.dwfa.ace.list.TerminologyListModel;
@@ -88,10 +89,13 @@ public class CommitActionListener implements ActionListener {
                  }
              }
          }
-
-         return c.commit(settings.getConfig().getDbConfig().getUserChangesChangeSetPolicy().convert(),
-                         settings.getConfig().getDbConfig().getChangeSetWriterThreading().convert(),
-                         settings.isForAdjudication());
+         ACE.suspendDatacheckDisplay();
+          boolean commit = c.commit(settings.getConfig().getDbConfig().getUserChangesChangeSetPolicy().convert(),
+                                           settings.getConfig().getDbConfig().getChangeSetWriterThreading().convert(),
+                                           settings.isForAdjudication());
+         Ts.get().waitTillDatachecksFinished();
+         ACE.resumeDatacheckDisplay();
+         return commit;
       }
 
       @Override

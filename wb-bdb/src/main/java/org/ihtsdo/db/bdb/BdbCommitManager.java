@@ -915,7 +915,7 @@ public class BdbCommitManager {
                             frameConfig.setCommitEnabled(false);
                         }
 
-                        updateAlerts();
+//                        updateAlerts();
                     }
                 } catch (TerminologyException e) {
                     AceLog.getAppLog().alertAndLogException(e);
@@ -1656,6 +1656,7 @@ public class BdbCommitManager {
             if (!canceled) {
                 runners.remove(c);
             }
+            dbCheckerPermit2.release();
         }
 
         @Override
@@ -1685,6 +1686,11 @@ public class BdbCommitManager {
 
         public static DataCheckRunner runDataChecks(Concept c, List<I_TestDataConstraints> tests) {
             DataCheckRunner runner = new DataCheckRunner(c, tests);
+            try {
+                dbCheckerPermit2.acquire();
+            } catch (InterruptedException ex) {
+                Logger.getLogger(BdbCommitManager.class.getName()).log(Level.SEVERE, null, ex);
+            }
             runner.execute();
             return runner;
         }
