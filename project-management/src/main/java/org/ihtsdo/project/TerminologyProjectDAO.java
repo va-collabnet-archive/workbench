@@ -574,7 +574,7 @@ public class TerminologyProjectDAO {
 		ConceptVersionBI conceptVersion = null;
 		try {
 			conceptVersion = Ts.get().getConceptVersion(Terms.get().getActiveAceFrameConfig().getViewCoordinate(), concept.getUUIDs());
-			return conceptVersion.getDescriptionPreferred().toUserString();
+			return conceptVersion.getDescriptionPreferred().getText();
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (TerminologyException e) {
