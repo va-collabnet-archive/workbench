@@ -37,11 +37,15 @@ public class WfComment implements WfCommentBI {
 	private Long date;
 
 	private String comment;
+	private SimpleDateFormat formatter;
 
 	public WfComment(Comment commentStructure) {
 
-		date = Long.parseLong(commentStructure.getComment().substring(commentStructure.getComment().trim().lastIndexOf(" ") + 1));
-		String comm = commentStructure.getComment().substring(0, commentStructure.getComment().lastIndexOf(" - Time:"));
+		this.formatter = new SimpleDateFormat();
+		String oldComment = commentStructure.getComment();
+		String datestr = oldComment.substring(oldComment.trim().lastIndexOf(" ") + 1);
+		date = Long.parseLong(datestr);
+		String comm = oldComment.substring(0, oldComment.lastIndexOf(" - Time:"));
 		comm = comm.replace(htmlHeader, "");
 		comm = comm.replace(htmlFooter, "");
 		comm = comm.replace(endP, "");
@@ -61,36 +65,18 @@ public class WfComment implements WfCommentBI {
 	}
 
 	public WfComment(String string) {
-		date = System.currentTimeMillis();
-		comment = formatComment(string + " - Time: " + date);
-		role = "Commenter";
 		try {
-			author = new WfUser(Terms.get().getActiveAceFrameConfig().getDbConfig().getUsername(), UUID.randomUUID());
+			this.formatter = new SimpleDateFormat();
+			date = System.currentTimeMillis();
+			String username = Terms.get().getActiveAceFrameConfig().getDbConfig().getUsername();
+			this.author = new WfUser(username,UUID.randomUUID());
+			role = "Author";
+			comment = role.toString() + HEADER_SEPARATOR  + username  + COMMENT_HEADER_SEP + string;
 		} catch (TerminologyException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-	}
-
-	/**
-	 * Format comment.
-	 * 
-	 * @param comment
-	 *            the comment
-	 * @return the string
-	 */
-	private String formatComment(String comment) {
-		long thickVer;
-		SimpleDateFormat formatter = new SimpleDateFormat();
-		thickVer = Long.parseLong(comment.substring(comment.trim().lastIndexOf(" ") + 1));
-		String strDate = formatter.format(thickVer);
-		String tmp = comment.substring(0, comment.lastIndexOf(" - Time:"));
-		if (tmp.indexOf(COMMENT_HEADER_SEP) > -1) {
-			tmp = tmp.replace(COMMENT_HEADER_SEP, endP + COMMENT_HEADER_SEP) + htmlFooter;
-			return htmlHeader + "<I>" + strDate + "</I>" + HEADER_SEPARATOR + tmp;
-		}
-		return htmlHeader + "<I>" + strDate + "</I>" + COMMENT_HEADER_SEP + tmp;
 	}
 
 	@Override
