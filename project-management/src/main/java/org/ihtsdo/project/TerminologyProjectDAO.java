@@ -57,7 +57,6 @@ import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.PathSetReadOnly;
-import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.RefsetPropertyMap;
 import org.dwfa.ace.api.RefsetPropertyMap.REFSET_PROPERTY;
 import org.dwfa.ace.api.Terms;
@@ -69,7 +68,6 @@ import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.bpa.BusinessProcess;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
-import org.dwfa.bpa.process.I_QueueProcesses;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.cement.ArchitectonicAuxiliary;
@@ -104,11 +102,8 @@ import org.ihtsdo.project.workflow.model.WorkflowDefinition;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.NidBitSetBI;
-import org.ihtsdo.tk.api.NidSet;
-import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
-import org.ihtsdo.tk.api.PositionSetBI;
 import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.TerminologyBuilderBI;
 import org.ihtsdo.tk.api.TerminologyStoreDI;
@@ -555,7 +550,7 @@ public class TerminologyProjectDAO {
 			I_GetConceptData parent = parents.iterator().next();
 
 			if (parent.getConceptNid() == ArchitectonicAuxiliary.Concept.TRANSLATION_PROJECTS_ROOT.localize().getNid()) {
-				String name = projectConcept.toString();
+				String name = getConceptString(projectConcept);
 				List<? extends I_DescriptionTuple> descTuples = projectConcept.getDescriptionTuples(config.getAllowedStatus(), config.getDescTypes(), config.getViewPositionSetReadOnly(), Precedence.TIME, config.getConflictResolutionStrategy());
 				for (I_DescriptionTuple tuple : descTuples) {
 					if (tuple.getTypeNid() == ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize().getNid()) {
@@ -568,6 +563,26 @@ public class TerminologyProjectDAO {
 			AceLog.getAppLog().alertAndLogException(e);
 		}
 		return project;
+	}
+
+	/**
+	 * Temporary method replacing I_Getconceptdata toString method
+	 * @param concept
+	 * @return
+	 */
+	private static String getConceptString(I_GetConceptData concept) {
+		ConceptVersionBI conceptVersion = null;
+		try {
+			conceptVersion = Ts.get().getConceptVersion(Terms.get().getActiveAceFrameConfig().getViewCoordinate(), concept.getUUIDs());
+			return conceptVersion.getDescriptionPreferred().toUserString();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (TerminologyException e) {
+			e.printStackTrace();
+		} catch (ContradictionException e) {
+			e.printStackTrace();
+		}
+		return concept.toString();
 	}
 
 	/**
@@ -597,7 +612,7 @@ public class TerminologyProjectDAO {
 			I_GetConceptData parent = parents.iterator().next();
 			
 			if (parent.getConceptNid() == ArchitectonicAuxiliary.Concept.MAPPING_PROJECTS_ROOT.localize().getNid()) {
-				String name = projectConcept.toString();
+				String name = getConceptString(projectConcept);
 				List<? extends I_DescriptionTuple> descTuples = projectConcept.getDescriptionTuples(config.getAllowedStatus(), config.getDescTypes(), config.getViewPositionSetReadOnly(), Precedence.TIME, config.getConflictResolutionStrategy());
 				for (I_DescriptionTuple tuple : descTuples) {
 					if (tuple.getTypeNid() == ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize().getNid()) {
@@ -638,7 +653,7 @@ public class TerminologyProjectDAO {
 			I_GetConceptData parent = parents.iterator().next();
 			
 			if (parent.getConceptNid() == ArchitectonicAuxiliary.Concept.TERMINOLOGY_PROJECTS_ROOT.localize().getNid()) {
-				String name = projectConcept.toString();
+				String name = getConceptString(projectConcept);
 				List<? extends I_DescriptionTuple> descTuples = projectConcept.getDescriptionTuples(config.getAllowedStatus(), config.getDescTypes(), config.getViewPositionSetReadOnly(), Precedence.TIME, config.getConflictResolutionStrategy());
 				for (I_DescriptionTuple tuple : descTuples) {
 					if (tuple.getTypeNid() == ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize().getNid()) {
@@ -1026,7 +1041,7 @@ public class TerminologyProjectDAO {
 			I_GetConceptData parent = parents.iterator().next();
 
 			if (parent.getConceptNid() == ArchitectonicAuxiliary.Concept.WORKSETS_ROOT.localize().getNid()) {
-				String name = workSetConcept.toString();
+				String name = getConceptString(workSetConcept);
 				List<? extends I_DescriptionTuple> descTuples = workSetConcept.getDescriptionTuples(config.getAllowedStatus(), (config.getDescTypes().getSetValues().length == 0) ? null : config.getDescTypes(), config.getViewPositionSetReadOnly(), Precedence.TIME,
 						config.getConflictResolutionStrategy());
 				for (I_DescriptionTuple tuple : descTuples) {
@@ -2302,7 +2317,7 @@ public class TerminologyProjectDAO {
 
 			I_GetConceptData parent = parents.iterator().next();
 
-			String name = partitionSchemeConcept.toString();
+			String name = getConceptString(partitionSchemeConcept);
 			List<? extends I_DescriptionTuple> descTuples = partitionSchemeConcept.getDescriptionTuples(config.getAllowedStatus(), config.getDescTypes(), config.getViewPositionSetReadOnly(), Precedence.TIME, config.getConflictResolutionStrategy());
 			for (I_DescriptionTuple tuple : descTuples) {
 				if (tuple.getTypeNid() == ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize().getNid()) {
@@ -2360,7 +2375,7 @@ public class TerminologyProjectDAO {
 					throw new Exception("Error: Wrong number of schemes in partition...");
 				}
 
-				String name = partitionConcept.toString();
+				String name = getConceptString(partitionConcept);
 				List<? extends I_DescriptionTuple> descTuples = partitionConcept.getDescriptionTuples(config.getAllowedStatus(), (config.getDescTypes().getSetValues().length == 0) ? null : config.getDescTypes(), config.getViewPositionSetReadOnly(), Precedence.TIME,
 						config.getConflictResolutionStrategy());
 				for (I_DescriptionTuple tuple : descTuples) {
@@ -2437,7 +2452,7 @@ public class TerminologyProjectDAO {
 	 */
 	public static void addConceptAsWorkSetMember(I_GetConceptData workSetMemberConcept, UUID workSetUUID, I_ConfigAceFrame config) {
 		try {
-			WorkSetMember member = new WorkSetMember(workSetMemberConcept.toString(), workSetMemberConcept.getConceptNid(), workSetMemberConcept.getUids(), workSetUUID);
+			WorkSetMember member = new WorkSetMember(getConceptString(workSetMemberConcept), workSetMemberConcept.getConceptNid(), workSetMemberConcept.getUids(), workSetUUID);
 			addConceptAsWorkSetMember(member, config);
 		} catch (IOException e) {
 			AceLog.getAppLog().alertAndLogException(e);
@@ -2820,7 +2835,7 @@ public class TerminologyProjectDAO {
 			Collection<? extends RefexChronicleBI<?>> members = workSetMemberConcept.getAnnotations();
 			for (RefexChronicleBI<?> promotionMember : members) {
 				if (promotionMember.getRefexNid() == promRefset.getRefsetId()) {
-					workSetMember = new WorkSetMember(workSetMemberConcept.toString(), workSetMemberConcept.getConceptNid(), workSetMemberConcept.getUids(), workSetRefset.getUids().iterator().next());
+					workSetMember = new WorkSetMember(getConceptString(workSetMemberConcept), workSetMemberConcept.getConceptNid(), workSetMemberConcept.getUids(), workSetRefset.getUids().iterator().next());
 				}
 			}
 
@@ -2854,7 +2869,7 @@ public class TerminologyProjectDAO {
 				if (extension.getRefsetId() == partitionRefset.getConceptNid()) {
 					I_ExtendByRefPart lastPart = getLastExtensionPart(extension);
 					I_GetConceptData component = termFactory.getConcept(extension.getComponentNid());
-					partitionMember = new PartitionMember(component.toString(), component.getConceptNid(), component.getUids(), partitionRefset.getUids().iterator().next());
+					partitionMember = new PartitionMember(getConceptString(component), component.getConceptNid(), component.getUids(), partitionRefset.getUids().iterator().next());
 				}
 			}
 		} catch (TerminologyException e) {
@@ -3147,7 +3162,7 @@ public class TerminologyProjectDAO {
 			I_GetConceptData parent = parents.iterator().next();
 
 			if (parent.getConceptNid() == ArchitectonicAuxiliary.Concept.WORKLISTS_ROOT.localize().getNid()) {
-				String name = workListConcept.toString();
+				String name = getConceptString(workListConcept);
 				List<? extends I_DescriptionTuple> descTuples = workListConcept.getDescriptionTuples(config.getAllowedStatus(), (config.getDescTypes().getSetValues().length == 0) ? null : config.getDescTypes(), config.getViewPositionSetReadOnly(), Precedence.TIME,
 						config.getConflictResolutionStrategy());
 
@@ -3309,14 +3324,14 @@ public class TerminologyProjectDAO {
 			addConceptAsPartitionMember(concept, partition, config);
 			Terms.get().addUncommitted(partition.getConcept());
 			I_GetConceptData assingStatus = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_ASSIGNED_STATUS.getUids());
-			WorkListMember workListMember = new WorkListMember(concept.toString(), concept.getConceptNid(), concept.getUids(), workList.getUids().iterator().next(), assingStatus, new java.util.Date().getTime());
+			WorkListMember workListMember = new WorkListMember(getConceptString(concept), concept.getConceptNid(), concept.getUids(), workList.getUids().iterator().next(), assingStatus, new java.util.Date().getTime());
 			WorkflowInterpreter interpreter = WorkflowInterpreter.createWorkflowInterpreter(workList.getWorkflowDefinition());
 			WfComponentProvider provider = new WfComponentProvider();
 			WfInstance wfInstance = new WfInstance();
 			wfInstance.setComponentId(Terms.get().nidToUuid(concept.getNid()));
 			wfInstance.setWfDefinition(workList.getWorkflowDefinition());
 			wfInstance.setWorkList(workList);
-			wfInstance.setComponentName(concept.toString());
+			wfInstance.setComponentName(getConceptString(concept));
 			wfInstance.setState(provider.statusConceptToWfState(assingStatus));
 			wfInstance.setLastChangeTime(System.currentTimeMillis());
 			WfUser destination = interpreter.getNextDestination(wfInstance, workList);
@@ -3848,7 +3863,7 @@ public class TerminologyProjectDAO {
 	 */
 	public static void addConceptAsPartitionMember(I_GetConceptData partitionMemberConcept, Partition partition, I_ConfigAceFrame config) {
 		try {
-			PartitionMember partitionMember = new PartitionMember(partitionMemberConcept.toString(), partitionMemberConcept.getConceptNid(), partitionMemberConcept.getUids(), partition.getConcept().getPrimUuid());
+			PartitionMember partitionMember = new PartitionMember(getConceptString(partitionMemberConcept), partitionMemberConcept.getConceptNid(), partitionMemberConcept.getUids(), partition.getConcept().getPrimUuid());
 			partitionMember.setMemberConcept(partitionMemberConcept);
 			addConceptAsPartitionMember(partitionMember, partition, config);
 
@@ -4356,7 +4371,8 @@ public class TerminologyProjectDAO {
 		// }
 		String name = "";
 		try {
-			name = workListMemberConcept.toString();
+			ConceptVersionBI conceptVersion = Ts.get().getConceptVersion(config.getViewCoordinate(),workListMemberConcept.getNid());
+			name = conceptVersion.getDescriptionPreferred().toUserString();
 
 			Collection<? extends RefexChronicleBI<?>> members = workListMemberConcept.getAnnotations();
 			for (RefexChronicleBI<?> promotionMember : members) {
@@ -5787,10 +5803,10 @@ public class TerminologyProjectDAO {
 		for (String line : list) {
 			String[] fields = line.split("\\|");
 			I_GetConceptData userConcept = Terms.get().getConcept(UUID.fromString(fields[1]));
-			WfUser user = new WfUser(userConcept.toString(), userConcept.getPrimUuid());
+			WfUser user = new WfUser(getConceptString(userConcept), userConcept.getPrimUuid());
 			
 			I_GetConceptData roleConcept = Terms.get().getConcept(UUID.fromString(fields[2]));
-			WfRole role = new WfRole(roleConcept.toString(), roleConcept.getPrimUuid());
+			WfRole role = new WfRole(getConceptString(roleConcept), roleConcept.getPrimUuid());
 			
 			WfMembership member = new WfMembership(UUID.fromString(fields[0]), user, role, Boolean.parseBoolean(fields[3]));
 			members.add(member);
