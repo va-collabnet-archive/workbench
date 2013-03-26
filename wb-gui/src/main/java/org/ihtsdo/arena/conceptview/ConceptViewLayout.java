@@ -1930,9 +1930,13 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
                 fsnPanel = dc;
             }
         }
-        temp.add(0, fsnPanel);
-        temp.add(1, prefUS);
-        int index = 2;
+        int index = 0;
+        if(fsnPanel != null){
+            temp.add(index++, fsnPanel);
+        }
+        if(prefUS != null){
+            temp.add(index++, prefUS);
+        }
         if (!tempUS.isEmpty()) {
             Collections.sort(tempUS, new DescPanelComparator());
             for (DragPanelDescription dc : tempUS) {
@@ -1987,7 +1991,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
                 temp.add(index++, dc);
             }
         }
-
+        
         if (activeDescriptionPanels.size() == temp.size()) {
             activeDescriptionPanels = temp;
         } else {
