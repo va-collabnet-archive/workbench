@@ -166,7 +166,7 @@ public class PromotionEditorFrame extends ComponentFrame implements PropertyChan
         statedChange = Ts.get().getEmptyNidSet();
         infChange = Ts.get().getEmptyNidSet();
         allChange = Ts.get().getEmptyNidSet();
-
+        
         // Setup top
         if (batchConceptList == null) {
             TerminologyListModel batchListModel = new TerminologyListModel();
@@ -190,27 +190,30 @@ public class PromotionEditorFrame extends ComponentFrame implements PropertyChan
                 Random random = new Random();
                 for (RefexVersionBI member : previousMerge) {
                     ComponentChronicleBI<?> component = Ts.get().getComponent(member.getReferencedComponentNid());
-                    if (DescriptionChronicleBI.class.isAssignableFrom(component.getClass())) {
-                        descChange.setMember(component.getNid());
-                    } else if (RelationshipChronicleBI.class.isAssignableFrom(component.getClass())) {
-                        RelationshipChronicleBI r = (RelationshipChronicleBI) component;
-                        RelationshipVersionBI version = r.getVersion(mergeConfig.getViewCoordinate().getViewCoordinateWithAllStatusValues());
-                        int charNid = version.getCharacteristicNid();
-                        if (charNid == SnomedMetadataRfx.getREL_CH_INFERRED_RELATIONSHIP_NID()) {
-                            infChange.setMember(component.getNid());
-                        } else if (charNid == SnomedMetadataRfx.getREL_CH_STATED_RELATIONSHIP_NID()) {
+                    if (component != null) {
+                        if (DescriptionChronicleBI.class.isAssignableFrom(component.getClass())) {
+                            descChange.setMember(component.getNid());
+                        } else if (RelationshipChronicleBI.class.isAssignableFrom(component.getClass())) {
+                            RelationshipChronicleBI r = (RelationshipChronicleBI) component;
+                            RelationshipVersionBI version = r.getVersion(mergeConfig.getViewCoordinate().getViewCoordinateWithAllStatusValues());
+                            int charNid = version.getCharacteristicNid();
+                            if (charNid == SnomedMetadataRfx.getREL_CH_INFERRED_RELATIONSHIP_NID()) {
+                                infChange.setMember(component.getNid());
+                            } else if (charNid == SnomedMetadataRfx.getREL_CH_STATED_RELATIONSHIP_NID()) {
+                                statedChange.setMember(component.getNid());
+                            }
+                        } else if (ConceptChronicleBI.class.isAssignableFrom(component.getClass())) {
                             statedChange.setMember(component.getNid());
                         }
-                    } else if (ConceptChronicleBI.class.isAssignableFrom(component.getClass())) {
-                        statedChange.setMember(component.getNid());
+                        //make colors
+                        float hue = random.nextFloat();
+                        float saturation = (random.nextInt(2000) + 1000) / 10000f;
+                        float luminance = 0.9f;
+                        Color color = Color.getHSBColor(hue, saturation, luminance);
+                        diffColor.put(component.getNid(), color);
+                        listModel.addElement((I_GetConceptData) Ts.get().getConcept(component.getConceptNid()));
                     }
-                    //make colors
-                    float hue = random.nextFloat();
-                    float saturation = (random.nextInt(2000) + 1000) / 10000f;
-                    float luminance = 0.9f;
-                    Color color = Color.getHSBColor(hue, saturation, luminance);
-                    diffColor.put(component.getNid(), color);
-                    listModel.addElement((I_GetConceptData) Ts.get().getConcept(component.getConceptNid()));
+  
                 }
                 mergeArena.getEditor().setDiffColor(diffColor);
                 sourceArena.getEditor().setDiffColor(diffColor);
@@ -218,6 +221,8 @@ public class PromotionEditorFrame extends ComponentFrame implements PropertyChan
                 model.setChangedDesc(descChange);
                 model.setChangedInferred(infChange);
                 model.setChangedStated(statedChange);
+                allChange.or(descChange);
+                allChange.or(statedChange);
             }
         }
 

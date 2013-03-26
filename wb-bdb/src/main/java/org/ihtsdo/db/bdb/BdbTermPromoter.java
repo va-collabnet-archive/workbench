@@ -128,12 +128,18 @@ public class BdbTermPromoter implements ProcessStampDataBI, ProcessUnfetchedConc
                 for (int nid : nidsToPromote) {
                     //promote concept attribute
                     if (nid == conceptChronicle.getConceptNid()) {
-                        Collection<? extends ConceptAttributeVersionBI> caVersions = conceptChronicle.getConceptAttributes().getVersions();
+                        Collection<? extends ConceptAttributeVersionBI> caVersions = conceptChronicle.getConceptAttributes().getVersions(sourceViewCoordinate);
+                        ConceptAttributeVersionBI latest = null;
                         for (ConceptAttributeVersionBI ca : caVersions) {
                             if (newStamps.contains(ca.getStampNid())) {
-                                promoteConceptAttribute((ConceptAttributes.Version)ca);
+                                if(latest == null){
+                                    latest = ca;
+                                }else if(latest.getTime() < ca.getTime()){
+                                    latest = ca;
+                                }
                             }
                         }
+                        promoteConceptAttribute((ConceptAttributes.Version)latest);
                     } else { //promote component
                         ComponentBI c = Bdb.getComponent(nid);
                         if (c != null) { //wfhx records returning null, don't want anyway
