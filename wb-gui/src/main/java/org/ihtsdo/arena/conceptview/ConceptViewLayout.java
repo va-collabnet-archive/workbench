@@ -1991,7 +1991,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
         if (activeDescriptionPanels.size() == temp.size()) {
             activeDescriptionPanels = temp;
         } else {
-            throw new TerminologyException("Sorted description panels do not match original size");
+            System.out.println("Sorted description panels do not match original size");
         }
     }
     
