@@ -292,7 +292,7 @@ public class WfInstance implements Serializable, WfProcessInstanceBI {
 				LanguageMembershipRefset targetLangRefset = new LanguageMembershipRefset(targetLanguage, config);
 				targetLangRefset.getPromotionRefset(config).setPromotionStatus(concept.getNid(),
 						tf.uuidToNative(newState.getId()));
-				targetLanguage.commit(ChangeSetGenerationPolicy.INCREMENTAL, ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);
+				//targetLanguage.commit(ChangeSetGenerationPolicy.INCREMENTAL, ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);
 			}
 		}
 		// Experiment to manage workflow restart in the same session
