@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -943,7 +944,9 @@ public class PromotionSourceConfig implements I_ConfigAceFrame {
     }
 
     public Set<PathBI> getPromotionPathSet() {
-        return config.getPromotionPathSet();
+        Set<PathBI> paths = new HashSet<>();
+        paths.add(sourcePos.getPath());
+        return paths;
     }
 
     public I_IntSet getPrefFilterTypesForRel() {

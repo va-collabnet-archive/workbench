@@ -34,8 +34,10 @@ import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.util.I_InitComponentMenus;
 import org.dwfa.tapi.ComputationCanceled;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.helper.time.TimeHelper;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.PathBI;
+import org.ihtsdo.tk.api.PositionBI;
 
 /**
  *
@@ -179,6 +181,16 @@ public class PromotionEditorGenerator implements I_InitComponentMenus{
                                 SnorocketExTask classifier = new SnorocketExTask();
                                 classifier.runClassifier(newFrameConfig);
                                 classifier.commitClassification();
+                                
+                                PositionBI sourcePos = Ts.get().newPosition(sourcePath,
+                                        TimeHelper.getTimeFromString("latest", TimeHelper.getFileDateFormat()));
+                                I_ConfigAceFrame sourceConfig = new PromotionSourceConfig(newFrame, newFrameConfig, sourcePos);
+                                sourceConfig.getEditingPathSet().clear();
+                                sourceConfig.getEditingPathSet().add(sourcePath);
+                                
+                                SnorocketExTask classifier2 = new SnorocketExTask();
+                                classifier2.runClassifier(sourceConfig);
+                                classifier2.commitClassification();
                                 newFrame.setVisible(true);
                             } catch (ComputationCanceled ex) {
                                 Logger.getLogger(PromotionEditorFrame.class.getName()).log(Level.SEVERE, null, ex);
