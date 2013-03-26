@@ -83,10 +83,15 @@ import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.swing.SwingTask;
 import org.ihtsdo.helper.bdb.MultiEditorContradictionCase;
 import org.ihtsdo.helper.bdb.MultiEditorContradictionDetector;
+import org.ihtsdo.lang.LANG_CODE;
 import org.ihtsdo.tk.api.*;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.conceptattribute.ConceptAttributeVersionBI;
+import org.ihtsdo.tk.api.description.DescriptionVersionBI;
+import org.ihtsdo.tk.api.refex.type_nid.RefexNidVersionBI;
+import org.ihtsdo.tk.binding.snomed.RefsetAux;
 import org.ihtsdo.tk.binding.snomed.Snomed;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 
 /**
@@ -639,6 +644,8 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
                     cpd.setTemplateCount(0);
                     conceptPanel.add(cpd, gbc);
                     gbc.gridy++;
+                    
+                    sortDescriptions();
                     
                     for (DragPanelDescription dc : activeDescriptionPanels) {
                         if (stop) {
@@ -1812,6 +1819,187 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
         @Override
         public void removeUpdate(DocumentEvent e) {
             update = true;
+        }
+    }
+    
+    private void sortDescriptions() throws TerminologyException, ContradictionException, IOException {
+        ArrayList<DragPanelDescription> temp = new ArrayList<>();
+        DragPanelDescription fsnPanel = null;
+        DragPanelDescription prefUS = null;
+        DragPanelDescription prefGB = null;
+        DragPanelDescription prefNL = null;
+        DragPanelDescription prefSE = null;
+        DragPanelDescription prefDK = null;
+        List<DragPanelDescription> prefXX = new ArrayList<>();
+        List<DragPanelDescription> tempUS = new ArrayList<>();
+        List<DragPanelDescription> tempGB = new ArrayList<>();
+        List<DragPanelDescription> tempNL = new ArrayList<>();
+        List<DragPanelDescription> tempSE = new ArrayList<>();
+        List<DragPanelDescription> tempDK = new ArrayList<>();
+        List<DragPanelDescription> tempXX = new ArrayList<>();
+        ConceptChronicleBI cc = (ConceptChronicleBI) layoutConcept;
+        ConceptVersionBI cv = cc.getVersion(coordinate);
+        DescriptionVersionBI fsn = cv.getDescriptionFullySpecified();
+        Collection<? extends DescriptionVersionBI> prefs = cv.getDescriptionsPreferredActive();
+        HashSet<Integer> prefNids = new HashSet<>();
+        for (DescriptionVersionBI d : prefs) {
+            Collection<? extends RefexVersionBI<?>> annots = d.getAnnotationMembersActive(coordinate, SnomedMetadataRf2.US_ENGLISH_REFSET_RF2.getLenient().getNid());
+            for (RefexVersionBI a : annots) {
+                RefexNidVersionBI ri = (RefexNidVersionBI) a;
+                if (ri.getNid1() == SnomedMetadataRf2.PREFERRED_RF2.getLenient().getNid()) {
+                    prefNids.add(d.getNid());
+                }
+            }
+            annots = d.getAnnotationMembersActive(coordinate, SnomedMetadataRf2.GB_ENGLISH_REFSET_RF2.getLenient().getNid());
+            for (RefexVersionBI a : annots) {
+                RefexNidVersionBI ri = (RefexNidVersionBI) a;
+                if (ri.getNid1() == SnomedMetadataRf2.PREFERRED_RF2.getLenient().getNid()) {
+                    prefNids.add(d.getNid());
+                }
+            }
+            if (Ts.get().hasUuid(RefsetAux.DA_REFEX.getUuids()[0])) {
+                annots = d.getAnnotationMembersActive(coordinate, RefsetAux.DA_REFEX.getLenient().getNid());
+                for (RefexVersionBI a : annots) {
+                    RefexNidVersionBI ri = (RefexNidVersionBI) a;
+                    if (ri.getNid1() == SnomedMetadataRf2.PREFERRED_RF2.getLenient().getNid()) {
+                        prefNids.add(d.getNid());
+                    }
+                }
+            }
+            if (Ts.get().hasUuid(RefsetAux.NL_REFEX.getUuids()[0])) {
+                annots = d.getAnnotationMembersActive(coordinate, RefsetAux.NL_REFEX.getLenient().getNid());
+                for (RefexVersionBI a : annots) {
+                    RefexNidVersionBI ri = (RefexNidVersionBI) a;
+                    if (ri.getNid1() == SnomedMetadataRf2.PREFERRED_RF2.getLenient().getNid()) {
+                        prefNids.add(d.getNid());
+                    }
+                }
+
+            }
+            if (Ts.get().hasUuid(RefsetAux.SV_REFEX.getUuids()[0])) {
+                annots = d.getAnnotationMembersActive(coordinate, RefsetAux.SV_REFEX.getLenient().getNid());
+                for (RefexVersionBI a : annots) {
+                    RefexNidVersionBI ri = (RefexNidVersionBI) a;
+                    if (ri.getNid1() == SnomedMetadataRf2.PREFERRED_RF2.getLenient().getNid()) {
+                        prefNids.add(d.getNid());
+                    }
+                }
+
+            }
+        }
+        for (DragPanelDescription dc : activeDescriptionPanels) {
+            if (dc.getDraggedThing().getNid() != fsn.getNid()) {
+                if (dc.getDraggedThing().hasAnnotationMemberActive(coordinate, SnomedMetadataRf2.US_ENGLISH_REFSET_RF2.getLenient().getNid())) {
+                    if (prefNids.contains(dc.getDraggedThing().getNid())) {
+                        prefUS = dc;
+                    } else {
+                        tempUS.add(dc);
+                    }
+                } else if (dc.getDraggedThing().hasAnnotationMemberActive(coordinate, SnomedMetadataRf2.GB_ENGLISH_REFSET_RF2.getLenient().getNid())) {
+                    if (prefNids.contains(dc.getDraggedThing().getNid())) {
+                        prefGB = dc;
+                    } else {
+                        tempGB.add(dc);
+                    }
+                } else if (dc.getDraggedThing().getLang().equals("nl")) {
+                    if (prefNids.contains(dc.getDraggedThing().getNid())) {
+                        prefNL = dc;
+                    } else {
+                        tempNL.add(dc);
+                    }
+                } else if (dc.getDraggedThing().getLang().equals("sv")) {
+                    if (prefNids.contains(dc.getDraggedThing().getNid())) {
+                        prefSE = dc;
+                    } else {
+                        tempSE.add(dc);
+                    }
+                } else if (dc.getDraggedThing().getLang().equals("da")) {
+                    if (prefNids.contains(dc.getDraggedThing().getNid())) {
+                        prefDK = dc;
+                    } else {
+                        tempDK.add(dc);
+                    }
+                } else if (dc.getDraggedThing().getLang().equals("da")) {
+                    if (prefNids.contains(dc.getDraggedThing().getNid())) {
+                        prefXX.add(dc);
+                    } else {
+                        tempXX.add(dc);
+                    }
+                }
+            } else {
+                fsnPanel = dc;
+            }
+        }
+        temp.add(0, fsnPanel);
+        temp.add(1, prefUS);
+        int index = 2;
+        if (!tempUS.isEmpty()) {
+            Collections.sort(tempUS, new DescPanelComparator());
+            for (DragPanelDescription dc : tempUS) {
+                temp.add(index++, dc);
+            }
+        }
+        if (prefGB != null) {
+            temp.add(index++, prefGB);
+        }
+        if (!tempGB.isEmpty()) {
+            Collections.sort(tempGB, new DescPanelComparator());
+            for (DragPanelDescription dc : tempGB) {
+                temp.add(index++, dc);
+            }
+        }
+        if (prefDK != null) {
+            temp.add(index++, prefDK);
+        }
+        if (!tempDK.isEmpty()) {
+            Collections.sort(tempDK, new DescPanelComparator());
+            for (DragPanelDescription dc : tempDK) {
+                temp.add(index++, dc);
+            }
+        }
+        if (prefNL != null) {
+            temp.add(index++, prefNL);
+        }
+        if (!tempNL.isEmpty()) {
+            Collections.sort(tempNL, new DescPanelComparator());
+            for (DragPanelDescription dc : tempNL) {
+                temp.add(index++, dc);
+            }
+        }
+        if (prefSE != null) {
+            temp.add(index++, prefSE);
+        }
+        if (!tempSE.isEmpty()) {
+            Collections.sort(tempSE, new DescPanelComparator());
+            for (DragPanelDescription dc : tempSE) {
+                temp.add(index++, dc);
+            }
+        }
+        if (!prefXX.isEmpty()) {
+            Collections.sort(prefXX, new DescPanelComparator());
+            for (DragPanelDescription dc : prefXX) {
+                temp.add(index++, dc);
+            }
+        }
+        if (!tempXX.isEmpty()) {
+            Collections.sort(tempXX, new DescPanelComparator());
+            for (DragPanelDescription dc : tempXX) {
+                temp.add(index++, dc);
+            }
+        }
+
+        if (activeDescriptionPanels.size() == temp.size()) {
+            activeDescriptionPanels = temp;
+        } else {
+            throw new TerminologyException("Sorted description panels do not match original size");
+        }
+    }
+    
+    public class DescPanelComparator implements Comparator<DragPanelDescription> {
+
+        @Override
+        public int compare(DragPanelDescription o1, DragPanelDescription o2) {
+            return o1.getDraggedThing().getNid() - o2.getDraggedThing().getNid();
         }
     }
 }
