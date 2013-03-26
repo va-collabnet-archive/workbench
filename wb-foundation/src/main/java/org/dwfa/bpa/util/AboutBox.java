@@ -199,17 +199,24 @@ public class AboutBox {
         final String href = buildHref(siteURL);
         String labelText = buildLabelText(href, projectId, archetypeId);
         JLabel label = new JLabel(labelText);
+
+        // Simulate hyperlink.
         label.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        label.setToolTipText(href);
         
-        // Open browser on mouse click.
+        // Open browser on mouse click, if supported.
         label.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                try {
-                    Desktop.getDesktop().browse(new URI(href));
-                } catch (Exception ex) {
-                    String msg = "Could not open link: " + href;
-                    LOGGER.log(Level.WARNING, msg, ex);  // Will print stack trace.
+                if (Desktop.isDesktopSupported()) {
+                    try {
+                        Desktop.getDesktop().browse(new URI(href));
+                    } catch (Exception ex) {
+                        String msg = "Could not open link: " + href;
+                        LOGGER.log(Level.WARNING, msg, ex);  // Will print stack trace.
+                    }
+                } else {
+                    LOGGER.info("Desktop API not supported, cannot open browser.");
                 }
             }
         });
@@ -236,7 +243,7 @@ public class AboutBox {
         
         // Link project version if href is not null.
         if (href != null) {
-            labelTextBuilder.append("Project version <a href=\"" + href + "\">" + projectId + "</a>");
+            labelTextBuilder.append("Project version <a href=\"\">" + projectId + "</a>");
         } else {
             labelTextBuilder.append("Project version " + projectId);
         }

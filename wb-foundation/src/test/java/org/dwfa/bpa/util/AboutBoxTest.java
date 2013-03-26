@@ -27,6 +27,7 @@ public class AboutBoxTest {
 
     @Before
     public void setUp() {
+        // Set test properties.
         appInfoProperties = new Properties();
         appInfoProperties.setProperty(GROUP_ID, groupId);
         appInfoProperties.setProperty(ARTIFACT_ID, artifactId);
@@ -89,7 +90,7 @@ public class AboutBoxTest {
         String linkLabelText = AboutBox.buildLabelText(href, projectId, archetypeId);
         
         String expectedValue = "<html><blockquote>" +
-                "Project version <a href=\"http://zzz.net\">abc:def:1.1</a>" +
+                "Project version <a href=\"\">abc:def:1.1</a>" +
                 "<br>Built from ghi:jkl:2.2" +
                 "</blockquote></html>";
         assertEquals(expectedValue, linkLabelText);
@@ -117,7 +118,7 @@ public class AboutBoxTest {
         String linkLabelText = AboutBox.buildLabelText(href, projectId, archetypeId);
         
         String expectedValue = "<html><blockquote>" +
-                "Project version <a href=\"http://zzz.net\">abc:def:1.1</a>" +
+                "Project version <a href=\"\">abc:def:1.1</a>" +
                 "</blockquote></html>";
         assertEquals(expectedValue, linkLabelText);
     }
