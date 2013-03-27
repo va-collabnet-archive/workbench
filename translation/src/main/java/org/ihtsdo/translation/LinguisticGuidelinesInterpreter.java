@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 
 import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseFactory;
@@ -14,10 +15,14 @@ import org.drools.builder.KnowledgeBuilder;
 import org.drools.builder.KnowledgeBuilderFactory;
 import org.drools.builder.ResourceType;
 import org.drools.io.Resource;
+import org.drools.io.ResourceFactory;
 import org.drools.io.impl.InputStreamResource;
 import org.drools.io.impl.ReaderInputStream;
 import org.drools.logger.KnowledgeRuntimeLoggerFactory;
 import org.drools.runtime.StatelessKnowledgeSession;
+import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.config.AceConfig;
+import org.dwfa.ace.log.AceLog;
 import org.ihtsdo.project.I_ContextualizeDescription;
 import org.ihtsdo.project.workflow.api.SimpleKindOfComputer;
 
@@ -54,34 +59,25 @@ public class LinguisticGuidelinesInterpreter {
 		super();
 		// kbase and ksession are singletons
 		try {
-		if (kbase == null || ksession == null) {
-			// Crate knowledge base with decision table
-			DecisionTableConfiguration dtableconfiguration = KnowledgeBuilderFactory.newDecisionTableConfiguration();
-			dtableconfiguration.setInputType(DecisionTableInputType.XLS);
+			if (kbase == null || ksession == null) {
+				// Crate knowledge base with decision table
+				DecisionTableConfiguration dtableconfiguration = KnowledgeBuilderFactory.newDecisionTableConfiguration();
+				dtableconfiguration.setInputType(DecisionTableInputType.XLS);
 
-			kbase = KnowledgeBaseFactory.newKnowledgeBase();
-			KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder(kbase);
+				kbase = KnowledgeBaseFactory.newKnowledgeBase();
+				KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder(kbase);
 
-			ReaderInputStream ris = null;
-			try {
-				ris = new ReaderInputStream(new FileReader(new File("drools-rules/linguistic-guidelines.xls")), "UTF-8");
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
+				Resource xlsRes = ResourceFactory.newFileResource(new File("drools-rules/linguistic-guidelines.xls"));
+				kbuilder.add(xlsRes, ResourceType.DTABLE, dtableconfiguration);
+				if (kbuilder.hasErrors()) {
+					System.err.print(kbuilder.getErrors());
+				}
+
+				kbase.addKnowledgePackages(kbuilder.getKnowledgePackages());
+				ksession = kbase.newStatelessKnowledgeSession();
 			}
-			Resource xlsRes = null;
-			xlsRes = new InputStreamResource(ris);
-			kbuilder.add(xlsRes, ResourceType.DTABLE, dtableconfiguration);
-
-			if (kbuilder.hasErrors()) {
-				System.err.print(kbuilder.getErrors());
-			}
-
-			kbase.addKnowledgePackages(kbuilder.getKnowledgePackages());
-			ksession = kbase.newStatelessKnowledgeSession();
-		}
 		} catch (Exception e) {
-			// no linguistic guidelines
-			// TODO: report
+			AceLog.getAppLog().log(Level.SEVERE, "ksession not created", e);
 		}
 	}
 
@@ -106,8 +102,7 @@ public class LinguisticGuidelinesInterpreter {
 	public List<String> getLinguisticGuidelines(I_ContextualizeDescription sourcePreferredDescription, I_ContextualizeDescription sourceFsnDescription) {
 		guidelines = new ArrayList<String>();
 		if (ksession != null) {
-			LinguistcGuidelineFacts linguisticGuidelinesFacts = new LinguistcGuidelineFacts(sourceFsnDescription.getText(), sourcePreferredDescription.getText(), sourceFsnDescription.getConcept()
-					.getPrimUuid());
+			LinguistcGuidelineFacts linguisticGuidelinesFacts = new LinguistcGuidelineFacts(sourceFsnDescription.getText(), sourcePreferredDescription.getText(), sourceFsnDescription.getConcept().getPrimUuid());
 			KnowledgeRuntimeLoggerFactory.newConsoleLogger(ksession);
 			ksession.setGlobal("guidelines", guidelines);
 			ksession.setGlobal("kindOfComputer", new SimpleKindOfComputer());
