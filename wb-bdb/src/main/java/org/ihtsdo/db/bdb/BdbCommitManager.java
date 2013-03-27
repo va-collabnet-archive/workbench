@@ -607,6 +607,8 @@ public class BdbCommitManager {
 
         if (performCommit) {
             return true;
+        }else{
+            updateAlerts();
         }
 
         return false;
@@ -807,6 +809,8 @@ public class BdbCommitManager {
 
         if (performCommit) {
             return true;
+        }else{
+            updateAlerts();
         }
 
         return false;
