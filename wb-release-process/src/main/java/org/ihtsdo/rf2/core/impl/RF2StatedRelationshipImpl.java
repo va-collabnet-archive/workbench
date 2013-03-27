@@ -216,7 +216,8 @@ public class RF2StatedRelationshipImpl extends RF2AbstractImpl implements I_Proc
 					if (moduleNspId!=null){
 						moduleId=moduleNspId[0];
 						String namespaceId=moduleNspId[1];
-						UUID componentUuid = Type5UuidFactory.get(sourceId + destinationId + relTypeId + relationshipGroup);	// sourceId + destinationId + typeId + relationshipGroup
+//						UUID componentUuid = Type5UuidFactory.get(sourceId + destinationId + relTypeId + relationshipGroup);	// sourceId + destinationId + typeId + relationshipGroup
+						UUID componentUuid = rel.getUUIDs().iterator().next();
 
 						relationshipId= getSCTId(getConfig(), componentUuid, Integer.parseInt(namespaceId), getConfig().getPartitionId(), getConfig().getReleaseDate(), getConfig().getExecutionId(), moduleId);
 					}
