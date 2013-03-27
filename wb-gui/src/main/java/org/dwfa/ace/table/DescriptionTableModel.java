@@ -55,6 +55,7 @@ import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.description.DescriptionChronicleBI;
+import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.api.id.IdBI;
 import org.ihtsdo.tk.api.id.LongIdBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
@@ -187,7 +188,8 @@ public abstract class DescriptionTableModel extends AbstractTableModel {
                     return new StringWithDescTuple(Boolean.toString(desc.isInitialCaseSignificant()), desc, false,
                             inConflict);
                 case STATUS:
-                    return new StringWithDescTuple(getPrefText(desc.getStatusNid()), desc, false, inConflict);
+                    DescriptionVersionBI dv = (DescriptionVersionBI) Ts.get().getComponentVersion(config.getViewCoordinate(), desc.getNid());
+                    return new StringWithDescTuple(getPrefText(dv.getStatusNid()), desc, false, inConflict);
                 case AUTHOR:
                     return new StringWithDescTuple(getPrefText(desc.getAuthorNid()), desc, false, inConflict);
                 case TYPE:

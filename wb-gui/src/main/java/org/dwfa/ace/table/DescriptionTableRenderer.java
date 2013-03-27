@@ -19,6 +19,8 @@ package org.dwfa.ace.table;
 import java.awt.Color;
 import java.awt.Component;
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.JLabel;
 import javax.swing.JTable;
@@ -29,6 +31,9 @@ import javax.swing.text.View;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.table.DescriptionTableModel.StringWithDescTuple;
+import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.ContradictionException;
+import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 
 public class DescriptionTableRenderer extends AceTableRenderer {
 
@@ -89,7 +94,15 @@ public class DescriptionTableRenderer extends AceTableRenderer {
                 }
                 boolean uncommitted = swt.getTuple().getVersion() == Integer.MAX_VALUE;
                 if (renderInactive) {
-                    boolean active = frameConfig.getAllowedStatus().contains(swt.getTuple().getStatusId());
+                    DescriptionVersionBI dv = null;
+                    try {
+                        dv = (DescriptionVersionBI) Ts.get().getComponentVersion(frameConfig.getViewCoordinate(), swt.getTuple().getNid());
+                    } catch (IOException ex) {
+                        Logger.getLogger(DescriptionTableRenderer.class.getName()).log(Level.SEVERE, null, ex);
+                    } catch (ContradictionException ex) {
+                        Logger.getLogger(DescriptionTableRenderer.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                    boolean active = frameConfig.getAllowedStatus().contains(dv.getStatusNid());
                     if (active == false) {
                         renderComponent.setBackground(Color.LIGHT_GRAY);
                     }
