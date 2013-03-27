@@ -30,7 +30,7 @@
 	<scm>
 		<connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/branches/wb-toolkit_trek-release-termmed-uktc</connection>
 		<developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/branches/wb-toolkit_trek-release-termmed-uktc</developerConnection>
-		<url>https://csfe.aceworkspace.net/integration/viewvc/viewvc.cgi/branches/wb-toolkit_trek-release-termmed-uktc/?root=workbench&amp;system=exsy1002</url>
+		<url>https://csfe.aceworkspace.net/svn/repos/workbench/branches/wb-toolkit_trek-release-termmed-uktc</url>
 	</scm>
 	<properties>
 		<branch>trek</branch>
