@@ -89,7 +89,7 @@ public class WfComponentProvider {
 
 				I_ConceptAttributeVersioned attr = user.getConAttrs();
 				if (TerminologyProjectDAO.isActive(attr.getStatusNid())) {
-					wfUsers.add(new WfUser(user.toUserString(), user.getUids().iterator().next(), null));
+					wfUsers.add(new WfUser(user.toString(), user.getUids().iterator().next(), null));
 
 					Set<? extends I_GetConceptData> allDescUsers = user.getDestRelOrigins(Terms.get().getActiveAceFrameConfig().getAllowedStatus(), allowedTypes, Terms.get().getActiveAceFrameConfig().getViewPositionSetReadOnly(), Precedence.TIME, Terms.get().getActiveAceFrameConfig()
 							.getConflictResolutionStrategy());
@@ -97,7 +97,7 @@ public class WfComponentProvider {
 
 						attr = descUser.getConAttrs();
 						if (TerminologyProjectDAO.isActive(attr.getStatusNid())) {
-							wfUsers.add(new WfUser(descUser.toUserString(), descUser.getUids().iterator().next(), null));
+							wfUsers.add(new WfUser(descUser.toString(), descUser.getUids().iterator().next(), null));
 
 						}
 					}

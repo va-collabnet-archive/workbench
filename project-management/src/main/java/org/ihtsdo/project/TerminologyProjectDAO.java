@@ -4375,7 +4375,7 @@ public class TerminologyProjectDAO {
 		String name = "";
 		try {
 			ConceptVersionBI conceptVersion = Ts.get().getConceptVersion(config.getViewCoordinate(),workListMemberConcept.getNid());
-			name = conceptVersion.getDescriptionPreferred().toUserString();
+			name = conceptVersion.getDescriptionPreferred().getText();
 
 			Collection<? extends RefexChronicleBI<?>> members = workListMemberConcept.getAnnotations();
 			for (RefexChronicleBI<?> promotionMember : members) {

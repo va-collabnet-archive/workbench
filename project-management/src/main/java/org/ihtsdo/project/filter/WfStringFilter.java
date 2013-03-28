@@ -57,7 +57,7 @@ public class WfStringFilter implements WfFilterBI {
 	public boolean evaluateInstance(WfProcessInstanceBI instance) {
 		try {
 			ConceptVersionBI concept = Ts.get().getConceptVersion(Terms.get().getActiveAceFrameConfig().getViewCoordinate(), instance.getComponentPrimUuid());
-			return concept.getDescriptionPreferred().toUserString().toLowerCase().contains(string.toLowerCase());
+			return concept.getDescriptionPreferred().getText().toLowerCase().contains(string.toLowerCase());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
