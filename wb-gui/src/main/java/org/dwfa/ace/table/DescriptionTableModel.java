@@ -189,7 +189,10 @@ public abstract class DescriptionTableModel extends AbstractTableModel {
                             inConflict);
                 case STATUS:
                     DescriptionVersionBI dv = (DescriptionVersionBI) Ts.get().getComponentVersion(config.getViewCoordinate(), desc.getNid());
-                    return new StringWithDescTuple(getPrefText(dv.getStatusNid()), desc, false, inConflict);
+                    if (dv != null){
+                        return new StringWithDescTuple(getPrefText(dv.getStatusNid()), desc, false, inConflict);
+                    }
+                    return new StringWithDescTuple(getPrefText(desc.getStatusNid()), desc, false, inConflict);
                 case AUTHOR:
                     return new StringWithDescTuple(getPrefText(desc.getAuthorNid()), desc, false, inConflict);
                 case TYPE:
