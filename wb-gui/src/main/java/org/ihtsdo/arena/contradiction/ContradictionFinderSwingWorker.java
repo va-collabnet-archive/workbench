@@ -299,7 +299,7 @@ public class ContradictionFinderSwingWorker
                 ConceptChronicleBI conceptToAdjudicate = 
                         Ts.get().getConceptForNid(currentIterator.nid());
                 conceptToAdjudicate.addAnnotation(member);
-                Ts.get().addUncommitted(conceptToAdjudicate);
+                Ts.get().addUncommittedNoChecks(conceptToAdjudicate);
                 Ts.get().commit(conceptToAdjudicate,
                         adjudicationWorkListChangeSetPolicy);
             }
