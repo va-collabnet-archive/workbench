@@ -41,6 +41,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
+import java.util.logging.Level;
 
 import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
@@ -310,6 +311,7 @@ public class WorkSetDetailsPanel extends JPanel {
 			ArrayList<WorkSetMember> result = new ArrayList<WorkSetMember>();
 			try {
 				Collection<? extends I_ExtendByRef> membersExtensions = termFactory.getRefsetExtensionMembers(workSet.getId());
+				AceLog.getAppLog().log(Level.INFO, "Members: " + membersExtensions.size());
 				for (I_ExtendByRef extension : membersExtensions) {
 					I_ExtendByRefPart lastPart = TerminologyProjectDAO.getLastExtensionPart(extension);
 					if (TerminologyProjectDAO.isActive(lastPart.getStatusNid())) {
@@ -340,6 +342,7 @@ public class WorkSetDetailsPanel extends JPanel {
 						}
 						if (i + 1 == tableModel.size()) {
 							tableModel.addElement(member);
+							break;
 						}
 					}
 				}
