@@ -216,9 +216,9 @@ public class GenerateUsersExtended extends AbstractMojo {
     */
    private String                 version;
    private File                   userConfigFile;
-   private String                 langSortPref;
+   private String                 langSortPref = "rf2";
    private String                 langPrefOrder;
-   private String                 statedInferredPolicy;
+   private String                 statedInferredPolicy = "is";
    private ConceptSpec            defaultStatus;
    private ConceptSpec            defaultDescType;
    private ConceptSpec            defaultRelType;
@@ -226,35 +226,35 @@ public class GenerateUsersExtended extends AbstractMojo {
    private ConceptSpec            defaultRelRefinability;
    private ConceptSpec            module;
    private String                 visibleRefests;
-   private String                 projectDevelopmentPathFsn;
+   private String                 projectDevelopmentPathFsn = "Workbench Auxiliary";
    private String                 projectDevelopmentParentPathFsn;
    private String                 projectDevelopmentParentPathUuid;
    private String                 projectDevelopmentOriginPathFsn;
-   private String                 projectDevelopmentViewPathFsn;
+   private String                 projectDevelopmentViewPathFsn = "Workbench Auxiliary";
    private String                 projectDevelopmentAdjPathFsn;
    private String                 hasDevPathAsOriginPathFsn;
    private I_ConfigAceFrame       userConfig;
    private I_ConfigAceFrame       defaultConfig;
-   private String                 generateAdjCs;
-   private ArrayList<ConceptSpec> cBooleanRefsets;
-   private ArrayList<ConceptSpec> cConceptRefsets;
-   private ArrayList<ConceptSpec> cConIntRefsets;
-   private ArrayList<ConceptSpec> cIntegerRefsets;
-   private ArrayList<ConceptSpec> cStringRefsets;
-   private ArrayList<ConceptSpec> cConConConRefsets;
-   private ArrayList<ConceptSpec> dBooleanRefsets;
-   private ArrayList<ConceptSpec> dConceptRefsets;
-   private ArrayList<ConceptSpec> dConIntRefsets;
-   private ArrayList<ConceptSpec> dIntegerRefsets;
-   private ArrayList<ConceptSpec> dStringRefsets;
-   private ArrayList<ConceptSpec> dConConConRefsets;
-   private ArrayList<ConceptSpec> destRelTypesList;
-   private ArrayList<ConceptSpec> cConceptRefsetStatus;
-   private ArrayList<ConceptSpec> cConceptRefsetConTypes;
-   private ArrayList<ConceptSpec> dConceptRefsetStatus;
-   private ArrayList<ConceptSpec> dConceptRefsetConTypes;
+   private String                 generateAdjCs = "false";
+   private ArrayList<ConceptSpec> cBooleanRefsets = new ArrayList<>();
+   private ArrayList<ConceptSpec> cConceptRefsets = new ArrayList<>();
+   private ArrayList<ConceptSpec> cConIntRefsets = new ArrayList<>();
+   private ArrayList<ConceptSpec> cIntegerRefsets = new ArrayList<>();
+   private ArrayList<ConceptSpec> cStringRefsets = new ArrayList<>();
+   private ArrayList<ConceptSpec> cConConConRefsets = new ArrayList<>();
+   private ArrayList<ConceptSpec> dBooleanRefsets = new ArrayList<>();
+   private ArrayList<ConceptSpec> dConceptRefsets = new ArrayList<>();
+   private ArrayList<ConceptSpec> dConIntRefsets = new ArrayList<>();
+   private ArrayList<ConceptSpec> dIntegerRefsets = new ArrayList<>();
+   private ArrayList<ConceptSpec> dStringRefsets = new ArrayList<>();
+   private ArrayList<ConceptSpec> dConConConRefsets = new ArrayList<>();
+   private ArrayList<ConceptSpec> destRelTypesList = new ArrayList<>();
+   private ArrayList<ConceptSpec> cConceptRefsetStatus = new ArrayList<>();
+   private ArrayList<ConceptSpec> cConceptRefsetConTypes = new ArrayList<>();
+   private ArrayList<ConceptSpec> dConceptRefsetStatus = new ArrayList<>();
+   private ArrayList<ConceptSpec> dConceptRefsetConTypes = new ArrayList<>();
    private ConceptSpec            refsetStatus;
-   private ArrayList<ConceptSpec> additionalRoots;
+   private ArrayList<ConceptSpec> additionalRoots = new ArrayList<>();
 
    private void addRelPermission(String userName, String typeUid,
                                  String typeName, String targetUid,
@@ -512,7 +512,7 @@ public class GenerateUsersExtended extends AbstractMojo {
                // add users to wf permissions refset
                I_TermFactory tf = Terms.get();
 
-               if (createdUsers) {
+//               if (createdUsers) {
                   defaultConfig = newProfile(null, null, null, null, null);
 
                   Set<PathBI> editingPathSet =
@@ -624,7 +624,7 @@ NEXT_WHILE:
                      getLog().warn("No relPermissionsFile: "
                                    + relPermissionsFile.getAbsolutePath());
                   }
-               }
+//               }
 
                Terms.get().commit();
                getLog().info("Starting close.");
@@ -848,21 +848,30 @@ NEXT_WHILE:
          }
       }
 
-      activeConfig.setDestRelTypes(destRelTypes);
-
-      // set up editing defaults
-      activeConfig.setDefaultImageType(
-          tf.getConcept(TermAux.AUX_IMAGE.getLenient().getUUIDs()));
-      activeConfig.setDefaultDescriptionType(
-          tf.getConcept(defaultDescType.getLenient().getUUIDs()));
-      activeConfig.setDefaultRelationshipCharacteristic(
-          tf.getConcept(defaultRelChar.getLenient().getUUIDs()));
-      activeConfig.setDefaultRelationshipRefinability(
-          tf.getConcept(defaultRelRefinability.getLenient().getUUIDs()));
-      activeConfig.setDefaultRelationshipType(
-          tf.getConcept(defaultRelType.getLenient().getUUIDs()));
-      activeConfig.setDefaultStatus(
-          tf.getConcept(defaultStatus.getLenient().getUUIDs()));
+       activeConfig.setDestRelTypes(destRelTypes);
+       // set up editing defaults
+       activeConfig.setDefaultImageType(
+               tf.getConcept(TermAux.AUX_IMAGE.getLenient().getUUIDs()));
+       if (defaultDescType != null) {
+           activeConfig.setDefaultDescriptionType(
+                   tf.getConcept(defaultDescType.getLenient().getUUIDs()));
+       }
+       if (defaultRelChar != null) {
+           activeConfig.setDefaultRelationshipCharacteristic(
+                   tf.getConcept(defaultRelChar.getLenient().getUUIDs()));
+       }
+       if (defaultRelRefinability != null) {
+           activeConfig.setDefaultRelationshipRefinability(
+                   tf.getConcept(defaultRelRefinability.getLenient().getUUIDs()));
+       }
+       if (defaultRelType != null) {
+           activeConfig.setDefaultRelationshipType(
+                   tf.getConcept(defaultRelType.getLenient().getUUIDs()));
+       }
+       if (defaultStatus != null) {
+           activeConfig.setDefaultStatus(
+                   tf.getConcept(defaultStatus.getLenient().getUUIDs()));
+       }
 
       // set up refset defaults for editing
       I_HoldRefsetPreferences attribRefsetPref =
@@ -1168,15 +1177,14 @@ NEXT_WHILE:
           SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getLenient().getNid());
 
       // set up paths
-      PathBI viewPath =
-         tf.getPath(Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC,
-                                         this.projectDevelopmentViewPathFsn));
-      PositionBI      viewPosition = tf.newPosition(viewPath, Long.MAX_VALUE);
-      Set<PositionBI> viewSet      = new HashSet<PositionBI>();
+          PathBI viewPath =
+                  tf.getPath(Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC,
+                  this.projectDevelopmentViewPathFsn));
+          PositionBI viewPosition = tf.newPosition(viewPath, Long.MAX_VALUE);
+          Set<PositionBI> viewSet = new HashSet<PositionBI>();
 
-      viewSet.add(viewPosition);
-      activeConfig.setViewPositions(viewSet);
-
+          viewSet.add(viewPosition);
+          activeConfig.setViewPositions(viewSet);
       PathBI editPath = null;
 
       if (!makeUserDevPath) {
@@ -1269,14 +1277,15 @@ NEXT_WHILE:
          activeConfig.getLanguagePreferenceList();
 
       languagePreferenceList.clear();
+       if (langPrefOrder != null) {
+           String[] langPrefConcepts = langPrefOrder.split(";");
 
-      String[] langPrefConcepts = langPrefOrder.split(";");
+           for (String langPref : langPrefConcepts) {
+               ConceptSpec lang = getConceptSpecFromPrefs(langPref.trim());
 
-      for (String langPref : langPrefConcepts) {
-         ConceptSpec lang = getConceptSpecFromPrefs(langPref.trim());
-
-         languagePreferenceList.add(lang.getLenient().getNid());
-      }
+               languagePreferenceList.add(lang.getLenient().getNid());
+           }
+       }
 
       /*
        * statedInferredPolicy preference options: stated (s), inferred (i),
@@ -1304,46 +1313,48 @@ NEXT_WHILE:
        *
        * Available types: boolean,concept, conInt, string, integer, conConCon
        */
-      String[] refsets = visibleRefests.split(",");
+       if (visibleRefests != null) {
+           String[] refsets = visibleRefests.split(",");
 
-      for (String r : refsets) {
-         String                            toggle     =
-            r.substring(0, r.indexOf(".")).trim();
-         String                            refset     =
-            r.substring(r.indexOf(".") + 1).trim();
-         I_HostConceptPlugins.TOGGLES      t          = null;
-         I_HostConceptPlugins.REFSET_TYPES refsetType = null;
+           for (String r : refsets) {
+               String toggle =
+                       r.substring(0, r.indexOf(".")).trim();
+               String refset =
+                       r.substring(r.indexOf(".") + 1).trim();
+               I_HostConceptPlugins.TOGGLES t = null;
+               I_HostConceptPlugins.REFSET_TYPES refsetType = null;
 
-         if (toggle.equals("concept")) {
-            t = I_HostConceptPlugins.TOGGLES.ATTRIBUTES;
-         } else if (toggle.equals("desc")) {
-            t = I_HostConceptPlugins.TOGGLES.DESCRIPTIONS;
-         } else {
-            throw new MojoExecutionException(
-                "Can't handle value:  " + toggle
-                + " For preference: visibleRefsets.component");
-         }
+               if (toggle.equals("concept")) {
+                   t = I_HostConceptPlugins.TOGGLES.ATTRIBUTES;
+               } else if (toggle.equals("desc")) {
+                   t = I_HostConceptPlugins.TOGGLES.DESCRIPTIONS;
+               } else {
+                   throw new MojoExecutionException(
+                           "Can't handle value:  " + toggle
+                           + " For preference: visibleRefsets.component");
+               }
 
-         if (refset.equals("boolean")) {
-            refsetType = I_HostConceptPlugins.REFSET_TYPES.BOOLEAN;
-         } else if (refset.equals("concept")) {
-            refsetType = I_HostConceptPlugins.REFSET_TYPES.CONCEPT;
-         } else if (refset.equals("conInt")) {
-            refsetType = I_HostConceptPlugins.REFSET_TYPES.CON_INT;
-         } else if (refset.equals("string")) {
-            refsetType = I_HostConceptPlugins.REFSET_TYPES.STRING;
-         } else if (refset.equals("integer")) {
-            refsetType = I_HostConceptPlugins.REFSET_TYPES.INTEGER;
-         } else if (refset.equals("conConCon")) {
-            refsetType = I_HostConceptPlugins.REFSET_TYPES.CID_CID_CID;
-         } else {
-            throw new MojoExecutionException(
-                "Can't handle value:  " + refset
-                + " For preference: visibleRefsets.type");
-         }
+               if (refset.equals("boolean")) {
+                   refsetType = I_HostConceptPlugins.REFSET_TYPES.BOOLEAN;
+               } else if (refset.equals("concept")) {
+                   refsetType = I_HostConceptPlugins.REFSET_TYPES.CONCEPT;
+               } else if (refset.equals("conInt")) {
+                   refsetType = I_HostConceptPlugins.REFSET_TYPES.CON_INT;
+               } else if (refset.equals("string")) {
+                   refsetType = I_HostConceptPlugins.REFSET_TYPES.STRING;
+               } else if (refset.equals("integer")) {
+                   refsetType = I_HostConceptPlugins.REFSET_TYPES.INTEGER;
+               } else if (refset.equals("conConCon")) {
+                   refsetType = I_HostConceptPlugins.REFSET_TYPES.CID_CID_CID;
+               } else {
+                   throw new MojoExecutionException(
+                           "Can't handle value:  " + refset
+                           + " For preference: visibleRefsets.type");
+               }
 
-         activeConfig.setRefsetInToggleVisible(refsetType, t, true);
-      }
+               activeConfig.setRefsetInToggleVisible(refsetType, t, true);
+           }
+       }
 
       return activeConfig;
    }
