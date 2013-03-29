@@ -61,6 +61,8 @@ import org.ihtsdo.tk.api.id.LongIdBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.refex.type_nid.RefexNidVersionBI;
+import org.ihtsdo.tk.binding.snomed.RefsetAux;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 import org.ihtsdo.tk.binding.snomed.WbDescType;
 import org.ihtsdo.tk.spec.ConceptSpec;
@@ -196,16 +198,25 @@ public abstract class DescriptionTableModel extends AbstractTableModel {
                 case AUTHOR:
                     return new StringWithDescTuple(getPrefText(desc.getAuthorNid()), desc, false, inConflict);
                 case TYPE:
-                    if (desc.getTypeNid() == WbDescType.SYNONYM.getLenient().getNid()
-                            && isPreferredTerm(desc, Refsets.EN_US_LANG) && isPreferredTerm(desc, Refsets.EN_GB_LANG)) {
+                    if (desc.getTypeNid() == SnomedMetadataRfx.getDES_SYNONYM_NID()
+                            && isPreferredTerm(desc, SnomedMetadataRf2.US_ENGLISH_REFSET_RF2) && isPreferredTerm(desc, SnomedMetadataRf2.GB_ENGLISH_REFSET_RF2)) {
                         return new StringWithDescTuple(getPrefText(desc.getTypeNid()) + " pt:EN", desc, false, inConflict);
-                    }else if (desc.getTypeNid() == WbDescType.SYNONYM.getLenient().getNid()
-                            && isPreferredTerm(desc, Refsets.EN_US_LANG) && !isPreferredTerm(desc, Refsets.EN_GB_LANG)) {
+                    }else if (desc.getTypeNid() == SnomedMetadataRfx.getDES_SYNONYM_NID()
+                            && isPreferredTerm(desc, SnomedMetadataRf2.US_ENGLISH_REFSET_RF2) && !isPreferredTerm(desc, SnomedMetadataRf2.GB_ENGLISH_REFSET_RF2)) {
                         return new StringWithDescTuple(getPrefText(desc.getTypeNid()) + " pt:US", desc, false, inConflict);
-                    }else if (desc.getTypeNid() == WbDescType.SYNONYM.getLenient().getNid()
-                            && !isPreferredTerm(desc, Refsets.EN_US_LANG) && isPreferredTerm(desc, Refsets.EN_GB_LANG)) {
+                    }else if (desc.getTypeNid() == SnomedMetadataRfx.getDES_SYNONYM_NID()
+                            && !isPreferredTerm(desc, SnomedMetadataRf2.US_ENGLISH_REFSET_RF2) && isPreferredTerm(desc, SnomedMetadataRf2.GB_ENGLISH_REFSET_RF2)) {
                         return new StringWithDescTuple(getPrefText(desc.getTypeNid()) + " pt:GB", desc, false, inConflict);
-                    } else {
+                    } else if (desc.getTypeNid() == SnomedMetadataRfx.getDES_SYNONYM_NID()
+                            && isPreferredTerm(desc, RefsetAux.DA_REFEX)) {
+                        return new StringWithDescTuple(getPrefText(desc.getTypeNid()) + " pt:DA", desc, false, inConflict);
+                    }else if (desc.getTypeNid() == SnomedMetadataRfx.getDES_SYNONYM_NID()
+                            && isPreferredTerm(desc, RefsetAux.SV_REFEX)) {
+                        return new StringWithDescTuple(getPrefText(desc.getTypeNid()) + " pt:SV", desc, false, inConflict);
+                    }else if (desc.getTypeNid() == SnomedMetadataRfx.getDES_SYNONYM_NID()
+                            && isPreferredTerm(desc, RefsetAux.NL_REFEX)) {
+                        return new StringWithDescTuple(getPrefText(desc.getTypeNid()) + " pt:NL", desc, false, inConflict);
+                    }else {
                         return new StringWithDescTuple(getPrefText(desc.getTypeNid()), desc, false, inConflict);
                     }
                 case VERSION:
@@ -247,14 +258,15 @@ public abstract class DescriptionTableModel extends AbstractTableModel {
     private boolean isPreferredTerm(I_DescriptionTuple desc, ConceptSpec evalRefset) {
         boolean isPreferredTerm = false;
         try {
-            Collection<? extends RefexChronicleBI> refexes =
-                    desc.getRefexesActive(config.getViewCoordinate());
-            int evalRefsetNid = Ts.get().getNidForUuids(evalRefset.getUuids());
+            if (Ts.get().hasUuid(evalRefset.getUuids()[0])) {
+                Collection<? extends RefexChronicleBI> refexes =
+                        desc.getRefexesActive(config.getViewCoordinate());
+                int evalRefsetNid = Ts.get().getNidForUuids(evalRefset.getUuids());
 
-            if (refexes != null) {
-                for (RefexChronicleBI refex : refexes) {
-                    if (refex.getRefexNid() == evalRefsetNid) {
-                        if (RefexVersionBI.class.isAssignableFrom(refex.getClass())) {
+                if (refexes != null) {
+                    for (RefexChronicleBI refex : refexes) {
+                        if (refex.getRefexNid() == evalRefsetNid) {
+                            if (RefexVersionBI.class.isAssignableFrom(refex.getClass())) {
                                 RefexVersionBI<?> rv = (RefexVersionBI<?>) refex;
 
                                 if (RefexNidVersionBI.class.isAssignableFrom(rv.getClass())) {
@@ -268,13 +280,14 @@ public abstract class DescriptionTableModel extends AbstractTableModel {
                             } else {
                                 System.out.println("Can't convert: RefexVersionBI:  " + refex);
                             }
+                        }
                     }
                 }
             }
             return isPreferredTerm;
-        }catch (IOException e) {
+        } catch (IOException e) {
             return isPreferredTerm;
-    }
+        }
 }
 protected abstract I_DescriptionTuple getDescription(int rowIndex) throws IOException;
 
