@@ -475,11 +475,11 @@ public class WorkbenchRunner {
         TtkPreferences.set(prefs);
         
         // If user preferences don't already exist, load defaults from file.
-        if (prefs.childrenNames().length == 0) {
+//        if (prefs.childrenNames().length == 0) {
             File preferencesFile = new File(userProfile.getParentFile(), "Preferences.xml");
             InputStream is = new FileInputStream(preferencesFile);
             Preferences.importPreferences(is);
-        }
+//        }
         
         // Bring up to date.
         prefs.sync();
