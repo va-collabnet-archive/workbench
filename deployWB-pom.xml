@@ -87,11 +87,11 @@
 		
 		<!-- From editor-sync -->
 		
-		<dependency>
+		<!--  <dependency>
         <groupId>org.dwfa.jini</groupId>
         <artifactId>jsk-dl</artifactId>
         <version>${org.dwfa.jini.version}</version>
-      </dependency>
+      </dependency>-->
 		
 		<dependency>
             <groupId>org.apache.lucene</groupId>
