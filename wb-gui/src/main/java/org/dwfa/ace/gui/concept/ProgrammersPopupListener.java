@@ -285,7 +285,7 @@ public class ProgrammersPopupListener extends MouseAdapter implements ActionList
                     "");
 			
 			if (start == null || start.trim().isEmpty()) {
-				start = "02/25/13 00:00:00";
+				start = "01/01/13 00:00:00";
 			}
 			
 			String end = (String) JOptionPane.showInputDialog(
@@ -298,7 +298,7 @@ public class ProgrammersPopupListener extends MouseAdapter implements ActionList
                     "");
 			
 			if (end == null || end.trim().isEmpty()) {
-				end = "03/01/13 00:00:00";
+				end = "12/31/13 00:00:00";
 			}
 
 			wf.sendAllChangesInTimeRangeToDefaultWorkflow(start, end);
