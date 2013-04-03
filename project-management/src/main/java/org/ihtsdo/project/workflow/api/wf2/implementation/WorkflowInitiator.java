@@ -62,41 +62,37 @@ public class WorkflowInitiator implements WorkflowInitiatiorBI {
 			alreadySeen.put(workflowNid, new NidSet());
 		}
 
-		SwingUtilities.invokeLater(new Runnable() {
-			synchronized
-			public void run() {
-				ConceptChronicleBI concept=null;
-				try {
-					I_RepresentIdSet idSet=(I_RepresentIdSet)myEvt.getNewValue();
-					if (idSet!=null){
-						NidBitSetItrBI possibleItr = idSet.iterator();
-						while (possibleItr.next()) {
-//							System.out.println("AlreadySeen: " + alreadySeen.get(workflowNid).contains(possibleItr.nid()) + " lastComplete: " + lastComplete.containsKey(possibleItr.nid()));
-							if (lastComplete.containsKey(possibleItr.nid())) {
-//								System.out.println("Diff cache time: " + (System.currentTimeMillis() - lastComplete.get(possibleItr.nid())));
-							}
-							
-							// 
-							if (!alreadySeen.get(workflowNid).contains(possibleItr.nid()) && (!lastComplete.containsKey(possibleItr.nid()) ||
-									(System.currentTimeMillis() - lastComplete.get(possibleItr.nid()) >  3000))) {
-								alreadySeen.get(workflowNid).add(possibleItr.nid());
-								concept=Ts.get().getConcept(possibleItr.nid());
-								if (concept!=null){
-//									System.out.println("Sending to workflow: " + concept.toString());
+
+		ConceptChronicleBI concept=null;
+		try {
+			I_RepresentIdSet idSet=(I_RepresentIdSet)myEvt.getNewValue();
+			if (idSet!=null){
+				NidBitSetItrBI possibleItr = idSet.iterator();
+				while (possibleItr.next()) {
+					//							System.out.println("AlreadySeen: " + alreadySeen.get(workflowNid).contains(possibleItr.nid()) + " lastComplete: " + lastComplete.containsKey(possibleItr.nid()));
+					if (lastComplete.containsKey(possibleItr.nid())) {
+						//								System.out.println("Diff cache time: " + (System.currentTimeMillis() - lastComplete.get(possibleItr.nid())));
+					}
+
+					// 
+					if (!alreadySeen.get(workflowNid).contains(possibleItr.nid()) && (!lastComplete.containsKey(possibleItr.nid()) ||
+							(System.currentTimeMillis() - lastComplete.get(possibleItr.nid()) >  3000))) {
+						alreadySeen.get(workflowNid).add(possibleItr.nid());
+						concept=Ts.get().getConcept(possibleItr.nid());
+						if (concept!=null){
+							//									System.out.println("Sending to workflow: " + concept.toString());
 									addComponentToDefaultWorklist(concept);
-								}
 							}
 						}
-						
 					}
-				} catch (IOException e) {
-					e.printStackTrace();
-				} catch (CancellationException e) {
-				} catch (Exception e) {
-					e.printStackTrace();
+
 				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			} catch (CancellationException e) {
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
-		});
 		return true;
 	}
 
@@ -128,7 +124,7 @@ public class WorkflowInitiator implements WorkflowInitiatiorBI {
 
 				boolean alreadyActiveInProject = false;
 				WfProcessInstanceBI completeInstanceInSameWorklist = null;
-				
+
 				for (WfProcessInstanceBI loopInstance : instances) {
 					if (!loopInstance.isCompleted()){
 						I_TerminologyProject loopProject = TerminologyProjectDAO.getProjectForWorklist((WorkList) loopInstance.getWorkList(), config);
@@ -152,7 +148,7 @@ public class WorkflowInitiator implements WorkflowInitiatiorBI {
 				if ( alreadyActiveInProject ){ //instance!=null
 					return false;
 				}
-				
+
 				if (completeInstanceInSameWorklist != null) {
 					I_GetConceptData assingStatus = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_ASSIGNED_STATUS.getUids());
 					completeInstanceInSameWorklist.setState(new WfState(assingStatus.toString(), assingStatus.getPrimUuid()));
@@ -169,35 +165,35 @@ public class WorkflowInitiator implements WorkflowInitiatiorBI {
 		}
 		return false;
 	}
-	
+
 	private class LruCache<A, B> extends LinkedHashMap<A, B> {
-	    private final int maxEntries;
+		private final int maxEntries;
 
-	    public LruCache(final int maxEntries) {
-	        super(maxEntries + 1, 1.0f, true);
-	        this.maxEntries = maxEntries;
-	    }
+		public LruCache(final int maxEntries) {
+			super(maxEntries + 1, 1.0f, true);
+			this.maxEntries = maxEntries;
+		}
 
-	    /**
-	     * Returns <tt>true</tt> if this <code>LruCache</code> has more entries than the maximum specified when it was
-	     * created.
-	     *
-	     * <p>
-	     * This method <em>does not</em> modify the underlying <code>Map</code>; it relies on the implementation of
-	     * <code>LinkedHashMap</code> to do that, but that behavior is documented in the JavaDoc for
-	     * <code>LinkedHashMap</code>.
-	     * </p>
-	     *
-	     * @param eldest
-	     *            the <code>Entry</code> in question; this implementation doesn't care what it is, since the
-	     *            implementation is only dependent on the size of the cache
-	     * @return <tt>true</tt> if the oldest
-	     * @see java.util.LinkedHashMap#removeEldestEntry(Map.Entry)
-	     */
-	    @Override
-	    protected boolean removeEldestEntry(final Map.Entry<A, B> eldest) {
-	        return super.size() > maxEntries;
-	    }
+		/**
+		 * Returns <tt>true</tt> if this <code>LruCache</code> has more entries than the maximum specified when it was
+		 * created.
+		 *
+		 * <p>
+		 * This method <em>does not</em> modify the underlying <code>Map</code>; it relies on the implementation of
+		 * <code>LinkedHashMap</code> to do that, but that behavior is documented in the JavaDoc for
+		 * <code>LinkedHashMap</code>.
+		 * </p>
+		 *
+		 * @param eldest
+		 *            the <code>Entry</code> in question; this implementation doesn't care what it is, since the
+		 *            implementation is only dependent on the size of the cache
+		 * @return <tt>true</tt> if the oldest
+		 * @see java.util.LinkedHashMap#removeEldestEntry(Map.Entry)
+		 */
+		@Override
+		protected boolean removeEldestEntry(final Map.Entry<A, B> eldest) {
+			return super.size() > maxEntries;
+		}
 	}
 
 
