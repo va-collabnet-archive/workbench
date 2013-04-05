@@ -561,13 +561,32 @@ public class WorkflowStore implements WorkflowStoreBI {
 	 */
 	public void sendAllChangesInTimeRangeToDefaultWorkflow(String startTime, String endTime) throws Exception {
 		WorkflowInitiator initiator = new WorkflowInitiator();
-		I_RepresentIdSet nidsToEvaluate = new IdentifierSet();
+
+		System.out.println("Starting evaluation: " + startTime + " to " +  endTime);
 		NidList changedNids = ReportingHelper.getChangedConceptNids(startTime, endTime);
+		System.out.println("Changed Nids: " + changedNids.size());
 		Iterator<Integer> nidsIterator = changedNids.iterator();
+		ConceptChronicleBI rootConcept = Ts.get().getConcept(UUID.fromString("ee9ac5d2-a07c-3981-a57a-f7f26baf38d8"));
+		int total = changedNids.size();
+		int count = 0;
 		while (nidsIterator.hasNext()) {
+			count++;
+			I_RepresentIdSet nidsToEvaluate = new IdentifierSet();
 			Integer loopNid = nidsIterator.next();
-			nidsToEvaluate.setMember(loopNid);
+			ConceptChronicleBI loopConcept = Ts.get().getConcept(loopNid);
+			boolean isKindOfSnomed = Ts.get().isKindOf(loopConcept.getConceptNid(), rootConcept.getConceptNid(), config.getViewCoordinate());
+			if (isKindOfSnomed) {
+				System.out.print("Sending: " + loopNid);
+				System.out.println(" - Concept: " + loopConcept.toString());
+				nidsToEvaluate.setMember(loopNid);
+				initiator.evaluateForWorkflowInitiation(new PropertyChangeEvent(this, "diff match", null, nidsToEvaluate));
+				System.out.println("Concept finished." + (total-count) + " more to go...");
+				Thread.sleep(1000);
+			} else {
+				System.out.print("Skipping: " + loopNid);
+				System.out.println(" - Concept: " + loopConcept.toString() + " | " + (total-count) + " more to go...");
+			}
 		}
-		initiator.evaluateForWorkflowInitiation(new PropertyChangeEvent(this, "diff match", null, nidsToEvaluate));
+		System.out.print("Workflow initiation finished.");
 	}
 }
