@@ -649,7 +649,7 @@ public class IconUtilities {
                 return EN_GBR;
             } else if (type.equals("03615ef2-aa56-336d-89c5-a1b5c4cee8f6")) {
                 return ESP;
-            } else if (type.equals("126606f9-e800-3699-877b-d6cccb35cb05")) {
+            } else if (type.equals("be446b41-0eda-3d36-84e4-ae196f05858b")) {
                 return DAN;
             }
 
