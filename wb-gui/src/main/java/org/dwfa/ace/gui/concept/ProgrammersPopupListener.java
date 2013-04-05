@@ -285,7 +285,7 @@ public class ProgrammersPopupListener extends MouseAdapter implements ActionList
                     "");
 			
 			if (start == null || start.trim().isEmpty()) {
-				start = "01/01/13 00:00:00";
+				start = "02/01/13 00:00:00";
 			}
 			
 			String end = (String) JOptionPane.showInputDialog(
