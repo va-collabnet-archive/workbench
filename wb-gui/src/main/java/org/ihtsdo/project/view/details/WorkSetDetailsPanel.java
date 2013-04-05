@@ -347,7 +347,24 @@ public class WorkSetDetailsPanel extends JPanel {
 					}
 				}
 			}
-
+			if (sourceRefsetTableModel != null && sourceRefsetTableModel.getRowCount() > 0) {
+				int membersSize = 0;
+				try {
+					if (surceRefsetMembersWorker != null && surceRefsetMembersWorker.isDone() && !surceRefsetMembersWorker.isCancelled() && surceRefsetMembersWorker.get() != null) {
+						Collection<? extends I_ExtendByRef> members;
+						members = surceRefsetMembersWorker.get();
+						membersSize = members.size();
+					}
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				} catch (ExecutionException e) {
+					e.printStackTrace();
+				}
+				worksetMembersCounter.setText("(" + tableModel.getSize() + " out of " + membersSize + ")");
+			} else {
+				worksetMembersCounter.setText("(" + tableModel.getSize() + ")");
+			}
+			worksetMembersCounter.revalidate();
 		};
 
 		/*
@@ -359,7 +376,12 @@ public class WorkSetDetailsPanel extends JPanel {
 		public void done() {
 			try {
 				if (sourceRefsetTableModel != null && sourceRefsetTableModel.getRowCount() > 0) {
-					worksetMembersCounter.setText("(" + tableModel.getSize() + " out of " + sourceRefsetTableModel.getRowCount() + ")");
+					int membersSize = 0;
+					if (surceRefsetMembersWorker != null && surceRefsetMembersWorker.isDone() && !surceRefsetMembersWorker.isCancelled() && surceRefsetMembersWorker.get() != null) {
+						Collection<? extends I_ExtendByRef> members = surceRefsetMembersWorker.get();
+						membersSize = members.size();
+					}
+					worksetMembersCounter.setText("(" + tableModel.getSize() + " out of " + membersSize + ")");
 				} else {
 					worksetMembersCounter.setText("(" + tableModel.getSize() + ")");
 				}
@@ -465,16 +487,14 @@ public class WorkSetDetailsPanel extends JPanel {
 		int n = 1;
 		try {
 			if (surceRefsetMembersWorker != null && surceRefsetMembersWorker.get() != null && surceRefsetMembersWorker.get().size() > 10000) {
-				n = JOptionPane.showConfirmDialog(this, "<html>More than " + 10000 + " refset members.<BR>" +
-						"Would you like to synchronize the WorkSet?", "Confirmation", JOptionPane.YES_NO_OPTION);
-			}else{
+				n = JOptionPane.showConfirmDialog(this, "<html>More than " + 10000 + " refset members.<BR>" + "Would you like to synchronize the WorkSet?", "Confirmation", JOptionPane.YES_NO_OPTION);
+			} else {
 				n = JOptionPane.showConfirmDialog(this, "Would you like to synchronize the WorkSet?", "Confirmation", JOptionPane.YES_NO_OPTION);
 			}
 		} catch (InterruptedException | ExecutionException e2) {
 			// TODO Auto-generated catch block
 			e2.printStackTrace();
 		}
-
 
 		if (n == 0) {
 			try {
