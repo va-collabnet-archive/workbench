@@ -41,6 +41,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.UUID;
 import java.util.prefs.BackingStoreException;
+import org.junit.Ignore;
 
 /**
  * Tests of {@link EnumBasedPreferences} class.
@@ -76,6 +77,7 @@ public class EnumBasedPreferencesTest extends TestCase {
     * Method description
     *
     */
+   @Ignore
    public void testGetDefaultAppPrefix_FromProperties() {
 
       // Create random arguments.
@@ -101,6 +103,7 @@ public class EnumBasedPreferencesTest extends TestCase {
     * Method description
     *
     */
+   @Ignore
    public void testGetDefaultAppPrefix_FromStrings() {
 
       // Create random arguments.
@@ -120,6 +123,7 @@ public class EnumBasedPreferencesTest extends TestCase {
     * Method description
     *
     */
+   @Ignore
    public void testPutGet() {
       PreferenceWithDefaultEnumBI<String> key   = new DummyPreferenceWithDefaultEnumBI<>("");
       String                              value = getRandomString(STRING_LENGTH);
@@ -132,6 +136,7 @@ public class EnumBasedPreferencesTest extends TestCase {
     * Method description
     *
     */
+   @Ignore
    public void testPutGet_Boolean() {
       PreferenceWithDefaultEnumBI<Boolean> key   = new DummyPreferenceWithDefaultEnumBI<>(false);
       boolean                              value = true;
@@ -144,6 +149,7 @@ public class EnumBasedPreferencesTest extends TestCase {
     * Method description
     *
     */
+   @Ignore
    public void testPutGet_ByteArray() {
       byte[]                              byteArray = new byte[] { 0xa, 0xb, 0xc };
       PreferenceWithDefaultEnumBI<byte[]> key       = new DummyPreferenceWithDefaultEnumBI<>(byteArray);
@@ -157,6 +163,7 @@ public class EnumBasedPreferencesTest extends TestCase {
     * Method description
     *
     */
+   @Ignore
    public void testPutGet_Double() {
       PreferenceWithDefaultEnumBI<Double> key   = new DummyPreferenceWithDefaultEnumBI<>(1.0);
       double                              value = 2.0;
@@ -169,6 +176,7 @@ public class EnumBasedPreferencesTest extends TestCase {
     * Method description
     *
     */
+   @Ignore
    public void testPutGet_Enum() {
       PreferenceWithDefaultEnumBI key   = new DummyPreferenceWithDefaultEnumBI<>(DummyEnum.JUNK1);
       Enum                        value = DummyEnum.JUNK2;
@@ -181,6 +189,7 @@ public class EnumBasedPreferencesTest extends TestCase {
     * Method description
     *
     */
+   @Ignore
    public void testPutGet_Float() {
       PreferenceWithDefaultEnumBI<Float> key   = new DummyPreferenceWithDefaultEnumBI<>(1.0f);
       float                              value = 2.0f;
@@ -193,6 +202,7 @@ public class EnumBasedPreferencesTest extends TestCase {
     * Method description
     *
     */
+   @Ignore
    public void testPutGet_Int() {
       PreferenceWithDefaultEnumBI<Integer> key   = new DummyPreferenceWithDefaultEnumBI<>(1);
       int                                  value = 2;
@@ -205,6 +215,7 @@ public class EnumBasedPreferencesTest extends TestCase {
     * Method description
     *
     */
+   @Ignore
    public void testPutGet_Long() {
       PreferenceWithDefaultEnumBI<Long> key   = new DummyPreferenceWithDefaultEnumBI<>(3l);
       long                              value = System.currentTimeMillis();
@@ -220,6 +231,7 @@ public class EnumBasedPreferencesTest extends TestCase {
     * @throws BackingStoreException
     * @throws IOException
     */
+   @Ignore
    public void testQueueListSettingsPreserved() throws BackingStoreException, IOException {
 
       // Construct a default QueuePreferences object.
