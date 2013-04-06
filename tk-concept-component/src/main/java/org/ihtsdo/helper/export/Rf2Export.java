@@ -46,6 +46,7 @@ import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.refex.type_nid.RefexNidVersionBI;
+import org.ihtsdo.tk.api.refex.type_nid_float.RefexNidFloatVersionBI;
 import org.ihtsdo.tk.binding.snomed.ConceptInactivationType;
 import org.ihtsdo.tk.binding.snomed.HistoricalRelType;
 import org.ihtsdo.tk.binding.snomed.RefsetAux;
@@ -115,9 +116,10 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
     private File directory;
     private Set<Integer> sameCycleStampNids;
     private Collection<Integer> taxonomyParentNids;
+    private ConceptVersionBI conNumRefsetParentConcept;
 
     //~--- constructors --------------------------------------------------------
-    /**
+        /**
      * Instantiates a new rf2 export.
      *
      * @param directory specifying where to write the files
@@ -142,6 +144,10 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
      * included in this release
      * @param makePrivateIdFile set to <code>true</code> to make an auxiliary
      * identifier file
+     * @param refsetParentConceptNid an integer representing the parent concept of simple refsets
+     * @param previousReleaseDate the date of the previous release
+     * @param stampsToRemove stamps to not include in the release
+     * @param taxonomyParentNids an integer representing the parent of taxonomy to release
      * @throws IOException signals that an I/O exception has occurred
      */
     public Rf2Export(File directory, ReleaseType releaseType, LANG_CODE language, COUNTRY_CODE country,
@@ -170,7 +176,78 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
             this.refsetParentConcept = Ts.get().getConceptVersion(viewCoordinate, refsetParentConceptNid);
         }
         this.taxonomyParentNids = taxonomyParentNids;
-
+        if(releaseType.equals(ReleaseType.DELTA) && previousReleaseDate != null){
+            for(int stamp : stampNids){
+                long time = Ts.get().getTimeForStampNid(stamp);
+                if(time < previousReleaseDate.getTime()){
+                    stampNids.remove(stamp);
+                }
+            }
+        }
+        
+        setup();
+    }
+    /**
+     * Instantiates a new rf2 export.
+     *
+     * @param directory specifying where to write the files
+     * @param releaseType the <code>ReleaseType</code> representing the type of
+     * release
+     * @param language the <code>LANG_CODE</code> representing the language of
+     * the release
+     * @param country the <code>COUNTRY_CODE</code> representing the country
+     * associated with the release
+     * @param namespace the String representing the namespace associated with
+     * the released content
+     * @param module the String representing the module associated with the
+     * released content
+     * @param effectiveDate specifying the official release date
+     * @param stampNids the valid stamp nids associated with content for this
+     * release
+     * @param viewCoordinate specifying which versions of the concepts to
+     * include in this release. Should not include all status values.
+     * @param excludedRefsetIds the set of nids associated with refexes which
+     * should not be included in the release (for example, workflow refsets)
+     * @param conceptsToProcess the set of nids representing the concepts to be
+     * included in this release
+     * @param makePrivateIdFile set to <code>true</code> to make an auxiliary
+     * identifier file
+     * @param refsetParentConceptNid an integer representing the parent concept of simple refsets
+     * @param previousReleaseDate the date of the previous release
+     * @param stampsToRemove stamps to not include in the release
+     * @param taxonomyParentNids an integer representing the parent of taxonomy to release
+     * @param conNumRefesetParentConceptNid an integer representing the parent concept of number float refsets
+     * @throws IOException signals that an I/O exception has occurred
+     */
+    public Rf2Export(File directory, ReleaseType releaseType, LANG_CODE language, COUNTRY_CODE country,
+            String namespace, String module, Date effectiveDate, Set<Integer> stampNids, ViewCoordinate viewCoordinate,
+            Set<Integer> excludedRefsetIds, NidBitSetBI conceptsToProcess, boolean makePrivateIdFile, int refsetParentConceptNid,
+            Date previousReleaseDate, Set<Integer> stampsToRemove, Collection taxonomyParentNids, Integer conNumRefesetParentConceptNid)
+            throws IOException, ContradictionException {
+        this.directory = directory;
+        directory.mkdirs();
+        this.releaseType = releaseType;
+        this.effectiveDate = effectiveDate;
+        this.language = language;
+        this.country = country;
+        this.namespace = namespace;
+        this.module = module;
+        this.stampNids = stampNids;
+        this.store = Ts.get();
+        this.viewCoordinate = viewCoordinate;
+        this.viewCoordinateAllStatus = viewCoordinate.getViewCoordinateWithAllStatusValues();
+        this.conceptsToProcess = conceptsToProcess;
+        this.effectiveDateString = TimeHelper.getShortFileDateFormat().format(effectiveDate);
+        this.excludedRefsetIds = excludedRefsetIds;
+        this.makePrivateIdFile = makePrivateIdFile;
+        this.sameCycleStampNids = stampsToRemove;
+        if(refsetParentConceptNid != 0){
+            this.refsetParentConcept = Ts.get().getConceptVersion(viewCoordinate, refsetParentConceptNid);
+        }
+        this.taxonomyParentNids = taxonomyParentNids;
+        if(conNumRefesetParentConceptNid != null){
+            this.conNumRefsetParentConcept = Ts.get().getConceptVersion(viewCoordinate, conNumRefesetParentConceptNid);
+        }
        
         if(releaseType.equals(ReleaseType.DELTA) && previousReleaseDate != null){
             for(int stamp : stampNids){
@@ -181,7 +258,11 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
             }
         }
         
-        File conceptsFile = new File(directory,
+        setup();
+    }
+    
+    private void setup() throws FileNotFoundException, UnsupportedEncodingException, IOException, ContradictionException{
+                File conceptsFile = new File(directory,
                 "sct2_Concept_UUID_" + releaseType.suffix + "_"
                 + country.getFormatedCountryCode() + namespace + "_"
                 + TimeHelper.getShortFileDateFormat().format(effectiveDate) + ".txt");
@@ -502,6 +583,10 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
         if(refsetParentConcept != null){
             writeSimpleRefsetFiles();
         }
+        
+        if(conNumRefsetParentConcept != null){
+            writeConFloatRefsetFiles();
+        }
     }
     /**
      * Writes the simple refset files for all of the refsets which are a child
@@ -525,7 +610,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                     refsetName = refsetName.concat("-simple-refset");
                 }
                 File simpleRefsetFile = new File(directory,
-                        "der2_Refset_" + refsetName + "_UUID_" + releaseType.suffix + "_"
+                        "der2_cRefset_" + refsetName + "_UUID_" + releaseType.suffix + "_"
                         + language.getFormatedLanguageCode() + namespace + "_"
                         + TimeHelper.getShortFileDateFormat().format(effectiveDate) + ".txt");
                 FileOutputStream simpleRefsetOs = new FileOutputStream(simpleRefsetFile);
@@ -596,6 +681,111 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                     }
                 processSimpleRefsetDesc(childRefset.getNid());
                 simpleRefsetWriter.close();
+            }
+        }
+    }
+    
+        /**
+     * Writes the con float refset files for all of the refsets which are a child
+     * of the
+     * <code>refsetParentConcept</code> and that were written in the module
+     * being released.
+     *
+     * @throws IOException signals that an I/O exception has occurred
+     * @throws ContradictionException if more than one version is found for the
+     * specified view coordinate
+     * @throws NoSuchAlgorithmException indicates a no such algorithm exception
+     * has occurred
+     */
+    private void writeConFloatRefsetFiles() throws IOException, ContradictionException, NoSuchAlgorithmException {
+        Collection<? extends ConceptVersionBI> childRefsetConcepts = conNumRefsetParentConcept.getRelationshipsIncomingSourceConceptsActiveIsa();
+        for (ConceptVersionBI childRefset : childRefsetConcepts) {
+            if (childRefset.getModuleNid() == Ts.get().getNidForUuids(UUID.fromString(module))) {
+                String refsetName = childRefset.getDescriptionPreferred().getText();
+                refsetName = refsetName.replace(" ", "-");
+                if(!refsetName.toLowerCase().contains("concept-number-refset")){
+                    refsetName = refsetName.concat("-concept-number-refset");
+                }
+                File conNumRefsetFile = new File(directory,
+                        "der2_ciRefset_" + refsetName + "_UUID_" + releaseType.suffix + "_"
+                        + language.getFormatedLanguageCode() + namespace + "_"
+                        + TimeHelper.getShortFileDateFormat().format(effectiveDate) + ".txt");
+                FileOutputStream conNumRefsetOs = new FileOutputStream(conNumRefsetFile);
+                Writer conNumRefsetWriter = new BufferedWriter(new OutputStreamWriter(conNumRefsetOs, "UTF8"));
+
+                for (Rf2File.ConNumRefsetFileFields field : Rf2File.ConNumRefsetFileFields.values()) {
+                    conNumRefsetWriter.write(field.headerText + field.seperator);
+                }
+                
+                Collection<RefexVersionBI> versions = new ArrayList<>();
+                if (releaseType.equals(ReleaseType.FULL)) {
+                    Collection<? extends RefexChronicleBI<?>> refsetMembers = childRefset.getRefsetMembers();
+                    for (RefexChronicleBI member : refsetMembers) {
+                        Collection<RefexVersionBI> refexVersions = member.getVersions();
+                        versions.addAll(refexVersions);
+                    }
+                } else {
+                    Collection<? extends RefexChronicleBI<?>> refsetMembers = childRefset.getRefsetMembers();
+                    for (RefexChronicleBI member : refsetMembers) {
+                        RefexVersionBI version = (RefexVersionBI) member.getVersion(viewCoordinateAllStatus);
+                        versions.add(version);
+                    }
+                }
+                boolean write = true;
+                    for (RefexVersionBI refexVersion : versions) {
+                        RefexNidFloatVersionBI nfVersion = (RefexNidFloatVersionBI) refexVersion;
+                        RefexChronicleBI chronicle = (RefexChronicleBI) nfVersion.getChronicle();
+                        if (sameCycleStampNids.contains(chronicle.getPrimordialVersion().getStampNid())) {
+                            RefexVersionBI version = (RefexVersionBI) chronicle.getVersion(viewCoordinateAllStatus);
+                            if (!version.isActive(viewCoordinate)) {
+                                write = false;
+                            }
+                        }
+                        if (write) {
+                            for (Rf2File.ConNumRefsetFileFields field : Rf2File.ConNumRefsetFileFields.values()) {
+                                switch (field) {
+                                    case ID:
+                                        conNumRefsetWriter.write(nfVersion.getPrimUuid() + field.seperator);
+
+                                        break;
+
+                                    case EFFECTIVE_TIME:
+                                        conNumRefsetWriter.write(effectiveDateString + field.seperator);
+
+                                        break;
+
+                                    case ACTIVE:
+                                        conNumRefsetWriter.write(store.getComponent(nfVersion.getStatusNid()).getPrimUuid() + field.seperator);
+
+                                        break;
+
+                                    case MODULE_ID:
+                                        conNumRefsetWriter.write(module + field.seperator);
+
+                                        break;
+
+                                    case REFSET_ID:
+                                        conNumRefsetWriter.write(store.getComponent(nfVersion.getRefexNid()).getPrimUuid() + field.seperator);
+
+                                        break;
+
+                                    case REFERENCED_COMPONENT_ID:
+                                        conNumRefsetWriter.write(store.getComponent(nfVersion.getReferencedComponentNid()).getPrimUuid() + field.seperator);
+
+                                        break;
+                                        
+                                    case ADDITIONAL_CONCEPT_ID:
+                                        conNumRefsetWriter.write(store.getComponent(nfVersion.getNid1()).getPrimUuid() + field.seperator);
+                                        break;
+                                    
+                                    case NUMBER:
+                                        conNumRefsetWriter.write(nfVersion.getFloat1() + field.seperator);
+                                }
+                            }
+                        }
+                    }
+                processConNumRefsetDesc(childRefset.getNid());
+                conNumRefsetWriter.close();
             }
         }
     }
@@ -1389,6 +1579,191 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
 
                 case ATTRIB_ORDER:
                     refsetDescWriter.write(0 + field.seperator);
+
+                    break;
+            }
+        }
+    }
+    
+    /**
+     * Writes the refset description file for concept number refexes according to
+     * the
+     * <code>Rf2File.RefsetDescriptorFileFields</code>.
+     *
+     * @param refexNid the nid associated with a language refex
+     * @throws IOException signals that an I/O exception has occurred
+     * @throws NoSuchAlgorithmException indicates that a no such algorithm
+     * exception has occurred
+     * @see Rf2File.RefsetDescriptorFileFields
+     */
+    private void processConNumRefsetDesc(int refexNid) throws IOException, NoSuchAlgorithmException {
+        ConceptSpec refsetDescriptor = new ConceptSpec("Reference set descriptor reference set (foundation metadata concept)",
+                UUID.fromString("5ddff82f-5aee-3b16-893f-6b7aa726cc4b"));
+        ConceptSpec attributeDescriptor = new ConceptSpec("Referenced component",
+                UUID.fromString("b0d88038-7f87-31a5-873e-d023e2484d0e"));
+        ConceptSpec attributeType = new ConceptSpec("Concept type component (foundation metadata concept)",
+                UUID.fromString("78f69fb6-410c-3b5a-9120-53954592a80d"));
+        for (Rf2File.RefsetDescriptorFileFields field : Rf2File.RefsetDescriptorFileFields.values()) {
+            switch (field) {
+                case ID:
+                    //referenced component, attribute order
+                    UUID uuid = UuidT5Generator.get(REFSET_DESC_NAMESPACE,
+                            store.getUuidPrimordialForNid(refexNid).toString()
+                            + 0);
+                    refsetDescWriter.write(uuid + field.seperator);
+
+                    break;
+
+                case EFFECTIVE_TIME:
+                    refsetDescWriter.write(effectiveDateString + field.seperator);
+
+                    break;
+
+                case ACTIVE:
+                    refsetDescWriter.write(store.getUuidPrimordialForNid(SnomedMetadataRfx.getSTATUS_CURRENT_NID()) + field.seperator);
+
+                    break;
+
+                case MODULE_ID:
+                    refsetDescWriter.write(module + field.seperator);
+
+                    break;
+
+                case REFSET_ID:
+                    refsetDescWriter.write(refsetDescriptor.getStrict(viewCoordinateAllStatus).getPrimUuid() + field.seperator);
+
+                    break;
+
+                case REFERENCED_COMPONENT_ID:
+                    refsetDescWriter.write(store.getUuidPrimordialForNid(refexNid) + field.seperator);
+
+                    break;
+
+                case ATTRIB_DESC:
+                    refsetDescWriter.write(attributeDescriptor.getStrict(viewCoordinateAllStatus).getPrimUuid() + field.seperator);
+
+                    break;
+
+                case ATTRIB_TYPE:
+                    refsetDescWriter.write(attributeType.getStrict(viewCoordinateAllStatus).getPrimUuid() + field.seperator);
+
+                    break;
+
+                case ATTRIB_ORDER:
+                    refsetDescWriter.write(0 + field.seperator);
+
+                    break;
+            }
+        }
+        //additional concept
+        attributeDescriptor = new ConceptSpec("Attribute type",
+                UUID.fromString("34e794d9-0405-3aa1-adf5-64801950c397")); //attribute description
+        for (Rf2File.RefsetDescriptorFileFields field : Rf2File.RefsetDescriptorFileFields.values()) {
+            switch (field) {
+                case ID:
+                    //referenced component, attribute order
+                    UUID uuid = UuidT5Generator.get(REFSET_DESC_NAMESPACE,
+                            store.getUuidPrimordialForNid(refexNid).toString()
+                            + 0);
+                    refsetDescWriter.write(uuid + field.seperator);
+
+                    break;
+
+                case EFFECTIVE_TIME:
+                    refsetDescWriter.write(effectiveDateString + field.seperator);
+
+                    break;
+
+                case ACTIVE:
+                    refsetDescWriter.write(store.getUuidPrimordialForNid(SnomedMetadataRfx.getSTATUS_CURRENT_NID()) + field.seperator);
+
+                    break;
+
+                case MODULE_ID:
+                    refsetDescWriter.write(module + field.seperator);
+
+                    break;
+
+                case REFSET_ID:
+                    refsetDescWriter.write(refsetDescriptor.getStrict(viewCoordinateAllStatus).getPrimUuid() + field.seperator);
+
+                    break;
+
+                case REFERENCED_COMPONENT_ID:
+                    refsetDescWriter.write(store.getUuidPrimordialForNid(refexNid) + field.seperator);
+
+                    break;
+
+                case ATTRIB_DESC:
+                    refsetDescWriter.write(attributeDescriptor.getStrict(viewCoordinateAllStatus).getPrimUuid() + field.seperator);
+
+                    break;
+
+                case ATTRIB_TYPE:
+                    refsetDescWriter.write(attributeType.getStrict(viewCoordinateAllStatus).getPrimUuid() + field.seperator);
+
+                    break;
+
+                case ATTRIB_ORDER:
+                    refsetDescWriter.write(1 + field.seperator);
+
+                    break;
+            }
+        }
+        
+        //additional number
+        attributeDescriptor = new ConceptSpec("Attribute type",
+                UUID.fromString("34e794d9-0405-3aa1-adf5-64801950c397")); //attribute description
+        attributeType = new ConceptSpec("Integer",
+                UUID.fromString("42d9f81e-27e9-3b73-9c19-9de4e2346b44"));
+        for (Rf2File.RefsetDescriptorFileFields field : Rf2File.RefsetDescriptorFileFields.values()) {
+            switch (field) {
+                case ID:
+                    //referenced component, attribute order
+                    UUID uuid = UuidT5Generator.get(REFSET_DESC_NAMESPACE,
+                            store.getUuidPrimordialForNid(refexNid).toString()
+                            + 0);
+                    refsetDescWriter.write(uuid + field.seperator);
+
+                    break;
+
+                case EFFECTIVE_TIME:
+                    refsetDescWriter.write(effectiveDateString + field.seperator);
+
+                    break;
+
+                case ACTIVE:
+                    refsetDescWriter.write(store.getUuidPrimordialForNid(SnomedMetadataRfx.getSTATUS_CURRENT_NID()) + field.seperator);
+
+                    break;
+
+                case MODULE_ID:
+                    refsetDescWriter.write(module + field.seperator);
+
+                    break;
+
+                case REFSET_ID:
+                    refsetDescWriter.write(refsetDescriptor.getStrict(viewCoordinateAllStatus).getPrimUuid() + field.seperator);
+
+                    break;
+
+                case REFERENCED_COMPONENT_ID:
+                    refsetDescWriter.write(store.getUuidPrimordialForNid(refexNid) + field.seperator);
+
+                    break;
+
+                case ATTRIB_DESC:
+                    refsetDescWriter.write(attributeDescriptor.getStrict(viewCoordinateAllStatus).getPrimUuid() + field.seperator);
+
+                    break;
+
+                case ATTRIB_TYPE:
+                    refsetDescWriter.write(attributeType.getStrict(viewCoordinateAllStatus).getPrimUuid() + field.seperator);
+
+                    break;
+
+                case ATTRIB_ORDER:
+                    refsetDescWriter.write(2 + field.seperator);
 
                     break;
             }

@@ -25,6 +25,7 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import org.ihtsdo.country.COUNTRY_CODE;
 import org.ihtsdo.helper.rf2.Rf2File;
+import static org.ihtsdo.helper.rf2.Rf2File.ConNumRefsetFileFields.ADDITIONAL_CONCEPT_ID;
 import static org.ihtsdo.helper.rf2.Rf2File.IdentifiersFileFields.ACTIVE;
 import static org.ihtsdo.helper.rf2.Rf2File.IdentifiersFileFields.ALTERNATE_IDENTIFIER;
 import static org.ihtsdo.helper.rf2.Rf2File.IdentifiersFileFields.EFFECTIVE_TIME;
@@ -282,6 +283,7 @@ public class UuidToSctIdWriter {
             processIdentifiers(privateIdentifiersWriter);
         }
         processSimpleRefsets();
+        processConNumRefsets();
         processUuidToSctMap();
     }
 
@@ -1602,6 +1604,109 @@ public class UuidToSctIdWriter {
 
                 simpleRefsetReader.close();
                 simpleRefsetWriter.close();
+            }
+        }
+    }
+    
+       /**
+     * Converts uuid-based concept number refset files to SCT ID based files.
+     * 
+     * @throws IOException signals that an I/O exception has occurred
+     */
+    private void processConNumRefsets() throws  IOException {
+        for (File inputFile : uuidFiles) {
+            if (inputFile.getName().toLowerCase().contains("concept-number-refset")) {
+                BufferedReader conNumRefsetReader = new BufferedReader(new InputStreamReader(new FileInputStream(inputFile), "UTF8"));
+                File conNumRefsetFile = new File(content,
+                        inputFile.getName().replace("UUID_", ""));
+                FileOutputStream outputStream = new FileOutputStream(conNumRefsetFile);
+                BufferedWriter conNumRefsetWriter = new BufferedWriter(new OutputStreamWriter(outputStream, "UTF8"));
+
+                for (Rf2File.ConNumRefsetFileFields field : Rf2File.ConNumRefsetFileFields.values()) {
+                    conNumRefsetWriter.write(field.headerText + field.seperator);
+                }
+
+                String refsetLine = conNumRefsetReader.readLine();
+                refsetLine = conNumRefsetReader.readLine();
+                while (refsetLine != null) {
+                    String[] parts = refsetLine.split("\t");
+                    for (Rf2File.ConNumRefsetFileFields field : Rf2File.ConNumRefsetFileFields.values()) {
+                        switch (field) {
+                            case ID:
+                                String memberUuid = parts[Rf2File.ConNumRefsetFileFields.ID.ordinal()];
+                                conNumRefsetWriter.write(memberUuid + field.seperator);
+
+                                break;
+
+                            case EFFECTIVE_TIME:
+                                String effectiveDateString = parts[Rf2File.ConNumRefsetFileFields.EFFECTIVE_TIME.ordinal()];
+                                conNumRefsetWriter.write(effectiveDateString + field.seperator);
+
+                                break;
+
+                            case ACTIVE:
+                                String status = parts[Rf2File.ConNumRefsetFileFields.ACTIVE.ordinal()];
+                                conNumRefsetWriter.write(convertStatus(status) + field.seperator);
+
+                                break;
+
+                            case MODULE_ID:
+                                conNumRefsetWriter.write(module + field.seperator);
+
+                                break;
+
+                            case REFSET_ID:
+                                String refsetId = parts[Rf2File.ConNumRefsetFileFields.REFSET_ID.ordinal()];
+                                String refsetSctId = getExistingSctId(refsetId);
+                                if (refsetSctId == null) {
+                                    refsetSctId = handler.getWithGeneration(UUID.fromString(refsetId), SctIdGenerator.TYPE.CONCEPT).toString();
+                                }
+                                if(!uuidToSctMap.containsKey(UUID.fromString(refsetId))){
+                                    this.uuidToSctMap.put(UUID.fromString(refsetId), refsetSctId);
+                                }
+                                conNumRefsetWriter.write(refsetSctId + field.seperator);
+
+                                break;
+
+                            case REFERENCED_COMPONENT_ID:
+                                String rc = parts[Rf2File.ConNumRefsetFileFields.REFERENCED_COMPONENT_ID.ordinal()];
+                                String rcSctId = getExistingSctId(rc);
+                                if (rcSctId == null) {
+                                    rcSctId = handler.getWithGeneration(UUID.fromString(rc), SctIdGenerator.TYPE.CONCEPT).toString();
+                                }
+                                if(!uuidToSctMap.containsKey(UUID.fromString(rc))){
+                                    this.uuidToSctMap.put(UUID.fromString(rc), rcSctId);
+                                }
+                                conNumRefsetWriter.write(rcSctId + field.seperator);
+
+                                break;
+                                
+                             case ADDITIONAL_CONCEPT_ID:
+                                String con1 = parts[Rf2File.ConNumRefsetFileFields.ADDITIONAL_CONCEPT_ID.ordinal()];
+                                String con1Id = getExistingSctId(con1);
+                                if (con1Id == null) {
+                                    con1Id = handler.getWithGeneration(UUID.fromString(con1), SctIdGenerator.TYPE.CONCEPT).toString();
+                                }
+                                if(!uuidToSctMap.containsKey(UUID.fromString(con1))){
+                                    this.uuidToSctMap.put(UUID.fromString(con1), con1Id);
+                                }
+                                conNumRefsetWriter.write(con1Id + field.seperator);
+
+                                break;
+                                 
+                             case NUMBER:
+                                String number = parts[Rf2File.ConNumRefsetFileFields.NUMBER.ordinal()];
+                                conNumRefsetWriter.write(number + field.seperator);
+
+                                break;
+                        }
+                    }
+
+                    refsetLine = conNumRefsetReader.readLine();
+                }
+
+                conNumRefsetReader.close();
+                conNumRefsetWriter.close();
             }
         }
     }

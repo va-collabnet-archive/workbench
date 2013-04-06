@@ -562,6 +562,62 @@ public class Rf2File {
             this.seperator = seperator;
         }
     }
+    
+     /**
+     * The Enum ConNumRefsetFileFields represents the fields needed in the
+     * concept number refsets file.
+     */
+    public enum ConNumRefsetFileFields {
+
+        /**
+         * The id field.
+         */
+        ID("id", "\t"),
+        /**
+         * The effective time field.
+         */
+        EFFECTIVE_TIME("effectiveTime", "\t"),
+        /**
+         * The active field.
+         */
+        ACTIVE("active", "\t"),
+        /**
+         * The module id field.
+         */
+        MODULE_ID("moduleId", "\t"),
+        /**
+         * The refset id field.
+         */
+        REFSET_ID("refSetId", "\t"),
+        /**
+         * The referenced component id field.
+         */
+        REFERENCED_COMPONENT_ID("referencedComponentId", "\t"),
+        /**
+         * The additional concept field.
+         */
+        ADDITIONAL_CONCEPT_ID("conceptId", "\t"),
+        /**
+         * The additional number field.
+         */
+        NUMBER("number", "\r\n");
+        
+        public final String headerText;
+        
+        public final String seperator;
+
+        //~--- constructors -----------------------------------------------------
+        /**
+         * Instantiates a new simple refset file fields.
+         *
+         * @param headerText the text to display in the header
+         * @param seperator the separator to use for separating the field
+         */
+        private ConNumRefsetFileFields(String headerText, String seperator) {
+            this.headerText = headerText;
+            this.seperator = seperator;
+        }
+    }
 
     /**
      * The Enum AttribValueRefsetFileFields represents the fields needed in the

@@ -250,6 +250,12 @@ public class GenerateIncrementalRf2File extends AbstractMojo {
     private IntSet pathIds;
     ViewCoordinate vc;
     Collection<Integer> taxonomyParentNids;
+    /**
+     * Concept number refset parent concept.
+     *
+     * @parameter @required
+     */
+    private ConceptDescriptor conceptNumberRefsetParentConceptSpec;
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
@@ -362,6 +368,10 @@ public class GenerateIncrementalRf2File extends AbstractMojo {
             if (refsetParentConceptSpec != null) {
                 refsetParentConceptNid = Ts.get().getNidForUuids(UUID.fromString(refsetParentConceptSpec.getUuid()));
             }
+            Integer conNumRefsetParentConceptNid = null;
+            if (conceptNumberRefsetParentConceptSpec != null) {
+                conNumRefsetParentConceptNid = Ts.get().getNidForUuids(UUID.fromString(conceptNumberRefsetParentConceptSpec.getUuid()));
+            }
 
             TaxonomyFilter filter = new TaxonomyFilter();
             Ts.get().iterateConceptDataInParallel(filter);
@@ -384,7 +394,8 @@ public class GenerateIncrementalRf2File extends AbstractMojo {
                     new Date(TimeHelper.getTimeFromString(this.previousReleaseDate,
                         TimeHelper.getFileDateFormat())),
                     sapsToRemove.getAsSet(),
-                    taxonomyParentNids);
+                    taxonomyParentNids,
+                    conNumRefsetParentConceptNid);
             Ts.get().iterateConceptDataInSequence(exporter);
             exporter.writeOneTimeFiles();
             exporter.close();
