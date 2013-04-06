@@ -102,12 +102,7 @@ public class DescriptionTableRenderer extends AceTableRenderer {
                     } catch (ContradictionException ex) {
                         Logger.getLogger(DescriptionTableRenderer.class.getName()).log(Level.SEVERE, null, ex);
                     }
-                    boolean active = false;
-                    if(dv != null){
-                         active = frameConfig.getAllowedStatus().contains(dv.getStatusNid());
-                    }else{
-                        active = frameConfig.getAllowedStatus().contains(swt.getTuple().getStatusNid());
-                    }
+                    boolean active = frameConfig.getAllowedStatus().contains(dv.getStatusNid());
                     if (active == false) {
                         renderComponent.setBackground(Color.LIGHT_GRAY);
                     }
