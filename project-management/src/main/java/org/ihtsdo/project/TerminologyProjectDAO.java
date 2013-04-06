@@ -3339,11 +3339,11 @@ public class TerminologyProjectDAO {
 				destination = new WfUser("user", ArchitectonicAuxiliary.Concept.USER.getPrimoridalUid());
 			}
 			addConceptAsWorkListMember(workListMember, Terms.get().uuidToNative(destination.getId()), config);
-			//if (concept.commit(ChangeSetGenerationPolicy.INCREMENTAL, ChangeSetGenerationThreadingPolicy.SINGLE_THREAD)) {
+			if (concept.commit(ChangeSetGenerationPolicy.INCREMENTAL, ChangeSetGenerationThreadingPolicy.SINGLE_THREAD)) {
 				nacWorkSet.getConcept().commit(ChangeSetGenerationPolicy.INCREMENTAL, ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);
 				partition.getConcept().commit(ChangeSetGenerationPolicy.INCREMENTAL, ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);
 				workList.getConcept().commit(ChangeSetGenerationPolicy.INCREMENTAL, ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);
-			//}
+			}
 		} catch (Exception e) {
 			AceLog.getAppLog().alertAndLogException(e);
 		}
