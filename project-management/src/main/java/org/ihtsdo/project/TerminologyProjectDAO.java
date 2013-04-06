@@ -237,7 +237,7 @@ public class TerminologyProjectDAO {
 	 * @return all terminology projects
 	 */
 	public static List<MappingProject> getAllMappingProjects(I_ConfigAceFrame config) {
-		
+
 		I_TermFactory termFactory = Terms.get();
 		List<MappingProject> projects = new ArrayList<MappingProject>();
 		try {
@@ -251,7 +251,7 @@ public class TerminologyProjectDAO {
 					projects.add(getMappingProject(child, config));
 				}
 			}
-			
+
 		} catch (TerminologyException e) {
 			AceLog.getAppLog().alertAndLogException(e);
 		} catch (IOException e) {
@@ -261,7 +261,7 @@ public class TerminologyProjectDAO {
 		}
 		return projects;
 	}
-	
+
 	/**
 	 * Gets the all workset target languages map.
 	 * 
@@ -484,35 +484,35 @@ public class TerminologyProjectDAO {
 				JOptionPane.showMessageDialog(new JDialog(), "This name is already in use", "Warning", JOptionPane.WARNING_MESSAGE);
 				throw new Exception("This name is already in use");
 			}
-			
+
 			termFactory.setActiveAceFrameConfig(config);
 			I_GetConceptData projectsRoot = termFactory.getConcept(ArchitectonicAuxiliary.Concept.MAPPING_PROJECTS_ROOT.getUids());
-			
+
 			newConcept = termFactory.newConcept(UUID.randomUUID(), false, config);
-			
+
 			termFactory.newDescription(UUID.randomUUID(), newConcept, "en", projectName, termFactory.getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids()), config);
-			
+
 			termFactory.newDescription(UUID.randomUUID(), newConcept, "en", projectName, termFactory.getConcept(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids()), config);
-			
+
 			termFactory.newRelationship(UUID.randomUUID(), newConcept, termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()), projectsRoot, termFactory.getConcept(ArchitectonicAuxiliary.Concept.STATED_RELATIONSHIP.getUids()),
 					termFactory.getConcept(ArchitectonicAuxiliary.Concept.NOT_REFINABLE.getUids()), termFactory.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids()), 0, config);
-			
+
 			project = new MappingProject(projectWithMetadata.getName(), newConcept.getConceptNid(), newConcept.getUids());
-			
+
 			termFactory.addUncommittedNoChecks(newConcept);
 			newConcept.commit(ChangeSetGenerationPolicy.INCREMENTAL, ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);
-			
+
 			// promote(newConcept, config);
 			//
 			// termFactory.addUncommittedNoChecks(newConcept);
 			// termFactory.commit();
-			
+
 			project = getMappingProject(newConcept, config);
-			
+
 			String nacWorkSetName = "Maintenance - " + project.getName().replace("(mapping project)", "");
 			WorkSet nacWorkSet = createNewWorkSet(nacWorkSetName, project, config);
 			createNewPartitionScheme("Maintenance - " + project.getName().replace("(mapping project)", ""), nacWorkSet.getUids().iterator().next(), config);
-			
+
 		} catch (TerminologyException e) {
 			AceLog.getAppLog().alertAndLogException(e);
 		} catch (IOException e) {
@@ -520,7 +520,7 @@ public class TerminologyProjectDAO {
 		} catch (Exception e) {
 			AceLog.getAppLog().alertAndLogException(e);
 		}
-		
+
 		return (MappingProject) project;
 	}
 
@@ -597,20 +597,20 @@ public class TerminologyProjectDAO {
 	 *             the exception
 	 */
 	public static MappingProject getMappingProject(I_GetConceptData projectConcept, I_ConfigAceFrame config) throws Exception {
-		
+
 		MappingProject project = null;
 		I_TermFactory termFactory = Terms.get();
 		try {
 			I_IntSet allowedDestRelTypes = termFactory.newIntSet();
 			allowedDestRelTypes.add(ArchitectonicAuxiliary.Concept.IS_A_REL.localize().getNid());
 			Set<? extends I_GetConceptData> parents = projectConcept.getSourceRelTargets(config.getAllowedStatus(), allowedDestRelTypes, config.getViewPositionSetReadOnly(), Precedence.TIME, config.getConflictResolutionStrategy());
-			
+
 			if (parents.size() != 1) {
 				throw new Exception("Error: Wrong number of parents in project...");
 			}
-			
+
 			I_GetConceptData parent = parents.iterator().next();
-			
+
 			if (parent.getConceptNid() == ArchitectonicAuxiliary.Concept.MAPPING_PROJECTS_ROOT.localize().getNid()) {
 				String name = getConceptString(projectConcept);
 				List<? extends I_DescriptionTuple> descTuples = projectConcept.getDescriptionTuples(config.getAllowedStatus(), config.getDescTypes(), config.getViewPositionSetReadOnly(), Precedence.TIME, config.getConflictResolutionStrategy());
@@ -638,20 +638,20 @@ public class TerminologyProjectDAO {
 	 *             the exception
 	 */
 	public static TerminologyProject getTerminologyProject(I_GetConceptData projectConcept, I_ConfigAceFrame config) throws Exception {
-		
+
 		TerminologyProject project = null;
 		I_TermFactory termFactory = Terms.get();
 		try {
 			I_IntSet allowedDestRelTypes = termFactory.newIntSet();
 			allowedDestRelTypes.add(ArchitectonicAuxiliary.Concept.IS_A_REL.localize().getNid());
 			Set<? extends I_GetConceptData> parents = projectConcept.getSourceRelTargets(config.getAllowedStatus(), allowedDestRelTypes, config.getViewPositionSetReadOnly(), Precedence.TIME, config.getConflictResolutionStrategy());
-			
+
 			if (parents.size() != 1) {
 				throw new Exception("Error: Wrong number of parents in project...");
 			}
-			
+
 			I_GetConceptData parent = parents.iterator().next();
-			
+
 			if (parent.getConceptNid() == ArchitectonicAuxiliary.Concept.TERMINOLOGY_PROJECTS_ROOT.localize().getNid()) {
 				String name = getConceptString(projectConcept);
 				List<? extends I_DescriptionTuple> descTuples = projectConcept.getDescriptionTuples(config.getAllowedStatus(), config.getDescTypes(), config.getViewPositionSetReadOnly(), Precedence.TIME, config.getConflictResolutionStrategy());
@@ -849,21 +849,21 @@ public class TerminologyProjectDAO {
 	public static I_TerminologyProject updateProjectMetadata(I_TerminologyProject projectWithMetadata, I_ConfigAceFrame config) {
 		I_TermFactory termFactory = Terms.get();
 		I_TerminologyProject project = null;
-		
+
 		try {
-			
+
 			I_TerminologyProject currentVersionOfProject = getProject(projectWithMetadata.getConcept(), config);
-			
+
 			if (!currentVersionOfProject.getName().equals(projectWithMetadata.getName())) {
 				updatePreferredTerm(projectWithMetadata.getConcept(), projectWithMetadata.getName(), config);
 			}
-			
+
 			I_GetConceptData projectsRefset = termFactory.getConcept(ArchitectonicAuxiliary.Concept.PROJECT_EXTENSION_REFSET.getUids());
-			
+
 			I_GetConceptData projectConcept = termFactory.getConcept(projectWithMetadata.getUids());
-			
+
 			String metadata = serialize(projectWithMetadata);
-			
+
 			List<I_ExtendByRef> extensions = new ArrayList<I_ExtendByRef>();
 			extensions.addAll(termFactory.getAllExtensionsForComponent(projectConcept.getConceptNid()));
 			for (I_ExtendByRef extension : extensions) {
@@ -884,7 +884,7 @@ public class TerminologyProjectDAO {
 				}
 			}
 			project = getProject(projectConcept, config);
-			
+
 		} catch (TerminologyException e) {
 			AceLog.getAppLog().alertAndLogException(e);
 		} catch (IOException e) {
@@ -892,7 +892,7 @@ public class TerminologyProjectDAO {
 		} catch (Exception e) {
 			AceLog.getAppLog().alertAndLogException(e);
 		}
-		
+
 		return project;
 	}
 
@@ -2585,7 +2585,7 @@ public class TerminologyProjectDAO {
 			if (!currentVersionOfWorkList.getName().equals(workListWithMetadata.getName())) {
 				updatePreferredTerm(workListWithMetadata.getConcept(), workListWithMetadata.getName(), config);
 			}
-			
+
 			WorklistMetadata worklistMetadata = new WorklistMetadata(workListWithMetadata.getName(), workListWithMetadata.getUids(), workListWithMetadata.getPartitionUUID(), workListWithMetadata.getWorkflowDefinitionFileName(), convertToStringListOfMembers(workListWithMetadata.getWorkflowUserRoles()));
 			String metadata = serialize(worklistMetadata);
 
@@ -3339,10 +3339,11 @@ public class TerminologyProjectDAO {
 				destination = new WfUser("user", ArchitectonicAuxiliary.Concept.USER.getPrimoridalUid());
 			}
 			addConceptAsWorkListMember(workListMember, Terms.get().uuidToNative(destination.getId()), config);
-			concept.commit(ChangeSetGenerationPolicy.INCREMENTAL, ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);
-			nacWorkSet.getConcept().commit(ChangeSetGenerationPolicy.INCREMENTAL, ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);
-			partition.getConcept().commit(ChangeSetGenerationPolicy.INCREMENTAL, ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);
-			workList.getConcept().commit(ChangeSetGenerationPolicy.INCREMENTAL, ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);
+			//if (concept.commit(ChangeSetGenerationPolicy.INCREMENTAL, ChangeSetGenerationThreadingPolicy.SINGLE_THREAD)) {
+				nacWorkSet.getConcept().commit(ChangeSetGenerationPolicy.INCREMENTAL, ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);
+				partition.getConcept().commit(ChangeSetGenerationPolicy.INCREMENTAL, ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);
+				workList.getConcept().commit(ChangeSetGenerationPolicy.INCREMENTAL, ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);
+			//}
 		} catch (Exception e) {
 			AceLog.getAppLog().alertAndLogException(e);
 		}
@@ -3447,7 +3448,7 @@ public class TerminologyProjectDAO {
 				// termFactory.commit();
 			}
 		}
-		
+
 		workListRefset.commit(ChangeSetGenerationPolicy.INCREMENTAL, ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);
 		newPromotionConcept.commit(ChangeSetGenerationPolicy.INCREMENTAL, ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);
 		newCommentsConcept.commit(ChangeSetGenerationPolicy.INCREMENTAL, ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);
@@ -3988,8 +3989,8 @@ public class TerminologyProjectDAO {
 	 *             the privileged action exception
 	 */
 	public static void deliverWorklistBusinessProcessToOutbox(WorkList worklist, I_Work worker) throws TerminologyException, IOException, TaskFailedException, InterruptedException, PrivilegedActionException {
-               throw new UnsupportedOperationException("TODO: JINI REMOVAL");
-        }
+		throw new UnsupportedOperationException("TODO: JINI REMOVAL");
+	}
 
 	/**
 	 * The subject separator.
@@ -4404,7 +4405,7 @@ public class TerminologyProjectDAO {
 	 * @return the all work list members
 	 */
 	public static List<WorkListMember> getAllWorkListMembers(WorkList workList, I_ConfigAceFrame config) {
-		
+
 		I_TermFactory termFactory = Terms.get();
 		List<WorkListMember> workListMembers = new ArrayList<WorkListMember>();
 		try {
@@ -4630,7 +4631,7 @@ public class TerminologyProjectDAO {
 				LanguageMembershipRefset targetLanguage = new LanguageMembershipRefset(transProject.getTargetLanguageRefset(), config);
 				PromotionRefset languagePromotionRefset = targetLanguage.getPromotionRefset(config);
 				languagePromotionRefset.setPromotionStatus(workListMemberWithMetadata.getId(), activityStatusConcept.getConceptNid());
-			// end
+				// end
 			}
 
 			workListMember = getWorkListMember(workListMemberWithMetadata.getConcept(), workList, config);
@@ -5656,21 +5657,21 @@ public class TerminologyProjectDAO {
 		WorkflowInterpreter interpreter = WorkflowInterpreter.createWorkflowInterpreter(workList.getWorkflowDefinition());
 
 		WfUser user = interpreter.getNextDestination(instance, workList);
-//		if (user == null) {
-//			throw new Exception("Cannot set next destination\n");
-//		}
-		
+		//		if (user == null) {
+		//			throw new Exception("Cannot set next destination\n");
+		//		}
+
 		TerminologyStoreDI ts = Ts.get();
-		
+
 		PromotionAndAssignmentRefset promRef = workList.getPromotionRefset(config);
 		ConceptVersionBI concept = ts.getConceptVersion(config.getViewCoordinate(), ts.getNidForUuids(member.getUids()));
-		
+
 		int userNid = promRef.getDestination(concept.getNid(), config).getNid();
-				
+
 		if (user != null) {
 			userNid = ts.getNidForUuids(user.getId());
 		}
-		
+
 		RefexCAB newSpec = new RefexCAB(TK_REFEX_TYPE.CID, concept.getNid(), ts.getNidForUuids(workList.getUids()));
 		int activeNid = SnomedMetadataRf1.CURRENT_RF1.getLenient().getNid();
 		int assignedNid = Terms.get().uuidToNative(ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_ASSIGNED_STATUS.getUids());
@@ -5782,49 +5783,49 @@ public class TerminologyProjectDAO {
 		try {
 			project=getTranslationProject(projectConcept, aceFrameConfig);
 		} catch (Exception e) {
-			
+
 		}
 		if (project==null){
 			try {
 				project=getTerminologyProject(projectConcept, aceFrameConfig);
 			} catch (Exception e) {
-				
+
 			}
 		}
 		if (project==null){
 			try {
 				project=getMappingProject(projectConcept, aceFrameConfig);
 			} catch (Exception e) {
-				
+
 			}
 		}
 		return project;
 	}
-	
+
 	public static List<WfMembership> convertToMembershipList(List<String> list) throws Exception {
 		List<WfMembership> members = new ArrayList<WfMembership>();
 		for (String line : list) {
 			String[] fields = line.split("\\|");
 			I_GetConceptData userConcept = Terms.get().getConcept(UUID.fromString(fields[1]));
 			WfUser user = new WfUser(getConceptString(userConcept), userConcept.getPrimUuid());
-			
+
 			I_GetConceptData roleConcept = Terms.get().getConcept(UUID.fromString(fields[2]));
 			WfRole role = new WfRole(getConceptString(roleConcept), roleConcept.getPrimUuid());
-			
+
 			WfMembership member = new WfMembership(UUID.fromString(fields[0]), user, role, Boolean.parseBoolean(fields[3]));
 			members.add(member);
 		}
-		
+
 		return members;
 	}
-	
+
 	public static List<String> convertToStringListOfMembers(List<WfMembership> list) {
 		List<String> members = new ArrayList<String>();
 		for (WfMembership line : list) {
 			members.add(line.getId().toString() + "|" + line.getUser().getId().toString() 
 					+ "|" + line.getRole().getId().toString() + "|" + line.isDefaultAssignment());
 		}
-		
+
 		return members;
 	}
 
@@ -5833,18 +5834,18 @@ public class TerminologyProjectDAO {
 		MappingProject project = new MappingProject(projectName, 0, null);
 		return createNewMappingProject(project, config);
 	}
-	
+
 	public static void promoteContent(int conceptNid, ViewCoordinate sourceViewCoordinate, int targetPathNid) throws Exception {
 		PathBI snomedCorePath = Terms.get().getPath(ArchitectonicAuxiliary.Concept.SNOMED_CORE.getUids());
 		PositionBI originPosition = Terms.get().newPosition(snomedCorePath, Long.MAX_VALUE);
-        
-        TerminologyPromoterBI promoter = Ts.get().getTerminologyPromoter(sourceViewCoordinate, Terms.get().getActiveAceFrameConfig().getEditCoordinate(), targetPathNid, 
-        		originPosition);
-		
+
+		TerminologyPromoterBI promoter = Ts.get().getTerminologyPromoter(sourceViewCoordinate, Terms.get().getActiveAceFrameConfig().getEditCoordinate(), targetPathNid, 
+				originPosition);
+
 		NidBitSetBI promotionNids = Ts.get().getEmptyNidSet();
 		promotionNids.setMember(conceptNid);
-		
+
 		promoter.promote(promotionNids, false);
 	}
-	
+
 }
