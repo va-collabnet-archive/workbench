@@ -3,7 +3,7 @@
 	<parent>
         <groupId>org.ihtsdo</groupId>
         <artifactId>wb-mmb</artifactId>
-        <version>kp-no-jini-1.0-SNAPSHOT</version>
+        <version>2.21-trek-no-jini-SNAPSHOT</version>
     </parent>
 	<artifactId>issue-repository-integration</artifactId>
 	<packaging>jar</packaging>
