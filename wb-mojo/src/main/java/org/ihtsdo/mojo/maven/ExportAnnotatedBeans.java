@@ -68,7 +68,8 @@ import org.dwfa.util.bean.Spec;
  * @goal export-beans
  * @requiresDependencyResolution compile
  */
-public class ExportAnnotatedBeans extends AbstractMojo implements ExceptionListener {
+public class ExportAnnotatedBeans extends AbstractMojo implements
+        ExceptionListener {
 
     /**
      * Location of the build directory.
@@ -109,12 +110,15 @@ public class ExportAnnotatedBeans extends AbstractMojo implements ExceptionListe
     /**
      * @parameter
      */
-    private String[] allowedRoots = { "org.dwfa", "org.jehri", "au.gov.nehta", "au.com.ncch", "org.aao", "org.kp", "org.ihtsdo", "uk.gov" };
+    private String[] allowedRoots = { "org.dwfa", "org.jehri", "au.gov.nehta",
+            "au.com.ncch", "org.aao", "org.kp", "org.ihtsdo", "uk.gov",
+            "net.nhs" };
 
     /**
      * @parameter
      */
-    private String[] forbiddenRoots = { "org.dwfa.cement", "org.dwfa.tapi", "org.dwfa.bpa.util" };
+    private String[] forbiddenRoots = { "org.dwfa.cement", "org.dwfa.tapi",
+            "org.dwfa.bpa.util" };
 
     /**
      * @parameter
@@ -134,7 +138,8 @@ public class ExportAnnotatedBeans extends AbstractMojo implements ExceptionListe
      */
     private MavenSession session;
 
-    private String[] allowedGoals = new String[] { "install", "deploy", "export-beans" };
+    private String[] allowedGoals = new String[] { "install", "deploy",
+            "export-beans" };
 
     /**
      * Location of the build directory.
@@ -152,8 +157,9 @@ public class ExportAnnotatedBeans extends AbstractMojo implements ExceptionListe
     public void execute() throws MojoExecutionException, MojoFailureException {
 
         try {
-            if (MojoUtil.alreadyRun(getLog(), Arrays.toString(allowedRoots) + Arrays.toString(forbiddenRoots),
-                this.getClass(), targetDirectory)) {
+            if (MojoUtil.alreadyRun(getLog(), Arrays.toString(allowedRoots)
+                    + Arrays.toString(forbiddenRoots), this.getClass(),
+                    targetDirectory)) {
                 return;
             }
         } catch (NoSuchAlgorithmException e1) {
@@ -171,8 +177,11 @@ public class ExportAnnotatedBeans extends AbstractMojo implements ExceptionListe
             for (Artifact a : artifacts) {
                 if (a.getScope().equals(Artifact.SCOPE_PROVIDED)) {
                     getLog().info("Not adding provided: " + a);
-                } else if (a.getGroupId().endsWith("runtime-directory") || a.getScope().equals("runtime-directory")) {
-                    getLog().error("(DEPRECATED - please change artifact to ZIP): Not adding runtime-directory: " + a);
+                } else if (a.getGroupId().endsWith("runtime-directory")
+                        || a.getScope().equals("runtime-directory")) {
+                    getLog().error(
+                            "(DEPRECATED - please change artifact to ZIP): Not adding runtime-directory: "
+                                    + a);
                 } else if (!a.getArtifactHandler().isAddedToClasspath()) {
                     getLog().info("Not adding non-classpath: " + a);
                 } else {
@@ -180,7 +189,10 @@ public class ExportAnnotatedBeans extends AbstractMojo implements ExceptionListe
                         getLog().info("System dependency: " + a);
                     }
                     if (a.getFile().length() > 10000000) {
-                        getLog().warn("Suppressing addition of: " + a + " \n file size is: " + a.getFile().length());
+                        getLog().warn(
+                                "Suppressing addition of: " + a
+                                        + " \n file size is: "
+                                        + a.getFile().length());
                     } else {
                         dependencyWithoutProvided.add(a);
                     }
@@ -193,8 +205,10 @@ public class ExportAnnotatedBeans extends AbstractMojo implements ExceptionListe
                     rootDir = this.outputDirectory;
 
                 }
-                URLClassLoader libLoader = MojoUtil.getProjectClassLoader(dependencyWithoutProvided);
-                Class beanListClass = libLoader.loadClass(BeanList.class.getName());
+                URLClassLoader libLoader = MojoUtil
+                        .getProjectClassLoader(dependencyWithoutProvided);
+                Class beanListClass = libLoader.loadClass(BeanList.class
+                        .getName());
 
                 for (Artifact artifact : dependencyWithoutProvided) {
                     if (artifact.getScope().equals(Artifact.SCOPE_SYSTEM)) {
@@ -203,14 +217,17 @@ public class ExportAnnotatedBeans extends AbstractMojo implements ExceptionListe
 
                     File dependencyFile = artifact.getFile();
                     if (dependencyFile.exists()) {
-                        getLog().info("writing annotated beans for: " + dependencyFile.getAbsolutePath());
+                        getLog().info(
+                                "writing annotated beans for: "
+                                        + dependencyFile.getAbsolutePath());
                         JarFile jf = new JarFile(dependencyFile);
                         Enumeration<JarEntry> jarEnum = jf.entries();
                         int notFoundCount = 0;
                         while (jarEnum.hasMoreElements()) {
                             JarEntry je = jarEnum.nextElement();
                             if (je.getName().endsWith(".class")) {
-                                String className = je.getName().replace('/', '.');
+                                String className = je.getName().replace('/',
+                                        '.');
                                 boolean allowed = false;
                                 for (String allowedRoot : allowedRoots) {
                                     if (className.startsWith(allowedRoot)) {
@@ -221,30 +238,41 @@ public class ExportAnnotatedBeans extends AbstractMojo implements ExceptionListe
                                                 break;
                                             }
                                         }
-                                        //getLog().info("allowed: " + je.getName());
+                                        // getLog().info("allowed: " +
+                                        // je.getName());
                                         break;
                                     }
                                 }
                                 if (allowed) {
-                                    classNameNoDotClass = className.substring(0, className.length() - 6);
+                                    classNameNoDotClass = className.substring(
+                                            0, className.length() - 6);
                                     try {
-                                        Class c = libLoader.loadClass(classNameNoDotClass);
-                                        Annotation annotation = c.getAnnotation(beanListClass);
+                                        Class c = libLoader
+                                                .loadClass(classNameNoDotClass);
+                                        Annotation annotation = c
+                                                .getAnnotation(beanListClass);
                                         if (c.getAnnotation(beanListClass) != null) {
                                             // getLog().info("Writing annotation
                                             // for: " + c.getCanonicalName());
 
-                                            BeanList bl = (BeanList) Proxy.newProxyInstance(
-                                                getClass().getClassLoader(), new Class[] { BeanList.class },
-                                                new GenericInvocationHandler(annotation));
+                                            BeanList bl = (BeanList) Proxy
+                                                    .newProxyInstance(
+                                                            getClass()
+                                                                    .getClassLoader(),
+                                                            new Class[] { BeanList.class },
+                                                            new GenericInvocationHandler(
+                                                                    annotation));
                                             for (Spec s : bl.specs()) {
-                                                if (s.type().equals(BeanType.GENERIC_BEAN)) {
+                                                if (s.type().equals(
+                                                        BeanType.GENERIC_BEAN)) {
                                                     writeGenericBean(c, s);
-                                                } else if (s.type().equals(BeanType.TASK_BEAN)) {
+                                                } else if (s.type().equals(
+                                                        BeanType.TASK_BEAN)) {
                                                     writeTaskBean(c, s);
                                                 } else {
                                                     throw new UnsupportedOperationException(
-                                                        "Data beans are deprecated. " + s);
+                                                            "Data beans are deprecated. "
+                                                                    + s);
                                                 }
                                             }
                                         }
@@ -254,21 +282,29 @@ public class ExportAnnotatedBeans extends AbstractMojo implements ExceptionListe
                                     } catch (ClassNotFoundException ex) {
                                         notFoundCount++;
                                         if (notFoundCount < 10) {
-                                            getLog().info("Can't find class: " + ex.getLocalizedMessage() +
-                                            		"\nLoader: \n" + libLoader);
+                                            getLog().info(
+                                                    "Can't find class: "
+                                                            + ex.getLocalizedMessage()
+                                                            + "\nLoader: \n"
+                                                            + libLoader);
                                         }
                                     }
                                 }
                             }
                         }
                     } else {
-                        getLog().info("Warning. Dependency file does not exist: " + dependencyFile.getAbsolutePath());
+                        getLog().info(
+                                "Warning. Dependency file does not exist: "
+                                        + dependencyFile.getAbsolutePath());
                     }
 
                 }
             } catch (Throwable e) {
-                getLog().error(e.getMessage() + " while loading " + classNameNoDotClass);
-                throw new MojoExecutionException(e.getMessage() + " while loading " + classNameNoDotClass, e);
+                getLog().error(
+                        e.getMessage() + " while loading "
+                                + classNameNoDotClass);
+                throw new MojoExecutionException(e.getMessage()
+                        + " while loading " + classNameNoDotClass, e);
             }
         } else {
             getLog().info("Not writing. Not an allowed goal.");
@@ -276,13 +312,15 @@ public class ExportAnnotatedBeans extends AbstractMojo implements ExceptionListe
     }
 
     @SuppressWarnings("unchecked")
-    private void writeTaskBean(Class c, Spec spec) throws MojoExecutionException {
+    private void writeTaskBean(Class c, Spec spec)
+            throws MojoExecutionException {
         try {
             String suffix = ".task";
             writeBean(c, spec, rootDir, suffix);
         } catch (Throwable e) {
             if (throwWriteBeansExceptions) {
-                throw new MojoExecutionException("Problem writing bean: " + spec, e);
+                throw new MojoExecutionException("Problem writing bean: "
+                        + spec, e);
             } else {
                 e.printStackTrace();
             }
@@ -290,7 +328,8 @@ public class ExportAnnotatedBeans extends AbstractMojo implements ExceptionListe
     }
 
     @SuppressWarnings("unchecked")
-    private void writeGenericBean(Class c, Spec spec) throws MojoExecutionException {
+    private void writeGenericBean(Class c, Spec spec)
+            throws MojoExecutionException {
         try {
             String suffix = ".bean";
             writeBean(c, spec, rootDir, suffix);
@@ -313,22 +352,27 @@ public class ExportAnnotatedBeans extends AbstractMojo implements ExceptionListe
      * @throws FileNotFoundException
      */
     @SuppressWarnings("unchecked")
-    private void writeBean(Class beanClass, Spec s, File rootDir, String suffix) throws IOException,
-            ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException,
+    private void writeBean(Class beanClass, Spec s, File rootDir, String suffix)
+            throws IOException, ClassNotFoundException, NoSuchMethodException,
+            InstantiationException, IllegalAccessException,
             InvocationTargetException, FileNotFoundException {
         rootDir.mkdirs();
         Object obj;
         if (beanClass.isEnum()) {
-            Method m = beanClass.getMethod("valueOf", new Class[] { String.class });
+            Method m = beanClass.getMethod("valueOf",
+                    new Class[] { String.class });
             obj = m.invoke(null, (Object[]) s.constructArgs());
         } else {
             try {
                 if (s.constructArgs().length == 0) {
-                    Constructor beanConstructor = beanClass.getConstructor(new Class[] {});
+                    Constructor beanConstructor = beanClass
+                            .getConstructor(new Class[] {});
                     obj = beanConstructor.newInstance(new Object[] {});
                 } else {
-                    Constructor beanConstructor = beanClass.getConstructor(new Class[] { String.class });
-                    obj = beanConstructor.newInstance((Object[]) s.constructArgs());
+                    Constructor beanConstructor = beanClass
+                            .getConstructor(new Class[] { String.class });
+                    obj = beanConstructor.newInstance((Object[]) s
+                            .constructArgs());
                 }
                 File beanDir = rootDir;
                 if (s.directory().length() > 1) {
@@ -348,7 +392,8 @@ public class ExportAnnotatedBeans extends AbstractMojo implements ExceptionListe
                 oos.writeObject(obj);
                 oos.close();
             } catch (InstantiationException e) {
-                System.err.println("Processing: " + beanClass + " Spec: " + s + " resulted in: " + e.getLocalizedMessage());
+                System.err.println("Processing: " + beanClass + " Spec: " + s
+                        + " resulted in: " + e.getLocalizedMessage());
             }
         }
 
@@ -360,10 +405,11 @@ public class ExportAnnotatedBeans extends AbstractMojo implements ExceptionListe
             File rootDir = new File(this.outputDirectory, "processes");
             rootDir.mkdirs();
 
-            File xmlSourceFile = new File(sourceDirectory.getAbsolutePath() + "/../process/" + spec.getSourceName()
-                + ".xml");
+            File xmlSourceFile = new File(sourceDirectory.getAbsolutePath()
+                    + "/../process/" + spec.getSourceName() + ".xml");
 
-            XMLDecoder d = new XMLDecoder(new BufferedInputStream(new FileInputStream(xmlSourceFile)));
+            XMLDecoder d = new XMLDecoder(new BufferedInputStream(
+                    new FileInputStream(xmlSourceFile)));
 
             d.setExceptionListener(this);
             Object process = d.readObject();
@@ -378,9 +424,12 @@ public class ExportAnnotatedBeans extends AbstractMojo implements ExceptionListe
                 fis.close();
                 String xmlData = new String(data);
                 int processIdStrLoc = xmlData.indexOf("processIdStr");
-                int stringElemLoc = xmlData.indexOf("<string>", processIdStrLoc);
-                String procIdStr = xmlData.substring(stringElemLoc + 8, stringElemLoc + 8 + 36);
-                File processDir = new File(this.outputDirectory, spec.getDirName());
+                int stringElemLoc = xmlData
+                        .indexOf("<string>", processIdStrLoc);
+                String procIdStr = xmlData.substring(stringElemLoc + 8,
+                        stringElemLoc + 8 + 36);
+                File processDir = new File(this.outputDirectory,
+                        spec.getDirName());
                 processDir.mkdirs();
                 /*
                  * Creating its own entry id causes duplicate entries if mvn is
@@ -389,7 +438,8 @@ public class ExportAnnotatedBeans extends AbstractMojo implements ExceptionListe
                  * entryId = UuidFactory.generate(); processFile = new
                  * File(processDir, procIdStr + "." + entryId + ".bp");
                  */
-                processFile = new File(processDir, procIdStr + "." + procIdStr + ".bp");
+                processFile = new File(processDir, procIdStr + "." + procIdStr
+                        + ".bp");
             } else {
                 File processDir = new File(rootDir, spec.getDirName());
                 processDir.mkdirs();
@@ -402,10 +452,12 @@ public class ExportAnnotatedBeans extends AbstractMojo implements ExceptionListe
             oos.close();
 
         } catch (Exception e) {
-            throw new MojoExecutionException("Problem making process: " + spec.getSourceName(), e);
+            throw new MojoExecutionException("Problem making process: "
+                    + spec.getSourceName(), e);
         }
         if (e != null) {
-            throw new MojoExecutionException("Problem making process: " + spec.getSourceName(), e);
+            throw new MojoExecutionException("Problem making process: "
+                    + spec.getSourceName(), e);
         }
     }
 
