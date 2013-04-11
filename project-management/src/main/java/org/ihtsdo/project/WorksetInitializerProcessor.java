@@ -36,6 +36,7 @@ import org.ihtsdo.tk.api.NidBitSetBI;
 import org.ihtsdo.tk.api.ProcessUnfetchedConceptDataBI;
 import org.ihtsdo.tk.api.TerminologyBuilderBI;
 import org.ihtsdo.tk.api.TerminologyStoreDI;
+import org.ihtsdo.tk.api.blueprint.IdDirective;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB.RefexProperty;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
@@ -289,14 +290,16 @@ public class WorksetInitializerProcessor implements ProcessUnfetchedConceptDataB
                 RefexCAB newSpec = new RefexCAB(
                         TK_REFEX_TYPE.CID,
                         concept.getNid(),
-                        workSetNid);
+                        workSetNid,
+                        IdDirective.GENERATE_HASH);
                 newSpec.put(RefexProperty.CNID1, activeNid);
                 RefexChronicleBI<?> newRefex = tc.constructIfNotCurrent(newSpec);
 
                 RefexCAB newSpecForProm = new RefexCAB(
                         TK_REFEX_TYPE.CID,
                         concept.getNid(),
-                        promRef.getRefsetId());
+                        promRef.getRefsetId(),
+                        IdDirective.GENERATE_HASH);
                 newSpecForProm.put(RefexProperty.CNID1, activeNid);
                 RefexChronicleBI<?> newRefexForProm = tc.constructIfNotCurrent(newSpecForProm);
                 concept.addAnnotation(newRefexForProm);
@@ -315,7 +318,8 @@ public class WorksetInitializerProcessor implements ProcessUnfetchedConceptDataB
                 RefexCAB newSpec = new RefexCAB(
                         TK_REFEX_TYPE.CID,
                         concept.getNid(),
-                        workSetNid);
+                        workSetNid,
+                        IdDirective.GENERATE_HASH);
                 newSpec.put(RefexProperty.CNID1, inactiveNid);
                 newSpec.setStatusUuid(inactiveUuid);
                 RefexChronicleBI<?> newRefex = tc.constructIfNotCurrent(newSpec);
@@ -323,7 +327,8 @@ public class WorksetInitializerProcessor implements ProcessUnfetchedConceptDataB
                 RefexCAB newSpecForProm = new RefexCAB(
                         TK_REFEX_TYPE.CID,
                         concept.getNid(),
-                        promRef.getRefsetId());
+                        promRef.getRefsetId(),
+                        IdDirective.GENERATE_HASH);
                 newSpecForProm.put(RefexProperty.CNID1, inactiveNid);
                 newSpecForProm.setStatusUuid(inactiveUuid);
                 RefexChronicleBI<?> newRefexForProm = tc.constructIfNotCurrent(newSpecForProm);

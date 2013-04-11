@@ -22,7 +22,9 @@ import org.ihtsdo.tk.api.AnalogGeneratorBI;
 import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.TypedComponentVersionBI;
 import org.ihtsdo.tk.api.blueprint.DescriptionCAB;
+import org.ihtsdo.tk.api.blueprint.IdDirective;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
+import org.ihtsdo.tk.api.blueprint.RefexDirective;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 
 /**
@@ -63,6 +65,8 @@ public interface DescriptionVersionBI<A extends DescriptionAnalogBI>
     /**
      * @param viewCoordinate the view coordinate specifying which version of the
      * description to make a blueprint of
+     * @param idDirective 
+     * @param refexDirective 
      * @return the description blueprint, which can be constructed to create
      * a <code>DescriptionChronicleBI</code>
      * @throws IOException signals that an I/O exception has occurred
@@ -72,7 +76,8 @@ public interface DescriptionVersionBI<A extends DescriptionAnalogBI>
      * @see org.ihtsdo.tk.api.blueprint.CreateOrAmendBlueprint
      */
     @Override
-    public DescriptionCAB makeBlueprint(ViewCoordinate viewCoordinate) throws IOException, ContradictionException, InvalidCAB;
+    public DescriptionCAB makeBlueprint(ViewCoordinate viewCoordinate, IdDirective idDirective, RefexDirective refexDirective) 
+            throws IOException, ContradictionException, InvalidCAB;
 
     /**
      * Tests to see if the description text matches the given

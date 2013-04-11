@@ -12,6 +12,7 @@ import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.TerminologyBuilderBI;
 import org.ihtsdo.tk.api.blueprint.DescriptionCAB;
+import org.ihtsdo.tk.api.blueprint.IdDirective;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB.RefexProperty;
@@ -91,20 +92,23 @@ public class AddFromDialectSpecAction extends AbstractAction {
                         SnomedMetadataRfx.getDES_SYNONYM_NID(),
                         LANG_CODE.EN,
                         descSpec.getDescriptionText(),
-                        false);
+                        false, 
+                        IdDirective.GENERATE_HASH);
                 newDesc = tc.constructIfNotCurrent(descSpecPref);
                 if (dialect.equals(LANG_CODE.EN_GB)) {
                     RefexCAB refexSpecPrefGb = new RefexCAB(
                         TK_REFEX_TYPE.CID,
                         descSpecPref.getComponentNid(),
-                        gbRefexNid);
+                        gbRefexNid,
+                        IdDirective.GENERATE_HASH);
                     refexSpecPrefGb.put(RefexProperty.CNID1, SnomedMetadataRfx.getDESC_ACCEPTABLE_NID());
                     newRefex = tc.constructIfNotCurrent(refexSpecPrefGb);
                 } else {
                     RefexCAB refexSpecPrefUs = new RefexCAB(
                         TK_REFEX_TYPE.CID,
                         descSpecPref.getComponentNid(),
-                        usRefexNid);
+                        usRefexNid,
+                        IdDirective.GENERATE_HASH);
                     refexSpecPrefUs.put(RefexProperty.CNID1, SnomedMetadataRfx.getDESC_ACCEPTABLE_NID());
                     newRefex = tc.constructIfNotCurrent(refexSpecPrefUs);
                 }
@@ -114,11 +118,13 @@ public class AddFromDialectSpecAction extends AbstractAction {
                         SnomedMetadataRfx.getDES_FULL_SPECIFIED_NAME_NID(),
                         dialect,
                         descSpec.getDescriptionText(),
-                        false);
+                        false, 
+                        IdDirective.GENERATE_HASH);
                 RefexCAB refexSpecFsn = new RefexCAB(
                         TK_REFEX_TYPE.CID,
                         descSpecFsn.getComponentNid(),
-                        refexNid);
+                        refexNid,
+                        IdDirective.GENERATE_HASH);
                 refexSpecFsn.put(RefexProperty.CNID1, SnomedMetadataRfx.getDESC_PREFERRED_NID());
                 newDesc = tc.constructIfNotCurrent(descSpecFsn);
                 newRefex = tc.constructIfNotCurrent(refexSpecFsn);
@@ -128,23 +134,21 @@ public class AddFromDialectSpecAction extends AbstractAction {
                         def,
                         dialect,
                         descSpec.getDescriptionText(),
-                        true);
+                        true, 
+                        IdDirective.GENERATE_HASH);
                 newDesc = tc.constructIfNotCurrent(descSpecDef);
                 RefexCAB refexSpecFsn = new RefexCAB(
                         TK_REFEX_TYPE.CID,
                         descSpecDef.getComponentNid(),
-                        refexNid);
+                        refexNid,
+                        IdDirective.GENERATE_HASH);
                 refexSpecFsn.put(RefexProperty.CNID1, SnomedMetadataRfx.getDESC_PREFERRED_NID());
                 newRefex = tc.constructIfNotCurrent(refexSpecFsn);
             }
             newDesc.addAnnotation(newRefex);
             ConceptChronicleBI concept = Ts.get().getConceptForNid(newDesc.getConceptNid());
             Ts.get().addUncommitted(concept);
-        } catch (IOException ex) {
-            AceLog.getAppLog().alertAndLogException(ex);
-        } catch (InvalidCAB ex) {
-            AceLog.getAppLog().alertAndLogException(ex);
-        } catch (ContradictionException ex) {
+        } catch (IOException | InvalidCAB | ContradictionException ex) {
             AceLog.getAppLog().alertAndLogException(ex);
         }
     }

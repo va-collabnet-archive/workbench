@@ -30,14 +30,19 @@ import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.ihtsdo.tk.Ts;
+//import static org.ihtsdo.tk.api.blueprint.IdDirective.GENERATE_HASH; // :!!!:REVIEW import *static* needed?
+//import static org.ihtsdo.tk.api.blueprint.IdDirective.GENERATE_RANDOM;
+//import static org.ihtsdo.tk.api.blueprint.IdDirective.GENERATE_RANDOM_CONCEPT_REST_HASH;
+//import static org.ihtsdo.tk.api.blueprint.IdDirective.GENERATE_REFEX_CONTENT_HASH;
+//import static org.ihtsdo.tk.api.blueprint.IdDirective.PRESERVE;
+//import static org.ihtsdo.tk.api.blueprint.IdDirective.PRESERVE_CONCEPT_REST_HASH;
 import org.ihtsdo.tk.api.ComponentBI;
 import org.ihtsdo.tk.api.ComponentChronicleBI;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.TerminologyBuilderBI;
-import org.ihtsdo.tk.api.TerminologyStoreDI;
+import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
-import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf1;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
@@ -59,8 +64,19 @@ public abstract class CreateOrAmendBlueprint implements PropertyChangeListener {
     private UUID statusUuid;
     private ComponentVersionBI cv;
     private ViewCoordinate vc;
-    private List<RefexCAB> annotations = new ArrayList<RefexCAB>();
+    private List<RefexCAB> annotations = new ArrayList<>();
     protected PropertyChangeSupport pcs = new PropertyChangeSupport(this);
+    /* :!!!:REVIEW:MERGE: from 113, not yet added.
+    protected PropertyChangeSupport pcs = new PropertyChangeSupport(this) {
+    
+        @Override
+        public void firePropertyChange(PropertyChangeEvent event) {
+            event.setPropagationId(propigationId.incrementAndGet());
+            super.firePropertyChange(event);
+        }
+    
+    };
+    */
     private Long longId;
     private int longAuthorityNid;
     private String stringId;
@@ -69,6 +85,9 @@ public abstract class CreateOrAmendBlueprint implements PropertyChangeListener {
     private int uuidAuthortiyNid;
     private boolean hasAdditionalIds = false;
     private HashMap<Object, Integer> idMap = new HashMap<>();
+
+    protected IdDirective idDirective;
+    protected RefexDirective refexDirective;
 
     /**
      * Removes the specified property change listener.
@@ -118,16 +137,22 @@ public abstract class CreateOrAmendBlueprint implements PropertyChangeListener {
      * from
      * @param viewCoordinate the view coordinate specifying which versions are
      * active and inactive
+     * @param idDirective
+     * @param refexDirective
      * @throws IOException signals that an I/O exception has occurred
      * @throws InvalidCAB if the any of the values in blueprint to make are
      * invalid
      * @throws ContradictionException if more than one version is returned for
      * the view coordinate
      */
-    public CreateOrAmendBlueprint(UUID componentUuid, ComponentVersionBI componentVersion,
-            ViewCoordinate viewCoordinate) throws IOException, InvalidCAB, ContradictionException {
+    public CreateOrAmendBlueprint(UUID componentUuid,
+            ComponentVersionBI componentVersion,
+            ViewCoordinate viewCoordinate,
+            IdDirective idDirective,
+            RefexDirective refexDirective) 
+            throws IOException, InvalidCAB, ContradictionException {
         try {
-            if (Ts.get().usesRf2Metadata()) {
+            if (Ts.get().usesRf2Metadata() /* && currentStatusUuid == null :!!!:REVIEW:MERGE: from trek-113 */) {
                 currentStatusUuid = SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getPrimUuid();
                 retiredStatusUuid = SnomedMetadataRf2.INACTIVE_VALUE_RF2.getLenient().getPrimUuid();
             } else {
@@ -139,6 +164,20 @@ public abstract class CreateOrAmendBlueprint implements PropertyChangeListener {
         }
         statusUuid = currentStatusUuid;
         this.componentUuid = componentUuid;
+        if (idDirective == IdDirective.PRESERVE) {
+            this.componentUuid = componentVersion.getPrimUuid();
+        } else if (idDirective == IdDirective.GENERATE_RANDOM) {
+            this.componentUuid = UUID.randomUUID();
+        } else if (cv instanceof ConceptVersionBI
+                && idDirective == IdDirective.GENERATE_RANDOM_CONCEPT_REST_HASH) {
+            this.componentUuid = UUID.randomUUID();
+        } else if (cv instanceof ConceptVersionBI
+                && idDirective == IdDirective.PRESERVE_CONCEPT_REST_HASH) {
+            this.componentUuid = componentVersion.getPrimUuid();
+        }
+        this.idDirective = idDirective;
+        this.refexDirective = refexDirective;
+
         this.cv = componentVersion;
         this.vc = viewCoordinate;
         getAnnotationBlueprintsFromOriginal();
@@ -174,15 +213,11 @@ public abstract class CreateOrAmendBlueprint implements PropertyChangeListener {
     public void propertyChange(PropertyChangeEvent propertyChangeEvent) {
         try {
             recomputeUuid();
-        } catch (NoSuchAlgorithmException ex) {
+        } catch (NoSuchAlgorithmException | InvalidCAB | ContradictionException ex) {
             Logger.getLogger(CreateOrAmendBlueprint.class.getName()).log(Level.SEVERE, null, ex);
         } catch (UnsupportedEncodingException ex) {
             Logger.getLogger(CreateOrAmendBlueprint.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
-            Logger.getLogger(CreateOrAmendBlueprint.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (InvalidCAB ex) {
-            Logger.getLogger(CreateOrAmendBlueprint.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ContradictionException ex) {
             Logger.getLogger(CreateOrAmendBlueprint.class.getName()).log(Level.SEVERE, null, ex);
         }
 
@@ -247,6 +282,22 @@ public abstract class CreateOrAmendBlueprint implements PropertyChangeListener {
         return componentUuid;
     }
 
+    protected static UUID getComponentUUID(UUID componentUuid,
+            ComponentVersionBI cv, IdDirective idDirective) {
+        if (componentUuid != null) {
+            return componentUuid;
+        }
+        switch (idDirective) {
+            case GENERATE_RANDOM:
+                return UUID.randomUUID();
+            case PRESERVE:
+                if (cv != null) {
+                    return cv.getPrimUuid();
+                }
+        }
+        return null;
+    }
+
     /**
      * Sets the uuid of the component specified by this blueprint.
      *
@@ -292,13 +343,35 @@ public abstract class CreateOrAmendBlueprint implements PropertyChangeListener {
      * @throws ContradictionException if more then one version is found for a
      * particular view coordinate
      */
-    public List<RefexCAB> getAnnotationBlueprintsFromOriginal() throws IOException, InvalidCAB, ContradictionException {
+    public final List<RefexCAB> getAnnotationBlueprintsFromOriginal() throws IOException, InvalidCAB, ContradictionException {
         if (annotations.isEmpty() && cv != null) {
-            if (cv.getRefexesActive(vc) != null) {
-                Collection<? extends RefexVersionBI<?>> originalRefexes = cv.getRefexesActive(vc);
-                if (!originalRefexes.isEmpty()) {
-                    for (RefexVersionBI refex : originalRefexes) {
-                        annotations.add(refex.makeBlueprint(vc));
+            if (refexDirective == RefexDirective.INCLUDE) {
+                if (cv.getRefexesActive(vc) != null) {
+                    Collection<? extends RefexVersionBI<?>> originalRefexes = cv.getRefexesActive(vc);
+                    if (!originalRefexes.isEmpty()) {
+                        IdDirective refexIdDirective = idDirective;
+                        switch (idDirective) {
+                            case GENERATE_RANDOM:
+                            case GENERATE_HASH:
+                            case GENERATE_RANDOM_CONCEPT_REST_HASH:
+                            case PRESERVE_CONCEPT_REST_HASH:
+                                idDirective = IdDirective.GENERATE_HASH;
+                                break;
+
+                            case GENERATE_REFEX_CONTENT_HASH:
+                                idDirective = IdDirective.GENERATE_REFEX_CONTENT_HASH;
+                                break;
+                            case PRESERVE:
+                                idDirective = IdDirective.PRESERVE;
+                                break;
+
+                        }
+                        for (RefexVersionBI refex : originalRefexes) {
+                            RefexCAB refexCab = refex.makeBlueprint(vc, refexIdDirective, refexDirective);
+                            refexCab.setReferencedComponentUuid(this.componentUuid);
+                            refexCab.recomputeUuid();
+                            annotations.add(refexCab);
+                        }
                     }
                 }
             }

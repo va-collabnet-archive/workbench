@@ -25,7 +25,9 @@ import java.io.IOException;
 
 import java.util.Set;
 import org.ihtsdo.tk.api.blueprint.CreateOrAmendBlueprint;
+import org.ihtsdo.tk.api.blueprint.IdDirective;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
+import org.ihtsdo.tk.api.blueprint.RefexDirective;
 
 /**
  * The Interface ComponentVersionBI provides terminology generic methods for
@@ -177,12 +179,14 @@ public interface ComponentVersionBI extends ComponentBI, VersionPointBI {
      * component.
      *
      * @param viewCoordinate the view coordinate specifying which version is active or inactive
+     * @param idDirective 
+     * @param refexDirective 
      * @return the blueprint of the component
      * @throws IOException signals that an I/O exception has occurred
      * @throws ContradictionException if more than one version is found for a given position or view coordinate
      * @throws InvalidCAB if the any of the values in blueprint to make are invalid
      * @see org.ihtsdo.tk.api.blueprint.CreateOrAmendBlueprint
      */
-    CreateOrAmendBlueprint makeBlueprint(ViewCoordinate viewCoordinate)
+    CreateOrAmendBlueprint makeBlueprint(ViewCoordinate viewCoordinate, IdDirective idDirective, RefexDirective refexDirective)
             throws IOException, ContradictionException, InvalidCAB;
 }

@@ -9,9 +9,7 @@ import org.dwfa.ace.log.AceLog;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Collection;
 import java.util.List;
-import java.util.UUID;
 
 import java.util.concurrent.ExecutionException;
 
@@ -23,9 +21,10 @@ import org.dwfa.ace.list.TerminologyListModel;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.ihtsdo.arena.contradiction.ContradictionEditorFrame;
 import org.ihtsdo.tk.Ts;
-import org.ihtsdo.tk.api.ComponentChronicleBI;
 import org.ihtsdo.tk.api.TerminologyBuilderBI;
+import org.ihtsdo.tk.api.blueprint.IdDirective;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
+import org.ihtsdo.tk.api.blueprint.RefexDirective;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
@@ -70,7 +69,7 @@ public class CommitActionListener implements ActionListener {
              ConceptChronicleBI conflictRefset = Ts.get().getConceptForNid(conflictRefsetNid);
              RefexVersionBI member = conflictRefset.getRefsetMemberActiveForComponent(vc, c.getConceptNid());
              if(member != null){
-                RefexCAB memberBp = member.makeBlueprint(vc);
+                RefexCAB memberBp = member.makeBlueprint(vc, IdDirective.PRESERVE, RefexDirective.EXCLUDE);
                 memberBp.setRetired();
                 builder.construct(memberBp);
                 Ts.get().addUncommitted(conflictRefset);
@@ -104,9 +103,7 @@ public class CommitActionListener implements ActionListener {
             if (get()) {
                settings.getView().getCvRenderer().updateCancelAndCommit();
             }
-         } catch (InterruptedException ex) {
-            AceLog.getAppLog().alertAndLogException(ex);
-         } catch (ExecutionException ex) {
+         } catch (  InterruptedException | ExecutionException ex) {
             AceLog.getAppLog().alertAndLogException(ex);
          }
       }

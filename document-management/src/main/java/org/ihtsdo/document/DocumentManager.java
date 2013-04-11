@@ -95,10 +95,10 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.ComputationCanceled;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.document.DictionaryResultsDialog;
 import org.ihtsdo.helper.time.TimeHelper;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.TerminologyBuilderBI;
+import org.ihtsdo.tk.api.blueprint.IdDirective;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
@@ -499,7 +499,10 @@ public class DocumentManager {
 			}
 			userWordFiles.add(dictionaryTextFile);
 
-			RefexCAB newSpec = new RefexCAB(TK_REFEX_TYPE.STR, dicRefset.getNid(), dicRefset.getNid());
+			RefexCAB newSpec = new RefexCAB(TK_REFEX_TYPE.STR, 
+                                dicRefset.getNid(), 
+                                dicRefset.getNid(),
+                                IdDirective.GENERATE_HASH);
 			newSpec.put(RefexCAB.RefexProperty.STRING1, dictionaryTextFile.getName());
 			newSpec.setStatusUuid(SnomedMetadataRf1.CURRENT_RF1.getLenient().getPrimUuid());
 			RefexChronicleBI<?> newRefex = tc.constructIfNotCurrent(newSpec);
@@ -967,7 +970,7 @@ public class DocumentManager {
 	 * @return the string
 	 */
 	public static String wildcardToRegex(String wildcard) {
-		StringBuffer s = new StringBuffer(wildcard.length());
+		StringBuilder s = new StringBuilder(wildcard.length());
 		s.append('^');
 		for (int i = 0, is = wildcard.length(); i < is; i++) {
 			char c = wildcard.charAt(i);

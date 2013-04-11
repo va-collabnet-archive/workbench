@@ -29,7 +29,6 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.ace.task.WorkerAttachmentKeys;
@@ -51,18 +50,18 @@ import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.TerminologyBuilderBI;
 import org.ihtsdo.tk.api.blueprint.ConceptCB;
 import org.ihtsdo.tk.api.blueprint.DescriptionCAB;
+import org.ihtsdo.tk.api.blueprint.IdDirective;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
+import org.ihtsdo.tk.api.blueprint.RefexDirective;
 import org.ihtsdo.tk.api.blueprint.RelationshipCAB;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
-import org.ihtsdo.tk.api.description.DescriptionChronicleBI;
 import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 import org.ihtsdo.tk.binding.snomed.Language;
 import org.ihtsdo.tk.binding.snomed.Snomed;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationshipType;
-import org.ihtsdo.tk.spec.ConceptSpec;
 import org.ihtsdo.tk.spec.ValidationException;
 
 /**
@@ -174,7 +173,8 @@ public class ImportOwlConcepts extends AbstractTask {
                                                     Snomed.IS_A.getLenient().getConceptNid(),
                                                     parent.getConceptNid(),
                                                     0,
-                                                    TkRelationshipType.STATED_HIERARCHY);
+                                                    TkRelationshipType.STATED_HIERARCHY,
+                                                    IdDirective.GENERATE_HASH);
                                             RelationshipChronicleBI newRel = builder.construct(rel);
                                             relsSeen.add(newRel.getPrimUuid());
 //                                        Ts.get().addUncommittedNoChecks(Ts.get().getConcept(rel.getSourceNid()));
@@ -194,7 +194,8 @@ public class ImportOwlConcepts extends AbstractTask {
                                             Snomed.IS_A.getLenient().getConceptNid(),
                                             Ts.get().getNidForUuids(parentUuid),
                                             0,
-                                            TkRelationshipType.STATED_HIERARCHY);
+                                            TkRelationshipType.STATED_HIERARCHY,
+                                            IdDirective.GENERATE_HASH);
                                     //check for previously imported
                                     if (!Ts.get().hasUuid(relBp.getComponentUuid())) {
                                         builder.construct(relBp);
@@ -225,7 +226,8 @@ public class ImportOwlConcepts extends AbstractTask {
                                             Snomed.IS_A.getLenient().getConceptNid(),
                                             Ts.get().getNidForUuids(topParentUuid),
                                             0,
-                                            TkRelationshipType.STATED_HIERARCHY);
+                                            TkRelationshipType.STATED_HIERARCHY,
+                                            IdDirective.GENERATE_HASH);
                                     RelationshipChronicleBI newRel = builder.construct(relBp);
                                     relsSeen.add(newRel.getPrimUuid());
 //                                Ts.get().addUncommittedNoChecks(Ts.get().getConcept(relBp.getSourceNid()));
@@ -242,7 +244,7 @@ public class ImportOwlConcepts extends AbstractTask {
                             if (!relsSeen.contains(rel.getPrimUuid()) 
                                     && rel.getCharacteristicNid() != SnomedMetadataRfx.getREL_CH_INFERRED_RELATIONSHIP_NID()
                                     && rel.getTypeNid() == Snomed.IS_A.getLenient().getConceptNid()) {
-                                RelationshipCAB relBp = rel.makeBlueprint(config.getViewCoordinate());
+                                RelationshipCAB relBp = rel.makeBlueprint(config.getViewCoordinate(), IdDirective.PRESERVE, RefexDirective.EXCLUDE);  // :!!!:REVIEW
                                 relBp.setRetired();
                                 relBp.setComponentUuidNoRecompute(rel.getPrimUuid());
                                 RelationshipChronicleBI construct = builder.construct(relBp);
@@ -323,18 +325,17 @@ public class ImportOwlConcepts extends AbstractTask {
             if (owl.getConceptUuid() == null) {
                 if (owl.getFsn() == null) {
                     String fsn = owl.getLabel() + " " + semanticTag;
-                    fsn.trim();
-                    owl.setFsn(fsn);
+                    owl.setFsn(fsn.trim());
                 }
                 if (owl.getLabel() == null) {
                     String label = owl.getFsn().replace(semanticTag, "");
-                    label.trim();
-                    owl.setLabel(label);
+                    owl.setLabel(label.trim());
                 }
                 ConceptCB newConceptBp = new ConceptCB(owl.getFsn(),
                         owl.getLabel(),
                         LANG_CODE.EN,
                         Snomed.IS_A.getLenient().getPrimUuid(),
+                        IdDirective.GENERATE_HASH,
                         parentUuids);
                 try {
                     //check for previous import
@@ -347,11 +348,7 @@ public class ImportOwlConcepts extends AbstractTask {
                         existingConcepts++;
                     }
                     owl.setConceptUuid(newConceptBp.getComponentUuid());
-                } catch (InvalidCAB e) {
-                    ConceptChronicleBI concept = Ts.get().getConcept(newConceptBp.getComponentUuid());
-                    owl.setConceptUuid(concept.getPrimUuid());
-                    existingConcepts++;
-                } catch (AssertionError e) {
+                } catch (InvalidCAB | AssertionError e) {
                     ConceptChronicleBI concept = Ts.get().getConcept(newConceptBp.getComponentUuid());
                     owl.setConceptUuid(concept.getPrimUuid());
                     existingConcepts++;
@@ -398,6 +395,7 @@ public class ImportOwlConcepts extends AbstractTask {
         return CONTINUE_CONDITION;
     }
 
+    @Override
     public int[] getDataContainerIds() {
         return new int[]{};
     }

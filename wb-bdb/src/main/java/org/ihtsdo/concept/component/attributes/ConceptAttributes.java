@@ -6,12 +6,10 @@ import com.sleepycat.bind.tuple.TupleOutput;
 
 import org.apache.commons.collections.primitives.ArrayIntList;
 
-import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_ConceptAttributeVersioned;
 import org.dwfa.ace.api.I_ConfigAceFrame;
-import org.ihtsdo.tk.api.ContradictionManagerBI;
 import org.dwfa.ace.api.I_MapNativeToNative;
 import org.dwfa.ace.api.PathSetReadOnly;
 import org.dwfa.ace.api.Terms;
@@ -49,9 +47,9 @@ import java.io.IOException;
 
 import java.util.*;
 import org.ihtsdo.tk.api.blueprint.ConceptAttributeAB;
-import org.ihtsdo.tk.api.blueprint.CreateOrAmendBlueprint;
+import org.ihtsdo.tk.api.blueprint.IdDirective;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
-import org.ihtsdo.tk.dto.concept.component.TkRevision;
+import org.ihtsdo.tk.api.blueprint.RefexDirective;
 
 public class ConceptAttributes extends ConceptComponent<ConceptAttributesRevision, ConceptAttributes>
         implements I_ConceptAttributeVersioned<ConceptAttributesRevision>,
@@ -59,7 +57,7 @@ public class ConceptAttributes extends ConceptComponent<ConceptAttributesRevisio
         ConceptAttributeAnalogBI<ConceptAttributesRevision> {
 
     private static VersionComputer<ConceptAttributes.Version> computer =
-            new VersionComputer<ConceptAttributes.Version>();
+            new VersionComputer<>();
     //~--- fields --------------------------------------------------------------
     private boolean defined;
     List<Version> versions;
@@ -103,7 +101,7 @@ public class ConceptAttributes extends ConceptComponent<ConceptAttributesRevisio
             List<I_ConceptAttributeTuple> returnTuples, Precedence precedencePolicy,
             ContradictionManagerBI contradictionManager)
             throws TerminologyException, IOException {
-        List<Version> returnList = new ArrayList<Version>();
+        List<Version> returnList = new ArrayList<>();
 
         computer.addSpecifiedVersions(allowedStatus, positionSet, returnList, getVersions(), precedencePolicy,
                 contradictionManager);
@@ -114,7 +112,7 @@ public class ConceptAttributes extends ConceptComponent<ConceptAttributesRevisio
             List<I_ConceptAttributeTuple> returnTuples, Precedence precedencePolicy,
             ContradictionManagerBI contradictionManager, long time)
             throws TerminologyException, IOException {
-        List<Version> returnList = new ArrayList<Version>();
+        List<Version> returnList = new ArrayList<>();
 
         computer.addSpecifiedVersions(allowedStatus, null, positionSet, returnList, getVersions(),
                 precedencePolicy, contradictionManager, time);
@@ -306,7 +304,7 @@ public class ConceptAttributes extends ConceptComponent<ConceptAttributesRevisio
 
     @Override
     public void writeToBdb(TupleOutput output, int maxReadOnlyStatusAtPositionNid) {
-        List<ConceptAttributesRevision> partsToWrite = new ArrayList<ConceptAttributesRevision>();
+        List<ConceptAttributesRevision> partsToWrite = new ArrayList<>();
 
         if (revisions != null) {
             for (ConceptAttributesRevision p : revisions) {
@@ -339,9 +337,10 @@ public class ConceptAttributes extends ConceptComponent<ConceptAttributesRevisio
     }
 
     @Override
-    public ConceptAttributeAB makeBlueprint(ViewCoordinate vc) throws IOException, ContradictionException, InvalidCAB {
+    public ConceptAttributeAB makeBlueprint(ViewCoordinate vc, IdDirective idDirective, RefexDirective refexDirective) 
+            throws IOException, ContradictionException, InvalidCAB {
         ConceptAttributeAB conAttrBp = new ConceptAttributeAB(getConId(), defined,
-                getVersion(vc), vc);
+                getVersion(vc), vc, refexDirective);
         return conAttrBp;
     }
 
@@ -378,7 +377,7 @@ public class ConceptAttributes extends ConceptComponent<ConceptAttributesRevisio
      */
     @Override
     public List<Version> getTuples() {
-        return Collections.unmodifiableList(new ArrayList<Version>(getVersions()));
+        return Collections.unmodifiableList(new ArrayList<>(getVersions()));
     }
 
     @Override
@@ -393,7 +392,7 @@ public class ConceptAttributes extends ConceptComponent<ConceptAttributesRevisio
 
     public List<Version> getTuples(NidSetBI allowedStatus, PositionBI viewPosition,
             Precedence precedencePolicy, ContradictionManagerBI contradictionManager) {
-        List<Version> returnList = new ArrayList<Version>();
+        List<Version> returnList = new ArrayList<>();
 
         addTuples(allowedStatus, viewPosition, returnList, precedencePolicy, contradictionManager);
 
@@ -402,7 +401,7 @@ public class ConceptAttributes extends ConceptComponent<ConceptAttributesRevisio
 
     public List<Version> getTuples(NidSetBI allowedStatus, PositionSetBI viewPositionSet,
             Precedence precedencePolicy, ContradictionManagerBI contradictionManager) {
-        List<Version> returnList = new ArrayList<Version>();
+        List<Version> returnList = new ArrayList<>();
 
         computer.addSpecifiedVersions(allowedStatus, viewPositionSet, returnList, getVersions(),
                 precedencePolicy, contradictionManager);
@@ -470,7 +469,7 @@ public class ConceptAttributes extends ConceptComponent<ConceptAttributesRevisio
                 count = count + revisions.size();
             }
 
-            list = new ArrayList<Version>(count);
+            list = new ArrayList<>(count);
 
             if (getTime() != Long.MIN_VALUE) {
                 list.add(new Version(this));
@@ -499,7 +498,7 @@ public class ConceptAttributes extends ConceptComponent<ConceptAttributesRevisio
      */
     @Override
     public List<ConceptAttributes.Version> getVersions(ViewCoordinate c) {
-        List<Version> returnTuples = new ArrayList<Version>(2);
+        List<Version> returnTuples = new ArrayList<>(2);
 
         computer.addSpecifiedVersions(c.getAllowedStatusNids(), (NidSetBI) null, c.getPositionSet(),
                 returnTuples, getVersions(), c.getPrecedence(),
@@ -510,7 +509,7 @@ public class ConceptAttributes extends ConceptComponent<ConceptAttributesRevisio
 
     public Collection<Version> getVersions(NidSetBI allowedStatus, PositionSetBI viewPositions,
             Precedence precedence, ContradictionManagerBI contradictionMgr) {
-        List<Version> returnTuples = new ArrayList<Version>(2);
+        List<Version> returnTuples = new ArrayList<>(2);
 
         computer.addSpecifiedVersions(allowedStatus, viewPositions, returnTuples, getVersions(), precedence,
                 contradictionMgr);
@@ -610,8 +609,9 @@ public class ConceptAttributes extends ConceptComponent<ConceptAttributesRevisio
         }
 
         @Override
-        public ConceptAttributeAB makeBlueprint(ViewCoordinate vc) throws IOException, ContradictionException, InvalidCAB{
-            return getCv().makeBlueprint(vc);
+        public ConceptAttributeAB makeBlueprint(ViewCoordinate vc, IdDirective idDirective, RefexDirective refexDirective) 
+                throws IOException, ContradictionException, InvalidCAB{
+            return getCv().makeBlueprint(vc, idDirective, refexDirective);
         }
 
         @Override

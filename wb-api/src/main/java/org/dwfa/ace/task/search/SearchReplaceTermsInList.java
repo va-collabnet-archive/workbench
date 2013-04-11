@@ -61,8 +61,10 @@ import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.TerminologyBuilderBI;
 import org.ihtsdo.tk.api.blueprint.DescriptionCAB;
+import org.ihtsdo.tk.api.blueprint.IdDirective;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
+import org.ihtsdo.tk.api.blueprint.RefexDirective;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 
 @BeanList(specs = { @Spec(directory = "tasks/ide/listview", type = BeanType.TASK_BEAN) })
@@ -237,13 +239,13 @@ public class SearchReplaceTermsInList extends AbstractTask {
                                 // Create a new, cloned, description
                                 try{
                                     TerminologyBuilderBI builder = Ts.get().getTerminologyBuilder(config.getEditCoordinate(), config.getViewCoordinate());
-                                    DescriptionCAB descriptionBlueprint = description.makeBlueprint(config.getViewCoordinate());
+                                    DescriptionCAB descriptionBlueprint = description.makeBlueprint(config.getViewCoordinate(), IdDirective.PRESERVE, RefexDirective.EXCLUDE);  // :!!!:REVIEW
                                     descriptionBlueprint.setText(finalDesc);
                                     descriptionBlueprint.setComponentUuid(UUID.randomUUID());
                                     builder.construct(descriptionBlueprint);
                                     for (RefexVersionBI refex : description.getRefexesActive(config.getViewCoordinate())) {
-                                        RefexCAB refexBlueprint = refex.makeBlueprint(config.getViewCoordinate());
-                                        refexBlueprint.setMemberUuid(refex.getPrimUuid());
+                                        RefexCAB refexBlueprint = refex.makeBlueprint(config.getViewCoordinate(), IdDirective.PRESERVE, RefexDirective.EXCLUDE);
+                                        refexBlueprint.setMemberUuid(refex.getPrimUuid()); // <-- redundant :???:!!!:REVIEW
                                         refexBlueprint.setRetired();
                                         builder.construct(refexBlueprint);
                                     }

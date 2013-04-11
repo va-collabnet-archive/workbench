@@ -83,13 +83,13 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
+import org.ihtsdo.tk.api.blueprint.IdDirective;
 
 /**
  * Goal which loads an EConcept.jbin file into a bdb.
@@ -449,8 +449,9 @@ public class LoadBdbMulti extends AbstractMojo {
 
                RefexCAB newPathSpec =
                   new RefexCAB(TK_REFEX_TYPE.CID,
-                               ReferenceConcepts.PATH.getNid(),
-                               ReferenceConcepts.REFSET_PATHS.getNid());
+                       ReferenceConcepts.PATH.getNid(),
+                       ReferenceConcepts.REFSET_PATHS.getNid(),
+                       IdDirective.GENERATE_HASH);
 
                newPathSpec.with(RefexProperty.CNID1, path.getNid());
                newPathSpec.with(RefexProperty.STATUS_NID,
@@ -458,8 +459,10 @@ public class LoadBdbMulti extends AbstractMojo {
                newPathSpec.setMemberContentUuid();
 
                RefexCAB newOriginSpec =
-                  new RefexCAB(TK_REFEX_TYPE.CID_INT, path.getNid(),
-                               ReferenceConcepts.REFSET_PATH_ORIGINS.getNid());
+                  new RefexCAB(TK_REFEX_TYPE.CID_INT, 
+                       path.getNid(),
+                       ReferenceConcepts.REFSET_PATH_ORIGINS.getNid(),
+                       IdDirective.GENERATE_HASH);
 
                newOriginSpec.with(RefexProperty.CNID1, origin.getNid());
                newOriginSpec.with(RefexProperty.INTEGER1, Integer.MAX_VALUE);
@@ -642,6 +645,7 @@ public class LoadBdbMulti extends AbstractMojo {
                       ec, Ts.get().getMetadataViewCoordinate());
                ConceptCB conceptBp = new ConceptCB(fsn, pref, LANG_CODE.EN,
                                         Snomed.IS_A.getLenient().getPrimUuid(),
+                                        IdDirective.GENERATE_HASH,
                                         parentUuid);
 
                if (conceptUuid != null) {
@@ -741,8 +745,9 @@ public class LoadBdbMulti extends AbstractMojo {
                   }
 
                   RefexCAB wordRefexSpec = new RefexCAB(TK_REFEX_TYPE.CID_STR,
-                                              caseSensitiveRefexColl.getNid(),
-                                              caseSensitiveRefexColl.getNid());
+                          caseSensitiveRefexColl.getNid(),
+                          caseSensitiveRefexColl.getNid(),
+                          IdDirective.GENERATE_HASH);
 
                   wordRefexSpec.with(RefexProperty.STRING1, word);
                   wordRefexSpec.with(RefexProperty.CNID1, icsTypeNid);
@@ -856,8 +861,9 @@ public class LoadBdbMulti extends AbstractMojo {
                   String   variant       = parts[variantIndex];
                   RefexCAB textRefexSpec =
                      new RefexCAB(TK_REFEX_TYPE.STR,
-                                  enTextWithVariantsRefexColl.getNid(),
-                                  enTextWithVariantsRefexColl.getNid());
+                          enTextWithVariantsRefexColl.getNid(),
+                          enTextWithVariantsRefexColl.getNid(),
+                          IdDirective.GENERATE_HASH);
 
                   textRefexSpec.with(RefexProperty.STRING1, word);
                   textRefexSpec.with(RefexProperty.STATUS_NID,
@@ -868,7 +874,8 @@ public class LoadBdbMulti extends AbstractMojo {
                      amender.constructIfNotCurrent(textRefexSpec);
                   RefexCAB variantRefexSpec =
                      new RefexCAB(TK_REFEX_TYPE.STR, textRefex.getNid(),
-                                  dialectVariantsRefexColl.getNid());
+                          dialectVariantsRefexColl.getNid(),
+                          IdDirective.GENERATE_HASH);
 
                   variantRefexSpec.with(RefexProperty.STRING1, variant);
                   variantRefexSpec.with(

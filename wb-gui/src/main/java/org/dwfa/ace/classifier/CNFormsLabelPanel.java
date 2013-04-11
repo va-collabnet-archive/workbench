@@ -292,7 +292,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
       c.gridx   = 0;
       c.gridy   = 0;
 
-      List<LabelForTuple> tLabelList = new ArrayList<LabelForTuple>();
+      List<LabelForTuple> tLabelList = new ArrayList<>();
 
       c.gridx     = 0;
       c.gridwidth = 2;
@@ -368,7 +368,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
             }
 
             if (showGroupLabels) {    // true shows one label per group
-               List<I_RelTuple> grpTuple = new ArrayList<I_RelTuple>();
+               List<I_RelTuple> grpTuple = new ArrayList<>();
 
                for (SnoRel sr : sg) {
                   grpTuple.add(new RelVersion(sr.relNid));
@@ -429,7 +429,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
       c.gridx   = 0;
       c.gridy   = 0;
 
-      List<LabelForTuple> tLabelList = new ArrayList<LabelForTuple>();
+      List<LabelForTuple> tLabelList = new ArrayList<>();
 
       c.gridx     = 0;
       c.gridwidth = 2;
@@ -450,7 +450,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
 
       // SHOW PROXIMAL ISAs -- as relationships
       SnoGrpList       isaSGList = cSnoTable.getIsaProx();
-      List<I_RelTuple> isaList   = new ArrayList<I_RelTuple>();
+      List<I_RelTuple> isaList   = new ArrayList<>();
 
       for (SnoGrp sg : isaSGList) {
          for (SnoRel sr : sg) {
@@ -501,7 +501,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
             }
 
             if (showGroupLabels) {    // true shows one label per group
-               List<I_RelTuple> grpTuple = new ArrayList<I_RelTuple>();
+               List<I_RelTuple> grpTuple = new ArrayList<>();
 
                for (SnoRel sr : sg) {
                   grpTuple.add(new RelVersion(sr.relNid));
@@ -563,7 +563,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
       c.gridx   = 0;
       c.gridy   = 0;
 
-      List<LabelForTuple> tLabelList = new ArrayList<LabelForTuple>();
+      List<LabelForTuple> tLabelList = new ArrayList<>();
 
       c.gridx     = 0;
       c.gridwidth = 2;
@@ -636,7 +636,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
             if (showGroupLabels) {    // set to true to show one label per
 
                // group
-               List<I_RelTuple> grpTuple = new ArrayList<I_RelTuple>();
+               List<I_RelTuple> grpTuple = new ArrayList<>();
 
                for (SnoRel sr : sg) {
                   grpTuple.add(new RelVersion(sr.relNid));
@@ -698,7 +698,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
       c.gridx   = 0;
       c.gridy   = 0;
 
-      List<LabelForTuple> tLabelList = new ArrayList<LabelForTuple>();
+      List<LabelForTuple> tLabelList = new ArrayList<>();
 
       c.gridx     = 0;
       c.gridwidth = 2;
@@ -719,7 +719,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
 
       // SHOW PROXIMAL PRIMITIVE ISAs -- as relationships
       SnoGrpList       isaSGList = cSnoTable.getIsaProxPrim();
-      List<I_RelTuple> isaList   = new ArrayList<I_RelTuple>();
+      List<I_RelTuple> isaList   = new ArrayList<>();
 
       for (SnoGrp sg : isaSGList) {
          for (SnoRel sr : sg) {
@@ -773,7 +773,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
             }
 
             if (showGroupLabels) {    // true shows one label per group
-               List<I_RelTuple> grpTuple = new ArrayList<I_RelTuple>();
+               List<I_RelTuple> grpTuple = new ArrayList<>();
 
                for (SnoRel sr : sg) {
                   grpTuple.add(new RelVersion(sr.relNid));
@@ -831,7 +831,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
       c.gridx   = 0;
       c.gridy   = 0;
 
-      List<LabelForTuple> tLabelList = new ArrayList<LabelForTuple>();
+      List<LabelForTuple> tLabelList = new ArrayList<>();
 
       c.gridx     = 0;
       c.gridwidth = 2;
@@ -904,7 +904,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
             }
 
             if (showGroupLabels) {    // true shows one label per group
-               List<I_RelTuple> grpTuple = new ArrayList<I_RelTuple>();
+               List<I_RelTuple> grpTuple = new ArrayList<>();
 
                for (SnoRel sr : sg) {
                   grpTuple.add(new RelVersion(sr.relNid));
@@ -974,7 +974,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
    public List<I_ImplementActiveLabel> getCommonLabels(boolean showLongForm, boolean showStatus,
            I_ConfigAceFrame config)
            throws IOException, TerminologyException {
-      List<I_ImplementActiveLabel> labelList = new ArrayList<I_ImplementActiveLabel>();
+      List<I_ImplementActiveLabel> labelList = new ArrayList<>();
 
       // GET CONCEPT ATTRIBUTES
       Set<? extends I_ConceptAttributeTuple> commonConTuples =
@@ -1014,12 +1014,12 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
            I_ConfigAceFrame config, DeltaColors colors, Map<I_ConceptAttributeTuple, Color> conAttrColorMap,
            Map<I_DescriptionTuple, Color> descColorMap, Map<I_RelTuple, Color> relColorMap)
            throws IOException, TerminologyException {
-      Set<I_ConceptAttributeTuple> allConAttrTuples = new HashSet<I_ConceptAttributeTuple>();
-      Set<I_RelTuple>              allRelTuples     = new HashSet<I_RelTuple>();
+      Set<I_ConceptAttributeTuple> allConAttrTuples = new HashSet<>();
+      Set<I_RelTuple>              allRelTuples     = new HashSet<>();
 
       // FIND ALL...
       for (PositionBI p : config.getViewPositionSet()) {
-         Set<PositionBI> pSet = new HashSet<PositionBI>();
+         Set<PositionBI> pSet = new HashSet<>();
 
          pSet.add(p);
 
@@ -1059,7 +1059,7 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
       // REL
       allRelTuples.removeAll(commonRelTuples);
 
-      Collection<I_ImplementActiveLabel> labelList = new ArrayList<I_ImplementActiveLabel>();
+      Collection<I_ImplementActiveLabel> labelList = new ArrayList<>();
 
       // CREATE CONCEPT ATTRIBUTE LABELS
       for (I_ConceptAttributeTuple t : allConAttrTuples) {
@@ -1694,7 +1694,8 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
         }
 
         @Override
-        public ConceptAttributeAB makeBlueprint(ViewCoordinate vc) throws IOException, ContradictionException {
+        public ConceptAttributeAB makeBlueprint(ViewCoordinate vc, org.ihtsdo.tk.api.blueprint.IdDirective idDirective, org.ihtsdo.tk.api.blueprint.RefexDirective refexDirective) 
+                throws IOException, ContradictionException {
             throw new UnsupportedOperationException("Not supported yet.");
         }
    }
@@ -2356,7 +2357,8 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
         }
 
         @Override
-        public RelationshipCAB makeBlueprint(ViewCoordinate vc) throws IOException, ContradictionException {
+        public RelationshipCAB makeBlueprint(ViewCoordinate vc, org.ihtsdo.tk.api.blueprint.IdDirective idDirective, org.ihtsdo.tk.api.blueprint.RefexDirective refexDirective)
+                throws IOException, ContradictionException {
             throw new UnsupportedOperationException("Not supported yet.");
         }
    }

@@ -31,8 +31,10 @@ import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.NidBitSetBI;
 import org.ihtsdo.tk.api.ProcessUnfetchedConceptDataBI;
 import org.ihtsdo.tk.api.TerminologyBuilderBI;
+import org.ihtsdo.tk.api.blueprint.IdDirective;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
+import org.ihtsdo.tk.api.blueprint.RefexDirective;
 import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
 import org.ihtsdo.tk.api.changeset.ChangeSetGeneratorBI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
@@ -140,7 +142,8 @@ public class Rf2RefexComputer implements ProcessUnfetchedConceptDataBI {
                     if (rel.isActive(viewCoordinate)) {
                         RefexCAB refexBp = new RefexCAB(TK_REFEX_TYPE.CID,
                                 rel.getSourceNid(),
-                                refexNid);
+                                refexNid,
+                                IdDirective.GENERATE_HASH);
                         refexBp.put(RefexCAB.RefexProperty.CNID1, rel.getTargetNid());
                         RefexChronicleBI<?> member = builder.construct(refexBp);
                         conceptChronicle.addAnnotation(member);
@@ -150,9 +153,9 @@ public class Rf2RefexComputer implements ProcessUnfetchedConceptDataBI {
                     } else {
                         Collection<? extends RefexVersionBI<?>> members = cvLatest.getAnnotationMembersActive(viewCoordinate, refexNid);
                         for (RefexVersionBI member : members) {
-                            RefexCAB refexBp = member.makeBlueprint(viewCoordinate);
+                            RefexCAB refexBp = member.makeBlueprint(viewCoordinate, IdDirective.PRESERVE, RefexDirective.EXCLUDE);
                             refexBp.setRetired();
-                            refexBp.setMemberUuid(member.getPrimUuid());
+                            refexBp.setMemberUuid(member.getPrimUuid()); // <-- redundant :???:!!!:REVIEW
                             builder = Ts.get().getTerminologyBuilder(editCoordinate, viewCoordinate);
                             RefexChronicleBI<?> retiredMember = builder.construct(refexBp);
                             conceptChronicle.addAnnotation(retiredMember);
@@ -172,8 +175,9 @@ public class Rf2RefexComputer implements ProcessUnfetchedConceptDataBI {
         if (!cv.isActive() && cav != null) {
             if(stampNids.contains(cav.getStampNid())){
                 RefexCAB refexBp = new RefexCAB(TK_REFEX_TYPE.CID,
-                    cv.getNid(),
-                    conceptInactiveRefexNid);
+                        cv.getNid(),
+                        conceptInactiveRefexNid,
+                        IdDirective.GENERATE_HASH);
                 refexBp.put(RefexCAB.RefexProperty.CNID1, getValueForRetirement(cv.getNid()));
                 RefexChronicleBI<?> member = builder.construct(refexBp);
                 conceptChronicle.addAnnotation(member);
@@ -195,9 +199,9 @@ public class Rf2RefexComputer implements ProcessUnfetchedConceptDataBI {
                                 viewCoordinate,
                                 SnomedMetadataRf2.REFERS_TO_REFSET_RF2.getLenient().getConceptNid());
                         for (RefexVersionBI member : members) {
-                            RefexCAB refexBp = member.makeBlueprint(viewCoordinate);
+                            RefexCAB refexBp = member.makeBlueprint(viewCoordinate, IdDirective.PRESERVE, RefexDirective.EXCLUDE);
                             refexBp.setRetired();
-                            refexBp.setMemberUuid(member.getPrimUuid());
+                            refexBp.setMemberUuid(member.getPrimUuid()); // <-- redundant :???:!!!:REVIEW
                             RefexChronicleBI<?> newMember = builder.construct(refexBp);
                             for(int stampNid : newMember.getAllStampNids()){
                                 newStamps.add(stampNid);
@@ -206,7 +210,8 @@ public class Rf2RefexComputer implements ProcessUnfetchedConceptDataBI {
                     } else {
                         RefexCAB refexBp = new RefexCAB(TK_REFEX_TYPE.CID,
                                 desc.getNid(),
-                                descInactiveRefexNid);
+                                descInactiveRefexNid,
+                                IdDirective.GENERATE_HASH);
                         refexBp.put(RefexCAB.RefexProperty.CNID1,
                                 SnomedMetadataRf2.INAPPROPRIATE_COMPONENT_RF2.getLenient().getNid());
                         RefexChronicleBI<?> newMember = builder.construct(refexBp);

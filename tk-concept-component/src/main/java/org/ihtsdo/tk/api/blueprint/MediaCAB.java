@@ -54,6 +54,7 @@ public class MediaCAB extends CreateOrAmendBlueprint {
      * @param format a string describing the media format
      * @param textDescription a string describing the media
      * @param dataBytes the data bytes representing the media
+     * @param idDirective 
      * @throws IOException signals that an I/O exception has occurred
      * @throws InvalidCAB if the any of the values in blueprint to make are
      * invalid
@@ -62,11 +63,11 @@ public class MediaCAB extends CreateOrAmendBlueprint {
      */
     public MediaCAB(
             int conceptNid, int typeNid, String format, String textDescription,
-            byte[] dataBytes)
+            byte[] dataBytes, IdDirective idDirective)
             throws IOException, InvalidCAB, ContradictionException {
         this(Ts.get().getComponent(conceptNid).getPrimUuid(),
                 Ts.get().getComponent(typeNid).getPrimUuid(),
-                format, textDescription, dataBytes);
+                format, textDescription, dataBytes, idDirective);
     }
 
     /**
@@ -85,10 +86,10 @@ public class MediaCAB extends CreateOrAmendBlueprint {
      */
     public MediaCAB(
             UUID conceptUuid, UUID typeUuid, String format, String textDescription,
-            byte[] dataBytes)
+            byte[] dataBytes, IdDirective idDirective)
             throws IOException, InvalidCAB, ContradictionException {
         this(conceptUuid, typeUuid, format, textDescription, dataBytes,
-                null, null, null);
+                null, null, null, idDirective, RefexDirective.EXCLUDE);
     }
 
     /**
@@ -103,6 +104,8 @@ public class MediaCAB extends CreateOrAmendBlueprint {
      * @param mediaVersion the media version to use as a pattern
      * @param viewCoordinate the view coordinate specifying which versions are
      * active and inactive
+     * @param idDirective 
+     * @param refexDirective 
      * @throws IOException signals that an I/O exception has occurred
      * @throws InvalidCAB if the any of the values in blueprint to make are
      * invalid
@@ -110,12 +113,19 @@ public class MediaCAB extends CreateOrAmendBlueprint {
      * given position or view coordinate
      */
     public MediaCAB(
-            int conceptNid, int typeNid, String format, String textDescription,
-            byte[] dataBytes, MediaVersionBI mediaVersion, ViewCoordinate viewCoordinate)
+            int conceptNid, int typeNid, 
+            String format, 
+            String textDescription,
+            byte[] dataBytes, 
+            MediaVersionBI mediaVersion, 
+            ViewCoordinate viewCoordinate,
+            IdDirective idDirective,
+            RefexDirective refexDirective)
             throws IOException, InvalidCAB, ContradictionException {
         this(Ts.get().getComponent(conceptNid).getPrimUuid(),
                 Ts.get().getComponent(typeNid).getPrimUuid(),
-                format, textDescription, dataBytes, mediaVersion, viewCoordinate);
+                format, textDescription, dataBytes, mediaVersion, viewCoordinate,
+                idDirective, refexDirective);
     }
 
     /**
@@ -130,6 +140,8 @@ public class MediaCAB extends CreateOrAmendBlueprint {
      * @param mediaVersion the media version to use as a pattern
      * @param viewCoordinate the view coordinate specifying which versions are
      * active and inactive
+     * @param idDirective 
+     * @param refexDirective 
      * @throws IOException signals that an I/O exception has occurred
      * @throws InvalidCAB if the any of the values in blueprint to make are
      * invalid
@@ -138,10 +150,12 @@ public class MediaCAB extends CreateOrAmendBlueprint {
      */
     public MediaCAB(
             UUID conceptUuid, UUID typeUuid, String format, String textDescription,
-            byte[] dataBytes, MediaVersionBI mediaVersion, ViewCoordinate viewCoordinate)
+            byte[] dataBytes, MediaVersionBI mediaVersion, ViewCoordinate viewCoordinate,
+            IdDirective idDirective,
+            RefexDirective refexDirective)
             throws IOException, InvalidCAB, ContradictionException {
         this(conceptUuid, typeUuid, format, textDescription, dataBytes,
-                null, mediaVersion, viewCoordinate);
+                null, mediaVersion, viewCoordinate, idDirective, refexDirective);
     }
 
     /**
@@ -158,6 +172,8 @@ public class MediaCAB extends CreateOrAmendBlueprint {
      * @param mediaVersion the media version to use as a pattern
      * @param viewCoordinate the view coordinate specifying which versions are
      * active and inactive
+     * @param idDirective 
+     * @param refexDirective 
      * @throws IOException signals that an I/O exception has occurred
      * @throws InvalidCAB if the any of the values in blueprint to make are
      * invalid
@@ -167,8 +183,11 @@ public class MediaCAB extends CreateOrAmendBlueprint {
     public MediaCAB(
             UUID conceptUuid, UUID typeUuid, String format, String textDescription,
             byte[] dataBytes, UUID componentUuid, MediaVersionBI mediaVersion,
-            ViewCoordinate viewCoordinate) throws IOException, InvalidCAB, ContradictionException {
-        super(componentUuid, mediaVersion, viewCoordinate);
+            ViewCoordinate viewCoordinate,
+            IdDirective idDirective,
+            RefexDirective refexDirective) throws IOException, InvalidCAB, ContradictionException {
+        super(getComponentUUID(componentUuid,mediaVersion,idDirective), 
+                mediaVersion, viewCoordinate, idDirective, refexDirective);
 
         this.conceptUuid = conceptUuid;
         this.typeUuid = typeUuid;
@@ -178,11 +197,7 @@ public class MediaCAB extends CreateOrAmendBlueprint {
         if (getComponentUuid() == null) {
             try {
                 recomputeUuid();
-            } catch (IOException ex) {
-                throw new RuntimeException(ex);
-            } catch (InvalidCAB ex) {
-                throw new RuntimeException(ex);
-            } catch (NoSuchAlgorithmException ex) {
+            } catch (IOException | InvalidCAB | NoSuchAlgorithmException ex) {
                 throw new RuntimeException(ex);
             }
         }
@@ -204,10 +219,26 @@ public class MediaCAB extends CreateOrAmendBlueprint {
      */
     @Override
     public void recomputeUuid() throws NoSuchAlgorithmException, IOException, InvalidCAB, ContradictionException {
-        setComponentUuid(
-                UuidT5Generator.get(mediaSpecNamespace,
-                getPrimoridalUuidString(conceptUuid)
-                + dataBytes));
+        switch (idDirective) {
+            case PRESERVE_CONCEPT_REST_HASH:
+            case GENERATE_RANDOM_CONCEPT_REST_HASH:
+            case GENERATE_HASH:
+            case GENERATE_REFEX_CONTENT_HASH:
+                setComponentUuid(
+                        UuidT5Generator.get(mediaSpecNamespace,
+                        getPrimoridalUuidString(conceptUuid)
+                        + dataBytes));
+                break;
+                
+            case GENERATE_RANDOM:
+                setComponentUuidNoRecompute(UUID.randomUUID());
+                break;
+
+            case PRESERVE:
+            default:
+            // nothing to do...
+
+        }
         for (RefexCAB annotBp : getAnnotationBlueprints()) {
             annotBp.setReferencedComponentUuid(getComponentUuid());
             annotBp.recomputeUuid();

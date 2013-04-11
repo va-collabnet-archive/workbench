@@ -16,6 +16,7 @@ package org.ihtsdo.batch;
 import java.util.Collection;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.ihtsdo.batch.BatchActionEvent.BatchActionEventType;
+import org.ihtsdo.tk.api.blueprint.IdDirective;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.blueprint.RelationshipCAB;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
@@ -64,7 +65,8 @@ public class BatchActionTaskLogicUnionCreate extends BatchActionTask {
         }
 
         // If not already a member, then a member record is added.
-        RefexCAB refexSpec = new RefexCAB(TK_REFEX_TYPE.CID, rcNid, unionSetNid);
+        RefexCAB refexSpec = new RefexCAB(TK_REFEX_TYPE.CID, rcNid, 
+                unionSetNid, IdDirective.GENERATE_HASH);
         int normalMemberNid = ts.getConcept(
                         RefsetAuxiliary.Concept.NORMAL_MEMBER.getUids()).getConceptNid();
         refexSpec.with(RefexCAB.RefexProperty.CNID1, normalMemberNid);

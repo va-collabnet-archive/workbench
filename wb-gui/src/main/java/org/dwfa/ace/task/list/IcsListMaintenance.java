@@ -46,6 +46,7 @@ import org.dwfa.util.bean.Spec;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.TerminologyBuilderBI;
+import org.ihtsdo.tk.api.blueprint.IdDirective;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB.RefexProperty;
@@ -93,11 +94,15 @@ public class IcsListMaintenance extends AbstractTask {
 
     }
 
-    public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
+    @Override
+    public void complete(I_EncodeBusinessProcess process, I_Work worker) 
+            throws TaskFailedException {
         // Nothing to do...
     }
 
-    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
+    @Override
+    public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) 
+            throws TaskFailedException {
         try {
             I_ConfigAceFrame config = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
             String fileName = (String) process.getProperty(icsListFileNameProp);
@@ -115,7 +120,7 @@ public class IcsListMaintenance extends AbstractTask {
             BufferedReader br = new BufferedReader(isr);
             Collection<? extends RefexVersionBI<?>> currentRefsetMembers =
                     caseSensitiveRefexColl.getRefsetMembersActive(vc);
-            ArrayList<RefexNidStringVersionBI> memberList = new ArrayList<RefexNidStringVersionBI>();
+            ArrayList<RefexNidStringVersionBI> memberList = new ArrayList<>();
             for (RefexVersionBI rv : currentRefsetMembers) {
                 RefexNidStringVersionBI member = (RefexNidStringVersionBI) rv;
                 memberList.add(member);
@@ -183,7 +188,9 @@ public class IcsListMaintenance extends AbstractTask {
 
     private void addMember(String word, int icsTypeNid) throws IOException, InvalidCAB, ContradictionException {
         RefexCAB wordRefexSpec = new RefexCAB(TK_REFEX_TYPE.CID_STR,
-                caseSensitiveRefexColl.getNid(), caseSensitiveRefexColl.getNid());
+                caseSensitiveRefexColl.getNid(), 
+                caseSensitiveRefexColl.getNid(),
+                IdDirective.GENERATE_HASH);
         wordRefexSpec.with(RefexProperty.STRING1, word);
         wordRefexSpec.with(RefexProperty.CNID1, icsTypeNid);
         wordRefexSpec.with(RefexProperty.STATUS_NID, SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid());
@@ -218,10 +225,12 @@ public class IcsListMaintenance extends AbstractTask {
         Ts.get().addUncommitted(caseSensitiveRefexColl);
     }
 
+    @Override
     public Collection<Condition> getConditions() {
         return CONTINUE_CONDITION;
     }
 
+    @Override
     public int[] getDataContainerIds() {
         return new int[]{};
     }

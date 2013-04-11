@@ -10,7 +10,6 @@ import org.apache.commons.collections.primitives.ArrayIntList;
 
 import org.dwfa.ace.api.I_ImagePart;
 import org.dwfa.ace.api.I_MapNativeToNative;
-import org.dwfa.ace.api.Terms;
 
 import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.concept.component.Revision;
@@ -27,7 +26,6 @@ import java.util.Collection;
 import java.util.Set;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.blueprint.MediaCAB;
-import org.ihtsdo.tk.dto.concept.component.TkRevision;
 
 public class ImageRevision extends Revision<ImageRevision, Image>
         implements I_ImagePart<ImageRevision>, MediaAnalogBI<ImageRevision> {
@@ -126,14 +124,17 @@ public class ImageRevision extends Revision<ImageRevision, Image>
    }
    
    @Override
-    public MediaCAB makeBlueprint(ViewCoordinate vc) throws IOException, ContradictionException, InvalidCAB{
+    public MediaCAB makeBlueprint(ViewCoordinate vc,org.ihtsdo.tk.api.blueprint.IdDirective idDirective, org.ihtsdo.tk.api.blueprint.RefexDirective refexDirective) 
+           throws IOException, ContradictionException, InvalidCAB{
         MediaCAB mediaBp = new MediaCAB(getConceptNid(),
                 getTypeNid(),
                 getFormat(),
                 getTextDescription(),
                 getMedia(),
                 getVersion(vc),
-                vc);
+                vc,
+                idDirective,
+                refexDirective);
         return mediaBp;
     }
 

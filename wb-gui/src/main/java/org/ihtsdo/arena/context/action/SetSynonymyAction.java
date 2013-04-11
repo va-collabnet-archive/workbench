@@ -19,6 +19,7 @@ import org.ihtsdo.tk.api.AnalogBI;
 import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.TerminologyBuilderBI;
+import org.ihtsdo.tk.api.blueprint.IdDirective;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB.RefexProperty;
@@ -108,7 +109,8 @@ public class SetSynonymyAction extends AbstractAction {
                     RefexCAB syn = new RefexCAB(
                             TK_REFEX_TYPE.CID,
                             desc.getNid(),
-                            dosNid);
+                            dosNid,
+                            IdDirective.GENERATE_HASH);
                     syn.put(RefexProperty.CNID1, Ts.get().getNidForUuids(SynonymyType.SYNONYM.getLenient().getPrimUuid()));
                     RefexChronicleBI<?> newRefex = tc.construct(syn);
                     I_GetConceptData refex = Terms.get().getConceptForNid(newRefex.getNid());
@@ -117,7 +119,8 @@ public class SetSynonymyAction extends AbstractAction {
                     RefexCAB nearSyn = new RefexCAB(
                             TK_REFEX_TYPE.CID,
                             desc.getNid(),
-                            dosNid);
+                            dosNid,
+                            IdDirective.GENERATE_HASH);
                     nearSyn.put(RefexProperty.CNID1, Ts.get().getNidForUuids(SynonymyType.NEAR_SYNONYMOUS.getLenient().getPrimUuid()));
                     RefexChronicleBI<?> newRefex = tc.construct(nearSyn);
                     I_GetConceptData refex = Terms.get().getConceptForNid(newRefex.getNid());
@@ -126,7 +129,8 @@ public class SetSynonymyAction extends AbstractAction {
                     RefexCAB notSyn = new RefexCAB(
                             TK_REFEX_TYPE.CID,
                             desc.getNid(),
-                            dosNid);
+                            dosNid,
+                            IdDirective.GENERATE_HASH);
                     notSyn.put(RefexProperty.CNID1, Ts.get().getNidForUuids(SynonymyType.NON_SYNONYMOUS.getLenient().getPrimUuid()));
                     RefexChronicleBI<?> newRefex = tc.construct(notSyn);
                     I_GetConceptData refex = Terms.get().getConceptForNid(newRefex.getNid());
@@ -136,19 +140,9 @@ public class SetSynonymyAction extends AbstractAction {
                 }
             }
 
-
-        } catch (TerminologyException ex) {
-            AceLog.getAppLog().alertAndLogException(ex);
-        } catch (IOException ex) {
-            AceLog.getAppLog().alertAndLogException(ex);
-        } catch (PropertyVetoException ex) {
-            AceLog.getAppLog().alertAndLogException(ex);
-        } catch (InvalidCAB ex) {
-            AceLog.getAppLog().alertAndLogException(ex);
-        } catch (ContradictionException ex) {
+        } catch (TerminologyException | IOException | PropertyVetoException | InvalidCAB | ContradictionException ex) {
             AceLog.getAppLog().alertAndLogException(ex);
         }
-
 
     }
 }

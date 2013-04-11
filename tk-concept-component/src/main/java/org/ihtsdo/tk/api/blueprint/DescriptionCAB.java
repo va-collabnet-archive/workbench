@@ -57,6 +57,7 @@ public class DescriptionCAB extends CreateOrAmendBlueprint {
      * @param text the text of the description
      * @param initialCaseSignificant set to <code>true</code> to mark the
      * description as initial case significant
+     * @param idDirective 
      * @throws IOException signals that an I/O exception has occurred
      * @throws InvalidCAB if the any of the values in blueprint to make are
      * invalid
@@ -64,11 +65,14 @@ public class DescriptionCAB extends CreateOrAmendBlueprint {
      * view coordinate
      */
     public DescriptionCAB(
-            int conceptNid, int typeNid, LANG_CODE langCode, String text, boolean initialCaseSignificant)
+            int conceptNid, int typeNid, LANG_CODE langCode, 
+            String text, 
+            boolean initialCaseSignificant, 
+            IdDirective idDirective)
             throws IOException, InvalidCAB, ContradictionException {
         this(Ts.get().getComponent(conceptNid).getPrimUuid(),
                 Ts.get().getComponent(typeNid).getPrimUuid(),
-                langCode, text, initialCaseSignificant);
+                langCode, text, initialCaseSignificant, idDirective);
     }
 
     /**
@@ -81,6 +85,7 @@ public class DescriptionCAB extends CreateOrAmendBlueprint {
      * @param text the lang code representing the language of the description
      * @param initialCaseSignificant set to <code>true</code> to mark the
      * description as initial case significant
+     * @param idDirective 
      * @throws IOException signals that an I/O exception has occurred
      * @throws InvalidCAB if the any of the values in blueprint to make are
      * invalid
@@ -88,10 +93,11 @@ public class DescriptionCAB extends CreateOrAmendBlueprint {
      * view coordinate
      */
     public DescriptionCAB(
-            UUID conceptUuid, UUID typeUuid, LANG_CODE langCode, String text, boolean initialCaseSignificant)
+            UUID conceptUuid, UUID typeUuid, LANG_CODE langCode, String text, boolean initialCaseSignificant, IdDirective idDirective)
             throws IOException, InvalidCAB, ContradictionException {
         this(conceptUuid, typeUuid, langCode, text, initialCaseSignificant,
-                null, null, null);
+                null, null, null, idDirective,
+                RefexDirective.EXCLUDE);
     }
 
     /**
@@ -108,6 +114,8 @@ public class DescriptionCAB extends CreateOrAmendBlueprint {
      * @param descriptionVersion the description version to use as a pattern
      * @param viewCoordinate the view coordinate specifying which versions are
      * active and inactive
+     * @param idDirective 
+     * @param refexDirective 
      * @throws IOException signals that an I/O exception has occurred
      * @throws InvalidCAB if the any of the values in blueprint to make are
      * invalid
@@ -115,11 +123,18 @@ public class DescriptionCAB extends CreateOrAmendBlueprint {
      * view coordinate
      */
     public DescriptionCAB(
-            int conceptNid, int typeNid, LANG_CODE langCode, String text, boolean initialCaseSignificant,
-            DescriptionVersionBI descriptionVersion, ViewCoordinate viewCoordinate) throws IOException, InvalidCAB, ContradictionException {
+            int conceptNid, int typeNid, LANG_CODE langCode, String text, 
+            boolean initialCaseSignificant,
+            DescriptionVersionBI descriptionVersion, 
+            ViewCoordinate viewCoordinate,
+            IdDirective idDirective,
+            RefexDirective refexDirective) 
+            throws IOException, InvalidCAB, ContradictionException {
         this(Ts.get().getComponent(conceptNid).getPrimUuid(),
                 Ts.get().getComponent(typeNid).getPrimUuid(),
-                langCode, text, initialCaseSignificant, descriptionVersion, viewCoordinate);
+                langCode, text, initialCaseSignificant, descriptionVersion, 
+                viewCoordinate,
+                idDirective, refexDirective);
     }
 
     /**
@@ -136,6 +151,8 @@ public class DescriptionCAB extends CreateOrAmendBlueprint {
      * @param descriptionVersion the description version to use as a pattern
      * @param viewCoordinate the view coordinate specifying which versions are
      * active and inactive
+     * @param idDirective 
+     * @param refexDirective 
      * @throws IOException signals that an I/O exception has occurred
      * @throws InvalidCAB if the any of the values in blueprint to make are
      * invalid
@@ -144,10 +161,16 @@ public class DescriptionCAB extends CreateOrAmendBlueprint {
      */
     public DescriptionCAB(
             UUID conceptUuid, UUID typeUuid, LANG_CODE langCode, String text,
-            boolean initialCaseSignificant, DescriptionVersionBI descriptionVersion, ViewCoordinate viewCoordinate) throws
+            boolean initialCaseSignificant, 
+            DescriptionVersionBI descriptionVersion, 
+            ViewCoordinate viewCoordinate,
+            IdDirective idDirective,
+            RefexDirective refexDirective) throws
             IOException, InvalidCAB, ContradictionException {
         this(conceptUuid, typeUuid, langCode, text, initialCaseSignificant,
-                null, descriptionVersion, viewCoordinate);
+                null, descriptionVersion, viewCoordinate, 
+                idDirective, 
+                refexDirective);
     }
 
     /**
@@ -174,9 +197,16 @@ public class DescriptionCAB extends CreateOrAmendBlueprint {
      */
     public DescriptionCAB(
             UUID conceptUuid, UUID typeUuid, LANG_CODE langCode, String text,
-            boolean initialCaseSignificant, UUID componentUuid,
-            DescriptionVersionBI descriptionVersion, ViewCoordinate viewCoordinate) throws IOException, InvalidCAB, ContradictionException {
-        super(componentUuid, descriptionVersion, viewCoordinate);
+            boolean initialCaseSignificant, 
+            UUID componentUuid,
+            DescriptionVersionBI descriptionVersion, 
+            ViewCoordinate viewCoordinate,
+            IdDirective idDirective,
+            RefexDirective refexDirective) 
+            throws IOException, InvalidCAB, ContradictionException {
+        super(getComponentUUID(componentUuid,descriptionVersion,idDirective), 
+                descriptionVersion, viewCoordinate,
+                idDirective, refexDirective);
 
         this.conceptUuid = conceptUuid;
         this.lang = langCode.getFormatedLanguageNoDialectCode();
@@ -186,11 +216,7 @@ public class DescriptionCAB extends CreateOrAmendBlueprint {
         if (getComponentUuid() == null) {
             try {
                 recomputeUuid();
-            } catch (IOException ex) {
-                throw new RuntimeException(ex);
-            } catch (InvalidCAB ex) {
-                throw new RuntimeException(ex);
-            } catch (NoSuchAlgorithmException ex) {
+            } catch (IOException | InvalidCAB | NoSuchAlgorithmException ex) {
                 throw new RuntimeException(ex);
             }
         }
@@ -212,19 +238,35 @@ public class DescriptionCAB extends CreateOrAmendBlueprint {
      * given position or view coordinate
      */
     @Override
-    public void recomputeUuid() throws NoSuchAlgorithmException, UnsupportedEncodingException,
+    public void recomputeUuid()
+            throws NoSuchAlgorithmException, UnsupportedEncodingException,
             IOException, InvalidCAB, ContradictionException {
-        setComponentUuid(UuidT5Generator.get(descSpecNamespace,
-                getPrimoridalUuidString(conceptUuid)
-                + typeUuid
-                + lang
-                + text));
-        for (RefexCAB annotBp : getAnnotationBlueprints()) {
-            annotBp.setReferencedComponentUuid(getComponentUuid());
-            annotBp.recomputeUuid();
+        switch (idDirective) {
+            case PRESERVE_CONCEPT_REST_HASH:
+            case GENERATE_RANDOM_CONCEPT_REST_HASH:
+            case GENERATE_HASH:
+            case GENERATE_REFEX_CONTENT_HASH:
+                setComponentUuid(UuidT5Generator.get(descSpecNamespace,
+                        getPrimoridalUuidString(conceptUuid)
+                        + typeUuid
+                        + lang
+                        + text));
+                break;
+                
+            case GENERATE_RANDOM:
+                setComponentUuidNoRecompute(UUID.randomUUID());
+                break;
+
+            case PRESERVE:
+            default:
+            // nothing to do...
 
         }
 
+        for (RefexCAB annotBp : getAnnotationBlueprints()) {
+            annotBp.setReferencedComponentUuid(getComponentUuid());
+            annotBp.recomputeUuid();
+        }
     }
 
     /**

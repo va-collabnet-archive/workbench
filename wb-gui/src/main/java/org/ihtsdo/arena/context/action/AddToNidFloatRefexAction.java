@@ -15,6 +15,7 @@ import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.TerminologyBuilderBI;
+import org.ihtsdo.tk.api.blueprint.IdDirective;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
@@ -50,7 +51,8 @@ public class AddToNidFloatRefexAction extends AbstractAction {
                 RelationshipVersionBI rel = (RelationshipVersionBI) component;
                 RefexCAB refexBp = new RefexCAB(TK_REFEX_TYPE.CID_FLOAT,
                         rel.getNid(),
-                        nidIntRefex.getLenient().getConceptNid());
+                        nidIntRefex.getLenient().getConceptNid(),
+                        IdDirective.GENERATE_HASH);
                 refexBp.put(RefexCAB.RefexProperty.FLOAT1, -1);
                 refexBp.put(RefexCAB.RefexProperty.CNID1, 
                         ml.getLenient().getConceptNid());
@@ -63,11 +65,7 @@ public class AddToNidFloatRefexAction extends AbstractAction {
             } else {
                 throw new UnsupportedOperationException("Only relationships are supported at this time.");
             }
-        } catch (IOException ex) {
-            Logger.getLogger(AddToNidFloatRefexAction.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (InvalidCAB ex) {
-            Logger.getLogger(AddToNidFloatRefexAction.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ContradictionException ex) {
+        } catch (IOException | InvalidCAB | ContradictionException ex) {
             Logger.getLogger(AddToNidFloatRefexAction.class.getName()).log(Level.SEVERE, null, ex);
         }
     }

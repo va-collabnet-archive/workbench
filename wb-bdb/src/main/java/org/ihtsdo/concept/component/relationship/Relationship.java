@@ -43,7 +43,9 @@ import java.io.IOException;
 
 import java.util.*;
 import org.ihtsdo.db.change.ChangeNotifier;
+import org.ihtsdo.tk.api.blueprint.IdDirective;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
+import org.ihtsdo.tk.api.blueprint.RefexDirective;
 import org.ihtsdo.tk.api.blueprint.RelationshipCAB;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf1;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
@@ -120,7 +122,7 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
     public void addTuples(NidSetBI allowedStatus, NidSetBI allowedTypes, PositionSetBI positions,
             List<I_RelTuple> relTupleList, Precedence precedencePolicy,
             ContradictionManagerBI contradictionManager) {
-        List<Version> tuplesToReturn = new ArrayList<Version>();
+        List<Version> tuplesToReturn = new ArrayList<>();
 
         computer.addSpecifiedRelVersions(allowedStatus, allowedTypes, positions, tuplesToReturn, getVersions(),
                 precedencePolicy, contradictionManager);
@@ -131,7 +133,7 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
     public void addTuples(NidSetBI allowedStatus, NidSetBI allowedTypes, PositionSetBI positions,
             List<I_RelTuple> relTupleList, Precedence precedencePolicy,
             ContradictionManagerBI contradictionManager, Long cutoffTime) {
-        List<Version> tuplesToReturn = new ArrayList<Version>();
+        List<Version> tuplesToReturn = new ArrayList<>();
 
         computer.addSpecifiedVersions(allowedStatus, allowedTypes, positions, tuplesToReturn, getVersions(),
                 precedencePolicy, contradictionManager, cutoffTime);
@@ -445,9 +447,7 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
             try {
                 classifierAuthorNid =
                         org.dwfa.cement.ArchitectonicAuxiliary.Concept.SNOROCKET.localize().getNid();
-            } catch (IOException ex) {
-                throw new RuntimeException(ex);
-            } catch (TerminologyException ex) {
+            } catch (    IOException | TerminologyException ex) {
                 throw new RuntimeException(ex);
             }
         }
@@ -461,7 +461,8 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
     }
 
     @Override
-    public RelationshipCAB makeBlueprint(ViewCoordinate vc) throws IOException, ContradictionException, InvalidCAB {
+    public RelationshipCAB makeBlueprint(ViewCoordinate vc, IdDirective idDirective, 
+                    RefexDirective refexDirective) throws IOException, ContradictionException, InvalidCAB {
         TkRelationshipType relType = null;
         if (getCharacteristicNid() == SnomedMetadataRf1.INFERRED_DEFINING_CHARACTERISTIC_TYPE_RF1.getLenient().getNid() ||
                 getCharacteristicNid() == SnomedMetadataRf1.DEFINING_CHARACTERISTIC_TYPE_RF1.getLenient().getNid()
@@ -476,7 +477,7 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
                 getGroup(),
                 relType,
                 getVersion(vc),
-                vc);
+                vc, idDirective, refexDirective);
         return relBp;
     }
 
@@ -540,7 +541,7 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
     @Override
     public List<? extends I_RelTuple> getSpecifiedVersions(I_ConfigAceFrame frameConfig)
             throws TerminologyException, IOException {
-        List<Relationship.Version> specifiedVersions = new ArrayList<Relationship.Version>();
+        List<Relationship.Version> specifiedVersions = new ArrayList<>();
 
         computer.addSpecifiedVersions(frameConfig.getAllowedStatus(), frameConfig.getViewPositionSetReadOnly(),
                 specifiedVersions, getTuples(), frameConfig.getPrecedence(),
@@ -553,7 +554,7 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
     public List<? extends I_RelTuple> getSpecifiedVersions(NidSetBI allowedStatus, PositionSetBI positions,
             Precedence precedencePolicy, ContradictionManagerBI contradictionManager)
             throws TerminologyException, IOException {
-        List<Relationship.Version> specifiedVersions = new ArrayList<Relationship.Version>();
+        List<Relationship.Version> specifiedVersions = new ArrayList<>();
 
         computer.addSpecifiedVersions(allowedStatus, positions, specifiedVersions, getTuples(),
                 precedencePolicy, contradictionManager);
@@ -563,7 +564,7 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 
     @Override
     public List<Version> getTuples() {
-        return Collections.unmodifiableList(new ArrayList<Version>(getVersions()));
+        return Collections.unmodifiableList(new ArrayList<>(getVersions()));
     }
 
     @Override
@@ -651,7 +652,7 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
                 count = count + revisions.size();
             }
 
-            ArrayList<Version> list = new ArrayList<Version>(count);
+            ArrayList<Version> list = new ArrayList<>(count);
 
             if (getTime() != Long.MIN_VALUE) {
                 list.add(new Version(this));
@@ -680,7 +681,7 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 
     @Override
     public List<Relationship.Version> getVersions(ViewCoordinate c) {
-        List<Version> returnValues = new ArrayList<Version>(2);
+        List<Version> returnValues = new ArrayList<>(2);
 
         computer.addSpecifiedRelVersions(returnValues, getVersions(), c);
 
@@ -689,7 +690,7 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 
     public Collection<Relationship.Version> getVersions(NidSetBI allowedStatus, NidSetBI allowedTypes,
             PositionSetBI viewPositions, Precedence precedence, ContradictionManagerBI contradictionMgr) {
-        List<Version> returnTuples = new ArrayList<Version>(2);
+        List<Version> returnTuples = new ArrayList<>(2);
 
         computer.addSpecifiedVersions(allowedStatus, allowedTypes, viewPositions, returnTuples, getVersions(),
                 precedence, contradictionMgr);
@@ -879,8 +880,10 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
         }
 
         @Override
-        public RelationshipCAB makeBlueprint(ViewCoordinate vc) throws IOException, ContradictionException, InvalidCAB {
-            return getCv().makeBlueprint(vc);
+        public RelationshipCAB makeBlueprint(ViewCoordinate vc, IdDirective idDirective, 
+                RefexDirective refexDirective) 
+                throws IOException, ContradictionException, InvalidCAB {
+            return getCv().makeBlueprint(vc, idDirective, refexDirective);
         }
 
         @Override

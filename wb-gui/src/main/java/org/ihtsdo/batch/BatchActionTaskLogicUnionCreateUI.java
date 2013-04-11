@@ -240,15 +240,23 @@ public class BatchActionTaskLogicUnionCreateUI extends javax.swing.JPanel
         if (BatchActionTask.ts.hasUuid(componentUuid) == true) {
             ConceptVersionBI refsetCB = BatchActionTask.ts.getConceptVersion(vc, componentUuid);
             // :SNOOWL: review added null, null)
-            ConceptAttributeAB cCab = new ConceptAttributeAB(componentUuid, false, null, null);
+            ConceptAttributeAB cCab = new ConceptAttributeAB(componentUuid, 
+                    false, 
+                    null, 
+                    null, 
+                    RefexDirective.EXCLUDE); // :!!!:REVIEW
             cCab.setCurrent();
             BatchActionTask.tsSnapshot.construct(cCab);
 
             // SET RELATIONSHIP TO CURRENT
             UUID roleTypeUuid = TermAux.IS_A.getLenient().getPrimUuid();
             UUID destUuid = DescriptionLogic.UNION_SETS_REFSET.getLenient().getPrimUuid();
-            RelationshipCAB rCab = new RelationshipCAB(refsetCB.getPrimUuid(), roleTypeUuid, destUuid, 0,
-                    TkRelationshipType.STATED_HIERARCHY);
+            RelationshipCAB rCab = new RelationshipCAB(refsetCB.getPrimUuid(), 
+                    roleTypeUuid, 
+                    destUuid, 
+                    0,
+                    TkRelationshipType.STATED_HIERARCHY, 
+                    IdDirective.GENERATE_HASH);
 
             BatchActionTask.tsSnapshot.construct(rCab);
             Ts.get().addUncommitted(refsetCB);
@@ -315,7 +323,10 @@ public class BatchActionTaskLogicUnionCreateUI extends javax.swing.JPanel
             unionSetCB = BatchActionTask.ts.getConceptVersion(vc, unionSetConceptUuid);
             // :SNOOWL: review added null, null)
             ConceptAttributeAB cCab = new ConceptAttributeAB(unionSetConceptUuid,
-                    false, null, null);
+                    false, 
+                    null, 
+                    null, 
+                    RefexDirective.EXCLUDE); // :!!!:REVIEW
             cCab.setCurrent();
             BatchActionTask.tsSnapshot.construct(cCab);
 
@@ -325,7 +336,8 @@ public class BatchActionTaskLogicUnionCreateUI extends javax.swing.JPanel
             destUuid = parent.getPrimUuid();
             RelationshipCAB rCab = new RelationshipCAB(unionSetConceptUuid,
                     roleTypeUuid, destUuid, 0,
-                    TkRelationshipType.STATED_HIERARCHY);
+                    TkRelationshipType.STATED_HIERARCHY,
+                    IdDirective.GENERATE_HASH);
             rCab.setCurrent();
             BatchActionTask.tsSnapshot.construct(rCab);
 
@@ -333,7 +345,8 @@ public class BatchActionTaskLogicUnionCreateUI extends javax.swing.JPanel
             destUuid = DescriptionLogic.UNION_SETS_REFSET.getUuids()[0];
             RelationshipCAB rCab2 = new RelationshipCAB(unionSetConceptUuid,
                     roleTypeUuid, destUuid, 0,
-                    TkRelationshipType.STATED_HIERARCHY);
+                    TkRelationshipType.STATED_HIERARCHY,
+                    IdDirective.GENERATE_HASH);
             rCab2.setCurrent();
             BatchActionTask.tsSnapshot.construct(rCab2);
 
@@ -371,6 +384,7 @@ public class BatchActionTaskLogicUnionCreateUI extends javax.swing.JPanel
             UUID isa = Snomed.IS_A.getLenient().getPrimUuid();
             ConceptCB newUnionSetCB = new ConceptCB(fsnStr, ptStr, LANG_CODE.EN,
                     isa,
+                    IdDirective.GENERATE_HASH,
                     parentUuids);
             newUnionSetCB.setComponentUuid(unionSetConceptUuid);
             TerminologyBuilderBI tc = Ts.get().getTerminologyBuilder(config.
@@ -399,7 +413,9 @@ public class BatchActionTaskLogicUnionCreateUI extends javax.swing.JPanel
 //                return false;
 //            }
 //        }
-        RefexCAB refexSpec = new RefexCAB(TK_REFEX_TYPE.CID, nid, nidUnionSetRefex);
+        RefexCAB refexSpec = new RefexCAB(TK_REFEX_TYPE.CID, nid, 
+                nidUnionSetRefex,
+                IdDirective.GENERATE_HASH);
         int parentMemberTypeNid = Terms.get().getConcept(
                 RefsetAuxiliary.Concept.MARKED_PARENT.getPrimoridalUid()).getConceptNid();
         refexSpec.with(RefexCAB.RefexProperty.CNID1, parentMemberTypeNid);
@@ -439,7 +455,8 @@ public class BatchActionTaskLogicUnionCreateUI extends javax.swing.JPanel
             RefexCAB refexSpecUsFsn = new RefexCAB(
                     TK_REFEX_TYPE.CID,
                     fsn.getNid(),
-                    Ts.get().getNidForUuids(usUuid));
+                    Ts.get().getNidForUuids(usUuid),
+                    IdDirective.GENERATE_HASH);
             refexSpecUsFsn.put(RefexCAB.RefexProperty.CNID1, preferredConcept.getNid());
             RefexChronicleBI<?> annot = tc.construct(refexSpecUsFsn);
 
@@ -450,7 +467,8 @@ public class BatchActionTaskLogicUnionCreateUI extends javax.swing.JPanel
             RefexCAB refexSpecUsPref = new RefexCAB(
                     TK_REFEX_TYPE.CID,
                     pref.getNid(),
-                    Ts.get().getNidForUuids(usUuid));
+                    Ts.get().getNidForUuids(usUuid),
+                    IdDirective.GENERATE_HASH);
 
             refexSpecUsPref.put(RefexCAB.RefexProperty.CNID1, preferredConcept.getNid());
             annot = tc.construct(refexSpecUsPref);
@@ -461,7 +479,8 @@ public class BatchActionTaskLogicUnionCreateUI extends javax.swing.JPanel
             RefexCAB refexSpecGbFsn = new RefexCAB(
                     TK_REFEX_TYPE.CID,
                     fsn.getNid(),
-                    Ts.get().getNidForUuids(gbUuid));
+                    Ts.get().getNidForUuids(gbUuid),
+                    IdDirective.GENERATE_HASH);
             refexSpecGbFsn.put(RefexCAB.RefexProperty.CNID1, preferredConcept.getNid());
             annot = tc.construct(refexSpecGbFsn);
             if (!gbRefexConcept.isAnnotationStyleRefex()) {
@@ -471,7 +490,8 @@ public class BatchActionTaskLogicUnionCreateUI extends javax.swing.JPanel
             RefexCAB refexSpecGbPref = new RefexCAB(
                     TK_REFEX_TYPE.CID,
                     pref.getNid(),
-                    Ts.get().getNidForUuids(gbUuid));
+                    Ts.get().getNidForUuids(gbUuid),
+                    IdDirective.GENERATE_HASH);
             refexSpecGbPref.put(RefexCAB.RefexProperty.CNID1, preferredConcept.getNid());
             annot = tc.construct(refexSpecGbPref);
             if (!gbRefexConcept.isAnnotationStyleRefex()) {

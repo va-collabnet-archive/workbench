@@ -37,6 +37,7 @@ import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.TerminologyBuilderBI;
+import org.ihtsdo.tk.api.blueprint.IdDirective;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB.RefexProperty;
@@ -87,13 +88,7 @@ public class RetireAsInappropriateAction extends AbstractAction {
                     });
                 }
             }
-        } catch (InterruptedException e1) {
-            AceLog.getAppLog().alertAndLogException(e1);
-        } catch (InvocationTargetException e1) {
-            AceLog.getAppLog().alertAndLogException(e1);
-        } catch (TerminologyException e1) {
-            AceLog.getAppLog().alertAndLogException(e1);
-        } catch (IOException e1) {
+        } catch (InterruptedException | InvocationTargetException | TerminologyException | IOException e1) {
             AceLog.getAppLog().alertAndLogException(e1);
         }
 
@@ -187,6 +182,7 @@ public class RetireAsInappropriateAction extends AbstractAction {
 
     private class ContinueActionListener implements ActionListener {
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             if (refersToNid != 0) {
                 wizard.setWizardPanelVisible(false);
@@ -212,6 +208,7 @@ public class RetireAsInappropriateAction extends AbstractAction {
 
     private class StopActionListener implements ActionListener {
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             wizard.setWizardPanelVisible(false);
         }
@@ -279,16 +276,13 @@ public class RetireAsInappropriateAction extends AbstractAction {
             RefexCAB newSpec = new RefexCAB(
                     TK_REFEX_TYPE.CID,
                     analogComponent.getNid(),
-                    refexConcept.getNid());
+                    refexConcept.getNid(),
+                    IdDirective.GENERATE_HASH);
             newSpec.put(RefexProperty.CNID1, nid);
             TerminologyBuilderBI tc = Ts.get().getTerminologyBuilder(config.getEditCoordinate(),
                     config.getViewCoordinate());
             tc.construct(newSpec);
-        } catch (IOException e1) {
-            AceLog.getAppLog().alertAndLogException(e1);
-        } catch (InvalidCAB e1) {
-            AceLog.getAppLog().alertAndLogException(e1);
-        } catch (ContradictionException e1) {
+        } catch (IOException | InvalidCAB | ContradictionException e1) {
             AceLog.getAppLog().alertAndLogException(e1);
         }
     }

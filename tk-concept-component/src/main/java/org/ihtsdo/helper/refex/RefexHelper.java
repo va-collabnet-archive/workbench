@@ -23,8 +23,10 @@ import org.ihtsdo.tk.api.ComponentChronicleBI;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.TerminologyBuilderBI;
+import org.ihtsdo.tk.api.blueprint.IdDirective;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
+import org.ihtsdo.tk.api.blueprint.RefexDirective;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
@@ -293,7 +295,8 @@ public class RefexHelper {
         boolean annotation = refexConcept.isAnnotationStyleRefex();
         RefexCAB memberBp = new RefexCAB(TK_REFEX_TYPE.CID,
                 component.getNid(),
-                refexNid);
+                refexNid,
+                IdDirective.GENERATE_HASH);
         memberBp.put(RefexCAB.RefexProperty.CNID1, conceptNid);
         RefexChronicleBI<?> refex = builder.constructIfNotCurrent(memberBp);
         if (annotation) {
@@ -344,7 +347,8 @@ public class RefexHelper {
         boolean annotation = refexConcept.isAnnotationStyleRefex();
         RefexCAB memberBp = new RefexCAB(TK_REFEX_TYPE.CID,
                 component.getNid(),
-                refexNid);
+                refexNid,
+                IdDirective.GENERATE_HASH);
         memberBp.put(RefexCAB.RefexProperty.CNID1, conceptNid);
         memberBp.setMemberUuid(memberUuid);
         RefexChronicleBI<?> refex = builder.constructIfNotCurrent(memberBp);
@@ -395,7 +399,8 @@ public class RefexHelper {
         boolean annotation = refexConcept.isAnnotationStyleRefex();
         RefexCAB memberBp = new RefexCAB(TK_REFEX_TYPE.BOOLEAN,
                 component.getNid(),
-                refexNid);
+                refexNid,
+                IdDirective.GENERATE_HASH);
         memberBp.put(RefexCAB.RefexProperty.BOOLEAN1, booleanValue);
         RefexChronicleBI<?> refex = builder.constructIfNotCurrent(memberBp);
         if (annotation) {
@@ -447,7 +452,8 @@ public class RefexHelper {
         boolean annotation = refexConcept.isAnnotationStyleRefex();
         RefexCAB memberBp = new RefexCAB(TK_REFEX_TYPE.BOOLEAN,
                 component.getNid(),
-                refexNid);
+                refexNid,
+                IdDirective.GENERATE_HASH);
         memberBp.put(RefexCAB.RefexProperty.BOOLEAN1, booleanValue);
         memberBp.setMemberUuid(memberUuid);
         RefexChronicleBI<?> refex = builder.constructIfNotCurrent(memberBp);
@@ -498,7 +504,8 @@ public class RefexHelper {
         boolean annotation = refexConcept.isAnnotationStyleRefex();
         RefexCAB memberBp = new RefexCAB(TK_REFEX_TYPE.INT,
                 component.getNid(),
-                refexNid);
+                refexNid,
+                IdDirective.GENERATE_HASH);
         memberBp.put(RefexCAB.RefexProperty.INTEGER1, integerValue);
         RefexChronicleBI<?> refex = builder.constructIfNotCurrent(memberBp);
         if (annotation) {
@@ -550,7 +557,8 @@ public class RefexHelper {
         boolean annotation = refexConcept.isAnnotationStyleRefex();
         RefexCAB memberBp = new RefexCAB(TK_REFEX_TYPE.INT,
                 component.getNid(),
-                refexNid);
+                refexNid,
+                IdDirective.GENERATE_HASH);
         memberBp.put(RefexCAB.RefexProperty.INTEGER1, integerValue);
         memberBp.setMemberUuid(memberUuid);
         RefexChronicleBI<?> refex = builder.constructIfNotCurrent(memberBp);
@@ -603,7 +611,8 @@ public class RefexHelper {
         boolean annotation = refexConcept.isAnnotationStyleRefex();
         RefexCAB memberBp = new RefexCAB(TK_REFEX_TYPE.STR,
                 component.getNid(),
-                refexNid);
+                refexNid,
+                IdDirective.GENERATE_HASH);
         memberBp.put(RefexCAB.RefexProperty.STRING1, stringValue);
         RefexChronicleBI<?> refex = builder.constructIfNotCurrent(memberBp);
         if (annotation) {
@@ -657,7 +666,8 @@ public class RefexHelper {
         boolean annotation = refexConcept.isAnnotationStyleRefex();
         RefexCAB memberBp = new RefexCAB(TK_REFEX_TYPE.STR,
                 component.getNid(),
-                refexNid);
+                refexNid,
+                IdDirective.GENERATE_HASH);
         memberBp.put(RefexCAB.RefexProperty.STRING1, stringValue);
         memberBp.setMemberUuid(memberUuid);
         RefexChronicleBI<?> refex = builder.constructIfNotCurrent(memberBp);
@@ -727,8 +737,8 @@ public class RefexHelper {
         for (RefexChronicleBI member : refexMembers) {
             ComponentVersionBI cvbi = member.getVersion(vc);
             if (cvbi != null) {
-                RefexCAB memberBp = (RefexCAB) cvbi.makeBlueprint(vc);
-                memberBp.setRetired();
+                RefexCAB memberBp = (RefexCAB) cvbi.makeBlueprint(vc, IdDirective.PRESERVE, RefexDirective.EXCLUDE);
+                memberBp.setRetired(); // <-- redundant :???:!!!:REVIEW
                 builder.construct(memberBp);
             }
         }
@@ -769,8 +779,8 @@ public class RefexHelper {
             ContradictionException, InvalidCAB {
         ConceptChronicleBI refexConcept = Ts.get().getConceptForNid(refexMember.getRefexNid());
         boolean annotation = refexConcept.isAnnotationStyleRefex();
-        RefexCAB memberBp = refexMember.makeBlueprint(vc);
-        memberBp.setMemberUuid(refexMember.getPrimUuid());
+        RefexCAB memberBp = refexMember.makeBlueprint(vc, IdDirective.PRESERVE, RefexDirective.EXCLUDE);
+        memberBp.setMemberUuid(refexMember.getPrimUuid()); // <-- redundant :???:!!!:REVIEW
         memberBp.setRetired();
         RefexChronicleBI<?> thing = builder.construct(memberBp);
         ConceptChronicleBI concept = refexMember.getEnclosingConcept();

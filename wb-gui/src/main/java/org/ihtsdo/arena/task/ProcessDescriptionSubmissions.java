@@ -23,8 +23,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.apache.lucene.queryParser.ParseException;
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_ConfigAceFrame;
@@ -38,7 +36,6 @@ import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.bpa.tasks.AbstractTask;
-import org.dwfa.jini.TermEntry;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
@@ -46,13 +43,13 @@ import org.dwfa.util.bean.Spec;
 import org.ihtsdo.helper.dialect.DialectHelper;
 import org.ihtsdo.helper.dialect.UnsupportedDialectOrLanguage;
 import org.ihtsdo.helper.msfile.DescriptionAdditionFileHelper;
-import org.ihtsdo.helper.msfile.MemberSubmissionFileHelper;
 import org.ihtsdo.lang.LANG_CODE;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ComponentChronicleBI;
 import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.TerminologyBuilderBI;
 import org.ihtsdo.tk.api.blueprint.DescriptionCAB;
+import org.ihtsdo.tk.api.blueprint.IdDirective;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
@@ -103,14 +100,16 @@ public class ProcessDescriptionSubmissions extends AbstractTask {
 
     }
 
+    @Override
     public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         // Nothing to do...
     }
 
+    @Override
     public Condition evaluate(final I_EncodeBusinessProcess process, final I_Work worker) throws TaskFailedException {
         int count = 0;
         try {
-            uuidList = new ArrayList<List<UUID>>();
+            uuidList = new ArrayList<>();
             duplicateDescriptions = new ArrayList<>();
             descMissingParentConcept = new ArrayList<>();
             conceptsToCommit = new ArrayList<>();
@@ -188,7 +187,7 @@ public class ProcessDescriptionSubmissions extends AbstractTask {
                 acceptabilityNid = 0;
                 caseSensitive = false;
                 
-                List<UUID> list = new ArrayList<UUID>();
+                List<UUID> list = new ArrayList<>();
                 String[] parts = line.split("\t");
                 String part = null;
                 if (sctPosition != null) {
@@ -283,21 +282,24 @@ public class ProcessDescriptionSubmissions extends AbstractTask {
                             SnomedMetadataRfx.getDES_SYNONYM_NID(),
                             lang,
                             descText,
-                            caseSensitive);
+                            caseSensitive, 
+                            IdDirective.GENERATE_HASH);
                     TerminologyBuilderBI builder = Ts.get().getTerminologyBuilder(config.getEditCoordinate(), config.getViewCoordinate());
                     ComponentChronicleBI<?> component = Ts.get().getComponent(descBp.getComponentUuid());
                     if (component == null) {
                         DescriptionChronicleBI description = builder.construct(descBp);
                         RefexCAB annotBp = new RefexCAB(TK_REFEX_TYPE.CID,
                                 description.getNid(),
-                                langRefexNid);
+                                langRefexNid,
+                                IdDirective.GENERATE_HASH);
                         annotBp.put(RefexCAB.RefexProperty.CNID1, acceptabilityNid);
                         RefexChronicleBI<?> annotation = builder.construct(annotBp);
                         description.addAnnotation(annotation);
                         if (addSecondDialectRefex) {
                             RefexCAB secondAnnotBp = new RefexCAB(TK_REFEX_TYPE.CID,
                                     description.getNid(),
-                                    secondDialectRefexNid);
+                                    secondDialectRefexNid,
+                                    IdDirective.GENERATE_HASH);
                             secondAnnotBp.put(RefexCAB.RefexProperty.CNID1, acceptabilityNid);
                             RefexChronicleBI<?> secondAnnotation = builder.construct(secondAnnotBp);
                             description.addAnnotation(secondAnnotation);
@@ -376,10 +378,12 @@ public class ProcessDescriptionSubmissions extends AbstractTask {
         }
     }
 
+    @Override
     public Collection<Condition> getConditions() {
         return AbstractTask.CONTINUE_CONDITION;
     }
 
+    @Override
     public int[] getDataContainerIds() {
         return new int[]{};
     }

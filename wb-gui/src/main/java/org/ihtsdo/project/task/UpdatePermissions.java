@@ -42,6 +42,7 @@ import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 import org.ihtsdo.lucene.SearchResult;
 import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.blueprint.IdDirective;
 import org.ihtsdo.tk.api.blueprint.RelationshipCAB;
 import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationshipType;
 
@@ -109,6 +110,7 @@ public class UpdatePermissions extends AbstractTask {
     /* (non-Javadoc)
      * @see org.dwfa.bpa.process.I_DefineTask#evaluate(org.dwfa.bpa.process.I_EncodeBusinessProcess, org.dwfa.bpa.process.I_Work)
      */
+    @Override
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
             throws TaskFailedException {
         try {
@@ -143,6 +145,7 @@ public class UpdatePermissions extends AbstractTask {
     /* (non-Javadoc)
      * @see org.dwfa.bpa.process.I_DefineTask#complete(org.dwfa.bpa.process.I_EncodeBusinessProcess, org.dwfa.bpa.process.I_Work)
      */
+    @Override
     public void complete(I_EncodeBusinessProcess process, I_Work worker)
             throws TaskFailedException {
     }
@@ -150,6 +153,7 @@ public class UpdatePermissions extends AbstractTask {
     /* (non-Javadoc)
      * @see org.dwfa.bpa.process.I_DefineTask#getConditions()
      */
+    @Override
     public Collection<Condition> getConditions() {
         return CONTINUE_CONDITION;
     }
@@ -157,6 +161,7 @@ public class UpdatePermissions extends AbstractTask {
     /* (non-Javadoc)
      * @see org.dwfa.bpa.tasks.AbstractTask#getDataContainerIds()
      */
+    @Override
     public int[] getDataContainerIds() {
         return new int[]{};
     }
@@ -202,8 +207,12 @@ public class UpdatePermissions extends AbstractTask {
             //throw new Exception("User unknown");
             //skip line
         } else {
-            RelationshipCAB RelationshipCAB = new RelationshipCAB(user.getPrimUuid(), UUID.fromString(typeUid),
-                    UUID.fromString(targetUid), 0, TkRelationshipType.STATED_ROLE);
+            RelationshipCAB RelationshipCAB = new RelationshipCAB(user.getPrimUuid(),
+                    UUID.fromString(typeUid),
+                    UUID.fromString(targetUid),
+                    0,
+                    TkRelationshipType.STATED_ROLE,
+                    IdDirective.GENERATE_HASH);
             Ts.get().getTerminologyBuilder(config.getEditCoordinate(),
                     config.getViewCoordinate()).constructIfNotCurrent(RelationshipCAB);
             //			old way

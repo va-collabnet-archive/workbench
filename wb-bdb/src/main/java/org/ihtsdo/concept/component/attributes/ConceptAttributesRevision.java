@@ -9,7 +9,6 @@ import java.io.IOException;
 import org.apache.commons.collections.primitives.ArrayIntList;
 
 import org.dwfa.ace.api.I_ConceptAttributePart;
-import org.dwfa.ace.api.Terms;
 
 import org.ihtsdo.concept.component.Revision;
 import org.ihtsdo.db.bdb.Bdb;
@@ -23,8 +22,9 @@ import org.ihtsdo.tk.api.ext.I_ConceptualizeExternally;
 
 import java.util.Collection;
 import java.util.Set;
+import org.ihtsdo.tk.api.blueprint.IdDirective;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
-import org.ihtsdo.tk.dto.concept.component.TkRevision;
+import org.ihtsdo.tk.api.blueprint.RefexDirective;
 
 public class ConceptAttributesRevision extends Revision<ConceptAttributesRevision, ConceptAttributes>
         implements I_ConceptAttributePart<ConceptAttributesRevision>,
@@ -192,8 +192,10 @@ public class ConceptAttributesRevision extends Revision<ConceptAttributesRevisio
    }
 
     @Override
-    public ConceptAttributeAB makeBlueprint(ViewCoordinate vc) throws IOException, ContradictionException, InvalidCAB {
-        ConceptAttributeAB conAttrBp = new ConceptAttributeAB(primordialComponent.getConceptNid(), defined, getVersion(vc), vc);
+    public ConceptAttributeAB makeBlueprint(ViewCoordinate vc, IdDirective idDirective, 
+                        RefexDirective refexDirective) throws IOException, ContradictionException, InvalidCAB {
+        ConceptAttributeAB conAttrBp = new ConceptAttributeAB(primordialComponent.getConceptNid(), 
+                defined, getVersion(vc), vc, refexDirective);
         return conAttrBp;
     }
 }

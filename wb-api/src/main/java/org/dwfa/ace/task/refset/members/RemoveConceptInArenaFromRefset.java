@@ -45,9 +45,9 @@ import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.TerminologyBuilderBI;
+import org.ihtsdo.tk.api.blueprint.IdDirective;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
-import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 import org.ihtsdo.tk.dto.concept.component.refex.TK_REFEX_TYPE;
 
 @BeanList(specs = { @Spec(directory = "tasks/ide/refset/membership", type = BeanType.TASK_BEAN) })
@@ -129,7 +129,9 @@ public class RemoveConceptInArenaFromRefset extends AbstractTask {
             //add to refset
             RefexCAB refexSpec = 
                     new RefexCAB(TK_REFEX_TYPE.CID, 
-                    conceptToAdd.getNid(), refsetConcept.getNid());
+                    conceptToAdd.getNid(), 
+                    refsetConcept.getNid(),
+                    IdDirective.GENERATE_HASH);
             refexSpec.put(RefexCAB.RefexProperty.CNID1, 
                     member.getConceptNid());
             refexSpec.setRetired();

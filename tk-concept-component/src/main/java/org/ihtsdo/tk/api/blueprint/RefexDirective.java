@@ -20,5 +20,14 @@ package org.ihtsdo.tk.api.blueprint;
  * @author kec
  */
 public enum RefexDirective {
-    INCLUDE, EXCLUDE
+    /**
+     * When generating a blueprint for this component recursively
+     * include RefexCAB blueprints for associated Refex members.
+     */
+    INCLUDE,
+    /**
+     * When generating a blueprint for this component
+     * exclude RefexCAB blueprints for associated Refex members.
+     */
+    EXCLUDE
 }

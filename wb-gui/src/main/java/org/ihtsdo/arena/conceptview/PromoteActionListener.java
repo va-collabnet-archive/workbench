@@ -30,9 +30,11 @@ import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.TerminologyBuilderBI;
+import org.ihtsdo.tk.api.blueprint.IdDirective;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB.RefexProperty;
+import org.ihtsdo.tk.api.blueprint.RefexDirective;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
@@ -89,7 +91,7 @@ public class PromoteActionListener implements ActionListener {
                 boolean changed = false;
                 if (promoteRefex.hasRefsetMemberActiveForComponent(c.getNid())) {
                     RefexNidVersionBI<?> member = (RefexNidVersionBI<?>) promoteRefex.getRefsetMemberActiveForComponent(vc, c.getNid());
-                    RefexCAB memberBp = member.makeBlueprint(vc);
+                    RefexCAB memberBp = member.makeBlueprint(vc, IdDirective.PRESERVE, RefexDirective.EXCLUDE);  // :!!!:REVIEW
                     if (member.getNid1() == TermAux.UNREVIEWED.getLenient().getConceptNid()) {
                         memberBp.put(RefexProperty.CNID1, TermAux.PROMOTE.getLenient().getConceptNid());
                     } else if (member.getNid1() == TermAux.PROMOTE.getLenient().getConceptNid()) {
@@ -102,7 +104,7 @@ public class PromoteActionListener implements ActionListener {
                 for (DescriptionVersionBI desc : c.getDescriptionsActive()) {
                     if (promoteRefex.hasRefsetMemberActiveForComponent(desc.getNid())) {
                         RefexNidVersionBI<?> member = (RefexNidVersionBI<?>) promoteRefex.getRefsetMemberActiveForComponent(vc, desc.getNid());
-                        RefexCAB memberBp = member.makeBlueprint(vc);
+                        RefexCAB memberBp = member.makeBlueprint(vc, IdDirective.PRESERVE, RefexDirective.EXCLUDE);  // :!!!:REVIEW
                         if (member.getNid1() == TermAux.UNREVIEWED.getLenient().getConceptNid()) {
                             memberBp.put(RefexProperty.CNID1, TermAux.PROMOTE.getLenient().getConceptNid());
                         } else if (member.getNid1() == TermAux.PROMOTE.getLenient().getConceptNid()) {
@@ -116,7 +118,7 @@ public class PromoteActionListener implements ActionListener {
                 for (RelationshipVersionBI rel : c.getRelationshipsOutgoingActive()) {
                     if (promoteRefex.hasRefsetMemberActiveForComponent(rel.getNid())) {
                         RefexNidVersionBI<?> member = (RefexNidVersionBI<?>) promoteRefex.getRefsetMemberActiveForComponent(vc, rel.getNid());
-                        RefexCAB memberBp = member.makeBlueprint(vc);
+                        RefexCAB memberBp = member.makeBlueprint(vc, IdDirective.PRESERVE, RefexDirective.EXCLUDE);  // :!!!:REVIEW
                         if (member.getNid1() == TermAux.UNREVIEWED.getLenient().getConceptNid()) {
                             memberBp.put(RefexProperty.CNID1, TermAux.PROMOTE.getLenient().getConceptNid());
                         } else if (member.getNid1() == TermAux.PROMOTE.getLenient().getConceptNid()) {

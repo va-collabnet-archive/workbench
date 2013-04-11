@@ -82,6 +82,7 @@ import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.lang.LANG_CODE;
 import org.ihtsdo.tk.api.*;
+import org.ihtsdo.tk.api.blueprint.IdDirective;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.description.DescriptionChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
@@ -224,11 +225,7 @@ public class NewConcept extends PreviousNextOrCancel {
             maker.execute();
             restore();
             maker.getLatch().await();
-        } catch (InterruptedException e) {
-            throw new TaskFailedException(e);
-        } catch (InvocationTargetException e) {
-            throw new TaskFailedException(e);
-        } catch (IllegalArgumentException e) {
+        } catch (InterruptedException | InvocationTargetException | IllegalArgumentException e) {
             throw new TaskFailedException(e);
         }
 
@@ -583,9 +580,7 @@ public class NewConcept extends PreviousNextOrCancel {
                 fsn.requestFocusInWindow();
                 wizardPanel.repaint();
                 GuiUtil.tickle(wizardPanel);
-            } catch (InterruptedException ex) {
-                Logger.getLogger(NewConcept.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (ExecutionException ex) {
+            } catch (InterruptedException | ExecutionException ex) {
                 Logger.getLogger(NewConcept.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
@@ -784,9 +779,7 @@ public class NewConcept extends PreviousNextOrCancel {
                 this.gbPref.setVisible(false);
                 this.gbLabelPref.setVisible(false);
             }
-        } catch (UnsupportedDialectOrLanguage ex) {
-            Logger.getLogger(NewConcept.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
+        } catch (UnsupportedDialectOrLanguage | IOException ex) {
             Logger.getLogger(NewConcept.class.getName()).log(Level.SEVERE, null, ex);
         }
 
@@ -808,9 +801,9 @@ public class NewConcept extends PreviousNextOrCancel {
 
             //create concept blue print
             if (lang.equals(LANG_CODE.EN_GB)) {
-                conceptSpec = new ConceptCB(fsnText, prefText, LANG_CODE.EN, isa, uuidArray);
+                conceptSpec = new ConceptCB(fsnText, prefText, LANG_CODE.EN, isa, IdDirective.GENERATE_HASH, uuidArray);
             } else {
-                conceptSpec = new ConceptCB(fsnText, prefText, LANG_CODE.EN, isa, uuidArray);
+                conceptSpec = new ConceptCB(fsnText, prefText, LANG_CODE.EN, isa, IdDirective.GENERATE_HASH, uuidArray);
             }
             conceptSpec.setComponentUuid(UUID.randomUUID());
             List<DescriptionCAB> fullySpecifiedNameCABs = conceptSpec.getFullySpecifiedNameCABs();
@@ -829,9 +822,7 @@ public class NewConcept extends PreviousNextOrCancel {
             }
             newConcept = tc.constructIfNotCurrent(conceptSpec);
             
-        } catch (IOException e) {
-            AceLog.getAppLog().alertAndLogException(e);
-        } catch (InvalidCAB e) {
+        } catch (IOException | InvalidCAB e) {
             AceLog.getAppLog().alertAndLogException(e);
         }
     }
@@ -848,12 +839,11 @@ public class NewConcept extends PreviousNextOrCancel {
                     LANG_CODE.EN_GB,
                     text,
                     CsWordsHelper.isIcTypeSignificant(parts[0],
-                        CaseSensitive.IC_SIGNIFICANT.getLenient().getNid()));
+                    CaseSensitive.IC_SIGNIFICANT.getLenient().getNid()),
+                    IdDirective.GENERATE_HASH);
 
             tc.construct(descSpecGbFsn);
-        } catch (IOException ex) {
-            AceLog.getAppLog().alertAndLogException(ex);
-        } catch (InvalidCAB ex) {
+        } catch (IOException | InvalidCAB ex) {
             AceLog.getAppLog().alertAndLogException(ex);
         }
     }
@@ -863,15 +853,14 @@ public class NewConcept extends PreviousNextOrCancel {
             refexSpecGbFsn = new RefexCAB(
                     TK_REFEX_TYPE.CID,
                     cv.getNid(),
-                    Ts.get().getNidForUuids(gbUuid));
+                    Ts.get().getNidForUuids(gbUuid),
+                    IdDirective.GENERATE_HASH);
             refexSpecGbFsn.put(RefexProperty.CNID1, preferredConcept.getNid());
             RefexChronicleBI<?> annot = tc.construct(refexSpecGbFsn);
             if (!gbRefexConcept.isAnnotationStyleRefex()) {
                 Ts.get().addUncommitted(gbRefexConcept);
             }
-        } catch (IOException ex) {
-            AceLog.getAppLog().alertAndLogException(ex);
-        } catch (InvalidCAB ex) {
+        } catch (IOException | InvalidCAB ex) {
             AceLog.getAppLog().alertAndLogException(ex);
         }
     }
@@ -889,13 +878,12 @@ public class NewConcept extends PreviousNextOrCancel {
                     LANG_CODE.EN_GB,
                     text,
                     CsWordsHelper.isIcTypeSignificant(parts[0],
-                        CaseSensitive.IC_SIGNIFICANT.getLenient().getNid()));
+                    CaseSensitive.IC_SIGNIFICANT.getLenient().getNid()),
+                    IdDirective.GENERATE_HASH);
 
             DescriptionChronicleBI dc = tc.construct(descSpecGbPref);
             cv = Ts.get().getComponentVersion(config.getViewCoordinate(), dc.getNid());
-        } catch (IOException ex) {
-            AceLog.getAppLog().alertAndLogException(ex);
-        } catch (InvalidCAB ex) {
+        } catch (IOException | InvalidCAB ex) {
             AceLog.getAppLog().alertAndLogException(ex);
         }
         return cv;
@@ -906,15 +894,14 @@ public class NewConcept extends PreviousNextOrCancel {
             refexSpecGbPref = new RefexCAB(
                     TK_REFEX_TYPE.CID,
                     cv.getNid(),
-                    Ts.get().getNidForUuids(gbUuid));
+                    Ts.get().getNidForUuids(gbUuid),
+                    IdDirective.GENERATE_HASH);
             refexSpecGbPref.put(RefexProperty.CNID1, preferredConcept.getNid());
             RefexChronicleBI<?> annot = tc.construct(refexSpecGbPref);
             if (!gbRefexConcept.isAnnotationStyleRefex()) {
                 Ts.get().addUncommitted(gbRefexConcept);
             }
-        } catch (IOException ex) {
-            AceLog.getAppLog().alertAndLogException(ex);
-        } catch (InvalidCAB ex) {
+        } catch (IOException | InvalidCAB ex) {
             AceLog.getAppLog().alertAndLogException(ex);
         }
     }
@@ -924,15 +911,14 @@ public class NewConcept extends PreviousNextOrCancel {
             refexSpecGbAcct = new RefexCAB(
                     TK_REFEX_TYPE.CID,
                     cv.getNid(),
-                    Ts.get().getNidForUuids(gbUuid));
+                    Ts.get().getNidForUuids(gbUuid),
+                    IdDirective.GENERATE_HASH);
             refexSpecGbAcct.put(RefexProperty.CNID1, Ts.get().getNidForUuids(AcceptabilityType.NOT_ACCEPTABLE.getLenient().getPrimUuid()));
             RefexChronicleBI<?> annot = tc.construct(refexSpecGbAcct);
             if (!gbRefexConcept.isAnnotationStyleRefex()) {
                 Ts.get().addUncommitted(gbRefexConcept);
             }
-        } catch (IOException ex) {
-            AceLog.getAppLog().alertAndLogException(ex);
-        } catch (InvalidCAB ex) {
+        } catch (IOException | InvalidCAB ex) {
             AceLog.getAppLog().alertAndLogException(ex);
         }
     }
@@ -949,12 +935,11 @@ public class NewConcept extends PreviousNextOrCancel {
                     LANG_CODE.EN_US,
                     text,
                     CsWordsHelper.isIcTypeSignificant(parts[0],
-                        CaseSensitive.IC_SIGNIFICANT.getLenient().getNid()));
+                    CaseSensitive.IC_SIGNIFICANT.getLenient().getNid()),
+                    IdDirective.GENERATE_HASH);
 
             tc.construct(descSpecUsFsn);
-        } catch (IOException ex) {
-            AceLog.getAppLog().alertAndLogException(ex);
-        } catch (InvalidCAB ex) {
+        } catch (IOException | InvalidCAB ex) {
             AceLog.getAppLog().alertAndLogException(ex);
         }
     }
@@ -964,16 +949,15 @@ public class NewConcept extends PreviousNextOrCancel {
             refexSpecUsFsn = new RefexCAB(
                     TK_REFEX_TYPE.CID,
                     cv.getNid(),
-                    Ts.get().getNidForUuids(usUuid));
+                    Ts.get().getNidForUuids(usUuid),
+                    IdDirective.GENERATE_HASH);
 
             refexSpecUsFsn.put(RefexProperty.CNID1, preferredConcept.getNid());
             RefexChronicleBI<?> annot = tc.construct(refexSpecUsFsn);
             if (!usRefexConcept.isAnnotationStyleRefex()) {
                 Ts.get().addUncommitted(usRefexConcept);
             }
-        } catch (IOException ex) {
-            AceLog.getAppLog().alertAndLogException(ex);
-        } catch (InvalidCAB ex) {
+        } catch (IOException | InvalidCAB ex) {
             AceLog.getAppLog().alertAndLogException(ex);
         }
     }
@@ -991,13 +975,12 @@ public class NewConcept extends PreviousNextOrCancel {
                     LANG_CODE.EN_US,
                     text,
                     CsWordsHelper.isIcTypeSignificant(parts[0],
-                        CaseSensitive.IC_SIGNIFICANT.getLenient().getNid()));
+                    CaseSensitive.IC_SIGNIFICANT.getLenient().getNid()),
+                    IdDirective.GENERATE_HASH);
 
             DescriptionChronicleBI dc = tc.construct(descSpecUsPref);
             cv = Ts.get().getComponentVersion(config.getViewCoordinate(), dc.getNid());
-        } catch (IOException ex) {
-            AceLog.getAppLog().alertAndLogException(ex);
-        } catch (InvalidCAB ex) {
+        } catch (IOException | InvalidCAB ex) {
             AceLog.getAppLog().alertAndLogException(ex);
         }
         return cv;
@@ -1008,16 +991,15 @@ public class NewConcept extends PreviousNextOrCancel {
             refexSpecUsPref = new RefexCAB(
                     TK_REFEX_TYPE.CID,
                     cv.getNid(),
-                    Ts.get().getNidForUuids(usUuid));
+                    Ts.get().getNidForUuids(usUuid),
+                    IdDirective.GENERATE_HASH);
 
             refexSpecUsPref.put(RefexProperty.CNID1, preferredConcept.getNid());
             RefexChronicleBI<?> annot = tc.construct(refexSpecUsPref);
             if (!usRefexConcept.isAnnotationStyleRefex()) {
                 Ts.get().addUncommitted(usRefexConcept);
             }
-        } catch (IOException ex) {
-            AceLog.getAppLog().alertAndLogException(ex);
-        } catch (InvalidCAB ex) {
+        } catch (IOException | InvalidCAB ex) {
             AceLog.getAppLog().alertAndLogException(ex);
         }
     }
@@ -1027,16 +1009,15 @@ public class NewConcept extends PreviousNextOrCancel {
             refexSpecUsAcct = new RefexCAB(
                     TK_REFEX_TYPE.CID,
                     cv.getNid(),
-                    Ts.get().getNidForUuids(usUuid));
+                    Ts.get().getNidForUuids(usUuid),
+                    IdDirective.GENERATE_HASH);
 
             refexSpecUsAcct.put(RefexProperty.CNID1, Ts.get().getNidForUuids(AcceptabilityType.NOT_ACCEPTABLE.getLenient().getPrimUuid()));
             RefexChronicleBI<?> annot = tc.construct(refexSpecUsAcct);
             if (!usRefexConcept.isAnnotationStyleRefex()) {
                 Ts.get().addUncommitted(usRefexConcept);
             }
-        } catch (IOException ex) {
-            AceLog.getAppLog().alertAndLogException(ex);
-        } catch (InvalidCAB ex) {
+        } catch (IOException | InvalidCAB ex) {
             AceLog.getAppLog().alertAndLogException(ex);
         }
     }
@@ -1079,7 +1060,7 @@ public class NewConcept extends PreviousNextOrCancel {
                 fullFsn = fullFsn.replaceAll("\n", "");
                 fullFsn = fullFsn.replaceAll("   *", " ");
                 String[] fsnWords = fullFsn.split("\\s");
-                HashSet<String> wordSet = new HashSet<String>();
+                HashSet<String> wordSet = new HashSet<>();
                 for (String word : fsnWords) {
                     if (!wordSet.contains(word) && word.length() > 1
                             && !word.startsWith("(") && !word.endsWith(")")) {
@@ -1133,11 +1114,7 @@ public class NewConcept extends PreviousNextOrCancel {
                         done = true;
                         NewConcept.this.notifyTaskDone();
                     }
-                } catch (IOException ex) {
-                    AceLog.getAppLog().alertAndLogException(ex);
-                } catch (TerminologyException ex) {
-                    AceLog.getAppLog().alertAndLogException(ex);
-                } catch (ParseException ex) {
+                } catch (IOException | TerminologyException | ParseException ex) {
                     AceLog.getAppLog().alertAndLogException(ex);
                 }
             }

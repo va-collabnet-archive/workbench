@@ -1,16 +1,22 @@
 package org.ihtsdo.tk.api.test;
 
+import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.UUID;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.lang.LANG_CODE;
 import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.TerminologyBuilderBI;
 import org.ihtsdo.tk.api.TerminologyStoreDI;
 import org.ihtsdo.tk.api.blueprint.ConceptCB;
 import org.ihtsdo.tk.api.blueprint.DescriptionCAB;
+import org.ihtsdo.tk.api.blueprint.IdDirective;
+import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.binding.snomed.Snomed;
 
@@ -34,9 +40,12 @@ public class ConceptHelper {
             // Create blueprint
             LANG_CODE langCode = LANG_CODE.EN; // EN_AU not supported!
             ConceptCB conceptBp = 
-                    new ConceptCB(fsnTerm, prefTerm, langCode, relTypeConcept.getPrimUuid(), parentConcept.getPrimUuid());
+                    new ConceptCB(fsnTerm, prefTerm, langCode, 
+                    relTypeConcept.getPrimUuid(),
+                    IdDirective.GENERATE_HASH,
+                    parentConcept.getPrimUuid());
             
-            final UUID conceptUuid = UUID.randomUUID();
+            final UUID conceptUuid = UUID.randomUUID();  // :!!!:REVIEW
             conceptBp.setComponentUuid(conceptUuid);
             TestArtefact.set("conceptUuid", conceptUuid);
             
@@ -51,7 +60,7 @@ public class ConceptHelper {
             
             return builder.construct(conceptBp);
 
-        } catch (Exception e) {            
+        } catch (TerminologyException | IOException | InvalidCAB | ContradictionException | NoSuchAlgorithmException e) {            
             throw new RuntimeException(e);
         }
     }

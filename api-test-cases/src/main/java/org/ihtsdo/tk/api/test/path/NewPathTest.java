@@ -20,12 +20,13 @@ import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.TerminologyBuilderBI;
 import org.ihtsdo.tk.api.TerminologyStoreDI;
 import org.ihtsdo.tk.api.blueprint.ConceptCB;
+import org.ihtsdo.tk.api.blueprint.IdDirective;
 import org.ihtsdo.tk.api.blueprint.PathCB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
+import org.ihtsdo.tk.api.blueprint.RefexDirective;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
-import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.test.ConceptHelper;
 import org.ihtsdo.tk.api.test.DefaultProfileBuilder;
 import org.ihtsdo.tk.api.test.NewConceptBuilder;
@@ -74,20 +75,31 @@ public class NewPathTest {
         String fsnTerm = String.format("New Path %d (test concept)", System.currentTimeMillis());
         String prefTerm = "New Path";
 
-        ConceptCB conceptBp = 
-                new ConceptCB(fsnTerm, prefTerm, langCode, relTypeConcept.getPrimUuid(), parentConcept.getPrimUuid());
+        ConceptCB conceptBp = new ConceptCB(fsnTerm, 
+                prefTerm, 
+                langCode, 
+                relTypeConcept.getPrimUuid(),
+                IdDirective.GENERATE_HASH,
+                parentConcept.getPrimUuid());
         
         conceptBp.setComponentUuid(UUID.randomUUID());
         
         UUID originPathUuid = Concept.ARCHITECTONIC_BRANCH.getPrimoridalUid();
         
-        RefexCAB pathRefexBp = new RefexCAB(TK_REFEX_TYPE.CID, TermAux.PATH.getLenient().getConceptNid(),
-            RefsetAux.PATH_REFSET.getLenient().getNid());
+        RefexCAB pathRefexBp = new RefexCAB(TK_REFEX_TYPE.CID, 
+                TermAux.PATH.getLenient().getConceptNid(),
+                RefsetAux.PATH_REFSET.getLenient().getNid(),
+                IdDirective.GENERATE_HASH);
         pathRefexBp.put(RefexCAB.RefexProperty.UUID1, conceptBp.getComponentUuid());
         pathRefexBp.setMemberUuid(UUID.randomUUID());
 
-        RefexCAB pathOriginRefexBp = new RefexCAB(TK_REFEX_TYPE.CID_INT, conceptBp.getComponentUuid(),
-            RefsetAux.PATH_ORIGIN_REFEST.getLenient().getNid(), null, null);
+        RefexCAB pathOriginRefexBp = new RefexCAB(TK_REFEX_TYPE.CID_INT, 
+                conceptBp.getComponentUuid(),
+                RefsetAux.PATH_ORIGIN_REFEST.getLenient().getNid(), 
+                null, 
+                null,
+                IdDirective.GENERATE_HASH,
+                RefexDirective.EXCLUDE); // :!!!:REVIEW
         pathOriginRefexBp.put(RefexCAB.RefexProperty.UUID1, originPathUuid);
         pathOriginRefexBp.put(RefexCAB.RefexProperty.INTEGER1, Integer.MAX_VALUE);
         pathRefexBp.setMemberUuid(UUID.randomUUID());
@@ -95,8 +107,13 @@ public class NewPathTest {
         // FIXME
         UUID originFromDevPathUuid = UUID.fromString("unknown origin path"); 
         
-        RefexCAB pathOriginRefexOtherBp = new RefexCAB(TK_REFEX_TYPE.CID_INT, originFromDevPathUuid,
-            RefsetAux.PATH_ORIGIN_REFEST.getLenient().getNid(), null, null);
+        RefexCAB pathOriginRefexOtherBp = new RefexCAB(TK_REFEX_TYPE.CID_INT, 
+                originFromDevPathUuid,
+                RefsetAux.PATH_ORIGIN_REFEST.getLenient().getNid(), 
+                null, 
+                null,
+                IdDirective.GENERATE_HASH,
+                RefexDirective.EXCLUDE); // :!!!:REVIEW
         pathOriginRefexOtherBp.put(RefexCAB.RefexProperty.UUID1, conceptBp.getComponentUuid());
         pathOriginRefexOtherBp.put(RefexCAB.RefexProperty.INTEGER1, Integer.MAX_VALUE);
         pathOriginRefexOtherBp.setMemberUuid(UUID.randomUUID());

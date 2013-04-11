@@ -22,6 +22,7 @@ import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.TerminologyBuilderBI;
+import org.ihtsdo.tk.api.blueprint.IdDirective;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB.RefexProperty;
@@ -81,7 +82,8 @@ public class CloneAndRetireAction extends AbstractAction {
                             newSpec = new RefexCAB(
                                 TK_REFEX_TYPE.CID,
                                 newDesc.getNid(),
-                                refex.getRefexNid());
+                                refex.getRefexNid(),
+                                IdDirective.GENERATE_HASH);
                             RefexNidVersionBI cv =
                                     (RefexNidVersionBI) refex.getVersion(config.getViewCoordinate());
                             int typeNid = cv.getNid1();
@@ -90,7 +92,8 @@ public class CloneAndRetireAction extends AbstractAction {
                             newSpec = new RefexCAB(
                                 TK_REFEX_TYPE.BOOLEAN,
                                 newDesc.getNid(),
-                                refex.getRefexNid());
+                                refex.getRefexNid(),
+                                IdDirective.GENERATE_HASH);
                             RefexBooleanVersionBI bv =
                                     (RefexBooleanVersionBI) refex.getVersion(config.getViewCoordinate());
                             boolean boolean1 = bv.getBoolean1();
@@ -99,7 +102,8 @@ public class CloneAndRetireAction extends AbstractAction {
                             newSpec = new RefexCAB(
                                 TK_REFEX_TYPE.STR,
                                 newDesc.getNid(),
-                                refex.getRefexNid());
+                                refex.getRefexNid(),
+                                IdDirective.GENERATE_HASH);
                             RefexStringVersionBI sv =
                                     (RefexStringVersionBI) refex.getVersion(config.getViewCoordinate());
                             String string1 = sv.getString1();
@@ -108,7 +112,8 @@ public class CloneAndRetireAction extends AbstractAction {
                             newSpec = new RefexCAB(
                                 TK_REFEX_TYPE.INT,
                                 newDesc.getNid(),
-                                refex.getRefexNid());
+                                refex.getRefexNid(),
+                                IdDirective.GENERATE_HASH);
                             RefexIntVersionBI iv =
                                     (RefexIntVersionBI) refex.getVersion(config.getViewCoordinate());
                             int int1 = iv.getInt1();

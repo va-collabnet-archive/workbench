@@ -75,6 +75,8 @@ public interface RelationshipVersionBI<A extends RelationshipAnalogBI>
     /**
      * @param viewCoordinate the view coordinate specifying which version of the
      * relationship to make a blueprint of
+     * @param idDirective 
+     * @param refexDirective 
      * @return the relationship blueprint, which can be constructed to create
      * a <code>RelationshipChronicleBI</code>
      * @throws IOException signals that an I/O exception has occurred
@@ -84,5 +86,6 @@ public interface RelationshipVersionBI<A extends RelationshipAnalogBI>
      * @see org.ihtsdo.tk.api.blueprint.CreateOrAmendBlueprint
      */
     @Override
-    public RelationshipCAB makeBlueprint(ViewCoordinate viewCoordinate) throws IOException, ContradictionException, InvalidCAB;
+    public RelationshipCAB makeBlueprint(ViewCoordinate viewCoordinate, org.ihtsdo.tk.api.blueprint.IdDirective idDirective, org.ihtsdo.tk.api.blueprint.RefexDirective refexDirective) 
+            throws IOException, ContradictionException, InvalidCAB;
 }

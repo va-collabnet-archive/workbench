@@ -75,9 +75,11 @@ import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.TerminologyBuilderBI;
 import org.ihtsdo.tk.api.blueprint.ConceptCB;
+import org.ihtsdo.tk.api.blueprint.IdDirective;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.blueprint.PathCB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
+import org.ihtsdo.tk.api.blueprint.RefexDirective;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.description.DescriptionChronicleBI;
@@ -537,7 +539,9 @@ public class PromotionEditorFrame extends ComponentFrame implements PropertyChan
                                 ComponentChronicleBI component = Ts.get().getComponent(allItr.nid());
                                 //add component to promotion refset
                                 RefexCAB promoteBp = new RefexCAB(TK_REFEX_TYPE.CID,
-                                        component.getNid(), mergePathConcept.getNid());
+                                        component.getNid(), 
+                                        mergePathConcept.getNid(),
+                                        IdDirective.GENERATE_HASH);
                                 promoteBp.put(RefexCAB.RefexProperty.CNID1, TermAux.UNREVIEWED.getLenient().getNid());
                                 builder.construct(promoteBp);
                                 //add to table
@@ -616,7 +620,7 @@ public class PromotionEditorFrame extends ComponentFrame implements PropertyChan
                                 RefexNidVersionBI member = (RefexNidVersionBI) m;
                                 if (member.getNid1() == TermAux.PROMOTE.getLenient().getConceptNid()
                                         || member.getNid1() == TermAux.UNREVIEWED.getLenient().getConceptNid()) {
-                                    RefexCAB memberBp = member.makeBlueprint(mergeVc);
+                                    RefexCAB memberBp = member.makeBlueprint(mergeVc, IdDirective.PRESERVE, RefexDirective.EXCLUDE);  // :!!!:REVIEW
                                     memberBp.put(RefexCAB.RefexProperty.CNID1, TermAux.PROMOTED.getLenient().getConceptNid());
                                     memberBp.setMemberUuid(member.getPrimUuid());
                                     builder.construct(memberBp);
@@ -683,7 +687,7 @@ public class PromotionEditorFrame extends ComponentFrame implements PropertyChan
                                 RefexNidVersionBI member = (RefexNidVersionBI) m;
                                 if (member.getNid1() == TermAux.PROMOTE.getLenient().getConceptNid()
                                         || member.getNid1() == TermAux.UNREVIEWED.getLenient().getConceptNid()) {
-                                    RefexCAB memberBp = member.makeBlueprint(mergeVc);
+                                    RefexCAB memberBp = member.makeBlueprint(mergeVc, IdDirective.PRESERVE, RefexDirective.EXCLUDE);  // :!!!:REVIEW
                                     memberBp.put(RefexCAB.RefexProperty.CNID1, TermAux.PROMOTED.getLenient().getConceptNid());
                                     memberBp.setMemberUuid(member.getPrimUuid());
                                     builder.construct(memberBp);
@@ -739,7 +743,7 @@ public class PromotionEditorFrame extends ComponentFrame implements PropertyChan
                             for (RefexVersionBI m : members) {
                                 RefexNidVersionBI member = (RefexNidVersionBI) m;
                                 if (member.getNid1() == TermAux.PROMOTE.getLenient().getConceptNid()) {
-                                    RefexCAB memberBp = member.makeBlueprint(mergeVc);
+                                    RefexCAB memberBp = member.makeBlueprint(mergeVc, IdDirective.PRESERVE, RefexDirective.EXCLUDE);  // :!!!:REVIEW
                                     nidsToPromote.setMember(Ts.get().getConceptNidForNid(member.getReferencedComponentNid()));
                                     memberBp.put(RefexCAB.RefexProperty.CNID1, TermAux.PROMOTED.getLenient().getConceptNid());
                                     memberBp.setMemberUuid(member.getPrimUuid());
@@ -806,7 +810,7 @@ public class PromotionEditorFrame extends ComponentFrame implements PropertyChan
                             for (RefexVersionBI m : members) {
                                 RefexNidVersionBI member = (RefexNidVersionBI) m;
                                 if (member.getNid1() == TermAux.PROMOTE.getLenient().getConceptNid()) {
-                                    RefexCAB memberBp = member.makeBlueprint(mergeVc);
+                                    RefexCAB memberBp = member.makeBlueprint(mergeVc, IdDirective.PRESERVE, RefexDirective.EXCLUDE);  // :!!!:REVIEW
                                     nidsToPromote.setMember(Ts.get().getConceptNidForNid(member.getReferencedComponentNid()));
                                     memberBp.put(RefexCAB.RefexProperty.CNID1, TermAux.PROMOTED.getLenient().getConceptNid());
                                     memberBp.setMemberUuid(member.getPrimUuid());
@@ -956,18 +960,24 @@ public class PromotionEditorFrame extends ComponentFrame implements PropertyChan
                 pathName,
                 LANG_CODE.EN,
                 ArchitectonicAuxiliary.Concept.IS_A_REL.getPrimoridalUid(),
+                IdDirective.GENERATE_HASH,
                 ArchitectonicAuxiliary.Concept.RELEASE.getPrimoridalUid());
         pathConceptBp.setComponentUuid(pathUUID);
 
         RefexCAB pathRefexBp = new RefexCAB(TK_REFEX_TYPE.CID,
                 TermAux.PATH.getLenient().getConceptNid(),
-                RefsetAux.PATH_REFSET.getLenient().getNid());
+                RefsetAux.PATH_REFSET.getLenient().getNid(),
+                IdDirective.GENERATE_HASH); // :!!!:REVIEW
         pathRefexBp.put(RefexCAB.RefexProperty.UUID1, pathConceptBp.getComponentUuid());
         pathRefexBp.setMemberUuid(UUID.randomUUID());
 
         RefexCAB pathOriginRefexBp = new RefexCAB(TK_REFEX_TYPE.CID_INT,
                 pathConceptBp.getComponentUuid(),
-                RefsetAux.PATH_ORIGIN_REFEST.getLenient().getNid(), null, null);
+                RefsetAux.PATH_ORIGIN_REFEST.getLenient().getNid(), 
+                null, 
+                null,
+                IdDirective.GENERATE_HASH,
+                RefexDirective.EXCLUDE); // :!!!:REVIEW
         pathOriginRefexBp.put(RefexCAB.RefexProperty.UUID1, Ts.get().getUuidPrimordialForNid(originPath.getConceptNid()));
         pathOriginRefexBp.put(RefexCAB.RefexProperty.INTEGER1, Integer.MAX_VALUE);
         pathRefexBp.setMemberUuid(UUID.randomUUID());

@@ -12,6 +12,7 @@ import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.TerminologyBuilderBI;
 import org.ihtsdo.tk.api.TerminologyStoreDI;
 import org.ihtsdo.tk.api.blueprint.DescriptionCAB;
+import org.ihtsdo.tk.api.blueprint.IdDirective;
 import org.ihtsdo.tk.api.blueprint.RelationshipCAB;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.description.DescriptionChronicleBI;
@@ -42,7 +43,12 @@ public class ModifyComponentTest {
         
         int synonymTypeNid = SnomedMetadataRf2.SYNONYM_RF2.getLenient().getNid();
         
-        DescriptionCAB descBlueprint = new DescriptionCAB(concept.getConceptNid(), synonymTypeNid, LANG_CODE.EN_AU, "NAF Description", false);
+        DescriptionCAB descBlueprint = new DescriptionCAB(concept.getConceptNid(), 
+                synonymTypeNid, 
+                LANG_CODE.EN_AU, 
+                "NAF Description", 
+                false, 
+                IdDirective.GENERATE_HASH);
         
         TerminologyStoreDI termStore = Ts.get();
         I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
@@ -70,7 +76,7 @@ public class ModifyComponentTest {
         
         int relTypeNid = SnomedRelationshipType.FINDING_SITE.getLenient().getNid();
         
-        RelationshipCAB relBlueprint = new RelationshipCAB(concept.getConceptNid(), relTypeNid, digestiveOrgan.getNid(), 0, TkRelationshipType.STATED_ROLE);
+        RelationshipCAB relBlueprint = new RelationshipCAB(concept.getConceptNid(), relTypeNid, digestiveOrgan.getNid(), 0, TkRelationshipType.STATED_ROLE, IdDirective.GENERATE_HASH);
         
         I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
 

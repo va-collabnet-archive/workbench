@@ -27,6 +27,7 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.TerminologyBuilderBI;
+import org.ihtsdo.tk.api.blueprint.IdDirective;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB.RefexProperty;
 import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
@@ -73,6 +74,7 @@ public class PromotionAndAssignmentRefset extends PromotionRefset {
     /* (non-Javadoc)
      * @see org.ihtsdo.project.refset.PromotionRefset#getLastPromotionTuple(int, org.dwfa.ace.api.I_ConfigAceFrame)
      */
+    @Override
     public RefexVersionBI getLastPromotionTuple(int componentId, I_ConfigAceFrame config) throws TerminologyException, IOException {
         I_GetConceptData component = termFactory.getConcept(componentId);
         Collection<? extends RefexChronicleBI<?>> members = component.getAnnotations();
@@ -92,6 +94,7 @@ public class PromotionAndAssignmentRefset extends PromotionRefset {
     /* (non-Javadoc)
      * @see org.ihtsdo.project.refset.PromotionRefset#getPromotionStatus(int, org.dwfa.ace.api.I_ConfigAceFrame)
      */
+    @Override
     public I_GetConceptData getPromotionStatus(int componentId, I_ConfigAceFrame config) throws IOException, TerminologyException {
         RefexVersionBI lastTuple = getLastPromotionTuple(componentId, config);
         if (lastTuple == null) {
@@ -124,6 +127,7 @@ public class PromotionAndAssignmentRefset extends PromotionRefset {
     /* (non-Javadoc)
      * @see org.ihtsdo.project.refset.PromotionRefset#getLastStatusTime(int, org.dwfa.ace.api.I_ConfigAceFrame)
      */
+    @Override
     public Long getLastStatusTime(int componentId, I_ConfigAceFrame config) throws IOException, TerminologyException {
         RefexVersionBI lastTuple = getLastPromotionTuple(componentId, config);
         if (lastTuple == null) {
@@ -137,6 +141,7 @@ public class PromotionAndAssignmentRefset extends PromotionRefset {
     /* (non-Javadoc)
      * @see org.ihtsdo.project.refset.PromotionRefset#getLastPromotionAuthor(int, org.dwfa.ace.api.I_ConfigAceFrame)
      */
+    @Override
     public I_GetConceptData getLastPromotionAuthor(int componentId, I_ConfigAceFrame config) throws IOException, TerminologyException {
         RefexVersionBI lastTuple = getLastPromotionTuple(componentId, config);
         if (lastTuple == null) {
@@ -150,6 +155,7 @@ public class PromotionAndAssignmentRefset extends PromotionRefset {
     /* (non-Javadoc)
      * @see org.ihtsdo.project.refset.PromotionRefset#getPreviousPromotionStatus(int, org.dwfa.ace.api.I_ConfigAceFrame)
      */
+    @Override
     public I_GetConceptData getPreviousPromotionStatus(int componentId, I_ConfigAceFrame config) throws IOException, TerminologyException {
         I_GetConceptData component = termFactory.getConcept(componentId);
         Collection<? extends RefexChronicleBI<?>> members = component.getAnnotations();
@@ -209,6 +215,7 @@ public class PromotionAndAssignmentRefset extends PromotionRefset {
     /* (non-Javadoc)
      * @see org.ihtsdo.project.refset.PromotionRefset#getPreviousStatusTime(int, org.dwfa.ace.api.I_ConfigAceFrame)
      */
+    @Override
     public Long getPreviousStatusTime(int componentId, I_ConfigAceFrame config) throws IOException, TerminologyException {
         I_GetConceptData component = termFactory.getConcept(componentId);
         Collection<? extends RefexChronicleBI<?>> members = component.getAnnotations();
@@ -236,6 +243,7 @@ public class PromotionAndAssignmentRefset extends PromotionRefset {
     /* (non-Javadoc)
      * @see org.ihtsdo.project.refset.PromotionRefset#setPromotionStatus(int, int)
      */
+    @Override
     public void setPromotionStatus(int componentId, int statusConceptId) throws Exception {
         I_ConfigAceFrame config = termFactory.getActiveAceFrameConfig();
         TerminologyBuilderBI tc = Ts.get().getTerminologyBuilder(config.getEditCoordinate(), config.getViewCoordinate());
@@ -252,7 +260,8 @@ public class PromotionAndAssignmentRefset extends PromotionRefset {
             RefexCAB newSpec = new RefexCAB(
                     TK_REFEX_TYPE.CID_CID,
                     componentId,
-                    refsetId);
+                    refsetId,
+                    IdDirective.GENERATE_HASH);
             newSpec.put(RefexProperty.CNID1, statusConceptId);
             newSpec.put(RefexProperty.CNID2, oldStatusCC.getNid2());
             RefexChronicleBI<?> newRefex = tc.constructIfNotCurrent(newSpec);
@@ -319,7 +328,8 @@ public class PromotionAndAssignmentRefset extends PromotionRefset {
             RefexCAB newSpec = new RefexCAB(
                     TK_REFEX_TYPE.CID_CID,
                     componentId,
-                    refsetId);
+                    refsetId,
+                    IdDirective.GENERATE_HASH);
             newSpec.put(RefexProperty.CNID1, statusConceptId);
             newSpec.put(RefexProperty.CNID2, defaultUserNid);
             RefexChronicleBI<?> newRefex = tc.construct(newSpec);
@@ -354,7 +364,8 @@ public class PromotionAndAssignmentRefset extends PromotionRefset {
             RefexCAB newSpec = new RefexCAB(
                     TK_REFEX_TYPE.CID_CID,
                     componentId,
-                    refsetId);
+                    refsetId,
+                    IdDirective.GENERATE_HASH);
             newSpec.put(RefexProperty.CNID1, oldStatusCC.getNid1());
             newSpec.put(RefexProperty.CNID2, destinationUserConceptId);
             RefexChronicleBI<?> newRefex = tc.constructIfNotCurrent(newSpec);
@@ -409,7 +420,8 @@ public class PromotionAndAssignmentRefset extends PromotionRefset {
             RefexCAB newSpec = new RefexCAB(
                     TK_REFEX_TYPE.CID_CID,
                     componentId,
-                    refsetId);
+                    refsetId,
+                    IdDirective.GENERATE_HASH);
             newSpec.put(RefexProperty.CNID1, defaultStatusNid);
             newSpec.put(RefexProperty.CNID2, destinationUserConceptId);
             RefexChronicleBI<?> newRefex = tc.construct(newSpec);
@@ -445,7 +457,8 @@ public class PromotionAndAssignmentRefset extends PromotionRefset {
             RefexCAB newSpec = new RefexCAB(
                     TK_REFEX_TYPE.CID_CID,
                     componentId,
-                    refsetId);
+                    refsetId,
+                    IdDirective.GENERATE_HASH);
             newSpec.put(RefexProperty.CNID1, statusConceptId);
             newSpec.put(RefexProperty.CNID2, destinationUserConceptId);
             RefexChronicleBI<?> newRefex = tc.constructIfNotCurrent(newSpec);
@@ -504,7 +517,8 @@ public class PromotionAndAssignmentRefset extends PromotionRefset {
             RefexCAB newSpec = new RefexCAB(
                     TK_REFEX_TYPE.CID_CID,
                     componentId,
-                    refsetId);
+                    refsetId,
+                    IdDirective.GENERATE_HASH);
             newSpec.put(RefexProperty.CNID1, statusConceptId);
             newSpec.put(RefexProperty.CNID2, destinationUserConceptId);
             RefexChronicleBI<?> newRefex = tc.construct(newSpec);

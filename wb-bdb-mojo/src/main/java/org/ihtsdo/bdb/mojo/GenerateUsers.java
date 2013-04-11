@@ -43,7 +43,6 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.commit.AlertToDataConstraintFailure;
 import org.dwfa.bpa.process.TaskFailedException;
-import org.dwfa.bpa.util.AppInfoProperties;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.id.Type5UuidFactory;
@@ -102,6 +101,7 @@ import java.util.UUID;
 import java.util.logging.Level;
 
 import javax.swing.JOptionPane;
+import org.ihtsdo.tk.api.blueprint.IdDirective;
 import org.ihtsdo.ttk.queue.QueueAddress;
 
 /**
@@ -240,7 +240,8 @@ public class GenerateUsers extends AbstractMojo {
          RelationshipCAB relCab = new RelationshipCAB(user.getPrimUuid(),
                                      UUID.fromString(typeUid),
                                      UUID.fromString(targetUid), 0,
-                                     TkRelationshipType.STATED_ROLE);
+                                     TkRelationshipType.STATED_ROLE,
+                                     IdDirective.GENERATE_HASH);
 
          Ts.get().getTerminologyBuilder(
              config.getEditCoordinate(),
@@ -275,14 +276,12 @@ public class GenerateUsers extends AbstractMojo {
       }
 
       if (!found) {
-         RelationshipCAB wfRelBp =
-            new RelationshipCAB(userConcept.getPrimUuid(),
-                                ArchitectonicAuxiliary.Concept
-                                   .WORKFLOW_EDITOR_STATUS
-                                   .getPrimoridalUid(), ArchitectonicAuxiliary
-                                   .Concept.WORKFLOW_ACTIVE_MODELER
-                                   .getPrimoridalUid(), 0,
-                                      TkRelationshipType.STATED_ROLE);
+          RelationshipCAB wfRelBp = new RelationshipCAB(userConcept.getPrimUuid(),
+                  ArchitectonicAuxiliary.Concept.WORKFLOW_EDITOR_STATUS.getPrimoridalUid(), 
+                  ArchitectonicAuxiliary.Concept.WORKFLOW_ACTIVE_MODELER.getPrimoridalUid(), 
+                  0,
+                  TkRelationshipType.STATED_ROLE,
+                  IdDirective.GENERATE_HASH);
          ViewCoordinate vc    = userConfig.getViewCoordinate();
          EditCoordinate oldEc = userConfig.getEditCoordinate();
          EditCoordinate ec    = new EditCoordinate(oldEc.getAuthorNid(),
@@ -334,6 +333,7 @@ public class GenerateUsers extends AbstractMojo {
          userConceptBp = new ConceptCB(userConfig.getDbConfig().getFullName(),
                                        userConfig.getUsername(), LANG_CODE.EN,
                                        TermAux.IS_A.getLenient().getPrimUuid(),
+                                       IdDirective.GENERATE_HASH,
                                        userParent.getLenient().getPrimUuid());
 
          // Needs a description record...
@@ -341,17 +341,18 @@ public class GenerateUsers extends AbstractMojo {
             new DescriptionCAB(userConceptBp.getComponentUuid(),
                                queueDescriptionType.getLenient().getPrimUuid(),
                                LANG_CODE.EN,
-                               userConfig.getUsername() + ".inbox", false);
+                               userConfig.getUsername() + ".inbox", 
+                               false,
+                               IdDirective.GENERATE_HASH);
 
          // add workflow relationship
          RelationshipCAB wfRelBp =
             new RelationshipCAB(userConceptBp.getComponentUuid(),
-                                ArchitectonicAuxiliary.Concept
-                                   .WORKFLOW_EDITOR_STATUS
-                                   .getPrimoridalUid(), ArchitectonicAuxiliary
-                                   .Concept.WORKFLOW_ACTIVE_MODELER
-                                   .getPrimoridalUid(), 0,
-                                      TkRelationshipType.STATED_ROLE);
+                ArchitectonicAuxiliary.Concept.WORKFLOW_EDITOR_STATUS.getPrimoridalUid(), 
+                 ArchitectonicAuxiliary.Concept.WORKFLOW_ACTIVE_MODELER.getPrimoridalUid(), 
+                 0,                     
+                 TkRelationshipType.STATED_ROLE,
+                 IdDirective.GENERATE_HASH);
          ViewCoordinate vc    = userConfig.getViewCoordinate();
          EditCoordinate oldEc = userConfig.getEditCoordinate();
          EditCoordinate ec    = new EditCoordinate(oldEc.getAuthorNid(),
@@ -753,7 +754,7 @@ NEXT_WHILE:
          tf.getPath(Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC,
                                          this.projectDevelopmentViewPathFsn));
       PositionBI      viewPosition = tf.newPosition(viewPath, Long.MAX_VALUE);
-      Set<PositionBI> viewSet      = new HashSet<PositionBI>();
+      Set<PositionBI> viewSet      = new HashSet<>();
 
       viewSet.add(viewPosition);
       activeConfig.setViewPositions(viewSet);
@@ -1042,8 +1043,7 @@ NEXT_WHILE:
                            + newDbProfile
                               .getChangeSetWriterFileName()), ChangeSetGenerationPolicy
                                  .MUTABLE_ONLY);
-            List<ChangeSetGeneratorBI> extraGeneratorList =
-               new ArrayList<ChangeSetGeneratorBI>();
+            List<ChangeSetGeneratorBI> extraGeneratorList = new ArrayList<>();
 
             extraGeneratorList.add(generator);
             Ts.get().addChangeSetGenerator(tempKey, generator);
@@ -1178,7 +1178,8 @@ NEXT_WHILE:
          new DescriptionCAB(userConcept.getPrimUuid(),
                             queueDescriptionType.getLenient().getPrimUuid(),
                             LANG_CODE.EN, userConfig.getUsername() + ".inbox",
-                            false);
+                            false,
+                            IdDirective.GENERATE_HASH);
       ViewCoordinate vc    = userConfig.getViewCoordinate();
       EditCoordinate oldEc = userConfig.getEditCoordinate();
       EditCoordinate ec    = new EditCoordinate(oldEc.getAuthorNid(),

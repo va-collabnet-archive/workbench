@@ -21,7 +21,9 @@ import org.ihtsdo.tk.api.AnalogGeneratorBI;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.blueprint.ConceptAttributeAB;
+import org.ihtsdo.tk.api.blueprint.IdDirective;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
+import org.ihtsdo.tk.api.blueprint.RefexDirective;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 
 /**
@@ -45,11 +47,17 @@ public interface ConceptAttributeVersionBI<A extends ConceptAttributeAnalogBI>
     /**
      * 
      * @param viewCoordinate specifying which version of the concept attributes to use for the blueprint
+     * @param idDirective 
+     * @param refexDirective 
      * @return the concept attribute blueprint which can be constructed to create a <code>ConceptAttributeChronicleBI</code>
      * @throws IOException signals that an I/O exception has occurred
      * @throws ContradictionException if more than one version is returned
      * @throws InvalidCAB if the any of the values in blueprint to make are invalid
      */
     @Override
-    public ConceptAttributeAB makeBlueprint(ViewCoordinate viewCoordinate) throws IOException, ContradictionException, InvalidCAB;
+    public ConceptAttributeAB makeBlueprint(
+            ViewCoordinate viewCoordinate, 
+            IdDirective idDirective, 
+            RefexDirective refexDirective) 
+            throws IOException, ContradictionException, InvalidCAB;
 }

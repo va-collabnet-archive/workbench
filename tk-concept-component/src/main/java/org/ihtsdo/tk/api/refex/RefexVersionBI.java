@@ -55,7 +55,7 @@ public interface RefexVersionBI<A extends RefexAnalogBI<A>>
      * @see org.ihtsdo.tk.api.blueprint.CreateOrAmendBlueprint
      */
     @Override
-    RefexCAB makeBlueprint(ViewCoordinate viewCoordinate) throws IOException, InvalidCAB, ContradictionException;
+    RefexCAB makeBlueprint(ViewCoordinate viewCoordinate, org.ihtsdo.tk.api.blueprint.IdDirective idDirective, org.ihtsdo.tk.api.blueprint.RefexDirective refexDirective) throws IOException, InvalidCAB, ContradictionException;
 
     /**
      * Gets the active version of this refex version in the form of a TK Refex Member.

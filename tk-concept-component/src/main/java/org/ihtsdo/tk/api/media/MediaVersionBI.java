@@ -75,6 +75,7 @@ public interface MediaVersionBI<A extends MediaAnalogBI>
      * @see org.ihtsdo.tk.api.blueprint.CreateOrAmendBlueprint
      */
     @Override
-    public MediaCAB makeBlueprint(ViewCoordinate viewCoordinate) throws IOException, ContradictionException, InvalidCAB;
+    public MediaCAB makeBlueprint(ViewCoordinate viewCoordinate, org.ihtsdo.tk.api.blueprint.IdDirective idDirective, org.ihtsdo.tk.api.blueprint.RefexDirective refexDirective) 
+            throws IOException, ContradictionException, InvalidCAB;
 
 }

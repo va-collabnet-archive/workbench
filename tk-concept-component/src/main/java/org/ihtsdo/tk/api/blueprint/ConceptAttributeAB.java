@@ -46,6 +46,7 @@ public class ConceptAttributeAB extends CreateOrAmendBlueprint {
      *
      * @param conceptNid the enclosing concept nid
      * @param defined set to <code>true</code> to mark the concept as defined
+     * @param refexDirective 
      * @throws IOException signals that an I/O exception has occurred
      * @throws InvalidCAB if the any of the values in blueprint to make are
      * invalid
@@ -53,10 +54,10 @@ public class ConceptAttributeAB extends CreateOrAmendBlueprint {
      * given position or view coordinate
      */
     public ConceptAttributeAB(
-            int conceptNid, boolean defined)
+            int conceptNid, boolean defined, RefexDirective refexDirective)
             throws IOException, InvalidCAB, ContradictionException {
         this(Ts.get().getComponent(conceptNid).getPrimUuid(),
-                defined, null, null);
+                defined, null, null, refexDirective);
     }
 
     /**
@@ -70,6 +71,7 @@ public class ConceptAttributeAB extends CreateOrAmendBlueprint {
      * pattern
      * @param viewCoordinate the view coordinate specifying which versions are
      * active and inactive
+     * @param refexDirective 
      * @throws IOException signals that an I/O exception has occurred
      * @throws InvalidCAB if the any of the values in blueprint to make are
      * invalid
@@ -77,10 +79,12 @@ public class ConceptAttributeAB extends CreateOrAmendBlueprint {
      * given position or view coordinate
      */
     public ConceptAttributeAB(
-            int conceptNid, boolean defined, ConceptAttributeVersionBI conceptAttributeVersion,
-            ViewCoordinate viewCoordinate) throws IOException, InvalidCAB, ContradictionException {
+            int conceptNid, boolean defined, 
+            ConceptAttributeVersionBI conceptAttributeVersion,
+            ViewCoordinate viewCoordinate, RefexDirective refexDirective) 
+            throws IOException, InvalidCAB, ContradictionException {
         this(Ts.get().getComponent(conceptNid).getPrimUuid(),
-                defined, conceptAttributeVersion, viewCoordinate);
+                defined, conceptAttributeVersion, viewCoordinate, refexDirective);
     }
 
     /**
@@ -92,6 +96,7 @@ public class ConceptAttributeAB extends CreateOrAmendBlueprint {
      * pattern
      * @param viewCoordinate the view coordinate specifying which versions are
      * active and inactive
+     * @param  refexDirective 
      * @throws IOException signals that an I/O exception has occurred
      * @throws InvalidCAB if the any of the values in blueprint to make are
      * invalid
@@ -99,9 +104,14 @@ public class ConceptAttributeAB extends CreateOrAmendBlueprint {
      * given position or view coordinate
      */
     public ConceptAttributeAB(
-            UUID componentUuid, boolean defined, ConceptAttributeVersionBI conceptAttributeVersion,
-            ViewCoordinate viewCoordinate) throws IOException, InvalidCAB, ContradictionException {
-        super(componentUuid, conceptAttributeVersion, viewCoordinate);
+            UUID componentUuid, 
+            boolean defined, 
+            ConceptAttributeVersionBI conceptAttributeVersion,
+            ViewCoordinate viewCoordinate,
+            RefexDirective refexDirective) 
+            throws IOException, InvalidCAB, ContradictionException {
+        super(componentUuid, conceptAttributeVersion, viewCoordinate, 
+                IdDirective.PRESERVE, refexDirective);
         this.defined = defined;
     }
 

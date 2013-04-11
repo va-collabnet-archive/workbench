@@ -3,7 +3,6 @@ package org.ihtsdo.concept.component.refset;
 //~--- non-JDK imports --------------------------------------------------------
 import com.sleepycat.bind.tuple.TupleInput;
 
-import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 
 import org.ihtsdo.concept.component.Revision;
@@ -22,8 +21,9 @@ import java.io.IOException;
 import java.util.Set;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ContradictionException;
-import org.ihtsdo.tk.api.blueprint.CreateOrAmendBlueprint;
+import org.ihtsdo.tk.api.blueprint.IdDirective;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
+import org.ihtsdo.tk.api.blueprint.RefexDirective;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 
@@ -142,12 +142,16 @@ public abstract class RefsetRevision<V extends RefsetRevision<V, C>, C extends R
     }
 
     @Override
-    public RefexCAB makeBlueprint(ViewCoordinate vc) throws IOException,
+    public RefexCAB makeBlueprint(ViewCoordinate vc, IdDirective idDirective, RefexDirective refexDirective) 
+            throws IOException,
             InvalidCAB, ContradictionException {
         RefexCAB rcs = new RefexCAB(getTkRefsetType(),
                 Ts.get().getUuidPrimordialForNid(getReferencedComponentNid()),
                 getRefexNid(),
-                getVersion(vc), vc);
+                getVersion(vc), 
+                vc, 
+                idDirective, 
+                refexDirective);
 
         addSpecProperties(rcs);
 

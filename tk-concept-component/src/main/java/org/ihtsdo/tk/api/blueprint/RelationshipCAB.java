@@ -68,12 +68,15 @@ public class RelationshipCAB extends CreateOrAmendBlueprint {
      * view coordinate
      */
     public RelationshipCAB(
-            int sourceNid, int typeNid, int targetNid, int group, TkRelationshipType relationshipType)
+            int sourceNid, int typeNid, int targetNid, int group, 
+            TkRelationshipType relationshipType,
+            IdDirective idDirective)
             throws IOException, InvalidCAB, ContradictionException {
         this(Ts.get().getComponent(sourceNid).getPrimUuid(),
                 Ts.get().getComponent(typeNid).getPrimUuid(),
                 Ts.get().getComponent(targetNid).getPrimUuid(),
-                group, null, relationshipType, null, null);
+                group, null, relationshipType, null, null,
+                idDirective, RefexDirective.EXCLUDE);
     }
 
     /**
@@ -94,9 +97,16 @@ public class RelationshipCAB extends CreateOrAmendBlueprint {
      * view coordinate
      */
     public RelationshipCAB(
-            UUID sourceUuid, UUID typeUuid, UUID targetUuid, int group, TkRelationshipType relationshipType)
+            UUID sourceUuid, UUID typeUuid, UUID targetUuid, int group, 
+            TkRelationshipType relationshipType,
+            IdDirective idDirective)
             throws IOException, InvalidCAB, ContradictionException {
-        this(sourceUuid, typeUuid, targetUuid, group, null, relationshipType, null, null);
+        this(sourceUuid, typeUuid, targetUuid, group, null, 
+                relationshipType, 
+                null, 
+                null,
+                idDirective, 
+                RefexDirective.EXCLUDE);
     }
 
     /**
@@ -114,6 +124,8 @@ public class RelationshipCAB extends CreateOrAmendBlueprint {
      * @param relationshipVersion the relationship version to use as a pattern
      * @param viewCoordinate the view coordinate specifying which versions are
      * active and inactive
+     * @param idDirective 
+     * @param refexDirective 
      * @throws IOException signals that an I/O exception has occurred
      * @throws InvalidCAB if the any of the values in blueprint to make are
      * invalid
@@ -121,12 +133,20 @@ public class RelationshipCAB extends CreateOrAmendBlueprint {
      * view coordinate
      */
     public RelationshipCAB(
-            int sourceNid, int typeNid, int targetNid, int group, TkRelationshipType relationshipType,
-            RelationshipVersionBI relationshipVersion, ViewCoordinate viewCoordinate) throws IOException, InvalidCAB, ContradictionException {
+            int sourceNid, int typeNid, int targetNid, int group, 
+            TkRelationshipType relationshipType,
+            RelationshipVersionBI relationshipVersion, 
+            ViewCoordinate viewCoordinate,
+            IdDirective idDirective,
+            RefexDirective refexDirective) 
+            throws IOException, InvalidCAB, ContradictionException {
         this(Ts.get().getComponent(sourceNid).getPrimUuid(),
                 Ts.get().getComponent(typeNid).getPrimUuid(),
                 Ts.get().getComponent(targetNid).getPrimUuid(),
-                group, null, relationshipType, relationshipVersion, viewCoordinate);
+                group, null, relationshipType, relationshipVersion, 
+                viewCoordinate,
+                idDirective, 
+                refexDirective);
     }
 
     /**
@@ -144,6 +164,8 @@ public class RelationshipCAB extends CreateOrAmendBlueprint {
      * @param relationshipVersion the relationship version to use as a pattern
      * @param viewCoordinate the view coordinate specifying which versions are
      * active and inactive
+     * @param idDirective 
+     * @param refexDirective 
      * @throws IOException signals that an I/O exception has occurred
      * @throws InvalidCAB if the any of the values in blueprint to make are
      * invalid
@@ -153,8 +175,16 @@ public class RelationshipCAB extends CreateOrAmendBlueprint {
     public RelationshipCAB(
             UUID sourceUuid, UUID typeUuid, UUID targetUuid, int group,
             TkRelationshipType relationshipType, RelationshipVersionBI relationshipVersion,
-            ViewCoordinate viewCoordinate) throws IOException, InvalidCAB, ContradictionException {
-        this(sourceUuid, typeUuid, targetUuid, group, null, relationshipType, relationshipVersion, viewCoordinate);
+            ViewCoordinate viewCoordinate,
+            IdDirective idDirective,
+            RefexDirective refexDirective) 
+            throws IOException, InvalidCAB, ContradictionException {
+        this(sourceUuid, typeUuid, targetUuid, group, null, 
+                relationshipType, 
+                relationshipVersion, 
+                viewCoordinate,
+                idDirective, 
+                refexDirective);
     }
 
     /**
@@ -174,6 +204,8 @@ public class RelationshipCAB extends CreateOrAmendBlueprint {
      * @param relationshipVersion the relationship version to use as a pattern
      * @param viewCoordinate the view coordinate specifying which versions are
      * active and inactive
+     * @param idDirective 
+     * @param refexDirective 
      * @throws IOException signals that an I/O exception has occurred
      * @throws InvalidCAB if the any of the values in blueprint to make are
      * invalid
@@ -183,8 +215,10 @@ public class RelationshipCAB extends CreateOrAmendBlueprint {
     public RelationshipCAB(
             UUID sourceUuid, UUID typeUuid, UUID targetUuid, int group,
             UUID componentUuid, TkRelationshipType relationshipType, RelationshipVersionBI relationshipVersion,
-            ViewCoordinate viewCoordinate) throws IOException, InvalidCAB, ContradictionException {
-        super(componentUuid, relationshipVersion, viewCoordinate);
+            ViewCoordinate viewCoordinate,
+            IdDirective idDirective,
+            RefexDirective refexDirective) throws IOException, InvalidCAB, ContradictionException {
+        super(componentUuid, relationshipVersion, viewCoordinate, idDirective, refexDirective);
         assert sourceUuid != null;
         assert typeUuid != null;
         assert targetUuid != null;
@@ -236,11 +270,7 @@ public class RelationshipCAB extends CreateOrAmendBlueprint {
         if (getComponentUuid() == null) {
             try {
                 recomputeUuid();
-            } catch (IOException ex) {
-                throw new RuntimeException(ex);
-            } catch (InvalidCAB ex) {
-                throw new RuntimeException(ex);
-            } catch (NoSuchAlgorithmException ex) {
+            } catch (IOException | InvalidCAB | NoSuchAlgorithmException ex) {
                 throw new RuntimeException(ex);
             }
         }
@@ -263,11 +293,26 @@ public class RelationshipCAB extends CreateOrAmendBlueprint {
      */
     @Override
     public void recomputeUuid() throws NoSuchAlgorithmException, UnsupportedEncodingException, IOException, InvalidCAB, ContradictionException {
-        setComponentUuid(UuidT5Generator.get(relSpecNamespace,
-                getPrimoridalUuidString(sourceUuid)
-                + getPrimoridalUuidString(typeUuid)
-                + getPrimoridalUuidString(destUuid)
-                + group));
+        switch (idDirective) {
+            case PRESERVE_CONCEPT_REST_HASH:
+            case GENERATE_RANDOM_CONCEPT_REST_HASH:
+            case GENERATE_HASH:
+            case GENERATE_REFEX_CONTENT_HASH:
+                setComponentUuid(UuidT5Generator.get(relSpecNamespace,
+                        getPrimoridalUuidString(sourceUuid)
+                        + getPrimoridalUuidString(typeUuid)
+                        + getPrimoridalUuidString(destUuid)
+                        + group));
+                break;
+            case GENERATE_RANDOM:
+                setComponentUuidNoRecompute(UUID.randomUUID());
+                break;
+
+            case PRESERVE:
+            default:
+            // nothing to do...
+
+        }
         for (RefexCAB annotBp : getAnnotationBlueprints()) {
             annotBp.setReferencedComponentUuid(getComponentUuid());
             annotBp.recomputeUuid();

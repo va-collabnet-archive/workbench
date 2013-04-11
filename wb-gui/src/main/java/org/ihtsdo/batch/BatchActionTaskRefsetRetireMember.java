@@ -20,8 +20,10 @@ import java.io.IOException;
 import java.util.Collection;
 import org.ihtsdo.batch.BatchActionEvent.BatchActionEventType;
 import org.ihtsdo.tk.api.ContradictionException;
+import org.ihtsdo.tk.api.blueprint.IdDirective;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
+import org.ihtsdo.tk.api.blueprint.RefexDirective;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
@@ -96,7 +98,7 @@ public class BatchActionTaskRefsetRetireMember extends BatchActionTask {
                             "retired member of: " + nidToName(collectionNid)));
                 } else {
                     // CHECK FILTER
-                    RefexCAB spec = rvbi.makeBlueprint(vc);
+                    RefexCAB spec = rvbi.makeBlueprint(vc, IdDirective.PRESERVE, RefexDirective.EXCLUDE);
                     boolean matched = false;
                     switch (refsetType) {
                         case BOOLEAN:

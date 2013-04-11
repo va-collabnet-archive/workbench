@@ -32,7 +32,9 @@ import org.ihtsdo.tk.api.ComponentChronicleBI;
 import org.ihtsdo.tk.api.NidBitSetBI;
 import org.ihtsdo.tk.api.NidBitSetItrBI;
 import org.ihtsdo.tk.api.TerminologyBuilderBI;
+import org.ihtsdo.tk.api.blueprint.IdDirective;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
+import org.ihtsdo.tk.api.blueprint.RefexDirective;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.cs.ChangeSetPolicy;
@@ -70,6 +72,7 @@ public class ContradictionFinderLessSwingWorker
             updateTimer.start();
         }
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             if (continueWork == false) {
                 updateTimer.stop();
@@ -79,6 +82,7 @@ public class ContradictionFinderLessSwingWorker
 
     /* ContradictionFinderStopActionListener */
     private class ContradictionFinderStopActionListener implements ActionListener {
+        @Override
         public void actionPerformed(ActionEvent e) {
             try {
             	String displayString = "User has canceled Identification operation.";
@@ -123,6 +127,7 @@ public class ContradictionFinderLessSwingWorker
             updateTimer.start();
         }
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             if (continueWork) {
                 // If running
@@ -252,7 +257,7 @@ public class ContradictionFinderLessSwingWorker
         // Iterate in Parallel
         int commitRecRefsetNid = Ts.get().getNidForUuids(RefsetAuxiliary.Concept.COMMIT_RECORD.getUids());
         int adjRecRefsetNid = Ts.get().getNidForUuids(RefsetAuxiliary.Concept.ADJUDICATION_RECORD.getUids());
-        List<MultiEditorContradictionCase> cases = new ArrayList<MultiEditorContradictionCase>();
+        List<MultiEditorContradictionCase> cases = new ArrayList<>();
         MultiEditorContradictionDetector mecd;
         mecd = new MultiEditorContradictionDetector(commitRecRefsetNid,
                 adjRecRefsetNid,
@@ -272,7 +277,7 @@ public class ContradictionFinderLessSwingWorker
         }
 
         // Done, get results
-        Set<Integer> returnSet = new HashSet<Integer>();   
+        Set<Integer> returnSet = new HashSet<>();   
         int conflictRefsetNid = Ts.get().getNidForUuids(RefsetAuxiliary.Concept.CONFLICT_RECORD.getUids());
         ConceptChronicleBI conflictRefset = Ts.get().getConceptForNid(conflictRefsetNid);
         TerminologyBuilderBI builder = 
@@ -300,7 +305,8 @@ public class ContradictionFinderLessSwingWorker
         while(currentIterator.next()){
            RefexCAB memberBp = new RefexCAB(TK_REFEX_TYPE.CID,
                     currentIterator.nid(),
-                    conflictRefsetNid);
+                    conflictRefsetNid,
+                    IdDirective.GENERATE_HASH);
             memberBp.put(RefexCAB.RefexProperty.CNID1, currentIterator.nid());
             RefexChronicleBI member = builder.constructIfNotCurrent(memberBp);
             if(conflictRefset.isAnnotationStyleRefex()){
@@ -317,7 +323,9 @@ public class ContradictionFinderLessSwingWorker
                     viewCoord, component.getConceptNid());
             
             if(member != null){
-                RefexCAB memberBp = member.makeBlueprint(viewCoord);
+                RefexCAB memberBp = member.makeBlueprint(viewCoord, 
+                        IdDirective.PRESERVE, 
+                        RefexDirective.EXCLUDE);
                 memberBp.setRetired();
                 builder.constructIfNotCurrent(memberBp);
             }

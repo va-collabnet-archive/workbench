@@ -23,9 +23,9 @@ import java.util.UUID;
 import org.ihtsdo.lang.LANG_CODE;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ContradictionException;
-import org.ihtsdo.tk.api.TerminologyBuilderBI;
 import org.ihtsdo.tk.api.blueprint.ConceptCB;
 import org.ihtsdo.tk.api.blueprint.CreateOrAmendBlueprint;
+import org.ihtsdo.tk.api.blueprint.IdDirective;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.binding.snomed.TermAux;
 
@@ -151,6 +151,7 @@ public class PathSpec implements SpecBI {
                 pathConcept.getDescription(),
                 LANG_CODE.EN,
                 TermAux.IS_A.getLenient().getPrimUuid(),
+                IdDirective.GENERATE_HASH,
                 parentConcept.getLenient().getPrimUuid());
         for (UUID uuid : pathConcept.getUuids()) {
             conceptBp.setComponentUuid(uuid);

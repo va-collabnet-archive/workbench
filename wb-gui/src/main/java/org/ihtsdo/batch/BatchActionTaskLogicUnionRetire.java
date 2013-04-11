@@ -26,7 +26,9 @@ import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.TerminologyBuilderBI;
 import org.ihtsdo.tk.api.blueprint.ConceptCB;
+import org.ihtsdo.tk.api.blueprint.IdDirective;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
+import org.ihtsdo.tk.api.blueprint.RefexDirective;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
@@ -82,7 +84,7 @@ public class BatchActionTaskLogicUnionRetire extends BatchActionTask {
                                 // retire marked parent concept
                                 ConceptVersionBI cvbi = ts.getConceptVersion(vc,
                                         member.getReferencedComponentNid());
-                                ConceptCB bp = cvbi.makeBlueprint(vc);
+                                ConceptCB bp = cvbi.makeBlueprint(vc, IdDirective.PRESERVE, RefexDirective.EXCLUDE);  // :!!!:REVIEW
                                 bp.setRetired();
 
                                 TerminologyBuilderBI tc = Ts.get().getTerminologyBuilder(ec, vc);

@@ -121,6 +121,8 @@ import java.util.UUID;
 import java.util.logging.Level;
 
 import javax.swing.JOptionPane;
+import org.ihtsdo.tk.api.blueprint.IdDirective;
+import org.ihtsdo.tk.api.blueprint.RefexDirective;
 import org.ihtsdo.ttk.queue.QueueAddress;
 
 /**
@@ -293,7 +295,8 @@ public class GenerateUsersExtended extends AbstractMojo {
          RelationshipCAB relCab = new RelationshipCAB(user.getPrimUuid(),
                                      UUID.fromString(typeUid),
                                      UUID.fromString(targetUid), 0,
-                                     TkRelationshipType.STATED_ROLE);
+                                     TkRelationshipType.STATED_ROLE,
+                                     IdDirective.GENERATE_HASH);
 
          Ts.get().getTerminologyBuilder(
              config.getEditCoordinate(),
@@ -327,14 +330,13 @@ public class GenerateUsersExtended extends AbstractMojo {
       }
 
       if (!found) {
-         RelationshipCAB wfRelBp =
-            new RelationshipCAB(userConcept.getPrimUuid(),
-                                ArchitectonicAuxiliary.Concept
-                                   .WORKFLOW_EDITOR_STATUS
-                                   .getPrimoridalUid(), ArchitectonicAuxiliary
-                                   .Concept.WORKFLOW_ACTIVE_MODELER
-                                   .getPrimoridalUid(), 0,
-                                      TkRelationshipType.STATED_ROLE);
+          RelationshipCAB wfRelBp =
+                  new RelationshipCAB(userConcept.getPrimUuid(),
+                  ArchitectonicAuxiliary.Concept.WORKFLOW_EDITOR_STATUS.getPrimoridalUid(), 
+                  ArchitectonicAuxiliary.Concept.WORKFLOW_ACTIVE_MODELER.getPrimoridalUid(), 
+                  0,
+                  TkRelationshipType.STATED_ROLE,
+                  IdDirective.GENERATE_HASH);
          ViewCoordinate vc    = userConfig.getViewCoordinate();
          EditCoordinate oldEc = userConfig.getEditCoordinate();
          EditCoordinate ec    = new EditCoordinate(oldEc.getAuthorNid(),
@@ -382,6 +384,7 @@ public class GenerateUsersExtended extends AbstractMojo {
       ConceptCB userConceptBp = new ConceptCB(dbConfig.getFullName(),
                                    userConfig.getUsername(), LANG_CODE.EN,
                                    TermAux.IS_A.getLenient().getPrimUuid(),
+                                   IdDirective.GENERATE_HASH,
                                    parentConcept.getPrimUuid());
       UUID userUuid = userConceptBp.getComponentUuid();
 
@@ -394,20 +397,21 @@ public class GenerateUsersExtended extends AbstractMojo {
 
          // Needs a description record...
          DescriptionCAB inboxDescBp =
-            new DescriptionCAB(userConceptBp.getComponentUuid(),
-                               queueDescriptionType.getLenient().getPrimUuid(),
-                               LANG_CODE.EN,
-                               userConfig.getUsername() + ".inbox", false);
+                  new DescriptionCAB(userConceptBp.getComponentUuid(),
+                  queueDescriptionType.getLenient().getPrimUuid(),
+                  LANG_CODE.EN,
+                  userConfig.getUsername() + ".inbox",
+                  false,
+                  IdDirective.GENERATE_HASH);
 
          // add workflow relationship
-         RelationshipCAB wfRelBp =
-            new RelationshipCAB(userConceptBp.getComponentUuid(),
-                                ArchitectonicAuxiliary.Concept
-                                   .WORKFLOW_EDITOR_STATUS
-                                   .getPrimoridalUid(), ArchitectonicAuxiliary
-                                   .Concept.WORKFLOW_ACTIVE_MODELER
-                                   .getPrimoridalUid(), 0,
-                                      TkRelationshipType.STATED_ROLE);
+          RelationshipCAB wfRelBp =
+                  new RelationshipCAB(userConceptBp.getComponentUuid(),
+                  ArchitectonicAuxiliary.Concept.WORKFLOW_EDITOR_STATUS.getPrimoridalUid(), 
+                  ArchitectonicAuxiliary.Concept.WORKFLOW_ACTIVE_MODELER.getPrimoridalUid(), 
+                  0,
+                  TkRelationshipType.STATED_ROLE,
+                  IdDirective.GENERATE_HASH);
          ViewCoordinate vc    = userConfig.getViewCoordinate();
          EditCoordinate oldEc = userConfig.getEditCoordinate();
          EditCoordinate ec    = new EditCoordinate(oldEc.getAuthorNid(),
@@ -436,6 +440,7 @@ public class GenerateUsersExtended extends AbstractMojo {
       ConceptCB parentConceptBp = new ConceptCB(userParentConceptName,
                                      userParentConceptName, LANG_CODE.EN_US,
                                      TermAux.IS_A.getLenient().getPrimUuid(),
+                                     IdDirective.GENERATE_HASH,
                                      TermAux.USER.getLenient().getPrimUuid());
 
       // Choose a strategy for creating the parent concept UUID.
@@ -680,6 +685,7 @@ NEXT_WHILE:
          ConceptCB newEditPathBp = new ConceptCB(username + " dev path",
                                       username + " dev path", LANG_CODE.EN,
                                       TermAux.IS_A.getLenient().getPrimUuid(),
+                                      IdDirective.GENERATE_HASH,
                                       editParentPathUuid);
          UUID userDevPathUuid = newEditPathBp.getComponentUuid();
 
@@ -689,8 +695,9 @@ NEXT_WHILE:
          } else {
             RefexCAB pathRefexBp =
                new RefexCAB(TK_REFEX_TYPE.CID,
-                            TermAux.PATH.getLenient().getConceptNid(),
-                            RefsetAux.PATH_REFSET.getLenient().getNid());
+                    TermAux.PATH.getLenient().getConceptNid(),
+                    RefsetAux.PATH_REFSET.getLenient().getNid(),
+                    IdDirective.GENERATE_HASH);
 
             pathRefexBp.put(RefexCAB.RefexProperty.UUID1,
                             newEditPathBp.getComponentUuid());
@@ -698,9 +705,10 @@ NEXT_WHILE:
 
             RefexCAB pathOriginRefexBp =
                new RefexCAB(TK_REFEX_TYPE.CID_INT,
-                            newEditPathBp.getComponentUuid(),
-                            RefsetAux.PATH_ORIGIN_REFEST.getLenient().getNid(),
-                            null, null);
+                    newEditPathBp.getComponentUuid(),
+                    RefsetAux.PATH_ORIGIN_REFEST.getLenient().getNid(),
+                    null, null,
+                    IdDirective.GENERATE_HASH, RefexDirective.EXCLUDE);
 
             pathOriginRefexBp.put(RefexCAB.RefexProperty.UUID1,
                                   editOriginPathUuid);
@@ -710,8 +718,9 @@ NEXT_WHILE:
 
             RefexCAB pathOriginRefexOtherBp =
                new RefexCAB(TK_REFEX_TYPE.CID_INT, originFromDevPathUuid,
-                            RefsetAux.PATH_ORIGIN_REFEST.getLenient().getNid(),
-                            null, null);
+                    RefsetAux.PATH_ORIGIN_REFEST.getLenient().getNid(),
+                    null, null,
+                    IdDirective.GENERATE_HASH, RefexDirective.EXCLUDE);
 
             pathOriginRefexOtherBp.put(RefexCAB.RefexProperty.UUID1,
                                        newEditPathBp.getComponentUuid());
@@ -1181,7 +1190,7 @@ NEXT_WHILE:
                   tf.getPath(Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC,
                   this.projectDevelopmentViewPathFsn));
           PositionBI viewPosition = tf.newPosition(viewPath, Long.MAX_VALUE);
-          Set<PositionBI> viewSet = new HashSet<PositionBI>();
+          Set<PositionBI> viewSet = new HashSet<>();
 
           viewSet.add(viewPosition);
           activeConfig.setViewPositions(viewSet);
@@ -2199,7 +2208,7 @@ NEXT_WHILE:
 
    private ArrayList<ConceptSpec> getConceptSpecListFromPrefs(
            String configString) {
-      ArrayList<ConceptSpec> conceptSpecList = new ArrayList<ConceptSpec>();
+      ArrayList<ConceptSpec> conceptSpecList = new ArrayList<>();
 
       if ((configString != null) &&!configString.equals("")) {
          String[] conceptSpecs = configString.split(";");
@@ -2310,11 +2319,12 @@ NEXT_WHILE:
       I_GetConceptData userConcept =
          Terms.get().getConcept(UUID.fromString(userUuidString));
       I_TermFactory  tf          = Terms.get();
-      DescriptionCAB inboxDescBp =
-         new DescriptionCAB(userConcept.getPrimUuid(),
-                            queueDescriptionType.getLenient().getPrimUuid(),
-                            LANG_CODE.EN, userConfig.getUsername() + ".inbox",
-                            false);
+       DescriptionCAB inboxDescBp =
+               new DescriptionCAB(userConcept.getPrimUuid(),
+               queueDescriptionType.getLenient().getPrimUuid(),
+               LANG_CODE.EN, userConfig.getUsername() + ".inbox",
+               false,
+               IdDirective.GENERATE_HASH);
       ViewCoordinate vc    = userConfig.getViewCoordinate();
       EditCoordinate oldEc = userConfig.getEditCoordinate();
       EditCoordinate ec    = new EditCoordinate(oldEc.getAuthorNid(),

@@ -37,15 +37,14 @@ import org.ihtsdo.tk.api.description.DescriptionAnalogBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.dto.concept.component.refex.TK_REFEX_TYPE;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
-import org.ihtsdo.helper.cswords.CsWordsHelper;
 import org.ihtsdo.helper.dialect.DialectHelper;
 import org.ihtsdo.lang.LANG_CODE;
 import org.ihtsdo.thread.NamedThreadFactory;
 import org.ihtsdo.tk.api.TerminologyStoreDI;
+import org.ihtsdo.tk.api.blueprint.IdDirective;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.refex.type_nid.RefexNidAnalogBI;
 import org.ihtsdo.tk.binding.snomed.Language;
-import org.ihtsdo.tk.binding.snomed.CaseSensitive;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 
@@ -154,17 +153,7 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
                     public void run() {
                         try {
                             doAction();
-                        } catch (IOException ex) {
-                            Logger.getLogger(UpdateTextDocumentListener.class.getName()).log(Level.SEVERE, null, ex);
-                        } catch (PropertyVetoException ex) {
-                            Logger.getLogger(UpdateTextDocumentListener.class.getName()).log(Level.SEVERE, null, ex);
-                        } catch (InvalidCAB ex) {
-                            Logger.getLogger(UpdateTextDocumentListener.class.getName()).log(Level.SEVERE, null, ex);
-                        } catch (UnsupportedDialectOrLanguage ex) {
-                            Logger.getLogger(UpdateTextDocumentListener.class.getName()).log(Level.SEVERE, null, ex);
-                        } catch (TerminologyException ex) {
-                            Logger.getLogger(UpdateTextDocumentListener.class.getName()).log(Level.SEVERE, null, ex);
-                        } catch (ContradictionException ex) {
+                        } catch (IOException | PropertyVetoException | InvalidCAB | UnsupportedDialectOrLanguage | TerminologyException | ContradictionException ex) {
                             Logger.getLogger(UpdateTextDocumentListener.class.getName()).log(Level.SEVERE, null, ex);
                         }
                     }
@@ -221,7 +210,7 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
                     for (RefexChronicleBI<?> descRefex : refexes) {
                         if (descRefex.isUncommitted()) {
                             if (descRefex.getRefexNid() == gbConcept.getNid()) {
-                                gbRefex = (RefexNidAnalogBI) descRefex;;
+                                gbRefex = (RefexNidAnalogBI) descRefex;
                             } else if (descRefex.getRefexNid() == usConcept.getNid()) {
                                 usRefex = (RefexNidAnalogBI) descRefex;
                             }
@@ -249,14 +238,16 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
         RefexCAB refexSpecUs = new RefexCAB(
                 TK_REFEX_TYPE.CID,
                 desc.getNid(),
-                usConcept.getNid());
+                usConcept.getNid(),
+                IdDirective.GENERATE_HASH);
         refexSpecUs.put(RefexProperty.CNID1, prefNid);
         RefexChronicleBI<?> newRefexUs = tc.construct(refexSpecUs);
 
         RefexCAB refexSpecGb = new RefexCAB(
                 TK_REFEX_TYPE.CID,
                 desc.getNid(),
-                gbConcept.getNid());
+                gbConcept.getNid(),
+                IdDirective.GENERATE_HASH);
         refexSpecGb.put(RefexProperty.CNID1, prefNid);
         RefexChronicleBI<?> newRefexGb = tc.construct(refexSpecGb);
 
@@ -274,14 +265,16 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
             RefexCAB refexSpecUs = new RefexCAB(
                     TK_REFEX_TYPE.CID,
                     desc.getNid(),
-                    usConcept.getNid());
+                    usConcept.getNid(), 
+                    IdDirective.GENERATE_HASH);
             refexSpecUs.put(RefexProperty.CNID1, acceptNid);
             RefexChronicleBI<?> newRefexUs = tc.construct(refexSpecUs);
 
             RefexCAB refexSpecGb = new RefexCAB(
                     TK_REFEX_TYPE.CID,
                     desc.getNid(),
-                    gbConcept.getNid());
+                    gbConcept.getNid(),
+                    IdDirective.GENERATE_HASH);
             refexSpecGb.put(RefexProperty.CNID1, acceptNid);
             RefexChronicleBI<?> newRefexGb = tc.construct(refexSpecGb);
 
@@ -293,7 +286,8 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
             RefexCAB refexSpecUs = new RefexCAB(
                     TK_REFEX_TYPE.CID,
                     desc.getNid(),
-                    usConcept.getNid());
+                    usConcept.getNid(),
+                    IdDirective.GENERATE_HASH);
             refexSpecUs.put(RefexProperty.CNID1, acceptNid);
             RefexChronicleBI<?> newRefexUs = tc.construct(refexSpecUs);
 
@@ -303,7 +297,8 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
             RefexCAB refexSpecGb = new RefexCAB(
                     TK_REFEX_TYPE.CID,
                     desc.getNid(),
-                    gbConcept.getNid());
+                    gbConcept.getNid(),
+                    IdDirective.GENERATE_HASH);
             refexSpecGb.put(RefexProperty.CNID1, acceptNid);
             RefexChronicleBI<?> newRefexGb = tc.construct(refexSpecGb);
 
@@ -321,14 +316,16 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
             RefexCAB refexSpecUs = new RefexCAB(
                     TK_REFEX_TYPE.CID,
                     desc.getNid(),
-                    usConcept.getNid());
+                    usConcept.getNid(),
+                    IdDirective.GENERATE_HASH);
             refexSpecUs.put(RefexProperty.CNID1, prefNid);
             RefexChronicleBI<?> newRefexUs = tc.construct(refexSpecUs);
 
             RefexCAB refexSpecGb = new RefexCAB(
                     TK_REFEX_TYPE.CID,
                     desc.getNid(),
-                    gbConcept.getNid());
+                    gbConcept.getNid(),
+                    IdDirective.GENERATE_HASH);
             refexSpecGb.put(RefexProperty.CNID1, prefNid);
             RefexChronicleBI<?> newRefexGb = tc.construct(refexSpecGb);
 
@@ -340,7 +337,8 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
             RefexCAB refexSpecUs = new RefexCAB(
                     TK_REFEX_TYPE.CID,
                     desc.getNid(),
-                    usConcept.getNid());
+                    usConcept.getNid(),
+                    IdDirective.GENERATE_HASH);
             refexSpecUs.put(RefexProperty.CNID1, prefNid);
             RefexChronicleBI<?> newRefexUs = tc.construct(refexSpecUs);
 
@@ -350,7 +348,8 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
             RefexCAB refexSpecGb = new RefexCAB(
                     TK_REFEX_TYPE.CID,
                     desc.getNid(),
-                    gbConcept.getNid());
+                    gbConcept.getNid(),
+                    IdDirective.GENERATE_HASH);
             refexSpecGb.put(RefexProperty.CNID1, prefNid);
             RefexChronicleBI<?> newRefexGb = tc.construct(refexSpecGb);
 
@@ -506,15 +505,7 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
                 I_GetConceptData concept = Terms.get().getConceptForNid(desc.getNid());
                 Terms.get().addUncommitted(concept);
             }
-        } catch (IOException ex) {
-            throw new PropertyVetoException(ex.toString(), pce);
-        } catch (TerminologyException ex) {
-            throw new PropertyVetoException(ex.toString(), pce);
-        } catch (InvalidCAB ex) {
-            throw new PropertyVetoException(ex.toString(), pce);
-        } catch (UnsupportedDialectOrLanguage ex) {
-            throw new PropertyVetoException(ex.toString(), pce);
-        } catch (ContradictionException ex) {
+        } catch (IOException | TerminologyException | InvalidCAB | UnsupportedDialectOrLanguage | ContradictionException ex) {
             throw new PropertyVetoException(ex.toString(), pce);
         }
     }

@@ -21,8 +21,6 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -88,6 +86,7 @@ import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.lang.LANG_CODE;
 import org.ihtsdo.tk.api.*;
+import org.ihtsdo.tk.api.blueprint.IdDirective;
 import org.ihtsdo.tk.api.conceptattribute.ConceptAttributeAnalogBI;
 import org.ihtsdo.tk.api.description.DescriptionAnalogBI;
 import org.ihtsdo.tk.binding.snomed.Language;
@@ -304,15 +303,7 @@ public class NewConceptFromBatch extends PreviousNextOrCancel {
                 maker.execute();
                 maker.getLatch().await();
             }
-        } catch (IntrospectionException e) {
-            throw new TaskFailedException(e);
-        } catch (IllegalAccessException e) {
-            throw new TaskFailedException(e);
-        } catch (InterruptedException e) {
-            throw new TaskFailedException(e);
-        } catch (InvocationTargetException e) {
-            throw new TaskFailedException(e);
-        } catch (IllegalArgumentException e) {
+        } catch (IntrospectionException | IllegalAccessException | InterruptedException | InvocationTargetException | IllegalArgumentException e) {
             throw new TaskFailedException(e);
         }
 
@@ -345,30 +336,30 @@ public class NewConceptFromBatch extends PreviousNextOrCancel {
 
                     //create blueprints
                     if (lang.equals("en")) {
-                        createBlueprintUsFsnRefex(conceptSpec.makeFullySpecifiedNameCAB().getComponentNid());
-                        createBlueprintGbFsnRefex(conceptSpec.makeFullySpecifiedNameCAB().getComponentNid());
-                        createBlueprintUsPrefRefex(conceptSpec.makePreferredCAB().getComponentNid());
-                        createBlueprintGbPrefRefex(conceptSpec.makePreferredCAB().getComponentNid());
+                        createBlueprintUsFsnRefex(conceptSpec.makeFullySpecifiedNameCAB(IdDirective.GENERATE_HASH).getComponentNid());
+                        createBlueprintGbFsnRefex(conceptSpec.makeFullySpecifiedNameCAB(IdDirective.GENERATE_HASH).getComponentNid());
+                        createBlueprintUsPrefRefex(conceptSpec.makePreferredCAB(IdDirective.GENERATE_HASH).getComponentNid());
+                        createBlueprintGbPrefRefex(conceptSpec.makePreferredCAB(IdDirective.GENERATE_HASH).getComponentNid());
                     }
                     if (lang.equals("en-us")) {
-                        createBlueprintUsFsnRefex(conceptSpec.makeFullySpecifiedNameCAB().getComponentNid());
-                        createBlueprintUsPrefRefex(conceptSpec.makePreferredCAB().getComponentNid());
+                        createBlueprintUsFsnRefex(conceptSpec.makeFullySpecifiedNameCAB(IdDirective.GENERATE_HASH).getComponentNid());
+                        createBlueprintUsPrefRefex(conceptSpec.makePreferredCAB(IdDirective.GENERATE_HASH).getComponentNid());
     //                   createBlueprintGbAcctRefex(conceptSpec.getPreferredCAB().getComponentNid()); //removed for rf2
                     }
                     if (lang.equals("en-gb")) {
     //                    createBlueprintGbFsnRefex(conceptSpec.getFsnCAB().getComponentNid());
-                        createBlueprintGbFsnRefex(conceptSpec.makeFullySpecifiedNameCAB().getComponentNid()); //only using one fsn
-                        createBlueprintGbPrefRefex(conceptSpec.makePreferredCAB().getComponentNid());
+                        createBlueprintGbFsnRefex(conceptSpec.makeFullySpecifiedNameCAB(IdDirective.GENERATE_HASH).getComponentNid()); //only using one fsn
+                        createBlueprintGbPrefRefex(conceptSpec.makePreferredCAB(IdDirective.GENERATE_HASH).getComponentNid());
     //                   createBlueprintUsAcctRefex(conceptSpec.getPreferredCAB().getComponentNid()); //removed for rf2
                     }
                     if (addUsDescFsn) {
     //                    createBlueprintUsFsnDesc();
-                        createBlueprintUsFsnRefex(conceptSpec.makeFullySpecifiedNameCAB().getComponentNid());
+                        createBlueprintUsFsnRefex(conceptSpec.makeFullySpecifiedNameCAB(IdDirective.GENERATE_HASH).getComponentNid());
                     }
                     if (addGbDescFsn) {
     //                    createBlueprintGbFsnDesc();
     //                    createBlueprintGbFsnRefex(descSpecGbFsn.getComponentNid());
-                        createBlueprintGbFsnRefex(conceptSpec.makeFullySpecifiedNameCAB().getComponentNid()); //only using one fsn (US)
+                        createBlueprintGbFsnRefex(conceptSpec.makeFullySpecifiedNameCAB(IdDirective.GENERATE_HASH).getComponentNid()); //only using one fsn (US)
                     }
                     if (addUsDescPref) {
                         createBlueprintUsPrefDesc();
@@ -380,13 +371,7 @@ public class NewConceptFromBatch extends PreviousNextOrCancel {
                         createBlueprintGbPrefRefex(descSpecGbPref.getComponentNid());
     //                    createBlueprintUsAcctRefex(descSpecGbPref.getComponentNid()); //removed for rf2
                     }
-                } catch (IOException ex) {
-                    AceLog.getAppLog().alertAndLogException(ex);
-                    return null;
-                } catch (InvalidCAB ex) {
-                    AceLog.getAppLog().alertAndLogException(ex);
-                    return null;
-                } catch (ContradictionException ex) {
+                } catch (        IOException | InvalidCAB | ContradictionException ex) {
                     AceLog.getAppLog().alertAndLogException(ex);
                     return null;
                 }
@@ -599,9 +584,7 @@ public class NewConceptFromBatch extends PreviousNextOrCancel {
                 wizardPanel.add(new JPanel(), c);
                 initialUpdate();
                 GuiUtil.tickle(wizardPanel);
-            } catch (InterruptedException ex) {
-                AceLog.getAppLog().alertAndLogException(ex);
-            } catch (ExecutionException ex) {
+            } catch (InterruptedException | ExecutionException ex) {
                 AceLog.getAppLog().alertAndLogException(ex);
             }
         }
@@ -888,9 +871,7 @@ public class NewConceptFromBatch extends PreviousNextOrCancel {
                 addGbDescPref = false;
                 addGbDescFsn = false;
             }
-        } catch (UnsupportedDialectOrLanguage ex) {
-            AceLog.getAppLog().alertAndLogException(ex);
-        } catch (IOException ex) {
+        } catch (UnsupportedDialectOrLanguage | IOException ex) {
             AceLog.getAppLog().alertAndLogException(ex);
         }
 
@@ -906,10 +887,12 @@ public class NewConceptFromBatch extends PreviousNextOrCancel {
             //create concept blue print
             if (lang.equals("en-gb")) {
                 conceptSpec = new ConceptCB(fsnText, prefText, LANG_CODE.EN,
-                        Snomed.IS_A.getLenient().getPrimUuid(), uuidArray);
+                        Snomed.IS_A.getLenient().getPrimUuid(), 
+                        IdDirective.GENERATE_HASH, uuidArray);
             } else {
                 conceptSpec = new ConceptCB(fsnText, prefText, LANG_CODE.EN,
-                        Snomed.IS_A.getLenient().getPrimUuid(), uuidArray);
+                        Snomed.IS_A.getLenient().getPrimUuid(), 
+                        IdDirective.GENERATE_HASH, uuidArray);
             }
 
             conceptSpec.setComponentUuid(newConceptUuid);
@@ -951,12 +934,11 @@ public class NewConceptFromBatch extends PreviousNextOrCancel {
                     fsnConcept.getPrimUuid(),
                     LANG_CODE.EN_GB,
                     text,
-                    false);
+                    false, 
+                    IdDirective.GENERATE_HASH);
 
             tc.construct(descSpecGbFsn);
-        } catch (IOException ex) {
-            AceLog.getAppLog().alertAndLogException(ex);
-        } catch (InvalidCAB ex) {
+        } catch (IOException | InvalidCAB ex) {
             AceLog.getAppLog().alertAndLogException(ex);
         }
     }
@@ -966,15 +948,14 @@ public class NewConceptFromBatch extends PreviousNextOrCancel {
             refexSpecGbFsn = new RefexCAB(
                     TK_REFEX_TYPE.CID,
                     componentNid,
-                    Ts.get().getNidForUuids(gbUuid));
+                    Ts.get().getNidForUuids(gbUuid),
+                    IdDirective.GENERATE_HASH);
             refexSpecGbFsn.put(RefexProperty.CNID1, preferredConcept.getNid());
             tc.construct(refexSpecGbFsn);
             if (!gbRefexConcept.isAnnotationStyleRefex()) {
                 Ts.get().addUncommitted(gbRefexConcept);
             }
-        } catch (IOException ex) {
-            AceLog.getAppLog().alertAndLogException(ex);
-        } catch (InvalidCAB ex) {
+        } catch (IOException | InvalidCAB ex) {
             AceLog.getAppLog().alertAndLogException(ex);
         }
     }
@@ -989,12 +970,11 @@ public class NewConceptFromBatch extends PreviousNextOrCancel {
                     synConcept.getPrimUuid(),
                     LANG_CODE.EN_GB,
                     text,
-                    false);
+                    false, 
+                    IdDirective.GENERATE_HASH);
 
             tc.construct(descSpecGbPref);
-        } catch (IOException ex) {
-            AceLog.getAppLog().alertAndLogException(ex);
-        } catch (InvalidCAB ex) {
+        } catch (IOException | InvalidCAB ex) {
             AceLog.getAppLog().alertAndLogException(ex);
         }
     }
@@ -1004,16 +984,15 @@ public class NewConceptFromBatch extends PreviousNextOrCancel {
             refexSpecGbPref = new RefexCAB(
                     TK_REFEX_TYPE.CID,
                     componentNid,
-                    Ts.get().getNidForUuids(gbUuid));
+                    Ts.get().getNidForUuids(gbUuid),
+                    IdDirective.GENERATE_HASH);
             refexSpecGbPref.put(RefexProperty.CNID1, preferredConcept.getNid());
 
             tc.construct(refexSpecGbPref);
             if (!gbRefexConcept.isAnnotationStyleRefex()) {
                 Ts.get().addUncommitted(gbRefexConcept);
             }
-        } catch (IOException ex) {
-            AceLog.getAppLog().alertAndLogException(ex);
-        } catch (InvalidCAB ex) {
+        } catch (IOException | InvalidCAB ex) {
             AceLog.getAppLog().alertAndLogException(ex);
         }
     }
@@ -1023,16 +1002,15 @@ public class NewConceptFromBatch extends PreviousNextOrCancel {
             refexSpecGbAcct = new RefexCAB(
                     TK_REFEX_TYPE.CID,
                     componentNid,
-                    Ts.get().getNidForUuids(gbUuid));
+                    Ts.get().getNidForUuids(gbUuid),
+                    IdDirective.GENERATE_HASH);
             refexSpecGbAcct.put(RefexProperty.CNID1, Ts.get().getNidForUuids(AcceptabilityType.NOT_ACCEPTABLE.getLenient().getPrimUuid()));
 
             tc.construct(refexSpecGbAcct);
             if (!gbRefexConcept.isAnnotationStyleRefex()) {
                 Ts.get().addUncommitted(gbRefexConcept);
             }
-        } catch (IOException ex) {
-            AceLog.getAppLog().alertAndLogException(ex);
-        } catch (InvalidCAB ex) {
+        } catch (IOException | InvalidCAB ex) {
             AceLog.getAppLog().alertAndLogException(ex);
         }
     }
@@ -1047,12 +1025,11 @@ public class NewConceptFromBatch extends PreviousNextOrCancel {
                     fsnConcept.getPrimUuid(),
                     LANG_CODE.EN_US,
                     text,
-                    false);
+                    false, 
+                    IdDirective.GENERATE_HASH);
 
             tc.construct(descSpecUsFsn);
-        } catch (IOException ex) {
-            AceLog.getAppLog().alertAndLogException(ex);
-        } catch (InvalidCAB ex) {
+        } catch (IOException | InvalidCAB ex) {
             AceLog.getAppLog().alertAndLogException(ex);
         }
     }
@@ -1062,7 +1039,8 @@ public class NewConceptFromBatch extends PreviousNextOrCancel {
             refexSpecUsFsn = new RefexCAB(
                     TK_REFEX_TYPE.CID,
                     componentNid,
-                    Ts.get().getNidForUuids(usUuid));
+                    Ts.get().getNidForUuids(usUuid),
+                    IdDirective.GENERATE_HASH);
 
             refexSpecUsFsn.put(RefexProperty.CNID1, preferredConcept.getNid());
 
@@ -1070,9 +1048,7 @@ public class NewConceptFromBatch extends PreviousNextOrCancel {
             if (!usRefexConcept.isAnnotationStyleRefex()) {
                 Ts.get().addUncommitted(usRefexConcept);
             }
-        } catch (IOException ex) {
-            AceLog.getAppLog().alertAndLogException(ex);
-        } catch (InvalidCAB ex) {
+        } catch (IOException | InvalidCAB ex) {
             AceLog.getAppLog().alertAndLogException(ex);
         }
     }
@@ -1087,12 +1063,11 @@ public class NewConceptFromBatch extends PreviousNextOrCancel {
                     synConcept.getPrimUuid(),
                     LANG_CODE.EN_US,
                     text,
-                    false);
+                    false, 
+                    IdDirective.GENERATE_HASH);
 
             tc.construct(descSpecUsPref);
-        } catch (IOException ex) {
-            AceLog.getAppLog().alertAndLogException(ex);
-        } catch (InvalidCAB ex) {
+        } catch (IOException | InvalidCAB ex) {
             AceLog.getAppLog().alertAndLogException(ex);
         }
     }
@@ -1102,7 +1077,8 @@ public class NewConceptFromBatch extends PreviousNextOrCancel {
             refexSpecUsPref = new RefexCAB(
                     TK_REFEX_TYPE.CID,
                     componentNid,
-                    Ts.get().getNidForUuids(usUuid));
+                    Ts.get().getNidForUuids(usUuid),
+                    IdDirective.GENERATE_HASH);
 
             refexSpecUsPref.put(RefexProperty.CNID1, preferredConcept.getNid());
 
@@ -1110,9 +1086,7 @@ public class NewConceptFromBatch extends PreviousNextOrCancel {
             if (!usRefexConcept.isAnnotationStyleRefex()) {
                 Ts.get().addUncommitted(usRefexConcept);
             }
-        } catch (IOException ex) {
-            AceLog.getAppLog().alertAndLogException(ex);
-        } catch (InvalidCAB ex) {
+        } catch (IOException | InvalidCAB ex) {
             AceLog.getAppLog().alertAndLogException(ex);
         }
     }
@@ -1122,7 +1096,8 @@ public class NewConceptFromBatch extends PreviousNextOrCancel {
             refexSpecUsAcct = new RefexCAB(
                     TK_REFEX_TYPE.CID,
                     componentNid,
-                    Ts.get().getNidForUuids(usUuid));
+                    Ts.get().getNidForUuids(usUuid),
+                    IdDirective.GENERATE_HASH);
 
             refexSpecUsAcct.put(RefexProperty.CNID1, Ts.get().getNidForUuids(AcceptabilityType.NOT_ACCEPTABLE.getLenient().getPrimUuid()));
 
@@ -1130,9 +1105,7 @@ public class NewConceptFromBatch extends PreviousNextOrCancel {
             if (!usRefexConcept.isAnnotationStyleRefex()) {
                 Ts.get().addUncommitted(usRefexConcept);
             }
-        } catch (IOException ex) {
-            AceLog.getAppLog().alertAndLogException(ex);
-        } catch (InvalidCAB ex) {
+        } catch (IOException | InvalidCAB ex) {
             AceLog.getAppLog().alertAndLogException(ex);
         }
     }
@@ -1142,6 +1115,7 @@ public class NewConceptFromBatch extends PreviousNextOrCancel {
         /**
          * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
          */
+        @Override
         public void actionPerformed(ActionEvent e) {
             returnCondition = Condition.PREVIOUS;
             done = true;
@@ -1229,7 +1203,7 @@ public class NewConceptFromBatch extends PreviousNextOrCancel {
                 //get text parts and make query term
                 String fullFsn = fsn.extractText();
                 String[] fsnWords = fullFsn.split("\\s");
-                HashSet<String> wordSet = new HashSet<String>();
+                HashSet<String> wordSet = new HashSet<>();
                 for (String word : fsnWords) {
                     if (!wordSet.contains(word) && word.length() > 1
                             && !word.startsWith("(") && !word.endsWith(")")) {
@@ -1283,21 +1257,19 @@ public class NewConceptFromBatch extends PreviousNextOrCancel {
                         done = true;
                         NewConceptFromBatch.this.notifyTaskDone();
                     }
-                } catch (IOException ex) {
-                    AceLog.getAppLog().alertAndLogException(ex);
-                } catch (TerminologyException ex) {
-                    AceLog.getAppLog().alertAndLogException(ex);
-                } catch (ParseException ex) {
+                } catch (IOException | TerminologyException | ParseException ex) {
                     AceLog.getAppLog().alertAndLogException(ex);
                 }
             }
         }
     }
 
+    @Override
     public Collection<Condition> getConditions() {
         return AbstractTask.PREVIOUS_CONTINUE_CANCEL;
     }
 
+    @Override
     public int[] getDataContainerIds() {
         return new int[]{};
     }

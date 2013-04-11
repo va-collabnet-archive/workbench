@@ -21,6 +21,7 @@ import java.util.Collection;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.ihtsdo.batch.BatchActionEvent.BatchActionEventType;
 import org.ihtsdo.tk.api.ContradictionException;
+import org.ihtsdo.tk.api.blueprint.IdDirective;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB.RefexProperty;
@@ -92,7 +93,10 @@ public class BatchActionTaskLogicNegateRelValue extends BatchActionTask {
                 }
 
                 // If not already a member, then a member record is added.
-                RefexCAB refexSpec = new RefexCAB(TK_REFEX_TYPE.CID, rvbi.getNid(), collectionNid);
+                RefexCAB refexSpec = new RefexCAB(TK_REFEX_TYPE.CID, 
+                        rvbi.getNid(), 
+                        collectionNid, 
+                        IdDirective.GENERATE_HASH);
 
                 int normalMemberNid = ts.getConcept(
                         RefsetAuxiliary.Concept.NORMAL_MEMBER.getUids()).getConceptNid();

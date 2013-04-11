@@ -12,7 +12,6 @@ import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_MapNativeToNative;
 import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.PathSetReadOnly;
-import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.utypes.UniversalAceDescription;
 import org.dwfa.tapi.I_DescribeConceptLocally;
 import org.dwfa.tapi.TerminologyException;
@@ -31,7 +30,6 @@ import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.PositionSetBI;
 import org.ihtsdo.tk.api.Precedence;
-import org.ihtsdo.tk.api.blueprint.CreateOrAmendBlueprint;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.description.DescriptionAnalogBI;
 import org.ihtsdo.tk.dto.concept.component.description.TkDescription;
@@ -50,15 +48,15 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.ihtsdo.lang.LANG_CODE;
 import org.ihtsdo.tk.api.blueprint.DescriptionCAB;
+import org.ihtsdo.tk.api.blueprint.IdDirective;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
-import org.ihtsdo.tk.api.description.DescriptionVersionBI;
-import org.ihtsdo.tk.dto.concept.component.TkRevision;
+import org.ihtsdo.tk.api.blueprint.RefexDirective;
 
 public class Description extends ConceptComponent<DescriptionRevision, Description>
         implements I_DescriptionVersioned<DescriptionRevision>, I_DescriptionPart<DescriptionRevision>,
         DescriptionAnalogBI<DescriptionRevision> {
 
-    private static VersionComputer<Description.Version> computer = new VersionComputer<Description.Version>();
+    private static VersionComputer<Description.Version> computer = new VersionComputer<>();
     //~--- fields --------------------------------------------------------------
     private boolean initialCaseSignificant;
     private String lang;
@@ -88,7 +86,7 @@ public class Description extends ConceptComponent<DescriptionRevision, Descripti
         primordialSapNid = Bdb.getSapNid(eDesc);
 
         if (eDesc.getRevisionList() != null) {
-            revisions = new RevisionSet<DescriptionRevision, Description>(primordialSapNid);
+            revisions = new RevisionSet<>(primordialSapNid);
 
             for (TkDescriptionRevision edv : eDesc.getRevisionList()) {
                 try {
@@ -117,7 +115,7 @@ public class Description extends ConceptComponent<DescriptionRevision, Descripti
     public void addTuples(NidSetBI allowedStatus, NidSetBI allowedTypes, PositionSetBI positions,
             List<I_DescriptionTuple<DescriptionRevision>> matchingTuples, Precedence precedence,
             ContradictionManagerBI contradictionManager) {
-        List<Version> returnTuples = new ArrayList<Version>();
+        List<Version> returnTuples = new ArrayList<>();
 
         computer.addSpecifiedVersions(allowedStatus, allowedTypes, positions, returnTuples, getVersions(),
                 precedence, contradictionManager);
@@ -127,7 +125,7 @@ public class Description extends ConceptComponent<DescriptionRevision, Descripti
     public void addTuples(NidSetBI allowedStatus, NidSetBI allowedTypes, PositionSetBI positions,
             List<I_DescriptionTuple<DescriptionRevision>> matchingTuples, Precedence precedence,
             ContradictionManagerBI contradictionManager, Long time) {
-        List<Version> returnTuples = new ArrayList<Version>();
+        List<Version> returnTuples = new ArrayList<>();
 
         computer.addSpecifiedVersions(allowedStatus, allowedTypes, positions, returnTuples, getVersions(),
                 precedence, contradictionManager, time);
@@ -375,7 +373,7 @@ public class Description extends ConceptComponent<DescriptionRevision, Descripti
 
     @Override
     public void writeToBdb(TupleOutput output, int maxReadOnlyStatusAtPositionNid) {
-        List<DescriptionRevision> partsToWrite = new ArrayList<DescriptionRevision>();
+        List<DescriptionRevision> partsToWrite = new ArrayList<>();
 
         if (revisions != null) {
             for (DescriptionRevision p : revisions) {
@@ -414,10 +412,11 @@ public class Description extends ConceptComponent<DescriptionRevision, Descripti
     }
 
     @Override
-    public DescriptionCAB makeBlueprint(ViewCoordinate vc) throws IOException, ContradictionException, InvalidCAB {
+    public DescriptionCAB makeBlueprint(ViewCoordinate vc, IdDirective idDirective, RefexDirective refexDirective) 
+            throws IOException, ContradictionException, InvalidCAB {
         DescriptionCAB descBp = new DescriptionCAB(getConceptNid(), getTypeNid(),
                 LANG_CODE.getLangCode(lang), getText(), initialCaseSignificant,
-                getVersion(vc), vc);
+                getVersion(vc), vc, idDirective, refexDirective);
         return descBp;
     }
 
@@ -460,7 +459,7 @@ public class Description extends ConceptComponent<DescriptionRevision, Descripti
 
     @Override
     public List<Version> getTuples() {
-        return Collections.unmodifiableList(new ArrayList<Version>(getVersions()));
+        return Collections.unmodifiableList(new ArrayList<>(getVersions()));
     }
 
     @Override
@@ -529,7 +528,7 @@ public class Description extends ConceptComponent<DescriptionRevision, Descripti
                 count = count + revisions.size();
             }
 
-            ArrayList<Version> list = new ArrayList<Version>(count);
+            ArrayList<Version> list = new ArrayList<>(count);
 
             if (getTime() != Long.MIN_VALUE) {
                 list.add(new Version(this));
@@ -557,7 +556,7 @@ public class Description extends ConceptComponent<DescriptionRevision, Descripti
 
     @Override
     public List<Description.Version> getVersions(ViewCoordinate c) {
-        List<Version> returnTuples = new ArrayList<Version>(2);
+        List<Version> returnTuples = new ArrayList<>(2);
 
         computer.addSpecifiedVersions(c.getAllowedStatusNids(), (NidSetBI) null, c.getPositionSet(),
                 returnTuples, getVersions(), c.getPrecedence(),
@@ -568,7 +567,7 @@ public class Description extends ConceptComponent<DescriptionRevision, Descripti
 
     public List<Description.Version> getVersions(NidSetBI allowedStatus, NidSetBI allowedTypes,
             PositionSetBI viewPositions, Precedence precedence, ContradictionManagerBI contradictionMgr) {
-        List<Version> returnTuples = new ArrayList<Version>(2);
+        List<Version> returnTuples = new ArrayList<>(2);
 
         computer.addSpecifiedVersions(allowedStatus, allowedTypes, viewPositions, returnTuples, getVersions(),
                 precedence, contradictionMgr);
@@ -696,8 +695,9 @@ public class Description extends ConceptComponent<DescriptionRevision, Descripti
         }
 
         @Override
-        public DescriptionCAB makeBlueprint(ViewCoordinate vc) throws IOException, ContradictionException, InvalidCAB {
-            return getCv().makeBlueprint(vc);
+        public DescriptionCAB makeBlueprint(ViewCoordinate vc, IdDirective idDirective, 
+            RefexDirective refexDirective) throws IOException, ContradictionException, InvalidCAB {
+            return getCv().makeBlueprint(vc, idDirective, refexDirective);
         }
 
         @Override

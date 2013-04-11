@@ -38,7 +38,9 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import org.ihtsdo.tk.api.blueprint.ConceptCB;
+import org.ihtsdo.tk.api.blueprint.IdDirective;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
+import org.ihtsdo.tk.api.blueprint.RefexDirective;
 
 /**
  * The Interface ConceptVersionBI provides methods for interacting with a
@@ -738,11 +740,13 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
      */
     boolean isMember(int refexCollectionNid) throws IOException;
 
-    ConceptCB makeBlueprint() throws IOException, ContradictionException, InvalidCAB;
+    ConceptCB makeBlueprint(IdDirective idDirective, RefexDirective refexDirective) throws IOException, ContradictionException, InvalidCAB;
 
     /**
      * @param viewCoordinate the view coordinate specifying which version of the
      * concept to make a blueprint of
+     * @param idDirective 
+     * @param refexDirective 
      * @return the concept blueprint, which can be constructed to create a <code>ConceptChronicleBI</code>
      * @throws IOException signals that an I/O exception has occurred
      * @throws ContradictionException if more than one version of the
@@ -752,5 +756,6 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
      * @see org.ihtsdo.tk.api.blueprint.CreateOrAmendBlueprint
      */
     @Override
-    ConceptCB makeBlueprint(ViewCoordinate viewCoordinate) throws IOException, ContradictionException, InvalidCAB;
+    ConceptCB makeBlueprint(ViewCoordinate viewCoordinate, IdDirective idDirective, RefexDirective refexDirective) 
+            throws IOException, ContradictionException, InvalidCAB;
 }

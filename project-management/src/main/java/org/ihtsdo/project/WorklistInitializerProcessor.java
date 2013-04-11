@@ -40,6 +40,7 @@ import org.ihtsdo.tk.api.NidBitSetBI;
 import org.ihtsdo.tk.api.ProcessUnfetchedConceptDataBI;
 import org.ihtsdo.tk.api.TerminologyBuilderBI;
 import org.ihtsdo.tk.api.TerminologyStoreDI;
+import org.ihtsdo.tk.api.blueprint.IdDirective;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB.RefexProperty;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
@@ -268,12 +269,16 @@ public class WorklistInitializerProcessor implements
 
 		try {
 			RefexCAB newSpec = new RefexCAB(TK_REFEX_TYPE.CID,
-					concept.getNid(), workListNid);
+                                concept.getNid(), 
+                                workListNid,
+                                IdDirective.GENERATE_HASH);
 			newSpec.put(RefexProperty.CNID1, activeNid);
 			RefexChronicleBI<?> newRefex = tc.constructIfNotCurrent(newSpec);
 
 			RefexCAB newSpecForProm = new RefexCAB(TK_REFEX_TYPE.CID_CID,
-					concept.getNid(), promRef.getRefsetId());
+				concept.getNid(), 
+                                promRef.getRefsetId(),
+                                IdDirective.GENERATE_HASH);
 			newSpecForProm.put(RefexProperty.CNID1, assignedNid);
 			newSpecForProm.put(RefexProperty.CNID2, userNid);
 			RefexChronicleBI<?> newRefexForProm = tc

@@ -53,7 +53,9 @@ import java.io.IOException;
 
 import java.util.*;
 import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.blueprint.IdDirective;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
+import org.ihtsdo.tk.api.blueprint.RefexDirective;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 
@@ -102,7 +104,7 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>, C extends Ref
     public void addTuples(List<I_ExtendByRefVersion> returnTuples, Precedence precedencePolicy,
             ContradictionManagerBI contradictionManager)
             throws TerminologyException, IOException {
-        List<RefsetMember<R, C>.Version> versionsToAdd = new ArrayList<RefsetMember<R, C>.Version>();
+        List<RefsetMember<R, C>.Version> versionsToAdd = new ArrayList<>();
 
         getVersionComputer().addSpecifiedVersions(Terms.get().getActiveAceFrameConfig().getAllowedStatus(),
                 Terms.get().getActiveAceFrameConfig().getViewPositionSetReadOnly(), versionsToAdd,
@@ -116,7 +118,7 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>, C extends Ref
             List<I_ExtendByRefVersion> returnTuples, Precedence precedencePolicy,
             ContradictionManagerBI contradictionManager)
             throws TerminologyException, IOException {
-        List<RefsetMember<R, C>.Version> versionsToAdd = new ArrayList<RefsetMember<R, C>.Version>();
+        List<RefsetMember<R, C>.Version> versionsToAdd = new ArrayList<>();
 
         getVersionComputer().addSpecifiedVersions(allowedStatus, positions, versionsToAdd,
                 (List<Version>) getVersions(), precedencePolicy, contradictionManager);
@@ -282,7 +284,7 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>, C extends Ref
 
         if (additionalVersionCount > 0) {
             if (revisions == null) {
-                revisions = new RevisionSet<R, C>(primordialSapNid);
+                revisions = new RevisionSet<>(primordialSapNid);
             }
 
             for (int i = 0; i < additionalVersionCount; i++) {
@@ -380,7 +382,7 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>, C extends Ref
 
     @Override
     public void writeToBdb(TupleOutput output, int maxReadOnlyStatusAtPositionNid) throws IOException{
-        List<RefsetRevision<R, C>> additionalVersionsToWrite = new ArrayList<RefsetRevision<R, C>>();
+        List<RefsetRevision<R, C>> additionalVersionsToWrite = new ArrayList<>();
 
         if (revisions != null) {
             for (RefsetRevision<R, C> p : revisions) {
@@ -449,12 +451,14 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>, C extends Ref
     }
 
     @Override
-    public RefexCAB makeBlueprint(ViewCoordinate vc) throws IOException,
+    public RefexCAB makeBlueprint(ViewCoordinate vc, IdDirective idDirective, 
+                    RefexDirective refexDirective) 
+            throws IOException,
         InvalidCAB, ContradictionException {
         RefexCAB rcs = new RefexCAB(getTkRefsetType(), 
                 Ts.get().getUuidPrimordialForNid(getReferencedComponentNid()),
                 getRefexNid(),
-                getVersion(vc), vc);
+                getVersion(vc), vc, idDirective, refexDirective);
 
         addSpecProperties(rcs);
 
@@ -470,7 +474,7 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>, C extends Ref
 
     @Override
     public List<Version> getTuples() {
-        return Collections.unmodifiableList(new ArrayList<Version>(getVersions()));
+        return Collections.unmodifiableList(new ArrayList<>(getVersions()));
     }
 
     @SuppressWarnings("rawtypes")
@@ -488,7 +492,7 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>, C extends Ref
             PositionSetReadOnly positions, Precedence precedencePolicy,
             ContradictionManagerBI contradictionManager)
             throws TerminologyException, IOException {
-        List<RefsetMember<R, C>.Version> versionsToAdd = new ArrayList<RefsetMember<R, C>.Version>();
+        List<RefsetMember<R, C>.Version> versionsToAdd = new ArrayList<>();
 
         getVersionComputer().addSpecifiedVersions(allowedStatus, positions, versionsToAdd,
                 (List<Version>) getVersions(), precedencePolicy, contradictionManager);
@@ -540,7 +544,7 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>, C extends Ref
                 count = count + revisions.size();
             }
 
-            ArrayList<Version> list = new ArrayList<Version>(count);
+            ArrayList<Version> list = new ArrayList<>(count);
 
             list.add(new Version(this));
 
@@ -558,7 +562,7 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>, C extends Ref
 
     @Override
     public List<RefsetMember<R, C>.Version> getVersions(ViewCoordinate c) {
-        List<RefsetMember<R, C>.Version> returnTuples = new ArrayList<RefsetMember<R, C>.Version>(2);
+        List<RefsetMember<R, C>.Version> returnTuples = new ArrayList<>(2);
 
         getVersionComputer().addSpecifiedVersions(c.getAllowedStatusNids(), (NidSetBI) null,
                 c.getPositionSet(), returnTuples, getVersions(), c.getPrecedence(),
@@ -784,8 +788,10 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>, C extends Ref
         }
 
         @Override
-        public RefexCAB makeBlueprint(ViewCoordinate vc) throws IOException, InvalidCAB, ContradictionException {
-            return getCv().makeBlueprint(vc);
+        public RefexCAB makeBlueprint(ViewCoordinate vc, IdDirective idDirective, 
+            RefexDirective refexDirective) 
+                throws IOException, InvalidCAB, ContradictionException {
+            return getCv().makeBlueprint(vc, idDirective, refexDirective);
         }
 
         @Override

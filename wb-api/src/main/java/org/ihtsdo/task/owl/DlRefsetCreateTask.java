@@ -22,7 +22,6 @@ import java.io.ObjectOutputStream;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
-import java.util.List;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -45,15 +44,13 @@ import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.TerminologyBuilderBI;
 import org.ihtsdo.tk.api.TerminologyStoreDI;
 import org.ihtsdo.tk.api.blueprint.ConceptCB;
-import org.ihtsdo.tk.api.blueprint.DescriptionCAB;
+import org.ihtsdo.tk.api.blueprint.IdDirective;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
-import org.ihtsdo.tk.api.blueprint.RelationshipCAB;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.binding.snomed.Snomed;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
-import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationshipType;
 
 /**
  *
@@ -159,8 +156,9 @@ public class DlRefsetCreateTask extends AbstractTask implements ActionListener {
                 "Description logic refset",
                 LANG_CODE.EN_CA,
                 isaUuid,
+                IdDirective.GENERATE_HASH,
                 refsetParentUuid);
-        cb.setComponentUuid(dlRefsetUuid);
+        cb.setComponentUuid(dlRefsetUuid); // :!!!:REVIEW
         ConceptChronicleBI ccbi = tsSnapshot.constructIfNotCurrent(cb);
         ts.addUncommitted(ccbi);
 
@@ -170,8 +168,9 @@ public class DlRefsetCreateTask extends AbstractTask implements ActionListener {
                 "Disjoint sets refset",
                 LANG_CODE.EN_CA,
                 isaUuid,
+                IdDirective.GENERATE_HASH,
                 dlRefsetUuid);
-        cb.setComponentUuid(disjointSetsRefsetUuid);
+        cb.setComponentUuid(disjointSetsRefsetUuid); // :!!!:REVIEW
         ts.addUncommitted(tsSnapshot.constructIfNotCurrent(cb));
 
         // Negation
@@ -180,6 +179,7 @@ public class DlRefsetCreateTask extends AbstractTask implements ActionListener {
                 "Negation refset",
                 LANG_CODE.EN_CA,
                 isaUuid,
+                IdDirective.GENERATE_HASH,  // :!!!:REVIEW
                 dlRefsetUuid);
         cb.setComponentUuid(negationRefsetUuid);
         ts.addUncommitted(tsSnapshot.constructIfNotCurrent(cb));
@@ -190,8 +190,9 @@ public class DlRefsetCreateTask extends AbstractTask implements ActionListener {
                 "Union sets refset",
                 LANG_CODE.EN_CA,
                 isaUuid,
+                IdDirective.GENERATE_HASH,
                 dlRefsetUuid);
-        cb.setComponentUuid(unionSetsRefsetUuid);
+        cb.setComponentUuid(unionSetsRefsetUuid); // :!!!:REVIEW
         ts.addUncommitted(tsSnapshot.constructIfNotCurrent(cb));
 
         // ConDOR reasoner
@@ -200,6 +201,7 @@ public class DlRefsetCreateTask extends AbstractTask implements ActionListener {
                 "ConDOR",
                 LANG_CODE.EN_CA,
                 isaUuid,
+                IdDirective.GENERATE_HASH,  // :!!!:REVIEW
                 UUID.fromString("f7495b58-6630-3499-a44e-2052b5fcf06c")); /* parent == user */
         cb.setComponentUuid(condorUuid);
         ts.addUncommitted(tsSnapshot.constructIfNotCurrent(cb));

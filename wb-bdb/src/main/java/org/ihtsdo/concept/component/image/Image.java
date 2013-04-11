@@ -11,7 +11,6 @@ import org.dwfa.ace.api.I_ImageTuple;
 import org.dwfa.ace.api.I_ImageVersioned;
 import org.dwfa.ace.api.I_MapNativeToNative;
 import org.dwfa.ace.api.PathSetReadOnly;
-import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.utypes.UniversalAceImage;
 import org.dwfa.ace.utypes.UniversalAceImagePart;
 import org.dwfa.tapi.TerminologyException;
@@ -43,15 +42,15 @@ import java.beans.PropertyVetoException;
 import java.io.IOException;
 
 import java.util.*;
-import org.ihtsdo.tk.api.blueprint.CreateOrAmendBlueprint;
+import org.ihtsdo.tk.api.blueprint.IdDirective;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.blueprint.MediaCAB;
-import org.ihtsdo.tk.dto.concept.component.TkRevision;
+import org.ihtsdo.tk.api.blueprint.RefexDirective;
 
 public class Image extends ConceptComponent<ImageRevision, Image>
         implements I_ImageVersioned<ImageRevision>, I_ImagePart<ImageRevision>, MediaAnalogBI<ImageRevision> {
 
-    private static VersionComputer<Image.Version> computer = new VersionComputer<Image.Version>();
+    private static VersionComputer<Image.Version> computer = new VersionComputer<>();
     //~--- fields --------------------------------------------------------------
     private String format;
     private byte[] image;
@@ -77,7 +76,7 @@ public class Image extends ConceptComponent<ImageRevision, Image>
         primordialSapNid = Bdb.getSapNid(eMedia);
 
         if (eMedia.getRevisionList() != null) {
-            revisions = new RevisionSet<ImageRevision, Image>(primordialSapNid);
+            revisions = new RevisionSet<>(primordialSapNid);
 
             for (TkMediaRevision eiv : eMedia.getRevisionList()) {
                 revisions.add(new ImageRevision(eiv, this));
@@ -95,7 +94,7 @@ public class Image extends ConceptComponent<ImageRevision, Image>
     public void addTuples(NidSetBI allowedStatus, NidSetBI allowedTypes, PositionSetBI positions,
             List<I_ImageTuple> matchingTuples, Precedence precedencePolicy,
             ContradictionManagerBI contradictionManager) {
-        List<Version> returnTuples = new ArrayList<Version>();
+        List<Version> returnTuples = new ArrayList<>();
 
         computer.addSpecifiedVersions(allowedStatus, allowedTypes, positions, returnTuples, getVersions(),
                 precedencePolicy, contradictionManager);
@@ -191,7 +190,7 @@ public class Image extends ConceptComponent<ImageRevision, Image>
     public boolean promote(PositionBI viewPosition, PathSetReadOnly pomotionPaths, NidSetBI allowedStatus,
             Precedence precedence, int authorNid) {
         int viewPathId = viewPosition.getPath().getConceptNid();
-        List<Version> matchingTuples = new ArrayList<Version>();
+        List<Version> matchingTuples = new ArrayList<>();
 
         computer.addSpecifiedVersions(allowedStatus, viewPosition, matchingTuples, getTuples(), precedence,
                 null);
@@ -318,7 +317,7 @@ public class Image extends ConceptComponent<ImageRevision, Image>
 
     @Override
     public void writeToBdb(TupleOutput output, int maxReadOnlyStatusAtPositionNid) {
-        List<ImageRevision> partsToWrite = new ArrayList<ImageRevision>();
+        List<ImageRevision> partsToWrite = new ArrayList<>();
 
         if (revisions != null) {
             for (ImageRevision p : revisions) {
@@ -361,14 +360,18 @@ public class Image extends ConceptComponent<ImageRevision, Image>
      * @see org.dwfa.vodb.types.I_ImageVersioned#getFormat()
      */
     @Override
-    public MediaCAB makeBlueprint(ViewCoordinate vc) throws IOException, ContradictionException, InvalidCAB {
+    public MediaCAB makeBlueprint(ViewCoordinate vc, IdDirective idDirective, 
+            RefexDirective refexDirective) 
+            throws IOException, ContradictionException, InvalidCAB {
         MediaCAB mediaBp = new MediaCAB(getConceptNid(),
                 getTypeNid(),
                 getFormat(),
                 getTextDescription(),
                 getMedia(),
                 getVersion(vc),
-                vc);
+                vc,
+                idDirective,
+                refexDirective);
         return mediaBp;
     }
 
@@ -436,7 +439,7 @@ public class Image extends ConceptComponent<ImageRevision, Image>
 
     @Override
     public List<Version> getTuples() {
-        return Collections.unmodifiableList(new ArrayList<Version>(getVersions()));
+        return Collections.unmodifiableList(new ArrayList<>(getVersions()));
     }
 
     @Override
@@ -510,7 +513,7 @@ public class Image extends ConceptComponent<ImageRevision, Image>
                 count = count + revisions.size();
             }
 
-            ArrayList<Version> list = new ArrayList<Version>(count);
+            ArrayList<Version> list = new ArrayList<>(count);
 
             if (getTime() != Long.MIN_VALUE) {
                 list.add(new Version(this));
@@ -532,7 +535,7 @@ public class Image extends ConceptComponent<ImageRevision, Image>
 
     @Override
     public List<Image.Version> getVersions(ViewCoordinate c) {
-        List<Version> returnTuples = new ArrayList<Version>(2);
+        List<Version> returnTuples = new ArrayList<>(2);
 
         computer.addSpecifiedVersions(c.getAllowedStatusNids(), (NidSetBI) null, c.getPositionSet(),
                 returnTuples, getVersions(), c.getPrecedence(),
@@ -543,7 +546,7 @@ public class Image extends ConceptComponent<ImageRevision, Image>
 
     public Collection<Image.Version> getVersions(NidSetBI allowedStatus, NidSetBI allowedTypes,
             PositionSetBI viewPositions, Precedence precedence, ContradictionManagerBI contradictionMgr) {
-        List<Version> returnTuples = new ArrayList<Version>(2);
+        List<Version> returnTuples = new ArrayList<>(2);
 
         computer.addSpecifiedVersions(allowedStatus, allowedTypes, viewPositions, returnTuples, getVersions(),
                 precedence, contradictionMgr);
@@ -651,8 +654,10 @@ public class Image extends ConceptComponent<ImageRevision, Image>
         }
 
         @Override
-        public MediaCAB makeBlueprint(ViewCoordinate vc) throws IOException, ContradictionException, InvalidCAB {
-            return getCv().makeBlueprint(vc);
+        public MediaCAB makeBlueprint(ViewCoordinate vc, IdDirective idDirective, 
+            RefexDirective refexDirective) 
+                throws IOException, ContradictionException, InvalidCAB {
+            return getCv().makeBlueprint(vc, idDirective, refexDirective);
         }
 
         @Override

@@ -18,7 +18,9 @@ import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.TerminologyBuilderBI;
 import org.ihtsdo.tk.api.blueprint.CreateOrAmendBlueprint;
+import org.ihtsdo.tk.api.blueprint.IdDirective;
 import org.ihtsdo.tk.api.blueprint.MediaCAB;
+import org.ihtsdo.tk.api.blueprint.RefexDirective;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.id.IdBI;
 import org.ihtsdo.tk.api.media.MediaAnalogBI;
@@ -38,7 +40,6 @@ public class ImageTest {
 
     private static final String UUID_VIEWER_IMAGE = "5f5be40f-24c1-374f-bd04-4a5003e366ea";
     private static final String UUID_REFERENCE_SET = "7e38cd2d-6f1a-3a81-be0b-21e6090573c2";
-
     private static boolean propertyChangeListenerFired = false;
 
     @Test
@@ -49,8 +50,12 @@ public class ImageTest {
         ConceptChronicleBI concept = ConceptHelper.createNewConcept("concept (test concept)", "refset",
             referenceSet.getNid());
 
-        MediaCAB imageCab = new MediaCAB(concept.getConceptNid(), viewerImage.getNid(), "image",
-            "a textual description", "a pretend image".getBytes());
+        MediaCAB imageCab = new MediaCAB(concept.getConceptNid(),
+                viewerImage.getNid(),
+                "image",
+                "a textual description",
+                "a pretend image".getBytes(),
+                IdDirective.GENERATE_HASH);
 
         I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
         TerminologyBuilderBI ammender = Ts.get().getTerminologyBuilder(config.getEditCoordinate(),
@@ -117,7 +122,7 @@ public class ImageTest {
         I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
 
         CreateOrAmendBlueprint cab = media.getVersion(config.getViewCoordinate()).makeBlueprint(
-            config.getViewCoordinate());
+                config.getViewCoordinate(), IdDirective.PRESERVE, RefexDirective.EXCLUDE);  // :!!!:REVIEW
         if (!MediaCAB.class.isAssignableFrom(cab.getClass())) {
             assertTrue(false);
         }
@@ -144,5 +149,4 @@ public class ImageTest {
         MediaChronicleBI modifiedRefex = ammender.construct(bp);
 
     }
-
 }

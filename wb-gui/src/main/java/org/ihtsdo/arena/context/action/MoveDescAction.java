@@ -20,6 +20,7 @@ import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.TerminologyBuilderBI;
+import org.ihtsdo.tk.api.blueprint.IdDirective;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB.RefexProperty;
@@ -80,36 +81,40 @@ public class MoveDescAction extends AbstractAction {
                         RefexCAB newSpec;
                         if (RefexNidVersionBI.class.isAssignableFrom(refex.getClass())) {
                             newSpec = new RefexCAB(
-                                TK_REFEX_TYPE.CID,
-                                newDesc.getNid(),
-                                refex.getRefexNid());
+                                    TK_REFEX_TYPE.CID,
+                                    newDesc.getNid(),
+                                    refex.getRefexNid(),
+                                    IdDirective.GENERATE_HASH);
                             RefexNidVersionBI cv =
                                     (RefexNidVersionBI) refex.getVersion(config.getViewCoordinate());
                             int typeNid = cv.getNid1();
                             newSpec.put(RefexProperty.CNID1, typeNid);
                         } else if(RefexBooleanVersionBI.class.isAssignableFrom(refex.getClass())){
                             newSpec = new RefexCAB(
-                                TK_REFEX_TYPE.BOOLEAN,
-                                newDesc.getNid(),
-                                refex.getRefexNid());
+                                    TK_REFEX_TYPE.BOOLEAN,
+                                    newDesc.getNid(),
+                                    refex.getRefexNid(),
+                                    IdDirective.GENERATE_HASH);
                             RefexBooleanVersionBI bv =
                                     (RefexBooleanVersionBI) refex.getVersion(config.getViewCoordinate());
                             boolean boolean1 = bv.getBoolean1();
                             newSpec.put(RefexProperty.BOOLEAN1, boolean1);
                         } else if (RefexStringVersionBI.class.isAssignableFrom(refex.getClass())){
                             newSpec = new RefexCAB(
-                                TK_REFEX_TYPE.STR,
-                                newDesc.getNid(),
-                                refex.getRefexNid());
+                                    TK_REFEX_TYPE.STR,
+                                    newDesc.getNid(),
+                                    refex.getRefexNid(),
+                                    IdDirective.GENERATE_HASH);
                             RefexStringVersionBI sv =
                                     (RefexStringVersionBI) refex.getVersion(config.getViewCoordinate());
                             String string1 = sv.getString1();
                             newSpec.put(RefexProperty.STRING1, string1);
                         } else if(RefexIntVersionBI.class.isAssignableFrom(refex.getClass())){
                             newSpec = new RefexCAB(
-                                TK_REFEX_TYPE.INT,
-                                newDesc.getNid(),
-                                refex.getRefexNid());
+                                    TK_REFEX_TYPE.INT,
+                                    newDesc.getNid(),
+                                    refex.getRefexNid(),
+                                    IdDirective.GENERATE_HASH);
                             RefexIntVersionBI iv =
                                     (RefexIntVersionBI) refex.getVersion(config.getViewCoordinate());
                             int int1 = iv.getInt1();
@@ -167,15 +172,7 @@ public class MoveDescAction extends AbstractAction {
             Terms.get().addUncommitted(sourceConcept);
 
 
-        } catch (TerminologyException e1) {
-            AceLog.getAppLog().alertAndLogException(e1);
-        } catch (IOException e1) {
-            AceLog.getAppLog().alertAndLogException(e1);
-        } catch (PropertyVetoException e1) {
-            AceLog.getAppLog().alertAndLogException(e1);
-        } catch (InvalidCAB e1) {
-            AceLog.getAppLog().alertAndLogException(e1);
-        } catch (ContradictionException e1) {
+        } catch (TerminologyException | IOException | PropertyVetoException | InvalidCAB | ContradictionException e1) {
             AceLog.getAppLog().alertAndLogException(e1);
         }
 

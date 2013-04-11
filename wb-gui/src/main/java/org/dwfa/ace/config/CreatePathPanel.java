@@ -46,6 +46,7 @@ import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.TerminologyBuilderBI;
 import org.ihtsdo.tk.api.blueprint.ConceptCB;
+import org.ihtsdo.tk.api.blueprint.IdDirective;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 
@@ -158,6 +159,7 @@ public class CreatePathPanel extends JPanel implements ActionListener {
                     desc.getText(),
                     LANG_CODE.EN,
                     ArchitectonicAuxiliary.Concept.IS_A_REL.getPrimoridalUid(),
+                    IdDirective.GENERATE_HASH,
                     selectedParent.getPrimUuid());
             conceptBlueprint.setComponentUuid(pathUUID);
             TerminologyBuilderBI builder = Ts.get().getTerminologyBuilder(config.getEditCoordinate(), config.getViewCoordinate());

@@ -38,6 +38,7 @@ import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.TerminologyBuilderBI;
 import org.ihtsdo.tk.api.blueprint.ConceptCB;
 import org.ihtsdo.tk.api.blueprint.DescriptionCAB;
+import org.ihtsdo.tk.api.blueprint.IdDirective;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.binding.snomed.Snomed;
@@ -66,10 +67,12 @@ public class NewConcept extends AbstractTask {
 
     }
 
+    @Override
     public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         // Nothing to do...
     }
 
+    @Override
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         ConceptChronicleBI newConcept = null;
 
@@ -101,6 +104,7 @@ public class NewConcept extends AbstractTask {
                     "new concept",
                     LANG_CODE.EN,
                     Snomed.IS_A.getLenient().getPrimUuid(),
+                    IdDirective.GENERATE_HASH,
                     parentConcept.getPrimUuid());
             
             /*
@@ -169,10 +173,12 @@ public class NewConcept extends AbstractTask {
         }
     }
 
+    @Override
     public Collection<Condition> getConditions() {
         return CONTINUE_CONDITION;
     }
 
+    @Override
     public int[] getDataContainerIds() {
         return new int[]{};
     }

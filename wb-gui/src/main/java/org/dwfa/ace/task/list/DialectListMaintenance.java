@@ -25,7 +25,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.lang.String;
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
@@ -48,6 +47,7 @@ import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.TerminologyBuilderBI;
+import org.ihtsdo.tk.api.blueprint.IdDirective;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB.RefexProperty;
@@ -95,10 +95,12 @@ public class DialectListMaintenance extends AbstractTask {
 
     }
 
+    @Override
     public void complete(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         // Nothing to do...
     }
 
+    @Override
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         try {
             I_ConfigAceFrame config = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
@@ -131,14 +133,14 @@ public class DialectListMaintenance extends AbstractTask {
             }
             Collection<? extends RefexVersionBI<?>> currentDialectRefsetMembers =
                     dialectRefexColl.getRefsetMembersActive(vc);
-            ArrayList<RefexStringVersionBI> dialectMemberList = new ArrayList<RefexStringVersionBI>();
+            ArrayList<RefexStringVersionBI> dialectMemberList = new ArrayList<>();
             for (RefexVersionBI rv : currentDialectRefsetMembers) {
                 RefexStringVersionBI member = (RefexStringVersionBI) rv;
                 dialectMemberList.add(member);
             }
             Collection<? extends RefexVersionBI<?>> currentRefsetMembers =
                     refexColl.getRefsetMembersActive(vc);
-            ArrayList<RefexStringVersionBI> memberList = new ArrayList<RefexStringVersionBI>();
+            ArrayList<RefexStringVersionBI> memberList = new ArrayList<>();
             for (RefexVersionBI rv : currentRefsetMembers) {
                 RefexStringVersionBI member = (RefexStringVersionBI) rv;
                 memberList.add(member);
@@ -202,7 +204,9 @@ public class DialectListMaintenance extends AbstractTask {
 
     private void addMember(String variant, String word) throws IOException, InvalidCAB, ContradictionException {
         RefexCAB textRefexSpec = new RefexCAB(TK_REFEX_TYPE.STR,
-                refexColl.getNid(), refexColl.getNid());
+                refexColl.getNid(), 
+                refexColl.getNid(),
+                IdDirective.GENERATE_HASH);
         textRefexSpec.with(RefexProperty.STRING1, word);
         textRefexSpec.with(RefexProperty.STATUS_NID,
                 SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid());
@@ -211,7 +215,9 @@ public class DialectListMaintenance extends AbstractTask {
         RefexChronicleBI<?> textRefex = tc.constructIfNotCurrent(textRefexSpec);
 
         RefexCAB variantRefexSpec = new RefexCAB(TK_REFEX_TYPE.STR,
-                textRefex.getNid(), dialectRefexColl.getNid());
+                textRefex.getNid(), 
+                dialectRefexColl.getNid(),
+                IdDirective.GENERATE_HASH);
 
         variantRefexSpec.with(RefexProperty.STRING1, variant);
         variantRefexSpec.with(RefexProperty.STATUS_NID,
@@ -234,10 +240,12 @@ public class DialectListMaintenance extends AbstractTask {
         Ts.get().addUncommitted(collConcept);
     }
     
+    @Override
     public Collection<Condition> getConditions() {
         return CONTINUE_CONDITION;
     }
 
+    @Override
     public int[] getDataContainerIds() {
         return new int[]{};
     }

@@ -18,8 +18,10 @@ import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.TerminologyBuilderBI;
 import org.ihtsdo.tk.api.blueprint.CreateOrAmendBlueprint;
+import org.ihtsdo.tk.api.blueprint.IdDirective;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB.RefexProperty;
+import org.ihtsdo.tk.api.blueprint.RefexDirective;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.id.IdBI;
 import org.ihtsdo.tk.api.refex.RefexAnalogBI;
@@ -136,7 +138,10 @@ public class NewRefsetTest {
         TerminologyBuilderBI ammender = Ts.get().getTerminologyBuilder(config.getEditCoordinate(),
             config.getViewCoordinate());
 
-        RefexCAB refexSpec = new RefexCAB(refexType, memberConcept.getNid(), refsetConcept.getNid());
+        RefexCAB refexSpec = new RefexCAB(refexType, 
+                memberConcept.getNid(), 
+                refsetConcept.getNid(),
+                IdDirective.GENERATE_HASH);
         switch (refexType) {
         case CID:
             refexSpec.put(RefexProperty.CNID1, refConcept1.getConceptNid());
@@ -336,7 +341,7 @@ public class NewRefsetTest {
         I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
 
         CreateOrAmendBlueprint cab = refsetMember.getVersion(config.getViewCoordinate()).makeBlueprint(
-            config.getViewCoordinate());
+            config.getViewCoordinate(), IdDirective.PRESERVE, RefexDirective.EXCLUDE);  // :!!!:REVIEW
         if (!RefexCAB.class.isAssignableFrom(cab.getClass())) {
             assertTrue(false);
         }

@@ -12,7 +12,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 
-import org.apache.commons.beanutils.converters.CalendarConverter;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_ShowActivity;
@@ -42,6 +41,7 @@ import org.ihtsdo.tk.api.conceptattribute.ConceptAttributeVersionBI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.PositionSet;
+import org.ihtsdo.tk.api.blueprint.IdDirective;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
@@ -142,14 +142,13 @@ public class DescriptionsDiffComputer {
 
 	private void addToRefset(I_GetConceptData member, I_GetConceptData refset) {
 		try {
-			RefexCAB newSpec = new RefexCAB(TK_REFEX_TYPE.CID, member.getNid(), refset.getNid());
+			RefexCAB newSpec = new RefexCAB(TK_REFEX_TYPE.CID, 
+                                member.getNid(), 
+                                refset.getNid(),
+                                IdDirective.GENERATE_HASH);
 			newSpec.put(RefexProperty.CNID1, activeNid);
 			RefexChronicleBI<?> newRefex = tb.construct(newSpec);
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (InvalidCAB e) {
-			e.printStackTrace();
-		} catch (ContradictionException e) {
+		} catch (    IOException | InvalidCAB | ContradictionException e) {
 			e.printStackTrace();
 		}
 	}
@@ -187,7 +186,7 @@ public class DescriptionsDiffComputer {
 	}
 
 	public void setup() throws IOException, InvalidCAB, ContradictionException, TerminologyException {
-		HashSet<I_ShowActivity> activities = new HashSet<I_ShowActivity>();
+		HashSet<I_ShowActivity> activities = new HashSet<>();
 		activity = Terms.get().newActivityPanel(true, config, "<html>Creating Diff refsets: " + refsetNamePrefix, true);
 		activities.add(activity);
 		activity.setValue(0);
@@ -231,54 +230,103 @@ public class DescriptionsDiffComputer {
 		}
 		
 		String preferredNamePrefix = "Comparison "+ formatter.format(init.getTime())  +  " to " + formatter.format(init.getTime()) +  " (Created on "  + dateFormat.format(new Date()) + ")";
-		ConceptCB addedConceptsRefsetCB = new ConceptCB(refsetNamePrefix + " Added Concepts" + fsnPostFix + " (refset)", preferredNamePrefix + " Added Concepts" + fsnPostFix, LANG_CODE.EN, ArchitectonicAuxiliary.Concept.IS_A_REL.getPrimoridalUid(), RefsetAuxiliary.Concept.REFSET_IDENTITY.getPrimoridalUid());
+		ConceptCB addedConceptsRefsetCB = new ConceptCB(refsetNamePrefix + " Added Concepts" + fsnPostFix + " (refset)", 
+                        preferredNamePrefix + " Added Concepts" + fsnPostFix, 
+                        LANG_CODE.EN, 
+                        ArchitectonicAuxiliary.Concept.IS_A_REL.getPrimoridalUid(),
+                        IdDirective.GENERATE_HASH,
+                        RefsetAuxiliary.Concept.REFSET_IDENTITY.getPrimoridalUid());
 		ConceptChronicleBI ac = tb.constructIfNotCurrent(addedConceptsRefsetCB);
 		addedConceptsRefset = (I_GetConceptData) ac;
 		tf.addUncommittedNoChecks(addedConceptsRefset);
 
-		ConceptCB retiredConceptsRefsetCB = new ConceptCB(refsetNamePrefix + " Retired Concepts" + fsnPostFix + " (refset)", preferredNamePrefix + " Retired Concepts"+ fsnPostFix, LANG_CODE.EN, ArchitectonicAuxiliary.Concept.IS_A_REL.getPrimoridalUid(), RefsetAuxiliary.Concept.REFSET_IDENTITY.getPrimoridalUid());
+		ConceptCB retiredConceptsRefsetCB = new ConceptCB(refsetNamePrefix + " Retired Concepts" + fsnPostFix + " (refset)", 
+                        preferredNamePrefix + " Retired Concepts"+ fsnPostFix, 
+                        LANG_CODE.EN, 
+                        ArchitectonicAuxiliary.Concept.IS_A_REL.getPrimoridalUid(), 
+                        IdDirective.GENERATE_HASH,
+                        RefsetAuxiliary.Concept.REFSET_IDENTITY.getPrimoridalUid());
 		ConceptChronicleBI rcd = tb.constructIfNotCurrent(retiredConceptsRefsetCB);
 		retiredConceptsRefset = (I_GetConceptData) rcd;
 		tf.addUncommittedNoChecks(retiredConceptsRefset);
 
-		ConceptCB reactivatedConceptsRefsetCB = new ConceptCB(refsetNamePrefix + " Reactivated Concepts" + fsnPostFix + " (refset)",  preferredNamePrefix + " Reactivated Concepts"+ fsnPostFix, LANG_CODE.EN, ArchitectonicAuxiliary.Concept.IS_A_REL.getPrimoridalUid(), RefsetAuxiliary.Concept.REFSET_IDENTITY.getPrimoridalUid());
+		ConceptCB reactivatedConceptsRefsetCB = new ConceptCB(refsetNamePrefix + " Reactivated Concepts" + fsnPostFix + " (refset)",  
+                        preferredNamePrefix + " Reactivated Concepts"+ fsnPostFix, 
+                        LANG_CODE.EN, 
+                        ArchitectonicAuxiliary.Concept.IS_A_REL.getPrimoridalUid(),
+                        IdDirective.GENERATE_HASH,
+                        RefsetAuxiliary.Concept.REFSET_IDENTITY.getPrimoridalUid());
 		ConceptChronicleBI reacs = tb.constructIfNotCurrent(reactivatedConceptsRefsetCB);
 		
 		reactivatedConceptsRefset = (I_GetConceptData) reacs;
 		tf.addUncommittedNoChecks(reactivatedConceptsRefset);
 
-		ConceptCB semtagChangesRefsetCB = new ConceptCB(refsetNamePrefix + " SemTag Changes" + fsnPostFix + " (refset)", preferredNamePrefix + " SemTag Changes"+ fsnPostFix, LANG_CODE.EN, ArchitectonicAuxiliary.Concept.IS_A_REL.getPrimoridalUid(), RefsetAuxiliary.Concept.REFSET_IDENTITY.getPrimoridalUid());
+		ConceptCB semtagChangesRefsetCB = new ConceptCB(refsetNamePrefix + " SemTag Changes" + fsnPostFix + " (refset)", 
+                        preferredNamePrefix + " SemTag Changes"+ fsnPostFix, 
+                        LANG_CODE.EN, 
+                        ArchitectonicAuxiliary.Concept.IS_A_REL.getPrimoridalUid(),
+                        IdDirective.GENERATE_HASH,
+                        RefsetAuxiliary.Concept.REFSET_IDENTITY.getPrimoridalUid());
 		ConceptChronicleBI stc = tb.constructIfNotCurrent(semtagChangesRefsetCB);
 		semtagChangesRefset = (I_GetConceptData) stc;
 		tf.addUncommittedNoChecks(semtagChangesRefset);
 
-		ConceptCB fsnChangesRefsetCB = new ConceptCB(refsetNamePrefix + " FSN Changes" + fsnPostFix + " (refset)", preferredNamePrefix + " FSN Changes"+ fsnPostFix, LANG_CODE.EN, ArchitectonicAuxiliary.Concept.IS_A_REL.getPrimoridalUid(), RefsetAuxiliary.Concept.REFSET_IDENTITY.getPrimoridalUid());
+		ConceptCB fsnChangesRefsetCB = new ConceptCB(refsetNamePrefix + " FSN Changes" + fsnPostFix + " (refset)", 
+                        preferredNamePrefix + " FSN Changes"+ fsnPostFix, 
+                        LANG_CODE.EN, 
+                        ArchitectonicAuxiliary.Concept.IS_A_REL.getPrimoridalUid(),
+                        IdDirective.GENERATE_HASH,
+                        RefsetAuxiliary.Concept.REFSET_IDENTITY.getPrimoridalUid());
 		ConceptChronicleBI fsnc = tb.constructIfNotCurrent(fsnChangesRefsetCB);
 		fsnChangesRefset = (I_GetConceptData) fsnc;
 		tf.addUncommittedNoChecks(fsnChangesRefset);
 
-		ConceptCB prefChangesRefsetCB = new ConceptCB(refsetNamePrefix + " Pref Changes" + fsnPostFix + " (refset)", preferredNamePrefix + " Pref Changes"+ fsnPostFix, LANG_CODE.EN, ArchitectonicAuxiliary.Concept.IS_A_REL.getPrimoridalUid(), RefsetAuxiliary.Concept.REFSET_IDENTITY.getPrimoridalUid());
+		ConceptCB prefChangesRefsetCB = new ConceptCB(refsetNamePrefix + " Pref Changes" + fsnPostFix + " (refset)", 
+                        preferredNamePrefix + " Pref Changes"+ fsnPostFix, 
+                        LANG_CODE.EN, 
+                        ArchitectonicAuxiliary.Concept.IS_A_REL.getPrimoridalUid(),
+                        IdDirective.GENERATE_HASH,
+                        RefsetAuxiliary.Concept.REFSET_IDENTITY.getPrimoridalUid());
 		ConceptChronicleBI prc = tb.constructIfNotCurrent(prefChangesRefsetCB);
 		prefChangesRefset = (I_GetConceptData) prc;
 		tf.addUncommittedNoChecks(prefChangesRefset);
 
-		ConceptCB retiredDescriptionsRefsetCB = new ConceptCB(refsetNamePrefix + " Retired Descriptions" + fsnPostFix + " (refset)", preferredNamePrefix + " Retired Descriptions"+ fsnPostFix, LANG_CODE.EN, ArchitectonicAuxiliary.Concept.IS_A_REL.getPrimoridalUid(), RefsetAuxiliary.Concept.REFSET_IDENTITY.getPrimoridalUid());
+		ConceptCB retiredDescriptionsRefsetCB = new ConceptCB(refsetNamePrefix + " Retired Descriptions" + fsnPostFix + " (refset)", 
+                        preferredNamePrefix + " Retired Descriptions"+ fsnPostFix, 
+                        LANG_CODE.EN, 
+                        ArchitectonicAuxiliary.Concept.IS_A_REL.getPrimoridalUid(),
+                        IdDirective.GENERATE_HASH,
+                        RefsetAuxiliary.Concept.REFSET_IDENTITY.getPrimoridalUid());
 		ConceptChronicleBI retd = tb.constructIfNotCurrent(retiredDescriptionsRefsetCB);
 		retiredDescriptionsRefset = (I_GetConceptData) retd;
 		tf.addUncommittedNoChecks(retiredDescriptionsRefset);
 
-		ConceptCB addedDescriptionsRefsetCB = new ConceptCB(refsetNamePrefix + " New Descriptions" + fsnPostFix + " (refset)", preferredNamePrefix + " New Descriptions"+ fsnPostFix, LANG_CODE.EN, ArchitectonicAuxiliary.Concept.IS_A_REL.getPrimoridalUid(), RefsetAuxiliary.Concept.REFSET_IDENTITY.getPrimoridalUid());
+		ConceptCB addedDescriptionsRefsetCB = new ConceptCB(refsetNamePrefix + " New Descriptions" + fsnPostFix + " (refset)", 
+                        preferredNamePrefix + " New Descriptions"+ fsnPostFix, 
+                        LANG_CODE.EN, 
+                        ArchitectonicAuxiliary.Concept.IS_A_REL.getPrimoridalUid(),
+                        IdDirective.GENERATE_HASH,
+                        RefsetAuxiliary.Concept.REFSET_IDENTITY.getPrimoridalUid());
 		ConceptChronicleBI addd = tb.constructIfNotCurrent(addedDescriptionsRefsetCB);
 		addedDescriptionsRefset = (I_GetConceptData) addd;
 		tf.addUncommittedNoChecks(addedDescriptionsRefset);
 
-		ConceptCB changedAcceptabilityRefsetCB = new ConceptCB(refsetNamePrefix + " Changed Acceptability" + fsnPostFix + " (refset)", preferredNamePrefix + " Changed Acceptability"+ fsnPostFix, LANG_CODE.EN, ArchitectonicAuxiliary.Concept.IS_A_REL.getPrimoridalUid(), RefsetAuxiliary.Concept.REFSET_IDENTITY.getPrimoridalUid());
+		ConceptCB changedAcceptabilityRefsetCB = new ConceptCB(refsetNamePrefix + " Changed Acceptability" + fsnPostFix + " (refset)", 
+                        preferredNamePrefix + " Changed Acceptability"+ fsnPostFix, 
+                        LANG_CODE.EN, 
+                        ArchitectonicAuxiliary.Concept.IS_A_REL.getPrimoridalUid(), 
+                        IdDirective.GENERATE_HASH,
+                        RefsetAuxiliary.Concept.REFSET_IDENTITY.getPrimoridalUid());
 		ConceptChronicleBI cha = tb.constructIfNotCurrent(changedAcceptabilityRefsetCB);
 		changedAcceptabilityRefset = (I_GetConceptData) cha;
 		tf.addUncommittedNoChecks(changedAcceptabilityRefset);
 
-		ConceptCB reactivatedDescriptionsRefsetCB = new ConceptCB(refsetNamePrefix + " Reactivated Descriptions" + fsnPostFix + " (refset)", preferredNamePrefix + " Reactivated Descriptions"+ fsnPostFix, LANG_CODE.EN, ArchitectonicAuxiliary.Concept.IS_A_REL.getPrimoridalUid(),
-				RefsetAuxiliary.Concept.REFSET_IDENTITY.getPrimoridalUid());
+		ConceptCB reactivatedDescriptionsRefsetCB = new ConceptCB(refsetNamePrefix + " Reactivated Descriptions" + fsnPostFix + " (refset)", 
+                        preferredNamePrefix + " Reactivated Descriptions"+ fsnPostFix, 
+                        LANG_CODE.EN, 
+                        ArchitectonicAuxiliary.Concept.IS_A_REL.getPrimoridalUid(),
+                        IdDirective.GENERATE_HASH,
+		        RefsetAuxiliary.Concept.REFSET_IDENTITY.getPrimoridalUid());
 		ConceptChronicleBI read = tb.constructIfNotCurrent(reactivatedDescriptionsRefsetCB);
 		reactivatedDescriptionsRefset = (I_GetConceptData) read;
 		tf.addUncommittedNoChecks(reactivatedDescriptionsRefset);
@@ -319,7 +367,7 @@ public class DescriptionsDiffComputer {
 			countIterated = 0;
 			countCompared = 0;
 			countDiff = 0;
-			monitorList = new ArrayList<Integer>();
+			monitorList = new ArrayList<>();
 			monitorList.add(tf.uuidToNative(UUID.fromString("d47b4cbe-76c0-3266-8b0c-26eba8b09aa4")));
 			monitorList.add(tf.uuidToNative(UUID.fromString("31c346d2-8ff7-371b-89d3-5a7121e18a86")));
 		}
@@ -378,7 +426,7 @@ public class DescriptionsDiffComputer {
 				String v2SemTag = "";
 				String v1Pref = "";
 				String v2Pref = "";
-				HashMap<UUID, DescriptionVersionBI> v1Descs = new HashMap<UUID, DescriptionVersionBI>();
+				HashMap<UUID, DescriptionVersionBI> v1Descs = new HashMap<>();
 				for (DescriptionVersionBI loopDescPre : version1.getDescriptionsActive()) {
 					DescriptionVersionBI loopDesc = (DescriptionVersionBI) loopDescPre.getVersion(v1);
 					v1Descs.put(loopDesc.getPrimUuid(), loopDesc);
@@ -398,7 +446,7 @@ public class DescriptionsDiffComputer {
 					}
 				}
 
-				HashMap<UUID, DescriptionVersionBI> v2Descs = new HashMap<UUID, DescriptionVersionBI>();
+				HashMap<UUID, DescriptionVersionBI> v2Descs = new HashMap<>();
 				for (DescriptionVersionBI loopDescPre : version2.getDescriptionsActive()) {
 					DescriptionVersionBI loopDesc = (DescriptionVersionBI) loopDescPre.getVersion(v2);
 					v2Descs.put(loopDesc.getPrimUuid(), loopDesc);

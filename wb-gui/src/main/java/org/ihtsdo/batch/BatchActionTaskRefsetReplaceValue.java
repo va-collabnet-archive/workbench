@@ -18,12 +18,12 @@ package org.ihtsdo.batch;
 
 import java.io.IOException;
 import java.util.Collection;
-import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
 import org.ihtsdo.batch.BatchActionEvent.BatchActionEventType;
-import org.ihtsdo.tk.api.AnalogBI;
 import org.ihtsdo.tk.api.ContradictionException;
+import org.ihtsdo.tk.api.blueprint.IdDirective;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
+import org.ihtsdo.tk.api.blueprint.RefexDirective;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
@@ -78,7 +78,7 @@ public class BatchActionTaskRefsetReplaceValue extends BatchActionTask {
         for (RefexVersionBI rvbi : currentRefexes) {
             if (rvbi.getRefexNid() == collectionNid) {
                 if (matchValue == null) {
-                    RefexCAB blueprint = rvbi.makeBlueprint(vc);
+                    RefexCAB blueprint = rvbi.makeBlueprint(vc, IdDirective.PRESERVE, RefexDirective.EXCLUDE);  // :!!!:REVIEW
                     blueprint.setMemberUuid(rvbi.getPrimUuid());
                     TK_REFEX_TYPE memberType = blueprint.getMemberType();
 
@@ -113,7 +113,7 @@ public class BatchActionTaskRefsetReplaceValue extends BatchActionTask {
                     changed = true;
                 } else {
                     // CHECK FILTER
-                    RefexCAB spec = rvbi.makeBlueprint(vc);
+                    RefexCAB spec = rvbi.makeBlueprint(vc, IdDirective.PRESERVE, RefexDirective.EXCLUDE);
                     boolean matched = false;
                     switch (refsetType) {
                         case BOOLEAN:
@@ -141,7 +141,7 @@ public class BatchActionTaskRefsetReplaceValue extends BatchActionTask {
                     }
 
                     if (matched) {
-                        RefexCAB blueprint = rvbi.makeBlueprint(vc);
+                        RefexCAB blueprint = rvbi.makeBlueprint(vc, IdDirective.PRESERVE, RefexDirective.EXCLUDE);  // :!!!:REVIEW
                         TK_REFEX_TYPE memberType = blueprint.getMemberType();
 
                         // CHANGE value

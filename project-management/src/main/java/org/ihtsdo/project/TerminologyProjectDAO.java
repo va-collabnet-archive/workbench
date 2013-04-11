@@ -127,6 +127,7 @@ import org.ihtsdo.tk.workflow.api.WfFilterBI;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.json.JettisonMappedXmlDriver;
+import org.ihtsdo.tk.api.blueprint.IdDirective;
 
 /**
  * The Class TerminologyProjectDAO.
@@ -1629,7 +1630,10 @@ public class TerminologyProjectDAO {
 			// termFactory.getConcept(ArchitectonicAuxiliary.Concept.PROJECT_NAMESPACE_REFSET.localize().getNid());
 			I_GetConceptData namespaceRefset = termFactory.getConcept(ArchitectonicAuxiliary.Concept.ALEJANDRO_RODRIGUEZ.localize().getNid());
 
-			RefexCAB newBluePrint = new RefexCAB(TK_REFEX_TYPE.CID_STR, projectConcept.getNid(), namespaceRefset.getNid());
+			RefexCAB newBluePrint = new RefexCAB(TK_REFEX_TYPE.CID_STR, 
+                                projectConcept.getNid(), 
+                                namespaceRefset.getNid(),
+                                IdDirective.GENERATE_HASH);
 			newBluePrint.put(RefexProperty.CNID1, ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid());
 			newBluePrint.put(RefexProperty.STRING1, namespaceText);
 			Ts.get().getTerminologyBuilder(config.getEditCoordinate(), config.getViewCoordinate()).constructIfNotCurrent(newBluePrint);
@@ -5672,7 +5676,10 @@ public class TerminologyProjectDAO {
 			userNid = ts.getNidForUuids(user.getId());
 		}
 
-		RefexCAB newSpec = new RefexCAB(TK_REFEX_TYPE.CID, concept.getNid(), ts.getNidForUuids(workList.getUids()));
+		RefexCAB newSpec = new RefexCAB(TK_REFEX_TYPE.CID, 
+                        concept.getNid(), 
+                        ts.getNidForUuids(workList.getUids()),
+                        IdDirective.GENERATE_HASH);
 		int activeNid = SnomedMetadataRf1.CURRENT_RF1.getLenient().getNid();
 		int assignedNid = Terms.get().uuidToNative(ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_ASSIGNED_STATUS.getUids());
 
@@ -5681,7 +5688,10 @@ public class TerminologyProjectDAO {
 		TerminologyBuilderBI tc = Ts.get().getTerminologyBuilder(config.getEditCoordinate(), config.getViewCoordinate());
 		RefexChronicleBI<?> newRefex = tc.constructIfNotCurrent(newSpec);
 
-		RefexCAB newSpecForProm = new RefexCAB(TK_REFEX_TYPE.CID_CID, concept.getNid(), promRef.getRefsetId());
+		RefexCAB newSpecForProm = new RefexCAB(TK_REFEX_TYPE.CID_CID, 
+                        concept.getNid(), 
+                        promRef.getRefsetId(),
+                        IdDirective.GENERATE_HASH);
 		newSpecForProm.put(RefexProperty.CNID1, assignedNid);
 		newSpecForProm.put(RefexProperty.CNID2, userNid);
 		RefexChronicleBI<?> newRefexForProm = tc.constructIfNotCurrent(newSpecForProm);

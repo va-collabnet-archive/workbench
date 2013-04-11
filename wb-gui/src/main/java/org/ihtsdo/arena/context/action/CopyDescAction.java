@@ -16,12 +16,12 @@ import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.arena.spec.Refsets;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.TerminologyBuilderBI;
+import org.ihtsdo.tk.api.blueprint.IdDirective;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB.RefexProperty;
@@ -38,7 +38,6 @@ import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 import org.ihtsdo.tk.drools.facts.ConceptFact;
 import org.ihtsdo.tk.drools.facts.DescFact;
 import org.ihtsdo.tk.dto.concept.component.refex.TK_REFEX_TYPE;
-import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 
 public class CopyDescAction extends AbstractAction {
@@ -83,7 +82,8 @@ public class CopyDescAction extends AbstractAction {
                             newSpec = new RefexCAB(
                                 TK_REFEX_TYPE.CID,
                                 newDesc.getNid(),
-                                refex.getRefexNid());
+                                refex.getRefexNid(),
+                                IdDirective.GENERATE_HASH);
                             RefexNidVersionBI cv =
                                     (RefexNidVersionBI) refex.getVersion(config.getViewCoordinate());
                             int typeNid = cv.getNid1();
@@ -92,7 +92,8 @@ public class CopyDescAction extends AbstractAction {
                             newSpec = new RefexCAB(
                                 TK_REFEX_TYPE.BOOLEAN,
                                 newDesc.getNid(),
-                                refex.getRefexNid());
+                                refex.getRefexNid(),
+                                IdDirective.GENERATE_HASH);
                             RefexBooleanVersionBI bv =
                                     (RefexBooleanVersionBI) refex.getVersion(config.getViewCoordinate());
                             boolean boolean1 = bv.getBoolean1();
@@ -101,7 +102,8 @@ public class CopyDescAction extends AbstractAction {
                             newSpec = new RefexCAB(
                                 TK_REFEX_TYPE.STR,
                                 newDesc.getNid(),
-                                refex.getRefexNid());
+                                refex.getRefexNid(),
+                                IdDirective.GENERATE_HASH);
                             RefexStringVersionBI sv =
                                     (RefexStringVersionBI) refex.getVersion(config.getViewCoordinate());
                             String string1 = sv.getString1();
@@ -110,7 +112,8 @@ public class CopyDescAction extends AbstractAction {
                             newSpec = new RefexCAB(
                                 TK_REFEX_TYPE.INT,
                                 newDesc.getNid(),
-                                refex.getRefexNid());
+                                refex.getRefexNid(),
+                                IdDirective.GENERATE_HASH);
                             RefexIntVersionBI iv =
                                     (RefexIntVersionBI) refex.getVersion(config.getViewCoordinate());
                             int int1 = iv.getInt1();
@@ -152,15 +155,7 @@ public class CopyDescAction extends AbstractAction {
             Terms.get().addUncommitted(concept);
 
 
-        } catch (TerminologyException e1) {
-            AceLog.getAppLog().alertAndLogException(e1);
-        } catch (IOException e1) {
-            AceLog.getAppLog().alertAndLogException(e1);
-        } catch (PropertyVetoException e1) {
-            AceLog.getAppLog().alertAndLogException(e1);
-        } catch (InvalidCAB e1) {
-            AceLog.getAppLog().alertAndLogException(e1);
-        } catch (ContradictionException e1) {
+        } catch (TerminologyException | IOException | PropertyVetoException | InvalidCAB | ContradictionException e1) {
             AceLog.getAppLog().alertAndLogException(e1);
         }
 

@@ -127,7 +127,7 @@ public class RelGroupVersion implements RelationshipGroupVersionBI {
 
     @Override
     public Collection<? extends RelationshipVersionBI> getRelationshipsActiveAllVersions() {
-        ArrayList<RelationshipVersionBI> results = new ArrayList<RelationshipVersionBI>();
+        ArrayList<RelationshipVersionBI> results = new ArrayList<>();
 
         for (RelationshipChronicleBI relc : rg.getRelationships()) {
             if (coordinate != null) {
@@ -155,7 +155,7 @@ public class RelGroupVersion implements RelationshipGroupVersionBI {
 
     @Override
     public Collection<? extends RelationshipVersionBI> getRelationshipsAll() throws ContradictionException {
-        ArrayList<RelationshipVersionBI> results = new ArrayList<RelationshipVersionBI>();
+        ArrayList<RelationshipVersionBI> results = new ArrayList<>();
 
         for (RelationshipChronicleBI relc : rg.getRelationships()) {
             if (coordinate != null) {
@@ -247,7 +247,7 @@ public class RelGroupVersion implements RelationshipGroupVersionBI {
 
     @Override
     public Collection<? extends RelationshipVersionBI> getRelationshipsActive() throws ContradictionException {
-        ArrayList<RelationshipVersionBI> results = new ArrayList<RelationshipVersionBI>();
+        ArrayList<RelationshipVersionBI> results = new ArrayList<>();
 
         for (RelationshipChronicleBI relc : rg.getRelationships()) {
             if (coordinate != null) {
@@ -271,7 +271,8 @@ public class RelGroupVersion implements RelationshipGroupVersionBI {
     }
 
     @Override
-    public CreateOrAmendBlueprint makeBlueprint(ViewCoordinate vc) throws IOException, ContradictionException {
+    public CreateOrAmendBlueprint makeBlueprint(ViewCoordinate vc, org.ihtsdo.tk.api.blueprint.IdDirective idDirective, org.ihtsdo.tk.api.blueprint.RefexDirective refexDirective)
+            throws IOException, ContradictionException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 

@@ -31,7 +31,9 @@ import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.blueprint.ConceptAttributeAB;
+import org.ihtsdo.tk.api.blueprint.IdDirective;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
+import org.ihtsdo.tk.api.blueprint.RefexDirective;
 import org.ihtsdo.tk.api.blueprint.RelationshipCAB;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
@@ -154,15 +156,23 @@ public class BatchActionTaskLogicDisjointAddUI extends javax.swing.JPanel
         if (BatchActionTask.ts.hasUuid(componentUuid) == true) {
             ConceptVersionBI refsetCB = BatchActionTask.ts.getConceptVersion(vc, componentUuid);
             // :SNOOWL: review added null, null)
-            ConceptAttributeAB cCab = new ConceptAttributeAB(componentUuid, false, null, null);
+            ConceptAttributeAB cCab = new ConceptAttributeAB(componentUuid,
+                    false,
+                    null,
+                    null,
+                    RefexDirective.EXCLUDE); // :!!!:REVIEW
             cCab.setCurrent();
             BatchActionTask.tsSnapshot.construct(cCab);
 
             // SET RELATIONSHIP TO CURRENT
             UUID roleTypeUuid = TermAux.IS_A.getLenient().getPrimUuid();
             UUID destUuid = DescriptionLogic.DISJOINT_SETS_REFSET.getLenient().getPrimUuid();
-            RelationshipCAB rCab = new RelationshipCAB(refsetCB.getPrimUuid(), roleTypeUuid, destUuid, 0,
-                    TkRelationshipType.STATED_HIERARCHY);
+            RelationshipCAB rCab = new RelationshipCAB(refsetCB.getPrimUuid(), 
+                    roleTypeUuid, 
+                    destUuid, 
+                    0,
+                    TkRelationshipType.STATED_HIERARCHY, 
+                    IdDirective.GENERATE_HASH);
 
             BatchActionTask.tsSnapshot.construct(rCab);
             Ts.get().addUncommitted(refsetCB);
