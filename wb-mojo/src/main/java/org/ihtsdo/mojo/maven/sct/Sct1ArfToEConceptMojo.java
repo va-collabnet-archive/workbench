@@ -3227,7 +3227,11 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
                     && theCon.compareTo(theRelDest) != IS_EQUAL) {
                 // UNCONNECTED CONCEPT theCon ==theDes !=theRel !=theRelDest
                 createEConcept(conList, desList, null, null, addRsByCon, addRsByRs, dos);
-            } else {
+            } else if (theCon.compareTo(theDes) != IS_EQUAL && theCon.compareTo(theRel) != IS_EQUAL
+                    && theCon.compareTo(theRelDest) != IS_EQUAL) {
+                // UNCONNECTED REFSET CONCEPT theCon !=theDes !=theRel !=theRelDest
+                createEConcept(conList, null, null, null, addRsByCon, addRsByRs, dos);
+            }else {
                 getLog().info("!!! Note: the following can occur if the placeholder concepts mojo is used. "
                         + "Placeholders are created for where the concept attach to existing data, potentially resulting in empty placeholders.");
                 getLog().info(

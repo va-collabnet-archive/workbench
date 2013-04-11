@@ -75,6 +75,7 @@ import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 import org.ihtsdo.tk.dto.concept.component.TkRevision;
 import org.ihtsdo.tk.dto.concept.component.refex.TK_REFEX_TYPE;
 import org.ihtsdo.tk.binding.snomed.CaseSensitive;
+import org.ihtsdo.tk.dto.concept.component.refex.TkRefexAbstractMember;
 import org.ihtsdo.tk.spec.ConceptSpec;
 import org.ihtsdo.tk.spec.PathSpec;
 
@@ -227,6 +228,15 @@ public class LoadBdbMulti extends AbstractMojo {
             while (conceptsProcessed.get() < conceptsRead.get()) {
                 Thread.sleep(1000);
             }
+            
+            Concept.resolveUnresolvedAnnotations(null);
+            if (Concept.getUnresolvedAnnotations() != null) {
+                for (TkRefexAbstractMember member : Concept.getUnresolvedAnnotations()) {
+                    Ts.get().addUncommittedNoChecks(Ts.get().getConceptForNid(Ts.get().getNidForUuids(member.getComponentUuid())));
+                }
+                Ts.get().commit();
+            }
+            
             getLog().info("Testing for dup UUIDs.");
             Concept.disableComponentsCRHM();
             UuidDupFinder dupFinder = new UuidDupFinder();

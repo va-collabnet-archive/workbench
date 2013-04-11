@@ -2709,4 +2709,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
             }
         }
     }
+    public static List<TkRefexAbstractMember<?>> getUnresolvedAnnotations() {
+        return unresolvedAnnotations;
+    }
 }
