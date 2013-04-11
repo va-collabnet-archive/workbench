@@ -336,6 +336,9 @@ public class Rf2CreatePlaceHoldersMojo extends AbstractMojo implements Serializa
             if (a == dataA.length) {
                 mergedData[m] = toBeMerged[tbm];
                 tbm++;
+            } else if (tbm >= toBeMerged.length) {
+                mergedData[m] = dataA[a];
+                a++;
             } else if (dataA[a] < toBeMerged[tbm]) {
                 mergedData[m] = dataA[a];
                 a++;
