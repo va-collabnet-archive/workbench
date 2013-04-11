@@ -202,10 +202,10 @@ public class Rf2CreatePlaceHoldersMojo extends AbstractMojo implements Serializa
             }
 
             // PROCESS SUBSETS
-            filesIn = getRF2Files(targetDirectory, targetSubDir, rf2Dirs, "subset_members", ".txt");
+            filesIn = getRF2Files(targetDirectory, targetSubDir, rf2Dirs, "Refset", ".txt");
             for (Rf2File file : filesIn) {
-                int MEMBERID = 1; // Column in subset file
-                scratchConcepts = parseForConceptIds(file, MEMBERID);
+                int REFSETID = 4; // Column in subset file
+                scratchConcepts = parseForConceptIds(file, REFSETID);
                 scratchConcepts = findConceptsNotPresent(knownConcepts, scratchConcepts);
                 expectedConcepts = mergeConceptArrays(expectedConcepts, scratchConcepts);
             }

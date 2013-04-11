@@ -2361,7 +2361,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
                 while (obj != null && idxRsA < aRsMax) {
                     Sct1_RefSetRecord rsRec = aRs.get(idxRsA);
                     Sct1_DesRecord desRec = (Sct1_DesRecord) obj;
-
+                    
                     int rsVin = compareMsbLsb(rsRec.referencedComponentUuidMsb,
                             rsRec.referencedComponentUuidLsb, desRec.desUuidMsb, desRec.desUuidLsb);
 
@@ -3227,7 +3227,11 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
                     && theCon.compareTo(theRelDest) != IS_EQUAL) {
                 // UNCONNECTED CONCEPT theCon ==theDes !=theRel !=theRelDest
                 createEConcept(conList, desList, null, null, addRsByCon, addRsByRs, dos);
-            } else {
+            } else if (theCon.compareTo(theDes) != IS_EQUAL && theCon.compareTo(theRel) != IS_EQUAL
+                    && theCon.compareTo(theRelDest) != IS_EQUAL) {
+                // UNCONNECTED REFSET CONCEPT theCon !=theDes !=theRel !=theRelDest
+                createEConcept(conList, null, null, null, addRsByCon, addRsByRs, dos);
+            }else {
                 getLog().info("!!! Note: the following can occur if the placeholder concepts mojo is used. "
                         + "Placeholders are created for where the concept attach to existing data, potentially resulting in empty placeholders.");
                 getLog().info(
@@ -3688,19 +3692,19 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
             countRefsetMember++;
 
         }
-
+        
         // ADD REFSET MEMBER VALUES
         if (rsByRsList != null && rsByRsList.size() > 0) {
             List<TkRefexAbstractMember<?>> listErm = new ArrayList<TkRefexAbstractMember<?>>();
             Collections.sort(rsByRsList);
 
             if (rsByRsList.size() > 100000) {
-                UUID tmpUUID = new UUID(cRec0.conUuidMsb, cRec0.conUuidLsb);
-                getLog().info(
+            UUID tmpUUID = new UUID(cRec0.conUuidMsb, cRec0.conUuidLsb);
+            getLog().info(
                         "::: NOTE: concept with MANY refset members = " + rsByRsList.size()
                         + ", concept UUID = " + tmpUUID.toString());
             }
-
+            
             int rsmMax = rsByRsList.size(); // NUMBER OF REFSET MEMBERS
             int rsmIdx = 0;
             long lastRefsetMemberUuidMsb = Long.MAX_VALUE;

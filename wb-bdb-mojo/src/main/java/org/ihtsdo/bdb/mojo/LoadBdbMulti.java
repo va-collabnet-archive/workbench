@@ -90,6 +90,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
+import org.ihtsdo.tk.dto.concept.component.refex.TkRefexAbstractMember;
 
 /**
  * Goal which loads an EConcept.jbin file into a bdb.
@@ -338,6 +339,14 @@ public class LoadBdbMulti extends AbstractMojo {
             Thread.sleep(1000);
          }
 
+          Concept.resolveUnresolvedAnnotations(null);
+          if (Concept.getUnresolvedAnnotations() != null) {
+              for (TkRefexAbstractMember member : Concept.getUnresolvedAnnotations()) {
+                  Ts.get().addUncommittedNoChecks(Ts.get().getConceptForNid(Ts.get().getNidForUuids(member.getComponentUuid())));
+              }
+              Ts.get().commit();
+          }
+         
          UuidDupFinder dupFinder = null;
 
          if (findDups) {

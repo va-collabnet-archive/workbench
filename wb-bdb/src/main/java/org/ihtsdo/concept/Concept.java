@@ -771,7 +771,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
         for (TkRefexAbstractMember<?> er : unresolvedAnnotations) {
             ConceptComponent cc;
             Object referencedComponent = Ts.get().getComponent(er.getComponentUuid());
-
+            
             if (referencedComponent != null) {
                 if (referencedComponent instanceof Concept) {
                     cc = ((Concept) referencedComponent).getConAttrs();
@@ -2797,5 +2797,9 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
                         + percentageUsed);
             }
         }
+    }
+
+    public static List<TkRefexAbstractMember<?>> getUnresolvedAnnotations() {
+        return unresolvedAnnotations;
     }
 }
