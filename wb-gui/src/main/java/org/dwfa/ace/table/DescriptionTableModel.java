@@ -190,10 +190,10 @@ public abstract class DescriptionTableModel extends AbstractTableModel {
                     return new StringWithDescTuple(Boolean.toString(desc.isInitialCaseSignificant()), desc, false,
                             inConflict);
                 case STATUS:
-//                    DescriptionVersionBI dv = (DescriptionVersionBI) Ts.get().getComponentVersion(config.getViewCoordinate(), desc.getNid());
-//                    if (dv != null){
-//                        return new StringWithDescTuple(getPrefText(dv.getStatusNid()), desc, false, inConflict);
-//                    }
+                    DescriptionVersionBI dv = (DescriptionVersionBI) Ts.get().getComponentVersion(config.getViewCoordinate(), desc.getNid());
+                    if (dv != null){
+                        return new StringWithDescTuple(getPrefText(dv.getStatusNid()), desc, false, inConflict);
+                    }
                     return new StringWithDescTuple(getPrefText(desc.getStatusNid()), desc, false, inConflict);
                 case AUTHOR:
                     return new StringWithDescTuple(getPrefText(desc.getAuthorNid()), desc, false, inConflict);
