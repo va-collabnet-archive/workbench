@@ -151,7 +151,7 @@ public class PathSpec implements SpecBI {
                 pathConcept.getDescription(),
                 LANG_CODE.EN,
                 TermAux.IS_A.getLenient().getPrimUuid(),
-                IdDirective.GENERATE_HASH,
+                IdDirective.PRESERVE_CONCEPT_REST_HASH,
                 parentConcept.getLenient().getPrimUuid());
         for (UUID uuid : pathConcept.getUuids()) {
             conceptBp.setComponentUuid(uuid);
