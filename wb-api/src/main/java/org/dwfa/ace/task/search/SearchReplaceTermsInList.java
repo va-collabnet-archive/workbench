@@ -239,13 +239,15 @@ public class SearchReplaceTermsInList extends AbstractTask {
                                 // Create a new, cloned, description
                                 try{
                                     TerminologyBuilderBI builder = Ts.get().getTerminologyBuilder(config.getEditCoordinate(), config.getViewCoordinate());
-                                    DescriptionCAB descriptionBlueprint = description.makeBlueprint(config.getViewCoordinate(), IdDirective.PRESERVE, RefexDirective.EXCLUDE);  // :!!!:REVIEW
+                                    DescriptionCAB descriptionBlueprint = description.makeBlueprint(config.getViewCoordinate(), 
+                                            IdDirective.PRESERVE, RefexDirective.EXCLUDE);  // :!!!:REVIEW ... looks ok.
                                     descriptionBlueprint.setText(finalDesc);
                                     descriptionBlueprint.setComponentUuid(UUID.randomUUID());
                                     builder.construct(descriptionBlueprint);
                                     for (RefexVersionBI refex : description.getRefexesActive(config.getViewCoordinate())) {
-                                        RefexCAB refexBlueprint = refex.makeBlueprint(config.getViewCoordinate(), IdDirective.PRESERVE, RefexDirective.EXCLUDE);
-                                        refexBlueprint.setMemberUuid(refex.getPrimUuid()); // <-- redundant :???:!!!:REVIEW
+                                        RefexCAB refexBlueprint = refex.makeBlueprint(config.getViewCoordinate(), 
+                                                IdDirective.PRESERVE, RefexDirective.EXCLUDE);
+                                        refexBlueprint.setMemberUuid(refex.getPrimUuid());
                                         refexBlueprint.setRetired();
                                         builder.construct(refexBlueprint);
                                     }

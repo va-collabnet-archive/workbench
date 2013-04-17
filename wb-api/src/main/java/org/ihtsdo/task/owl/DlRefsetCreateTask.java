@@ -156,9 +156,9 @@ public class DlRefsetCreateTask extends AbstractTask implements ActionListener {
                 "Description logic refset",
                 LANG_CODE.EN_CA,
                 isaUuid,
-                IdDirective.GENERATE_HASH,
+                IdDirective.PRESERVE_CONCEPT_REST_HASH,
                 refsetParentUuid);
-        cb.setComponentUuid(dlRefsetUuid); // :!!!:REVIEW
+        cb.setComponentUuid(dlRefsetUuid);
         ConceptChronicleBI ccbi = tsSnapshot.constructIfNotCurrent(cb);
         ts.addUncommitted(ccbi);
 
@@ -168,9 +168,9 @@ public class DlRefsetCreateTask extends AbstractTask implements ActionListener {
                 "Disjoint sets refset",
                 LANG_CODE.EN_CA,
                 isaUuid,
-                IdDirective.GENERATE_HASH,
+                IdDirective.PRESERVE_CONCEPT_REST_HASH,
                 dlRefsetUuid);
-        cb.setComponentUuid(disjointSetsRefsetUuid); // :!!!:REVIEW
+        cb.setComponentUuid(disjointSetsRefsetUuid); // :!!!:REVIEW ... changed, ok.
         ts.addUncommitted(tsSnapshot.constructIfNotCurrent(cb));
 
         // Negation
@@ -179,7 +179,7 @@ public class DlRefsetCreateTask extends AbstractTask implements ActionListener {
                 "Negation refset",
                 LANG_CODE.EN_CA,
                 isaUuid,
-                IdDirective.GENERATE_HASH,  // :!!!:REVIEW
+                IdDirective.PRESERVE_CONCEPT_REST_HASH,  // :!!!:REVIEW ... changed, ok.
                 dlRefsetUuid);
         cb.setComponentUuid(negationRefsetUuid);
         ts.addUncommitted(tsSnapshot.constructIfNotCurrent(cb));
@@ -190,9 +190,9 @@ public class DlRefsetCreateTask extends AbstractTask implements ActionListener {
                 "Union sets refset",
                 LANG_CODE.EN_CA,
                 isaUuid,
-                IdDirective.GENERATE_HASH,
+                IdDirective.PRESERVE_CONCEPT_REST_HASH,
                 dlRefsetUuid);
-        cb.setComponentUuid(unionSetsRefsetUuid); // :!!!:REVIEW
+        cb.setComponentUuid(unionSetsRefsetUuid); // :!!!:REVIEW ... changed, ok.
         ts.addUncommitted(tsSnapshot.constructIfNotCurrent(cb));
 
         // ConDOR reasoner
@@ -201,7 +201,7 @@ public class DlRefsetCreateTask extends AbstractTask implements ActionListener {
                 "ConDOR",
                 LANG_CODE.EN_CA,
                 isaUuid,
-                IdDirective.GENERATE_HASH,  // :!!!:REVIEW
+                IdDirective.PRESERVE_CONCEPT_REST_HASH,  // :!!!:REVIEW ... changed, ok.
                 UUID.fromString("f7495b58-6630-3499-a44e-2052b5fcf06c")); /* parent == user */
         cb.setComponentUuid(condorUuid);
         ts.addUncommitted(tsSnapshot.constructIfNotCurrent(cb));
