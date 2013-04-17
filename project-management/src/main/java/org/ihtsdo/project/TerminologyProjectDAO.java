@@ -229,6 +229,7 @@ public class TerminologyProjectDAO {
 		}
 		return projects;
 	}
+
 	/**
 	 * Gets the all terminology projects.
 	 * 
@@ -316,6 +317,7 @@ public class TerminologyProjectDAO {
 		return targetLanguagesCache;
 
 	}
+
 	/**
 	 * Creates the new translation project.
 	 * 
@@ -392,7 +394,7 @@ public class TerminologyProjectDAO {
 			String nacWorkSetName = "Maintenance - " + project.getName().replace("(translation project)", "");
 			WorkSet nacWorkSet = createNewWorkSet(nacWorkSetName, project, config);
 			createNewPartitionScheme("Maintenance - " + project.getName().replace("(translation project)", ""), nacWorkSet.getUids().iterator().next(), config);
-
+			getTranslationProjectDefaultConfigFile(project);
 		} catch (TerminologyException e) {
 			AceLog.getAppLog().alertAndLogException(e);
 		} catch (IOException e) {
@@ -404,6 +406,40 @@ public class TerminologyProjectDAO {
 		return project;
 	}
 
+	/**
+	 * This method returns the parameter projects default configuration file<br>
+	 * if the file does not exists, it creates a new default configuration file<br>.
+	 *
+	 * @param project the project
+	 * @return The project file
+	 */
+	public static File getTranslationProjectDefaultConfigFile(TranslationProject project) {
+		File configFile = null;
+		File sharedFolder = new File("profiles/shared");
+		if (!sharedFolder.exists()) {
+			sharedFolder.mkdirs();
+		} else {
+			List<UUID> uids = project.getUids();
+			for (UUID uuid : uids) {
+				File tmpFile = new File("profiles/shared/" + uuid + "-translation-config.cfg");
+				if (tmpFile.exists()) {
+					configFile = tmpFile;
+				}
+			}
+		}
+		if (configFile == null) {
+			configFile = new File("profiles/shared/" + project.getUids().get(0) + "-translation-config.cfg");
+			if(!configFile.exists()){
+				try {
+					configFile.createNewFile();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
+		return configFile;
+	}
 
 	/**
 	 * Creates the new project.
@@ -464,6 +500,7 @@ public class TerminologyProjectDAO {
 
 		return project;
 	}
+
 	/**
 	 * Creates the new project.
 	 * 
@@ -567,6 +604,7 @@ public class TerminologyProjectDAO {
 
 	/**
 	 * Temporary method replacing I_Getconceptdata toString method
+	 * 
 	 * @param concept
 	 * @return
 	 */
@@ -626,6 +664,7 @@ public class TerminologyProjectDAO {
 		}
 		return project;
 	}
+
 	/**
 	 * Gets the project.
 	 * 
@@ -667,6 +706,7 @@ public class TerminologyProjectDAO {
 		}
 		return project;
 	}
+
 	/**
 	 * Update preferred term.
 	 * 
@@ -836,6 +876,7 @@ public class TerminologyProjectDAO {
 
 		return project;
 	}
+
 	/**
 	 * Update project metadata.
 	 * 
@@ -1583,7 +1624,7 @@ public class TerminologyProjectDAO {
 							relVersioned.addVersion(newPart);
 						}
 						termFactory.addUncommittedNoChecks(project.getConcept());
-						//termFactory.commit();
+						// termFactory.commit();
 					}
 				}
 				// I_RelVersioned newRelationship =
@@ -1653,7 +1694,7 @@ public class TerminologyProjectDAO {
 	public static void setReleasePathRefset(I_TerminologyProject project, I_GetConceptData concept, I_ConfigAceFrame config) {
 		I_TermFactory termFactory = Terms.get();
 		try {
-			if ((concept != null) && (project.getReleasePath() == null) || ( concept != null && concept.getConceptNid() != project.getReleasePath().getConceptNid())) {
+			if ((concept != null) && (project.getReleasePath() == null) || (concept != null && concept.getConceptNid() != project.getReleasePath().getConceptNid())) {
 				List<? extends I_RelTuple> targetRefsetRels = null;
 				I_IntSet allowedDestRelTypes = termFactory.newIntSet();
 				allowedDestRelTypes.add(ArchitectonicAuxiliary.Concept.HAS_RELEASE_PATH_REFSET_ATTRIBUTE.localize().getNid());
@@ -2586,7 +2627,8 @@ public class TerminologyProjectDAO {
 				updatePreferredTerm(workListWithMetadata.getConcept(), workListWithMetadata.getName(), config);
 			}
 
-			WorklistMetadata worklistMetadata = new WorklistMetadata(workListWithMetadata.getName(), workListWithMetadata.getUids(), workListWithMetadata.getPartitionUUID(), workListWithMetadata.getWorkflowDefinitionFileName(), convertToStringListOfMembers(workListWithMetadata.getWorkflowUserRoles()));
+			WorklistMetadata worklistMetadata = new WorklistMetadata(workListWithMetadata.getName(), workListWithMetadata.getUids(), workListWithMetadata.getPartitionUUID(), workListWithMetadata.getWorkflowDefinitionFileName(),
+					convertToStringListOfMembers(workListWithMetadata.getWorkflowUserRoles()));
 			String metadata = serialize(worklistMetadata);
 
 			Collection<? extends I_ExtendByRef> extensions = termFactory.getAllExtensionsForComponent(workListConcept.getConceptNid());
@@ -2906,6 +2948,7 @@ public class TerminologyProjectDAO {
 		}
 		return workSetMembers;
 	}
+
 	/**
 	 * Gets the all work set members.
 	 * 
@@ -2928,7 +2971,7 @@ public class TerminologyProjectDAO {
 					workSetMembers.add(getWorkSetMember(termFactory.getConcept(extension.getComponentNid()), workset.getId(), config));
 					i++;
 				}
-				if(i == count){
+				if (i == count) {
 					break;
 				}
 			}
@@ -3216,7 +3259,7 @@ public class TerminologyProjectDAO {
 	 */
 	public static WorkSet getNonAssignedChangesWorkSet(I_TerminologyProject project, I_ConfigAceFrame config) {
 		WorkSet nacWorkSet = null;
-		String nacWorkSetName = "Maintenance - " ;
+		String nacWorkSetName = "Maintenance - ";
 
 		for (WorkSet loopWorkSet : project.getWorkSets(config)) {
 			if (loopWorkSet.getName().startsWith(nacWorkSetName)) {
@@ -3268,7 +3311,7 @@ public class TerminologyProjectDAO {
 
 		WorkList returnWorkList = createNewWorkList(newNacWorkList, config);
 		ActivityUpdater updater = null;
-		if(activity != null){
+		if (activity != null) {
 			updater = new ActivityUpdater(activity, "Generating WorkList");
 		}
 		if (returnWorkList != null) {
@@ -3839,7 +3882,7 @@ public class TerminologyProjectDAO {
 				I_TerminologyProject project = getProjectForWorklist(workList, config);
 				if (project.getProjectType().equals(I_TerminologyProject.Type.TRANSLATION)) {
 					TranslationProject transProject = (TranslationProject) project;
-					if(transProject.getTargetLanguageRefset() != null){
+					if (transProject.getTargetLanguageRefset() != null) {
 						LanguageMembershipRefset targetLanguage = new LanguageMembershipRefset(transProject.getTargetLanguageRefset(), config);
 						PromotionRefset languagePromotionRefset = targetLanguage.getPromotionRefset(config);
 						languagePromotionRefset.setPromotionStatus(member.getId(), activityStatusConcept.getConceptNid());
@@ -4375,7 +4418,7 @@ public class TerminologyProjectDAO {
 		// }
 		String name = "";
 		try {
-			ConceptVersionBI conceptVersion = Ts.get().getConceptVersion(config.getViewCoordinate(),workListMemberConcept.getNid());
+			ConceptVersionBI conceptVersion = Ts.get().getConceptVersion(config.getViewCoordinate(), workListMemberConcept.getNid());
 			name = conceptVersion.getDescriptionPreferred().getText();
 
 			Collection<? extends RefexChronicleBI<?>> members = workListMemberConcept.getAnnotations();
@@ -4480,9 +4523,9 @@ public class TerminologyProjectDAO {
 		List<WorkListMember> members = getAllWorkListMembers(workList, config);
 
 		for (WorkListMember loopMember : members) {
-			if(filters != null){
+			if (filters != null) {
 				for (WfFilterBI filter : filters) {
-					if(!filter.evaluateInstance(loopMember.getWfInstance())){
+					if (!filter.evaluateInstance(loopMember.getWfInstance())) {
 						continue;
 					}
 				}
@@ -4626,8 +4669,8 @@ public class TerminologyProjectDAO {
 
 			// Translation specific concept level promotion refset
 			I_TerminologyProject project = getProjectForWorklist(workList, config);
-			if(project.getProjectType().equals(I_TerminologyProject.Type.TRANSLATION)){
-				TranslationProject transProject = (TranslationProject)project;
+			if (project.getProjectType().equals(I_TerminologyProject.Type.TRANSLATION)) {
+				TranslationProject transProject = (TranslationProject) project;
 				LanguageMembershipRefset targetLanguage = new LanguageMembershipRefset(transProject.getTargetLanguageRefset(), config);
 				PromotionRefset languagePromotionRefset = targetLanguage.getPromotionRefset(config);
 				languagePromotionRefset.setPromotionStatus(workListMemberWithMetadata.getId(), activityStatusConcept.getConceptNid());
@@ -5166,7 +5209,7 @@ public class TerminologyProjectDAO {
 		workList.setWorkflowUserRoles(workflowUserRoles);
 		workList = createNewWorkList(workList, config);
 		ActivityUpdater updater = null;
-		if(activity != null){
+		if (activity != null) {
 			updater = new ActivityUpdater(activity, "Generating WorkList");
 		}
 		if (workList != null) {
@@ -5657,9 +5700,9 @@ public class TerminologyProjectDAO {
 		WorkflowInterpreter interpreter = WorkflowInterpreter.createWorkflowInterpreter(workList.getWorkflowDefinition());
 
 		WfUser user = interpreter.getNextDestination(instance, workList);
-		//		if (user == null) {
-		//			throw new Exception("Cannot set next destination\n");
-		//		}
+		// if (user == null) {
+		// throw new Exception("Cannot set next destination\n");
+		// }
 
 		TerminologyStoreDI ts = Ts.get();
 
@@ -5777,24 +5820,23 @@ public class TerminologyProjectDAO {
 		}
 	}
 
-	public static I_TerminologyProject getProject(
-			I_GetConceptData projectConcept, I_ConfigAceFrame aceFrameConfig) {
-		I_TerminologyProject project=null;
+	public static I_TerminologyProject getProject(I_GetConceptData projectConcept, I_ConfigAceFrame aceFrameConfig) {
+		I_TerminologyProject project = null;
 		try {
-			project=getTranslationProject(projectConcept, aceFrameConfig);
+			project = getTranslationProject(projectConcept, aceFrameConfig);
 		} catch (Exception e) {
 
 		}
-		if (project==null){
+		if (project == null) {
 			try {
-				project=getTerminologyProject(projectConcept, aceFrameConfig);
+				project = getTerminologyProject(projectConcept, aceFrameConfig);
 			} catch (Exception e) {
 
 			}
 		}
-		if (project==null){
+		if (project == null) {
 			try {
-				project=getMappingProject(projectConcept, aceFrameConfig);
+				project = getMappingProject(projectConcept, aceFrameConfig);
 			} catch (Exception e) {
 
 			}
@@ -5822,8 +5864,7 @@ public class TerminologyProjectDAO {
 	public static List<String> convertToStringListOfMembers(List<WfMembership> list) {
 		List<String> members = new ArrayList<String>();
 		for (WfMembership line : list) {
-			members.add(line.getId().toString() + "|" + line.getUser().getId().toString() 
-					+ "|" + line.getRole().getId().toString() + "|" + line.isDefaultAssignment());
+			members.add(line.getId().toString() + "|" + line.getUser().getId().toString() + "|" + line.getRole().getId().toString() + "|" + line.isDefaultAssignment());
 		}
 
 		return members;
@@ -5839,8 +5880,7 @@ public class TerminologyProjectDAO {
 		PathBI snomedCorePath = Terms.get().getPath(ArchitectonicAuxiliary.Concept.SNOMED_CORE.getUids());
 		PositionBI originPosition = Terms.get().newPosition(snomedCorePath, Long.MAX_VALUE);
 
-		TerminologyPromoterBI promoter = Ts.get().getTerminologyPromoter(sourceViewCoordinate, Terms.get().getActiveAceFrameConfig().getEditCoordinate(), targetPathNid, 
-				originPosition);
+		TerminologyPromoterBI promoter = Ts.get().getTerminologyPromoter(sourceViewCoordinate, Terms.get().getActiveAceFrameConfig().getEditCoordinate(), targetPathNid, originPosition);
 
 		NidBitSetBI promotionNids = Ts.get().getEmptyNidSet();
 		promotionNids.setMember(conceptNid);

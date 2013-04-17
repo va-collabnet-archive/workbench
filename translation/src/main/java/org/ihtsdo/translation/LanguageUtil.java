@@ -75,6 +75,7 @@ import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.lucene.SearchResult;
 import org.ihtsdo.project.ContextualizedDescription;
 import org.ihtsdo.project.I_ContextualizeDescription;
+import org.ihtsdo.project.TerminologyProjectDAO;
 import org.ihtsdo.project.model.TranslationProject;
 import org.ihtsdo.project.refset.LanguageMembershipRefset;
 import org.ihtsdo.project.refset.LanguageSpecRefset;
@@ -1547,7 +1548,7 @@ public class LanguageUtil {
 	 */
 	public static void setDefaultTranslationConfig(ConfigTranslationModule defaultConfig, TranslationProject project) {
 		try {
-			File configFile = getTranslationProjectDefaultConfigFile(project);
+			File configFile = TerminologyProjectDAO.getTranslationProjectDefaultConfigFile(project);
 			FileOutputStream fos = new FileOutputStream(configFile);
 			ObjectOutputStream os = new ObjectOutputStream(fos);
 			os.writeObject(defaultConfig);
@@ -1569,21 +1570,25 @@ public class LanguageUtil {
 	public static ConfigTranslationModule getDefaultTranslationConfig(TranslationProject project) {
 		ConfigTranslationModule result = new ConfigTranslationModule();
 		try {
-			File configFile = getTranslationProjectDefaultConfigFile(project);
+			File configFile =TerminologyProjectDAO.getTranslationProjectDefaultConfigFile(project);
 
 			if (configFile.exists()) {
 				FileInputStream fis;
 				fis = new FileInputStream(configFile);
 				ObjectInputStream ois = new ObjectInputStream(fis);
-				result = (ConfigTranslationModule) ois.readObject();
-				ois.close();
-				fis.close();
+				try{
+					result = (ConfigTranslationModule) ois.readObject();
+				}catch(Exception e){
+					e.printStackTrace();
+					setDefaultTranslationConfig(result, project);
+				}finally{
+					ois.close();
+					fis.close();
+				}
 			}
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}
 
@@ -1612,32 +1617,6 @@ public class LanguageUtil {
 		return true;
 	}
 
-	/**
-	 * This method returns the parameter projects default configuration file<br>
-	 * if the file does not exists, it creates a new default configuration file<br>.
-	 *
-	 * @param project the project
-	 * @return The project file
-	 */
-	private static File getTranslationProjectDefaultConfigFile(TranslationProject project) {
-		File configFile = null;
-		File sharedFolder = new File("profiles/shared");
-		if (!sharedFolder.exists()) {
-			sharedFolder.mkdirs();
-		} else {
-			List<UUID> uids = project.getUids();
-			for (UUID uuid : uids) {
-				File tmpFile = new File("profiles/shared/" + uuid + "-translation-config.cfg");
-				if (tmpFile.exists()) {
-					configFile = tmpFile;
-				}
-			}
-		}
-		if (configFile == null) {
-			configFile = new File("profiles/shared/" + project.getUids().get(0) + "-translation-config.cfg");
-		}
-		return configFile;
-	}
 
 	/**
 	 * Gets the children.
