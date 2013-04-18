@@ -27,6 +27,7 @@ import org.ihtsdo.tk.dto.concept.component.attribute.TkConceptAttributes;
 import org.ihtsdo.tk.dto.concept.component.attribute.TkConceptAttributesRevision;
 import org.ihtsdo.tk.dto.concept.component.description.TkDescription;
 import org.ihtsdo.tk.dto.concept.component.description.TkDescriptionRevision;
+import org.ihtsdo.tk.dto.concept.component.identifier.TkIdentifier;
 import org.ihtsdo.tk.dto.concept.component.refex.TkRefexAbstractMember;
 import org.ihtsdo.tk.dto.concept.component.refex.type_uuid.TkRefexUuidMember;
 import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationship;
@@ -85,7 +86,7 @@ public class RF1ToRF2Transformer extends AbstractTransformer {
     private UUID pathUUID;
     private final UUID auxPathUUID = UUID.fromString("2faa9260-8fb2-11db-b606-0800200c9a66");
     private final UUID authorUser = UUID.fromString("f7495b58-6630-3499-a44e-2052b5fcf06c");
-    private final UUID legacyUsDialectRefsetUuid = UUID.fromString("f7495b58-6630-3499-a44e-2052b5fcf06c");
+    private final UUID legacyUsDialectRefsetUuid = UUID.fromString("29bf812c-7a77-595d-8b12-ea37c473a5e6");
     private final UUID legacyGbDialectRefsetUuid = UUID.fromString("a0982f18-ec51-56d2-a8b1-6ff8964813dd");
     private final UUID rf2UsDialectRefsetUuid = UUID.fromString("bca0a686-3516-3daf-8fcf-fe396d13cfad");
     private final UUID rf2GbDialectRefsetUuid = UUID.fromString("eb9a5e42-3cba-356d-b623-3ed472e20b30");
@@ -156,7 +157,7 @@ public class RF1ToRF2Transformer extends AbstractTransformer {
                     attributes.setStatusUuid(SnomedMetadataRf2.LIMITED_COMPONENT_RF2.getLenient().getPrimUuid());
                 }
             }
-
+            
             if ((pathUUID == null)
                     || (pathUUID != null && attributes.getPathUuid().equals(pathUUID))) {
                 if (attributes.getAuthorUuid() == null) {
@@ -166,6 +167,42 @@ public class RF1ToRF2Transformer extends AbstractTransformer {
                     attributes.setModuleUuid(TkRevision.unspecifiedModuleUuid);
                 }
             }
+            
+            if (attributes.getAdditionalIdComponents() != null) {
+                List<TkIdentifier> additionalIdList = attributes.getAdditionalIdComponents();
+                for (TkIdentifier tkIdentifier : additionalIdList) {
+                    if ((pathUUID == null && tkIdentifier.pathUuid.compareTo(auxPathUUID) != 0)
+                            || (pathUUID != null && tkIdentifier.getPathUuid().equals(pathUUID))) {
+                        if (tkIdentifier.getStatusUuid().equals(SnomedMetadataRf1.CURRENT_RF1.getLenient().getPrimUuid())) {
+                            tkIdentifier.setStatusUuid(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getPrimUuid());
+                        } else if (tkIdentifier.getStatusUuid().equals(SnomedMetadataRf1.RETIRED_INACTIVE_STATUS_RF1.getLenient().getPrimUuid())) {
+                            tkIdentifier.setStatusUuid(SnomedMetadataRf2.INACTIVE_VALUE_RF2.getLenient().getPrimUuid());
+                        } else if (tkIdentifier.getStatusUuid().equals(SnomedMetadataRf1.AMBIGUOUS_INACTIVE_STATUS_RF1.getLenient().getPrimUuid())) {
+                            tkIdentifier.setStatusUuid(SnomedMetadataRf2.AMBIGUOUS_COMPONENT_RF2.getLenient().getPrimUuid());
+                        } else if (tkIdentifier.getStatusUuid().equals(SnomedMetadataRf1.DUPLICATE_INACTIVE_STATUS_RF1.getLenient().getPrimUuid())) {
+                            tkIdentifier.setStatusUuid(SnomedMetadataRf2.DUPLICATE_COMPONENT_RF2.getLenient().getPrimUuid());
+                        } else if (tkIdentifier.getStatusUuid().equals(SnomedMetadataRf1.ERRONEOUS_INACTIVE_STATUS_RF1.getLenient().getPrimUuid())) {
+                            tkIdentifier.setStatusUuid(SnomedMetadataRf2.ERRONEOUS_COMPONENT_RF2.getLenient().getPrimUuid());
+                        } else if (tkIdentifier.getStatusUuid().equals(SnomedMetadataRf1.INAPPROPRIATE_INACTIVE_STATUS_RF1.getLenient().getPrimUuid())) {
+                            tkIdentifier.setStatusUuid(SnomedMetadataRf2.INAPPROPRIATE_COMPONENT_RF2.getLenient().getPrimUuid());
+                        } else if (tkIdentifier.getStatusUuid().equals(SnomedMetadataRf1.LIMITED_ACTIVE_STATUS_RF1.getLenient().getPrimUuid())) {
+                            tkIdentifier.setStatusUuid(SnomedMetadataRf2.LIMITED_COMPONENT_RF2.getLenient().getPrimUuid());
+                        }
+                    }
+                    
+                    if ((pathUUID == null)
+                            || (pathUUID != null && tkIdentifier.getPathUuid().equals(pathUUID))) {
+                        if (tkIdentifier.getAuthorUuid() == null) {
+                            tkIdentifier.setAuthorUuid(authorUser);
+                        }
+                        if (tkIdentifier.getModuleUuid() == null) {
+                            tkIdentifier.setModuleUuid(TkRevision.unspecifiedModuleUuid);
+                        }
+                    }
+
+                }
+            }
+
         } catch (ValidationException e) {
             AceLog.getAppLog().log(Level.SEVERE, e.getMessage(), e);
         } catch (IOException e) {
@@ -260,6 +297,13 @@ public class RF1ToRF2Transformer extends AbstractTransformer {
 
                 if (hasGbAnnotation || hasUsAnnotation) {
                     // do not add language refset set
+                    if (description.getTypeUuid().equals(SnomedMetadataRf1.FULLY_SPECIFIED_DESCRIPTION_TYPE.getLenient().getPrimUuid())) {
+                        description.setTypeUuid(SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getLenient().getPrimUuid());
+                    } else if (description.getTypeUuid().equals(SnomedMetadataRf1.PREFERRED_TERM_DESCRIPTION_TYPE_RF1.getLenient().getPrimUuid())) {
+                        description.setTypeUuid(SnomedMetadataRf2.SYNONYM_RF2.getLenient().getPrimUuid());
+                    } else if (description.getTypeUuid().equals(SnomedMetadataRf1.SYNOMYM_DESCRIPTION_TYPE_RF1.getLenient().getPrimUuid())) {
+                        description.setTypeUuid(SnomedMetadataRf2.SYNONYM_RF2.getLenient().getPrimUuid());
+                    }                    
                 } else if (langRefsetUUID != null && !description.getLang().equals(LANG_CODE.EN.getFormatedLanguageCode())) {
                     processLangDescription(description, concept);
                 } else if (usRefsetUUID != null && !DialectHelper.isTextForDialect(description.getText(), Language.EN_US.getLenient().getNid())
@@ -317,6 +361,14 @@ public class RF1ToRF2Transformer extends AbstractTransformer {
                     revision.setStatusUuid(SnomedMetadataRf2.LIMITED_COMPONENT_RF2.getLenient().getPrimUuid());
                 }
 
+            }
+            
+            if (revision.getTypeUuid().equals(SnomedMetadataRf1.FULLY_SPECIFIED_DESCRIPTION_TYPE.getLenient().getPrimUuid())) {
+                revision.setTypeUuid(SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getLenient().getPrimUuid());
+            } else if (revision.getTypeUuid().equals(SnomedMetadataRf1.PREFERRED_TERM_DESCRIPTION_TYPE_RF1.getLenient().getPrimUuid())) {
+                revision.setTypeUuid(SnomedMetadataRf2.SYNONYM_RF2.getLenient().getPrimUuid());
+            } else if (revision.getTypeUuid().equals(SnomedMetadataRf1.SYNOMYM_DESCRIPTION_TYPE_RF1.getLenient().getPrimUuid())) {
+                revision.setTypeUuid(SnomedMetadataRf2.SYNONYM_RF2.getLenient().getPrimUuid());
             }
 
             if ((pathUUID == null)
