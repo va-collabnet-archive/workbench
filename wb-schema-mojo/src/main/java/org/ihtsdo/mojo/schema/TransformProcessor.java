@@ -59,16 +59,19 @@ public class TransformProcessor implements ProcessUnfetchedConceptDataBI{
 			allConcepts = Ts.get().getAllConceptNids();
 			this.transformer = transformer;
 			this.eConceptDOS = eConceptDOS;
-//            watchUuids.add(UUID.fromString("5e1fe940-8faf-11db-b606-0800200c9a66")); // fully specified name
+            watchUuids.add(UUID.fromString("ef6ae557-83da-5664-ac23-a393ae6a7a1c")); // ABDOMINAL AND PELVIC PAIN --> ICD10-CM Concept
+            watchUuids.add(UUID.fromString("32bf3aa1-8287-5302-a62a-aa354e66b845")); // ABNORMALITY OF FORCES OF LABOR --> ICD9-CM Concept
+            watchUuids.add(UUID.fromString("1c1540af-59b1-5e18-8c51-a72672e74246")); // Category Lists --> KP HealthConnect --> KP Taxonomy
+            watchUuids.add(UUID.fromString("5e1fe940-8faf-11db-b606-0800200c9a66")); // fully specified name
             watchUuids.add(UUID.fromString("693e7426-8145-53ff-90a7-b43c6aa2e863")); // Presbylarynx (disorder)
 //            watchUuids.add(UUID.fromString("814b4598-07f1-5548-a887-c5371dbaaf84")); // Cares for sick or handicapped family member
 //            watchUuids.add(UUID.fromString("ae72b74d-92ad-f699-c019-10bbc1fbe0ec")); //
 
 //            watchUuids.add(UUID.fromString("bca0a686-3516-3daf-8fcf-fe396d13cfad")); // United States of America English language reference set
 //            watchUuids.add(UUID.fromString("eb9a5e42-3cba-356d-b623-3ed472e20b30")); // Great Britain English language reference set
-              watchUuids.add(UUID.fromString("29bf812c-7a77-595d-8b12-ea37c473a5e6")); // US English Dialect Subset
-              watchUuids.add(UUID.fromString("e8191494-ce3c-5bd8-803e-31d31c831f8a")); // GB English Dialect Exceptions Subset
-              watchUuids.add(UUID.fromString("a0982f18-ec51-56d2-a8b1-6ff8964813dd")); // GB English Dialect Subset
+//              watchUuids.add(UUID.fromString("29bf812c-7a77-595d-8b12-ea37c473a5e6")); // US English Dialect Subset
+//              watchUuids.add(UUID.fromString("e8191494-ce3c-5bd8-803e-31d31c831f8a")); // GB English Dialect Exceptions Subset
+//              watchUuids.add(UUID.fromString("a0982f18-ec51-56d2-a8b1-6ff8964813dd")); // GB English Dialect Subset
 
 //            watchUuids.add(UUID.fromString("8c473da3-eb41-5415-9108-6b43adc0a42e")); // Hypothyroidism in pregnancy, antepartum -- KP
 //            watchUuids.add(UUID.fromString("ac4744c9-ea2b-11e0-9572-0800200c9a66")); // Hypothyroidism in pregnancy, antepartum -- SCT
