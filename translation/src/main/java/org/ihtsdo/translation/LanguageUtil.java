@@ -108,28 +108,32 @@ public class LanguageUtil {
 	 * The Enum Language.
 	 */
 	public static enum Language {
-		
+
 		/** The danish. */
-		danish, 
- /** The spanish. */
- spanish, 
- /** The swedish. */
- swedish, 
- /** The french_canadian. */
- french_canadian, 
- /** The english_us. */
- english_us, 
- /** The english_uk. */
- english_uk
+		danish,
+		/** The spanish. */
+		spanish,
+		/** The swedish. */
+		swedish,
+		/** The french_canadian. */
+		french_canadian,
+		/** The english_us. */
+		english_us,
+		/** The english_uk. */
+		english_uk
 	}
 
 	/**
 	 * Contextualize selected refset descriptions.
-	 *
-	 * @param englishLanguageRefsetConcept the english language refset concept
-	 * @param languagePath the language path
-	 * @param langCode the lang code
-	 * @param config the config
+	 * 
+	 * @param englishLanguageRefsetConcept
+	 *            the english language refset concept
+	 * @param languagePath
+	 *            the language path
+	 * @param langCode
+	 *            the lang code
+	 * @param config
+	 *            the config
 	 */
 	public static void contextualizeSelectedRefsetDescriptions(I_GetConceptData englishLanguageRefsetConcept, I_GetConceptData languagePath, String langCode, I_ConfigAceFrame config) {
 		I_TermFactory tf = Terms.get();
@@ -166,10 +170,13 @@ public class LanguageUtil {
 
 	/**
 	 * Import descriptions file.
-	 *
-	 * @param descriptionsFile the descriptions file
-	 * @param release the release
-	 * @param language the language
+	 * 
+	 * @param descriptionsFile
+	 *            the descriptions file
+	 * @param release
+	 *            the release
+	 * @param language
+	 *            the language
 	 */
 	public static void importDescriptionsFile(File descriptionsFile, String release, Language language) {
 		I_TermFactory tf = Terms.get();
@@ -179,7 +186,7 @@ public class LanguageUtil {
 			I_GetConceptData languageRefset = null;
 			I_GetConceptData languagePath = null;
 			I_GetConceptData languageCode = null;
-//TODO some language refset still belong to architectonic
+			// TODO some language refset still belong to architectonic
 			switch (language) {
 			case danish:
 				languageRefset = tf.getConcept(RefsetAuxiliary.Concept.LANGUAGE_REFSET_DA.getUids());
@@ -197,7 +204,8 @@ public class LanguageUtil {
 				languageCode = tf.getConcept(ArchitectonicAuxiliary.Concept.SV_SE.getUids());
 				break;
 			case french_canadian:
-//				languageRefset = tf.getConcept(RefsetAuxiliary.Concept.LANGUAGE_REFSET_FR_CA.getUids());
+				// languageRefset =
+				// tf.getConcept(RefsetAuxiliary.Concept.LANGUAGE_REFSET_FR_CA.getUids());
 				languageRefset = tf.getConcept(UUID.fromString("15d652f0-d246-54f1-914d-956cd3bd265a"));
 				languagePath = tf.getConcept(ArchitectonicAuxiliary.Concept.SNOMED_LANGUAGE_FR_CA_PATH.getUids());
 				languageCode = tf.getConcept(ArchitectonicAuxiliary.Concept.FR_CA.getUids());
@@ -265,11 +273,11 @@ public class LanguageUtil {
 					String initialCapitalStatusId = column[4];
 
 					String descriptionTypeId = column[5];
-					I_GetConceptData descriptionType=null ;
-					if (descriptionTypeId.equals("3")){
-						descriptionType=tf.getConcept(SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getLenient().getNid());
-					}else{
-						descriptionType=tf.getConcept(SnomedMetadataRf2.SYNONYM_RF2.getLenient().getNid());	
+					I_GetConceptData descriptionType = null;
+					if (descriptionTypeId.equals("3")) {
+						descriptionType = tf.getConcept(SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getLenient().getNid());
+					} else {
+						descriptionType = tf.getConcept(SnomedMetadataRf2.SYNONYM_RF2.getLenient().getNid());
 					}
 					String langCodeStr = column[6];
 
@@ -301,13 +309,8 @@ public class LanguageUtil {
 						I_DescriptionVersioned<?> newDescription = tf.newDescription(UUID.randomUUID(), concept, langCodeStr, term, descriptionType, config);
 
 						I_Identify descriptionWithIdentifiers = (I_Identify) newDescription;
-						descriptionWithIdentifiers.addLongId(Long.parseLong(descriptionId), 
-                                                        tf.uuidToNative(ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.getUids()),
-								SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid(), 
-                                                                Long.MAX_VALUE, 
-                                                                config.getDbConfig().getUserConcept().getNid(),
-                                                                config.getEditCoordinate().getModuleNid(),
-                                                                languagePath.getConceptNid());
+						descriptionWithIdentifiers.addLongId(Long.parseLong(descriptionId), tf.uuidToNative(ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.getUids()), SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid(), Long.MAX_VALUE, config.getDbConfig().getUserConcept().getNid(), config
+								.getEditCoordinate().getModuleNid(), languagePath.getConceptNid());
 
 						if (initialCapitalStatusId.trim().equals("0")) {
 							newDescription.getMutableParts().iterator().next().setInitialCaseSignificant(false);
@@ -327,8 +330,7 @@ public class LanguageUtil {
 						}
 						I_GetConceptData languagerefsetConcept = tf.getConcept(languageRefset.getConceptNid());
 
-						refsetHelper.newRefsetExtension(languageRefset.getConceptNid(), newDescription.getDescId(), EConcept.REFSET_TYPES.CID,
-								new RefsetPropertyMap().with(RefsetPropertyMap.REFSET_PROPERTY.CID_ONE, acceptabilityConcept.getConceptNid()), config);
+						refsetHelper.newRefsetExtension(languageRefset.getConceptNid(), newDescription.getDescId(), EConcept.REFSET_TYPES.CID, new RefsetPropertyMap().with(RefsetPropertyMap.REFSET_PROPERTY.CID_ONE, acceptabilityConcept.getConceptNid()), config);
 
 						tf.addUncommittedNoChecks(concept);
 						tf.addUncommittedNoChecks(languagerefsetConcept);
@@ -400,12 +402,11 @@ public class LanguageUtil {
 				sourceText = matchedDescription.getTuples(config.getConflictResolutionStrategy()).iterator().next().getText();
 
 				if (matchedDescription.getTuples(config.getConflictResolutionStrategy()).iterator().next().getTypeNid() == SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getLenient().getNid()
-						&& sourceLangCode.toLowerCase().startsWith(
-								matchedDescription.getTuples(config.getConflictResolutionStrategy()).iterator().next().getLang().trim().toLowerCase().substring(0, 2))
+						&& sourceLangCode.toLowerCase().startsWith(matchedDescription.getTuples(config.getConflictResolutionStrategy()).iterator().next().getLang().trim().toLowerCase().substring(0, 2))
 						&& matchedDescription.getTuples(config.getConflictResolutionStrategy()).iterator().next().getStatusNid() == SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid()) {
 
-					I_GetConceptData refsetConcept =(I_GetConceptData) Terms.get().getConcept(ArchitectonicAuxiliary.getLanguageConcept(targetLangCode).getUids());
-					List<ContextualizedDescription> descriptions=null;
+					I_GetConceptData refsetConcept = (I_GetConceptData) Terms.get().getConcept(ArchitectonicAuxiliary.getLanguageConcept(targetLangCode).getUids());
+					List<ContextualizedDescription> descriptions = null;
 					try {
 						descriptions = LanguageUtil.getContextualizedDescriptions(cnid, refsetConcept.getConceptNid(), true);
 					} catch (Exception e) {
@@ -420,7 +421,6 @@ public class LanguageUtil {
 						}
 					}
 
-					
 				}
 
 				if (targetDescriptionId != null) {
@@ -441,12 +441,17 @@ public class LanguageUtil {
 
 	/**
 	 * Gets the similarity results.
-	 *
-	 * @param query the query
-	 * @param sourceLangRefsetIds the source lang refset ids
-	 * @param targetLangRefsetId the target lang refset id
-	 * @param descTypes the desc types
-	 * @param worker the worker
+	 * 
+	 * @param query
+	 *            the query
+	 * @param sourceLangRefsetIds
+	 *            the source lang refset ids
+	 * @param targetLangRefsetId
+	 *            the target lang refset id
+	 * @param descTypes
+	 *            the desc types
+	 * @param worker
+	 *            the worker
 	 * @return the similarity results
 	 */
 	public static List<SimilarityMatchedItem> getSimilarityResults(String query, List<Integer> sourceLangRefsetIds, int targetLangRefsetId, List<Integer> descTypes, SwingWorker worker) {
@@ -473,20 +478,20 @@ public class LanguageUtil {
 			allowedStatuses.add(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid());
 
 			int preferred = SnomedMetadataRf2.PREFERRED_RF2.getLenient().getNid();
-			int synonym =SnomedMetadataRf2.SYNONYM_RF2.getLenient().getNid();
+			int synonym = SnomedMetadataRf2.SYNONYM_RF2.getLenient().getNid();
 
 			int fsn = SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getLenient().getNid();
 
 			// 200 similarity matches cut off - previously
 			// results.topDocs.scoreDocs.length
 			for (int i = 0; i < 500 && matches.size() < 100 && i < results.topDocs.scoreDocs.length; i++) {
-				if(worker != null && worker.isCancelled()){
+				if (worker != null && worker.isCancelled()) {
 					break;
 				}
 				Document doc = null;
-				try{
-					 doc = results.searcher.doc(results.topDocs.scoreDocs[i].doc);
-				}catch (AlreadyClosedException e) {
+				try {
+					doc = results.searcher.doc(results.topDocs.scoreDocs[i].doc);
+				} catch (AlreadyClosedException e) {
 					break;
 				}
 				String sourceText = "";
@@ -503,7 +508,7 @@ public class LanguageUtil {
 				ContextualizedDescription sourceDesc = null;
 				boolean isMemberOfSource = false;
 				for (I_ExtendByRef extension : extensions) {
-					if(worker != null && worker.isCancelled()){
+					if (worker != null && worker.isCancelled()) {
 						break;
 					}
 					if (sourceLangRefsetIds.contains(extension.getRefsetId())) {
@@ -511,7 +516,7 @@ public class LanguageUtil {
 						extensionUsed = extension;
 						long lastVersion = Long.MIN_VALUE;
 						for (I_ExtendByRefVersion loopTuple : extension.getTuples(config.getConflictResolutionStrategy())) {
-							if(worker != null && worker.isCancelled()){
+							if (worker != null && worker.isCancelled()) {
 								break;
 							}
 							if (loopTuple.getTime() >= lastVersion) {
@@ -545,7 +550,7 @@ public class LanguageUtil {
 
 					List<ContextualizedDescription> descriptions = LanguageUtil.getContextualizedDescriptions(cnid, targetLangRefsetId, true);
 					for (I_ContextualizeDescription targetDesc : descriptions) {
-						if(worker != null && worker.isCancelled()){
+						if (worker != null && worker.isCancelled()) {
 							break;
 						}
 						targetDescriptionId = null;
@@ -599,8 +604,7 @@ public class LanguageUtil {
 	 *            the status id
 	 */
 	@Deprecated
-	public static void persistEditedDescription(I_GetConceptData concept, int descriptionId, String text, int descType, String langCode, I_ConfigAceFrame config, boolean isCaseSignificant,
-			int statusId) {
+	public static void persistEditedDescription(I_GetConceptData concept, int descriptionId, String text, int descType, String langCode, I_ConfigAceFrame config, boolean isCaseSignificant, int statusId) {
 		I_TermFactory tf = Terms.get();
 		try {
 			if (descriptionId == Integer.MAX_VALUE) {
@@ -615,8 +619,7 @@ public class LanguageUtil {
 
 				for (I_DescriptionVersioned<?> description : descriptions) {
 					I_DescriptionTuple tuple = description.getTuples(config.getConflictResolutionStrategy()).iterator().next();
-					if (tuple.getDescId() == descriptionId
-							&& (!tuple.getText().trim().equals(text.trim()) || tuple.isInitialCaseSignificant() != isCaseSignificant || tuple.getStatusId() != statusId)) {
+					if (tuple.getDescId() == descriptionId && (!tuple.getText().trim().equals(text.trim()) || tuple.isInitialCaseSignificant() != isCaseSignificant || tuple.getStatusId() != statusId)) {
 						I_DescriptionPart newPart = tuple.duplicate();
 						newPart.setText(text.trim());
 						newPart.setInitialCaseSignificant(isCaseSignificant);
@@ -660,8 +663,7 @@ public class LanguageUtil {
 	 * @param statusId
 	 *            the status id
 	 */
-	public static void persistEditedDescription(I_GetConceptData concept, I_DescriptionTuple descriptionTuple, String text, int descType, String langCode, I_ConfigAceFrame config,
-			boolean isCaseSignificant, int statusId) {
+	public static void persistEditedDescription(I_GetConceptData concept, I_DescriptionTuple descriptionTuple, String text, int descType, String langCode, I_ConfigAceFrame config, boolean isCaseSignificant, int statusId) {
 		I_TermFactory tf = Terms.get();
 		try {
 			// TODO: what to do with other uncommited changes
@@ -684,14 +686,9 @@ public class LanguageUtil {
 				return;
 			} else {
 				I_DescriptionVersioned<?> description = tf.getDescription(descriptionTuple.getDescId(), descriptionTuple.getConceptNid());
-				if (descriptionTuple.getDescId() == descriptionTuple.getDescId()
-						&& (!descriptionTuple.getText().trim().equals(text.trim()) || descriptionTuple.isInitialCaseSignificant() != isCaseSignificant || descriptionTuple.getStatusId() != statusId)) {
+				if (descriptionTuple.getDescId() == descriptionTuple.getDescId() && (!descriptionTuple.getText().trim().equals(text.trim()) || descriptionTuple.isInitialCaseSignificant() != isCaseSignificant || descriptionTuple.getStatusId() != statusId)) {
 					for (PathBI editPath : config.getEditingPathSet()) {
-						I_DescriptionPart newPart = (I_DescriptionPart) descriptionTuple.getMutablePart().makeAnalog(statusId, 
-                                                        Long.MAX_VALUE, 
-                                                        config.getDbConfig().getUserConcept().getNid(),
-                                                        config.getEditCoordinate().getModuleNid(),
-                                                        editPath.getConceptNid());
+						I_DescriptionPart newPart = (I_DescriptionPart) descriptionTuple.getMutablePart().makeAnalog(statusId, Long.MAX_VALUE, config.getDbConfig().getUserConcept().getNid(), config.getEditCoordinate().getModuleNid(), editPath.getConceptNid());
 						newPart.setText(text.trim());
 						newPart.setInitialCaseSignificant(isCaseSignificant);
 						description.addVersion(newPart);
@@ -730,8 +727,7 @@ public class LanguageUtil {
 			I_IntSet allowedDestRelTypes = termFactory.newIntSet();
 			allowedDestRelTypes.add(termFactory.uuidToNative(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()));
 			Set<I_GetConceptData> childrenSet = new HashSet<I_GetConceptData>();
-			childrenSet.addAll(concept.getDestRelOrigins(config.getAllowedStatus(), allowedDestRelTypes, config.getViewPositionSetReadOnly(), config.getPrecedence(),
-					config.getConflictResolutionStrategy()));
+			childrenSet.addAll(concept.getDestRelOrigins(config.getAllowedStatus(), allowedDestRelTypes, config.getViewPositionSetReadOnly(), config.getPrecedence(), config.getConflictResolutionStrategy()));
 			descendants.addAll(childrenSet);
 			for (I_GetConceptData loopConcept : childrenSet) {
 				descendants = getDescendants(descendants, loopConcept);
@@ -769,7 +765,7 @@ public class LanguageUtil {
 				int fsnRF1 = tf.uuidToNative(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids());
 				int prefRF1 = tf.uuidToNative(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids());
 				int synRF1 = tf.uuidToNative(ArchitectonicAuxiliary.Concept.SYNONYM_DESCRIPTION_TYPE.getUids());
-				
+
 				if (!allowedTypes.contains(synonymRF2)) {
 					allowedTypes.add(synonymRF2);
 				}
@@ -794,8 +790,7 @@ public class LanguageUtil {
 				for (I_GetConceptData semtagConcept : descendants) {
 					String source = "";
 					String target = "";
-					for (I_DescriptionTuple tuple : semtagConcept.getDescriptionTuples(config.getAllowedStatus(), config.getDescTypes(), config.getViewPositionSetReadOnly(),
-							config.getPrecedence(), config.getConflictResolutionStrategy())) {
+					for (I_DescriptionTuple tuple : semtagConcept.getDescriptionTuples(config.getAllowedStatus(), config.getDescTypes(), config.getViewPositionSetReadOnly(), config.getPrecedence(), config.getConflictResolutionStrategy())) {
 						if (((tuple.getTypeNid() == prefRF1) || (tuple.getTypeNid() == synRF1)) && tuple.getLang().equals(sourceLangCode)) {
 							source = tuple.getText();
 						}
@@ -841,7 +836,8 @@ public class LanguageUtil {
 			JPanel uiPanel = null;
 
 			if (uiType == LanguageUtil.ADVANCED_UI) {
-				//uiPanel = new TranslationConceptEditor(concept, config, sourceLangCode, targetLangCode);
+				// uiPanel = new TranslationConceptEditor(concept, config,
+				// sourceLangCode, targetLangCode);
 			} else if (uiType == LanguageUtil.SIMPLE_UI) {
 				uiPanel = new SimpleTranslationConceptEditor(concept, config, sourceLangCode, targetLangCode);
 			}
@@ -873,20 +869,29 @@ public class LanguageUtil {
 
 	/**
 	 * Persist edited description.
-	 *
-	 * @param concept the concept
-	 * @param descriptionTuple the description tuple
-	 * @param text the text
-	 * @param acceptabilityId the acceptability id
-	 * @param descType the desc type
-	 * @param langCode the lang code
-	 * @param languageRefsetId the language refset id
-	 * @param config the config
-	 * @param isCaseSignificant the is case significant
-	 * @param statusId the status id
+	 * 
+	 * @param concept
+	 *            the concept
+	 * @param descriptionTuple
+	 *            the description tuple
+	 * @param text
+	 *            the text
+	 * @param acceptabilityId
+	 *            the acceptability id
+	 * @param descType
+	 *            the desc type
+	 * @param langCode
+	 *            the lang code
+	 * @param languageRefsetId
+	 *            the language refset id
+	 * @param config
+	 *            the config
+	 * @param isCaseSignificant
+	 *            the is case significant
+	 * @param statusId
+	 *            the status id
 	 */
-	public static void persistEditedDescription(I_GetConceptData concept, I_DescriptionTuple descriptionTuple, String text, int acceptabilityId, int descType, String langCode,
-			int languageRefsetId, I_ConfigAceFrame config, boolean isCaseSignificant, int statusId) {
+	public static void persistEditedDescription(I_GetConceptData concept, I_DescriptionTuple descriptionTuple, String text, int acceptabilityId, int descType, String langCode, int languageRefsetId, I_ConfigAceFrame config, boolean isCaseSignificant, int statusId) {
 		I_TermFactory tf = Terms.get();
 		I_HelpRefsets refsetHelper = tf.getRefsetHelper(config);
 		try {
@@ -905,22 +910,15 @@ public class LanguageUtil {
 
 				I_GetConceptData acceptabilityConcept = tf.getConcept(acceptabilityId);
 
-				refsetHelper.newRefsetExtension(languageRefsetId, newDescription.getDescId(), EConcept.REFSET_TYPES.CID,
-						new RefsetPropertyMap().with(RefsetPropertyMap.REFSET_PROPERTY.CID_ONE, acceptabilityConcept.getConceptNid()), config);
+				refsetHelper.newRefsetExtension(languageRefsetId, newDescription.getDescId(), EConcept.REFSET_TYPES.CID, new RefsetPropertyMap().with(RefsetPropertyMap.REFSET_PROPERTY.CID_ONE, acceptabilityConcept.getConceptNid()), config);
 
 				tf.commit();
 				return;
 			} else {
 				I_DescriptionVersioned description = tf.getDescription(descriptionTuple.getDescId(), descriptionTuple.getConceptNid());
-				if (descriptionTuple.getDescId() == descriptionTuple.getDescId()
-						&& (!descriptionTuple.getText().trim().equals(text.trim()) || descriptionTuple.isInitialCaseSignificant() != isCaseSignificant || descriptionTuple.getStatusNid() != statusId)) {
+				if (descriptionTuple.getDescId() == descriptionTuple.getDescId() && (!descriptionTuple.getText().trim().equals(text.trim()) || descriptionTuple.isInitialCaseSignificant() != isCaseSignificant || descriptionTuple.getStatusNid() != statusId)) {
 					for (PathBI editPath : config.getEditingPathSet()) {
-						I_DescriptionPart newPart = (I_DescriptionPart) 
-                                                        descriptionTuple.getMutablePart().makeAnalog(statusId, 
-                                                        Long.MAX_VALUE, 
-                                                        config.getDbConfig().getUserConcept().getNid(),
-                                                        config.getEditCoordinate().getModuleNid(),
-                                                        editPath.getConceptNid());
+						I_DescriptionPart newPart = (I_DescriptionPart) descriptionTuple.getMutablePart().makeAnalog(statusId, Long.MAX_VALUE, config.getDbConfig().getUserConcept().getNid(), config.getEditCoordinate().getModuleNid(), editPath.getConceptNid());
 						newPart.setText(text.trim());
 						newPart.setInitialCaseSignificant(isCaseSignificant);
 						description.addVersion(newPart);
@@ -953,12 +951,7 @@ public class LanguageUtil {
 					I_GetConceptData acceptabilityConcept = tf.getConcept(acceptabilityId);
 
 					for (PathBI editPath : config.getEditingPathSet()) {
-						I_ExtendByRefPartCid newExtConceptPart = (I_ExtendByRefPartCid) 
-                                                        lastPart.makeAnalog(statusId, 
-                                                        Long.MAX_VALUE, 
-                                                        config.getDbConfig().getUserConcept().getNid(),
-                                                        config.getEditCoordinate().getModuleNid(),
-                                                        editPath.getConceptNid());
+						I_ExtendByRefPartCid newExtConceptPart = (I_ExtendByRefPartCid) lastPart.makeAnalog(statusId, Long.MAX_VALUE, config.getDbConfig().getUserConcept().getNid(), config.getEditCoordinate().getModuleNid(), editPath.getConceptNid());
 						newExtConceptPart.setC1id(acceptabilityConcept.getConceptNid());
 						languageExtension.addVersion(newExtConceptPart);
 					}
@@ -967,8 +960,7 @@ public class LanguageUtil {
 				} else {
 					I_GetConceptData acceptabilityConcept = tf.getConcept(acceptabilityId);
 
-					refsetHelper.newRefsetExtension(languageRefsetId, description.getDescId(), EConcept.REFSET_TYPES.CID,
-							new RefsetPropertyMap().with(RefsetPropertyMap.REFSET_PROPERTY.CID_ONE, acceptabilityConcept.getConceptNid()), config);
+					refsetHelper.newRefsetExtension(languageRefsetId, description.getDescId(), EConcept.REFSET_TYPES.CID, new RefsetPropertyMap().with(RefsetPropertyMap.REFSET_PROPERTY.CID_ONE, acceptabilityConcept.getConceptNid()), config);
 
 					tf.commit();
 				}
@@ -985,46 +977,59 @@ public class LanguageUtil {
 
 	/**
 	 * Gets the contextualized descriptions.
-	 *
-	 * @param conceptId the concept id
-	 * @param languageRefsetId the language refset id
-	 * @param returnConflictResolvedLatestState the return conflict resolved latest state
+	 * 
+	 * @param conceptId
+	 *            the concept id
+	 * @param languageRefsetId
+	 *            the language refset id
+	 * @param returnConflictResolvedLatestState
+	 *            the return conflict resolved latest state
 	 * @return the contextualized descriptions
-	 * @throws TerminologyException the terminology exception
-	 * @throws IOException Signals that an I/O exception has occurred.
-	 * @throws Exception the exception
+	 * @throws TerminologyException
+	 *             the terminology exception
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
+	 * @throws Exception
+	 *             the exception
 	 */
-	public static List<ContextualizedDescription> getContextualizedDescriptions(int conceptId, int languageRefsetId, boolean returnConflictResolvedLatestState) throws TerminologyException,
-			IOException, Exception {
+	public static List<ContextualizedDescription> getContextualizedDescriptions(int conceptId, int languageRefsetId, boolean returnConflictResolvedLatestState) throws TerminologyException, IOException, Exception {
 
 		I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
-		return ContextualizedDescription.getContextualizedDescriptions(conceptId, languageRefsetId, config.getAllowedStatus(), config.getDescTypes(), config.getViewPositionSetReadOnly(),
-				returnConflictResolvedLatestState);
+		return ContextualizedDescription.getContextualizedDescriptions(conceptId, languageRefsetId, config.getAllowedStatus(), config.getDescTypes(), config.getViewPositionSetReadOnly(), returnConflictResolvedLatestState);
 	}
 
 	/**
 	 * Gets the contextualized descriptions.
-	 *
-	 * @param conceptId the concept id
-	 * @param languageRefsetId the language refset id
-	 * @param allowedStatus the allowed status
-	 * @param allowedTypes the allowed types
-	 * @param positions the positions
-	 * @param returnConflictResolvedLatestState the return conflict resolved latest state
+	 * 
+	 * @param conceptId
+	 *            the concept id
+	 * @param languageRefsetId
+	 *            the language refset id
+	 * @param allowedStatus
+	 *            the allowed status
+	 * @param allowedTypes
+	 *            the allowed types
+	 * @param positions
+	 *            the positions
+	 * @param returnConflictResolvedLatestState
+	 *            the return conflict resolved latest state
 	 * @return the contextualized descriptions
-	 * @throws TerminologyException the terminology exception
-	 * @throws IOException Signals that an I/O exception has occurred.
-	 * @throws Exception the exception
+	 * @throws TerminologyException
+	 *             the terminology exception
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
+	 * @throws Exception
+	 *             the exception
 	 */
-	public static List<ContextualizedDescription> getContextualizedDescriptions(int conceptId, int languageRefsetId, I_IntSet allowedStatus, I_IntSet allowedTypes,
-			PositionSetReadOnly positions, boolean returnConflictResolvedLatestState) throws TerminologyException, IOException, Exception {
+	public static List<ContextualizedDescription> getContextualizedDescriptions(int conceptId, int languageRefsetId, I_IntSet allowedStatus, I_IntSet allowedTypes, PositionSetReadOnly positions, boolean returnConflictResolvedLatestState) throws TerminologyException, IOException, Exception {
 		return ContextualizedDescription.getContextualizedDescriptions(conceptId, languageRefsetId, allowedStatus, allowedTypes, positions, returnConflictResolvedLatestState);
 	}
 
 	/**
 	 * Compute language refset spec multi origin.
-	 *
-	 * @param languageSpecRefsetId the language spec refset id
+	 * 
+	 * @param languageSpecRefsetId
+	 *            the language spec refset id
 	 */
 	@Deprecated
 	public static void computeLanguageRefsetSpecMultiOrigin(int languageSpecRefsetId) {
@@ -1121,8 +1126,9 @@ public class LanguageUtil {
 
 	/**
 	 * Compute language refset spec.
-	 *
-	 * @param languageSpecRefsetId the language spec refset id
+	 * 
+	 * @param languageSpecRefsetId
+	 *            the language spec refset id
 	 */
 	@Deprecated
 	public static void computeLanguageRefsetSpec(int languageSpecRefsetId) {
@@ -1131,7 +1137,8 @@ public class LanguageUtil {
 			I_ConfigAceFrame config = tf.getActiveAceFrameConfig();
 			I_GetConceptData current = tf.getConcept(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid());
 			I_GetConceptData retired = tf.getConcept(SnomedMetadataRf2.INACTIVE_VALUE_RF2.getLenient().getNid());
-//			I_GetConceptData notAcceptable = tf.getConcept(ArchitectonicAuxiliary.Concept.NOT_ACCEPTABLE.getUids());
+			// I_GetConceptData notAcceptable =
+			// tf.getConcept(ArchitectonicAuxiliary.Concept.NOT_ACCEPTABLE.getUids());
 			I_GetConceptData languageSpecConcept = tf.getConcept(languageSpecRefsetId);
 			LanguageSpecRefset languageSpec = new LanguageSpecRefset(languageSpecConcept);
 			I_GetConceptData enumeratedOriginConcept = languageSpec.getEnumeratedOriginRefsetConcept(tf.getActiveAceFrameConfig());
@@ -1169,7 +1176,7 @@ public class LanguageUtil {
 			// retiring not acceptable and missing descriptions from previous
 			// computation
 			for (I_ExtendByRef previousComputationMember : tf.getRefsetExtensionMembers(languageMembershipConcept.getConceptNid())) {
-				if ( !descIdAcceptabilityMap.containsKey(previousComputationMember.getComponentId())) {
+				if (!descIdAcceptabilityMap.containsKey(previousComputationMember.getComponentId())) {
 					long lastVersion = Long.MIN_VALUE;
 					I_ExtendByRefPartCid previousComputationPart = null;
 					for (I_ExtendByRefVersion loopTuple : previousComputationMember.getTuples(config.getConflictResolutionStrategy())) {
@@ -1180,12 +1187,7 @@ public class LanguageUtil {
 					}
 
 					for (PathBI editPath : config.getEditingPathSet()) {
-						I_ExtendByRefPartCid newExtConceptPart = (I_ExtendByRefPartCid) 
-                                                        previousComputationPart.makeAnalog(retired.getConceptNid(), 
-                                                            Long.MAX_VALUE, 
-                                                            config.getDbConfig().getUserConcept().getNid(),
-                                                            config.getEditCoordinate().getModuleNid(),
-                                                            editPath.getConceptNid());
+						I_ExtendByRefPartCid newExtConceptPart = (I_ExtendByRefPartCid) previousComputationPart.makeAnalog(retired.getConceptNid(), Long.MAX_VALUE, config.getDbConfig().getUserConcept().getNid(), config.getEditCoordinate().getModuleNid(), editPath.getConceptNid());
 						previousComputationMember.addVersion(newExtConceptPart);
 					}
 					tf.addUncommitted(previousComputationMember);
@@ -1193,38 +1195,33 @@ public class LanguageUtil {
 			}
 			// Adding or updating positive acceptance members
 			for (Integer loopDescId : descIdAcceptabilityMap.keySet()) {
-//				if (descIdAcceptabilityMap.get(loopDescId) != notAcceptable.getConceptNid()) {
-					I_ExtendByRef currentMember = null;
-					for (I_ExtendByRef specMember : tf.getAllExtensionsForComponent(loopDescId)) {
-						if (specMember.getRefsetId() == languageMembershipConcept.getConceptNid()) {
-							currentMember = specMember;
+				// if (descIdAcceptabilityMap.get(loopDescId) !=
+				// notAcceptable.getConceptNid()) {
+				I_ExtendByRef currentMember = null;
+				for (I_ExtendByRef specMember : tf.getAllExtensionsForComponent(loopDescId)) {
+					if (specMember.getRefsetId() == languageMembershipConcept.getConceptNid()) {
+						currentMember = specMember;
+					}
+				}
+				if (currentMember != null) {
+					Integer lastVersion = Integer.MIN_VALUE;
+					I_ExtendByRefPartCidInt specPart = null;
+					for (I_ExtendByRefVersion loopTuple : currentMember.getTuples(config.getConflictResolutionStrategy())) {
+						if (loopTuple.getVersion() >= lastVersion) {
+							lastVersion = loopTuple.getVersion();
+							specPart = (I_ExtendByRefPartCidInt) loopTuple.getMutablePart();
 						}
 					}
-					if (currentMember != null) {
-						Integer lastVersion = Integer.MIN_VALUE;
-						I_ExtendByRefPartCidInt specPart = null;
-						for (I_ExtendByRefVersion loopTuple : currentMember.getTuples(config.getConflictResolutionStrategy())) {
-							if (loopTuple.getVersion() >= lastVersion) {
-								lastVersion = loopTuple.getVersion();
-								specPart = (I_ExtendByRefPartCidInt) loopTuple.getMutablePart();
-							}
-						}
-						for (PathBI editPath : config.getEditingPathSet()) {
-							I_ExtendByRefPartCid newExtConceptPart = (I_ExtendByRefPartCid) 
-                                                                specPart.makeAnalog(current.getConceptNid(), 
-                                                                    Long.MAX_VALUE, 
-                                                                    config.getDbConfig().getUserConcept().getNid(),
-                                                                    config.getEditCoordinate().getModuleNid(),
-                                                                    editPath.getConceptNid());
-                                                                    newExtConceptPart.setC1id(descIdAcceptabilityMap.get(loopDescId));
-                                                                    currentMember.addVersion(newExtConceptPart);
-						}
-						tf.addUncommitted(currentMember);
-					} else {
-						refsetHelper.newRefsetExtension(languageMembershipConcept.getConceptNid(), loopDescId, EConcept.REFSET_TYPES.CID,
-								new RefsetPropertyMap().with(RefsetPropertyMap.REFSET_PROPERTY.CID_ONE, descIdAcceptabilityMap.get(loopDescId)), config);
+					for (PathBI editPath : config.getEditingPathSet()) {
+						I_ExtendByRefPartCid newExtConceptPart = (I_ExtendByRefPartCid) specPart.makeAnalog(current.getConceptNid(), Long.MAX_VALUE, config.getDbConfig().getUserConcept().getNid(), config.getEditCoordinate().getModuleNid(), editPath.getConceptNid());
+						newExtConceptPart.setC1id(descIdAcceptabilityMap.get(loopDescId));
+						currentMember.addVersion(newExtConceptPart);
 					}
-//				}
+					tf.addUncommitted(currentMember);
+				} else {
+					refsetHelper.newRefsetExtension(languageMembershipConcept.getConceptNid(), loopDescId, EConcept.REFSET_TYPES.CID, new RefsetPropertyMap().with(RefsetPropertyMap.REFSET_PROPERTY.CID_ONE, descIdAcceptabilityMap.get(loopDescId)), config);
+				}
+				// }
 			}
 
 		} catch (IOException e) {
@@ -1239,10 +1236,12 @@ public class LanguageUtil {
 
 	/**
 	 * Gets the translation config.
-	 *
-	 * @param config the config
+	 * 
+	 * @param config
+	 *            the config
 	 * @return the translation config
-	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
 	 */
 	public static ConfigTranslationModule getTranslationConfig(I_ConfigAceFrame config) throws IOException {
 		ConfigTranslationModule translationConfig = null;
@@ -1259,10 +1258,13 @@ public class LanguageUtil {
 
 	/**
 	 * Sets the translation config.
-	 *
-	 * @param config the config
-	 * @param translationConfig the translation config
-	 * @throws IOException Signals that an I/O exception has occurred.
+	 * 
+	 * @param config
+	 *            the config
+	 * @param translationConfig
+	 *            the translation config
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
 	 */
 	public static void setTranslationConfig(I_ConfigAceFrame config, ConfigTranslationModule translationConfig) throws IOException {
 		config.getDbConfig().setProperty("TRANSLATION_CONFIG", translationConfig);
@@ -1270,19 +1272,26 @@ public class LanguageUtil {
 
 	/**
 	 * Generate fsn.
-	 *
-	 * @param concept the concept
-	 * @param sourceLangRefset the source lang refset
-	 * @param targetLangRefset the target lang refset
-	 * @param project the project
-	 * @param config the config
+	 * 
+	 * @param concept
+	 *            the concept
+	 * @param sourceLangRefset
+	 *            the source lang refset
+	 * @param targetLangRefset
+	 *            the target lang refset
+	 * @param project
+	 *            the project
+	 * @param config
+	 *            the config
 	 * @return the i_ contextualize description
-	 * @throws FSNGenerationException the fSN generation exception
-	 * @throws IOException Signals that an I/O exception has occurred.
-	 * @throws Exception the exception
+	 * @throws FSNGenerationException
+	 *             the fSN generation exception
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
+	 * @throws Exception
+	 *             the exception
 	 */
-	public static I_ContextualizeDescription generateFSN(I_GetConceptData concept, LanguageMembershipRefset sourceLangRefset, LanguageMembershipRefset targetLangRefset,
-			TranslationProject project, I_ConfigAceFrame config) throws FSNGenerationException, IOException, Exception {
+	public static I_ContextualizeDescription generateFSN(I_GetConceptData concept, LanguageMembershipRefset sourceLangRefset, LanguageMembershipRefset targetLangRefset, TranslationProject project, I_ConfigAceFrame config) throws FSNGenerationException, IOException, Exception {
 
 		ContextualizedDescription sourceFSN = null;
 		I_ContextualizeDescription generatedTargetFSN = null;
@@ -1301,9 +1310,7 @@ public class LanguageUtil {
 			List<ContextualizedDescription> sourceDescriptions = LanguageUtil.getContextualizedDescriptions(concept.getConceptNid(), sourceLangRefset.getRefsetId(), true);
 
 			for (ContextualizedDescription loopDescription : sourceDescriptions) {
-				if (loopDescription.getTypeId() == fsn.getConceptNid() 
-						&& isActive(loopDescription.getDescriptionStatusId()) 
-						&& loopDescription.getLanguageExtension() != null) {
+				if (loopDescription.getTypeId() == fsn.getConceptNid() && isActive(loopDescription.getDescriptionStatusId()) && loopDescription.getLanguageExtension() != null) {
 					sourceFSN = loopDescription;
 				}
 			}
@@ -1319,8 +1326,7 @@ public class LanguageUtil {
 				}
 			}
 			if (sourceFSN != null) {
-				if (!alreadyHasFSN && translationConfig.getSelectedFsnGenStrategy().toString().equals(ConfigTranslationModule.FsnGenerationStrategy.SAME_AS_PREFERRED.toString())
-						&& targetPreferred != null) {
+				if (!alreadyHasFSN && translationConfig.getSelectedFsnGenStrategy().toString().equals(ConfigTranslationModule.FsnGenerationStrategy.SAME_AS_PREFERRED.toString()) && targetPreferred != null) {
 					String targetFSNText = "";
 					if (sourceFSN.getText().lastIndexOf("(") > 0 && sourceFSN.getText().lastIndexOf(")") > sourceFSN.getText().lastIndexOf("(")) {
 						String sourceSemtag = sourceFSN.getText().substring(sourceFSN.getText().lastIndexOf("(") + 1, sourceFSN.getText().lastIndexOf(")"));
@@ -1331,8 +1337,7 @@ public class LanguageUtil {
 					} else {
 						targetFSNText = targetPreferred.getText().trim();
 					}
-					generatedTargetFSN = ContextualizedDescription.createNewContextualizedDescription(concept.getConceptNid(), targetLangRefset.getRefsetId(),
-							targetLangRefset.getLangCode(config));
+					generatedTargetFSN = ContextualizedDescription.createNewContextualizedDescription(concept.getConceptNid(), targetLangRefset.getRefsetId(), targetLangRefset.getLangCode(config));
 
 					generatedTargetFSN.setTypeId(fsn.getConceptNid());
 					generatedTargetFSN.setText(targetFSNText);
@@ -1342,8 +1347,7 @@ public class LanguageUtil {
 				}
 				if (!alreadyHasFSN && translationConfig.getSelectedFsnGenStrategy().toString().equals(ConfigTranslationModule.FsnGenerationStrategy.COPY_SOURCE_LANGUAGE.toString())) {
 
-					generatedTargetFSN = ContextualizedDescription.createNewContextualizedDescription(concept.getConceptNid(), targetLangRefset.getRefsetId(),
-							targetLangRefset.getLangCode(config));
+					generatedTargetFSN = ContextualizedDescription.createNewContextualizedDescription(concept.getConceptNid(), targetLangRefset.getRefsetId(), targetLangRefset.getLangCode(config));
 
 					generatedTargetFSN.setTypeId(fsn.getConceptNid());
 					generatedTargetFSN.setText(sourceFSN.getText());
@@ -1367,16 +1371,20 @@ public class LanguageUtil {
 
 	/**
 	 * Gets the default preferred term text.
-	 *
-	 * @param concept the concept
-	 * @param sourceLangRefset the source lang refset
-	 * @param targetLangRefset the target lang refset
-	 * @param config the config
+	 * 
+	 * @param concept
+	 *            the concept
+	 * @param sourceLangRefset
+	 *            the source lang refset
+	 * @param targetLangRefset
+	 *            the target lang refset
+	 * @param config
+	 *            the config
 	 * @return the default preferred term text
-	 * @throws Exception the exception
+	 * @throws Exception
+	 *             the exception
 	 */
-	public static String getDefaultPreferredTermText(I_GetConceptData concept, LanguageMembershipRefset sourceLangRefset, LanguageMembershipRefset targetLangRefset, I_ConfigAceFrame config)
-			throws Exception {
+	public static String getDefaultPreferredTermText(I_GetConceptData concept, LanguageMembershipRefset sourceLangRefset, LanguageMembershipRefset targetLangRefset, I_ConfigAceFrame config) throws Exception {
 		String defaultPreferredTerm = "";
 
 		ConfigTranslationModule translationConfig = getTranslationConfig(config);
@@ -1391,8 +1399,7 @@ public class LanguageUtil {
 				List<ContextualizedDescription> sourceDescriptions = LanguageUtil.getContextualizedDescriptions(concept.getConceptNid(), sourceLangRefset.getRefsetId(), true);
 
 				for (ContextualizedDescription loopDescription : sourceDescriptions) {
-					if (loopDescription.getTypeId() == fsn.getConceptNid() && isActive(loopDescription.getDescriptionStatusId())
-							&& loopDescription.getLanguageRefsetId() == sourceLangRefset.getRefsetId()) {
+					if (loopDescription.getTypeId() == fsn.getConceptNid() && isActive(loopDescription.getDescriptionStatusId()) && loopDescription.getLanguageRefsetId() == sourceLangRefset.getRefsetId()) {
 						sourceFSN = loopDescription;
 					}
 				}
@@ -1408,10 +1415,9 @@ public class LanguageUtil {
 					List<Integer> types = new ArrayList<Integer>();
 					types.add(fsn.getConceptNid());
 					types.add(preferred.getConceptNid());
-					List<Integer > sourceIds = new ArrayList<Integer>();
+					List<Integer> sourceIds = new ArrayList<Integer>();
 					sourceIds.add(sourceLangRefset.getRefsetId());
-					List<SimilarityMatchedItem> matches = LanguageUtil.getSimilarityResults(sourceFSN.getText().substring(0, sourceFSN.getText().indexOf("(") - 1).trim(),
-							sourceIds, targetLangRefset.getRefsetId(),types, null);
+					List<SimilarityMatchedItem> matches = LanguageUtil.getSimilarityResults(sourceFSN.getText().substring(0, sourceFSN.getText().indexOf("(") - 1).trim(), sourceIds, targetLangRefset.getRefsetId(), types, null);
 
 					if (!matches.isEmpty()) {
 						defaultPreferredTerm = matches.iterator().next().getTargetText().toString();
@@ -1425,17 +1431,21 @@ public class LanguageUtil {
 
 	/**
 	 * Gets the default ics.
-	 *
-	 * @param concept the concept
-	 * @param sourceLangRefset the source lang refset
-	 * @param targetLangRefset the target lang refset
-	 * @param config the config
-	 * @param translationConfig 
+	 * 
+	 * @param concept
+	 *            the concept
+	 * @param sourceLangRefset
+	 *            the source lang refset
+	 * @param targetLangRefset
+	 *            the target lang refset
+	 * @param config
+	 *            the config
+	 * @param translationConfig
 	 * @return the default ics
-	 * @throws Exception the exception
+	 * @throws Exception
+	 *             the exception
 	 */
-	public static Boolean getDefaultICS(I_GetConceptData concept, LanguageMembershipRefset sourceLangRefset, LanguageMembershipRefset targetLangRefset, I_ConfigAceFrame config, ConfigTranslationModule translationConfig)
-			throws Exception {
+	public static Boolean getDefaultICS(I_GetConceptData concept, LanguageMembershipRefset sourceLangRefset, LanguageMembershipRefset targetLangRefset, I_ConfigAceFrame config, ConfigTranslationModule translationConfig) throws Exception {
 		Boolean defaultICS = false;
 
 		if (translationConfig != null && translationConfig.getSelectedIcsGenerationStrategy() != null) {
@@ -1453,7 +1463,7 @@ public class LanguageUtil {
 					}
 				}
 
-				  if (translationConfig.getSelectedIcsGenerationStrategy().equals(ConfigTranslationModule.IcsGenerationStrategy.COPY_FROM_SOURCE)) {
+				if (translationConfig.getSelectedIcsGenerationStrategy().equals(ConfigTranslationModule.IcsGenerationStrategy.COPY_FROM_SOURCE)) {
 					defaultICS = sourceFSN.isInitialCaseSignificant();
 				}
 			}
@@ -1463,17 +1473,19 @@ public class LanguageUtil {
 
 	/**
 	 * Gets the linguistic guidelines.
-	 *
-	 * @param concept the concept
+	 * 
+	 * @param concept
+	 *            the concept
 	 * @return the linguistic guidelines
-	 * @throws Exception the exception
+	 * @throws Exception
+	 *             the exception
 	 */
 	public static String getLinguisticGuidelines(I_ContextualizeDescription sourcePreferredDescription, I_ContextualizeDescription sourceFsnDescription) throws Exception {
 		String htmlResponse = "";
 
 		LinguisticGuidelinesInterpreter interpreter = LinguisticGuidelinesInterpreter.createLinguisticGuidelinesInterpreter();
 		List<String> guidelines = interpreter.getLinguisticGuidelines(sourcePreferredDescription, sourceFsnDescription);
-		
+
 		if (guidelines != null && !guidelines.isEmpty()) {
 			htmlResponse = "<html><body>";
 			for (String resultsItem : guidelines) {
@@ -1481,26 +1493,30 @@ public class LanguageUtil {
 			}
 			htmlResponse = htmlResponse + "</body></html>";
 		}
-//		ResultsCollectorWorkBench resultsCollector = RulesLibrary.checkConcept(concept, Terms.get().getConcept(RefsetAuxiliary.Concept.LANG_GUIDELINES_CONTEXT.getUids()), false, Terms.get()
-//				.getActiveAceFrameConfig());
-//
-//		if (!resultsCollector.getResultsItems().isEmpty()) {
-//			htmlResponse = "<html><body>";
-//			for (ResultsItem resultsItem : resultsCollector.getResultsItems()) {
-//				if (resultsItem.getErrorCode() == 1099) {
-//					htmlResponse = htmlResponse + resultsItem.getMessage() + "<br><br>";
-//				}
-//			}
-//			htmlResponse = htmlResponse + "</body></html>";
-//		}
+		// ResultsCollectorWorkBench resultsCollector =
+		// RulesLibrary.checkConcept(concept,
+		// Terms.get().getConcept(RefsetAuxiliary.Concept.LANG_GUIDELINES_CONTEXT.getUids()),
+		// false, Terms.get()
+		// .getActiveAceFrameConfig());
+		//
+		// if (!resultsCollector.getResultsItems().isEmpty()) {
+		// htmlResponse = "<html><body>";
+		// for (ResultsItem resultsItem : resultsCollector.getResultsItems()) {
+		// if (resultsItem.getErrorCode() == 1099) {
+		// htmlResponse = htmlResponse + resultsItem.getMessage() + "<br><br>";
+		// }
+		// }
+		// htmlResponse = htmlResponse + "</body></html>";
+		// }
 
 		return htmlResponse;
 	}
 
 	/**
 	 * Checks if is active.
-	 *
-	 * @param statusId the status id
+	 * 
+	 * @param statusId
+	 *            the status id
 	 * @return true, if is active
 	 */
 	public static boolean isActive(int statusId) {
@@ -1521,8 +1537,9 @@ public class LanguageUtil {
 
 	/**
 	 * Checks if is inactive.
-	 *
-	 * @param statusId the status id
+	 * 
+	 * @param statusId
+	 *            the status id
 	 * @return true, if is inactive
 	 */
 	private static boolean isInactive(int statusId) {
@@ -1542,9 +1559,11 @@ public class LanguageUtil {
 
 	/**
 	 * Sets the default translation config.
-	 *
-	 * @param defaultConfig the default config
-	 * @param project the project
+	 * 
+	 * @param defaultConfig
+	 *            the default config
+	 * @param project
+	 *            the project
 	 */
 	public static void setDefaultTranslationConfig(ConfigTranslationModule defaultConfig, TranslationProject project) {
 		try {
@@ -1563,27 +1582,32 @@ public class LanguageUtil {
 
 	/**
 	 * Gets the default translation config.
-	 *
-	 * @param project the project
+	 * 
+	 * @param project
+	 *            the project
 	 * @return the default translation config
 	 */
 	public static ConfigTranslationModule getDefaultTranslationConfig(TranslationProject project) {
 		ConfigTranslationModule result = new ConfigTranslationModule();
 		try {
-			File configFile =TerminologyProjectDAO.getTranslationProjectDefaultConfigFile(project);
+			File configFile = TerminologyProjectDAO.getTranslationProjectDefaultConfigFile(project);
 
 			if (configFile.exists()) {
-				FileInputStream fis;
-				fis = new FileInputStream(configFile);
-				ObjectInputStream ois = new ObjectInputStream(fis);
-				try{
+				FileInputStream fis = null;
+				ObjectInputStream ois = null;
+				try {
+					fis = new FileInputStream(configFile);
+					ois = new ObjectInputStream(fis);
 					result = (ConfigTranslationModule) ois.readObject();
-				}catch(Exception e){
-					e.printStackTrace();
+				} catch (Exception e) {
 					setDefaultTranslationConfig(result, project);
-				}finally{
-					ois.close();
-					fis.close();
+				} finally {
+					if (ois != null) {
+						ois.close();
+					}
+					if (fis != null) {
+						fis.close();
+					}
 				}
 			}
 		} catch (FileNotFoundException e) {
@@ -1596,17 +1620,19 @@ public class LanguageUtil {
 
 	}
 
-	public static TranslationTermChangeListener getTranslationTermChangeListener(){
-		if (translationTermChangeListener!=null){
-			return translationTermChangeListener; 
+	public static TranslationTermChangeListener getTranslationTermChangeListener() {
+		if (translationTermChangeListener != null) {
+			return translationTermChangeListener;
 		}
-		translationTermChangeListener=new TranslationTermChangeListener();
+		translationTermChangeListener = new TranslationTermChangeListener();
 		return translationTermChangeListener;
 	}
+
 	/**
 	 * Checks if is item being sent.
-	 *
-	 * @param e the e
+	 * 
+	 * @param e
+	 *            the e
 	 * @return true, if is item being sent
 	 */
 	public static boolean isItemBeingSent(ActionEvent e) {
@@ -1617,12 +1643,13 @@ public class LanguageUtil {
 		return true;
 	}
 
-
 	/**
 	 * Gets the children.
-	 *
-	 * @param concept the concept
-	 * @param config the config
+	 * 
+	 * @param concept
+	 *            the concept
+	 * @param config
+	 *            the config
 	 * @return the children
 	 */
 	public static Set<? extends I_GetConceptData> getChildren(I_GetConceptData concept, I_ConfigAceFrame config) {
@@ -1634,8 +1661,7 @@ public class LanguageUtil {
 			allowedDestRelTypes.add(Terms.get().getConcept(UUID.fromString("c93a30b9-ba77-3adb-a9b8-4589c9f8fb25")).getNid());
 			allowedDestRelTypes.add(tf.uuidToNative(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()));
 			allowedDestRelTypes.add(tf.uuidToNative(ArchitectonicAuxiliary.Concept.IS_A_DUP_REL.getUids()));
-			children = concept.getDestRelOrigins(config.getAllowedStatus(), allowedDestRelTypes, config.getViewPositionSetReadOnly(), config.getPrecedence(),
-					config.getConflictResolutionStrategy());
+			children = concept.getDestRelOrigins(config.getAllowedStatus(), allowedDestRelTypes, config.getViewPositionSetReadOnly(), config.getPrecedence(), config.getConflictResolutionStrategy());
 		} catch (TerminologyException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -1649,18 +1675,17 @@ public class LanguageUtil {
 
 	/**
 	 * Read default project.
-	 *
+	 * 
 	 * @return the default project for language
 	 */
-	synchronized
-	public static DefaultProjectForLanguage readDefaultProjects(){
+	synchronized public static DefaultProjectForLanguage readDefaultProjects() {
 		if (defPrjForLanguage != null) {
 			return defPrjForLanguage;
 		} else {
-			File file = new File("sampleProcesses/DefaultProjects.pdl" );
-			if (file.exists()){
+			File file = new File("sampleProcesses/DefaultProjects.pdl");
+			if (file.exists()) {
 				XStream xStream = new XStream(new DomDriver());
-				defPrjForLanguage=(DefaultProjectForLanguage)xStream.fromXML(file);
+				defPrjForLanguage = (DefaultProjectForLanguage) xStream.fromXML(file);
 				return defPrjForLanguage;
 			}
 			return null;
@@ -1670,20 +1695,20 @@ public class LanguageUtil {
 
 	/**
 	 * Write default project for language.
-	 *
-	 * @param defaultProjectForLanguage the default project for language map
+	 * 
+	 * @param defaultProjectForLanguage
+	 *            the default project for language map
 	 */
-	synchronized
-	public static void writeDefaultProjects(DefaultProjectForLanguage defaultProjectForLanguage){
+	synchronized public static void writeDefaultProjects(DefaultProjectForLanguage defaultProjectForLanguage) {
 		File outputFile = new File("sampleProcesses/DefaultProjects.pdl");
 		XStream xStream = new XStream(new DomDriver());
 
 		FileOutputStream rfos;
 		try {
 			rfos = new FileOutputStream(outputFile);
-			OutputStreamWriter rosw = new OutputStreamWriter(rfos,"UTF-8");
-			xStream.toXML(defaultProjectForLanguage,rosw);
-			defPrjForLanguage=defaultProjectForLanguage;
+			OutputStreamWriter rosw = new OutputStreamWriter(rfos, "UTF-8");
+			xStream.toXML(defaultProjectForLanguage, rosw);
+			defPrjForLanguage = defaultProjectForLanguage;
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (UnsupportedEncodingException e) {
