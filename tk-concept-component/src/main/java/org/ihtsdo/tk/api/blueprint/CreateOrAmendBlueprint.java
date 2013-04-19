@@ -343,7 +343,7 @@ public abstract class CreateOrAmendBlueprint implements PropertyChangeListener {
      * @throws ContradictionException if more then one version is found for a
      * particular view coordinate
      */
-    public final List<RefexCAB> getAnnotationBlueprintsFromOriginal() throws IOException, InvalidCAB, ContradictionException {
+    private List<RefexCAB> getAnnotationBlueprintsFromOriginal() throws IOException, InvalidCAB, ContradictionException {
         if (annotations.isEmpty() && cv != null) {
             if (refexDirective == RefexDirective.INCLUDE) {
                 if (cv.getRefexesActive(vc) != null) {

@@ -82,7 +82,7 @@ public class RefexCAB extends CreateOrAmendBlueprint {
      * @throws InvalidCAB if the any of the values in blueprint to make are
      * invalid
      */
-    public UUID computeMemberComponentUuid() throws IOException, InvalidCAB {
+    private UUID computeMemberComponentUuid() throws IOException, InvalidCAB {
         try {
             UUID memberComponentUuid = UuidT5Generator.get(refexSpecNamespace,
                     memberType.name()
@@ -124,7 +124,7 @@ public class RefexCAB extends CreateOrAmendBlueprint {
      * invalid
      * @throws IOException signals that an I/O exception has occurred
      */
-    public UUID computeMemberContentUuid() throws InvalidCAB, IOException {
+    private UUID computeMemberContentUuid() throws InvalidCAB, IOException {
         try {
             StringBuilder sb = new StringBuilder();
             for (RefexProperty prop : RefexProperty.values()) {
@@ -168,7 +168,7 @@ public class RefexCAB extends CreateOrAmendBlueprint {
             case PRESERVE_CONCEPT_REST_HASH:
             case GENERATE_RANDOM_CONCEPT_REST_HASH:
             case GENERATE_HASH:
-                if (getReferencedComponentUuid() != null) { // :!!!:REVIEW
+                if (getReferencedComponentUuid() != null) {
                     setComponentUuidNoRecompute(computeMemberComponentUuid());
                 }
                 break;
@@ -259,9 +259,9 @@ public class RefexCAB extends CreateOrAmendBlueprint {
                 null, null, null,
                 idDirective,
                 RefexDirective.EXCLUDE);
-
+        recomputeUuid();
         this.properties.put(RefexProperty.MEMBER_UUID,
-                computeMemberComponentUuid());
+                getComponentUuid());
     }
 
     /**
@@ -297,9 +297,9 @@ public class RefexCAB extends CreateOrAmendBlueprint {
             RefexDirective refexDirective)
             throws IOException, InvalidCAB, ContradictionException {
         this(memberType, referencedComponentUuid, collectionNid, null, refexVersion, viewCoordinate, idDirective, refexDirective);
-
+        recomputeUuid();
         this.properties.put(RefexProperty.MEMBER_UUID,
-                computeMemberComponentUuid());
+               getComponentUuid());
     }
 
     /**

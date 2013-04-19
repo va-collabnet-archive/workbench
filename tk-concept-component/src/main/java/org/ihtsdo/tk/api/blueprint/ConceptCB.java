@@ -220,14 +220,12 @@ public final class ConceptCB extends CreateOrAmendBlueprint {
             DescriptionCAB fsnBp = dv.makeBlueprint(conceptVersion.getViewCoordinate(), idDirective, refexDirective);
             fsnCABs.add(fsnBp);
             descCABs.add(fsnBp);
-            fsnBp.getAnnotationBlueprintsFromOriginal();
         }
         for (DescriptionVersionBI dv : conceptVersion.getDescriptionsPreferredActive()) {
             prefNames.add(dv.getText());
             DescriptionCAB prefBp = dv.makeBlueprint(conceptVersion.getViewCoordinate(), idDirective, refexDirective);
             prefCABs.add(prefBp);
             descCABs.add(prefBp);
-            prefBp.getAnnotationBlueprintsFromOriginal();
         }
         for (DescriptionVersionBI dv : conceptVersion.getDescriptionsActive()) {
             if (conceptVersion.getDescriptionsFullySpecifiedActive().contains(dv) || conceptVersion.getDescriptionsPreferredActive().contains(dv)) {
@@ -235,7 +233,6 @@ public final class ConceptCB extends CreateOrAmendBlueprint {
             }
             DescriptionCAB descBp = dv.makeBlueprint(conceptVersion.getViewCoordinate(), idDirective, refexDirective);
             descCABs.add(descBp);
-            descBp.getAnnotationBlueprintsFromOriginal();
         }
         for (RelationshipVersionBI rv : conceptVersion.getRelationshipsOutgoingActive()) {
             if (rv.getCharacteristicNid() == SnomedMetadataRf1.INFERRED_DEFINING_CHARACTERISTIC_TYPE_RF1.getLenient().getNid()
@@ -245,12 +242,10 @@ public final class ConceptCB extends CreateOrAmendBlueprint {
             }
             RelationshipCAB relBp = rv.makeBlueprint(conceptVersion.getViewCoordinate(), idDirective, refexDirective);
             relCABs.add(relBp);
-            relBp.getAnnotationBlueprintsFromOriginal();
         }
         for (MediaVersionBI mv : conceptVersion.getMediaActive()) {
             MediaCAB mediaBp = mv.makeBlueprint(conceptVersion.getViewCoordinate(), idDirective, refexDirective);
             mediaCABs.add(mediaBp);
-            mediaBp.getAnnotationBlueprintsFromOriginal();
         }
         this.setComponentUuid(newConceptUuid);
     }
