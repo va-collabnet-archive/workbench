@@ -11,7 +11,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -41,9 +40,6 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
 
-import org.apache.tools.ant.types.resources.FileResource;
-import org.apache.xmlbeans.ResourceLoader;
-import org.apache.xmlbeans.impl.schema.FileResourceLoader;
 import org.ihtsdo.project.workflow.api.WfComponentProvider;
 import org.ihtsdo.project.workflow.api.WorkflowDefinitionManager;
 import org.ihtsdo.project.workflow.model.WfAction;
@@ -51,7 +47,6 @@ import org.ihtsdo.project.workflow.model.WfRole;
 import org.ihtsdo.project.workflow.model.WfState;
 import org.ihtsdo.project.workflow.model.WorkflowDefinition;
 
-import com.googlecode.sardine.model.Collection;
 
 /**
  * @author Guillermo Reynoso
