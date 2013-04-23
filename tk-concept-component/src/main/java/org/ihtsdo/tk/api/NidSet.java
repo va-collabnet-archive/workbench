@@ -77,6 +77,15 @@ public class NidSet implements NidSetBI, Serializable {
     }
 
     /**
+     * Instantiates a new native id set based on a single nid.
+     *
+     * @param singleNid 
+     */
+    public NidSet(int singleNid) {
+        this(new int[]{singleNid});
+    }
+    
+    /**
      * Instantiates a new native id set based on the given
      * <code>values</code>.
      *
