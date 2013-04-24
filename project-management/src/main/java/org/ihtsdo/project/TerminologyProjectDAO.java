@@ -4618,6 +4618,8 @@ public class TerminologyProjectDAO {
 			// workListMember,worklist.getUids().toArray(uuidArray), config);
 			// }
 			TerminologyProjectDAO.workListCache.remove(worklist.getUids().iterator().next());
+			ConceptChronicleBI extRefsetConcept = Ts.get().getConcept(ArchitectonicAuxiliary.Concept.WORKLISTS_EXTENSION_REFSET.localize().getNid());
+			extRefsetConcept.commit(ChangeSetGenerationPolicy.INCREMENTAL, ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);
 		} catch (Exception e) {
 			AceLog.getAppLog().alertAndLogException(e);
 		}
