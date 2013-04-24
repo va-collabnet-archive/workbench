@@ -402,8 +402,9 @@ public class SimilarityPanel extends JPanel implements Serializable {
 			try {
 				get();
 			} catch (InterruptedException e) {
+				
 			} catch (ExecutionException e) {
-			}
+			}catch (CancellationException ex){}
 		}
 
 		/**
