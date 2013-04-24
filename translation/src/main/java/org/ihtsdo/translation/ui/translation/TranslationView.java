@@ -566,7 +566,7 @@ public class TranslationView extends JPanel {
 				// ======== splitPane4 ========
 				{
 					splitPane4.setOrientation(JSplitPane.VERTICAL_SPLIT);
-					splitPane4.setResizeWeight(0.5);
+					splitPane4.setResizeWeight(0.2);
 					splitPane4.setTopComponent(targetTable);
 
 					// ---- descriptionPanel1 ----
