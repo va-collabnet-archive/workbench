@@ -272,7 +272,7 @@ public class DescriptionPanel extends JPanel {
 			if (descriptionInEditor != null) {
 				AceLog.getAppLog().info("Persisting changes");
 				Ts.get().removeTermChangeListener(TranslationTermChangeListener.getInstance());
-				descriptionInEditor.persistChanges(false, false);
+				descriptionInEditor.persistChanges(true, false);
 				EventMediator.getInstance().fireEvent(new DescriptionSavedEvent(descriptionInEditor, instance.getWorkListUUID()));
 				Ts.get().addTermChangeListener(TranslationTermChangeListener.getInstance());
 			}

@@ -683,20 +683,15 @@ public class WfInboxPanel extends JPanel {
 						int n = JOptionPane.showOptionDialog(this, "Uncommited concept in editor", "Uncommited", JOptionPane.YES_NO_CANCEL_OPTION,
 								JOptionPane.WARNING_MESSAGE, null, options, options[2]);
 						if (n == JOptionPane.YES_OPTION) {
-							previousConcept.commit(ChangeSetGenerationPolicy.INCREMENTAL, ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);
+							boolean commited = previousConcept.commit(ChangeSetGenerationPolicy.INCREMENTAL, ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);
+							if(!commited){
+								returnToPreviousItem(previousIndex);
+							}
 						} else if (n == JOptionPane.NO_OPTION) {
 							previousConcept.cancel();
 							Ts.get().cancel();
 						} else {
-							if (previousIndex > 0 && previousIndex < inboxTable.getRowCount()) {
-								inboxTable.setRowSelectionInterval(previousIndex, previousIndex);
-								selectedIndex = previousIndex;
-								return;
-							} else if (inboxTable.getRowCount() >= 0) {
-								inboxTable.setRowSelectionInterval(0, 0);
-								selectedIndex = 0;
-								return;
-							}
+							returnToPreviousItem(previousIndex);
 						}
 					}
 				}
@@ -799,6 +794,18 @@ public class WfInboxPanel extends JPanel {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
+		}
+	}
+
+	private void returnToPreviousItem(int previousIndex) {
+		if (previousIndex > 0 && previousIndex < inboxTable.getRowCount()) {
+			inboxTable.setRowSelectionInterval(previousIndex, previousIndex);
+			selectedIndex = previousIndex;
+			return;
+		} else if (inboxTable.getRowCount() >= 0) {
+			inboxTable.setRowSelectionInterval(0, 0);
+			selectedIndex = 0;
+			return;
 		}
 	}
 
