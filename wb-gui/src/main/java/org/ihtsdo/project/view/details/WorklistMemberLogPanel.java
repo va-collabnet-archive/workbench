@@ -476,8 +476,7 @@ public class WorklistMemberLogPanel extends JPanel {
 			}
 			if (emptyRow) {
 				lastObjectStringdata = objStringdata;
-			} else if (lastObjectStringdata[0] != null && objStringdata[0] != null && lastObjectStringdata[2] != null && objStringdata[2] != null
-					&& lastObjectStringdata[0].equals(objStringdata[0]) && lastObjectStringdata[2].equals(objStringdata[2])) {
+			} else if (lastObjectStringdata[0] != null && objStringdata[0] != null && lastObjectStringdata[2] != null && objStringdata[2] != null && lastObjectStringdata[0].equals(objStringdata[0]) && lastObjectStringdata[2].equals(objStringdata[2])) {
 				lastObjectStringdata = objStringdata;
 			} else {
 				dataVecList.add(lastObjectStringdata);
@@ -558,8 +557,7 @@ public class WorklistMemberLogPanel extends JPanel {
 					}
 				}
 				comments = new ArrayList<String>();
-				comments.addAll(TerminologyProjectDAO.getWorkList(Terms.get().getConcept(this.member.getWorkListUUID()), config)
-						.getCommentsRefset(config).getComments(this.member.getId()).values());
+				comments.addAll(TerminologyProjectDAO.getWorkList(Terms.get().getConcept(this.member.getWorkListUUID()), config).getCommentsRefset(config).getComments(this.member.getId()).values());
 
 				for (int i = comments.size() - 1; i > -1; i--) {
 					thickVer = Long.valueOf(comments.get(i).substring(comments.get(i).trim().lastIndexOf(" ") + 1));
@@ -594,8 +592,7 @@ public class WorklistMemberLogPanel extends JPanel {
 				hashVarCol = new HashMap<Integer, Integer>();
 				TranslationProject translationProject = (TranslationProject) project;
 				I_GetConceptData langRefset = translationProject.getTargetLanguageRefset();
-				List<ContextualizedDescription> descriptions = ContextualizedDescription.getContextualizedDescriptions(member.getId(),
-						langRefset.getConceptNid(), true);
+				List<ContextualizedDescription> descriptions = ContextualizedDescription.getContextualizedDescriptions(member.getId(), langRefset.getConceptNid(), true);
 				for (ContextualizedDescription description : descriptions) {
 					if (description.getLanguageExtension() != null) {
 						Integer did = description.getDescId();
@@ -814,8 +811,7 @@ public class WorklistMemberLogPanel extends JPanel {
 					button1ActionPerformed();
 				}
 			});
-			panel1.add(button1, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.VERTICAL, new Insets(0, 0,
-					0, 0), 0, 0));
+			panel1.add(button1, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.VERTICAL, new Insets(0, 0, 0, 0), 0, 0));
 		}
 		add(panel1, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
 
@@ -823,8 +819,7 @@ public class WorklistMemberLogPanel extends JPanel {
 		{
 			scrollPane1.setViewportView(table1);
 		}
-		add(scrollPane1, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0,
-				0));
+		add(scrollPane1, new GridBagConstraints(1, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
 		// JFormDesigner - End of component initialization
 		// //GEN-END:initComponents
 	}
