@@ -148,8 +148,8 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
     private Map<PanelSection, CollapsePanelPrefs> prefMap;
     private Set<Integer> stamps;
     private ConceptViewSettings settings;
-    private Collection<RelationshipGroupVersionBI> statedRelGroups;
-    private Collection<RelationshipGroupVersionBI> shortNormRelGroups;
+    private Collection<RelationshipGroupVersionBI> statedRelGroups = new ArrayList<>();
+    private Collection<RelationshipGroupVersionBI> shortNormRelGroups = new ArrayList<>();
     private List<? extends I_RelTuple> statedRels;
     private JPanel conceptPanel;
     private Set<Integer> sapsForConflict = new HashSet<>();
@@ -341,7 +341,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
             
             activeStatedRelPanels = new ArrayList<>(statedRels.size());
             setupRels(latch, statedRels, activeStatedRelPanels, cpr, false);
-            
+             
             if (stop) {
                 return null;
             }
