@@ -139,7 +139,9 @@ public class BdbTermPromoter implements ProcessStampDataBI, ProcessUnfetchedConc
                                 }
                             }
                         }
-                        promoteConceptAttribute((ConceptAttributes.Version)latest);
+                        if (latest != null) {
+                            promoteConceptAttribute((ConceptAttributes.Version)latest);
+                        }
                     } else { //promote component
                         ComponentBI c = Bdb.getComponent(nid);
                         if (c != null) { //wfhx records returning null, don't want anyway
