@@ -81,7 +81,7 @@ public class WorkflowInitiator implements WorkflowInitiatiorBI {
 						concept=Ts.get().getConcept(possibleItr.nid());
 						if (concept!=null){
 							//									System.out.println("Sending to workflow: " + concept.toString());
-									addComponentToDefaultWorklist(concept);
+									addComponentToDefaultWorklist(concept, (idSet.cardinality() < 10));
 							}
 						}
 					}
@@ -97,7 +97,7 @@ public class WorkflowInitiator implements WorkflowInitiatiorBI {
 	}
 
 	private static boolean addComponentToDefaultWorklist(
-			ConceptChronicleBI concept) {
+			ConceptChronicleBI concept, boolean commit) {
 		I_ConfigAceFrame config;
 		try {
 			config = Terms.get().getActiveAceFrameConfig();
@@ -152,10 +152,13 @@ public class WorkflowInitiator implements WorkflowInitiatiorBI {
 				if (completeInstanceInSameWorklist != null) {
 					I_GetConceptData assingStatus = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_ASSIGNED_STATUS.getUids());
 					completeInstanceInSameWorklist.setState(new WfState(assingStatus.toString(), assingStatus.getPrimUuid()));
+					if (commit) {
+						concept.commit(ChangeSetGenerationPolicy.INCREMENTAL, ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);
+					}
 				} else {
-					workList.createInstanceForComponent(concept.getPrimUuid(), new WfProcessDefinition(workList.getWorkflowDefinition()));
+					workList.createInstanceForComponent(concept.getPrimUuid(), new WfProcessDefinition(workList.getWorkflowDefinition()), commit);
 				}
-				//concept.commit(ChangeSetGenerationPolicy.INCREMENTAL, ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);
+				
 				return true;
 			} else {
 				return false;

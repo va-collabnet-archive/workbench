@@ -33,6 +33,7 @@ import org.ihtsdo.project.TerminologyProjectDAO;
 import org.ihtsdo.project.refset.PromotionAndAssignmentRefset;
 import org.ihtsdo.project.refset.WorkflowRefset;
 import org.ihtsdo.project.workflow.api.WorkflowDefinitionManager;
+import org.ihtsdo.project.workflow.api.wf2.implementation.WfProcessDefinition;
 import org.ihtsdo.project.workflow.model.WfMembership;
 import org.ihtsdo.project.workflow.model.WfUser;
 import org.ihtsdo.project.workflow.model.WorkflowDefinition;
@@ -357,11 +358,24 @@ public class WorkList extends WorkflowRefset implements Serializable, WorkListBI
 			WfProcessDefinitionBI definition) throws Exception {
 		// Definition is ignored, managed at worklist level in legacy implementation
 		// Component is expected to be concept
+		// default to commit=true
 		WorkListMember newMember = TerminologyProjectDAO.addConceptAsNacWorklistMember(this, 
 				Terms.get().getConcept(componentUuid), 
-				Terms.get().getActiveAceFrameConfig());
+				Terms.get().getActiveAceFrameConfig(), true);
 		
 		return newMember.getWfInstance();
+	}
+	
+	public WfProcessInstanceBI createInstanceForComponent(UUID componentUuid,
+			WfProcessDefinitionBI definition, boolean commit) throws Exception {
+		// Definition is ignored, managed at worklist level in legacy implementation
+		// Component is expected to be concept
+		WorkListMember newMember = TerminologyProjectDAO.addConceptAsNacWorklistMember(this, 
+				Terms.get().getConcept(componentUuid), 
+				Terms.get().getActiveAceFrameConfig(), commit);
+		
+		return newMember.getWfInstance();
+		
 	}
 
 	@Override
@@ -390,6 +404,6 @@ public class WorkList extends WorkflowRefset implements Serializable, WorkListBI
 			return false;
 		return true;
 	}
-	
+
 	
 }

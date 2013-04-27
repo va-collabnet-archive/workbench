@@ -3355,17 +3355,18 @@ public class TerminologyProjectDAO {
 	 *            the destination
 	 * @param config
 	 *            the config
+	 * @param commit 
 	 * @return the work list member
 	 * @throws IOException
 	 *             Signals that an I/O exception has occurred.
 	 */
-	public static WorkListMember addConceptAsNacWorklistMember(WorkList workList, I_GetConceptData concept, I_ConfigAceFrame config) throws IOException {
+	public static WorkListMember addConceptAsNacWorklistMember(WorkList workList, I_GetConceptData concept, I_ConfigAceFrame config, boolean commit) throws IOException {
 		try {
 			WorkSet nacWorkSet = getNonAssignedChangesWorkSet(getProjectForWorklist(workList, config), config);
 			addConceptAsWorkSetMember(concept, nacWorkSet.getUids().iterator().next(), config);
 			Partition partition = workList.getPartition();
 			addConceptAsPartitionMember(concept, partition, config);
-			Terms.get().addUncommitted(partition.getConcept());
+			Terms.get().addUncommittedNoChecks(partition.getConcept());
 			I_GetConceptData assingStatus = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_ASSIGNED_STATUS.getUids());
 			WorkListMember workListMember = new WorkListMember(getConceptString(concept), concept.getConceptNid(), concept.getUids(), workList.getUids().iterator().next(), assingStatus, new java.util.Date().getTime());
 			WorkflowInterpreter interpreter = WorkflowInterpreter.createWorkflowInterpreter(workList.getWorkflowDefinition());
@@ -3382,10 +3383,12 @@ public class TerminologyProjectDAO {
 				destination = new WfUser("user", ArchitectonicAuxiliary.Concept.USER.getPrimoridalUid());
 			}
 			addConceptAsWorkListMember(workListMember, Terms.get().uuidToNative(destination.getId()), config);
-			if (concept.commit(ChangeSetGenerationPolicy.INCREMENTAL, ChangeSetGenerationThreadingPolicy.SINGLE_THREAD)) {
-				nacWorkSet.getConcept().commit(ChangeSetGenerationPolicy.INCREMENTAL, ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);
-				partition.getConcept().commit(ChangeSetGenerationPolicy.INCREMENTAL, ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);
-				workList.getConcept().commit(ChangeSetGenerationPolicy.INCREMENTAL, ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);
+			if (commit) {
+				if (concept.commit(ChangeSetGenerationPolicy.INCREMENTAL, ChangeSetGenerationThreadingPolicy.SINGLE_THREAD)) {
+					nacWorkSet.getConcept().commit(ChangeSetGenerationPolicy.INCREMENTAL, ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);
+					partition.getConcept().commit(ChangeSetGenerationPolicy.INCREMENTAL, ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);
+					workList.getConcept().commit(ChangeSetGenerationPolicy.INCREMENTAL, ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);
+				}
 			}
 		} catch (Exception e) {
 			AceLog.getAppLog().alertAndLogException(e);
@@ -4659,7 +4662,7 @@ public class TerminologyProjectDAO {
 			// }
 			// termFactory.addUncommittedNoChecks(extension);
 			// promote(extension, config);
-			// // termFactory.addUncommitted(extension);
+			// // termFactory.addUncommittedNoChecks(extension);
 			// // termFactory.commit();
 			// }
 			// }
@@ -5679,10 +5682,10 @@ public class TerminologyProjectDAO {
 		// // // loopExtension.promote(viewPosition,
 		// config.getPromotionPathSetReadOnly(),
 		// // // allowedStatusWithRetired, Precedence.TIME);
-		// // // tf.addUncommitted(tf.getConcept(loopExtension.getRefsetId()));
+		// // // tf.addUncommittedNoChecks(tf.getConcept(loopExtension.getRefsetId()));
 		// // // } else if ((originVersion != null && targetVersion != null)) {
 		// // // if (originVersion.getVersion() != targetVersion.getVersion()) {
-		// // // tf.addUncommitted(tf.getConcept(loopExtension.getRefsetId()));
+		// // // tf.addUncommittedNoChecks(tf.getConcept(loopExtension.getRefsetId()));
 		// // // loopExtension.promote(viewPosition,
 		// config.getPromotionPathSetReadOnly(),
 		// // // allowedStatusWithRetired, Precedence.TIME);

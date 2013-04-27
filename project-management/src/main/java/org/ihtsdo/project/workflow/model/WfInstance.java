@@ -295,8 +295,8 @@ public class WfInstance implements Serializable, WfProcessInstanceBI {
 				//targetLanguage.commit(ChangeSetGenerationPolicy.INCREMENTAL, ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);
 			}
 		}
-		// Experiment to manage workflow restart in the same session
-		concept.commit(ChangeSetGenerationPolicy.INCREMENTAL, ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);
+		//  to manage workflow restart in the same session
+		//concept.commit(ChangeSetGenerationPolicy.INCREMENTAL, ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);
 	}
 
 	/**
