@@ -34,16 +34,14 @@ import org.ihtsdo.tk.workflow.api.WorkflowStoreBI;
 
 public class WorkflowInitiator implements WorkflowInitiatiorBI {
 
-	public static Map<Integer,NidSet> alreadySeen;
+	public static Map<Integer, LruCache> alreadySeen;
 	private static ConceptChronicleBI rootConcept;
 	private static WorkflowStoreBI wfStore;
 	private PropertyChangeEvent myEvt;
-	public static Map<Integer, Long> lastComplete;
 
 
 	public WorkflowInitiator() {
-		alreadySeen = new HashMap<Integer,NidSet>();
-		lastComplete = Collections.synchronizedMap(new LruCache<Integer, Long>(1000));
+		alreadySeen = new HashMap<Integer,LruCache>();
 	}
 
 	@Override
@@ -59,7 +57,7 @@ public class WorkflowInitiator implements WorkflowInitiatiorBI {
 		}
 
 		if (alreadySeen.get(workflowNid) == null) {
-			alreadySeen.put(workflowNid, new NidSet());
+			alreadySeen.put(workflowNid, new LruCache<Integer, Long>(1000));
 		}
 
 
@@ -70,33 +68,34 @@ public class WorkflowInitiator implements WorkflowInitiatiorBI {
 				boolean individualCommit = (idSet.cardinality() < 10);
 				NidBitSetItrBI possibleItr = idSet.iterator();
 				while (possibleItr.next()) {
-					//							System.out.println("AlreadySeen: " + alreadySeen.get(workflowNid).contains(possibleItr.nid()) + " lastComplete: " + lastComplete.containsKey(possibleItr.nid()));
-					if (lastComplete.containsKey(possibleItr.nid())) {
-						//								System.out.println("Diff cache time: " + (System.currentTimeMillis() - lastComplete.get(possibleItr.nid())));
+//							System.out.println("AlreadySeen: " + alreadySeen.get(workflowNid).contains(possibleItr.nid()) + " lastComplete: " + lastComplete.containsKey(possibleItr.nid()));
+					long timeDiff = 0L;
+					if (alreadySeen.get(workflowNid).containsKey(possibleItr.nid())) {
+						timeDiff = System.currentTimeMillis() - (Long) alreadySeen.get(workflowNid).get(possibleItr.nid());
+//						System.out.println("Diff cache time: " + timeDiff);
 					}
 
-					// 
-					if (!alreadySeen.get(workflowNid).contains(possibleItr.nid()) && (!lastComplete.containsKey(possibleItr.nid()) ||
-							(System.currentTimeMillis() - lastComplete.get(possibleItr.nid()) >  3000))) {
-						alreadySeen.get(workflowNid).add(possibleItr.nid());
+					alreadySeen.get(workflowNid).put(possibleItr.nid(), System.currentTimeMillis());
+					
+					if ( !alreadySeen.get(workflowNid).containsKey(possibleItr.nid()) || timeDiff >  3000) {
 						concept=Ts.get().getConcept(possibleItr.nid());
 						if (concept!=null){
-							//									System.out.println("Sending to workflow: " + concept.toString());
-									addComponentToDefaultWorklist(concept, individualCommit);
-							}
+//							System.out.println("Sending to workflow: " + concept.toString());
+							addComponentToDefaultWorklist(concept, individualCommit);
 						}
 					}
-				
-				    if (!individualCommit) {
-				    	Ts.get().commit();
-				    }
 				}
-			} catch (IOException e) {
-				e.printStackTrace();
-			} catch (CancellationException e) {
-			} catch (Exception e) {
-				e.printStackTrace();
+
+				if (!individualCommit) {
+					Ts.get().commit();
+				}
 			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (CancellationException e) {
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		return true;
 	}
 
@@ -143,17 +142,18 @@ public class WorkflowInitiator implements WorkflowInitiatiorBI {
 					}
 				}
 
-				//WfProcessInstanceBI instance = wfStore.getProcessInstance(workList, concept.getPrimUuid());
-
-				//System.out.println("instance: " + instance);
-				//System.out.println("instance.isActive(): " + instance.isActive());
-				//System.out.println("instance.isCompleted(): " + instance.isCompleted());
+//				WfProcessInstanceBI instance = wfStore.getProcessInstance(workList, concept.getPrimUuid());
+//
+//				System.out.println("instance: " + instance);
+//				System.out.println("instance.isActive(): " + instance.isActive());
+//				System.out.println("instance.isCompleted(): " + instance.isCompleted());
 
 				if ( alreadyActiveInProject ){ //instance!=null
 					return false;
 				}
-
-				if (completeInstanceInSameWorklist != null) {
+				
+				if (completeInstanceInSameWorklist != null && 
+						(System.currentTimeMillis() - completeInstanceInSameWorklist.getLastChangeTime()) > 3000 ) {
 					I_GetConceptData assingStatus = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_ASSIGNED_STATUS.getUids());
 					completeInstanceInSameWorklist.setState(new WfState(assingStatus.toString(), assingStatus.getPrimUuid()));
 					if (commit) {
@@ -162,7 +162,7 @@ public class WorkflowInitiator implements WorkflowInitiatiorBI {
 				} else {
 					workList.createInstanceForComponent(concept.getPrimUuid(), new WfProcessDefinition(workList.getWorkflowDefinition()), commit);
 				}
-				
+
 				return true;
 			} else {
 				return false;

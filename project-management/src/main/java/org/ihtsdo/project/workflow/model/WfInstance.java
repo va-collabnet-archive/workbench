@@ -274,16 +274,17 @@ public class WfInstance implements Serializable, WfProcessInstanceBI {
 		I_GetConceptData concept = tf.getConcept(instance.getComponentId());
 		pormAssigRefset.setPromotionStatus(concept.getNid(), tf.uuidToNative(newState.getId()));
 		instance.setState(newState);
-		if (instance.isCompleted()) {
-			if (WorkflowInitiator.lastComplete != null) {
-				WorkflowInitiator.lastComplete.put(concept.getNid(), System.currentTimeMillis());
-			}
-			if (WorkflowInitiator.alreadySeen != null) {
-				for (NidSet loopMap : WorkflowInitiator.alreadySeen.values()) {
-					loopMap.remove(concept.getNid());
-				}
-			}
-		}
+		// old code
+//		if (instance.isCompleted()) {
+//			if (WorkflowInitiator.lastComplete != null) {
+//				WorkflowInitiator.lastComplete.put(concept.getNid(), System.currentTimeMillis());
+//			}
+//			if (WorkflowInitiator.alreadySeen != null) {
+//				for (NidSet loopMap : WorkflowInitiator.alreadySeen.values()) {
+//					loopMap.remove(concept.getNid());
+//				}
+//			}
+//		}
 		I_TerminologyProject project = TerminologyProjectDAO.getProjectForWorklist(workList, config);
 		if (project.getProjectType().equals(Type.TRANSLATION)) {
 			TranslationProject transProject = (TranslationProject) project;
