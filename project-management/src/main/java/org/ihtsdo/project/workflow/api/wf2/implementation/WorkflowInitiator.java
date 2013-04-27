@@ -67,6 +67,7 @@ public class WorkflowInitiator implements WorkflowInitiatiorBI {
 		try {
 			I_RepresentIdSet idSet=(I_RepresentIdSet)myEvt.getNewValue();
 			if (idSet!=null){
+				boolean individualCommit = (idSet.cardinality() < 10);
 				NidBitSetItrBI possibleItr = idSet.iterator();
 				while (possibleItr.next()) {
 					//							System.out.println("AlreadySeen: " + alreadySeen.get(workflowNid).contains(possibleItr.nid()) + " lastComplete: " + lastComplete.containsKey(possibleItr.nid()));
@@ -81,11 +82,14 @@ public class WorkflowInitiator implements WorkflowInitiatiorBI {
 						concept=Ts.get().getConcept(possibleItr.nid());
 						if (concept!=null){
 							//									System.out.println("Sending to workflow: " + concept.toString());
-									addComponentToDefaultWorklist(concept, (idSet.cardinality() < 10));
+									addComponentToDefaultWorklist(concept, individualCommit);
 							}
 						}
 					}
-
+				
+				    if (!individualCommit) {
+				    	Ts.get().commit();
+				    }
 				}
 			} catch (IOException e) {
 				e.printStackTrace();
