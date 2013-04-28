@@ -3343,6 +3343,10 @@ public class TerminologyProjectDAO {
 		}
 		return nacWorkLists;
 	}
+	
+	public static WorkListMember addConceptAsNacWorklistMember(WorkList workList, I_GetConceptData concept, I_ConfigAceFrame config) throws IOException {
+		return addConceptAsNacWorklistMember(workList, concept, config, true);
+	}
 
 	/**
 	 * Adds the concept as nac worklist member.
