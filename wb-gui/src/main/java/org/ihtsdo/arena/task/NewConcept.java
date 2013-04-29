@@ -89,6 +89,8 @@ import org.ihtsdo.tk.binding.snomed.CaseSensitive;
 import org.ihtsdo.tk.binding.snomed.Language;
 import org.ihtsdo.tk.binding.snomed.Snomed;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
+import org.ihtsdo.tk.binding.snomed.Taxonomies;
+import org.ihtsdo.tk.binding.snomed.TermAux;
 
 /**
  *
@@ -798,13 +800,21 @@ public class NewConcept extends PreviousNextOrCancel {
 
         try {
             //get parents
-            UUID isa = Snomed.IS_A.getLenient().getPrimUuid();
             UUID[] uuidArray = new UUID[nidList.size()];
+            boolean isSnomed = false;
 
             for (int index = 0; index < nidList.size(); index++) {
-                uuidArray[index] = Terms.get().nidToUuid(nidList.get(index));
+                UUID uuid = Terms.get().nidToUuid(nidList.get(index));
+                uuidArray[index] = uuid;
+                if(Ts.get().isKindOf(nidList.get(index), Taxonomies.SNOMED.getLenient().getConceptNid(), config.getViewCoordinate())){
+                    isSnomed = true;
+                }
             }
-
+            
+            UUID isa = TermAux.IS_A.getLenient().getPrimUuid();
+            if(isSnomed){
+                isa = Snomed.IS_A.getLenient().getPrimUuid();
+            }
 
             //create concept blue print
             if (lang.equals(LANG_CODE.EN_GB)) {
