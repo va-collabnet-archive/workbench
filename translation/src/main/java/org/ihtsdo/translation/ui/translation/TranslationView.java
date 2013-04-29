@@ -184,7 +184,6 @@ public class TranslationView extends JPanel {
 				sourceTable = new LanguageTermPanel(true);
 			}
 			splitPane2.setTopComponent(sourceTable);
-			splitPane2.setDividerLocation(300);
 			result = sourceTable.populateTable(project, worklistMember, true, translConfig, null, this.readOnlyMode);
 
 			if (targetTable == null) {
@@ -526,7 +525,7 @@ public class TranslationView extends JPanel {
 			// ======== splitPane2 ========
 			{
 				splitPane2.setOrientation(JSplitPane.VERTICAL_SPLIT);
-				splitPane2.setResizeWeight(1.0);
+				splitPane2.setResizeWeight(0.5);
 				splitPane2.setDividerSize(15);
 				splitPane2.setDividerLocation(300);
 				splitPane2.setOneTouchExpandable(true);
@@ -560,7 +559,7 @@ public class TranslationView extends JPanel {
 				splitPane3.setOrientation(JSplitPane.VERTICAL_SPLIT);
 				splitPane3.setDividerSize(15);
 				splitPane3.setDividerLocation(500);
-				splitPane3.setResizeWeight(1.0);
+				splitPane3.setResizeWeight(0.5);
 				splitPane3.setOneTouchExpandable(true);
 
 				// ======== splitPane4 ========
