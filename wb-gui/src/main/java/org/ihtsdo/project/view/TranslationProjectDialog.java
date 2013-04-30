@@ -48,6 +48,7 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.ihtsdo.project.TerminologyProjectDAO;
 import org.ihtsdo.project.model.I_TerminologyProject;
+import org.ihtsdo.project.model.TranslationProject;
 
 /**
  * The Class TranslationProjectDialog.
@@ -292,7 +293,7 @@ public class TranslationProjectDialog extends JDialog {
 		jTree1.setRootVisible(false);
 		config = Terms.get().getActiveAceFrameConfig();
 
-		List<I_TerminologyProject> projects = TerminologyProjectDAO.getAllProjects(config);
+		List<TranslationProject> projects = TerminologyProjectDAO.getAllTranslationProjects(config);
 
 		for (i = 0; i < projects.size(); i++) {
 			addProjectToTree(rootNode, projects.get(i), false);
