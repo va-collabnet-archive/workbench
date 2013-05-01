@@ -175,7 +175,9 @@ import com.sleepycat.je.DatabaseException;
 import java.util.logging.Logger;
 import org.ihtsdo.db.change.ChangeNotifier;
 import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.TerminologyStoreDI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
+import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 
 public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_Search {
@@ -298,31 +300,19 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     @Override
     public Condition computeRefset(int refsetNid, RefsetSpecQuery query, I_ConfigAceFrame frameConfig)
             throws Exception {
-        Concept refsetConcept = Concept.get(refsetNid);
+                Concept refsetConcept = Concept.get(refsetNid);
+        TerminologyStoreDI ts = Ts.get();
+        ConceptChronicleBI refsetConcept2 = ts.getConcept(refsetNid);
+        
         Collection<RefsetMember<?, ?>> members = refsetConcept.getData().getRefsetMembers();
+        ViewCoordinate vc = frameConfig.getViewCoordinate();
+        Collection<? extends RefexVersionBI<?>> members2 = refsetConcept2.getRefsetMembersActive(vc);
         HashSet<Integer> currentMembersList = new HashSet<Integer>();
-        NidSetBI allowedStatus = frameConfig.getAllowedStatus();
-        int cidTypeNid = REFSET_TYPES.CID.getTypeNid();
-        int normalMemberNid = ReferenceConcepts.NORMAL_MEMBER.getNid();
-        for (RefsetMember<?, ?> m : members) {
-            for (RefsetMember.Version v : m.getVersions(frameConfig.getViewCoordinate())) {
-                if (allowedStatus.contains(v.getStatusNid()) && (v.getTypeNid() == cidTypeNid)) {
-                    if (((I_ExtendByRefPartCid) v).getC1id() == normalMemberNid) {
-                        if (Terms.get().hasConcept(m.getComponentId())) {
-                            currentMembersList.add(m.getComponentId());
-                        } else {    // assume it is a description member
-                            I_DescriptionVersioned desc = Terms.get().getDescription(m.getComponentId());
-
-                            if (desc != null) {
-                                currentMembersList.add(desc.getConceptNid());
-                            }
-                        }
-                    }
-                }
-            }
+        for (RefexVersionBI m : members2) {
+            currentMembersList.add(ts.getConceptNidForNid(m.getReferencedComponentNid()));
         }
+        
         HashSet<I_ShowActivity> activities = new HashSet<I_ShowActivity>();
-
         if (query == null) {
             MarkedParentComputer mpc = new MarkedParentComputer(refsetConcept, members, frameConfig, activities);
             mpc.addUncommitted();
@@ -2458,7 +2448,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
 
         public void run() {
             try {
-                AceFrame newFrame = new AceFrame(WorkbenchRunner.args, WorkbenchRunner.lc, frameConfig, false);
+                AceFrame newFrame = new AceFrame(WorkbenchRunner.args, frameConfig, false);
 
                 newFrame.setVisible(true);
 

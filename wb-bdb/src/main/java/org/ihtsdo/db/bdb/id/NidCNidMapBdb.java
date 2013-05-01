@@ -35,6 +35,8 @@ import org.ihtsdo.tk.api.NidBitSetBI;
 import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.binding.snomed.Snomed;
+import org.ihtsdo.tk.spec.ValidationException;
 
 /**
  * <h2>Implementation Details</h2> The
@@ -673,6 +675,24 @@ public class NidCNidMapBdb extends ComponentBdb {
                 }
             }
         }
+    }
+    
+    public Set<Integer> getChildNids(int parentNid, ViewCoordinate vc) throws ValidationException, IOException, ContradictionException{
+        Set<Integer> childSet = new HashSet<>();
+        Iterator<PositionBI> viewPositionItr = vc.getPositionSet().iterator();
+        PositionBI position = viewPositionItr.next();
+        RelativePositionComputerBI computer = RelativePositionComputer.getComputer(position);
+        int isaNid = Snomed.IS_A.getLenient().getConceptNid();
+        
+        IndexCacheRecord parentRecord = getIndexCacheRecord(parentNid);
+        for(int childNid : parentRecord.getDestinationOriginNids()){
+            for(RelationshipIndexRecord r :  getIndexCacheRecord(childNid).getRelationshipsRecord()){
+                if(r.isActiveTaxonomyRelationship(vc, computer) && r.getTypeNid() == isaNid){
+                    childSet.add(childNid);
+                }
+            }
+        }
+        return childSet;
     }
 
     public Set<Integer> getAncestorNids(int childNid, ViewCoordinate vc) throws IOException, ContradictionException {

@@ -41,6 +41,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -48,6 +49,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.ihtsdo.db.change.ChangeNotifier;
 import org.ihtsdo.tk.api.relationship.group.RelationshipGroupChronicleBI;
 
@@ -154,8 +157,14 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
    @Override
    protected void addToMemberMap(RefsetMember<?, ?> refsetMember) {
       memberMapLock.lock();
-
       try {
+         if(refsetComponentMap.get() == null){
+             try {
+                 setupMemberMap(getRefsetMembers());
+             } catch (IOException ex) {
+                 Logger.getLogger(ConceptDataSimpleReference.class.getName()).log(Level.SEVERE, null, ex);
+             }
+         }
          if (refsetMembersMap.get() != null) {
             refsetMembersMap.get().put(refsetMember.nid, refsetMember);
          }
@@ -888,10 +897,14 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
 
    @Override
    public RefsetMember<?, ?> getRefsetMemberForComponent(int componentNid) throws IOException {
-      Collection<RefsetMember<?, ?>> refsetMemberList = getRefsetMembers();
+       if(refsetMembers == null){
+           getRefsetMembers();
+       }
 
-      if (refsetMemberList.size() < useMemberMapThreshold) {
-         for (RefsetMember<?, ?> member : refsetMemberList) {
+      if (refsetMembers.get().size() < useMemberMapThreshold) {
+           Iterator<RefsetMember<?, ?>> iterator = refsetMembers.get().iterator();
+         while(iterator.hasNext()){
+             RefsetMember<?, ?> member = iterator.next();
             if (member.getComponentNid() == componentNid) {
                return member;
             }
@@ -901,7 +914,7 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
       }
 
       if (refsetComponentMap.get() == null) {
-         setupMemberMap(refsetMemberList);
+         setupMemberMap(refsetMembers.get());
       }
 
       return refsetComponentMap.get().get(componentNid);

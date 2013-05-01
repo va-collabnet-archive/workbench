@@ -1,8 +1,5 @@
 package org.ihtsdo.concept;
 
-//~--- non-JDK imports --------------------------------------------------------
-import jsr166y.ConcurrentReferenceHashMap;
-
 import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_ConfigAceFrame.LANGUAGE_SORT_PREF;
@@ -23,15 +20,12 @@ import org.dwfa.ace.api.I_Transact;
 import org.dwfa.ace.api.PathSetReadOnly;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.TimePathId;
-import org.ihtsdo.tk.api.cs.ChangeSetPolicy;
-import org.ihtsdo.tk.api.cs.ChangeSetWriterThreading;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.exceptions.ToIoException;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.utypes.UniversalAceBean;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.tk.api.contradiction.IdentifyAllContradictionStrategy;
 import org.dwfa.vodb.types.IntSet;
 
 import org.ihtsdo.concept.component.ConceptComponent;
@@ -60,8 +54,9 @@ import org.ihtsdo.lucene.LuceneManager;
 import org.ihtsdo.lucene.LuceneManager.LuceneSearchType;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ComponentChronicleBI;
-import org.ihtsdo.tk.api.ContradictionManagerBI;
 import org.ihtsdo.tk.api.ContradictionException;
+import org.ihtsdo.tk.api.ContradictionManagerBI;
+import org.ihtsdo.tk.api.NidBitSetBI;
 import org.ihtsdo.tk.api.NidList;
 import org.ihtsdo.tk.api.NidListBI;
 import org.ihtsdo.tk.api.NidSet;
@@ -71,14 +66,19 @@ import org.ihtsdo.tk.api.PositionSetBI;
 import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.ProcessComponentChronicleBI;
 import org.ihtsdo.tk.api.RelAssertionType;
+import org.ihtsdo.tk.api.TerminologyStoreDI;
+import org.ihtsdo.tk.api.blueprint.ConceptCB;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
 import org.ihtsdo.tk.api.changeset.ChangeSetGenerationThreadingPolicy;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.api.contradiction.IdentifyAllContradictionStrategy;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate.LANGUAGE_SORT;
+import org.ihtsdo.tk.api.cs.ChangeSetPolicy;
+import org.ihtsdo.tk.api.cs.ChangeSetWriterThreading;
 import org.ihtsdo.tk.api.id.IdBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
@@ -92,16 +92,14 @@ import org.ihtsdo.tk.contradiction.FoundContradictionVersions;
 import org.ihtsdo.tk.dto.concept.TkConcept;
 import org.ihtsdo.tk.dto.concept.component.attribute.TkConceptAttributes;
 import org.ihtsdo.tk.dto.concept.component.description.TkDescription;
+import org.ihtsdo.tk.dto.concept.component.identifier.TkIdentifier;
 import org.ihtsdo.tk.dto.concept.component.media.TkMedia;
 import org.ihtsdo.tk.dto.concept.component.refex.TkRefexAbstractMember;
 import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationship;
 import org.ihtsdo.tk.hash.Hashcode;
 import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 
-//~--- JDK imports ------------------------------------------------------------
-
 import java.io.IOException;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -115,12 +113,9 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.logging.Level;
-import org.ihtsdo.concept.component.identifier.IdentifierVersionUuid;
-import org.ihtsdo.tk.api.NidBitSetBI;
-import org.ihtsdo.tk.api.TerminologyStoreDI;
-import org.ihtsdo.tk.api.blueprint.ConceptCB;
-import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
-import org.ihtsdo.tk.dto.concept.component.identifier.TkIdentifier;
+
+import jsr166y.ConcurrentReferenceHashMap;
+//~--- JDK imports ------------------------------------------------------------
 
 public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI, Comparable<Concept> {
 
@@ -776,7 +771,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
         for (TkRefexAbstractMember<?> er : unresolvedAnnotations) {
             ConceptComponent cc;
             Object referencedComponent = Ts.get().getComponent(er.getComponentUuid());
-
+            
             if (referencedComponent != null) {
                 if (referencedComponent instanceof Concept) {
                     cc = ((Concept) referencedComponent).getConAttrs();
@@ -1306,6 +1301,23 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
         for (RefexChronicleBI<?> refex : refexes) {
             for (RefexVersionBI<?> version : refex.getVersions(vc)) {
                 returnValues.add(version);
+            }
+        }
+
+        return Collections.unmodifiableCollection(returnValues);
+    }
+    
+    @Override
+    public Collection<Integer> getRefsetMemberNidsActive(ViewCoordinate vc)
+            throws IOException {
+        Collection<? extends RefexChronicleBI<?>> refexes = getRefsetMembers();
+        Set<Integer> returnValues =
+                new HashSet<>(refexes.size());
+
+        for (RefexChronicleBI<?> refex : refexes) {
+            for (RefexVersionBI<?> version : refex.getVersions(vc)) {
+                refex.getNid();
+                break;
             }
         }
 
@@ -2802,5 +2814,9 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
                         + percentageUsed);
             }
         }
+    }
+
+    public static List<TkRefexAbstractMember<?>> getUnresolvedAnnotations() {
+        return unresolvedAnnotations;
     }
 }

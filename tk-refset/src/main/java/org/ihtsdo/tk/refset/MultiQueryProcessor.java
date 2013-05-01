@@ -27,21 +27,21 @@ import org.ihtsdo.tk.api.ProcessUnfetchedConceptDataBI;
  * @author aimeefurber
  */
 public class MultiQueryProcessor implements ProcessUnfetchedConceptDataBI {
-    RefsetComputer[] queries;
+    RefsetComputerNew[] queries;
     NidBitSetBI possibleNids;
     
 
-    public MultiQueryProcessor(RefsetComputer... queries) throws IOException {
+    public MultiQueryProcessor(RefsetComputerNew... queries) throws IOException {
         this.queries = queries;
         possibleNids = Ts.get().getEmptyNidSet();
-        for(RefsetComputer query : queries){
+        for(RefsetComputerNew query : queries){
             possibleNids.or(query.getNidSet());
         }
     }
 
     @Override
     public void processUnfetchedConceptData(int conceptNid, ConceptFetcherBI conceptFetcher) throws Exception {
-        for(RefsetComputer query : queries){
+        for(RefsetComputerNew query : queries){
             query.processUnfetchedConceptData(conceptNid, conceptFetcher);
         }
         

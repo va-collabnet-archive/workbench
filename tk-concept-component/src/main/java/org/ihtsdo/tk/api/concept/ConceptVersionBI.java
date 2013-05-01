@@ -236,6 +236,8 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
      * this version
      */
     Collection<? extends RefexVersionBI<?>> getRefsetMembersActive() throws IOException, ContradictionException;
+    
+    Collection<Integer> getRefsetMemberNidsActive() throws IOException, ContradictionException;
 
     /**
      * Gets all the relationship groups for this version regardless of status.

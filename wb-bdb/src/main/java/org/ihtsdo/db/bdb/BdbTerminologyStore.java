@@ -55,6 +55,7 @@ import org.ihtsdo.tk.db.DbDependency;
 import org.ihtsdo.tk.db.EccsDependency;
 import org.ihtsdo.tk.dto.concept.component.TkRevision;
 import org.ihtsdo.tk.refset.RefsetSpecBuilder;
+import org.ihtsdo.tk.spec.ValidationException;
 import org.ihtsdo.tk.uuid.UuidFactory;
 
 public class BdbTerminologyStore implements TerminologyStoreDI {
@@ -849,6 +850,11 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
     }
     
     @Override
+    public Set<Integer> getChildren(int parentNid, ViewCoordinate vc) throws ValidationException, IOException, ContradictionException{
+        return Bdb.getNidCNidMap().getChildNids(parentNid, vc);
+    }
+    
+    @Override
     public boolean hasExtension(int refsetNid, int componentNid) {
         return Bdb.getNidCNidMap().hasExtension(refsetNid, componentNid);
     }
@@ -884,4 +890,9 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
             int pathNid, PositionBI originPosition){
          return new BdbTermPromoter(sourceViewCoordinate, sourceEditCoordinate, pathNid, originPosition);
      }
+    
+    @Override
+    public void waitTillDatachecksFinished(){
+        BdbCommitManager.waitTillDatachecksFinished();
+    }
 }

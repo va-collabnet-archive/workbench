@@ -452,8 +452,9 @@ public abstract class RefsetMember<R extends RefsetRevision<R, C>, C extends Ref
     public RefexCAB makeBlueprint(ViewCoordinate vc) throws IOException,
         InvalidCAB, ContradictionException {
         RefexCAB rcs = new RefexCAB(getTkRefsetType(), 
-                Ts.get().getUuidPrimordialForNid(getReferencedComponentNid()),
+                getReferencedComponentNid(),
                 getRefexNid(),
+                getPrimUuid(),
                 getVersion(vc), vc);
 
         addSpecProperties(rcs);

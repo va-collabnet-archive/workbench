@@ -36,7 +36,7 @@ import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.NidBitSetBI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
-import org.ihtsdo.tk.refset.RefsetComputer.ComputeType;
+import org.ihtsdo.tk.refset.RefsetComputerNew.ComputeType;
 import org.ihtsdo.tk.refset.RefsetSpecQuery.GROUPING_TYPE;
 import org.ihtsdo.tk.refset.RefsetSpecStatement.QUERY_TOKENS;
 
@@ -56,12 +56,12 @@ public class RefsetSpecBuilder implements QueryBuilderBI{
  
     @Override
     public ArrayList<NidBitSetBI> getResults(Query... queries) throws IOException, Exception{
-        RefsetComputer[] computers = new RefsetComputer[queries.length];
+        RefsetComputerNew[] computers = new RefsetComputerNew[queries.length];
         int count = 0;
         for(Query query : queries){
             RefsetSpecQuery refsetSpec = buildSpec(query);
             NidBitSetBI possibleConcepts = refsetSpec.getPossibleConcepts(Ts.get().getAllConceptNids(), null);
-            RefsetComputer computer = new RefsetComputer(refsetSpec, genericVc,
+            RefsetComputerNew computer = new RefsetComputerNew(refsetSpec, genericVc,
                 possibleConcepts, null,
                 computeType);
             computers[count++] = computer;
@@ -70,7 +70,7 @@ public class RefsetSpecBuilder implements QueryBuilderBI{
         Ts.get().iterateConceptDataInParallel(queryProcessor);
         
         ArrayList<NidBitSetBI> results = new ArrayList<>();
-        for(RefsetComputer computer : computers){
+        for(RefsetComputerNew computer : computers){
             results.add(computer.getResultNids());
         }
         return results;

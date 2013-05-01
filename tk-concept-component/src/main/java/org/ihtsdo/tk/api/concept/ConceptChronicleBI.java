@@ -138,6 +138,9 @@ public interface ConceptChronicleBI extends ComponentChronicleBI<ConceptVersionB
      * @throws IOException signals that an I/O exception has occurred
      */
     Collection<? extends RefexVersionBI<?>> getRefsetMembersActive(ViewCoordinate viewCoordinate) throws IOException;
+    
+    Collection<Integer> getRefsetMemberNidsActive(ViewCoordinate vc)
+            throws IOException;
 
     /**
      * Gets any active refset members, based on the given

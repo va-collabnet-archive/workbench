@@ -39,6 +39,7 @@ import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 import org.ihtsdo.tk.contradiction.ContradictionIdentifierBI;
 import org.ihtsdo.tk.db.DbDependency;
 import org.ihtsdo.tk.dto.concept.component.TkRevision;
+import org.ihtsdo.tk.spec.ValidationException;
 
 /**
  * The Interface TerminologyStoreDI.
@@ -941,6 +942,8 @@ public interface TerminologyStoreDI extends TerminologyDI {
      * found for the given view coordinate
      */
     Set<Integer> getAncestors(int childNid, ViewCoordinate viewCoordinate) throws IOException, ContradictionException;
+    
+    public Set<Integer> getChildren(int parentNid, ViewCoordinate vc) throws ValidationException, IOException, ContradictionException;
 
     /**
      * Gets the nids of incoming relationships source concepts.
@@ -967,24 +970,37 @@ public interface TerminologyStoreDI extends TerminologyDI {
      */
     boolean regenerateWfHxLuceneIndex(ViewCoordinate viewCoordinate) throws Exception;
     
+    /**
+     * Gets a query builder for getting results from a query.
+     * @param viewCoordinate the <code>ViewCoordinate</code> representing the end position of the query
+     * @return a <code>QueryBuilderBI</code> object based on the specified view coordinate.
+     */
     QueryBuilderBI getQueryBuilder(ViewCoordinate viewCoordinate);
     /**
-     * Use if origin path and target path are the same.
-     * @param sourceViewCoordinate
-     * @param sourceEditCoordinate
-     * @param targetViewCoordinate
-     * @return 
+     * Promotes terminology from the path specified by the source view coordinate to the path specified by the target view coordinate.
+     * Uses the metadata from the source edit coordinate to write to the target path. Use this method if the origin 
+     * of the source path is the same as the target path. For example, Path B has an origin of Path A, and the desired promotion is from Path B to Path A.
+     * @param sourceViewCoordinate the <code>ViewCoordinate</code> representing the source view position
+     * @param sourceEditCoordinate the <code>EditCoordinate</code> representing the editing metadata to use in writing the promotion
+     * @param targetViewCoordinate the <code>ViewCoordinate</code> representing the target view position
+     * @return a <code>TerminoloyPromoterBI</code> object based on the specified coordinates
      */
     TerminologyPromoterBI getTerminologyPromoter(ViewCoordinate sourceViewCoordinate, EditCoordinate sourceEditCoordinate,
             ViewCoordinate targetViewCoordinate);
     /**
-     * Use if origin path is different from target path.
-     * @param sourceViewCoordinate
-     * @param sourceEditCoordinate
-     * @param targetPath
-     * @param originPosition
-     * @return 
+     * Promotes terminology from the path specified by the source view coordinate to the path specified by the target path nid.
+     * Uses the metadata from the source edit coordinate to write to the target path. Use this method if the origin of the source path
+     * is different than the target path. For example, Path B has an origin of Path A, and the desired promotion is from Path B to Path C.
+     * @param sourceViewCoordinate the <code>ViewCoordinate</code> representing the source view position
+     * @param sourceEditCoordinate the <code>EditCoordinate</code> representing the editing metadata to use in writing the promotion
+     * @param targetPath the <code>nid</code> representing the target path
+     * @param originPosition the <code>PositionBI</code> representing the origin position of the source path
+     * @return a <code>TerminoloyPromoterBI</code> object based on the specified coordinates
      */
     TerminologyPromoterBI getTerminologyPromoter(ViewCoordinate sourceViewCoordinate, EditCoordinate sourceEditCoordinate,
             int targetPath, PositionBI originPosition);
+    /**
+     * Can call to wait until all datachecks are finished running.
+     */
+    public void waitTillDatachecksFinished();
 }
