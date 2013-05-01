@@ -418,7 +418,7 @@ public class NewConcept extends PreviousNextOrCancel {
       tc = Ts.get().getTerminologyBuilder(config.getEditCoordinate(), config.getViewCoordinate());
 
       try {
-
+          String semanticTag = "";
          // get parents
          UUID   isa       = Snomed.IS_A.getLenient().getPrimUuid();
          UUID[] uuidArray = new UUID[nidList.size()];
@@ -430,6 +430,15 @@ public class NewConcept extends PreviousNextOrCancel {
          if (uuidArray.length > 0) {
             ConceptVersionBI firstParent = Ts.get().getConceptVersion(config.getViewCoordinate(),
                                               uuidArray[0]);
+            String firstConceptFsn = firstParent.getDescriptionFullySpecified().getText();
+            int semanticTagIndex = firstConceptFsn.lastIndexOf('(');
+            if (semanticTagIndex > 1) {
+                if (fsnText.indexOf('(') < 0) {
+                    semanticTag = firstConceptFsn.substring(semanticTagIndex - 1);
+                }
+            }
+            
+            
             Collection<? extends RelationshipVersionBI> outgoingIsa =
                firstParent.getRelationshipsOutgoingActiveIsa();
 
@@ -447,10 +456,10 @@ public class NewConcept extends PreviousNextOrCancel {
 
          // create concept blue print
          if (lang.equals(LANG_CODE.EN_GB)) {
-            conceptSpec = new ConceptCB(fsnText, prefText, LANG_CODE.EN, isa, IdDirective.GENERATE_HASH,
+            conceptSpec = new ConceptCB(fsnText + semanticTag, prefText, LANG_CODE.EN, isa, IdDirective.GENERATE_HASH,
                                         uuidArray);
          } else {
-            conceptSpec = new ConceptCB(fsnText, prefText, LANG_CODE.EN, isa, IdDirective.GENERATE_HASH,
+            conceptSpec = new ConceptCB(fsnText + semanticTag, prefText, LANG_CODE.EN, isa, IdDirective.GENERATE_HASH,
                                         uuidArray);
          }
 
