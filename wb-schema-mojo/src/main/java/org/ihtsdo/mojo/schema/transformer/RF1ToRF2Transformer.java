@@ -314,6 +314,9 @@ public class RF1ToRF2Transformer extends AbstractTransformer {
                     processUSDescription(description, concept);
                 } else if (gbRefsetUUID != null && DialectHelper.isTextForDialect(description.getText(), Language.EN_UK.getLenient().getNid())) {
                     processGBDescription(description, concept);
+                } else if (gbRefsetUUID == null && usRefsetUUID != null && description.lang.equalsIgnoreCase("en")) {
+                    // review condition of this case ... when/if more cases get added
+                    processUSDescription(description, concept);                     
                 } else {
                     throw new UnsupportedDialectOrLanguage("Can't support language or dialect.");
                 }

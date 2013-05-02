@@ -59,11 +59,16 @@ public class TransformProcessor implements ProcessUnfetchedConceptDataBI{
 			allConcepts = Ts.get().getAllConceptNids();
 			this.transformer = transformer;
 			this.eConceptDOS = eConceptDOS;
-            watchUuids.add(UUID.fromString("ef6ae557-83da-5664-ac23-a393ae6a7a1c")); // ABDOMINAL AND PELVIC PAIN --> ICD10-CM Concept
-            watchUuids.add(UUID.fromString("32bf3aa1-8287-5302-a62a-aa354e66b845")); // ABNORMALITY OF FORCES OF LABOR --> ICD9-CM Concept
-            watchUuids.add(UUID.fromString("1c1540af-59b1-5e18-8c51-a72672e74246")); // Category Lists --> KP HealthConnect --> KP Taxonomy
-            watchUuids.add(UUID.fromString("5e1fe940-8faf-11db-b606-0800200c9a66")); // fully specified name RF1
-            watchUuids.add(UUID.fromString("693e7426-8145-53ff-90a7-b43c6aa2e863")); // Presbylarynx (disorder)
+                        
+                        
+            watchUuids.add(UUID.fromString("d439284a-21d1-3ef9-842c-27f017c9f042")); // Acquired anomaly of ear ... to check redundant roles
+            System.out.println(":DEBUG: added d439284a-21d1-3ef9-842c-27f017c9f042 Acquired anomaly of ear ### to check redundant roles");
+            
+//            watchUuids.add(UUID.fromString("ef6ae557-83da-5664-ac23-a393ae6a7a1c")); // ABDOMINAL AND PELVIC PAIN --> ICD10-CM Concept
+//            watchUuids.add(UUID.fromString("32bf3aa1-8287-5302-a62a-aa354e66b845")); // ABNORMALITY OF FORCES OF LABOR --> ICD9-CM Concept
+//            watchUuids.add(UUID.fromString("1c1540af-59b1-5e18-8c51-a72672e74246")); // Category Lists --> KP HealthConnect --> KP Taxonomy
+//            watchUuids.add(UUID.fromString("5e1fe940-8faf-11db-b606-0800200c9a66")); // fully specified name RF1
+//            watchUuids.add(UUID.fromString("693e7426-8145-53ff-90a7-b43c6aa2e863")); // Presbylarynx (disorder)
 //            watchUuids.add(UUID.fromString("814b4598-07f1-5548-a887-c5371dbaaf84")); // Cares for sick or handicapped family member
 //            watchUuids.add(UUID.fromString("ae72b74d-92ad-f699-c019-10bbc1fbe0ec")); //
 
