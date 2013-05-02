@@ -16,8 +16,11 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
+
 public class CommonUtils {
 	private static String newLine="\r\n";
+	private static HashMap<String, String> HashNames;
+	private static File rf2Description;
 	public static String[] getSmallestArray(HashMap<BufferedReader, String[]> passedMap, int[] sortColumns) {
 
 		List<String[]> mapValues = new ArrayList<String[]>(passedMap.values());
@@ -174,5 +177,56 @@ public class CommonUtils {
 		}finally{
 
 		}
+	}
+	public static HashMap<String, String> getNames(File descriptionFile,String date) throws IOException {
+		if (HashNames!=null && rf2Description!=null && rf2Description.getAbsolutePath()==descriptionFile.getAbsolutePath()){
+				return HashNames;
+		}
+		HashNames=new HashMap<String, String>();
+
+		File tmpSorted=new File("tmpSorted");
+		File tmpSorting=new File("tmpSorting");
+		if (!tmpSorted.exists()){
+			tmpSorted.mkdirs();
+		}
+		if (!tmpSorting.exists()){
+			tmpSorting.mkdirs();
+		}
+		rf2Description=descriptionFile;
+		
+		File sortDes=new File(tmpSorted,"tmp_" + descriptionFile.getName());
+		FileSorter fs=new FileSorter(descriptionFile,sortDes,tmpSorting,new int[]{0,1});
+		fs.execute();
+		fs=null;
+		System.gc();
+
+		File snapDes=new File(tmpSorted,"Snap_" + descriptionFile.getName());
+
+		SnapshotGeneratorMultiColumn ssh=new SnapshotGeneratorMultiColumn(sortDes, date, new int[]{0}, 1, snapDes, null, null);
+
+		ssh.execute();
+		ssh=null;
+		System.gc();
+
+		FileInputStream fis = new FileInputStream(snapDes);
+		InputStreamReader isr = new InputStreamReader(fis,"UTF-8");
+		BufferedReader br = new BufferedReader(isr);
+		
+
+		br.readLine();
+
+		String line;
+		String[] spl;
+		while((line=br.readLine())!=null){
+			spl=line.split("\t",-1);
+			if (spl[2].compareTo("1")==0
+					&& spl[6].compareTo("900000000000003001")==0){
+				HashNames.put(spl[4], spl[7]);
+			}
+		}
+
+		br.close();
+		System.gc();
+		return HashNames;
 	}
 }
