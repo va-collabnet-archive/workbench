@@ -87,12 +87,11 @@ import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.dwfa.util.id.Type3UuidFactory;
-import org.dwfa.util.id.Type5UuidFactory;
 import org.ihtsdo.db.change.ChangeNotifier;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
-import org.ihtsdo.tk.binding.snomed.RefsetAux;
 import org.ihtsdo.tk.binding.snomed.TermAux;
+import org.ihtsdo.tk.uuid.UuidT3Generator;
+import org.ihtsdo.tk.uuid.UuidT5Generator;
 
 public abstract class ConceptComponent<R extends Revision<R, C>, C extends ConceptComponent<R, C>>
         implements I_AmTermComponent, I_AmPart<R>, I_AmTuple<R>, I_Identify, IdBI, I_IdPart, I_IdVersion,
@@ -643,9 +642,9 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
                         IdentifierVersionLong idvl = new IdentifierVersionLong((TkIdentifierLong) idv);
                         additionalIdVersions.add(idvl);
                         if (idv.authorityUuid.equals(snomedAuthorityUuid)) {
-                            Bdb.getUuidsToNidMap().put(Type3UuidFactory.fromSNOMED(idv.getDenotation().toString()), nid);
+                            Bdb.getUuidsToNidMap().put(UuidT3Generator.fromSNOMED(idv.getDenotation().toString()), nid);
                         } else {
-                            Bdb.getUuidsToNidMap().put(Type5UuidFactory.get(idv.getAuthorityUuid(), idv.getDenotation().toString()), nid);
+                            Bdb.getUuidsToNidMap().put(UuidT5Generator.get(idv.getAuthorityUuid(), idv.getDenotation().toString()), nid);
 
                         }
                         break;
@@ -653,14 +652,14 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
                     case STRING:
                         IdentifierVersionString idvs = new IdentifierVersionString((TkIdentifierString) idv);
                         additionalIdVersions.add(idvs);
-                        Bdb.getUuidsToNidMap().put(Type5UuidFactory.get(idv.getAuthorityUuid(), idv.getDenotation().toString()), nid);
+                        Bdb.getUuidsToNidMap().put(UuidT5Generator.get(idv.getAuthorityUuid(), idv.getDenotation().toString()), nid);
 
                         break;
 
                     case UUID:
                         Bdb.getUuidsToNidMap().put((UUID) denotation, nid);
                         additionalIdVersions.add(new IdentifierVersionUuid((TkIdentifierUuid) idv));
-                        Bdb.getUuidsToNidMap().put(Type5UuidFactory.get(idv.getAuthorityUuid(), idv.getDenotation().toString()), nid);
+                        Bdb.getUuidsToNidMap().put(UuidT5Generator.get(idv.getAuthorityUuid(), idv.getDenotation().toString()), nid);
 
                         break;
 
@@ -1022,7 +1021,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
                 UUID authorUuid = Ts.get().getConceptForNid(getAuthorNid()).getPrimUuid();
                 String stringToHash = authorUuid.toString()
                         + Long.toString(getTime());
-                UUID type5Uuid = Type5UuidFactory.get(Type5UuidFactory.AUTHOR_TIME_ID,
+                UUID type5Uuid = UuidT5Generator.get(UuidT5Generator.AUTHOR_TIME_ID,
                         stringToHash);
                 buf.append(" authTime: ");
                 buf.append(type5Uuid);
@@ -2522,7 +2521,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
                 UUID authorUuid = Ts.get().getConceptForNid(getAuthorNid()).getPrimUuid();
                 String stringToHash = authorUuid.toString()
                         + Long.toString(getTime());
-                UUID type5Uuid = Type5UuidFactory.get(Type5UuidFactory.AUTHOR_TIME_ID,
+                UUID type5Uuid = UuidT5Generator.get(UuidT5Generator.AUTHOR_TIME_ID,
                         stringToHash);
                 buf.append(" authTime: ");
                 buf.append(type5Uuid);
