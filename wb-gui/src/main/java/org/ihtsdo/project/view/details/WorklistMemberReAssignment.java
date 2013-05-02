@@ -126,7 +126,7 @@ public class WorklistMemberReAssignment extends JPanel {
 			I_TermFactory tf = Terms.get();
 			provider = new WfComponentProvider();
 
-			workflowInterpreterInitWorker = new WorkflowInterperterInitWorker(workList);
+			workflowInterpreterInitWorker = new WorkflowInterperterInitWorker(workList, false);
 			workflowInterpreterInitWorker.addPropertyChangeListener(new ProgressListener(pBarW));
 			workflowInterpreterInitWorker.execute();
 
@@ -149,9 +149,7 @@ public class WorklistMemberReAssignment extends JPanel {
 			membersTable2.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 			membersTable2.setAutoCreateRowSorter(true);
 
-			boolean canReassign = permissionApi.checkPermissionForProject(config.getDbConfig().getUserConcept(),
-					tf.getConcept(ArchitectonicAuxiliary.Concept.PROJECTS_ROOT_HIERARCHY.localize().getNid()),
-					tf.getConcept(ArchitectonicAuxiliary.Concept.REASSINGNMENTS_PERMISSION.localize().getNid()));
+			boolean canReassign = permissionApi.checkPermissionForProject(config.getDbConfig().getUserConcept(), tf.getConcept(ArchitectonicAuxiliary.Concept.PROJECTS_ROOT_HIERARCHY.localize().getNid()), tf.getConcept(ArchitectonicAuxiliary.Concept.REASSINGNMENTS_PERMISSION.localize().getNid()));
 
 			if (canReassign) {
 				destinationCombo.setEnabled(true);
@@ -255,10 +253,8 @@ public class WorklistMemberReAssignment extends JPanel {
 				} catch (TerminologyException e) {
 					AceLog.getAppLog().alertAndLogException(e);
 				}
-			} else if (status == null || user == null || status.toString().trim().equals("") || user.toString().trim().equals("")
-					|| status.toString().equalsIgnoreCase("Loading...")) {
-				JOptionPane.showMessageDialog(WorklistMemberReAssignment.this, "Status and Destination required.", "Message",
-						JOptionPane.INFORMATION_MESSAGE);
+			} else if (status == null || user == null || status.toString().trim().equals("") || user.toString().trim().equals("") || status.toString().equalsIgnoreCase("Loading...")) {
+				JOptionPane.showMessageDialog(WorklistMemberReAssignment.this, "Status and Destination required.", "Message", JOptionPane.INFORMATION_MESSAGE);
 				pBarW.setVisible(false);
 				return;
 			}
@@ -277,8 +273,7 @@ public class WorklistMemberReAssignment extends JPanel {
 						}
 						Terms.get().commit();
 						pBarW.setVisible(false);
-						JOptionPane.showMessageDialog(WorklistMemberReAssignment.this, "Worklist members sent!", "Message",
-								JOptionPane.INFORMATION_MESSAGE);
+						JOptionPane.showMessageDialog(WorklistMemberReAssignment.this, "Worklist members sent!", "Message", JOptionPane.INFORMATION_MESSAGE);
 						// worker.execute(process);
 					} catch (Exception e) {
 						// error getting the workflow
@@ -371,6 +366,22 @@ public class WorklistMemberReAssignment extends JPanel {
 	 *            the e
 	 */
 	private void refreshButtonActionPerformed(ActionEvent e) {
+		if (workflowInterpreterInitWorker != null && !workflowInterpreterInitWorker.isDone()) {
+			workflowInterpreterInitWorker.cancel(true);
+			workflowInterpreterInitWorker = null;
+		}
+		workflowInterpreterInitWorker = new WorkflowInterperterInitWorker(workList, true);
+		workflowInterpreterInitWorker.addPropertyChangeListener(new ProgressListener(pBarW));
+		workflowInterpreterInitWorker.execute();
+		while (!workflowInterpreterInitWorker.isDone()) {
+		}
+		try {
+			WfState selectedState = (WfState) statusCombo.getSelectedItem();
+			getPosibleUsers(selectedState);
+		} catch (ClassCastException ex) {
+			// IGNORE
+		}
+
 		DefaultTableModel model = (DefaultTableModel) membersTable2.getModel();
 		while (model.getRowCount() > 0) {
 			model.removeRow(0);
@@ -463,8 +474,7 @@ public class WorklistMemberReAssignment extends JPanel {
 						}
 						Terms.get().commit();
 						pBarW.setVisible(false);
-						JOptionPane.showMessageDialog(WorklistMemberReAssignment.this, "Worklist members sent!", "Message",
-								JOptionPane.INFORMATION_MESSAGE);
+						JOptionPane.showMessageDialog(WorklistMemberReAssignment.this, "Worklist members sent!", "Message", JOptionPane.INFORMATION_MESSAGE);
 						pBarW.setVisible(false);
 						refreshButtonActionPerformed(null);
 					} catch (Exception e) {
@@ -526,15 +536,13 @@ public class WorklistMemberReAssignment extends JPanel {
 
 				// ---- label9 ----
 				label9.setText("WorkList members");
-				panel4.add(label9, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0,
-						5, 0), 0, 0));
+				panel4.add(label9, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
 
 				// ======== membersTableScrollPanel ========
 				{
 					membersTableScrollPanel.setViewportView(membersTable);
 				}
-				panel4.add(membersTableScrollPanel, new GridBagConstraints(0, 1, 1, 2, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-						new Insets(0, 0, 5, 0), 0, 0));
+				panel4.add(membersTableScrollPanel, new GridBagConstraints(0, 1, 1, 2, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
 			}
 			splitPane1.setLeftComponent(panel4);
 
@@ -548,8 +556,7 @@ public class WorklistMemberReAssignment extends JPanel {
 
 				// ---- label10 ----
 				label10.setText("WorkList members to re-assign");
-				panel5.add(label10, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0,
-						5, 0), 0, 0));
+				panel5.add(label10, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
 
 				// ---- bAdd ----
 				bAdd.setText(">");
@@ -559,15 +566,13 @@ public class WorklistMemberReAssignment extends JPanel {
 						bAddActionPerformed();
 					}
 				});
-				panel5.add(bAdd, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.NORTH, GridBagConstraints.HORIZONTAL, new Insets(0,
-						0, 5, 5), 0, 0));
+				panel5.add(bAdd, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.NORTH, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 5, 5), 0, 0));
 
 				// ======== membersTableScrollPanel2 ========
 				{
 					membersTableScrollPanel2.setViewportView(membersTable2);
 				}
-				panel5.add(membersTableScrollPanel2, new GridBagConstraints(1, 1, 1, 2, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-						new Insets(0, 0, 5, 0), 0, 0));
+				panel5.add(membersTableScrollPanel2, new GridBagConstraints(1, 1, 1, 2, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
 
 				// ---- bDel ----
 				bDel.setText("<");
@@ -577,8 +582,7 @@ public class WorklistMemberReAssignment extends JPanel {
 						bDelActionPerformed();
 					}
 				});
-				panel5.add(bDel, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0, GridBagConstraints.NORTH, GridBagConstraints.HORIZONTAL, new Insets(0,
-						0, 5, 5), 0, 0));
+				panel5.add(bDel, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0, GridBagConstraints.NORTH, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 5, 5), 0, 0));
 
 				// ---- refreshButton ----
 				refreshButton.setText("Refresh");
@@ -589,13 +593,11 @@ public class WorklistMemberReAssignment extends JPanel {
 						refreshButtonActionPerformed(e);
 					}
 				});
-				panel5.add(refreshButton, new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0, GridBagConstraints.NORTHWEST, GridBagConstraints.NONE,
-						new Insets(0, 0, 0, 5), 0, 0));
+				panel5.add(refreshButton, new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0, GridBagConstraints.NORTHWEST, GridBagConstraints.NONE, new Insets(0, 0, 0, 5), 0, 0));
 			}
 			splitPane1.setRightComponent(panel5);
 		}
-		add(splitPane1,
-				new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
+		add(splitPane1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
 
 		// ======== tabbedPane1 ========
 		{
@@ -610,8 +612,7 @@ public class WorklistMemberReAssignment extends JPanel {
 
 				// ---- label1 ----
 				label1.setText("Status:");
-				panel2.add(label1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0,
-						0, 5), 0, 0));
+				panel2.add(label1, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
 
 				// ---- statusCombo ----
 				statusCombo.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
@@ -621,18 +622,15 @@ public class WorklistMemberReAssignment extends JPanel {
 						statusComboItemStateChanged(e);
 					}
 				});
-				panel2.add(statusCombo, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(
-						0, 0, 0, 5), 0, 0));
+				panel2.add(statusCombo, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
 
 				// ---- label8 ----
 				label8.setText("Destination:");
-				panel2.add(label8, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0,
-						0, 5), 0, 0));
+				panel2.add(label8, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
 
 				// ---- destinationCombo ----
 				destinationCombo.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
-				panel2.add(destinationCombo, new GridBagConstraints(3, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-						new Insets(0, 0, 0, 5), 0, 0));
+				panel2.add(destinationCombo, new GridBagConstraints(3, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
 
 				// ---- sendButton ----
 				sendButton.setText("Send");
@@ -643,8 +641,7 @@ public class WorklistMemberReAssignment extends JPanel {
 						sendButtonActionPerformed();
 					}
 				});
-				panel2.add(sendButton, new GridBagConstraints(4, 0, 1, 1, 0.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.VERTICAL, new Insets(
-						0, 0, 0, 0), 0, 0));
+				panel2.add(sendButton, new GridBagConstraints(4, 0, 1, 1, 0.0, 0.0, GridBagConstraints.EAST, GridBagConstraints.VERTICAL, new Insets(0, 0, 0, 0), 0, 0));
 			}
 			tabbedPane1.addTab("Status And Destination", panel2);
 
@@ -655,8 +652,7 @@ public class WorklistMemberReAssignment extends JPanel {
 				((GridBagLayout) panel3.getLayout()).rowHeights = new int[] { 0, 0 };
 				((GridBagLayout) panel3.getLayout()).columnWeights = new double[] { 0.0, 0.0, 1.0E-4 };
 				((GridBagLayout) panel3.getLayout()).rowWeights = new double[] { 0.0, 1.0E-4 };
-				panel3.add(actionsComboBox, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-						new Insets(0, 0, 0, 5), 0, 0));
+				panel3.add(actionsComboBox, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
 
 				// ---- performAction ----
 				performAction.setText("GO");
@@ -666,14 +662,12 @@ public class WorklistMemberReAssignment extends JPanel {
 						performActionActionPerformed(e);
 					}
 				});
-				panel3.add(performAction, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-						new Insets(0, 0, 0, 0), 0, 0));
+				panel3.add(performAction, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 			}
 			tabbedPane1.addTab("Actions", panel3);
 
 		}
-		add(tabbedPane1, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0,
-				0));
+		add(tabbedPane1, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
 
 		// ---- pBarW ----
 		pBarW.setIndeterminate(true);

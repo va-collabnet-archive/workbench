@@ -9,15 +9,22 @@ public class WorkflowInterperterInitWorker extends SwingWorker<WorkflowInterpret
 
 	private WorkList workList;
 	/** The interpreter. */
+	private boolean fresh;
 
-	public WorkflowInterperterInitWorker(WorkList workList) {
+	public WorkflowInterperterInitWorker(WorkList workList, boolean fresh) {
 		super();
 		this.workList = workList;
+		this.fresh = fresh;
 	}
 
 	@Override
 	protected WorkflowInterpreter doInBackground() throws Exception {
-		WorkflowInterpreter interpreter = WorkflowInterpreter.createWorkflowInterpreter(workList.getWorkflowDefinition());
+		WorkflowInterpreter interpreter;
+		if(!fresh){
+			interpreter = WorkflowInterpreter.createWorkflowInterpreter(workList.getWorkflowDefinition());
+		}else{
+			interpreter = WorkflowInterpreter.createFreshWorkflowInterpreter(workList.getWorkflowDefinition());
+		}
 		return interpreter;
 	}
 

@@ -72,6 +72,17 @@ public class WorkflowInterpreter {
 
 		return new WorkflowInterpreter(workflowfDefinition);
 	}
+	
+	/**
+	 * Creates the workflow interpreter.
+	 * 
+	 * @param workflowfDefinition
+	 *            the workflowf definition
+	 * @return the workflow interpreter
+	 */
+	public static WorkflowInterpreter createFreshWorkflowInterpreter(WorkflowDefinition workflowfDefinition) {
+		return new WorkflowInterpreter(workflowfDefinition);
+	}
 
 	/** The h wf i. */
 	private static HashMap<String, WorkflowInterpreter> hWfI = new HashMap<String, WorkflowInterpreter>();
