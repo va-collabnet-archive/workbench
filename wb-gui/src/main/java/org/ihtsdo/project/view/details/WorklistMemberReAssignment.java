@@ -30,7 +30,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
 import javax.swing.JButton;
@@ -63,8 +65,9 @@ import org.ihtsdo.project.workflow.api.WfComponentProvider;
 import org.ihtsdo.project.workflow.api.WorkflowInterpreter;
 import org.ihtsdo.project.workflow.api.wf2.implementation.WfActivity;
 import org.ihtsdo.project.workflow.api.wf2.implementation.WfProcessDefinition;
-import org.ihtsdo.project.workflow.model.WfAction;
 import org.ihtsdo.project.workflow.model.WfInstance;
+import org.ihtsdo.project.workflow.model.WfMembership;
+import org.ihtsdo.project.workflow.model.WfRole;
 import org.ihtsdo.project.workflow.model.WfState;
 import org.ihtsdo.project.workflow.model.WfStateComparator;
 import org.ihtsdo.project.workflow.model.WfUser;
@@ -376,8 +379,9 @@ public class WorklistMemberReAssignment extends JPanel {
 		while (!workflowInterpreterInitWorker.isDone()) {
 		}
 		try {
+			destinationCombo.removeAllItems();
 			WfState selectedState = (WfState) statusCombo.getSelectedItem();
-			getPosibleUsers(selectedState);
+			refreshDestinationCombo(selectedState);
 		} catch (ClassCastException ex) {
 			// IGNORE
 		}
@@ -412,25 +416,29 @@ public class WorklistMemberReAssignment extends JPanel {
 		if (!e.getItem().toString().equals(DELETE_OPTION) && !e.getItem().toString().startsWith("Loading")) {
 			destinationCombo.removeAllItems();
 			WfState selectedState = (WfState) e.getItem();
-			List<WfUser> newItems = getPosibleUsers(selectedState);
-
-			List<WfUser> reducedList = getPosibleUsers(selectedState);
-			for (WfUser wfUser : newItems) {
-				if (!reducedList.contains(wfUser)) {
-					reducedList.add(wfUser);
-				}
-			}
-			for (WfUser wfUser : reducedList) {
-				destinationCombo.addItem(wfUser);
-			}
+			refreshDestinationCombo(selectedState);
 		} else if (e.getItem().toString().equals(DELETE_OPTION)) {
 			destinationCombo.removeAllItems();
 		}
 	}
 
+	private void refreshDestinationCombo(WfState selectedState) {
+		List<WfUser> newItems = getPosibleUsers(selectedState);
+
+		List<WfUser> reducedList = getPosibleUsers(selectedState);
+		for (WfUser wfUser : newItems) {
+			if (!reducedList.contains(wfUser)) {
+				reducedList.add(wfUser);
+			}
+		}
+		for (WfUser wfUser : reducedList) {
+			destinationCombo.addItem(wfUser);
+		}
+	}
+
 	private List<WfUser> getPosibleUsers(WfState selectedState) {
 		List<WfUser> users = workList.getUsers();
-		List<WfUser> result = new ArrayList<WfUser>();
+		Set<WfUser> result = new HashSet<WfUser>();
 		for (WfUser wfUser : users) {
 			WfInstance wfInstance = new WfInstance();
 			// For now it does not meter.
@@ -447,14 +455,17 @@ public class WorklistMemberReAssignment extends JPanel {
 				wfInstance.setState(selectedState);
 				wfInstance.setDestination(wfUser);
 				wfInstance.setWfDefinition(workList.getWorkflowDefinition());
-				List<WfAction> posibleActions = interpreter.getPossibleActions(wfInstance, wfUser);
-				if (posibleActions != null && !posibleActions.isEmpty() && !result.contains(wfUser)) {
-					result.add(wfUser);
+				List<WfRole> roles = interpreter.getNextRole(wfInstance, workList);
+				for (WfMembership loopMembership : workList.getWorkflowUserRoles()) {
+					if (loopMembership.getUser().equals(wfUser) && roles.contains(loopMembership.getRole())) {
+						result.add(loopMembership.getUser());
+					}
 				}
 			}
 		}
-		Collections.sort(result, new WfUserComparator());
-		return result;
+		List<WfUser> res = new ArrayList<>(result);
+		Collections.sort(res, new WfUserComparator());
+		return res;
 	}
 
 	private void performActionActionPerformed(ActionEvent e) {
