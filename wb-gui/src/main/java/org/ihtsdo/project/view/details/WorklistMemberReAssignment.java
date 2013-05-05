@@ -424,8 +424,8 @@ public class WorklistMemberReAssignment extends JPanel {
 
 	private void refreshDestinationCombo(WfState selectedState) {
 		List<WfUser> newItems = getPosibleUsers(selectedState);
-
-		List<WfUser> reducedList = getPosibleUsers(selectedState);
+		List<WfUser> reducedList = new ArrayList<WfUser>();
+		
 		for (WfUser wfUser : newItems) {
 			if (!reducedList.contains(wfUser)) {
 				reducedList.add(wfUser);
