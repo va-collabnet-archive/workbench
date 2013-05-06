@@ -19,10 +19,10 @@ import org.apache.maven.doxia.markup.HtmlMarkup;
 import org.apache.maven.doxia.sink.Sink;
 import org.apache.maven.doxia.sink.SinkEventAttributeSet;
 import org.apache.maven.doxia.sink.SinkEventAttributes;
+import org.apache.maven.doxia.siterenderer.Renderer;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.reporting.AbstractMavenReport;
 import org.apache.maven.reporting.MavenReportException;
-import org.codehaus.doxia.site.renderer.SiteRenderer;
 import org.ihtsdo.rf2.file.delta.snapshot.tasks.FileSorter;
 
 /**
@@ -56,7 +56,7 @@ public class ReportBatchQACheck extends AbstractMavenReport {
 	 * @required
 	 * @readonly
 	 */
-	private SiteRenderer siteRenderer;
+	private Renderer siteRenderer;
 
 	/**
 	 * Execution details csv/txt file.
@@ -543,7 +543,7 @@ public class ReportBatchQACheck extends AbstractMavenReport {
 	}
 
 	@Override
-	protected SiteRenderer getSiteRenderer() {
+	protected Renderer getSiteRenderer() {
 		return siteRenderer;
 	}
 

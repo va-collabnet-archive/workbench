@@ -15,7 +15,6 @@
  */
 package org.ihtsdo.mojo.mojo;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Set;
 import java.util.UUID;
@@ -32,9 +31,6 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.id.Type5UuidFactory;
-import org.ihtsdo.db.bdb.Bdb;
-import org.ihtsdo.mojo.mojo.ConceptDescriptor;
-import org.ihtsdo.tk.api.Precedence;
 
 /**
  * Goal which converts a refset concept in la language refste concept adding promotion refset,

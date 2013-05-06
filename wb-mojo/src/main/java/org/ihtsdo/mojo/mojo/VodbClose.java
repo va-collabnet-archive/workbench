@@ -13,25 +13,21 @@
 package org.ihtsdo.mojo.mojo;
 
 //~--- non-JDK imports --------------------------------------------------------
+import java.io.File;
+import java.security.NoSuchAlgorithmException;
+
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-
 import org.dwfa.ace.api.I_ImplementTermFactory;
 import org.dwfa.ace.api.Terms;
-
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.helper.bdb.NullComponentFinder;
 import org.ihtsdo.helper.bdb.UuidDupFinder;
 import org.ihtsdo.helper.bdb.UuidDupReporter;
 import org.ihtsdo.mojo.maven.MojoUtil;
-
 //~--- JDK imports ------------------------------------------------------------
-
-import java.io.File;
-
-import java.security.NoSuchAlgorithmException;
 
 /**
  *

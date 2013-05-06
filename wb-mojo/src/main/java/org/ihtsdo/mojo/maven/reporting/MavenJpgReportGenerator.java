@@ -27,10 +27,10 @@ import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
+import org.apache.maven.doxia.sink.Sink;
+import org.apache.maven.doxia.siterenderer.Renderer;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.reporting.AbstractMavenReport;
-import org.codehaus.doxia.sink.Sink;
-import org.codehaus.doxia.site.renderer.SiteRenderer;
 
 /**
  * @goal jpgreport
@@ -61,7 +61,7 @@ public class MavenJpgReportGenerator extends AbstractMavenReport {
      * @required
      * @readonly
      */
-    private SiteRenderer siteRenderer;
+    private Renderer siteRenderer;
 
     /**
      * @parameter default-value="target/reports"
@@ -162,7 +162,7 @@ public class MavenJpgReportGenerator extends AbstractMavenReport {
         return outputDirectory;
     }
 
-    protected SiteRenderer getSiteRenderer() {
+    protected Renderer getSiteRenderer() {
         return siteRenderer;
     }
 

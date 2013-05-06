@@ -23,8 +23,6 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.UUID;
 
-import org.dwfa.vodb.bind.ThinVersionHelper;
-
 public class SimpleUniversalAcePosition {
 
     private static SimpleDateFormat dateParser = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");

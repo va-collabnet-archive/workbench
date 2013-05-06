@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.util.logging.Level;
 
-import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.ihtsdo.workflow.refset.semHier.SemanticHierarchyRefsetWriter;
 

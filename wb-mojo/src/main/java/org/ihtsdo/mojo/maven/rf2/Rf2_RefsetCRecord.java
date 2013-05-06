@@ -15,12 +15,17 @@
  */
 package org.ihtsdo.mojo.maven.rf2;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Logger;
+
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
 

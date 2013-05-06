@@ -7,7 +7,6 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.ihtsdo.mojo.maven.MojoUtil;
-import org.ihtsdo.rf2.refset.factory.RF2AttributeValueRefsetFactory;
 import org.ihtsdo.rf2.refset.factory.RF2RetiredWithoutReasonRefsetFactory;
 import org.ihtsdo.rf2.util.Config;
 import org.ihtsdo.rf2.util.ExportUtil;

@@ -17,21 +17,22 @@ package org.ihtsdo.mojo.econcept;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import java.io.BufferedOutputStream;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-
 import org.dwfa.tapi.TerminologyException;
-
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ConceptFetcherBI;
 import org.ihtsdo.tk.api.NidBitSetBI;
 import org.ihtsdo.tk.api.ProcessUnfetchedConceptDataBI;
 import org.ihtsdo.tk.dto.concept.TkConcept;
-
 //~--- JDK imports ------------------------------------------------------------
-
-import java.io.*;
 
 
 /**

@@ -44,8 +44,8 @@ import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.id.Type5UuidFactory;
-import org.ihtsdo.mojo.maven.transform.UuidSnomedMapHandler;
 import org.ihtsdo.mojo.maven.transform.SctIdGenerator.TYPE;
+import org.ihtsdo.mojo.maven.transform.UuidSnomedMapHandler;
 import org.ihtsdo.mojo.mojo.ConceptDescriptor;
 
 public abstract class MemberRefsetHandler {

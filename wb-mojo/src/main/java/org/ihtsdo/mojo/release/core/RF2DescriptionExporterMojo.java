@@ -1,15 +1,10 @@
 package org.ihtsdo.mojo.release.core;
 
 import java.io.File;
-import java.security.NoSuchAlgorithmException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.ihtsdo.mojo.maven.MojoUtil;
 import org.ihtsdo.rf2.core.factory.RF2DescriptionFactory;
 import org.ihtsdo.rf2.util.Config;
 import org.ihtsdo.rf2.util.ExportUtil;

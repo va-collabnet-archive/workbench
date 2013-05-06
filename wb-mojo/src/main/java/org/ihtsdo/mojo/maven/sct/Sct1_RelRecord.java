@@ -19,6 +19,7 @@ package org.ihtsdo.mojo.maven.sct;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.UUID;
+
 import org.dwfa.util.id.Type3UuidFactory;
 
 class Sct1_RelRecord implements Comparable<Object>, Serializable {

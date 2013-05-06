@@ -10,7 +10,6 @@ import org.dwfa.ace.api.I_ImplementTermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.util.io.FileIO;
 import org.ihtsdo.concept.component.description.Description;
-import org.ihtsdo.db.bdb.computer.ReferenceConcepts;
 import org.ihtsdo.lucene.LuceneManager;
 import org.ihtsdo.lucene.LuceneManager.LuceneSearchType;
 import org.ihtsdo.tk.Ts;

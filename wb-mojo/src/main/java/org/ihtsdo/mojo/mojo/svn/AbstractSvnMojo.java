@@ -1,11 +1,11 @@
 package org.ihtsdo.mojo.mojo.svn;
 
+import java.io.File;
+
 import org.apache.maven.plugin.AbstractMojo;
 import org.codehaus.plexus.components.interactivity.Prompter;
 import org.codehaus.plexus.components.interactivity.PrompterException;
 import org.tigris.subversion.javahl.PromptUserPassword3;
-
-import java.io.File;
 
 public abstract class AbstractSvnMojo
     extends AbstractMojo
