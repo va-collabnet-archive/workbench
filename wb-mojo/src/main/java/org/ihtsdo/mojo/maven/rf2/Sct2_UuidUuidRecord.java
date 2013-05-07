@@ -48,7 +48,7 @@ public class Sct2_UuidUuidRecord
     }
 
     /**
-     * Sort order: SCTID, UUID long
+     * Sort order: [SCTID_COMPUTED_UUID, DECLARED_ASSIGNED_UUID]
      *
      * @param o
      * @return

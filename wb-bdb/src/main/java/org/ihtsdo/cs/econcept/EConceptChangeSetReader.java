@@ -30,6 +30,7 @@ import org.ihtsdo.db.bdb.BdbProperty;
 import org.ihtsdo.etypes.EConcept;
 
 import com.sleepycat.je.DatabaseException;
+import java.util.UUID;
 import org.ihtsdo.helper.time.TimeHelper;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 
@@ -107,6 +108,9 @@ public class EConceptChangeSetReader implements I_ReadChangeSet {
         while ((nextCommitTime() <= endTime) && (nextCommitTime() != Long.MAX_VALUE)) {
             try {
                 EConcept eConcept = new EConcept(dataStream);
+//                if (eConcept.getPrimordialUuid().compareTo(UUID.fromString("d439284a-21d1-3ef9-842c-27f017c9f042")) == 0) {
+//                    System.out.println(":!!!:DEBUG: EConceptChangeSetReader ...AAA... \n" + eConcept.toString());
+//                }
                 if (csreOut != null) {
                     csreOut.append("\n*******************************\n");
                     csreOut.append(TimeHelper.formatDateForFile(nextCommitTime()));
@@ -132,6 +136,9 @@ public class EConceptChangeSetReader implements I_ReadChangeSet {
                             AceLog.getEditLog().fine("Read eConcept... " + eConcept);
                         }
                         if (!noCommit) {
+                            if (eConcept.getPrimordialUuid().compareTo(UUID.fromString("d439284a-21d1-3ef9-842c-27f017c9f042")) == 0) {
+                                System.out.println(":!!!:DEBUG: EConceptChangeSetReader ...BBB... \n" + eConcept.toString());
+                            }
                             commitEConcept(eConcept, nextCommit, values, annotatedIndexes);
                         }
                 } else {

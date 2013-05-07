@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 International Health Terminology Standards Development Organisation.
+ * Copyright 2013 International Health Terminology Standards Development Organisation.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.ihtsdo.mojo.maven.rf2;
+package org.ihtsdo.mojo.db;
 
 import java.io.BufferedInputStream;
 import java.io.EOFException;
@@ -25,32 +25,31 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.UUID;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.dwfa.ace.log.AceLog;
 
 /**
  *
- * @author Marc Campbell
+ * @author Marc E. Campbell
  */
-public class Sct2_UuidUuidRemapper {
+public class UuidUuidRemapper {
 
     UUID uuidComputedArray[];
     UUID uuidDeclaredArray[];
 
-    public Sct2_UuidUuidRemapper(String filePathName)
+    public UuidUuidRemapper(String filePathName)
             throws IOException {
-        ArrayList<Sct2_UuidUuidRecord> idList = new ArrayList<>();
+        ArrayList<UuidUuidRecord> idList = new ArrayList<>();
         ObjectInputStream ois;
         ois = new ObjectInputStream(new BufferedInputStream(new FileInputStream(filePathName)));
         try {
             Object obj;
             while ((obj = ois.readObject()) != null) {
-                if (obj instanceof Sct2_UuidUuidRecord) {
-                    idList.add((Sct2_UuidUuidRecord) obj);
+                if (obj instanceof UuidUuidRecord) {
+                    idList.add((UuidUuidRecord) obj);
                 }
             }
         } catch (ClassNotFoundException ex) {
-            Logger.getLogger(Sct2_UuidUuidRemapper.class.getName()).log(Level.SEVERE, null, ex);
+            AceLog.getAppLog().log(Level.SEVERE, null, ex);
         } catch (EOFException ex) {
             // getLog().info(" relationship count = " + count + " @EOF\r\n");
             ois.close();
@@ -58,11 +57,11 @@ public class Sct2_UuidUuidRemapper {
         setupArrays(idList);
     }
 
-    public Sct2_UuidUuidRemapper(ArrayList<Sct2_UuidUuidRecord> idList) {
+    public UuidUuidRemapper(ArrayList<UuidUuidRecord> idList) {
         setupArrays(idList);
     }
 
-    private void setupArrays(ArrayList<Sct2_UuidUuidRecord> idList) {
+    private void setupArrays(ArrayList<UuidUuidRecord> idList) {
         int countSctDuplicates = 0;
         int countSctPairUuidChanged = 0;
         StringBuilder sb = new StringBuilder();
@@ -100,9 +99,9 @@ public class Sct2_UuidUuidRemapper {
         this.uuidComputedArray = new UUID[idList.size()];
         this.uuidDeclaredArray = new UUID[idList.size()];
         for (int i = 0; i < idList.size(); i++) {
-            Sct2_UuidUuidRecord sct2_UuidUuidRecord = idList.get(i);
-            this.uuidComputedArray[i] = sct2_UuidUuidRecord.uuidComputed;
-            this.uuidDeclaredArray[i] = sct2_UuidUuidRecord.uuidDeclared;
+            UuidUuidRecord UuidUuidRecord = idList.get(i);
+            this.uuidComputedArray[i] = UuidUuidRecord.uuidComputed;
+            this.uuidDeclaredArray[i] = UuidUuidRecord.uuidDeclared;
         }
     }
 
@@ -118,5 +117,4 @@ public class Sct2_UuidUuidRemapper {
             return null;
         }
     }
-    
 }

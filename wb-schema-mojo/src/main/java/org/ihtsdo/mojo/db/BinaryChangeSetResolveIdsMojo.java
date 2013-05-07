@@ -13,6 +13,7 @@
  */
 package org.ihtsdo.mojo.db;
 
+import java.io.File;
 import java.io.IOException;
 
 import org.apache.maven.plugin.AbstractMojo;
@@ -26,13 +27,14 @@ import org.ihtsdo.mojo.db.BinaryChangeSetResolveIds.SctIdResolution;
  * were used with respective enclosing concepts keep only the latest use of SCT IDs which were used
  * for more than one enclosing concept write out a change set file with
  *
- * @goal bcs-resolve-ids
+ * @goal bcs-resolve-sctids
  *
  * @phase process-resources
  * @requiresDependencyResolution compile
  */
 public class BinaryChangeSetResolveIdsMojo extends AbstractMojo {
 
+    private static final String FILE_SEPARATOR = File.separator;
     /**
      * The change set directory
      *
@@ -46,21 +48,29 @@ public class BinaryChangeSetResolveIdsMojo extends AbstractMojo {
      * @required
      */
     private String targetDirectory;
-
     /**
-     * Location of the build directory.
-     * KEEP_ALL_SCTID, KEEP_NO_ECCS_SCTID, KEEP_LAST_CURRENT_USE
-     * 
+     * Location of the build directory. KEEP_ALL_SCTID, KEEP_NO_ECCS_SCTID, KEEP_LAST_CURRENT_USE
+     *
      * @parameter default-value= "KEEP_NO_ECCS_SCTID"
      * @required
      */
     private String resolutionApproach;
     private SctIdResolution resolution;
+    /**
+     * @parameter @required
+     */
+    private String extensionPathUuidStr;
+    /**
+     * Directory used for intermediate serialized sct/uuid mapping cache
+     *
+     * @parameter default-value = "id-cache"
+     */
+    private String idCacheDir = "";
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         getLog().info("resolving change set ids in: " + changeSetDir);
-        
+
         if (resolutionApproach.equalsIgnoreCase("KEEP_ALL_SCTID")) {
             resolution = SctIdResolution.KEEP_ALL_SCTID;
         } else if (resolutionApproach.equalsIgnoreCase("KEEP_NO_ECCS_SCTID")) {
@@ -70,9 +80,18 @@ public class BinaryChangeSetResolveIdsMojo extends AbstractMojo {
         } else {
             throw new MojoFailureException("BinaryChangeSetResolveIdsMojo invalid ");
         }
-        
+
         try {
-            BinaryChangeSetResolveIds rcsi = new BinaryChangeSetResolveIds(changeSetDir, targetDirectory, resolution);
+            BinaryChangeSetResolveIds rcsi = new BinaryChangeSetResolveIds(changeSetDir, targetDirectory, resolution, true, true, extensionPathUuidStr);
+
+            // Setup directory paths
+            String cachePath = targetDirectory + FILE_SEPARATOR + idCacheDir + FILE_SEPARATOR;
+            String idCacheFName = cachePath + "uuidRemapRelLogicalCache.ser";
+            // handle RF1 stated rels imported without any rel sctid
+            UuidUuidRemapper idLookup = new UuidUuidRemapper(idCacheFName);
+
+            rcsi.setRelUuidRemap(idLookup);
+
             rcsi.processFiles();
         } catch (IOException | TerminologyException ex) {
             throw new MojoExecutionException("BinaryChangeSetResolveIdsMojo \n", ex);

@@ -109,7 +109,7 @@ public class Rf2IdUuidCacheArfGenMojo extends AbstractMojo implements Serializab
     public void execute()
             throws MojoExecutionException, MojoFailureException {
         List<Rf2File> filesIn;
-        getLog().info("::: BEGIN Rf2UuidXmapGenMojo");
+        getLog().info("::: BEGIN Rf2IdUuidCacheArfGenMojo");
         try {
             // SHOW DIRECTORIES
             String wDir = targetDirectory.getAbsolutePath();
