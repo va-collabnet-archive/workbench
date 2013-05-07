@@ -50,12 +50,6 @@ public class QaReviewListReport extends AbstractMavenReport {
 	 */
 	private Renderer siteRenderer;
 
-	/**
-	 * @parmeter default-value="\t"
-	 * @required
-	 * @readonly
-	 */
-	private String separator;
 
 	/**
 	 * Execution details csv/txt file.
@@ -174,9 +168,9 @@ public class QaReviewListReport extends AbstractMavenReport {
 			String firstLine = sourceBr.readLine();
 			aSink.table(tableAttr);
 			if (firstLine != null) {
-				firstLine.split(separator);
+				firstLine.split("\\t",-1);
 				aSink.tableRow();
-				String[] rulesHeaderSplited = firstLine.split(separator, -1);
+				String[] rulesHeaderSplited = firstLine.split("\\t",-1);
 				SinkEventAttributes headerAttrs = new SinkEventAttributeSet();
 				for (int i = 0; i < rulesHeaderSplited.length; i++) {
 					headerAttrs.addAttribute(SinkEventAttributes.CLASS, "sortable-text fd-column-" + (i - 1));
@@ -186,7 +180,7 @@ public class QaReviewListReport extends AbstractMavenReport {
 				}
 				while (sourceBr.ready()) {
 					String ruleLine = sourceBr.readLine();
-					String[] ruleLineSplit = ruleLine.split(separator, -1);
+					String[] ruleLineSplit = ruleLine.split("\\t",-1);
 
 					aSink.tableRow();
 					for (String string : ruleLineSplit) {
