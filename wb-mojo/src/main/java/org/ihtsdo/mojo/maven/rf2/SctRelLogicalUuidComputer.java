@@ -15,6 +15,7 @@
  */
 package org.ihtsdo.mojo.maven.rf2;
 
+import org.ihtsdo.helper.rf2.UuidUuidRecord;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -41,9 +42,9 @@ public class SctRelLogicalUuidComputer {
      * @throws NoSuchAlgorithmException
      * @throws UnsupportedEncodingException
      */
-    public static ArrayList<Sct2_UuidUuidRecord> createSctUuidToLogicalUuidList(Sct2_RelLogicalRecord[] a)
+    public static ArrayList<UuidUuidRecord> createSctUuidToLogicalUuidList(Sct2_RelLogicalRecord[] a)
             throws NoSuchAlgorithmException, UnsupportedEncodingException {
-        ArrayList<Sct2_UuidUuidRecord> uuidUuidList = new ArrayList<>();
+        ArrayList<UuidUuidRecord> uuidUuidList = new ArrayList<>();
 
         // SORT BY [C1-Group-RoleType-C2]
         Arrays.sort(a);
@@ -65,7 +66,7 @@ public class SctRelLogicalUuidComputer {
             
             UUID uuidFromSctId = UUID.fromString(Type3UuidFactory.fromSNOMED(a[i].relSctId).toString());
             
-            uuidUuidList.add(new Sct2_UuidUuidRecord(uuidComputed, uuidFromSctId));
+            uuidUuidList.add(new UuidUuidRecord(uuidComputed, uuidFromSctId));
 
             lastC1 = a[i].c1SnoId;
             lastGroup = a[i].group;

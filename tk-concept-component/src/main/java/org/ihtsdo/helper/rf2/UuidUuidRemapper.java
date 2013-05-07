@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.ihtsdo.mojo.maven.rf2;
+package org.ihtsdo.helper.rf2;
 
 import java.io.BufferedInputStream;
 import java.io.EOFException;
@@ -26,31 +26,30 @@ import java.util.Collections;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.dwfa.ace.log.AceLog;
 
 /**
  *
  * @author Marc Campbell
  */
-public class Sct2_UuidUuidRemapper {
+public class UuidUuidRemapper {
 
-    UUID uuidComputedArray[];
-    UUID uuidDeclaredArray[];
+    public UUID uuidComputedArray[];
+    public UUID uuidDeclaredArray[];
 
-    public Sct2_UuidUuidRemapper(String filePathName)
+    public UuidUuidRemapper(String filePathName)
             throws IOException {
-        ArrayList<Sct2_UuidUuidRecord> idList = new ArrayList<>();
+        ArrayList<UuidUuidRecord> idList = new ArrayList<>();
         ObjectInputStream ois;
         ois = new ObjectInputStream(new BufferedInputStream(new FileInputStream(filePathName)));
         try {
             Object obj;
             while ((obj = ois.readObject()) != null) {
-                if (obj instanceof Sct2_UuidUuidRecord) {
-                    idList.add((Sct2_UuidUuidRecord) obj);
+                if (obj instanceof UuidUuidRecord) {
+                    idList.add((UuidUuidRecord) obj);
                 }
             }
         } catch (ClassNotFoundException ex) {
-            Logger.getLogger(Sct2_UuidUuidRemapper.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(UuidUuidRemapper.class.getName()).log(Level.SEVERE, null, ex);
         } catch (EOFException ex) {
             // getLog().info(" relationship count = " + count + " @EOF\r\n");
             ois.close();
@@ -58,24 +57,24 @@ public class Sct2_UuidUuidRemapper {
         setupArrays(idList);
     }
 
-    public Sct2_UuidUuidRemapper(ArrayList<Sct2_UuidUuidRecord> idList) {
+    public UuidUuidRemapper(ArrayList<UuidUuidRecord> idList) {
         setupArrays(idList);
     }
 
-    private void setupArrays(ArrayList<Sct2_UuidUuidRecord> idList) {
-        int countSctDuplicates = 0;
-        int countSctPairUuidChanged = 0;
+    private void setupArrays(ArrayList<UuidUuidRecord> idList) {
+        int countDuplicates = 0;
+        int countPairUuidChanged = 0;
         StringBuilder sb = new StringBuilder();
         Collections.sort(idList); // required for binarySearch
         for (int i = 0; i < idList.size() - 1; i++) {
             if (idList.get(i).uuidComputed.compareTo(idList.get(i + 1).uuidComputed) == 0) {
-                countSctDuplicates++;
+                countDuplicates++;
                 boolean isNotChanged = true;
                 if (idList.get(i).uuidDeclared.compareTo(idList.get(i + 1).uuidDeclared) == 0) {
-                    countSctPairUuidChanged++;
+                    countPairUuidChanged++;
                     isNotChanged = false;
                 }
-                if (countSctDuplicates < 200) {
+                if (countDuplicates < 200) {
                     if (isNotChanged) {
                         sb.append("\r\nAMBIGUOUS PRIMORDIAL UUID ====\r\n");
                     } else {
@@ -88,21 +87,22 @@ public class Sct2_UuidUuidRemapper {
                 }
             }
         }
-        sb.append("\r\n::: countSctDuplicates = ");
-        sb.append(countSctDuplicates);
-        sb.append("\r\n::: countSctPairUuidChanged = ");
-        sb.append(countSctPairUuidChanged);
+        sb.append("\r\n::: countDuplicates = ");
+        sb.append(countDuplicates);
+        sb.append("\r\n::: countPairUuidChanged = ");
+        sb.append(countPairUuidChanged);
         sb.append("\r\n");
-        AceLog.getAppLog().log(Level.INFO, sb.toString());
-        if (countSctDuplicates > 0) {
+        Logger logger = Logger.getLogger(this.getClass().getName());
+        logger.info(sb.toString());
+        if (countDuplicates > 0) {
             throw new UnsupportedOperationException("duplicate uuids not supported");
         }
         this.uuidComputedArray = new UUID[idList.size()];
         this.uuidDeclaredArray = new UUID[idList.size()];
         for (int i = 0; i < idList.size(); i++) {
-            Sct2_UuidUuidRecord sct2_UuidUuidRecord = idList.get(i);
-            this.uuidComputedArray[i] = sct2_UuidUuidRecord.uuidComputed;
-            this.uuidDeclaredArray[i] = sct2_UuidUuidRecord.uuidDeclared;
+            UuidUuidRecord uuidUuidRecord = idList.get(i);
+            this.uuidComputedArray[i] = uuidUuidRecord.uuidComputed;
+            this.uuidDeclaredArray[i] = uuidUuidRecord.uuidDeclared;
         }
     }
 

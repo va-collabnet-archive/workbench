@@ -1,10 +1,5 @@
-package org.ihtsdo.mojo.db;
-
-import java.io.Serializable;
-import java.util.UUID;
-
 /*
- * Copyright 2013 International Health Terminology Standards Development Organisation.
+ * Copyright 2012 International Health Terminology Standards Development Organisation.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,20 +13,21 @@ import java.util.UUID;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.ihtsdo.helper.rf2;
+
+import java.io.Serializable;
+import java.util.UUID;
 
 /**
  *
- * @author Marc E. Campbell
+ * @author logger
  */
-
 public class UuidUuidRecord
         implements Comparable<UuidUuidRecord>, Serializable {
 
     private static final long serialVersionUID = 1L;
-    private static final String LINE_TERMINATOR = "\r\n";
-    private static final String TAB_CHARACTER = "\t";
-    UUID uuidComputed;
-    UUID uuidDeclared;
+    public UUID uuidComputed;
+    public UUID uuidDeclared;
 
     public UuidUuidRecord(UUID uuidComputed, UUID uuidDeclared) {
         this.uuidComputed = uuidComputed;
@@ -60,5 +56,5 @@ public class UuidUuidRecord
             }
         }
     }
-    
+
 }

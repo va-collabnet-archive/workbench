@@ -20,6 +20,7 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.helper.rf2.UuidUuidRemapper;
 import org.ihtsdo.mojo.db.BinaryChangeSetResolveIds.SctIdResolution;
 
 /**
@@ -47,7 +48,14 @@ public class BinaryChangeSetResolveIdsMojo extends AbstractMojo {
      * @parameter expression="${project.build.directory}/generated-artifact"
      * @required
      */
-    private String targetDirectory;
+    private String genArtifactDir;
+    /**
+     * Location of the build directory.
+     *
+     * @parameter expression="${project.build.directory}"
+     * @required
+     */
+    private String buildDir;
     /**
      * Location of the build directory. KEEP_ALL_SCTID, KEEP_NO_ECCS_SCTID, KEEP_LAST_CURRENT_USE
      *
@@ -82,10 +90,10 @@ public class BinaryChangeSetResolveIdsMojo extends AbstractMojo {
         }
 
         try {
-            BinaryChangeSetResolveIds rcsi = new BinaryChangeSetResolveIds(changeSetDir, targetDirectory, resolution, true, true, extensionPathUuidStr);
+            BinaryChangeSetResolveIds rcsi = new BinaryChangeSetResolveIds(changeSetDir, genArtifactDir, resolution, true, true, extensionPathUuidStr);
 
-            // Setup directory paths
-            String cachePath = targetDirectory + FILE_SEPARATOR + idCacheDir + FILE_SEPARATOR;
+            // Import remap cache which has been 
+            String cachePath = buildDir + FILE_SEPARATOR + idCacheDir + FILE_SEPARATOR;
             String idCacheFName = cachePath + "uuidRemapRelLogicalCache.ser";
             // handle RF1 stated rels imported without any rel sctid
             UuidUuidRemapper idLookup = new UuidUuidRemapper(idCacheFName);
@@ -107,10 +115,10 @@ public class BinaryChangeSetResolveIdsMojo extends AbstractMojo {
     }
 
     public String getTargetDirectory() {
-        return targetDirectory;
+        return genArtifactDir;
     }
 
     public void setTargetDirectory(String targetDirectory) {
-        this.targetDirectory = targetDirectory;
+        this.genArtifactDir = targetDirectory;
     }
 }

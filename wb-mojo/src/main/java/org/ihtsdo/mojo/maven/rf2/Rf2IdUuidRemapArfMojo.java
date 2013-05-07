@@ -15,25 +15,34 @@
  */
 package org.ihtsdo.mojo.maven.rf2;
 
+import java.io.BufferedOutputStream;
+import org.ihtsdo.helper.rf2.UuidUuidRemapper;
+import org.ihtsdo.helper.rf2.UuidUuidRecord;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.ihtsdo.tk.uuid.UuidT3Generator;
 
 /**
  *
- * Read a file of SCTID with corresponding UUIDs and determines if the UUIDs
- * need to be re-mapped.
+ * Read a file of SCTID with corresponding UUIDs and determines if the UUIDs need to be re-mapped.
  *
  * @author Marc E. Campbell
  *
@@ -66,22 +75,22 @@ public class Rf2IdUuidRemapArfMojo
      */
     private String idSubDir = "";
     /**
-     * Input Directory.<br> The directory array parameter supported extensions
-     * via separate directories in the array.
+     * Input Directory.<br> The directory array parameter supported extensions via separate
+     * directories in the array.
      *
      * @parameter
      */
     private String idInputDir = "";
     /**
-     * Input Directories Array.<br> The directory array parameter supported
-     * extensions via separate directories in the array.
+     * Input Directories Array.<br> The directory array parameter supported extensions via separate
+     * directories in the array.
      *
      * @parameter
      */
     private String remapSubDir;
     /**
-     * Input Directories Array.<br> The directory array parameter supported
-     * extensions via separate directories in the array.
+     * Input Directories Array.<br> The directory array parameter supported extensions via separate
+     * directories in the array.
      *
      * @parameter
      */
@@ -128,7 +137,7 @@ public class Rf2IdUuidRemapArfMojo
             // Parse IHTSDO Terminology Identifiers to Sct_CompactId cache file.
             filesIn = Rf2File.getFiles(wDir, idSubDir, idInputDir,
                     "_Identifier_", ".txt");
-            Sct2_UuidUuidRecord.parseToUuidRemapCacheFile(filesIn, idCacheFName);
+            parseToUuidRemapCacheFile(filesIn, idCacheFName);
 
         } catch (Exception ex) {
             Logger.getLogger(Rf2IdUuidRemapArfMojo.class.getName()).log(Level.SEVERE, null, ex);
@@ -139,7 +148,7 @@ public class Rf2IdUuidRemapArfMojo
     void RemapAllFiles(String tDir, String tSubDir, String[] inDirs, String idCacheFName)
             throws IOException {
         long startTime = System.currentTimeMillis();
-        Sct2_UuidUuidRemapper idLookup = new Sct2_UuidUuidRemapper(idCacheFName);
+        UuidUuidRemapper idLookup = new UuidUuidRemapper(idCacheFName);
         System.out.println((System.currentTimeMillis() - startTime) + " mS");
 
         for (String inDirName : inDirs) {
@@ -162,7 +171,7 @@ public class Rf2IdUuidRemapArfMojo
 
     }
 
-    void RemapFile(File inFile, File outFile, Sct2_UuidUuidRemapper uuidUuidRemapper)
+    void RemapFile(File inFile, File outFile, UuidUuidRemapper uuidUuidRemapper)
             throws IOException {
         getLog().info("remap UUIDs in: " + inFile.getAbsolutePath());
 
@@ -211,5 +220,129 @@ public class Rf2IdUuidRemapArfMojo
             }
         }
 
+    }
+
+    /**
+     *
+     * @param fList
+     * @param parseToUuidRemapCacheFile
+     * @throws Exception
+     */
+    static void parseToUuidRemapCacheFile(List<Rf2File> fList, String idCacheOutputPathFnameStr)
+            throws Exception {
+        // SNOMED CT UUID scheme
+        long sctUuidSchemeIdL = Long.parseLong("900000000000002006");
+        long countNonActiveL;
+        long countNonComputedIdsL;
+        long nonParsableLinesL;
+        long totalParsedLinesL;
+        Set<Long> idSchemeSet = new HashSet<>();
+        Set<Long> dateTimeSet = new HashSet<>();
+        Set<Long> moduleIdSet = new HashSet<>();
+        try (ObjectOutputStream oos = new ObjectOutputStream(
+                new BufferedOutputStream(
+                new FileOutputStream(idCacheOutputPathFnameStr)))) {
+            int IDENTIFIER_SCHEME_ID = 0;
+            int ALTERNATE_IDENTIFIER = 1;
+            int EFFECTIVE_TIME = 2;
+            int ACTIVE = 3;
+            int MODULE_ID = 4;
+            int REFERENCED_COMPONENT_ID = 5;
+            for (Rf2File f : fList) {
+                BufferedReader br = new BufferedReader(
+                        new InputStreamReader(
+                        new FileInputStream(f.file), "UTF-8"));
+                br.readLine();
+                countNonActiveL = 0;
+                countNonComputedIdsL = 0;
+                totalParsedLinesL = 0;
+                nonParsableLinesL = 0;
+                while (br.ready()) {
+                    String tempLine = br.readLine();
+                    String[] line = tempLine.split(TAB_CHARACTER);
+                    if (line.length < REFERENCED_COMPONENT_ID + 1) {
+                        System.err.println("not parsed: " + tempLine);
+                        nonParsableLinesL++;
+                        continue;
+                    } else {
+                        totalParsedLinesL++;
+                    }
+                    // IDENTIFIER_SCHEME_ID
+                    long identifierScheme = Long.parseLong(line[IDENTIFIER_SCHEME_ID]);
+                    if (identifierScheme != sctUuidSchemeIdL) {
+                        idSchemeSet.add(identifierScheme);
+                        continue;
+                    }
+                    // ACTIVE
+                    int activeData = Integer.parseInt(line[ACTIVE]);
+                    if (activeData != 1) {
+                        countNonActiveL++;
+                    }
+                    // EFFECTIVE_TIME
+                    String eTimeStr = Rf2x.convertEffectiveTimeToDate(line[EFFECTIVE_TIME]);
+                    long eTime = Rf2x.convertDateToTime(eTimeStr);
+                    dateTimeSet.add(eTime);
+
+                    // MODULE_ID
+                    Long moduleIdL = Long.parseLong(line[MODULE_ID]);
+                    moduleIdSet.add(moduleIdL);
+
+                    // ALTERNATE_IDENTIFIER and REFERENCED_COMPONENT_ID
+                    // Assigned uuid
+                    UUID aUuid = UUID.fromString(line[ALTERNATE_IDENTIFIER]);
+                    // Computed uuid
+                    long sctIdL = Long.parseLong(line[REFERENCED_COMPONENT_ID]);
+                    UUID cUuid = UUID.fromString(
+                            UuidT3Generator.fromSNOMED(sctIdL).toString());
+                    // UUID cUuid = UUID.fromString(Rf2x.convertSctIdToUuidStr(sctIdL));
+                    if (aUuid.compareTo(cUuid) != 0) {
+                        countNonComputedIdsL++;
+                    }
+
+                    UuidUuidRecord tempIdCompact = new UuidUuidRecord(
+                            cUuid,
+                            aUuid);
+                    // Write to JBIN file
+                    oos.writeUnshared(tempIdCompact);
+                }
+                StringBuilder sb = new StringBuilder();
+                sb.append("\n::: parseToUuidRemapCacheFile(..) ");
+                sb.append("\n::: PARSED & WRITTEN TO ID CACHE: ");
+                sb.append(f.file.toURI().toString());
+                if (idSchemeSet.size() > 0) {
+                    Long[] idSchemeArray = idSchemeSet.toArray(new Long[0]);
+                    for (Long long1 : idSchemeArray) {
+                        sb.append("\n::: WARNING unsupported id scheme: ");
+                        sb.append(long1.toString());
+                    }
+                } else {
+                    sb.append("\n::: Schema OK (900000000000002006)");
+                }
+                sb.append("\n::: countNonActive=");
+                sb.append(countNonActiveL);
+                sb.append("\n::: countNonComputedIDs=");
+                sb.append(countNonComputedIdsL);
+                sb.append("\n::: totalParsedLinesL=");
+                sb.append(totalParsedLinesL);
+                sb.append("\n::: nonParsableLines=");
+                sb.append(nonParsableLinesL);
+                sb.append("\n::: dateTimeCount=");
+                sb.append(dateTimeSet.size());
+                Long[] moduleIdArray = moduleIdSet.toArray(new Long[0]);
+                for (Long moduleIdLong : moduleIdArray) {
+                    sb.append("\n::: ModuleID: ");
+                    sb.append(moduleIdLong.toString());
+                }
+                Long[] dateTimeArray = dateTimeSet.toArray(new Long[0]);
+                for (Long dateLong : dateTimeArray) {
+                    sb.append("\n:::     ");
+                    sb.append(Rf2x.convertTimeToDate(dateLong));
+                }
+                sb.append("\n::: \n");
+                Logger logger = Logger.getLogger(UuidUuidRecord.class.getName());
+                logger.info(sb.toString());
+            }
+            oos.flush();
+        }
     }
 }
