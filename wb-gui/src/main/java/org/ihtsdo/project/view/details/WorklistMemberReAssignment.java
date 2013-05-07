@@ -412,13 +412,13 @@ public class WorklistMemberReAssignment extends JPanel {
 			} catch (ExecutionException e1) {
 				e1.printStackTrace();
 			}
-		}
-		if (!e.getItem().toString().equals(DELETE_OPTION) && !e.getItem().toString().startsWith("Loading")) {
-			destinationCombo.removeAllItems();
-			WfState selectedState = (WfState) e.getItem();
-			refreshDestinationCombo(selectedState);
-		} else if (e.getItem().toString().equals(DELETE_OPTION)) {
-			destinationCombo.removeAllItems();
+			if (!e.getItem().toString().equals(DELETE_OPTION) && !e.getItem().toString().startsWith("Loading")) {
+				destinationCombo.removeAllItems();
+				WfState selectedState = (WfState) e.getItem();
+				refreshDestinationCombo(selectedState);
+			} else if (e.getItem().toString().equals(DELETE_OPTION)) {
+				destinationCombo.removeAllItems();
+			}
 		}
 	}
 
@@ -822,12 +822,7 @@ public class WorklistMemberReAssignment extends JPanel {
 			try {
 				get();
 				statusCombo.removeItemAt(0);
-				statusCombo.addItemListener(new ItemListener() {
-					@Override
-					public void itemStateChanged(ItemEvent e) {
-						statusComboItemStateChanged(e);
-					}
-				});
+				statusCombo.setSelectedIndex(0);
 			} catch (Exception ignore) {
 				AceLog.getAppLog().alertAndLogException(ignore);
 			}
