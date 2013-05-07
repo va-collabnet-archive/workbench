@@ -61,7 +61,6 @@ public class Sct2_RelLogicalRecord
         this.group = group;
 
         this.time = Rf2x.convertDateToTime(dateStr);
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     public static ArrayList<Sct2_RelLogicalRecord> parseRelationships(List<Rf2File> fList)
