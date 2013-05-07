@@ -51,7 +51,7 @@ public class QaReviewListReport extends AbstractMavenReport {
 	private Renderer siteRenderer;
 
 	/**
-	 * @component
+	 * @parmeter default-value="\t"
 	 * @required
 	 * @readonly
 	 */
