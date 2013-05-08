@@ -1579,6 +1579,7 @@ public class BdbCommitManager {
 
         @Override
         protected Collection<AlertToDataConstraintFailure> doInBackground() throws Exception {
+            try {
             List<AlertToDataConstraintFailure> runnerAlerts = new ArrayList<AlertToDataConstraintFailure>();
 
             if (canceled) {
@@ -1643,24 +1644,21 @@ public class BdbCommitManager {
             }
 
             return runnerAlerts;
-        }
+            
+            } finally {
+                long remaining = latch.getCount();
 
-        @Override
-        protected void done() {
-            super.done();
-
-            long remaining = latch.getCount();
-
-            for (long i = 0; i < remaining; i++) {
+                for (long i = 0; i < remaining; i++) {
 
 //          System.out.println(">>>>>>>>>>>>> Latch cancel: " + latch.getCount());
-                latch.countDown();
-            }
+                    latch.countDown();
+                }
 
-            if (!canceled) {
-                runners.remove(c);
+                if (!canceled) {
+                    runners.remove(c);
+                }
+                dbCheckerPermit2.release();
             }
-            dbCheckerPermit2.release();
         }
 
         @Override
