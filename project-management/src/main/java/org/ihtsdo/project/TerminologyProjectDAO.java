@@ -114,6 +114,7 @@ import org.ihtsdo.tk.api.changeset.ChangeSetGenerationThreadingPolicy;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.conceptattribute.ConceptAttributeVersionBI;
+import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.description.DescriptionChronicleBI;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
@@ -5886,10 +5887,12 @@ public class TerminologyProjectDAO {
 	}
 
 	public static void promoteContent(int conceptNid, ViewCoordinate sourceViewCoordinate, int targetPathNid) throws Exception {
-		PathBI snomedCorePath = Terms.get().getPath(ArchitectonicAuxiliary.Concept.SNOMED_CORE.getUids());
-		PositionBI originPosition = Terms.get().newPosition(snomedCorePath, Long.MAX_VALUE);
+		EditCoordinate editCoord = Terms.get().getActiveAceFrameConfig().getEditCoordinate();
+		
+		PathBI editPath = Terms.get().getPath(editCoord.getEditPaths()[0]);
+		PositionBI originPosition = Terms.get().newPosition(editPath, Long.MAX_VALUE);
 
-		TerminologyPromoterBI promoter = Ts.get().getTerminologyPromoter(sourceViewCoordinate, Terms.get().getActiveAceFrameConfig().getEditCoordinate(), targetPathNid, originPosition);
+		TerminologyPromoterBI promoter = Ts.get().getTerminologyPromoter(sourceViewCoordinate, editCoord, targetPathNid, originPosition);
 
 		NidBitSetBI promotionNids = Ts.get().getEmptyNidSet();
 		promotionNids.setMember(conceptNid);
