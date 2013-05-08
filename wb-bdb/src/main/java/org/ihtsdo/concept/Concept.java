@@ -1306,6 +1306,23 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
 
         return Collections.unmodifiableCollection(returnValues);
     }
+    
+    @Override
+    public Collection<Integer> getRefsetMemberNidsActive(ViewCoordinate vc)
+            throws IOException {
+        Collection<? extends RefexChronicleBI<?>> refexes = getRefsetMembers();
+        Set<Integer> returnValues =
+                new HashSet<>(refexes.size());
+
+        for (RefexChronicleBI<?> refex : refexes) {
+            for (RefexVersionBI<?> version : refex.getVersions(vc)) {
+                refex.getNid();
+                break;
+            }
+        }
+
+        return Collections.unmodifiableCollection(returnValues);
+    }
 
     @Override
     public Collection<? extends RefexVersionBI<?>> getRefsetMembersActive(ViewCoordinate vc, Long cuttoffTime)

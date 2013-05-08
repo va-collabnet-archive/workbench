@@ -43,7 +43,6 @@ import org.dwfa.ace.table.refset.ReflexiveRefsetMemberTableModel;
 import org.dwfa.ace.table.refset.ReflexiveRefsetUtil;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.ace.task.WorkerAttachmentKeys;
-import org.dwfa.ace.task.refset.spec.RefsetSpec;
 import org.dwfa.ace.tree.TermTreeHelper;
 import org.dwfa.bpa.BusinessProcess;
 import org.dwfa.bpa.ExecutionRecord;
@@ -123,7 +122,9 @@ import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.refset.RefsetSpec;
 
 public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeListener {
 
@@ -345,12 +346,12 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
     }
 
     public void updatePanel() {
-        I_GetConceptData refset = (I_GetConceptData) getLabel().getTermComponent();
+        ConceptChronicleBI refset = (ConceptChronicleBI) getLabel().getTermComponent();
 
         if (refset != null) {
-            RefsetSpec spec = new RefsetSpec(refset, true, ace.getAceFrameConfig());
-
-            refsetStatusValueLabel.setText(spec.getOverallSpecStatusString());
+            RefsetSpec spec = new RefsetSpec(refset, true, ace.getAceFrameConfig().getViewCoordinate());
+//TODO
+            refsetStatusValueLabel.setText("none");
             computeTypeValueLabel.setText(spec.getComputeTypeString());
 
             try {
@@ -1021,8 +1022,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
                     newRelationship(refsetSpec, refsetComputeTypeRel, refsetComputeType, aceConfig);
                     // supporting refsets purpose relationships
                     newRelationship(refsetSpec, purposeRel, specAnnotation, aceConfig);
-                    RefsetSpec spec = new RefsetSpec(refsetSpec, aceConfig);
-                    spec.modifyOverallSpecStatus(status);
+                    RefsetSpec spec = new RefsetSpec(refsetSpec, aceConfig.getViewCoordinate());
                 }
                 newRelationship(markedParent, isA, supportingRefset, aceConfig);
                 newRelationship(commentsRefset, purposeRel, stringAnnotation, aceConfig);

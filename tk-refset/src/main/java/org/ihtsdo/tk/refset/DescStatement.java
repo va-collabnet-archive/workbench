@@ -12,11 +12,9 @@
  */
 package org.ihtsdo.tk.refset;
 
-import org.ihtsdo.tk.refset.other.ActivityBI;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.Collection;
-import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -44,24 +42,12 @@ import org.ihtsdo.tk.refset.RefsetSpecQuery.GROUPING_TYPE;
  */
 public class DescStatement extends RefsetSpecStatement {
    
-    private Collection<ActivityBI> activities;
-//TODO: need activity panel
-//    private StopActionListener stopListener = new StopActionListener();
+
     private NidBitSetBI possibleLuceneDescMatches;
     private NidBitSetBI possibleLuceneConcMatches;
     private Pattern regexPattern;
     private ViewCoordinate viewCoordinate;
 
-//TODO: need activity panel
-//    private class StopActionListener implements ActionListener {
-//
-//        @Override
-//        public void actionPerformed(ActionEvent e) {
-//            for (I_ShowActivity a : activities) {
-//                a.cancel();
-//            }
-//        }
-//    }
 
     /**
      * Constructor for refset spec statement.
@@ -226,22 +212,10 @@ public class DescStatement extends RefsetSpecStatement {
             return false;
         }
     }
-//TODO: need activity panel first
-//    private I_ShowActivity setupActivityPanel(I_RepresentIdSet parentPossibleConcepts) {
-//        I_ShowActivity activity =
-//                Terms.get().newActivityPanel(true, config, "<html>Possible: <br>" + this.toHtmlFragment(), true);
-//        activity.setIndeterminate(true);
-//        activity.setProgressInfoLower("Incoming count: " + parentPossibleConcepts.cardinality());
-//        activity.addStopActionListener(stopListener);
-//        return activity;
-//    }
 
     @Override
-    public NidBitSetBI getPossibleConcepts(NidBitSetBI parentPossibleConcepts,
-            Collection<ActivityBI> activities) throws IOException, ComputationCanceled {
-        ActivityBI activity = null;
+    public NidBitSetBI getPossibleConcepts(NidBitSetBI parentPossibleConcepts) throws IOException, ComputationCanceled {
         long startTime = System.currentTimeMillis();
-        this.activities = activities;
 
         NidBitSetBI possibleConcepts = termFactory.getEmptyNidSet();
         if (parentPossibleConcepts == null) {
@@ -267,7 +241,7 @@ public class DescStatement extends RefsetSpecStatement {
 
                 break;
             case DESC_LUCENE_MATCH:
-                getPossibleDescriptions(termFactory.getEmptyNidSet(), activities);
+                getPossibleDescriptions(termFactory.getEmptyNidSet());
                 if (possibleLuceneConcMatches != null) {
                     possibleConcepts.or(possibleLuceneConcMatches);
                 }
@@ -297,20 +271,16 @@ public class DescStatement extends RefsetSpecStatement {
         }
         setPossibleConceptsCount(possibleConcepts.cardinality());
 
-        if (activity != null) {
             long endTime = System.currentTimeMillis();
             long elapsed = endTime - startTime;
             String elapsedStr = TimeHelper.getElapsedTimeString(elapsed);
-            activity.setProgressInfoLower("Elapsed: " + elapsedStr + ";  Incoming count: "
+            System.out.println("Elapsed: " + elapsedStr + ";  Incoming count: "
                     + parentPossibleConcepts.cardinality() + "; Outgoing count: " + possibleConcepts.cardinality());
-            activity.complete();
-        }
         return possibleConcepts;
     }
 
     @Override
-    public NidBitSetBI getPossibleDescriptions(NidBitSetBI parentPossibleDescriptions,
-            Collection<ActivityBI> activities) throws IOException {
+    public NidBitSetBI getPossibleDescriptions(NidBitSetBI parentPossibleDescriptions) throws IOException {
 
         NidBitSetBI possibleDescriptions = termFactory.getEmptyNidSet();
         possibleLuceneDescMatches = null;
@@ -334,7 +304,6 @@ public class DescStatement extends RefsetSpecStatement {
                 NidBitSetBI refsetMemberSet = termFactory.getEmptyNidSet();
                 for (RefexChronicleBI ext : refsetExtensions) {
                     int componentId = ext.getReferencedComponentNid();
-//TODO: not sure this is right  
                     if (componentId == termFactory.getConceptNidForNid(componentId)) {
                         refsetMemberSet.setMember(componentId);
                     } else {
@@ -398,8 +367,7 @@ public class DescStatement extends RefsetSpecStatement {
     }
 
     @Override
-    public NidBitSetBI getPossibleRelationships(NidBitSetBI parentPossibleConcepts,
-            Collection<ActivityBI> activities) throws IOException {
+    public NidBitSetBI getPossibleRelationships(NidBitSetBI parentPossibleConcepts) throws IOException {
         throw new IOException("Get possible relationships in desc statement unsupported operation.");
     }
 
@@ -422,8 +390,7 @@ public class DescStatement extends RefsetSpecStatement {
      */
     private boolean descriptionTypeIsKindOf(DescriptionVersionBI descriptionBeingChecked) throws IOException, ContradictionException {
 
-            ConceptChronicleBI descTypeBeingChecked = termFactory.getConcept(descriptionBeingChecked.getTypeNid());
-//TODO: should pass in view coordinate?            
+            ConceptChronicleBI descTypeBeingChecked = termFactory.getConcept(descriptionBeingChecked.getTypeNid());           
             return termFactory.isKindOf(descTypeBeingChecked.getNid(),
                     ((ConceptChronicleBI) queryConstraint).getNid(), viewCoordinate);
    }
@@ -439,8 +406,7 @@ public class DescStatement extends RefsetSpecStatement {
      */
     private boolean descriptionTypeIsDescendentOf(ConceptChronicleBI requiredType, DescriptionVersionBI descriptionBeingChecked)
             throws IOException, ContradictionException {
-            ConceptChronicleBI descTypeBeingChecked = termFactory.getConcept(descriptionBeingChecked.getTypeNid());
-//TODO pass in view coordinate?            
+            ConceptChronicleBI descTypeBeingChecked = termFactory.getConcept(descriptionBeingChecked.getTypeNid());       
             return termFactory.isChildOf(descTypeBeingChecked.getNid(),
                     ((ConceptChronicleBI) queryConstraint).getNid(), viewCoordinate);
     }
@@ -504,15 +470,13 @@ public class DescStatement extends RefsetSpecStatement {
     private boolean descriptionStatusIsDescendentOf(ConceptChronicleBI requiredStatus,
             DescriptionVersionBI descriptionBeingChecked) throws IOException, ContradictionException {
 
-            ConceptChronicleBI statusBeingChecked = termFactory.getConcept(descriptionBeingChecked.getStatusNid());
-//TODO: pass in view coordinate? also, why isn't required status being used?            
+            ConceptChronicleBI statusBeingChecked = termFactory.getConcept(descriptionBeingChecked.getStatusNid());         
             return termFactory.isChildOf(statusBeingChecked.getNid(),
                     ((ConceptChronicleBI) queryConstraint).getNid(), viewCoordinate);
     }
 
     private boolean descriptionStatusIsKindOf(DescriptionVersionBI descriptionBeingChecked) throws IOException, ContradictionException {
-            ConceptChronicleBI statusBeingChecked = termFactory.getConcept(descriptionBeingChecked.getStatusNid());
-//TODO: pass in view coordinate?        
+            ConceptChronicleBI statusBeingChecked = termFactory.getConcept(descriptionBeingChecked.getStatusNid());      
             return termFactory.isChildOf(statusBeingChecked.getNid(),
                     ((ConceptChronicleBI) queryConstraint).getNid(), viewCoordinate);
     }
@@ -526,8 +490,6 @@ public class DescStatement extends RefsetSpecStatement {
         if (regexPattern == null) {
             String queryConstraintString = (String) queryConstraint;
             regexPattern = Pattern.compile(queryConstraintString);
-//TODO: need log            
-//            AceLog.getAppLog().info("Compiling regex: " + regexPattern + " into: " + regexPattern);
             System.out.println("Compiling regex: " + regexPattern + " into: " + regexPattern);
         }
 
@@ -758,8 +720,6 @@ public class DescStatement extends RefsetSpecStatement {
         if (regexPattern == null) {
             String queryConstraintString = (String) queryConstraint;
             regexPattern = Pattern.compile(queryConstraintString);
-//TODO: need log
-//            AceLog.getAppLog().info("Compiling regex: " + regexPattern + " into: " + regexPattern);
             System.out.println("Compiling regex: " + regexPattern + " into: " + regexPattern);
         }
         DescriptionVersionBI a = descriptionBeingTested.getVersion(viewCoordinate);

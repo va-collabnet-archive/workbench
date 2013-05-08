@@ -44,13 +44,13 @@ import org.ihtsdo.tk.refset.RefsetSpecStatement.QUERY_TOKENS;
  * Builds a RefsetQuerySpec object from a Query object.
  * @author aimeefurber
  */
-public class RefsetSpecBuilder implements QueryBuilderBI{
+public class QueryToSpecBuilder implements QueryBuilderBI{
     RefsetSpecQuery spec;
     ViewCoordinate genericVc; //use if not V1 or V2
     Grouping topGrouping;
     ComputeType computeType;
 
-    public RefsetSpecBuilder(ViewCoordinate viewCoordinate) {
+    public QueryToSpecBuilder(ViewCoordinate viewCoordinate) {
         this.genericVc = viewCoordinate;
     }
  
@@ -60,10 +60,9 @@ public class RefsetSpecBuilder implements QueryBuilderBI{
         int count = 0;
         for(Query query : queries){
             RefsetSpecQuery refsetSpec = buildSpec(query);
-            NidBitSetBI possibleConcepts = refsetSpec.getPossibleConcepts(Ts.get().getAllConceptNids(), null);
+            NidBitSetBI possibleConcepts = refsetSpec.getPossibleConcepts(Ts.get().getAllConceptNids());
             RefsetComputer computer = new RefsetComputer(refsetSpec, genericVc,
-                possibleConcepts, null,
-                computeType);
+                possibleConcepts, computeType);
             computers[count++] = computer;
         }
         MultiQueryProcessor queryProcessor = new MultiQueryProcessor(computers);
@@ -86,7 +85,7 @@ public class RefsetSpecBuilder implements QueryBuilderBI{
         
         for(Branch b : topBranches){
             if(Relationship.class.isAssignableFrom(b.getClass())){
-                computeType = ComputeType.RELATIONSHP;
+                computeType = ComputeType.RELATIONSHIP;
                 RefsetSpecQuery relStatement = processRelationshipBranch(((Relationship) b));
                 spec.addSubquery(getGroupingConcept(topGrouping),
                         true,

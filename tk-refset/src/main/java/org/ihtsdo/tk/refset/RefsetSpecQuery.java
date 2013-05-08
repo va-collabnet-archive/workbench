@@ -12,7 +12,6 @@
  */
 package org.ihtsdo.tk.refset;
 
-import org.ihtsdo.tk.refset.other.ActivityBI;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
@@ -143,7 +142,7 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
         totalStatementCount = 0;
         continueComputation = true;
     }
-
+    
     public ArrayList<RefsetSpecQuery> getSubqueries() {
         return subqueries;
     }
@@ -243,14 +242,13 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
 
     @SuppressWarnings("unchecked")
     public NidBitSetBI getPossibleConceptsInterruptable(
-            final NidBitSetBI parentPossibleConcepts,
-            final Collection<ActivityBI> activities)
+            final NidBitSetBI parentPossibleConcepts)
             throws TerminologyException, IOException, ComputationCanceled {
 
         FutureTask task = new FutureTask(new Callable<NidBitSetBI>() {
             @Override
             public NidBitSetBI call() throws Exception {
-                return getPossibleConcepts(parentPossibleConcepts, activities);
+                return getPossibleConcepts(parentPossibleConcepts);
             }
         });
 
@@ -264,9 +262,6 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
             }
             return results;
         } catch (InterruptedException e) {
-            for (ActivityBI activity : activities) {
-                activity.cancel();
-            }
             throw new ComputationCanceled("Compute cancelled");
         } catch (ExecutionException e) {
             if (getRootCause(e) instanceof TerminologyException) {
@@ -295,21 +290,11 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
     }
 
     @Override
-    public NidBitSetBI getPossibleConcepts(final NidBitSetBI parentPossibleConcepts,
-            Collection<ActivityBI> activities)
+    public NidBitSetBI getPossibleConcepts(final NidBitSetBI parentPossibleConcepts)
             throws IOException, ComputationCanceled, ContradictionException, TerminologyException {
         if (!continueComputation) {
             throw new ComputationCanceled("Compute cancelled");
         }
-//TODO: need activity panel     
-//        ActivityBI activity =
-//                Terms.get().newActivityPanel(true, config, "<html>Possible: <br>"
-//                + this.toHtmlFragment(0), true);
-//        activities.add(activity);
-//        activity.setMaximum(statements.size() + subqueries.size());
-//        activity.setValue(0);
-//        activity.setIndeterminate(true);
-//        activity.addStopActionListener(new StopActionListener(this, Thread.currentThread()));
         long startTime = System.currentTimeMillis();
 
         if (allComponentsNeedsResort) {
@@ -317,7 +302,6 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
             allComponentsNeedsResort = false;
         }
 
-//TODO: need activity panel         AceLog.getAppLog().info(">> Start of " + this.toString());
         System.out.println(">> Start of " + this.toString());
         NidBitSetBI possibleConcepts = null;
         // process all statements and subqueries
@@ -325,8 +309,6 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
             case AND:
             case NEGATED_OR:
                 if (statements.isEmpty() && subqueries.isEmpty()) {
-//TODO: need activity panel                    activity.complete();
-//                    activity.setProgressInfoLower("Spec is invalid - dangling AND.");
                     throw new TerminologyException("Spec is invalid - dangling AND.\n" + this.toString());
                 }
 
@@ -334,23 +316,19 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
                     if (!continueComputation) {
                         throw new ComputationCanceled("Compute cancelled");
                     }
-//TODO: need activity panel                     activity.setProgressInfoLower("Initializing...");
                     if (possibleConcepts == null) {
                         possibleConcepts = component.getPossibleConcepts(
-                                parentPossibleConcepts, activities);
+                                parentPossibleConcepts);
                     } else {
                         possibleConcepts.and(component.getPossibleConcepts(
-                                possibleConcepts, activities));
+                                possibleConcepts));
                     }
-//TODO: need activity panel                     activity.setValue(activity.getValue() + 1);
                 }
                 break;
 
             case OR:
             case NEGATED_AND:
                 if (statements.isEmpty() && subqueries.isEmpty()) {
-//TODO: need activity panel                    activity.complete();
-//                    activity.setProgressInfoLower("Spec is invalid - dangling OR.");
                     throw new TerminologyException("Spec is invalid - dangling OR.\n" + this.toString());
                 }
 
@@ -358,45 +336,37 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
                     if (!continueComputation) {
                         throw new ComputationCanceled("Compute cancelled");
                     }
-//TODO: need activity panel                     activity.setProgressInfoLower("Initializing...");
                     if (possibleConcepts == null) {
                         possibleConcepts = component.getPossibleConcepts(
-                                parentPossibleConcepts, activities);
+                                parentPossibleConcepts);
                     } else {
                         possibleConcepts.or(component.getPossibleConcepts(
-                                parentPossibleConcepts, activities));
+                                parentPossibleConcepts));
                     }
-//TODO: need activity panel                    activity.setValue(activity.getValue() + 1);
                 }
 
                 break;
             case CONCEPT_CONTAINS_DESC:
             case NOT_CONCEPT_CONTAINS_DESC:
                 if (statements.isEmpty() && subqueries.isEmpty()) {
-//TODO: need activity panel                     activity.complete();
-//                    activity.setProgressInfoLower("Spec is invalid - dangling concept-contains-desc.");
                     throw new TerminologyException("Spec is invalid - dangling concept-contains-desc.");
                 }
                 for (RefsetSpecComponent component : allComponents) {
                     if (!continueComputation) {
                         throw new ComputationCanceled("Compute cancelled");
                     }
-//TODO: need activity panel                     activity.setProgressInfoLower("Initializing...");
                     if (possibleConcepts == null) {
                         possibleConcepts = component.getPossibleConcepts(
-                                parentPossibleConcepts, activities);
+                                parentPossibleConcepts);
                     } else {
                         possibleConcepts.or(component.getPossibleConcepts(
-                                parentPossibleConcepts, activities));
+                                parentPossibleConcepts));
                     }
-//TODO: need activity panel                     activity.setValue(activity.getValue() + 1);
                 }
                 break;
             case CONCEPT_CONTAINS_REL:
             case NOT_CONCEPT_CONTAINS_REL:
                 if (statements.isEmpty() && subqueries.isEmpty()) {
-//TODO: need activity panel                     activity.complete();
-//                    activity.setProgressInfoLower("Spec is invalid - dangling concept-contains-rel.");
                     throw new TerminologyException("Spec is invalid - dangling concept-contains-rel.");
                 }
 
@@ -404,15 +374,13 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
                     if (!continueComputation) {
                         throw new ComputationCanceled("Compute cancelled");
                     }
-//TODO: need activity panel                     activity.setProgressInfoLower("Initializing...");
                     if (possibleConcepts == null) {
                         possibleConcepts = component.getPossibleConcepts(
-                                parentPossibleConcepts, activities);
+                                parentPossibleConcepts);
                     } else {
                         possibleConcepts.or(component.getPossibleConcepts(
-                                parentPossibleConcepts, activities));
+                                parentPossibleConcepts));
                     }
-//TODO: need activity panel                     activity.setValue(activity.getValue() + 1);
                 }
 
                 break;
@@ -420,9 +388,6 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
             case V2:
                 // TODO - EKM
                 if (statements.isEmpty() && subqueries.isEmpty()) {
-//TODO: need activity panel                     activity.complete();
-//                    activity.setProgressInfoLower("Spec is invalid - dangling "
-//                            + groupingType + ".");
                     throw new IOException("Spec is invalid - dangling "
                             + groupingType + ".\n" + this.toString());
                 }
@@ -431,15 +396,13 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
                     if (!continueComputation) {
                         throw new ComputationCanceled("Compute cancelled");
                     }
-//TODO: need activity panel                     activity.setProgressInfoLower("Initializing...");
                     if (possibleConcepts == null) {
                         possibleConcepts = component.getPossibleConcepts(
-                                parentPossibleConcepts, activities);
+                                parentPossibleConcepts);
                     } else {
                         possibleConcepts.or(component.getPossibleConcepts(
-                                parentPossibleConcepts, activities));
+                                parentPossibleConcepts));
                     }
-//TODO: need activity panel                     activity.setValue(activity.getValue() + 1);
                 }
                 break;
             default:
@@ -448,7 +411,6 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
         long endTime = System.currentTimeMillis();
         long elapsed = endTime - startTime;
         String elapsedStr = TimeHelper.getElapsedTimeString(elapsed);
-//TODO: need activity panel         AceLog.getAppLog().info(this + " possibleConceptTime: " + elapsedStr);
         System.out.println(this + " possibleConceptTime: " + elapsedStr);
         if (possibleConcepts == null) {
             possibleConcepts = Ts.get().getEmptyNidSet();
@@ -458,12 +420,6 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
         if (parentPossibleConcepts != null) {
             incomingCount = "" + parentPossibleConcepts.cardinality();
         }
-//TODO: need activity panel 
-//        activity.setProgressInfoLower("Elapsed: " + elapsedStr
-//                + "; Incoming count: " + incomingCount + "; Outgoing count: "
-//                + possibleConcepts.cardinality());
-//
-//        activity.complete();
         if (!continueComputation) {
             throw new ComputationCanceled("Compute cancelled");
         }
@@ -533,8 +489,7 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
      */
     @Override
     public boolean execute(int componentNid, Object component, GROUPING_TYPE version,
-            ViewCoordinate v1_is, ViewCoordinate v2_is,
-            Collection<ActivityBI> activities) throws IOException,
+            ViewCoordinate v1_is, ViewCoordinate v2_is) throws IOException,
             TerminologyException, ComputationCanceled, ContradictionException {
 
         if (!continueComputation) {
@@ -571,7 +526,7 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
                     }
                     if (!specComponent.execute(componentNid, component, version,
                             this.v1_is, 
-                            this.v2_is, activities)) {
+                            this.v2_is)) {
                         // can exit the AND early, as at least one statement is
                         // returning false
                         return false;
@@ -602,7 +557,7 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
                             }
                         }
                     }
-                    if (specComponent.execute(componentNid, component, version, this.v1_is, this.v2_is, activities)) {
+                    if (specComponent.execute(componentNid, component, version, this.v1_is, this.v2_is)) {
                         // exit the OR statement early, as at least one statement
                         // has returned true
                         return true;
@@ -613,13 +568,13 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
                 // will return false
                 return false;
             case CONCEPT_CONTAINS_DESC:
-                return executeConceptContainsDesc(component, version, v1_is, v2_is, activities);
+                return executeConceptContainsDesc(component, version, v1_is, v2_is);
             case NOT_CONCEPT_CONTAINS_DESC:
-                return !executeConceptContainsDesc(component, version, v1_is, v2_is, activities);
+                return !executeConceptContainsDesc(component, version, v1_is, v2_is);
             case CONCEPT_CONTAINS_REL:
-                return executeConceptContainsRel(component, version, v1_is, v2_is, activities);
+                return executeConceptContainsRel(component, version, v1_is, v2_is);
             case NOT_CONCEPT_CONTAINS_REL:
-                return !executeConceptContainsRel(component, version, v1_is, v2_is, activities);
+                return !executeConceptContainsRel(component, version, v1_is, v2_is);
             case V1:
             case V2:
                 if (statements.isEmpty() && subqueries.isEmpty()) {
@@ -632,7 +587,7 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
                         throw new ComputationCanceled("Compute cancelled");
                     }
                     if (specComponent.execute(componentNid, component, groupingType, v1_is,
-                            v2_is, activities)) {
+                            v2_is)) {
                         // exit the OR statement early, as at least one statement
                         // has returned true
                         return true;
@@ -649,8 +604,7 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
 
 
     private boolean executeConceptContainsDesc(Object component,
-            GROUPING_TYPE version, ViewCoordinate v1_is, ViewCoordinate v2_is,
-            Collection<ActivityBI> activities)
+            GROUPING_TYPE version, ViewCoordinate v1_is, ViewCoordinate v2_is)
             throws TerminologyException, IOException, ComputationCanceled, ContradictionException {
         if (!continueComputation) {
             throw new ComputationCanceled("Compute cancelled");
@@ -680,7 +634,7 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
                 if (!continueComputation) {
                     throw new ComputationCanceled("Compute cancelled");
                 }
-                if (!statement.execute(description.getNid(), description, version, v1_is, v2_is, activities)) {
+                if (!statement.execute(description.getNid(), description, version, v1_is, v2_is)) {
                     // can exit the execution early, as at least one statement
                     // is returning false
                     valid = false;
@@ -694,7 +648,7 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
                 if (!continueComputation) {
                     throw new ComputationCanceled("Compute cancelled");
                 }
-                if (!subquery.execute(description.getNid(), description, version, v1_is, v2_is, activities)) {
+                if (!subquery.execute(description.getNid(), description, version, v1_is, v2_is)) {
                     // can exit the execution early, as at least one query is
                     // returning false
                     valid = false;
@@ -714,7 +668,7 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
 
     private boolean executeConceptContainsRel(Object component,
             GROUPING_TYPE groupingVersion, ViewCoordinate v1_is,
-            ViewCoordinate v2_is, Collection<ActivityBI> activities)
+            ViewCoordinate v2_is)
             throws TerminologyException, IOException, ComputationCanceled, ContradictionException {
         if (!continueComputation) {
             throw new ComputationCanceled("Compute cancelled");
@@ -743,7 +697,7 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
                 if (!continueComputation) {
                     throw new ComputationCanceled("Compute cancelled");
                 }
-                if (!statement.execute(rel.getNid(), rel, groupingVersion, v1_is, v2_is, activities)) {
+                if (!statement.execute(rel.getNid(), rel, groupingVersion, v1_is, v2_is)) {
                     // can exit the execution early, as at least one statement
                     // is returning false
                     valid = false;
@@ -757,7 +711,7 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
                 if (!continueComputation) {
                     throw new ComputationCanceled("Compute cancelled");
                 }
-                if (!subquery.execute(rel.getNid(), rel, groupingVersion, v1_is, v2_is, activities)) {
+                if (!subquery.execute(rel.getNid(), rel, groupingVersion, v1_is, v2_is)) {
                     // can exit the execution early, as at least one query is
                     // returning false
                     valid = false;
@@ -872,14 +826,13 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
 
     @SuppressWarnings("unchecked")
     public NidBitSetBI getPossibleDescriptionsInterruptable(
-            final NidBitSetBI parentPossibleDescriptions,
-            final Collection<ActivityBI> activities)
+            final NidBitSetBI parentPossibleDescriptions)
             throws TerminologyException, IOException, ComputationCanceled {
 
         FutureTask task = new FutureTask(new Callable<NidBitSetBI>() {
             @Override
             public NidBitSetBI call() throws Exception {
-                return getPossibleDescriptions(parentPossibleDescriptions, activities);
+                return getPossibleDescriptions(parentPossibleDescriptions);
             }
         });
 
@@ -912,21 +865,12 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
     }
 
     @Override
-    public NidBitSetBI getPossibleDescriptions(NidBitSetBI parentPossibleDescriptions,
-            Collection<ActivityBI> activities)
+    public NidBitSetBI getPossibleDescriptions(NidBitSetBI parentPossibleDescriptions)
             throws IOException, ComputationCanceled {
 
         if (!continueComputation) {
             throw new ComputationCanceled("Compute cancelled");
         }
-//TODO: need activity panel      
-//        ActivityBI activity =
-//                Terms.get().newActivityPanel(true, config, "<html>Possible: <br>"
-//                + this.toHtmlFragment(0), true);
-//        activity.setMaximum(statements.size() + subqueries.size());
-//        activity.setValue(0);
-//        activity.setIndeterminate(true);
-//        activity.addStopActionListener(new StopActionListener(this, Thread.currentThread()));
 
         if (allComponentsNeedsResort) {
             Collections.sort(allComponents, calculationOrderComparator);
@@ -934,7 +878,6 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
         }
 
         long startTime = System.currentTimeMillis();
-//TODO: need activity panel         AceLog.getAppLog().info(">> Start of " + this.toString());
         System.out.println(">> Start of " + this.toString());
         NidBitSetBI possibleDescriptions = null;
         // process all statements and subqueries
@@ -942,67 +885,49 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
             case AND:
             case NEGATED_OR:
                 if (statements.isEmpty() && subqueries.isEmpty()) {
-//TODO: need activity panel                     activity.complete();
                 }
 
                 for (RefsetSpecComponent component : allComponents) {
                     if (!continueComputation) {
                         throw new ComputationCanceled("Compute cancelled");
                     }
-//TODO: need activity panel                     activity.setProgressInfoLower("Initializing...");
                     if (possibleDescriptions == null) {
                         possibleDescriptions = component.getPossibleDescriptions(
-                                parentPossibleDescriptions, activities);
+                                parentPossibleDescriptions);
                     } else {
                         possibleDescriptions.and(component.getPossibleDescriptions(
-                                possibleDescriptions, activities));
+                                possibleDescriptions));
                     }
-//TODO: need activity panel                     activity.setValue(activity.getValue() + 1);
                 }
 
                 break;
             case OR:
             case NEGATED_AND:
                 if (statements.isEmpty() && subqueries.isEmpty()) {
-//TODO: need activity panel                     activity.complete();
                 }
 
                 for (RefsetSpecComponent component : allComponents) {
                     if (!continueComputation) {
                         throw new ComputationCanceled("Compute cancelled");
                     }
-//TODO: need activity panel                     activity.setProgressInfoLower("Initializing...");
                     if (possibleDescriptions == null) {
                         possibleDescriptions = component.getPossibleDescriptions(
-                                parentPossibleDescriptions, activities);
+                                parentPossibleDescriptions);
                     } else {
                         possibleDescriptions.or(component.getPossibleDescriptions(
-                                parentPossibleDescriptions, activities));
+                                parentPossibleDescriptions));
                     }
-//TODO: need activity panel                     activity.setValue(activity.getValue() + 1);
                 }
 
                 break;
             case CONCEPT_CONTAINS_DESC:
-//TODO: need activity panel 
-//                activity.complete();
-//                activity.setProgressInfoLower("Concept-contains-desc is not supported within a description refset calculation.");
                 throw new IOException("Concept-contains-desc is not supported within a description refset calculation.");
             case NOT_CONCEPT_CONTAINS_DESC:
-//TODO: need activity panel 
-//                activity.complete();
-//                activity.setProgressInfoLower("NOT Concept-contains-desc is not supported within a description refset calculation.");
                 throw new IOException(
                         "NOT Concept-contains-desc is not supported within a description refset calculation.");
             case CONCEPT_CONTAINS_REL:
-//TODO: need activity panel 
-//                activity.complete();
-//                activity.setProgressInfoLower("Concept-contains-rel is not supported within a description refset calculation.");
                 throw new IOException("Concept-contains-rel is not supported within a description refset calculation.");
             case NOT_CONCEPT_CONTAINS_REL:
-//TODO: need activity panel 
-//              activity.complete();
-//               activity.setProgressInfoLower("NOT Concept-contains-rel is not supported within a description refset calculation.");
                 throw new IOException(
                         "NOT Concept-contains-rel is not supported within a description refset calculation.");
             default:
@@ -1011,7 +936,6 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
         long elapsedTime = System.currentTimeMillis() - startTime;
         long minutes = elapsedTime / 60000;
         long seconds = (elapsedTime % 60000) / 1000;
-//TODO: need activity panel         AceLog.getAppLog().info(this + " possibleConceptTime: " + minutes + " minutes, " + seconds + " seconds.");
         System.out.println(this + " possibleConceptTime: " + minutes + " minutes, " + seconds + " seconds.");
         if (possibleDescriptions == null) {
             possibleDescriptions = Ts.get().getEmptyNidSet();
@@ -1021,10 +945,6 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
         if (parentPossibleDescriptions != null) {
             incomingCount = "" + parentPossibleDescriptions.cardinality();
         }
-//TODO: need activity panel 
-//        activity.setProgressInfoLower("Elapsed: " + elapsedTime + "; Incoming count: " + incomingCount
-//                + "; Outgoing count: " + possibleDescriptions.cardinality());
-//        activity.complete();
         if (!continueComputation) {
             throw new ComputationCanceled("Compute cancelled");
         }
@@ -1033,8 +953,7 @@ public class RefsetSpecQuery extends RefsetSpecComponent {
     }
 
     @Override
-    public NidBitSetBI getPossibleRelationships(NidBitSetBI parentPossibleConcepts,
-            Collection<ActivityBI> activities) throws IOException {
+    public NidBitSetBI getPossibleRelationships(NidBitSetBI parentPossibleConcepts) throws IOException {
         throw new IOException("Get possible relationships unimplemented.");
     }
 

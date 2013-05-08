@@ -299,6 +299,43 @@ public class RefexCAB extends CreateOrAmendBlueprint {
                     (Integer) this.properties.get(RefexProperty.STATUS_NID)).getPrimUuid());
         }
     }
+    
+    /**
+     * Instantiates a new refex blueprint using nid values and a given
+     * <code>refexVersion</code>. Uses the given
+     * <code>memberUuid</code> as the refex member uuid.
+     *
+     * @param memberType the refex member type
+     * @param referencedComponentNid the nid of the referenced component
+     * @param collectionNid the nid of the refex collection concept
+     * @param memberUuid the uuid of the refex member
+     * @param refexVersion the refex version to use as a pattern
+     * @param viewCoordinate the view coordinate specifying which versions are
+     * active and inactive
+     * @throws IOException signals that an I/O exception has occurred
+     * @throws InvalidCAB if the any of the values in blueprint to make are
+     * invalid
+     * @throws ContradictionException if more than one version is found for a
+     * given position or view coordinate
+     */
+    public RefexCAB(TK_REFEX_TYPE memberType,
+            int referencedComponentNid, int collectionNid,
+            UUID memberUuid, RefexVersionBI refexVersion,
+            ViewCoordinate viewCoordinate) throws IOException, InvalidCAB, ContradictionException {
+        super(memberUuid, refexVersion, viewCoordinate);
+        this.memberType = memberType;
+        this.properties.put(RefexProperty.RC_NID, referencedComponentNid);
+        this.properties.put(RefexProperty.COLLECTION_NID, collectionNid);
+        this.properties.put(RefexProperty.STATUS_NID,
+                SnomedMetadataRfx.getSTATUS_CURRENT_NID());
+        if (memberUuid != null) {
+            this.properties.put(RefexProperty.MEMBER_UUID, memberUuid);
+        }
+        if (this.properties.get(RefexProperty.STATUS_NID) != null) {
+            setStatusUuid(Ts.get().getComponent(
+                    (Integer) this.properties.get(RefexProperty.STATUS_NID)).getPrimUuid());
+        }
+    }
 
     /**
      *
@@ -391,6 +428,10 @@ public class RefexCAB extends CreateOrAmendBlueprint {
          * The referenced component uuid.
          */
         RC_UUID,
+        /**
+         * The referenced component nid.
+         */
+        RC_NID,
         /**
          * The refex member status nid.
          */
@@ -695,6 +736,9 @@ public class RefexCAB extends CreateOrAmendBlueprint {
                 case RC_UUID:
                     refexAnalog.setReferencedComponentNid(Ts.get().getNidForUuids((UUID) entry.getValue()));
                     break;
+                case RC_NID:
+                    refexAnalog.setReferencedComponentNid((Integer) entry.getValue());
+                    break;
                 case BOOLEAN1:
                     RefexBooleanAnalogBI<?> booleanPart = (RefexBooleanAnalogBI<?>) refexAnalog;
                     booleanPart.setBoolean1((Boolean) entry.getValue());
@@ -781,6 +825,9 @@ public class RefexCAB extends CreateOrAmendBlueprint {
                 case RC_UUID:
                     refexAnalog.setReferencedComponentNid(Ts.get().getNidForUuids((UUID) entry.getValue()));
                     break;
+                case RC_NID:
+                    refexAnalog.setReferencedComponentNid((Integer) entry.getValue());
+                    break;
                 case CNID1:
                     RefexNidAnalogBI<?> c1part = (RefexNidAnalogBI<?>) refexAnalog;
                     c1part.setNid1((Integer) entry.getValue());
@@ -860,6 +907,11 @@ public class RefexCAB extends CreateOrAmendBlueprint {
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
+                case RC_NID:
+                        if (!entry.getValue().equals(refexVersion.getReferencedComponentNid())) {
+                            return false;
+                        }
+                        break;
                 case COLLECTION_NID:
                     if (!entry.getValue().equals(refexVersion.getRefexNid())) {
                         return false;
@@ -1036,6 +1088,16 @@ public class RefexCAB extends CreateOrAmendBlueprint {
      */
     public UUID getReferencedComponentUuid() {
         return (UUID) properties.get(RefexProperty.RC_UUID);
+    }
+    
+    /**
+     * Gets the nid of the referenced component associated with this refex
+     * blueprint.
+     *
+     * @return the referenced component uuid
+     */
+    public Integer getReferencedComponentNid() {
+        return (Integer) properties.get(RefexProperty.RC_NID);
     }
 
     /**

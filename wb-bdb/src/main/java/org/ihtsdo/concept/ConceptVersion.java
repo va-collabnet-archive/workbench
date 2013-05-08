@@ -418,7 +418,7 @@ public class ConceptVersion implements ConceptVersionBI, Comparable<ConceptVersi
             throws IOException {
         return concept.getRefexMembersActive(xyz, refsetNid);
     }
-
+    
     @Override
     public Collection<? extends RefexVersionBI<?>> getRefexesActive(ViewCoordinate xyz) throws IOException {
         return concept.getRefexesActive(xyz);
@@ -450,6 +450,12 @@ public class ConceptVersion implements ConceptVersionBI, Comparable<ConceptVersi
     public Collection<? extends RefexVersionBI<?>> getRefsetMembersActive(ViewCoordinate vc)
             throws IOException {
         return concept.getRefsetMembersActive(vc);
+    }
+    
+    @Override
+    public Collection<Integer> getRefsetMemberNidsActive(ViewCoordinate vc)
+            throws IOException {
+        return concept.getRefsetMemberNidsActive(vc);
     }
 
     @Override
@@ -663,6 +669,11 @@ public class ConceptVersion implements ConceptVersionBI, Comparable<ConceptVersi
     @Override
     public Collection<? extends RefexVersionBI<?>> getRefsetMembersActive() throws IOException {
         return concept.getRefsetMembersActive(vc);
+    }
+    
+    @Override
+    public Collection<Integer> getRefsetMemberNidsActive() throws IOException {
+        return concept.getRefsetMemberNidsActive(vc);
     }
 
     @Override

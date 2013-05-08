@@ -114,6 +114,11 @@ public class BdbTerminologySnapshot implements TerminologySnapshotDI {
    }
    
    @Override
+    public void commit(ChangeSetPolicy changeSetPolicy) throws IOException {
+        throw new UnsupportedOperationException();
+    }
+   
+   @Override
     public void commit(ConceptChronicleBI cc, ChangeSetPolicy changeSetPolicy) throws IOException {
         throw new UnsupportedOperationException();
     }

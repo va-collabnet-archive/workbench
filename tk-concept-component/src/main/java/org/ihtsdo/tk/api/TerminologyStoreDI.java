@@ -39,6 +39,7 @@ import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 import org.ihtsdo.tk.contradiction.ContradictionIdentifierBI;
 import org.ihtsdo.tk.db.DbDependency;
 import org.ihtsdo.tk.dto.concept.component.TkRevision;
+import org.ihtsdo.tk.spec.ValidationException;
 
 /**
  * The Interface TerminologyStoreDI.
@@ -156,16 +157,6 @@ public interface TerminologyStoreDI extends TerminologyDI {
     boolean usesRf2Metadata() throws IOException;
 
     //~--- get methods ---------------------------------------------------------
-    /**
-     * Gets all the concept nids for every concept in the database.
-     *
-     * @return all the concept nids
-     * @throws IOException signals that an I/O exception has occurred
-     * @deprecated not in TK3 -- use TerminologyDI
-     */
-    @Deprecated
-    NidBitSetBI getAllConceptNids() throws IOException;
-
     /**
      * Gets a component chronicle for the given
      * <code>uuids</code>.
@@ -941,6 +932,38 @@ public interface TerminologyStoreDI extends TerminologyDI {
      * found for the given view coordinate
      */
     Set<Integer> getAncestors(int childNid, ViewCoordinate viewCoordinate) throws IOException, ContradictionException;
+    
+    /**
+     * Gets the nids of the immediate children for the concept associated with
+     * the given
+     * <code>parentNid</code>.
+     *
+     * @param parentNid the nid associated with the parent concept
+     * @param viewCoordinate the viewCoordinate specifying which version of the
+     * concepts in question to use
+     * @return the nids of ancestor concepts
+     * @throws IOException signals that an I/O exception has occurred
+     * @throws ContradictionException if more than one version of a concept is
+     * found for the given view coordinate
+     * @throws ValidationException if unable to validate the "Is a" concept
+     */
+    Set<Integer> getChildren(int parentNid, ViewCoordinate vc) throws ValidationException, IOException, ContradictionException;
+    
+    /**
+     * Gets the nids of all the descendants including the parent for the concept associated with
+     * the given
+     * <code>parentNid</code>.
+     *
+     * @param parentNid the nid associated with the parent concept
+     * @param viewCoordinate the viewCoordinate specifying which version of the
+     * concepts in question to use
+     * @return the nids of ancestor concepts
+     * @throws IOException signals that an I/O exception has occurred
+     * @throws ContradictionException if more than one version of a concept is
+     * found for the given view coordinate
+     * @throws ValidationException if unable to validate the "Is a" concept
+     */
+    NidBitSetBI getKindOf(int parentNid, ViewCoordinate vc) throws ValidationException, IOException, ContradictionException;
 
     /**
      * Gets the nids of incoming relationships source concepts.

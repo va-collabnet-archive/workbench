@@ -54,7 +54,8 @@ import org.ihtsdo.tk.contradiction.ContradictionIdentifierBI;
 import org.ihtsdo.tk.db.DbDependency;
 import org.ihtsdo.tk.db.EccsDependency;
 import org.ihtsdo.tk.dto.concept.component.TkRevision;
-import org.ihtsdo.tk.refset.RefsetSpecBuilder;
+import org.ihtsdo.tk.refset.QueryToSpecBuilder;
+import org.ihtsdo.tk.spec.ValidationException;
 import org.ihtsdo.tk.uuid.UuidFactory;
 
 public class BdbTerminologyStore implements TerminologyStoreDI {
@@ -160,6 +161,12 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
     @Override
     public void commit() throws IOException {
         BdbCommitManager.commit();
+    }
+    
+    @Override
+    public void commit(ChangeSetPolicy changeSetPolicy) throws IOException {
+        BdbCommitManager.commit(changeSetPolicy,
+                ChangeSetWriterThreading.SINGLE_THREAD);
     }
     
     @Override
@@ -849,6 +856,14 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
     }
     
     @Override
+    public Set<Integer> getChildren(int parentNid, ViewCoordinate vc) throws ValidationException, IOException, ContradictionException{
+        return Bdb.getNidCNidMap().getChildNids(parentNid, vc);
+    }
+    
+    public NidBitSetBI getKindOf(int parentNid, ViewCoordinate vc) throws ValidationException, IOException, ContradictionException{
+        return Bdb.getNidCNidMap().getKindOfNids(parentNid, vc);
+    }
+    @Override
     public boolean hasExtension(int refsetNid, int componentNid) {
         return Bdb.getNidCNidMap().hasExtension(refsetNid, componentNid);
     }
@@ -870,7 +885,7 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
     
     @Override
     public QueryBuilderBI getQueryBuilder(ViewCoordinate viewCoordinate){
-        return new RefsetSpecBuilder(viewCoordinate.getViewCoordinateWithAllStatusValues());
+        return new QueryToSpecBuilder(viewCoordinate.getViewCoordinateWithAllStatusValues());
     }
     
     @Override

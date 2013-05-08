@@ -16,15 +16,9 @@
  */
 package org.ihtsdo.tk.refset;
 
-import org.ihtsdo.tk.refset.other.ActivityBI;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-//import org.dwfa.ace.api.I_AmTuple;
-//import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.cement.RefsetAuxiliary.Concept;
 import org.dwfa.tapi.I_ConceptualizeUniversally;
 import org.dwfa.tapi.TerminologyException;
@@ -191,7 +185,7 @@ public abstract class RefsetSpecStatement extends RefsetSpecComponent {
     @Override
     public boolean execute(int componentNid, Object component,
             GROUPING_TYPE version, ViewCoordinate v1_is,
-            ViewCoordinate v2_is, Collection<ActivityBI> activities) throws IOException, ContradictionException {
+            ViewCoordinate v2_is) throws IOException, ContradictionException {
 
         boolean statementResult = getStatementResult(componentNid, component,
                 version, v1_is, v2_is);

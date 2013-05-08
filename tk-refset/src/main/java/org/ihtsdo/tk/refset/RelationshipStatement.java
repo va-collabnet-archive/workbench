@@ -16,33 +16,21 @@
  */
 package org.ihtsdo.tk.refset;
 
-import org.ihtsdo.tk.refset.other.ActivityBI;
 import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.UUID;
 
 import org.dwfa.tapi.ComputationCanceled;
-import org.dwfa.util.id.Type5UuidFactory;
 import org.ihtsdo.helper.time.TimeHelper;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ComponentChronicleBI;
 import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.NidBitSetBI;
-import org.ihtsdo.tk.api.NidSet;
-import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
-import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf1;
-import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
-import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 import org.ihtsdo.tk.refset.RefsetSpecQuery.GROUPING_TYPE;
 
 /**
@@ -54,7 +42,6 @@ import org.ihtsdo.tk.refset.RefsetSpecQuery.GROUPING_TYPE;
  */
 public class RelationshipStatement extends RefsetSpecStatement {
 
-    private Collection<ActivityBI> activities;
 
     /**
      * Constructor for refset spec statement.
@@ -64,8 +51,8 @@ public class RelationshipStatement extends RefsetSpecStatement {
      * @param queryConstraint The destination concept (e.g. "paracetamol")
      * @throws Exception
      */
-    public RelationshipStatement(boolean useNotQualifier,
-            ConceptChronicleBI queryToken,
+    public RelationshipStatement(boolean useNotQualifier, 
+            ConceptChronicleBI queryToken, 
             ConceptChronicleBI queryConstraint,
             ViewCoordinate viewCoordinate) throws Exception {
         super(useNotQualifier, queryToken, queryConstraint, viewCoordinate);
@@ -254,11 +241,8 @@ public class RelationshipStatement extends RefsetSpecStatement {
     }
 
     @Override
-    public NidBitSetBI getPossibleConcepts(NidBitSetBI parentPossibleConcepts,
-            Collection<ActivityBI> activities) throws IOException, ComputationCanceled {
-        ActivityBI activity = null;
+    public NidBitSetBI getPossibleConcepts(NidBitSetBI parentPossibleConcepts) throws IOException, ComputationCanceled {
         long startTime = System.currentTimeMillis();
-        this.activities = activities;
 
         NidBitSetBI possibleConcepts = termFactory.getEmptyNidSet();
         if (parentPossibleConcepts == null) {
@@ -320,26 +304,22 @@ public class RelationshipStatement extends RefsetSpecStatement {
         }
         setPossibleConceptsCount(possibleConcepts.cardinality());
 
-        if (activity != null) {
+
             long endTime = System.currentTimeMillis();
             long elapsed = endTime - startTime;
             String elapsedStr = TimeHelper.getElapsedTimeString(elapsed);
-            activity.setProgressInfoLower("Elapsed: " + elapsedStr + ";  Incoming count: "
+            System.out.println("Elapsed: " + elapsedStr + ";  Incoming count: "
                     + parentPossibleConcepts.cardinality() + "; Outgoing count: " + possibleConcepts.cardinality());
-            activity.complete();
-        }
         return possibleConcepts;
     }
 
     @Override
-    public NidBitSetBI getPossibleDescriptions(NidBitSetBI parentPossibleConcepts,
-            Collection<ActivityBI> activities) throws IOException {
+    public NidBitSetBI getPossibleDescriptions(NidBitSetBI parentPossibleConcepts) throws IOException {
         throw new IOException("Get possible descriptions in rel statement unsupported operation.");
     }
 
     @Override
-    public NidBitSetBI getPossibleRelationships(NidBitSetBI parentPossibleConcepts,
-            Collection<ActivityBI> activities) throws IOException {
+    public NidBitSetBI getPossibleRelationships(NidBitSetBI parentPossibleConcepts) throws IOException {
         throw new IOException("Get possible relationships in rel statement unsupported operation.");
     }
 
@@ -372,8 +352,9 @@ public class RelationshipStatement extends RefsetSpecStatement {
 
     private boolean relRefinabilityIsChildOf(RelationshipVersionBI relTuple) throws IOException {
         try {
-            Collection<? extends ConceptVersionBI> children = ((ConceptChronicleBI) queryConstraint).getVersion(viewCoordinate).getRelationshipsIncomingSourceConceptsActiveIsa();
-
+            Collection<? extends ConceptVersionBI> children
+                    = ((ConceptChronicleBI) queryConstraint).getVersion(viewCoordinate).getRelationshipsIncomingSourceConceptsActiveIsa();
+           
             for (ConceptVersionBI child : children) {
                 if (relRefinabilityIs(child, relTuple)) {
                     return true;
@@ -412,7 +393,7 @@ public class RelationshipStatement extends RefsetSpecStatement {
         try {
             Collection<? extends ConceptVersionBI> children =
                     requiredCharType.getVersion(viewCoordinate).getRelationshipsIncomingSourceConceptsActiveIsa();
-
+            
             for (ConceptChronicleBI child : children) {
                 if (relCharIs(child, relTuple)) {
                     return true;
@@ -431,8 +412,9 @@ public class RelationshipStatement extends RefsetSpecStatement {
     private boolean relCharIsChildOf(RelationshipVersionBI relTuple) throws IOException {
         try {
 
-            Collection<? extends ConceptVersionBI> children = ((ConceptChronicleBI) queryConstraint).getVersion(viewCoordinate).getRelationshipsIncomingSourceConceptsActiveIsa();
-
+            Collection<? extends ConceptVersionBI> children
+                    = ((ConceptChronicleBI) queryConstraint).getVersion(viewCoordinate).getRelationshipsIncomingSourceConceptsActiveIsa();
+            
             for (ConceptChronicleBI child : children) {
                 if (relCharIs(child, relTuple)) {
                     return true;
@@ -488,7 +470,8 @@ public class RelationshipStatement extends RefsetSpecStatement {
     private boolean relTypeIsChildOf(RelationshipVersionBI relTuple) throws IOException {
         try {
 
-            Collection<? extends ConceptVersionBI> children = ((ConceptChronicleBI) queryConstraint).getVersion(viewCoordinate).getRelationshipsIncomingSourceConceptsActiveIsa();
+            Collection<? extends ConceptVersionBI> children
+                    = ((ConceptChronicleBI) queryConstraint).getVersion(viewCoordinate).getRelationshipsIncomingSourceConceptsActiveIsa();
 
             for (ConceptVersionBI child : children) {
                 if (relTypeIs(child, relTuple)) {
@@ -510,8 +493,9 @@ public class RelationshipStatement extends RefsetSpecStatement {
     private boolean relTypeIsDescendentOf(ConceptChronicleBI requiredRelType, RelationshipVersionBI relTuple) throws IOException {
         try {
 
-            Collection<? extends ConceptVersionBI> children = requiredRelType.getVersion(viewCoordinate).getRelationshipsIncomingSourceConceptsActiveIsa();
-
+            Collection<? extends ConceptVersionBI> children
+                    = requiredRelType.getVersion(viewCoordinate).getRelationshipsIncomingSourceConceptsActiveIsa();
+            
             for (ConceptVersionBI child : children) {
                 if (relTypeIs(child, relTuple)) {
                     return true;
@@ -535,8 +519,9 @@ public class RelationshipStatement extends RefsetSpecStatement {
             throws IOException {
         try {
 
-            Collection<? extends ConceptVersionBI> children = requiredStatus.getVersion(viewCoordinate).getRelationshipsIncomingSourceConceptsActiveIsa();
-
+            Collection<? extends ConceptVersionBI> children
+                    = requiredStatus.getVersion(viewCoordinate).getRelationshipsIncomingSourceConceptsActiveIsa();
+           
             for (ConceptChronicleBI child : children) {
                 if (relStatusIs(child, relTuple)) {
                     return true;
@@ -555,7 +540,8 @@ public class RelationshipStatement extends RefsetSpecStatement {
     private boolean relStatusIsChildOf(RelationshipVersionBI relTuple) throws IOException {
         try {
 
-            Collection<? extends ConceptVersionBI> children = ((ConceptChronicleBI) queryConstraint).getVersion(viewCoordinate).getRelationshipsIncomingSourceConceptsActiveIsa();
+            Collection<? extends ConceptVersionBI> children
+                    = ((ConceptChronicleBI) queryConstraint).getVersion(viewCoordinate).getRelationshipsIncomingSourceConceptsActiveIsa();
 
             for (ConceptChronicleBI child : children) {
                 if (relStatusIs(child, relTuple)) {
@@ -583,7 +569,7 @@ public class RelationshipStatement extends RefsetSpecStatement {
     }
 
     private boolean relStatusIs(ConceptChronicleBI requiredStatus, RelationshipVersionBI relTuple) {
-        return componentStatusIs(requiredStatus, relTuple);
+           return componentStatusIs(requiredStatus, relTuple);
     }
 
     private boolean relIs(RelationshipVersionBI relTuple) throws IOException {
@@ -592,7 +578,7 @@ public class RelationshipStatement extends RefsetSpecStatement {
     }
 
     private boolean relRestrictionIs(RelationshipVersionBI relTuple) throws IOException {
-        throw new IOException("Unimplemented query : rel restriction is");
+        throw new IOException("Unimplemented query : rel restriction is"); 
     }
 
     private boolean relLogicalQuantifierIsDescendentOf(RelationshipVersionBI relTuple) throws IOException {
@@ -635,7 +621,8 @@ public class RelationshipStatement extends RefsetSpecStatement {
     private boolean relDestinationIsChildOf(RelationshipVersionBI relTuple) throws IOException {
         try {
 
-            Collection<? extends ConceptVersionBI> children = ((ConceptChronicleBI) queryConstraint).getVersion(viewCoordinate).getRelationshipsIncomingSourceConceptsActiveIsa();
+            Collection<? extends ConceptVersionBI> children
+                    = ((ConceptChronicleBI) queryConstraint).getVersion(viewCoordinate).getRelationshipsIncomingSourceConceptsActiveIsa();
 
 
             for (ConceptChronicleBI child : children) {
@@ -659,7 +646,8 @@ public class RelationshipStatement extends RefsetSpecStatement {
             throws IOException {
         try {
 
-            Collection<? extends ConceptVersionBI> children = requiredDestination.getVersion(viewCoordinate).getRelationshipsIncomingSourceConceptsActiveIsa();
+            Collection<? extends ConceptVersionBI> children
+                    = requiredDestination.getVersion(viewCoordinate).getRelationshipsIncomingSourceConceptsActiveIsa();
 
 
             for (ConceptChronicleBI child : children) {
@@ -681,88 +669,9 @@ public class RelationshipStatement extends RefsetSpecStatement {
             ViewCoordinate v1_is, ViewCoordinate v2_is)
             throws IOException {
         try {
-            //            if v2 has a relationship that is semantically the same as v1, then return false
-            //            only care about active
-            NidSetBI activeNids = new NidSet();
-            activeNids.add(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid());
-            activeNids.add(SnomedMetadataRf1.CURRENT_RF1.getLenient().getNid());
-            ViewCoordinate v1Active = new ViewCoordinate(v1_is);
-            v1Active.setAllowedStatusNids(activeNids);
-            ViewCoordinate v2Active = new ViewCoordinate(v2_is);
-            v2Active.setAllowedStatusNids(activeNids);
             RelationshipVersionBI a1 = relBeingTested.getVersion(v1_is);
             RelationshipVersionBI a2 = relBeingTested.getVersion(v2_is);
-            if (a1 == null && a2 != null && a2.getStatusNid() == SnomedMetadataRfx.getSTATUS_CURRENT_NID()) {
-                ConceptChronicleBI enclosingConcept = relBeingTested.getEnclosingConcept();
-
-                UUID v2Hash = null;
-                if (a2.getGroup() == 0) {
-                    v2Hash = Type5UuidFactory.get(Ts.get().getUuidPrimordialForNid(a2.getSourceNid()).toString()
-                            + Ts.get().getUuidPrimordialForNid(a2.getTypeNid()).toString()
-                            + Ts.get().getUuidPrimordialForNid(a2.getTargetNid()).toString()
-                            + Ts.get().getUuidPrimordialForNid(a2.getCharacteristicNid()).toString());
-                } else {
-                    String groupHash = null;
-                    int group = a2.getGroup();
-                    ConceptVersionBI v2Concept = enclosingConcept.getVersion(v2Active);
-                    Collection<? extends RelationshipVersionBI> v2Rels = v2Concept.getRelationshipsOutgoingActive();
-                    ArrayList<String> hashes = new ArrayList<>();
-                    String hash = null;
-                    for (RelationshipVersionBI rel : v2Rels) {
-                        if (rel.getGroup() == group && a2.getCharacteristicNid() == rel.getCharacteristicNid()) {
-                            hash = Ts.get().getUuidPrimordialForNid(rel.getSourceNid()).toString()
-                                    + Ts.get().getUuidPrimordialForNid(rel.getTypeNid()).toString()
-                                    + Ts.get().getUuidPrimordialForNid(rel.getTargetNid()).toString()
-                                    + Ts.get().getUuidPrimordialForNid(rel.getCharacteristicNid()).toString();
-                            hashes.add(hash);
-                        }
-                    }
-                    Collections.sort(hashes);
-                    for (String s : hashes) {
-                        groupHash = groupHash + s;
-                    }
-                    v2Hash = Type5UuidFactory.get(groupHash);
-                }
-
-                ConceptVersionBI v1Concept = enclosingConcept.getVersion(v1Active);
-                Collection<? extends RelationshipVersionBI> v1Rels = v1Concept.getRelationshipsOutgoingActive();
-                HashSet<UUID> v1RelHashes = new HashSet<>();
-                for (RelationshipVersionBI rel : v1Rels) {
-                    if (rel.getGroup() == 0) {
-                        UUID hash = Type5UuidFactory.get(Ts.get().getUuidPrimordialForNid(rel.getSourceNid()).toString()
-                                + Ts.get().getUuidPrimordialForNid(rel.getTypeNid()).toString()
-                                + Ts.get().getUuidPrimordialForNid(rel.getTargetNid()).toString()
-                                + Ts.get().getUuidPrimordialForNid(rel.getCharacteristicNid()).toString());
-                        v1RelHashes.add(hash);
-                    } else {
-                        int group = rel.getGroup();
-                        ArrayList<String> hashes = new ArrayList<>();
-                        String hash = null;
-                        for (RelationshipVersionBI r : v1Rels) {
-                            if (r.getGroup() == group && r.getCharacteristicNid() == rel.getCharacteristicNid()) {
-                                hash = Ts.get().getUuidPrimordialForNid(r.getSourceNid()).toString()
-                                        + Ts.get().getUuidPrimordialForNid(r.getTypeNid()).toString()
-                                        + Ts.get().getUuidPrimordialForNid(r.getTargetNid()).toString()
-                                        + Ts.get().getUuidPrimordialForNid(r.getCharacteristicNid()).toString();
-                                hashes.add(hash);
-                            }
-                        }
-                        Collections.sort(hashes);
-                        String groupHash = null;
-                        for (String s : hashes) {
-                            groupHash = groupHash + s;
-                        }
-                        v1RelHashes.add(Type5UuidFactory.get(groupHash));
-                    }
-                }
-
-                if (v1RelHashes.contains(v2Hash)) {
-                    return false;
-                } else {
-                    return true;
-                }
-            }
-            return false;
+            return (a1 == null && a2 != null);
         } catch (Exception e) {
             e.printStackTrace();
             throw new IOException(e.getMessage());
@@ -825,91 +734,11 @@ public class RelationshipStatement extends RefsetSpecStatement {
         try {
             RelationshipVersionBI a1 = relBeingTested.getVersion(v1_is);
             RelationshipVersionBI a2 = relBeingTested.getVersion(v2_is);
-            if (a1 != null
+            return (a1 != null
                     && a2 != null
                     && !(a1.getPathNid() == a2.getPathNid()
                     && a1.getTime() == a2.getTime())
-                    && a1.getStatusNid() != a2.getStatusNid()) {
-                UUID v1Hash = null;
-                if (a1.getGroup() == 0) {
-                    v1Hash = Type5UuidFactory.get(Ts.get().getUuidPrimordialForNid(a1.getSourceNid()).toString()
-                            + Ts.get().getUuidPrimordialForNid(a1.getTypeNid()).toString()
-                            + Ts.get().getUuidPrimordialForNid(a1.getTargetNid()).toString()
-                            + Ts.get().getUuidPrimordialForNid(a1.getCharacteristicNid()).toString()
-                            + Ts.get().getUuidPrimordialForNid(a1.getStatusNid()).toString());
-                } else {
-                    String groupHash = null;
-                    int group = a1.getGroup();
-                    ConceptVersionBI v1Concept = a1.getEnclosingConcept().getVersion(v1_is);
-                    Collection<? extends RelationshipVersionBI> v1Rels = v1Concept.getRelationshipsOutgoingActive();
-                    ArrayList<String> hashes = new ArrayList<>();
-                    String hash = null;
-                    for (RelationshipVersionBI rel : v1Rels) {
-                        if (rel.getGroup() == group && a1.getCharacteristicNid() == rel.getCharacteristicNid()) {
-                            hash = Ts.get().getUuidPrimordialForNid(rel.getSourceNid()).toString()
-                                    + Ts.get().getUuidPrimordialForNid(rel.getTypeNid()).toString()
-                                    + Ts.get().getUuidPrimordialForNid(rel.getTargetNid()).toString()
-                                    + Ts.get().getUuidPrimordialForNid(rel.getCharacteristicNid()).toString()
-                                    + Ts.get().getUuidPrimordialForNid(rel.getStatusNid()).toString();
-                            hashes.add(hash);
-                        }
-                    }
-                    Collections.sort(hashes);
-                    for (String s : hashes) {
-                        groupHash = groupHash + s;
-                    }
-                    v1Hash = Type5UuidFactory.get(groupHash);
-                }
-
-                HashSet<UUID> v2RelHashes = new HashSet<>();
-                ConceptVersionBI v2Concept = a2.getEnclosingConcept().getVersion(v2_is);
-                Collection<? extends RelationshipVersionBI> v2Rels = v2Concept.getRelationshipsOutgoingActive();
-                for (RelationshipVersionBI rel : v2Rels) {
-                    if (rel.getGroup() == 0) {
-                        UUID hash = Type5UuidFactory.get(Ts.get().getUuidPrimordialForNid(rel.getSourceNid()).toString()
-                                + Ts.get().getUuidPrimordialForNid(rel.getTypeNid()).toString()
-                                + Ts.get().getUuidPrimordialForNid(rel.getTargetNid()).toString()
-                                + Ts.get().getUuidPrimordialForNid(rel.getCharacteristicNid()).toString()
-                                + Ts.get().getUuidPrimordialForNid(rel.getStatusNid()).toString());
-                        v2RelHashes.add(hash);
-                    } else {
-                        int group = rel.getGroup();
-                        ArrayList<String> hashes = new ArrayList<>();
-                        String hash = null;
-                        for (RelationshipVersionBI r : v2Rels) {
-                            if (r.getGroup() == group && r.getCharacteristicNid() == rel.getCharacteristicNid()
-                                    && r.getStatusNid() == rel.getStatusNid()) {
-                                hash = Ts.get().getUuidPrimordialForNid(r.getSourceNid()).toString()
-                                        + Ts.get().getUuidPrimordialForNid(r.getTypeNid()).toString()
-                                        + Ts.get().getUuidPrimordialForNid(r.getTargetNid()).toString()
-                                        + Ts.get().getUuidPrimordialForNid(r.getCharacteristicNid()).toString()
-                                        + Ts.get().getUuidPrimordialForNid(r.getStatusNid()).toString();
-                                boolean add = true;
-                                for(String h : hashes){
-                                    if(h.equals(hash)){
-                                        add = false;
-                                    }
-                                }
-                                if(add){
-                                    hashes.add(hash);
-                                }
-                            }
-                        }
-                        Collections.sort(hashes);
-                        String groupHash = null;
-                        for (String s : hashes) {
-                            groupHash = groupHash + s;
-                        }
-                        v2RelHashes.add(Type5UuidFactory.get(groupHash));
-                    }
-                }
-                if (v2RelHashes.contains(v1Hash)) {
-                    return false;
-                } else {
-                    return true;
-                }
-            }
-            return false;
+                    && a1.getStatusNid() != a2.getStatusNid());
         } catch (Exception e) {
             throw new IOException(e.getMessage());
         }

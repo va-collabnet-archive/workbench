@@ -140,6 +140,15 @@ public interface TerminologyDI {
      * @throws IOException signals that an I/O exception has occurred
      */
     void commit(ConceptChronicleBI conceptChronicle, ChangeSetPolicy changeSetPolicy) throws IOException;
+    /**
+     * Commits all uncommitted changes with changesets written according to the
+     * <code>changeSetPolicy</code>.
+     *
+     * @param changeSetPolicy the change set policy to use for writing changeset
+     * generated on commit
+     * @throws IOException signals that an I/O exception has occurred
+     */
+    void commit(ChangeSetPolicy changeSetPolicy) throws IOException;
 
     /**
      * Cancels any uncommitted changes on the specified

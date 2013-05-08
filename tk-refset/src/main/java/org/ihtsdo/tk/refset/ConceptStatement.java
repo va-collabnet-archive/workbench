@@ -15,7 +15,6 @@ package org.ihtsdo.tk.refset;
 
 import java.io.IOException;
 import java.util.Collection;
-import java.util.UUID;
 import org.dwfa.tapi.ComputationCanceled;
 import org.ihtsdo.helper.time.TimeHelper;
 import org.ihtsdo.tk.Ts;
@@ -28,33 +27,16 @@ import org.ihtsdo.tk.api.conceptattribute.ConceptAttributeVersionBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.refset.RefsetSpecQuery.GROUPING_TYPE;
-import org.ihtsdo.tk.refset.other.ActivityBI;
 
 /**
  * Represents partial information contained in a refset spec. An example of a statement is : "NOT: Concept is
  * : Paracetamol"
  *
- * @author Chrissy Hill, Keith Campbell
- *
  */
 public class ConceptStatement extends RefsetSpecStatement {
 
     ConceptChronicleBI queryConstraintConcept;
-    private Collection<ActivityBI> activities;
-//TODO: need activity panel
-//    private StopActionListener stopListener = new StopActionListener();
     private TerminologyStoreDI ts;
-
-//TODO: need activity panel
-//    private class StopActionListener implements ActionListener {
-//
-//        @Override
-//        public void actionPerformed(ActionEvent e) {
-//            for (ActivityBI a : activities) {
-//                a.cancel();
-//            }
-//        }
-//    }
 
     /**
      * Constructor for refset spec statement.
@@ -62,6 +44,7 @@ public class ConceptStatement extends RefsetSpecStatement {
      * @param useNotQualifier Whether to use the NOT qualifier.
      * @param queryToken The query type to use (e.g. "concept is")
      * @param queryConstraint The destination concept (e.g. "paracetamol")
+     * @param viewCoordinate  The <code>ViewCoordinate</code> specifying active/inactive versions
      * @throws Exception
      */
     public ConceptStatement(boolean useNotQualifier, ConceptChronicleBI queryToken, ConceptChronicleBI queryConstraint,
@@ -81,27 +64,22 @@ public class ConceptStatement extends RefsetSpecStatement {
     }
 
     @Override
-    public NidBitSetBI getPossibleDescriptions(NidBitSetBI parentPossibleConcepts,
-            Collection<ActivityBI> activities) throws IOException {
+    public NidBitSetBI getPossibleDescriptions(NidBitSetBI parentPossibleConcepts) throws IOException {
         throw new IOException("Get possible descriptions in concept statement unsupported operation.");
     }
 
     @Override
-    public NidBitSetBI getPossibleRelationships(NidBitSetBI parentPossibleConcepts,
-            Collection<ActivityBI> activities) throws IOException {
+    public NidBitSetBI getPossibleRelationships(NidBitSetBI parentPossibleConcepts) throws IOException {
         throw new IOException("Get possible relationships in concept statement unsupported operation.");
     }
 
     @Override
-    public NidBitSetBI getPossibleConcepts(NidBitSetBI parentPossibleConcepts,
-            Collection<ActivityBI> activities) throws IOException, ComputationCanceled, ContradictionException {
-        ActivityBI activity = null;
+    public NidBitSetBI getPossibleConcepts(NidBitSetBI parentPossibleConcepts) throws IOException, ComputationCanceled, ContradictionException {
         long startTime = System.currentTimeMillis();
-        this.activities = activities;
 
         NidBitSetBI possibleConcepts = termFactory.getEmptyNidSet();
         if (parentPossibleConcepts == null) {
-            parentPossibleConcepts = termFactory.getEmptyNidSet();
+            parentPossibleConcepts = termFactory.getAllConceptNids();
         }
 
         switch (tokenEnum) {
@@ -114,41 +92,32 @@ public class ConceptStatement extends RefsetSpecStatement {
                 }
                 break;
             case CONCEPT_IS_CHILD_OF:
-//TODO: need activity panel first             
-//                activity = setupActivityPanel(parentPossibleConcepts);
-//                activities.add(activity);
 
                 if (isNegated()) {
                     possibleConcepts.or(parentPossibleConcepts);
                 } else {
-//TODO: need to implement
-//                    NidBitSetBI results = queryConstraintConcept.getPossibleChildOfConcepts(config);
-//                    possibleConcepts.or(results);
+                    NidBitSetBI results = Ts.get().getEmptyNidSet();
+                    for(int nid : Ts.get().getChildren(queryConstraintConcept.getNid(), viewCoordinate)){
+                        results.setMember(nid);
+                    }
+                    possibleConcepts.or(results);
                 }
                 break;
             case CONCEPT_IS_DESCENDENT_OF:
             case CONCEPT_IS_KIND_OF:
-//TODO: need activity panel first
-//                activity = setupActivityPanel(parentPossibleConcepts);
-//                activities.add(activity);
                 if (isNegated()) {
                     possibleConcepts.or(parentPossibleConcepts);
                 } else {
-//TODO: need to implement
-//                    NidBitSetBI results = (NidBitSetBI) queryConstraintConcept.getPossibleKindOfConcepts(config);
-//                    possibleConcepts.or(results);
+                    NidBitSetBI results = Ts.get().getKindOf(queryConstraintConcept.getNid(), viewCoordinate);
+                    possibleConcepts.or(results);
                 }
                 break;
             case CONCEPT_IS_MEMBER_OF:
-//TODO: need activity panel first
-//                activity = setupActivityPanel(parentPossibleConcepts);
-                activities.add(activity);
                                 Collection<? extends RefexChronicleBI<?>> refsetExtensions = 
                         termFactory.getConcept(((ConceptChronicleBI) queryConstraint).getNid()).getRefsetMembers();
                 NidBitSetBI refsetMemberSet = termFactory.getEmptyNidSet();
                 for (RefexChronicleBI ext : refsetExtensions) {
                     int componentId = ext.getReferencedComponentNid();
-//TODO: this needs to check the concept nid
                     if (componentId == termFactory.getConceptNidForNid(componentId)) {
                         refsetMemberSet.setMember(componentId);
                     }
@@ -178,25 +147,13 @@ public class ConceptStatement extends RefsetSpecStatement {
         }
         setPossibleConceptsCount(possibleConcepts.cardinality());
 
-        if (activity != null) {
             long endTime = System.currentTimeMillis();
             long elapsed = endTime - startTime;
             String elapsedStr = TimeHelper.getElapsedTimeString(elapsed);
-            activity.setProgressInfoLower("Elapsed: " + elapsedStr + ";  Incoming count: "
+            System.out.println("Elapsed: " + elapsedStr + ";  Incoming count: "
                     + parentPossibleConcepts.cardinality() + "; Outgoing count: " + possibleConcepts.cardinality());
-            activity.complete();
-        }
         return possibleConcepts;
     }
-//TODO: need activity panel first
-//    private I_ShowActivity setupActivityPanel(I_RepresentIdSet parentPossibleConcepts) {
-//        I_ShowActivity activity;
-//        activity = Terms.get().newActivityPanel(true, config, "<html>Possible: <br>" + this.toHtmlFragment(), true);
-//        activity.setIndeterminate(true);
-//        activity.setProgressInfoLower("Incoming count: " + parentPossibleConcepts.cardinality());
-//        activity.addStopActionListener(stopListener);
-//        return activity;
-//    }
 
     @Override
     public boolean getStatementResult(int componentNid, Object component, GROUPING_TYPE groupingVersion, ViewCoordinate v1_is,
@@ -303,11 +260,10 @@ public class ConceptStatement extends RefsetSpecStatement {
 
     /**
      * Tests if the concept being tested is an immediate child of the query constraint.
-     *
-     * @param conceptBeingTested
-     * @return
-     * @throws TerminologyException
-     * @throws IOException
+     * @param conceptNid the nid of the concept being tested
+     * @param viewCoordinate the <code>ViewCoordinate</code> specifying active/inactive versions
+     * @return <code>true</code> if the concept is a child of the query constraint, otherwise <code>false</code>
+     * @throws IOException indicates an I/O Exception has occurred
      */
     private boolean conceptIsChildOf(int conceptNid, ViewCoordinate viewCoordinate) throws IOException {
         try {
@@ -321,10 +277,10 @@ public class ConceptStatement extends RefsetSpecStatement {
     /**
      * Tests of the concept being tested is a member of the specified refset.
      *
-     * @param concept
-     * @return
-     * @throws IOException
-     * @throws TerminologyException
+     * @param concept the <code>ConceptVersionBI</code> representing the concept being tested
+     * @return true if the concept is a member of the specified refset, <code>false</code> otherwise
+     * @throws IOException indicates an I/O Exception as occurred
+     * @throws TerminologyException indicates a Terminolgoy Exception has occurred
      */
     private boolean conceptIsMemberOf(ConceptVersionBI conceptBeingTested) throws IOException {
         return componentIsMemberOf(conceptBeingTested);
@@ -333,8 +289,8 @@ public class ConceptStatement extends RefsetSpecStatement {
     /**
      * Tests of the current concept is the same as the query constraint.
      *
-     * @param concept
-     * @return
+     * @param concept the nid of the concept being tested
+     * @return <code>true</code> if the concept is the same, <code>false</code> otherwise
      */
     private boolean conceptIs(int conceptNid) {
         return conceptNid == queryConstraintConcept.getConceptNid();
@@ -344,7 +300,8 @@ public class ConceptStatement extends RefsetSpecStatement {
      * Tests if the current concept is a child of the query constraint. This does not return true if they are
      * the same concept. This will check depth >= 1 to find children.
      *
-     * @param concept
+     * @param concept the nid of the concept being tested
+     * @param concept the <code>ViewCoordinate</code> specifying which versions are active/inactive
      * @return
      * @throws IOException
      * @throws TerminologyException
@@ -374,7 +331,7 @@ public class ConceptStatement extends RefsetSpecStatement {
     /**
      * Tests if the current concept has a status the same as the query constraint.
      *
-     * @param concept
+     * @param concept the 
      * @return
      * @throws IOException
      * @throws TerminologyException
@@ -387,7 +344,6 @@ public class ConceptStatement extends RefsetSpecStatement {
         }
     }
     
-//TODO: not sure this is working right
     private boolean conceptStatusIsChildOf(ConceptVersionBI conceptBeingTested) throws IOException {
         try {
             Collection<? extends ConceptVersionBI> childStatuses
@@ -406,8 +362,7 @@ public class ConceptStatement extends RefsetSpecStatement {
     }
 
     private boolean conceptStatusIsDescendantOf(ConceptVersionBI conceptBeingTested) throws IOException, ContradictionException {
-        ConceptChronicleBI statusBeingChecked = termFactory.getConcept(conceptBeingTested.getStatusNid());
-//TODO: pass in view coordinate? also, why isn't required status being used?            
+        ConceptChronicleBI statusBeingChecked = termFactory.getConcept(conceptBeingTested.getStatusNid());           
             return termFactory.isChildOf(statusBeingChecked.getNid(),
                     ((ConceptChronicleBI) queryConstraint).getNid(), viewCoordinate);
     }

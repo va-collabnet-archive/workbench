@@ -16,9 +16,7 @@
  */
 package org.ihtsdo.tk.refset;
 
-import org.ihtsdo.tk.refset.other.ActivityBI;
 import java.io.IOException;
-import java.util.Collection;
 import java.util.Set;
 
 import org.dwfa.tapi.ComputationCanceled;
@@ -50,16 +48,12 @@ public abstract class RefsetSpecComponent {
     }
 
 	public abstract boolean execute(int componentNid, Object component,
-			GROUPING_TYPE version, ViewCoordinate v1Is, ViewCoordinate v2Is,
-			Collection<ActivityBI> activities) throws IOException,
+			GROUPING_TYPE version, ViewCoordinate v1Is, ViewCoordinate v2Is) throws IOException,
 			TerminologyException, ContradictionException;
 
-    public abstract NidBitSetBI getPossibleConcepts(NidBitSetBI parentPossibleConcepts,
-            Collection<ActivityBI> activities) throws IOException, ComputationCanceled, ContradictionException, TerminologyException;
+    public abstract NidBitSetBI getPossibleConcepts(NidBitSetBI parentPossibleConcepts) throws IOException, ComputationCanceled, ContradictionException, TerminologyException;
 
-    public abstract NidBitSetBI getPossibleDescriptions(NidBitSetBI parentPossibleConcepts,
-            Collection<ActivityBI> activities) throws IOException, ComputationCanceled;
+    public abstract NidBitSetBI getPossibleDescriptions(NidBitSetBI parentPossibleConcepts) throws IOException, ComputationCanceled;
 
-    public abstract NidBitSetBI getPossibleRelationships(NidBitSetBI parentPossibleConcepts,
-            Collection<ActivityBI> activities) throws IOException, ComputationCanceled;
+    public abstract NidBitSetBI getPossibleRelationships(NidBitSetBI parentPossibleConcepts) throws IOException, ComputationCanceled;
 }

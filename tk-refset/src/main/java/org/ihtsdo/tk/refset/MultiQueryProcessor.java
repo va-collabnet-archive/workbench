@@ -16,7 +16,6 @@
 package org.ihtsdo.tk.refset;
 
 import java.io.IOException;
-import org.ihtsdo.helper.query.Query;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ConceptFetcherBI;
 import org.ihtsdo.tk.api.NidBitSetBI;
