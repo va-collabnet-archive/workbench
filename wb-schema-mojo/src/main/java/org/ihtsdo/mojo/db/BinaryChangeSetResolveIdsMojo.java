@@ -96,9 +96,11 @@ public class BinaryChangeSetResolveIdsMojo extends AbstractMojo {
             String cachePath = buildDir + FILE_SEPARATOR + idCacheDir + FILE_SEPARATOR;
             String idCacheFName = cachePath + "uuidRemapRelLogicalCache.ser";
             // handle RF1 stated rels imported without any rel sctid
-            UuidUuidRemapper idLookup = new UuidUuidRemapper(idCacheFName);
-
-            rcsi.setRelUuidRemap(idLookup);
+            File file = new File(idCacheFName);
+            if (file.exists()) {
+                UuidUuidRemapper idLookup = new UuidUuidRemapper(idCacheFName);
+                rcsi.setRelUuidRemap(idLookup);
+            }
 
             rcsi.processFiles();
         } catch (IOException | TerminologyException ex) {
