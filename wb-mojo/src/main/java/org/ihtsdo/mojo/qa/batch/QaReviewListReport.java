@@ -84,10 +84,9 @@ public class QaReviewListReport extends AbstractMavenReport {
 				createFileReport(file);
 				sink.tableRow();
 				sink.tableCell();
-				sink.link(file.getPath().replaceAll(".txt", ".html"));
-				sink.text(file.getName());
-				sink.link_();
+				sink.link(file.getName().replaceAll(".txt", ".html"));
 				sink.text(file.getName().replaceAll(".txt", ""));
+				sink.link_();
 				sink.tableCell_();
 				sink.tableRow_();
 			}
@@ -181,6 +180,7 @@ public class QaReviewListReport extends AbstractMavenReport {
 					aSink.text(rulesHeaderSplited[i]);
 					aSink.tableHeaderCell_();
 				}
+				aSink.tableRow_();
 				while (sourceBr.ready()) {
 					String ruleLine = sourceBr.readLine();
 					String[] ruleLineSplit = ruleLine.split("\\t", -1);
