@@ -81,11 +81,22 @@ public class QaReviewListReport extends AbstractMavenReport {
 			sink.tableRow_();
 
 			for (File file : files) {
+
+				FileInputStream sourceFis = new FileInputStream(file);
+				InputStreamReader sourceIsr = new InputStreamReader(sourceFis, "UTF-8");
+				BufferedReader sourceBr = new BufferedReader(sourceIsr);
+				int count = 0;
+				while (sourceBr.ready()) {
+					sourceBr.readLine();
+					count++;
+				}
+				sourceBr.close();
+
 				createFileReport(file);
 				sink.tableRow();
 				sink.tableCell();
 				sink.link(file.getName().replaceAll(".txt", ".html"));
-				sink.text(file.getName().replaceAll(".txt", ""));
+				sink.text(file.getName().replaceAll(".txt", "") + " ( " + count + " )");
 				sink.link_();
 				sink.tableCell_();
 				sink.tableRow_();
@@ -177,8 +188,16 @@ public class QaReviewListReport extends AbstractMavenReport {
 				for (int i = 0; i < rulesHeaderSplited.length; i++) {
 					headerAttrs.addAttribute(SinkEventAttributes.CLASS, "sortable-text fd-column-" + (i - 1));
 					aSink.tableHeaderCell(headerAttrs);
-					aSink.text(rulesHeaderSplited[i]);
+					aSink.text("");
 					aSink.tableHeaderCell_();
+				}
+				aSink.tableRow_();
+
+				aSink.tableRow();
+				for (String string : rulesHeaderSplited) {
+					aSink.tableCell();
+					aSink.text(string);
+					aSink.tableCell_();
 				}
 				aSink.tableRow_();
 				while (sourceBr.ready()) {
@@ -191,6 +210,7 @@ public class QaReviewListReport extends AbstractMavenReport {
 						aSink.text(string);
 						aSink.tableCell_();
 					}
+					aSink.tableRow_();
 				}
 			} else {
 				aSink.tableRow();
