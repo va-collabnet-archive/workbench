@@ -621,7 +621,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
             boolean write = true;
             if (sameCycleStampNids.contains(conceptAttributeChronicle.getPrimordialVersion().getStampNid())) {
                 ConceptAttributeVersionBI version = conceptAttributeChronicle.getVersion(viewCoordinateAllStatus);
-                if(!version.isActive(viewCoordinate)){
+                if(version !=null || !version.isActive(viewCoordinate)){
                     write = false;
                 }
             }
@@ -688,7 +688,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
             
             if (sameCycleStampNids.contains(descriptionChronicle.getPrimordialVersion().getStampNid())) {
                 DescriptionVersionBI version = descriptionChronicle.getVersion(viewCoordinateAllStatus);
-                if(!version.isActive(viewCoordinate)){
+                if(version == null || !version.isActive(viewCoordinate)){
                     write = false;
                 }
             }
@@ -771,7 +771,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
             boolean write = true;
             if (sameCycleStampNids.contains(relationshipChronicle.getPrimordialVersion().getStampNid())) {
                 RelationshipVersionBI version = relationshipChronicle.getVersion(viewCoordinateAllStatus);
-                if (!version.isActive(viewCoordinate)) {
+                if (version == null || !version.isActive(viewCoordinate)) {
                     write = false;
                 }
             }
@@ -960,7 +960,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
             boolean write = true;
             if (sameCycleStampNids.contains(refexChronicle.getPrimordialVersion().getStampNid())) {
                 RefexVersionBI version = (RefexVersionBI) refexChronicle.getVersion(viewCoordinateAllStatus);
-                if(!version.isActive(viewCoordinate)){
+                if(version == null || !version.isActive(viewCoordinate)){
                     write = false;
                 }
             }
