@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Locale;
 import java.util.ResourceBundle;
+import java.util.Set;
 
 import org.apache.maven.doxia.markup.HtmlMarkup;
 import org.apache.maven.doxia.sink.Sink;
@@ -50,7 +51,6 @@ public class QaReviewListReport extends AbstractMavenReport {
 	 */
 	private Renderer siteRenderer;
 
-
 	/**
 	 * Execution details csv/txt file.
 	 * 
@@ -84,7 +84,10 @@ public class QaReviewListReport extends AbstractMavenReport {
 				createFileReport(file);
 				sink.tableRow();
 				sink.tableCell();
+				sink.link(file.getPath().replaceAll(".txt", ".html"));
 				sink.text(file.getName());
+				sink.link_();
+				sink.text(file.getName().replaceAll(".txt", ""));
 				sink.tableCell_();
 				sink.tableRow_();
 			}
@@ -102,7 +105,7 @@ public class QaReviewListReport extends AbstractMavenReport {
 	private void createFileReport(File sourceFile) throws IOException {
 		try {
 
-			Sink aSink = getSinkFactory().createSink(new File(outputDirectory), sourceFile.getName().replaceAll(".csv", ".html"));
+			Sink aSink = getSinkFactory().createSink(new File(outputDirectory), sourceFile.getName().replaceAll(".txt", ".html"));
 
 			aSink.head();
 			aSink.title();
@@ -168,9 +171,9 @@ public class QaReviewListReport extends AbstractMavenReport {
 			String firstLine = sourceBr.readLine();
 			aSink.table(tableAttr);
 			if (firstLine != null) {
-				firstLine.split("\\t",-1);
+				firstLine.split("\\t", -1);
 				aSink.tableRow();
-				String[] rulesHeaderSplited = firstLine.split("\\t",-1);
+				String[] rulesHeaderSplited = firstLine.split("\\t", -1);
 				SinkEventAttributes headerAttrs = new SinkEventAttributeSet();
 				for (int i = 0; i < rulesHeaderSplited.length; i++) {
 					headerAttrs.addAttribute(SinkEventAttributes.CLASS, "sortable-text fd-column-" + (i - 1));
@@ -180,7 +183,7 @@ public class QaReviewListReport extends AbstractMavenReport {
 				}
 				while (sourceBr.ready()) {
 					String ruleLine = sourceBr.readLine();
-					String[] ruleLineSplit = ruleLine.split("\\t",-1);
+					String[] ruleLineSplit = ruleLine.split("\\t", -1);
 
 					aSink.tableRow();
 					for (String string : ruleLineSplit) {
