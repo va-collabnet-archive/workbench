@@ -375,7 +375,7 @@ public class StatusAtPositionBdb extends ComponentBdb {
 
     public int getSapNid(int statusNid, long time, int authorNid, int moduleNid, int pathNid) {
         if (time == Long.MAX_VALUE) {
-            UncommittedStatusForPath usp = new UncommittedStatusForPath(statusNid, authorNid, pathNid, moduleNid);
+            UncommittedStatusForPath usp = new UncommittedStatusForPath(statusNid, authorNid, moduleNid, pathNid);
 
             if (uncomittedStatusPathEntries.containsKey(usp)) {
                 return uncomittedStatusPathEntries.get(usp);

@@ -953,7 +953,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         return changed;
     }
 
-    public final void resetUncommitted(int statusNid, int authorNid, int pathNid, int moduleNid) {
+    public final void resetUncommitted(int statusNid, int authorNid, int moduleNid, int pathNid) {
         if (getTime() != Long.MIN_VALUE) {
             throw new UnsupportedOperationException("Cannot resetUncommitted if time != Long.MIN_VALUE");
         }

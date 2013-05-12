@@ -13,7 +13,7 @@ public class UncommittedStatusForPath {
 
    //~--- constructors --------------------------------------------------------
 
-   public UncommittedStatusForPath(int statusNid, int authorNid, int pathNid, int moduleNid) {
+   public UncommittedStatusForPath(int statusNid, int authorNid, int moduleNid, int pathNid) {
       super();
       this.statusNid = statusNid;
       this.authorNid = authorNid;
