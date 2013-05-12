@@ -5889,8 +5889,8 @@ public class TerminologyProjectDAO {
 	public static void promoteContent(int conceptNid, ViewCoordinate sourceViewCoordinate, int targetPathNid) throws Exception {
 		EditCoordinate editCoord = Terms.get().getActiveAceFrameConfig().getEditCoordinate();
 		
-		PathBI editPath = Terms.get().getPath(editCoord.getEditPaths()[0]);
-		PositionBI originPosition = Terms.get().newPosition(editPath, Long.MAX_VALUE);
+		PositionBI[] positionSet = sourceViewCoordinate.getPositionSet().getPositionArray();
+		PositionBI originPosition = positionSet[0].getAllOrigins().iterator().next();
 
 		TerminologyPromoterBI promoter = Ts.get().getTerminologyPromoter(sourceViewCoordinate, editCoord, targetPathNid, originPosition);
 
