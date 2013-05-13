@@ -92,6 +92,8 @@ public class WorklistMemberStatusPanel extends JPanel {
 	 */
 	public WorklistMemberStatusPanel() {
 		initComponents();
+		button2.setVisible(false);
+		button2.setEnabled(false);
 	}
 
 	/**
@@ -104,6 +106,11 @@ public class WorklistMemberStatusPanel extends JPanel {
 	 */
 	public WorklistMemberStatusPanel(WorkList workList, I_ConfigAceFrame config) {
 		initComponents();
+		
+		// Hiding promote button
+		button2.setVisible(false);
+		button2.setEnabled(false);
+		
 		this.workList = workList;
 		this.config = config;
 		label19.setText("Partition: " + workList.getPartition().getName());
