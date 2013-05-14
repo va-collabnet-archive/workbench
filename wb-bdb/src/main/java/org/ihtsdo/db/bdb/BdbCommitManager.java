@@ -405,12 +405,12 @@ public class BdbCommitManager {
         boolean passedRelease = false;
         boolean performCommit = true;
         WriteLock datacheckWriteLock = dataCheckLock.writeLock();
+        I_RepresentIdSet allUncommitted = new IdentifierSet();
         try {
             
             synchronized (uncommittedCNids) {
                 synchronized (uncommittedCNidsNoChecks) {
                     synchronized (uncommittedWfMemberIds) {
-                        I_RepresentIdSet allUncommitted = new IdentifierSet();
                         allUncommitted.or(uncommittedCNids);
                         allUncommitted.or(uncommittedCNidsNoChecks);
                         for (I_ExtendByRef ref : uncommittedWfMemberIds) {
@@ -606,6 +606,7 @@ public class BdbCommitManager {
         fireCommit();
 
         if (performCommit) {
+            GlobalPropertyChange.firePropertyChange(TerminologyStoreDI.CONCEPT_EVENT.POST_SUCESSFUL_COMMIT, null, allUncommitted);
             return true;
         }else{
             updateAlerts();
@@ -808,6 +809,7 @@ public class BdbCommitManager {
         fireCommit();
 
         if (performCommit) {
+            GlobalPropertyChange.firePropertyChange(TerminologyStoreDI.CONCEPT_EVENT.POST_SUCESSFUL_COMMIT, null, allUncommitted);
             return true;
         }else{
             updateAlerts();
