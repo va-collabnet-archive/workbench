@@ -3466,6 +3466,7 @@ public class TerminologyProjectDAO {
 		termFactory.newDescription(UUID.randomUUID(), newPromotionConcept, "en", name + " - promotion refset", termFactory.getConcept(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids()), config);
 		termFactory.newRelationship(UUID.randomUUID(), newPromotionConcept, termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()), workListsRoot, defining, refinability, current, 0, config);
 		termFactory.newRelationship(UUID.randomUUID(), newConcept, promotionRelConcept, newPromotionConcept, defining, refinability, current, 0, config);
+                newPromotionConcept.setAnnotationStyleRefex(true);
 
 		workList = new WorkList(workListWithMetadata.getName(), newConcept.getConceptNid(), newConcept.getUids(), workListWithMetadata.getPartitionUUID());
 		workList.setWorkflowDefinition(workListWithMetadata.getWorkflowDefinition());
