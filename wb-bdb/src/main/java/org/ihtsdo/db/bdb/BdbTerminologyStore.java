@@ -842,4 +842,9 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
         }
         return false;
     }
+    
+    @Override
+    public void waitTillDatachecksFinished(){
+        BdbCommitManager.waitTillDatachecksFinished();
+    }
 }

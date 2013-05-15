@@ -28,6 +28,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyVetoException;
 import java.io.*;
+import java.lang.ref.WeakReference;
 import java.lang.reflect.InvocationTargetException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivilegedActionException;
@@ -35,6 +36,7 @@ import java.util.List;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import javax.security.auth.login.LoginException;
 import javax.swing.Timer;
@@ -146,6 +148,9 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
    private static List<I_TestDataConstraints> commitTests   = new ArrayList<I_TestDataConstraints>();
    public static AceConfig                    aceConfig;
    private static JButton                     synchronizeButton;
+   
+    private static AtomicBoolean active = new AtomicBoolean(true);
+    private static ArrayList<WeakReference<ListenForDataChecks>> dataChecks = new ArrayList<>();
 
    //~--- static initializers -------------------------------------------------
 
@@ -3077,8 +3082,28 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
       }
    }
 
+public static void resumeDatacheckDisplay() {
+        active.set(true);
+        for(WeakReference wr : dataChecks){
+            ListenForDataChecks listener = (ListenForDataChecks) wr.get();
+            listener.layoutAlerts();
+        }
+    }
 
-   public class ListenForDataChecks implements ListDataListener, ActionListener {
+    public static void suspendDatacheckDisplay() {
+        active.set(false);
+    }
+    
+    public static boolean datachecksRunning(){
+        return active.get();
+    }
+    
+    public class ListenForDataChecks implements ListDataListener, ActionListener {
+
+        public ListenForDataChecks() {
+            dataChecks.add(new WeakReference(this));
+        }
+        
       @Override
       public void actionPerformed(ActionEvent evt) {
          JComboBox comboBox = (JComboBox) evt.getSource();

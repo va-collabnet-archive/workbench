@@ -295,7 +295,6 @@ public class DrComponentHelper {
 				RelationshipsDAO rDao=new RelationshipsDAO();
 				concept.getOutgoingRelationships().addAll(rDao.getConstraintNormalForm(oldStyleConcept, factContextName));
 				rDao=null;
-				System.gc();
 			}
 
 			DrDefiningRolesSet statedRolesSet = new DrDefiningRolesSet();

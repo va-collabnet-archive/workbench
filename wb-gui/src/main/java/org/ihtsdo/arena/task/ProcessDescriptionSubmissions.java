@@ -26,6 +26,7 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.lucene.queryParser.ParseException;
+import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
@@ -320,9 +321,20 @@ public class ProcessDescriptionSubmissions extends AbstractTask {
                 }
             }
             process.setProperty(uuidListListPropName, uuidList);
+            ACE.suspendDatacheckDisplay();
+            System.out.println("###### Adding as uncommitted : " + conceptsToCommit.size() + " concepts");
+            int counter = 0;
             for(ConceptChronicleBI concept : conceptsToCommit){
                 Ts.get().addUncommitted(concept);
+                counter++;
+                if(counter%100 == 0){
+                    System.out.println(counter);
+                }
             }
+            System.out.println("######### TO HERE 1 ########");
+            Ts.get().waitTillDatachecksFinished();
+             System.out.println("######### TO HERE 2 ########");
+            ACE.resumeDatacheckDisplay();
             if (!duplicateDescriptions.isEmpty()) {
                 worker.getLogger().info("NOT ADDING. Found " + duplicateDescriptions.size() + " existing descriptions matching. ");
                 int count1 = 1;

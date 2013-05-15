@@ -964,4 +964,8 @@ public interface TerminologyStoreDI extends TerminologyDI {
      * @throws Exception indicates an exception has occurred
      */
     boolean regenerateWfHxLuceneIndex(ViewCoordinate viewCoordinate) throws Exception;
+        /**
+     * Can call to wait until all datachecks are finished running.
+     */
+    public void waitTillDatachecksFinished();
 }

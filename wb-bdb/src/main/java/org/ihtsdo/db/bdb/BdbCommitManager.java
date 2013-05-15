@@ -87,6 +87,7 @@ import org.ihtsdo.tk.api.TerminologyStoreDI;
 public class BdbCommitManager {
 
     private static final int PERMIT_COUNT = 50;
+    private static final int DATACHECK_PERMIT_COUNT = 300;
     public static String pluginRoot = "plugins";
     private static final AtomicInteger writerCount = new AtomicInteger(0);
     private static boolean writeChangeSets = true;
@@ -101,7 +102,8 @@ public class BdbCommitManager {
     private static long lastCommit = Bdb.gVersion.incrementAndGet();
     private static long lastCancel = Integer.MIN_VALUE;
     private static Semaphore dbWriterPermit = new Semaphore(PERMIT_COUNT);
-    private static Semaphore dbCheckerPermit = new Semaphore(PERMIT_COUNT);
+    private static Semaphore dbCheckerPermit = new Semaphore(DATACHECK_PERMIT_COUNT);
+    private static Semaphore dbCheckerPermit2 = new Semaphore(DATACHECK_PERMIT_COUNT);
     private static ReentrantReadWriteLock dataCheckLock = new ReentrantReadWriteLock();
     private static List<I_TestDataConstraints> creationTests =
             new ArrayList<I_TestDataConstraints>();
@@ -174,13 +176,14 @@ public class BdbCommitManager {
             dbWriterService.execute(new SetNidsForCid(concept));
             dbWriterService.execute(new ConceptWriter(concept));
             dbCheckerPermit.acquire();
+            dbCheckerPermit2.acquire();
             dbCheckerService.execute(new DataChecker(concept));
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }finally{
-            dbCheckerPermit.acquireUninterruptibly(PERMIT_COUNT);
+            dbCheckerPermit.acquireUninterruptibly(DATACHECK_PERMIT_COUNT);
             readLock.unlock();
-            dbCheckerPermit.release(PERMIT_COUNT);
+            dbCheckerPermit.release(DATACHECK_PERMIT_COUNT);
         }
     }
     
@@ -197,8 +200,13 @@ public class BdbCommitManager {
            if (performCreationTests) {
                 waitTillWritesFinished();
                 Set<AlertToDataConstraintFailure> warningsAndErrors = new HashSet<AlertToDataConstraintFailure>();
-
-                dataCheckMap.put(concept, warningsAndErrors);
+                if(!warningsAndErrors.isEmpty()){
+                    dataCheckMap.put(concept, warningsAndErrors);
+                }else{
+                    if(dataCheckMap.containsKey(concept)){
+                        dataCheckMap.remove(concept);
+                    }
+                }
                 DataCheckRunner checkRunner = DataCheckRunner.runDataChecks(concept, creationTests);
                 
                 try {
@@ -224,8 +232,9 @@ public class BdbCommitManager {
 
        @Override
        protected void done() {
-            UpdateFrames updateFrames = new UpdateFrames(concept);
-            updateFrames.run();
+           UpdateFrames updateFrames = new UpdateFrames(concept);
+           updateFrames.run();
+           dbCheckerPermit2.release();
        }
         
     }
@@ -396,12 +405,12 @@ public class BdbCommitManager {
         boolean passedRelease = false;
         boolean performCommit = true;
         WriteLock datacheckWriteLock = dataCheckLock.writeLock();
+        I_RepresentIdSet allUncommitted = new IdentifierSet();
         try {
             
             synchronized (uncommittedCNids) {
                 synchronized (uncommittedCNidsNoChecks) {
                     synchronized (uncommittedWfMemberIds) {
-                        I_RepresentIdSet allUncommitted = new IdentifierSet();
                         allUncommitted.or(uncommittedCNids);
                         allUncommitted.or(uncommittedCNidsNoChecks);
                         for (I_ExtendByRef ref : uncommittedWfMemberIds) {
@@ -426,7 +435,13 @@ public class BdbCommitManager {
                                 Set<AlertToDataConstraintFailure> warningsAndErrors =
                                         new HashSet<AlertToDataConstraintFailure>();
                                 Concept concept = Concept.get(uncommittedCNidItr.nid());
-                                    dataCheckMap.put(concept, warningsAndErrors);
+                                    if (!warningsAndErrors.isEmpty()) {
+                                        dataCheckMap.put(concept, warningsAndErrors);
+                                    } else {
+                                        if (dataCheckMap.containsKey(concept)) {
+                                            dataCheckMap.remove(concept);
+                                        }
+                                    }
                                     DataCheckRunner checkRunner = DataCheckRunner.runDataChecks(concept, commitTests);
                                     checkRunner.latch.await();
 
@@ -592,6 +607,8 @@ public class BdbCommitManager {
 
         if (performCommit) {
             return true;
+        }else{
+            updateAlerts();
         }
 
         return false;
@@ -632,8 +649,13 @@ public class BdbCommitManager {
             int errorCount = 0;
             int warningCount = 0;
             Set<AlertToDataConstraintFailure> warningsAndErrors = new HashSet<AlertToDataConstraintFailure>();
-
-            dataCheckMap.put(c, warningsAndErrors);
+            if(!warningsAndErrors.isEmpty()){
+                dataCheckMap.put(c, warningsAndErrors);
+            }else{
+                if(dataCheckMap.containsKey(c)){
+                    dataCheckMap.remove(c);
+                }
+            }
             datacheckWriteLock.lock();
             DataCheckRunner checkRunner = DataCheckRunner.runDataChecks(c, commitTests);
             CountDownLatch latch = checkRunner.latch;
@@ -787,6 +809,8 @@ public class BdbCommitManager {
 
         if (performCommit) {
             return true;
+        }else{
+            updateAlerts();
         }
 
         return false;
@@ -804,7 +828,7 @@ public class BdbCommitManager {
 
                         aceInstance.getDataCheckListScroller();
                         aceInstance.getUncommittedListModel().clear();
-
+                        
                         for (Collection<AlertToDataConstraintFailure> alerts : dataCheckMap.values()) {
                             aceInstance.getUncommittedListModel().addAll(alerts);
                         }
@@ -895,7 +919,7 @@ public class BdbCommitManager {
                             frameConfig.setCommitEnabled(false);
                         }
 
-                        updateAlerts();
+//                        updateAlerts();
                     }
                 } catch (TerminologyException e) {
                     AceLog.getAppLog().alertAndLogException(e);
@@ -1308,8 +1332,8 @@ public class BdbCommitManager {
 
             @Override
             public void run() {
-                doUpdate();
-            }
+                    doUpdate();
+                }
         });
     }
 
@@ -1318,8 +1342,8 @@ public class BdbCommitManager {
 
             @Override
             public void run() {
-                doUpdate();
-            }
+                    doUpdate();
+                }
         });
     }
 
@@ -1331,6 +1355,13 @@ public class BdbCommitManager {
                 dbWriterPermit.release(PERMIT_COUNT);
             }
         }
+    }
+    
+    public static void waitTillDatachecksFinished() {
+        dbCheckerPermit.acquireUninterruptibly(DATACHECK_PERMIT_COUNT);
+        dbCheckerPermit2.acquireUninterruptibly(DATACHECK_PERMIT_COUNT);
+        dbCheckerPermit.release(DATACHECK_PERMIT_COUNT);
+        dbCheckerPermit2.release(DATACHECK_PERMIT_COUNT);
     }
 
     public static void writeImmediate(Concept concept) {
@@ -1548,6 +1579,7 @@ public class BdbCommitManager {
 
         @Override
         protected Collection<AlertToDataConstraintFailure> doInBackground() throws Exception {
+            try {
             List<AlertToDataConstraintFailure> runnerAlerts = new ArrayList<AlertToDataConstraintFailure>();
 
             if (canceled) {
@@ -1612,22 +1644,20 @@ public class BdbCommitManager {
             }
 
             return runnerAlerts;
-        }
+            
+            } finally {
+                long remaining = latch.getCount();
 
-        @Override
-        protected void done() {
-            super.done();
-
-            long remaining = latch.getCount();
-
-            for (long i = 0; i < remaining; i++) {
+                for (long i = 0; i < remaining; i++) {
 
 //          System.out.println(">>>>>>>>>>>>> Latch cancel: " + latch.getCount());
-                latch.countDown();
-            }
+                    latch.countDown();
+                }
 
-            if (!canceled) {
-                runners.remove(c);
+                if (!canceled) {
+                    runners.remove(c);
+                }
+                dbCheckerPermit2.release();
             }
         }
 
@@ -1641,18 +1671,28 @@ public class BdbCommitManager {
                 }
 
                 currentAlerts.addAll(results);
-                dataCheckMap.put(c, currentAlerts);
+                if(!currentAlerts.isEmpty()){
+                    dataCheckMap.put(c, currentAlerts);
+                }else{
+                    if(dataCheckMap.containsKey(c)){
+                        dataCheckMap.remove(c);
+                    }
+                }
             }
 
             if (canceled) {
                 return;
             }
-
             doUpdate();
         }
 
         public static DataCheckRunner runDataChecks(Concept c, List<I_TestDataConstraints> tests) {
             DataCheckRunner runner = new DataCheckRunner(c, tests);
+            try {
+                dbCheckerPermit2.acquire();
+            } catch (InterruptedException ex) {
+                Logger.getLogger(BdbCommitManager.class.getName()).log(Level.SEVERE, null, ex);
+            }
             runner.execute();
             return runner;
         }
@@ -1749,8 +1789,9 @@ public class BdbCommitManager {
         @Override
         public void run() {
             if (getActiveFrame() != null) {
-                updateAlerts();
-
+                if(ACE.datachecksRunning()){
+                    updateAlerts();
+                }
                 I_ConfigAceFrame activeFrame = getActiveFrame();
 
                 for (Frame f : OpenFrames.getFrames()) {
