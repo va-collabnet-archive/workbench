@@ -1,12 +1,10 @@
 package org.ihtsdo.workflow.refset.utilities;
 
 import java.io.IOException;
-import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Level;
 import org.dwfa.ace.api.I_GetConceptData;
 
-import org.dwfa.ace.api.I_HelpRefsets;
 import org.dwfa.ace.api.RefsetPropertyMap;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.RefsetPropertyMap.REFSET_PROPERTY;
@@ -16,7 +14,13 @@ import org.dwfa.tapi.I_ConceptualizeUniversally;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 import org.ihtsdo.tk.Ts;
-import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
+import org.ihtsdo.tk.api.ComponentVersionBI;
+import org.ihtsdo.tk.api.blueprint.RefexCAB;
+import org.ihtsdo.tk.api.coordinate.EditCoordinate;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.api.refex.RefexVersionBI;
+import org.ihtsdo.tk.api.refex.type_string.RefexStringVersionBI;
+import org.ihtsdo.tk.refset.SpecRefsetHelper;
 import org.ihtsdo.tk.spec.ConceptSpec;
 import org.ihtsdo.workflow.refset.WorkflowRefset;
 
@@ -26,7 +30,7 @@ import org.ihtsdo.workflow.refset.WorkflowRefset;
  */
 public abstract class WorkflowRefsetWriter extends WorkflowRefset {
 
-    protected I_HelpRefsets helper = null;
+//    protected I_HelpRefsets helper = null;
 
     public abstract String fieldsToRefsetString() throws IOException;
 
@@ -35,7 +39,7 @@ public abstract class WorkflowRefsetWriter extends WorkflowRefset {
         super(refsetConcept);
 
         if (Terms.get() != null) {
-            helper = Terms.get().getRefsetHelper(Terms.get().getActiveAceFrameConfig());
+//            helper = Terms.get().getRefsetHelper(Terms.get().getActiveAceFrameConfig());
         }
     }
 
@@ -46,8 +50,9 @@ public abstract class WorkflowRefsetWriter extends WorkflowRefset {
             if (fields.valuesExist()) {
                 RefsetPropertyMap propMap = new RefsetPropertyMap();
                 propMap.put(REFSET_PROPERTY.STRING_VALUE, fieldsToRefsetString());
-
-                ref = helper.makeWfMetadataMemberAndSetup(refsetNid, fields.getReferencedComponentNid(), REFSET_TYPES.STR, propMap, UUID.randomUUID());
+                SpecRefsetHelper helper = new SpecRefsetHelper(Terms.get().getActiveAceFrameConfig().getViewCoordinate(),
+                        Terms.get().getActiveAceFrameConfig().getEditCoordinate());
+                ref = (I_ExtendByRef) helper.newStringRefsetExtension(refsetNid, fields.getReferencedComponentNid(), fieldsToRefsetString());
                
                 if (ref != null) {
 	                I_GetConceptData refset = Terms.get().getConcept(refsetNid);
@@ -84,18 +89,31 @@ public abstract class WorkflowRefsetWriter extends WorkflowRefset {
         return ref;
     }
 
-    public I_ExtendByRef retireMember() {
-        I_ExtendByRef ref = null;
+    public I_ExtendByRef retireMember(){
+        RefexVersionBI ref = null;
+        
 
         try {
+            ViewCoordinate vc = Terms.get().getActiveAceFrameConfig().getViewCoordinate();
+            EditCoordinate ec = Terms.get().getActiveAceFrameConfig().getEditCoordinate();
             RefsetPropertyMap propMap = new RefsetPropertyMap();
 
             if (fields.valuesExist()) {
-                propMap.put(REFSET_PROPERTY.STRING_VALUE, fieldsToRefsetString());
-                ref = helper.getRefsetExtension(refsetNid, fields.getReferencedComponentNid(), propMap);
+                ComponentVersionBI component = (RefexStringVersionBI) Ts.get().getComponentVersion(
+                        vc,fields.getReferencedComponentNid());
+                for(RefexVersionBI r : component.getRefexMembersActive(vc, refsetNid)){
+                    RefexStringVersionBI refStr = (RefexStringVersionBI) r;
+                    if(refStr.getString1().equals(fieldsToRefsetString())){
+                        ref = r;
+                    }
+                }
+                
 
                 if (ref != null) {
-                    helper.retireRefsetStrExtension(refsetNid, fields.getReferencedComponentNid(), propMap);
+                    RefexCAB retireBp = ref.makeBlueprint(vc);
+                    retireBp.setRetired();
+                    retireBp.setComponentUuidNoRecompute(ref.getPrimUuid());
+                    Ts.get().getTerminologyBuilder(ec, vc).construct(retireBp);
                     I_GetConceptData refset = Terms.get().getConcept(refsetNid);
                     
                     if (refset.isAnnotationStyleRefex()) {
@@ -116,6 +134,6 @@ public abstract class WorkflowRefsetWriter extends WorkflowRefset {
         }
 
         fields.cleanValues();
-        return ref;
+        return (I_ExtendByRef) ref;
     }
 }

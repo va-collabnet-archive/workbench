@@ -23,7 +23,6 @@ package org.dwfa.ace.tree;
 
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidCid;
@@ -33,7 +32,6 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.refset.RefsetCommentPopupListener;
 import org.dwfa.ace.search.QueryBean;
 import org.dwfa.ace.search.SimilarConceptQuery;
-import org.dwfa.ace.task.refset.spec.RefsetSpec;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 
@@ -43,7 +41,6 @@ import org.ihtsdo.tk.api.ConceptContainerBI;
 
 //~--- JDK imports ------------------------------------------------------------
 
-import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -55,11 +52,6 @@ import java.io.IOException;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -68,6 +60,7 @@ import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
+import org.ihtsdo.tk.refset.RefsetSpec;
 
 public class TreeMouseListener extends MouseAdapter {
    private ACE ace;
@@ -228,7 +221,7 @@ public class TreeMouseListener extends MouseAdapter {
 
                      RefsetSpec refsetSpecHelper =
                         new RefsetSpec(ace.getAceFrameConfig().getRefsetSpecInSpecEditor(),
-                                       ace.getAceFrameConfig());
+                                       ace.getAceFrameConfig().getViewCoordinate());
                      boolean excludeDesc     = true;
                      boolean excludeConcept  = true;
                      boolean excludeRel      = true;

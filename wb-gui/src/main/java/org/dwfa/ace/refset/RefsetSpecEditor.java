@@ -28,12 +28,9 @@ import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_PluginToConceptPanel;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
-import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
-import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.ace.gui.concept.ConceptPanel;
 import org.dwfa.ace.log.AceLog;
-import org.dwfa.ace.refset.spec.I_HelpSpecRefset;
 import org.dwfa.ace.table.JTableWithDragImage;
 import org.dwfa.ace.table.refset.ReflexiveRefsetCommentTableModel;
 import org.dwfa.ace.table.refset.ReflexiveRefsetFieldData;
@@ -43,7 +40,6 @@ import org.dwfa.ace.table.refset.ReflexiveRefsetMemberTableModel;
 import org.dwfa.ace.table.refset.ReflexiveRefsetUtil;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.ace.task.WorkerAttachmentKeys;
-import org.dwfa.ace.tree.TermTreeHelper;
 import org.dwfa.bpa.BusinessProcess;
 import org.dwfa.bpa.ExecutionRecord;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
@@ -89,7 +85,6 @@ import java.lang.reflect.InvocationTargetException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Date;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -97,7 +92,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.UUID;
@@ -122,6 +116,7 @@ import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
+import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.refset.RefsetSpec;
@@ -594,13 +589,8 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
         I_GetConceptData refsetConcept = (I_GetConceptData) getLabel().getTermComponent();
 
         if (refsetConcept != null) {
-            Set<? extends I_GetConceptData> specs = Terms.get().getRefsetHelper(
-                    ace.getAceFrameConfig()).getSpecificationRefsetForRefset(
-                    refsetConcept, ace.getAceFrameConfig());
-
-            if (specs.size() > 0) {
-                refsetSpecConcept = specs.iterator().next();
-            }
+            RefsetSpec helper = new RefsetSpec(refsetConcept, true, ace.getAceFrameConfig().getViewCoordinate());
+            refsetSpecConcept = (I_GetConceptData) helper.getRefsetSpecConcept();
         }
 
         return refsetSpecConcept;
@@ -1085,8 +1075,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
     public static void newDescription(I_GetConceptData concept, I_GetConceptData descriptionType,
             String description, I_ConfigAceFrame aceConfig, I_GetConceptData status)
             throws TerminologyException, Exception {
-        I_HelpSpecRefset helper = Terms.get().getSpecRefsetHelper(Terms.get().getActiveAceFrameConfig());
-        I_IntSet actives = helper.getCurrentStatusIntSet();
+        NidSetBI actives = Terms.get().getActiveAceFrameConfig().getViewCoordinate().getAllowedStatusNids();
 
         if (descriptionType.getNid()
                 == ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.localize().getNid()) {

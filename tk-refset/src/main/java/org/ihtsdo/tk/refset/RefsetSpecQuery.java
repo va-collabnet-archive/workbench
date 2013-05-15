@@ -48,7 +48,6 @@ import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
  * This class provides a preliminary optimization by providing a function to return the possible concepts that
  * should be tested based on the concepts in the spec.
  *
- * @author Chrissy Hill, Keith Campbell
  *
  */
 public class RefsetSpecQuery extends RefsetSpecComponent {

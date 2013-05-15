@@ -37,7 +37,6 @@ import javax.swing.JList;
 import javax.swing.JOptionPane;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
-import org.dwfa.ace.api.I_HelpRefsets;
 import org.dwfa.ace.api.I_ModelTerminologyList;
 import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.I_TermFactory;
@@ -119,7 +118,6 @@ public class UpdateIdentifiers extends AbstractTask {
 			I_TermFactory tf = Terms.get();
 			config = tf.getActiveAceFrameConfig();
 
-			I_HelpRefsets refsetHelper = tf.getRefsetHelper(config);
 			JList conceptList = config.getBatchConceptList();
 			I_ModelTerminologyList model = (I_ModelTerminologyList) conceptList.getModel();
 			model.clear();

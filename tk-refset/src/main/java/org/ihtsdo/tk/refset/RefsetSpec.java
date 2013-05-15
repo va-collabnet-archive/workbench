@@ -64,7 +64,7 @@ public class RefsetSpec {
                 Collection<? extends ConceptVersionBI> relSources = concept.getVersion(vc).getRelationshipsIncomingSourceConceptsActive(
                                                                                                            specifiesRefsetRelNid);
                 if(relSources != null && !relSources.isEmpty()){
-                    this.spec = relSources.iterator().next();
+                    this.spec = relSources.iterator().next().getChronicle();
                 }else{
                     this.spec = null;
                 }
@@ -192,8 +192,11 @@ public class RefsetSpec {
                 return refsetConcept;
             }
             int specifiesRefsetRelNid = ts.getNidForUuids(RefsetAuxiliary.Concept.SPECIFIES_REFSET.getUids());
-            refsetConcept = getRefsetSpecConcept().getVersion(vc).getRelationshipsIncomingSourceConceptsActive(
-                    specifiesRefsetRelNid).iterator().next();
+            Collection<? extends ConceptVersionBI> specConcepts = getRefsetSpecConcept().getVersion(vc).getRelationshipsOutgoingTargetConceptsActive(
+                                                                                                       specifiesRefsetRelNid);
+            if(!specConcepts.isEmpty()){
+                refsetConcept = specConcepts.iterator().next();
+            }
             return refsetConcept;
         } catch (Exception e) {
             e.printStackTrace();
@@ -212,6 +215,26 @@ public class RefsetSpec {
 
             return memberRefsetConcept.getVersion(vc).getRelationshipsOutgoingTargetConceptsActive(
                     markedParentRelNid).iterator().next();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+    
+    public ConceptChronicleBI getPromotionRefsetConcept() {
+        try {
+            int promotionRelNid =
+                    ts.getNidForUuids(RefsetAuxiliary.Concept.PROMOTION_REL.getUids());
+            ConceptChronicleBI memberRefsetConcept = getMemberRefsetConcept();
+            if (memberRefsetConcept == null) {
+                return null;
+            }
+            Collection<? extends ConceptVersionBI> promotionConcepts = 
+                    memberRefsetConcept.getVersion(vc).getRelationshipsOutgoingTargetConceptsActive(promotionRelNid);
+            if(promotionConcepts.isEmpty()){
+                return null;
+            }
+            return promotionConcepts.iterator().next();
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -261,6 +284,21 @@ public class RefsetSpec {
 
             return memberRefsetConcept.getVersion(vc).getRelationshipsOutgoingTargetConceptsActive(
                     computeTimeRelNid).iterator().next().getChronicle();
+        } catch (Exception e) {
+            throw new IOException(e);
+        }
+    }
+    
+    public Collection<? extends ConceptVersionBI> getCommentsRefsetConcepts() throws IOException {
+        try {
+            int computeTimeRelNid = ts.getNidForUuids(RefsetAuxiliary.Concept.COMMENTS_REL.getUids());
+            ConceptChronicleBI memberRefsetConcept = getMemberRefsetConcept();
+            if (memberRefsetConcept == null) {
+                return null;
+            }
+
+            return memberRefsetConcept.getVersion(vc).getRelationshipsOutgoingTargetConceptsActive(
+                    computeTimeRelNid);
         } catch (Exception e) {
             throw new IOException(e);
         }

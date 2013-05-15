@@ -29,7 +29,6 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
-import org.dwfa.ace.refset.spec.I_HelpSpecRefset;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
@@ -43,8 +42,12 @@ import org.dwfa.util.LogWithAlerts;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
+import org.ihtsdo.lang.LANG_CODE;
 import org.ihtsdo.tk.Ts;
-import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
+import org.ihtsdo.tk.api.TerminologyBuilderBI;
+import org.ihtsdo.tk.api.blueprint.ConceptCB;
+import org.ihtsdo.tk.api.blueprint.RelationshipCAB;
+import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationshipType;
 
 /**
  * Gets the data from the Request for change panel and verifies that the
@@ -120,23 +123,15 @@ public class GetNewRefsetGroupingPanelDataTask extends AbstractTask {
                     I_GetConceptData ancillaryPurpose =
                             termFactory.getConcept(RefsetAuxiliary.Concept.ANCILLARY_DATA.getUids());
 
-                    I_HelpSpecRefset helper = Terms.get().getSpecRefsetHelper(Terms.get().getActiveAceFrameConfig());
 
                     // create concept
-                    I_GetConceptData newRefsetGroupingConcept =
-                            helper.newConcept(config, termFactory.getConcept(statusTermEntry.getIds()));
-
-                    // create descriptions
-                    helper.newDescription(newRefsetGroupingConcept, fsnConcept, refsetName, config, termFactory
-                        .getConcept(statusTermEntry.getIds()));
-                    helper.newDescription(newRefsetGroupingConcept, ptConcept, refsetName, config, termFactory
-                        .getConcept(statusTermEntry.getIds()));
-
-                    // create relationships
-                    helper.newRelationship(newRefsetGroupingConcept, isA, parent, config, termFactory
-                        .getConcept(statusTermEntry.getIds()));
-                    helper.newRelationship(newRefsetGroupingConcept, purposeRel, ancillaryPurpose, config, termFactory
-                        .getConcept(statusTermEntry.getIds()));
+                    ConceptCB newConceptBp = new ConceptCB(refsetName, refsetName,
+                            LANG_CODE.EN, isA.getPrimUuid(), parent.getPrimUuid());
+                    RelationshipCAB relBp = new RelationshipCAB(newConceptBp.getComponentUuid(),
+                            purposeRel.getPrimUuid(), ancillaryPurpose.getPrimUuid(),
+                            0, TkRelationshipType.STATED_HIERARCHY);
+                    TerminologyBuilderBI builder = Ts.get().getTerminologyBuilder(config.getEditCoordinate(), config.getViewCoordinate());
+                    I_GetConceptData newRefsetGroupingConcept = (I_GetConceptData) builder.construct(newConceptBp);
 
                     // save newly created concept UUID
                     process.setProperty(groupingConceptUuidPropName, newRefsetGroupingConcept.getUids().iterator()

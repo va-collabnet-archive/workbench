@@ -26,10 +26,10 @@ import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidCidString;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
-import org.dwfa.ace.refset.spec.I_HelpSpecRefset;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.tk.refset.SpecRefsetHelper;
 
 public class ConceptConceptStringExtTupleFileUtil {
 
@@ -134,8 +134,6 @@ public class ConceptConceptStringExtTupleFileUtil {
                 return null;
             }
 
-            I_HelpSpecRefset refsetHelper = Terms.get().getSpecRefsetHelper(importConfig);
-            refsetHelper.setAutocommitActive(false);
             I_TermFactory termFactory = Terms.get();
 
             if (!termFactory.hasId(refsetUuid)) {
@@ -160,9 +158,10 @@ public class ConceptConceptStringExtTupleFileUtil {
             }
 
             try {
+                SpecRefsetHelper refsetHelper = new SpecRefsetHelper(importConfig.getViewCoordinate(), importConfig.getEditCoordinate());
                 refsetHelper.newConceptConceptStringRefsetExtension(termFactory.uuidToNative(refsetUuid), termFactory
                     .uuidToNative(componentUuid), termFactory.uuidToNative(c1Uuid), termFactory.uuidToNative(c2Uuid),
-                    strValue, memberUuid, (UUID) importConfig.getProperty("pathUuid"), statusUuid, effectiveDate);
+                    strValue);
             } catch (Exception e) {
                 String errorMessage =
                         "CidCidStr: Exception thrown while creating new concept-concept-string refset extension";

@@ -90,6 +90,7 @@ import org.ihtsdo.translation.ui.SimpleTranslationConceptEditor;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
+import org.ihtsdo.tk.refset.SpecRefsetHelper;
 
 /**
  * The Class LanguageUtil.
@@ -232,8 +233,6 @@ public class LanguageUtil {
 
 			I_ConfigAceFrame config = tf.getActiveAceFrameConfig();
 
-			I_HelpRefsets refsetHelper = tf.getRefsetHelper(config);
-
 			Set<PathBI> savedEditPaths = config.getEditingPathSet();
 
 			for (PathBI editPath : savedEditPaths) {
@@ -329,8 +328,9 @@ public class LanguageUtil {
 							acceptabilityConcept = tf.getConcept(SnomedMetadataRf2.PREFERRED_RF2.getLenient().getNid());
 						}
 						I_GetConceptData languagerefsetConcept = tf.getConcept(languageRefset.getConceptNid());
-
-						refsetHelper.newRefsetExtension(languageRefset.getConceptNid(), newDescription.getDescId(), EConcept.REFSET_TYPES.CID, new RefsetPropertyMap().with(RefsetPropertyMap.REFSET_PROPERTY.CID_ONE, acceptabilityConcept.getConceptNid()), config);
+                                                SpecRefsetHelper helper = new SpecRefsetHelper(config.getViewCoordinate(), config.getEditCoordinate());
+                                                helper.newConceptRefsetExtension(languageRefset.getConceptNid(), newDescription.getDescId(), acceptabilityConcept.getConceptNid());
+                                                helper.newConceptRefsetExtension(dnid, cnid, cnid);
 
 						tf.addUncommittedNoChecks(concept);
 						tf.addUncommittedNoChecks(languagerefsetConcept);
@@ -893,7 +893,6 @@ public class LanguageUtil {
 	 */
 	public static void persistEditedDescription(I_GetConceptData concept, I_DescriptionTuple descriptionTuple, String text, int acceptabilityId, int descType, String langCode, int languageRefsetId, I_ConfigAceFrame config, boolean isCaseSignificant, int statusId) {
 		I_TermFactory tf = Terms.get();
-		I_HelpRefsets refsetHelper = tf.getRefsetHelper(config);
 		try {
 
 			// Cleaning uncommitted changes, remove in production
@@ -909,9 +908,8 @@ public class LanguageUtil {
 				tf.addUncommitted(concept);
 
 				I_GetConceptData acceptabilityConcept = tf.getConcept(acceptabilityId);
-
-				refsetHelper.newRefsetExtension(languageRefsetId, newDescription.getDescId(), EConcept.REFSET_TYPES.CID, new RefsetPropertyMap().with(RefsetPropertyMap.REFSET_PROPERTY.CID_ONE, acceptabilityConcept.getConceptNid()), config);
-
+                                SpecRefsetHelper helper = new SpecRefsetHelper(config.getViewCoordinate(), config.getEditCoordinate());
+                                helper.newConceptRefsetExtension(languageRefsetId, newDescription.getDescId(), acceptabilityConcept.getConceptNid());
 				tf.commit();
 				return;
 			} else {
@@ -959,9 +957,8 @@ public class LanguageUtil {
 					tf.commit();
 				} else {
 					I_GetConceptData acceptabilityConcept = tf.getConcept(acceptabilityId);
-
-					refsetHelper.newRefsetExtension(languageRefsetId, description.getDescId(), EConcept.REFSET_TYPES.CID, new RefsetPropertyMap().with(RefsetPropertyMap.REFSET_PROPERTY.CID_ONE, acceptabilityConcept.getConceptNid()), config);
-
+                                        SpecRefsetHelper helper = new SpecRefsetHelper(config.getViewCoordinate(), config.getEditCoordinate());
+                                        helper.newConceptRefsetExtension(languageRefsetId, description.getDescId(), acceptabilityConcept.getConceptNid());
 					tf.commit();
 				}
 			}
@@ -1143,7 +1140,6 @@ public class LanguageUtil {
 			LanguageSpecRefset languageSpec = new LanguageSpecRefset(languageSpecConcept);
 			I_GetConceptData enumeratedOriginConcept = languageSpec.getEnumeratedOriginRefsetConcept(tf.getActiveAceFrameConfig());
 			I_GetConceptData languageMembershipConcept = null;// languageSpec.getLanguageMembershipRefsetConcept();
-			I_HelpRefsets refsetHelper = tf.getRefsetHelper(config);
 			HashMap<Integer, Integer> descIdAcceptabilityMap = new HashMap<Integer, Integer>();
 
 			// adding enumerated members to map
@@ -1219,7 +1215,8 @@ public class LanguageUtil {
 					}
 					tf.addUncommitted(currentMember);
 				} else {
-					refsetHelper.newRefsetExtension(languageMembershipConcept.getConceptNid(), loopDescId, EConcept.REFSET_TYPES.CID, new RefsetPropertyMap().with(RefsetPropertyMap.REFSET_PROPERTY.CID_ONE, descIdAcceptabilityMap.get(loopDescId)), config);
+                                        SpecRefsetHelper helper = new SpecRefsetHelper(config.getViewCoordinate(), config.getEditCoordinate());
+                                        helper.newConceptRefsetExtension(languageMembershipConcept.getConceptNid(), loopDescId, descIdAcceptabilityMap.get(loopDescId));
 				}
 				// }
 			}

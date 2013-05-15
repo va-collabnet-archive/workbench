@@ -65,7 +65,7 @@ public class ComputeFromSpec {
         for (RefexChronicleBI refex : members) {
             Collection versions = refex.getVersions(viewCoordinate);
             if (versions != null || !versions.isEmpty()) {
-                currentMemberSet.setMember(refex.getNid());
+                currentMemberSet.setMember(refex.getReferencedComponentNid());
             }
         }
 

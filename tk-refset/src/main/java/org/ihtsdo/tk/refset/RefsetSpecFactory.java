@@ -50,12 +50,13 @@ import org.ihtsdo.tk.refset.RefsetSpecStatement.QUERY_TOKENS;
 
 public class RefsetSpecFactory {
     private static TerminologyStoreDI ts = Ts.get();
+    private static ViewCoordinate vc;
     public static RefsetSpecQuery createQuery(ViewCoordinate viewCoordinate,
             ConceptChronicleBI refsetSpec, ConceptChronicleBI refset, ComputeType refsetType) throws Exception {
-
+        vc = viewCoordinate;
         // create tree object that corresponds to the database's refset spec
         Collection<? extends RefexChronicleBI> extensions =
-                refsetSpec.getRefsetMembers();
+                refsetSpec.getRefsetMembersActive(vc);
         HashMap<Integer, DefaultMutableTreeNode> extensionMap = new HashMap<Integer, DefaultMutableTreeNode>();
         HashSet<Integer> fetchedComponents = new HashSet<Integer>();
         fetchedComponents.add(refsetSpec.getConceptNid());
@@ -364,7 +365,7 @@ public class RefsetSpecFactory {
                 if (fetchedComponents.contains(member.getNid()) == false) {
                     fetchedComponents.add(member.getNid());
                     ConceptChronicleBI refsetConcept = ts.getConcept(refsetNid);
-                    addExtensionsToMap(refsetConcept.getRefsetMembers(), extensionMap,
+                    addExtensionsToMap(refsetConcept.getRefsetMembersActive(vc), extensionMap,
                             fetchedComponents, refsetNid);
                 }
             }

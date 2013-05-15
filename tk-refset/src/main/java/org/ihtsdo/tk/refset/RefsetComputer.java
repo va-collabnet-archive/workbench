@@ -7,6 +7,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.dwfa.cement.RefsetAuxiliary;
@@ -130,6 +131,9 @@ public class RefsetComputer implements ProcessUnfetchedConceptDataBI {
             switch (computeType) {
                 case CONCEPT:
                     ConceptChronicleBI concept = fcfc.fetch();
+                    if(concept.getPrimUuid().equals(UUID.fromString("da184cdc-b6fa-3bd5-8759-7d87e686a3f1"))){
+                        System.out.println("DEBUG");
+                    }
                     executeComponent(concept, cNid, cNid);
                     break;
                 case DESCRIPTION:

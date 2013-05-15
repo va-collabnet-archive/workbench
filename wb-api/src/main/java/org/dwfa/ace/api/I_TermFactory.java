@@ -33,7 +33,6 @@ import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.refset.spec.I_HelpSpecRefset;
 import org.dwfa.ace.task.commit.AlertToDataConstraintFailure;
-import org.dwfa.ace.task.refset.spec.compute.RefsetSpecQuery;
 import org.dwfa.ace.task.search.I_TestSearchResults;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.tapi.AllowDataCheckSuppression;
@@ -104,9 +103,6 @@ public interface I_TermFactory {
            throws Exception;
 
    void commitTransaction() throws IOException;
-
-   public Condition computeRefset(int nid, RefsetSpecQuery query, I_ConfigAceFrame frameConfig)
-           throws TerminologyException, IOException, Exception;
 
    long convertToThickVersion(int version);
 
@@ -369,8 +365,6 @@ public interface I_TermFactory {
 
    void removeFromWatchList(I_GetConceptData c);
 
-   public void removeOrigin(PathBI path, I_Position origin, I_ConfigAceFrame config) throws IOException;
-
    public void resetViewPositions();
 
    /**
@@ -603,17 +597,7 @@ public interface I_TermFactory {
    public I_ImageVersioned getImage(UUID fromString) throws IOException;
 
    public HashMap<Integer, KnowledgeBase> getKnowledgeBaseCache();
-
-   I_HelpMarkedParentRefsets getMarkedParentRefsetHelper(I_ConfigAceFrame config, int memberRefsetId,
-           int memberTypeId)
-           throws Exception;
-
-   I_HelpMemberRefsetsCalculateConflicts getMemberRefsetConflictCalculator(I_ConfigAceFrame config)
-           throws Exception;
-
-   I_HelpMemberRefsets getMemberRefsetHelper(I_ConfigAceFrame config, int memberRefsetId, int memberTypeId)
-           throws Exception;
-
+   
    PathBI getPath(Collection<UUID> uids) throws TerminologyException, IOException;
 
    PathBI getPath(int nid) throws TerminologyException, IOException;
@@ -649,8 +633,6 @@ public interface I_TermFactory {
 
    List<? extends I_ExtendByRef> getRefsetExtensionsForComponent(int refsetNid, int nid) throws IOException;
 
-   I_HelpRefsets getRefsetHelper(I_ConfigAceFrame config);
-
    I_RelVersioned getRelationship(int rNid) throws IOException;
 
    /**
@@ -659,8 +641,6 @@ public interface I_TermFactory {
     * @throws IOException
     */
    public I_RepresentIdSet getRelationshipIdSet() throws IOException;
-
-   I_HelpSpecRefset getSpecRefsetHelper(I_ConfigAceFrame config) throws Exception;
 
    String getStats() throws IOException;
 

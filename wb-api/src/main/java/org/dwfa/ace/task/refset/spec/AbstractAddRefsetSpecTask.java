@@ -24,7 +24,6 @@ package org.dwfa.ace.task.refset.spec;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_HelpRefsets;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.RefsetPropertyMap;
 import org.dwfa.ace.api.Terms;
@@ -54,6 +53,8 @@ import java.lang.reflect.InvocationTargetException;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import javax.swing.JOptionPane;
@@ -61,6 +62,8 @@ import javax.swing.JTree;
 import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
+import org.ihtsdo.tk.refset.RefsetSpec;
+import org.ihtsdo.tk.refset.SpecRefsetHelper;
 
 public abstract class AbstractAddRefsetSpecTask extends AbstractTask {
    private static final int dataVersion = 4;
@@ -139,11 +142,23 @@ public abstract class AbstractAddRefsetSpecTask extends AbstractTask {
 
             if (canAdd) {
                I_TermFactory     tf           = Terms.get();
-               I_HelpRefsets     refsetHelper = tf.getRefsetHelper(configFrame);
                RefsetPropertyMap propMap      = getRefsetPropertyMap(tf, configFrame);
-               I_ExtendByRef     ext          = refsetHelper.getOrCreateRefsetExtension(refsetId,
-                                                   componentId, propMap.getMemberType(), propMap,
-                                                   UUID.randomUUID());
+               SpecRefsetHelper helper = new SpecRefsetHelper(configFrame.getViewCoordinate(), configFrame.getEditCoordinate());
+               I_ExtendByRef     ext = null;
+               if(propMap.containsKey(RefsetPropertyMap.REFSET_PROPERTY.CID_THREE)){
+                   ext = (I_ExtendByRef) helper.newConceptConceptConceptRefsetExtension(
+                       refsetId, componentId, propMap.getInt(RefsetPropertyMap.REFSET_PROPERTY.CID_ONE),
+                       propMap.getInt(RefsetPropertyMap.REFSET_PROPERTY.CID_TWO),
+                       propMap.getInt(RefsetPropertyMap.REFSET_PROPERTY.CID_THREE));
+               }else if(propMap.containsKey(RefsetPropertyMap.REFSET_PROPERTY.CID_TWO)){
+                   ext = (I_ExtendByRef) helper.newConceptConceptRefsetExtension(
+                       refsetId, componentId, propMap.getInt(RefsetPropertyMap.REFSET_PROPERTY.CID_ONE),
+                       propMap.getInt(RefsetPropertyMap.REFSET_PROPERTY.CID_TWO));
+               }else if(propMap.containsKey(RefsetPropertyMap.REFSET_PROPERTY.CID_TWO)){
+                   ext = (I_ExtendByRef) helper.newConceptRefsetExtension(
+                       refsetId, componentId, propMap.getInt(RefsetPropertyMap.REFSET_PROPERTY.CID_ONE));
+               }
+               
                List<? extends I_ExtendByRefVersion> tuples = ext.getTuples(configFrame.getAllowedStatus(),
                                                                 configFrame.getViewPositionSetReadOnly(),
                                                                 configFrame.getPrecedence(),
@@ -185,9 +200,9 @@ public abstract class AbstractAddRefsetSpecTask extends AbstractTask {
                   }
                }
 
-               RefsetSpec refsetSpecHelper = new RefsetSpec(refsetSpec, configFrame);
+               RefsetSpec refsetSpecHelper = new RefsetSpec(refsetSpec, configFrame.getViewCoordinate());
 
-               refsetSpecHelper.setLastEditTime(System.currentTimeMillis());
+               refsetSpecHelper.setLastEditTime(System.currentTimeMillis(), configFrame.getEditCoordinate());
                configFrame.fireRefsetSpecChanged(ext);
                configFrame.refreshRefsetTab();
             } else {
