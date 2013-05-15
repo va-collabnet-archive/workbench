@@ -39,8 +39,8 @@ import org.ihtsdo.tk.spec.ValidationException;
  * to a concept in RF2 format. Needs a transformConfig to match the following.
  * Path is required. US/GB are required if transforming English language
  * content. Lang is generic for other languages. Can use both lang and US/GB if
- * content includes English and another language. Currently supports only one generic
- * language, although could be extended to allow for more.
+ * content includes English and another language. Currently supports only one
+ * generic language, although could be extended to allow for more.
  * <code>
  * <config>
  * <transformer>
@@ -50,15 +50,18 @@ import org.ihtsdo.tk.spec.ValidationException;
  * <parameters>
  * <langRefset>
  * <uuid>e57ec728-742f-56b3-9b53-9613670fb24d</uuid>
- * <description>Swedish [International Organization for Standardization 639-1 code sv] language reference set (foundation metadata concept)</description>
+ * <description>Swedish [International Organization for Standardization 639-1
+ * code sv] language reference set (foundation metadata concept)</description>
  * </langRefset>
  * <usDialectRefset>
  * <uuid>bca0a686-3516-3daf-8fcf-fe396d13cfad</uuid>
- * <description>United States of America English language reference set (foundation metadata concept)</description>
+ * <description>United States of America English language reference set
+ * (foundation metadata concept)</description>
  * </usDialectRefset>
  * <gbDialectRefset>
  * <uuid>eb9a5e42-3cba-356d-b623-3ed472e20b30</uuid>
- * <description>Great Britain English language reference set (foundation metadata concept)</description>
+ * <description>Great Britain English language reference set (foundation
+ * metadata concept)</description>
  * </gbDialectRefset>
  * <path>
  * <uuid>454a9a98-0328-583d-8861-f3419ef6a809</uuid>
@@ -114,7 +117,7 @@ public class RF1ToRF2Transformer extends AbstractTransformer {
         ConceptDescriptor gbRefset = api.getConceptDescriptor(api.getIntId(id), "parameters.gbDialectRefset");
         ConceptDescriptor langRefset = api.getConceptDescriptor(api.getIntId(id), "parameters.langRefset");
         ConceptDescriptor path = api.getConceptDescriptor(api.getIntId(id), "parameters.path");
-        if (path.getUuid() != null) { 
+        if (path.getUuid() != null) {
             this.pathUUID = path.getVerifiedConcept().getPrimUuid();
         } else {
             // when path is not configured, the transformer will directly test for SNOMED concepts
@@ -157,7 +160,7 @@ public class RF1ToRF2Transformer extends AbstractTransformer {
                     attributes.setStatusUuid(SnomedMetadataRf2.LIMITED_COMPONENT_RF2.getLenient().getPrimUuid());
                 }
             }
-            
+
             if ((pathUUID == null)
                     || (pathUUID != null && attributes.getPathUuid().equals(pathUUID))) {
                 if (attributes.getAuthorUuid() == null) {
@@ -167,7 +170,7 @@ public class RF1ToRF2Transformer extends AbstractTransformer {
                     attributes.setModuleUuid(TkRevision.unspecifiedModuleUuid);
                 }
             }
-            
+
             if (attributes.getAdditionalIdComponents() != null) {
                 List<TkIdentifier> additionalIdList = attributes.getAdditionalIdComponents();
                 for (TkIdentifier tkIdentifier : additionalIdList) {
@@ -189,7 +192,7 @@ public class RF1ToRF2Transformer extends AbstractTransformer {
                             tkIdentifier.setStatusUuid(SnomedMetadataRf2.LIMITED_COMPONENT_RF2.getLenient().getPrimUuid());
                         }
                     }
-                    
+
                     if ((pathUUID == null)
                             || (pathUUID != null && tkIdentifier.getPathUuid().equals(pathUUID))) {
                         if (tkIdentifier.getAuthorUuid() == null) {
@@ -208,7 +211,7 @@ public class RF1ToRF2Transformer extends AbstractTransformer {
         } catch (IOException e) {
             AceLog.getAppLog().log(Level.SEVERE, e.getMessage(), e);
         }
-        
+
         if (concept.getConceptAttributes().getRevisionList() != null) {
             List<TkConceptAttributesRevision> conceptAttributeList = concept.getConceptAttributes().getRevisionList();
             for (TkConceptAttributesRevision tkConceptAttributesRevision : conceptAttributeList) {
@@ -218,9 +221,9 @@ public class RF1ToRF2Transformer extends AbstractTransformer {
 
     }
 
-     /* (non-Javadoc)
-	 * @see org.ihtsdo.mojo.schema.AbstractTransformer#transformAttributesRevision(org.ihtsdo.tk.dto.concept.component.attribute.TkConceptAttributesRevision)
-	 */
+    /* (non-Javadoc)
+     * @see org.ihtsdo.mojo.schema.AbstractTransformer#transformAttributesRevision(org.ihtsdo.tk.dto.concept.component.attribute.TkConceptAttributesRevision)
+     */
     private void transformAttributesRevision(TkConceptAttributesRevision attributeRevision, TkConcept concept) {
         try {
             if ((pathUUID == null && attributeRevision.pathUuid.compareTo(auxPathUUID) != 0)
@@ -281,7 +284,7 @@ public class RF1ToRF2Transformer extends AbstractTransformer {
                 } else if (description.getStatusUuid().equals(SnomedMetadataRf1.LIMITED_ACTIVE_STATUS_RF1.getLenient().getPrimUuid())) {
                     description.setStatusUuid(SnomedMetadataRf2.LIMITED_COMPONENT_RF2.getLenient().getPrimUuid());
                 }
-                
+
                 boolean hasGbAnnotation = false;
                 boolean hasUsAnnotation = false;
                 if (description.getAnnotations() != null) {
@@ -303,7 +306,7 @@ public class RF1ToRF2Transformer extends AbstractTransformer {
                         description.setTypeUuid(SnomedMetadataRf2.SYNONYM_RF2.getLenient().getPrimUuid());
                     } else if (description.getTypeUuid().equals(SnomedMetadataRf1.SYNOMYM_DESCRIPTION_TYPE_RF1.getLenient().getPrimUuid())) {
                         description.setTypeUuid(SnomedMetadataRf2.SYNONYM_RF2.getLenient().getPrimUuid());
-                    }                    
+                    }
                 } else if (langRefsetUUID != null && !description.getLang().equals(LANG_CODE.EN.getFormatedLanguageCode())) {
                     processLangDescription(description, concept);
                 } else if (usRefsetUUID != null && !DialectHelper.isTextForDialect(description.getText(), Language.EN_US.getLenient().getNid())
@@ -316,7 +319,7 @@ public class RF1ToRF2Transformer extends AbstractTransformer {
                     processGBDescription(description, concept);
                 } else if (gbRefsetUUID == null && usRefsetUUID != null && description.lang.equalsIgnoreCase("en")) {
                     // review condition of this case ... when/if more cases get added
-                    processUSDescription(description, concept);                     
+                    processUSDescription(description, concept);
                 } else {
                     throw new UnsupportedDialectOrLanguage("Can't support language or dialect.");
                 }
@@ -331,7 +334,41 @@ public class RF1ToRF2Transformer extends AbstractTransformer {
                     description.setModuleUuid(TkRevision.unspecifiedModuleUuid);
                 }
             }
-            
+
+            if (description.getAdditionalIdComponents() != null) {
+                List<TkIdentifier> additionalIdList = description.getAdditionalIdComponents();
+                for (TkIdentifier tkIdentifier : additionalIdList) {
+                    if ((pathUUID == null && tkIdentifier.pathUuid.compareTo(auxPathUUID) != 0)
+                            || (pathUUID != null && tkIdentifier.getPathUuid().equals(pathUUID))) {
+                        if (tkIdentifier.getStatusUuid().equals(SnomedMetadataRf1.CURRENT_RF1.getLenient().getPrimUuid())) {
+                            tkIdentifier.setStatusUuid(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getPrimUuid());
+                        } else if (tkIdentifier.getStatusUuid().equals(SnomedMetadataRf1.RETIRED_INACTIVE_STATUS_RF1.getLenient().getPrimUuid())) {
+                            tkIdentifier.setStatusUuid(SnomedMetadataRf2.INACTIVE_VALUE_RF2.getLenient().getPrimUuid());
+                        } else if (tkIdentifier.getStatusUuid().equals(SnomedMetadataRf1.AMBIGUOUS_INACTIVE_STATUS_RF1.getLenient().getPrimUuid())) {
+                            tkIdentifier.setStatusUuid(SnomedMetadataRf2.AMBIGUOUS_COMPONENT_RF2.getLenient().getPrimUuid());
+                        } else if (tkIdentifier.getStatusUuid().equals(SnomedMetadataRf1.DUPLICATE_INACTIVE_STATUS_RF1.getLenient().getPrimUuid())) {
+                            tkIdentifier.setStatusUuid(SnomedMetadataRf2.DUPLICATE_COMPONENT_RF2.getLenient().getPrimUuid());
+                        } else if (tkIdentifier.getStatusUuid().equals(SnomedMetadataRf1.ERRONEOUS_INACTIVE_STATUS_RF1.getLenient().getPrimUuid())) {
+                            tkIdentifier.setStatusUuid(SnomedMetadataRf2.ERRONEOUS_COMPONENT_RF2.getLenient().getPrimUuid());
+                        } else if (tkIdentifier.getStatusUuid().equals(SnomedMetadataRf1.INAPPROPRIATE_INACTIVE_STATUS_RF1.getLenient().getPrimUuid())) {
+                            tkIdentifier.setStatusUuid(SnomedMetadataRf2.INAPPROPRIATE_COMPONENT_RF2.getLenient().getPrimUuid());
+                        } else if (tkIdentifier.getStatusUuid().equals(SnomedMetadataRf1.LIMITED_ACTIVE_STATUS_RF1.getLenient().getPrimUuid())) {
+                            tkIdentifier.setStatusUuid(SnomedMetadataRf2.LIMITED_COMPONENT_RF2.getLenient().getPrimUuid());
+                        }
+                    }
+
+                    if ((pathUUID == null)
+                            || (pathUUID != null && tkIdentifier.getPathUuid().equals(pathUUID))) {
+                        if (tkIdentifier.getAuthorUuid() == null) {
+                            tkIdentifier.setAuthorUuid(authorUser);
+                        }
+                        if (tkIdentifier.getModuleUuid() == null) {
+                            tkIdentifier.setModuleUuid(TkRevision.unspecifiedModuleUuid);
+                        }
+                    }
+                }
+            }
+
         } catch (UnsupportedDialectOrLanguage | IOException e) {
             AceLog.getAppLog().log(Level.SEVERE, e.getMessage(), e);
         }
@@ -365,7 +402,7 @@ public class RF1ToRF2Transformer extends AbstractTransformer {
                 }
 
             }
-            
+
             if (revision.getTypeUuid().equals(SnomedMetadataRf1.FULLY_SPECIFIED_DESCRIPTION_TYPE.getLenient().getPrimUuid())) {
                 revision.setTypeUuid(SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getLenient().getPrimUuid());
             } else if (revision.getTypeUuid().equals(SnomedMetadataRf1.PREFERRED_TERM_DESCRIPTION_TYPE_RF1.getLenient().getPrimUuid())) {
@@ -383,7 +420,7 @@ public class RF1ToRF2Transformer extends AbstractTransformer {
                     revision.setModuleUuid(TkRevision.unspecifiedModuleUuid);
                 }
             }
-            
+
         } catch (IOException e) {
             AceLog.getAppLog().log(Level.SEVERE, e.getMessage(), e);
         }
@@ -428,6 +465,41 @@ public class RF1ToRF2Transformer extends AbstractTransformer {
                     }
                 }
             }
+
+            if (relationship.getAdditionalIdComponents() != null) {
+                List<TkIdentifier> additionalIdList = relationship.getAdditionalIdComponents();
+                for (TkIdentifier tkIdentifier : additionalIdList) {
+                    if ((pathUUID == null && tkIdentifier.pathUuid.compareTo(auxPathUUID) != 0)
+                            || (pathUUID != null && tkIdentifier.getPathUuid().equals(pathUUID))) {
+                        if (tkIdentifier.getStatusUuid().equals(SnomedMetadataRf1.CURRENT_RF1.getLenient().getPrimUuid())) {
+                            tkIdentifier.setStatusUuid(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getPrimUuid());
+                        } else if (tkIdentifier.getStatusUuid().equals(SnomedMetadataRf1.RETIRED_INACTIVE_STATUS_RF1.getLenient().getPrimUuid())) {
+                            tkIdentifier.setStatusUuid(SnomedMetadataRf2.INACTIVE_VALUE_RF2.getLenient().getPrimUuid());
+                        } else if (tkIdentifier.getStatusUuid().equals(SnomedMetadataRf1.AMBIGUOUS_INACTIVE_STATUS_RF1.getLenient().getPrimUuid())) {
+                            tkIdentifier.setStatusUuid(SnomedMetadataRf2.AMBIGUOUS_COMPONENT_RF2.getLenient().getPrimUuid());
+                        } else if (tkIdentifier.getStatusUuid().equals(SnomedMetadataRf1.DUPLICATE_INACTIVE_STATUS_RF1.getLenient().getPrimUuid())) {
+                            tkIdentifier.setStatusUuid(SnomedMetadataRf2.DUPLICATE_COMPONENT_RF2.getLenient().getPrimUuid());
+                        } else if (tkIdentifier.getStatusUuid().equals(SnomedMetadataRf1.ERRONEOUS_INACTIVE_STATUS_RF1.getLenient().getPrimUuid())) {
+                            tkIdentifier.setStatusUuid(SnomedMetadataRf2.ERRONEOUS_COMPONENT_RF2.getLenient().getPrimUuid());
+                        } else if (tkIdentifier.getStatusUuid().equals(SnomedMetadataRf1.INAPPROPRIATE_INACTIVE_STATUS_RF1.getLenient().getPrimUuid())) {
+                            tkIdentifier.setStatusUuid(SnomedMetadataRf2.INAPPROPRIATE_COMPONENT_RF2.getLenient().getPrimUuid());
+                        } else if (tkIdentifier.getStatusUuid().equals(SnomedMetadataRf1.LIMITED_ACTIVE_STATUS_RF1.getLenient().getPrimUuid())) {
+                            tkIdentifier.setStatusUuid(SnomedMetadataRf2.LIMITED_COMPONENT_RF2.getLenient().getPrimUuid());
+                        }
+                    }
+
+                    if ((pathUUID == null)
+                            || (pathUUID != null && tkIdentifier.getPathUuid().equals(pathUUID))) {
+                        if (tkIdentifier.getAuthorUuid() == null) {
+                            tkIdentifier.setAuthorUuid(authorUser);
+                        }
+                        if (tkIdentifier.getModuleUuid() == null) {
+                            tkIdentifier.setModuleUuid(TkRevision.unspecifiedModuleUuid);
+                        }
+                    }
+                }
+            }
+
         } catch (IOException e) {
             AceLog.getAppLog().log(Level.SEVERE, e.getMessage(), e);
         }
@@ -499,7 +571,7 @@ public class RF1ToRF2Transformer extends AbstractTransformer {
                 }
                 ((TkRefexUuidMember) annotation).refsetUuid = rf2GbDialectRefsetUuid;
             }
-            
+
             if (annotation.refsetUuid.compareTo(legacyUsDialectRefsetUuid) == 0) {
                 UUID uuid1 = ((TkRefexUuidMember) annotation).uuid1;
 
@@ -512,7 +584,7 @@ public class RF1ToRF2Transformer extends AbstractTransformer {
                 }
                 ((TkRefexUuidMember) annotation).refsetUuid = rf2UsDialectRefsetUuid;
             }
-            
+
             if ((pathUUID == null && annotation.pathUuid.compareTo(auxPathUUID) != 0)
                     || (pathUUID != null && annotation.getPathUuid().equals(pathUUID))) {
                 if (annotation.getStatusUuid().equals(SnomedMetadataRf1.CURRENT_RF1.getLenient().getPrimUuid())) {
@@ -536,7 +608,7 @@ public class RF1ToRF2Transformer extends AbstractTransformer {
         } catch (IOException e) {
             AceLog.getAppLog().log(Level.SEVERE, e.getMessage(), e);
         }
-        
+
         if (annotation.getRevisionList() != null) {
             List<? extends TkRevision> revisionList = annotation.getRevisionList();
             for (TkRevision r : revisionList) {
@@ -604,7 +676,7 @@ public class RF1ToRF2Transformer extends AbstractTransformer {
         } catch (IOException e) {
             AceLog.getAppLog().log(Level.SEVERE, e.getMessage(), e);
         }
-        
+
         if (member.getRevisionList() != null) {
             List<? extends TkRevision> revisionList = member.getRevisionList();
             for (TkRevision r : revisionList) {
@@ -650,7 +722,7 @@ public class RF1ToRF2Transformer extends AbstractTransformer {
         checkForMultipleFsn(eConcept);
         return true;
     }
-    
+
     private void checkForMultipleFsn(TkConcept eConcept) {
         // check for multiple active FSN descriptions
         if (eConcept.descriptions != null) {
@@ -830,7 +902,7 @@ public class RF1ToRF2Transformer extends AbstractTransformer {
 
         }
     }
-            
+
     private void processUSDescription(TkDescription description, TkConcept concept) throws ValidationException, IOException {
         List<TkRefexAbstractMember<?>> annotations = description.getAnnotations();
         if (annotations == null) {
@@ -1010,5 +1082,4 @@ public class RF1ToRF2Transformer extends AbstractTransformer {
             description.setAnnotations(annotations);
         }
     }
-
 }

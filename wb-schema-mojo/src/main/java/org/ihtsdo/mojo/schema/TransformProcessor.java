@@ -61,8 +61,8 @@ public class TransformProcessor implements ProcessUnfetchedConceptDataBI{
 			this.eConceptDOS = eConceptDOS;
                         
                         
-            watchUuids.add(UUID.fromString("d439284a-21d1-3ef9-842c-27f017c9f042")); // Acquired anomaly of ear ... to check redundant roles
-            System.out.println(":DEBUG: added d439284a-21d1-3ef9-842c-27f017c9f042 Acquired anomaly of ear ### to check redundant roles");
+//            watchUuids.add(UUID.fromString("d439284a-21d1-3ef9-842c-27f017c9f042")); // Acquired anomaly of ear ... to check redundant roles
+//            System.out.println(":DEBUG: added d439284a-21d1-3ef9-842c-27f017c9f042 Acquired anomaly of ear ### to check redundant roles");
             
 //            watchUuids.add(UUID.fromString("ef6ae557-83da-5664-ac23-a393ae6a7a1c")); // ABDOMINAL AND PELVIC PAIN --> ICD10-CM Concept
 //            watchUuids.add(UUID.fromString("32bf3aa1-8287-5302-a62a-aa354e66b845")); // ABNORMALITY OF FORCES OF LABOR --> ICD9-CM Concept
