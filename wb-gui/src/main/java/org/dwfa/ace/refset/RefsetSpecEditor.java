@@ -1059,6 +1059,9 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
         } catch (Exception exception) {
             AceLog.getAppLog().alertAndLogException(exception);
         }
+        JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
+                        "Refset metadata added.", "",
+                        JOptionPane.INFORMATION_MESSAGE);
         return true;
     }
 
