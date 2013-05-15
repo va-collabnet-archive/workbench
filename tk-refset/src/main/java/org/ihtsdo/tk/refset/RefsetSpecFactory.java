@@ -70,7 +70,7 @@ public class RefsetSpecFactory {
             if (r.getReferencedComponentNid() == refsetSpec.getConceptNid()) {
                 root.add(extNode);
             } else {
-                extensionMap.get(r.getReferencedComponentNid()).add(extNode);
+                extensionMap.get(r.getNid()).add(extNode);
             }
         }
 
