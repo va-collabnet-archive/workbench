@@ -658,7 +658,6 @@ public class RefsetSpecTreeMouseListener extends MouseAdapter {
         }
 
         private void forgetClause(I_ExtendByRef specPart) throws Exception {
-            specPart.cancel();
             try {
                 if (specPart.isUncommitted()) {
                     Terms.get().forget(specPart);
@@ -666,7 +665,10 @@ public class RefsetSpecTreeMouseListener extends MouseAdapter {
                     I_GetConceptData refsetIdentityConcept = aceConfig.getRefsetInSpecEditor();
                     RefsetSpec refsetSpec = new RefsetSpec(refsetIdentityConcept, true, aceConfig.getViewCoordinate());
                     refsetSpec.setLastEditTime(System.currentTimeMillis(), aceConfig.getEditCoordinate());
+                }else{
+                    specPart.cancel();
                 }
+                
                 Terms.get().addUncommitted(Terms.get().getConcept(specPart.getRefsetId()));
             } catch (IOException e) {
                 AceLog.getAppLog().alertAndLogException(e);
