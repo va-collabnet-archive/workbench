@@ -55,8 +55,9 @@ public class RefsetSpecFactory {
             ConceptChronicleBI refsetSpec, ConceptChronicleBI refset, ComputeType refsetType) throws Exception {
         vc = viewCoordinate;
         // create tree object that corresponds to the database's refset spec
+        
         Collection<? extends RefexChronicleBI> extensions =
-                refsetSpec.getRefsetMembersActive(vc);
+                refsetSpec.getRefsetMembers();
         HashMap<Integer, DefaultMutableTreeNode> extensionMap = new HashMap<Integer, DefaultMutableTreeNode>();
         HashSet<Integer> fetchedComponents = new HashSet<Integer>();
         fetchedComponents.add(refsetSpec.getConceptNid());
@@ -70,7 +71,7 @@ public class RefsetSpecFactory {
             if (r.getReferencedComponentNid() == refsetSpec.getConceptNid()) {
                 root.add(extNode);
             } else {
-                extensionMap.get(r.getNid()).add(extNode);
+                extensionMap.get(r.getReferencedComponentNid()).add(extNode);
             }
         }
 
