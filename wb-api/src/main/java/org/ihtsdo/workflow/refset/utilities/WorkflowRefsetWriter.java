@@ -3,6 +3,7 @@ package org.ihtsdo.workflow.refset.utilities;
 import java.io.IOException;
 import java.util.UUID;
 import java.util.logging.Level;
+import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 
 import org.dwfa.ace.api.RefsetPropertyMap;
@@ -15,11 +16,13 @@ import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ComponentVersionBI;
+import org.ihtsdo.tk.api.TerminologyBuilderBI;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.refex.type_string.RefexStringVersionBI;
+import org.ihtsdo.tk.dto.concept.component.refex.TK_REFEX_TYPE;
 import org.ihtsdo.tk.refset.SpecRefsetHelper;
 import org.ihtsdo.tk.spec.ConceptSpec;
 import org.ihtsdo.workflow.refset.WorkflowRefset;
@@ -47,13 +50,16 @@ public abstract class WorkflowRefsetWriter extends WorkflowRefset {
         ConceptSpec wfHxRefSpec = new ConceptSpec("history workflow refset",UUID.fromString("0b6f0e24-5fe2-3869-9342-c18008f53283"));
         I_ExtendByRef ref = null;
         try {
+            I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
             if (fields.valuesExist()) {
                 RefsetPropertyMap propMap = new RefsetPropertyMap();
                 propMap.put(REFSET_PROPERTY.STRING_VALUE, fieldsToRefsetString());
-                SpecRefsetHelper helper = new SpecRefsetHelper(Terms.get().getActiveAceFrameConfig().getViewCoordinate(),
-                        Terms.get().getActiveAceFrameConfig().getEditCoordinate());
-                ref = (I_ExtendByRef) helper.newStringRefsetExtension(refsetNid, fields.getReferencedComponentNid(), fieldsToRefsetString());
-               
+                RefexCAB memberBp = new RefexCAB(TK_REFEX_TYPE.STR,
+                        fields.getReferencedComponentNid(),
+                        refsetNid);
+                memberBp.put(RefexCAB.RefexProperty.STRING1, fieldsToRefsetString());
+                TerminologyBuilderBI builder = Ts.get().getTerminologyBuilder(config.getEditCoordinate(), config.getViewCoordinate());
+                builder.construct(memberBp);
                 if (ref != null) {
 	                I_GetConceptData refset = Terms.get().getConcept(refsetNid);
 	
