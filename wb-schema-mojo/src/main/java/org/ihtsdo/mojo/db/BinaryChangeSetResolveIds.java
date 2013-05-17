@@ -63,6 +63,7 @@ public class BinaryChangeSetResolveIds {
     private long eccsTimeThreshold; // :!!!:TEMP: move to POM parameter
     private HashMap<Long, UUID> keepMap;
     private StringBuilder instancesNotKept;
+    private StringBuilder descriptionsKept;
     private SctIdResolution resolution;
     private UuidUuidRemapper relLogicalUuidRemapper;
 
@@ -72,7 +73,7 @@ public class BinaryChangeSetResolveIds {
 
     public enum SctIdResolution {
 
-        KEEP_ALL_SCTID, KEEP_NO_ECCS_SCTID, KEEP_LAST_CURRENT_USE
+        KEEP_ALL_SCTID, KEEP_NO_ECCS_SCTID, KEEP_LAST_CURRENT_USE, FILTER_DESCRIPTION_SCTIDS
     };
     // DETAIL LOG FILES
     private boolean eccsLogPreB;
@@ -129,7 +130,17 @@ public class BinaryChangeSetResolveIds {
     }
 
     public void processFiles() throws IOException {
-        instancesNotKept = new StringBuilder("\r\n SCTID-UUID instance pairs not kept\r\n");
+        instancesNotKept = new StringBuilder();
+        instancesNotKept.append("\n\n**************************");
+        instancesNotKept.append("\n*** INSTANCES NOT KEPT ***");
+        instancesNotKept.append("\n**************************");
+        instancesNotKept.append("\nSCTID \t ConceptUUID \t ComponentUUID\n");
+        
+        descriptionsKept = new StringBuilder();
+        descriptionsKept.append("\n\n**************************");
+        descriptionsKept.append("\n*** INSTANCES ARE KEPT ***");
+        descriptionsKept.append("\n**************************");
+        descriptionsKept.append("\nSCTID \t ConceptUUID \t ComponentUUID\n");
 
         pass1CreateKeepMap();
 
@@ -151,11 +162,14 @@ public class BinaryChangeSetResolveIds {
             eccsLogPostWriter.flush();
             eccsLogPostWriter.close();
         }
+        eccsLogExceptionsWriter.append(instancesNotKept.toString());
+        eccsLogExceptionsWriter.append(descriptionsKept.toString());
         eccsLogExceptionsWriter.flush();
         eccsLogExceptionsWriter.close();
 
-        Logger logger = Logger.getLogger(BinaryChangeSetResolveIds.class.getName());
-        logger.log(Level.INFO, instancesNotKept.toString());
+        // Logger logger = Logger.getLogger(BinaryChangeSetResolveIds.class.getName());
+        // logger.log(Level.INFO, instancesNotKept.toString());
+        // logger.log(Level.INFO, descriptionsKept.toString());
     }
 
     private void pass1CreateKeepMap() {
@@ -213,7 +227,7 @@ public class BinaryChangeSetResolveIds {
             keepList.add(prevKeep);
         }
 
-        System.out.println("\n\n############ KEEP LIST ############");
+        System.out.println("\n\n************ KEEP LIST ************");
         for (SctIdUseInstance keep : keepList) {
             System.out.println(keep.sctidL + "\t"
                     + keep.enclosingConcept + "\t" + keep.timeL + "\t" + keep.activeInt);
@@ -230,7 +244,7 @@ public class BinaryChangeSetResolveIds {
                     bw.write(Long.toString(k.sctidL));
                     bw.write("\t");
                     bw.write(k.enclosingConcept.toString());
-                    bw.write("\r\n");
+                    bw.write("\n");
                 }
                 bw.flush();
             }
@@ -278,9 +292,9 @@ public class BinaryChangeSetResolveIds {
                         timeStampEccsL = in.readLong();
                         eConcept = new TkConcept(in);
                         // :!!!:DEBUG:
-                        if (eConcept.getPrimordialUuid().compareTo(UUID.fromString("d439284a-21d1-3ef9-842c-27f017c9f042")) == 0) {
-                            System.out.println(":!!!:DEBUG: BinaryChangeSetResolveIds .IN. \n" + eConcept.toString());
-                        }
+//                        if (eConcept.getPrimordialUuid().compareTo(UUID.fromString("d439284a-21d1-3ef9-842c-27f017c9f042")) == 0) {
+//                            System.out.println(":!!!:DEBUG: BinaryChangeSetResolveIds .IN. \n" + eConcept.toString());
+//                        }
                         if (eccsLogPreWriter != null) {
                             eccsLogPreWriter.write("\n------- ");
                             eccsLogPreWriter.write(eConcept.toString());
@@ -341,7 +355,7 @@ public class BinaryChangeSetResolveIds {
                             // Process additional ids
                             if (tkd.additionalIds != null) {
                                 preList = tkd.additionalIds;
-                                postList = processIdListWithFilter(enclosingUuid, preList);
+                                postList = processIdListWithFilterDesc(enclosingUuid, tkd, preList);
                                 tkd.additionalIds = postList;
                                 timeFirstEditL = findIdListFirstUseDate(postList, timeFirstEditL);
                             }
@@ -411,9 +425,9 @@ public class BinaryChangeSetResolveIds {
                         }
                     }
 
-                    if (eConcept.getPrimordialUuid().compareTo(UUID.fromString("d439284a-21d1-3ef9-842c-27f017c9f042")) == 0) {
-                        System.out.println(":!!!:DEBUG: BinaryChangeSetResolveIds .OUT. \n" + eConcept.toString());
-                    }
+//                    if (eConcept.getPrimordialUuid().compareTo(UUID.fromString("d439284a-21d1-3ef9-842c-27f017c9f042")) == 0) {
+//                        System.out.println(":!!!:DEBUG: BinaryChangeSetResolveIds .OUT. \n" + eConcept.toString());
+//                    }
                     if (eccsLogPostWriter != null) {
                         eccsLogPostWriter.write("\n------- ");
                         eccsLogPostWriter.write(eConcept.toString());
@@ -544,6 +558,9 @@ public class BinaryChangeSetResolveIds {
         if (resolution.compareTo(SctIdResolution.KEEP_NO_ECCS_SCTID) == 0) {
             return; // no special cases to add to use list
         }
+        if (resolution.compareTo(SctIdResolution.FILTER_DESCRIPTION_SCTIDS) == 0) {
+            return; // no special cases to add to use list
+        }
         for (TkIdentifier tki : idList) {
             if (tki.authorityUuid.compareTo(snomedIntUuid) == 0) {
                 boolean status = false;
@@ -562,6 +579,9 @@ public class BinaryChangeSetResolveIds {
             List<TkIdentifier> idList) throws IOException {
         if (resolution.compareTo(SctIdResolution.KEEP_ALL_SCTID) == 0) {
             return idList; // do not filter list
+        }
+        if (resolution.compareTo(SctIdResolution.FILTER_DESCRIPTION_SCTIDS) == 0) {
+            return idList; // do not filter list of non-descriptions
         }
         ArrayList<TkIdentifier> filteredIdList = new ArrayList<>();
         for (TkIdentifier tki : idList) {
@@ -587,7 +607,72 @@ public class BinaryChangeSetResolveIds {
                             instancesNotKept.append((Long) tki.getDenotation());
                             instancesNotKept.append("\t");
                             instancesNotKept.append(enclosingConceptUuid.toString());
-                            instancesNotKept.append("\r\n");
+                            instancesNotKept.append("\n");
+                        }
+                    } else {
+                        filteredIdList.add(tki); // not a filtered case
+                    }
+                }
+            } else {
+                filteredIdList.add(tki); // not a filtered authority
+            }
+        }
+        return filteredIdList;
+    }
+
+    private List<TkIdentifier> processIdListWithFilterDesc(UUID enclosingConceptUuid, TkDescription tkd, List<TkIdentifier> idList)
+            throws IOException {
+        if (resolution.compareTo(SctIdResolution.KEEP_ALL_SCTID) == 0) {
+            return idList; // do not filter list
+        }
+        ArrayList<TkIdentifier> filteredIdList = new ArrayList<>();
+        for (TkIdentifier tki : idList) {
+            // Report any extension path exception
+            if (extensionPath != null
+                    && tki.getPathUuid().compareTo(snomedCorePath) == 0
+                    && tki.getTime() > eccsTimeThreshold) {
+                tki.setPathUuid(extensionPath);
+                if (!eccsPathExceptionFoundB) {
+                    eccsLogExceptionsWriter.append(enclosingConceptUuid.toString());
+                    eccsPathExceptionFoundB = true;
+                }
+                eccsLogExceptionsWriter.append(" id");
+            }
+            // Process additional ids
+            if (tki.authorityUuid.compareTo(snomedIntUuid) == 0) {
+                if (resolution.compareTo(SctIdResolution.FILTER_DESCRIPTION_SCTIDS) == 0) {
+                    if (tkd.pathUuid.compareTo(extensionPath) == 0
+                            || tkd.pathUuid.compareTo(snomedCorePath) == 0) {
+                        // only keep SCTID on extension path or SNOMED Core path
+                        filteredIdList.add(tki);
+                        descriptionsKept.append((Long) tki.getDenotation());
+                        descriptionsKept.append("\t");
+                        descriptionsKept.append(enclosingConceptUuid.toString());
+                        descriptionsKept.append("\t");
+                        descriptionsKept.append(tkd.primordialUuid.toString());
+                        descriptionsKept.append("\t");
+                        descriptionsKept.append(tkd.pathUuid.toString());
+                        descriptionsKept.append("\tKEEP\n");
+                    } else {
+                        instancesNotKept.append((Long) tki.getDenotation());
+                        instancesNotKept.append("\t");
+                        instancesNotKept.append(enclosingConceptUuid.toString());
+                        instancesNotKept.append("\t");
+                        instancesNotKept.append(tkd.primordialUuid.toString());
+                        instancesNotKept.append("\t");
+                        instancesNotKept.append(tkd.pathUuid.toString());
+                        instancesNotKept.append("\tDROP\n");
+                    }
+                } else if (resolution.compareTo(SctIdResolution.KEEP_NO_ECCS_SCTID) != 0) {
+                    if (keepMap.containsKey((Long) tki.getDenotation())) {
+                        UUID keepUuid = keepMap.get((Long) tki.getDenotation());
+                        if (enclosingConceptUuid.compareTo(keepUuid) == 0) {
+                            filteredIdList.add(tki); // match, keep this instance
+                        } else {
+                            instancesNotKept.append((Long) tki.getDenotation());
+                            instancesNotKept.append("\t");
+                            instancesNotKept.append(enclosingConceptUuid.toString());
+                            instancesNotKept.append("\n");
                         }
                     } else {
                         filteredIdList.add(tki); // not a filtered case

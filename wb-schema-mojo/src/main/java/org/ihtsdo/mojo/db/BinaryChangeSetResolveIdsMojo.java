@@ -26,7 +26,9 @@ import org.ihtsdo.mojo.db.BinaryChangeSetResolveIds.SctIdResolution;
 /**
  * Read all binary change set under a specified directory hierarchy create a map of when the SCT IDs
  * were used with respective enclosing concepts keep only the latest use of SCT IDs which were used
- * for more than one enclosing concept write out a change set file with
+ * for more than one enclosing concept write out a change set file with.<br>
+ * 
+ * For FILTER_DESCRIPTION_SCTIDS setting only the descriptions are processed.  SCTIDs not on the extension path are discarded.
  *
  * @goal bcs-resolve-sctids
  *
@@ -57,7 +59,7 @@ public class BinaryChangeSetResolveIdsMojo extends AbstractMojo {
      */
     private String buildDir;
     /**
-     * Location of the build directory. KEEP_ALL_SCTID, KEEP_NO_ECCS_SCTID, KEEP_LAST_CURRENT_USE
+     * Location of the build directory. KEEP_ALL_SCTID, KEEP_NO_ECCS_SCTID, KEEP_LAST_CURRENT_USE, FILTER_DESCRIPTION_SCTIDS
      *
      * @parameter default-value= "KEEP_NO_ECCS_SCTID"
      * @required
@@ -85,6 +87,9 @@ public class BinaryChangeSetResolveIdsMojo extends AbstractMojo {
             resolution = SctIdResolution.KEEP_NO_ECCS_SCTID;
         } else if (resolutionApproach.equalsIgnoreCase("KEEP_LAST_CURRENT_USE")) {
             resolution = SctIdResolution.KEEP_LAST_CURRENT_USE;
+        } else if (resolutionApproach.equalsIgnoreCase("FILTER_DESCRIPTION_SCTIDS")) {
+            // only process descriptions
+            resolution = SctIdResolution.FILTER_DESCRIPTION_SCTIDS;
         } else {
             throw new MojoFailureException("BinaryChangeSetResolveIdsMojo invalid ");
         }

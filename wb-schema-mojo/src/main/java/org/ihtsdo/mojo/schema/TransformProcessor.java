@@ -56,12 +56,15 @@ public class TransformProcessor implements ProcessUnfetchedConceptDataBI{
 	 */
 	public TransformProcessor(AbstractTransformer transformer, DataOutputStream eConceptDOS) {
 		try {
-			allConcepts = Ts.get().getAllConceptNids();
-			this.transformer = transformer;
-			this.eConceptDOS = eConceptDOS;
+                    allConcepts = Ts.get().getAllConceptNids();
+                    this.transformer = transformer;
+                    this.eConceptDOS = eConceptDOS;
                         
-                        
-//            watchUuids.add(UUID.fromString("d439284a-21d1-3ef9-842c-27f017c9f042")); // Acquired anomaly of ear ... to check redundant roles
+                    // 'Pleural thickening' follow the SCTIDs
+                    watchUuids.add(UUID.fromString("ba76565d-cf05-347e-9a8b-6de2e099f2fe"));
+                    watchUuids.add(UUID.fromString("b8bf6a01-d840-5169-a021-fb1131878da8"));
+
+          //            watchUuids.add(UUID.fromString("d439284a-21d1-3ef9-842c-27f017c9f042")); // Acquired anomaly of ear ... to check redundant roles
 //            System.out.println(":DEBUG: added d439284a-21d1-3ef9-842c-27f017c9f042 Acquired anomaly of ear ### to check redundant roles");
             
 //            watchUuids.add(UUID.fromString("ef6ae557-83da-5664-ac23-a393ae6a7a1c")); // ABDOMINAL AND PELVIC PAIN --> ICD10-CM Concept
