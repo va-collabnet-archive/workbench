@@ -641,8 +641,8 @@ public class BinaryChangeSetResolveIds {
             // Process additional ids
             if (tki.authorityUuid.compareTo(snomedIntUuid) == 0) {
                 if (resolution.compareTo(SctIdResolution.FILTER_DESCRIPTION_SCTIDS) == 0) {
-                    if (tkd.pathUuid.compareTo(extensionPath) == 0
-                            || tkd.pathUuid.compareTo(snomedCorePath) == 0) {
+                    if (tki.pathUuid.compareTo(extensionPath) == 0
+                            || tki.pathUuid.compareTo(snomedCorePath) == 0) {
                         // only keep SCTID on extension path or SNOMED Core path
                         filteredIdList.add(tki);
                         descriptionsKept.append((Long) tki.getDenotation());
