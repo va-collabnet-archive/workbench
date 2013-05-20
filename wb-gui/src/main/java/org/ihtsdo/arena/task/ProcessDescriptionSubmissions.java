@@ -322,7 +322,6 @@ public class ProcessDescriptionSubmissions extends AbstractTask {
             }
             process.setProperty(uuidListListPropName, uuidList);
             ACE.suspendDatacheckDisplay();
-            System.out.println("###### Adding as uncommitted : " + conceptsToCommit.size() + " concepts");
             int counter = 0;
             for(ConceptChronicleBI concept : conceptsToCommit){
                 Ts.get().addUncommitted(concept);
@@ -331,9 +330,7 @@ public class ProcessDescriptionSubmissions extends AbstractTask {
                     System.out.println(counter);
                 }
             }
-            System.out.println("######### TO HERE 1 ########");
             Ts.get().waitTillDatachecksFinished();
-             System.out.println("######### TO HERE 2 ########");
             ACE.resumeDatacheckDisplay();
             if (!duplicateDescriptions.isEmpty()) {
                 worker.getLogger().info("NOT ADDING. Found " + duplicateDescriptions.size() + " existing descriptions matching. ");
