@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 import java.util.logging.Level;
@@ -41,10 +42,13 @@ import org.ihtsdo.helper.rf2.UuidUuidRemapper;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf1;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 import org.ihtsdo.tk.dto.concept.TkConcept;
+import org.ihtsdo.tk.dto.concept.component.attribute.TkConceptAttributes;
 import org.ihtsdo.tk.dto.concept.component.description.TkDescription;
 import org.ihtsdo.tk.dto.concept.component.identifier.TkIdentifier;
 import org.ihtsdo.tk.dto.concept.component.refex.TkRefexAbstractMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_uuid.TkRefexUuidRevision;
 import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationship;
+import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationshipRevision;
 
 /**
  *
@@ -65,10 +69,15 @@ public class BinaryChangeSetResolveIds {
     private StringBuilder instancesNotKept;
     private StringBuilder descriptionsKept;
     private SctIdResolution resolution;
-    private UuidUuidRemapper relLogicalUuidRemapper;
+    private UuidUuidRemapper sctPrimorialUuidRemapper;
+    private HashSet<UUID> skipUuidSet;
 
-    void setRelUuidRemap(UuidUuidRemapper idLookup) {
-        relLogicalUuidRemapper = idLookup;
+    void setSkipUuidSet(HashSet<UUID> skipUuidSet) {
+        this.skipUuidSet = skipUuidSet;
+    }
+
+    void setSctPrimorialUuidRemapper(UuidUuidRemapper uuidUuidRemapper) {
+        this.sctPrimorialUuidRemapper = uuidUuidRemapper;
     }
 
     public enum SctIdResolution {
@@ -126,7 +135,7 @@ public class BinaryChangeSetResolveIds {
         this.snomedCorePath = UUID.fromString("8c230474-9f11-30ce-9cad-185a96fd03a2");
         this.eccsTimeThreshold = 1327996800000L; // :!!!:TEMP: move to POM parameter
 
-        this.relLogicalUuidRemapper = null;
+        this.skipUuidSet = null;
     }
 
     public void processFiles() throws IOException {
@@ -135,7 +144,7 @@ public class BinaryChangeSetResolveIds {
         instancesNotKept.append("\n*** INSTANCES NOT KEPT ***");
         instancesNotKept.append("\n**************************");
         instancesNotKept.append("\nSCTID \t ConceptUUID \t ComponentUUID\n");
-        
+
         descriptionsKept = new StringBuilder();
         descriptionsKept.append("\n\n**************************");
         descriptionsKept.append("\n*** INSTANCES ARE KEPT ***");
@@ -264,6 +273,22 @@ public class BinaryChangeSetResolveIds {
         List<TkIdentifier> preList;
         List<TkIdentifier> postList;
         List<TkChangeSortable> bcsList = new ArrayList<>();
+        // :DEBUG:BEGIN:
+//        HashSet<UUID> debugSet = new HashSet<>();
+//        debugSet.add(UUID.fromString("9ef4e796-d5b9-538e-b1b4-43b4d9d7815a"));
+//        debugSet.add(UUID.fromString("76ae0785-e3a7-52c6-8054-f82be4e9b8c4"));
+//        debugSet.add(UUID.fromString("fe5ed2e6-ba31-5d61-828c-a017d02094de"));
+//        debugSet.add(UUID.fromString("7158f3db-7e44-53e0-beee-9f82b0ffcce7"));
+//        debugSet.add(UUID.fromString("07570642-1b43-31b4-9e90-4d1ebc8e21bb"));
+//        debugSet.add(UUID.fromString("db8c0eba-4c1e-5659-bfc7-afb779f78062"));
+//        debugSet.add(UUID.fromString("f3a36c74-9b49-57d9-a912-cdb5a9cb2b69"));
+//        debugSet.add(UUID.fromString("fe94655d-f895-524a-bfa9-1aa5f588f7b0"));
+//        debugSet.add(UUID.fromString("68d85b76-f5df-5403-aef1-29cba3dc3db2"));
+//        debugSet.add(UUID.fromString("76ae0785-e3a7-52c6-8054-f82be4e9b8c4"));
+//        debugSet.add(UUID.fromString("776b8717-5d7b-5ae7-a07a-70883733ee48"));
+//        debugSet.add(UUID.fromString("3b4f0354-9424-56f7-9a1c-941d406355fa"));
+//        debugSet.add(UUID.fromString("cdf6415e-c388-52f3-8944-b9157d30166c"));        
+        // :DEBUG:END:
         try {
             for (File file : eccsInputFilesList) {
                 FileInputStream fis = new FileInputStream(file);
@@ -291,17 +316,29 @@ public class BinaryChangeSetResolveIds {
                     try {
                         timeStampEccsL = in.readLong();
                         eConcept = new TkConcept(in);
+                        enclosingUuid = eConcept.primordialUuid;
                         // :!!!:DEBUG:
-//                        if (eConcept.getPrimordialUuid().compareTo(UUID.fromString("d439284a-21d1-3ef9-842c-27f017c9f042")) == 0) {
+//                        if (debugSet.contains(eConcept.getPrimordialUuid())) {
 //                            System.out.println(":!!!:DEBUG: BinaryChangeSetResolveIds .IN. \n" + eConcept.toString());
 //                        }
+
+                        if (sctPrimorialUuidRemapper != null) {
+                            remapUuids(eConcept);
+                            enclosingUuid = eConcept.primordialUuid;
+                        }
+
+                        if (skipUuidSet != null
+                                && skipUuidSet.contains(eConcept.primordialUuid)) {
+                            eccsLogExceptionsWriter.append("skipped UUID :: " + enclosingUuid.toString());
+                            continue;
+                        }
+
                         if (eccsLogPreWriter != null) {
                             eccsLogPreWriter.write("\n------- ");
                             eccsLogPreWriter.write(eConcept.toString());
                             eccsLogPreWriter.write("\n");
                         }
 
-                        enclosingUuid = eConcept.primordialUuid;
                     } catch (EOFException e) {
                         in.close();
                         break;
@@ -387,14 +424,6 @@ public class BinaryChangeSetResolveIds {
                                 timeFirstEditL = findIdListFirstUseDate(postList, timeFirstEditL);
                             }
 
-                            // 
-                            if (relLogicalUuidRemapper != null) {
-                                UUID uuid = relLogicalUuidRemapper.getUuid(tkr.primordialUuid);
-                                if (uuid != null) {
-                                    tkr.primordialUuid = uuid;
-                                }
-                            }
-
                         }
                     }
                     // Refset Members
@@ -425,7 +454,7 @@ public class BinaryChangeSetResolveIds {
                         }
                     }
 
-//                    if (eConcept.getPrimordialUuid().compareTo(UUID.fromString("d439284a-21d1-3ef9-842c-27f017c9f042")) == 0) {
+//                    if (debugSet.contains(eConcept.getPrimordialUuid())) {
 //                        System.out.println(":!!!:DEBUG: BinaryChangeSetResolveIds .OUT. \n" + eConcept.toString());
 //                    }
                     if (eccsLogPostWriter != null) {
@@ -683,6 +712,99 @@ public class BinaryChangeSetResolveIds {
             }
         }
         return filteredIdList;
+    }
+
+    private TkConcept remapUuids(TkConcept eConcept) throws IOException {
+        UUID enclosingPrimordialUuid = sctPrimorialUuidRemapper.getUuid(eConcept.primordialUuid);
+        if (enclosingPrimordialUuid != null) {
+            eccsLogExceptionsWriter.append("remapped UUID from :: " + eConcept.primordialUuid + " :: to :: " + enclosingPrimordialUuid);
+            eConcept.primordialUuid = enclosingPrimordialUuid;
+        } else {
+            enclosingPrimordialUuid = eConcept.primordialUuid;
+        }
+
+        if (eConcept.conceptAttributes != null) {
+            TkConceptAttributes attributes = eConcept.conceptAttributes;
+            attributes.primordialUuid = enclosingPrimordialUuid;
+            List<TkRefexAbstractMember<?>> conceptAnnotations = attributes.annotations;
+            if (conceptAnnotations != null) {
+                for (TkRefexAbstractMember<?> tkram : conceptAnnotations) {
+                    tkram.componentUuid = enclosingPrimordialUuid;
+                    if (tkram.annotations != null) {
+                        throw new UnsupportedOperationException("tkram.annotations != null" + tkram.toString());
+                    }
+                    List<?> revisions = tkram.revisions;
+                    if (revisions != null) {
+                        for (Object o : revisions) {
+                            if (TkRefexUuidRevision.class.isAssignableFrom(o.getClass())) {
+                                TkRefexUuidRevision trur = (TkRefexUuidRevision) o;
+                                UUID uuid1 = sctPrimorialUuidRemapper.getUuid(trur.uuid1);
+                                if (uuid1 != null) {
+                                    trur.uuid1 = uuid1;
+                                }
+                            } else {
+                                throw new UnsupportedOperationException("conceptAnnotations revision" + o.getClass());
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        if (eConcept.descriptions != null) {
+            List<TkDescription> descriptions = eConcept.descriptions;
+            for (TkDescription tkd : descriptions) {
+                tkd.conceptUuid = enclosingPrimordialUuid;
+                // description revisions do not have any remappable uuids
+            }
+        }
+
+        if (eConcept.relationships != null) {
+            List<TkRelationship> relationships = eConcept.relationships;
+            for (TkRelationship tkr : relationships) {
+                tkr.c1Uuid = enclosingPrimordialUuid;
+                // 
+                UUID relUuid = sctPrimorialUuidRemapper.getUuid(tkr.primordialUuid);
+                if (relUuid != null) {
+                    tkr.primordialUuid = relUuid;
+                }
+                UUID c2Uuid = sctPrimorialUuidRemapper.getUuid(tkr.c2Uuid);
+                if (c2Uuid != null) {
+                    tkr.c2Uuid = c2Uuid;
+                }
+                UUID typeUuid = sctPrimorialUuidRemapper.getUuid(tkr.typeUuid);
+                if (typeUuid != null) {
+                    tkr.typeUuid = typeUuid;
+                }
+                if (tkr.revisions != null) {
+                    List<TkRelationshipRevision> revisions = tkr.revisions;
+                    for (TkRelationshipRevision tkrr : revisions) {
+                        UUID revTypeUuid = sctPrimorialUuidRemapper.getUuid(tkrr.typeUuid);
+                        if (revTypeUuid != null) {
+                            tkrr.typeUuid = revTypeUuid;
+                        }
+                    }
+                }
+            }
+        }
+
+        if (eConcept.refsetMembers != null) {
+            List<TkRefexAbstractMember<?>> refsetMembers = eConcept.refsetMembers;
+            for (TkRefexAbstractMember<?> tkram : refsetMembers) {
+                UUID componentUuid = sctPrimorialUuidRemapper.getUuid(tkram.componentUuid);
+                if (componentUuid != null) {
+                    tkram.componentUuid = componentUuid;
+                }
+                List<?> revisions = tkram.revisions;
+                if (revisions != null) {
+                    for (Object o : revisions) {
+                        throw new UnsupportedOperationException(":eConcept.refsetMembers revisions" + o.getClass());
+                    }
+                }
+            }
+        }
+
+        return eConcept;
     }
 
     private Long findIdListFirstUseDate(List<TkIdentifier> idList, Long firstDate) {

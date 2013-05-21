@@ -15,6 +15,8 @@ package org.ihtsdo.mojo.db;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.UUID;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -76,6 +78,13 @@ public class BinaryChangeSetResolveIdsMojo extends AbstractMojo {
      * @parameter default-value = "id-cache"
      */
     private String idCacheDir = "";
+    /**
+     * Primordial UUIDs of eConcepts to be skip ... i.e. not included in load.
+     *
+     * @parameter
+     */
+    private String[] skipUuids;
+
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
@@ -98,13 +107,21 @@ public class BinaryChangeSetResolveIdsMojo extends AbstractMojo {
             BinaryChangeSetResolveIds rcsi = new BinaryChangeSetResolveIds(changeSetDir, genArtifactDir, resolution, true, true, extensionPathUuidStr);
 
             // Import remap cache which has been 
-            String cachePath = buildDir + FILE_SEPARATOR + idCacheDir + FILE_SEPARATOR;
-            String idCacheFName = cachePath + "uuidRemapRelLogicalCache.ser";
-            // handle RF1 stated rels imported without any rel sctid
+            String cachePath = buildDir + FILE_SEPARATOR + idCacheDir + FILE_SEPARATOR;            
+            String idCacheFName = cachePath + "uuidRemapCache.ser";
+            // handle RF1 computed UUIDs which were reassigned in RF2
             File file = new File(idCacheFName);
             if (file.exists()) {
-                UuidUuidRemapper idLookup = new UuidUuidRemapper(idCacheFName);
-                rcsi.setRelUuidRemap(idLookup);
+                UuidUuidRemapper uuidRemapCache = new UuidUuidRemapper(idCacheFName);
+                rcsi.setSctPrimorialUuidRemapper(uuidRemapCache);
+            }
+            
+            if (skipUuids != null) {
+                HashSet<UUID> skipUuidSet = new HashSet<>();
+                for (String str : skipUuids) {
+                    skipUuidSet.add(UUID.fromString(str));
+                }
+                rcsi.setSkipUuidSet(skipUuidSet);
             }
 
             rcsi.processFiles();
