@@ -42,7 +42,8 @@ import org.ihtsdo.tk.uuid.UuidT3Generator;
 
 /**
  *
- * Read a file of SCTID with corresponding UUIDs and determines if the UUIDs need to be re-mapped.
+ * Read a file of SCTID with corresponding UUIDs and determines if the UUIDs 
+ * need to be re-mapped.
  *
  * @author Marc E. Campbell
  *
@@ -123,7 +124,9 @@ public class Rf2IdUuidRemapArfMojo
 
         CreateUuidRemapCache(wDir, idCacheFName);
         try {
-            RemapAllFiles(wDir, remapSubDir, remapArfDirs, idCacheFName);
+            if (remapArfDirs != null) {
+                RemapAllFiles(wDir, remapSubDir, remapArfDirs, idCacheFName);
+            }
         } catch (IOException ex) {
             throw new MojoExecutionException("failed uuid remap", ex);
         }
@@ -294,16 +297,17 @@ public class Rf2IdUuidRemapArfMojo
                     long sctIdL = Long.parseLong(line[REFERENCED_COMPONENT_ID]);
                     UUID cUuid = UUID.fromString(
                             UuidT3Generator.fromSNOMED(sctIdL).toString());
+                    
                     // UUID cUuid = UUID.fromString(Rf2x.convertSctIdToUuidStr(sctIdL));
                     if (aUuid.compareTo(cUuid) != 0) {
                         countNonComputedIdsL++;
+                        UuidUuidRecord tempIdCompact = new UuidUuidRecord(
+                                cUuid,
+                                aUuid);
+                        // Write to JBIN file
+                        oos.writeUnshared(tempIdCompact);
                     }
 
-                    UuidUuidRecord tempIdCompact = new UuidUuidRecord(
-                            cUuid,
-                            aUuid);
-                    // Write to JBIN file
-                    oos.writeUnshared(tempIdCompact);
                 }
                 StringBuilder sb = new StringBuilder();
                 sb.append("\n::: parseToUuidRemapCacheFile(..) ");
