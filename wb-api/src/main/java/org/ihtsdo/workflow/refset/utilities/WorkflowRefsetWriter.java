@@ -18,8 +18,10 @@ import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.TerminologyBuilderBI;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.refex.type_string.RefexStringVersionBI;
 import org.ihtsdo.tk.dto.concept.component.refex.TK_REFEX_TYPE;
@@ -48,36 +50,34 @@ public abstract class WorkflowRefsetWriter extends WorkflowRefset {
 
     public I_ExtendByRef addMember(boolean autoCommit) {
         ConceptSpec wfHxRefSpec = new ConceptSpec("history workflow refset",UUID.fromString("0b6f0e24-5fe2-3869-9342-c18008f53283"));
-        I_ExtendByRef ref = null;
+        RefexChronicleBI<?> ref = null;
         try {
             I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
             if (fields.valuesExist()) {
-                RefsetPropertyMap propMap = new RefsetPropertyMap();
-                propMap.put(REFSET_PROPERTY.STRING_VALUE, fieldsToRefsetString());
                 RefexCAB memberBp = new RefexCAB(TK_REFEX_TYPE.STR,
                         fields.getReferencedComponentNid(),
                         refsetNid);
                 memberBp.put(RefexCAB.RefexProperty.STRING1, fieldsToRefsetString());
                 TerminologyBuilderBI builder = Ts.get().getTerminologyBuilder(config.getEditCoordinate(), config.getViewCoordinate());
-                builder.construct(memberBp);
+                ref = builder.construct(memberBp);
                 if (ref != null) {
-	                I_GetConceptData refset = Terms.get().getConcept(refsetNid);
+	                ConceptChronicleBI refset = Ts.get().getConcept(refsetNid);
 	
 	                if (refset.isAnnotationStyleRefex()) {
+                            ConceptChronicleBI rc = Ts.get().getConcept(fields.getReferencedComponentUid());
 	                	// Workflow history refset only annotated workflow refset at this point
 		                if (autoCommit) {
 		                	// Updated via AdvanceWf, Undo, override
-			                Terms.get().addUncommittedNoChecks(ref);
-			                I_GetConceptData concept = Terms.get().getConcept(fields.getReferencedComponentUid());
-		                	Ts.get().commit(concept);
+			                Ts.get().addUncommittedNoChecks(rc);
+		                	Ts.get().commit(rc);
 		                } else {
 		                	// Updated via UpdateWorkflowUponCommit (includes autoApprove) 
-		                	Terms.get().addUncommittedNoChecks(ref);
+		                	Ts.get().addUncommittedNoChecks(rc);
 		                }
 	                } else {
                             UUID refsetUuid = Ts.get().getUuidPrimordialForNid(refsetNid);
                             if (refsetUuid.equals(wfHxRefSpec.getLenient().getPrimUuid())) {
-                                Terms.get().addUncommittedNoChecks(refset);
+                                Ts.get().addUncommittedNoChecks(refset);
                             } else {
                                 // Other workflow refsets (ie editor category)
                                 Ts.get().commit(refset);
@@ -92,7 +92,7 @@ public abstract class WorkflowRefsetWriter extends WorkflowRefset {
         }
 
         fields.cleanValues();
-        return ref;
+        return (I_ExtendByRef) ref;
     }
 
     public I_ExtendByRef retireMember(){

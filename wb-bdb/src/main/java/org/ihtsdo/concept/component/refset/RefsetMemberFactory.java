@@ -35,6 +35,7 @@ import org.ihtsdo.tk.dto.concept.component.refex.type_string.TkRefsetStrMember;
 
 import com.sleepycat.bind.tuple.TupleInput;
 import org.ihtsdo.concept.Concept;
+import org.ihtsdo.concept.I_ManageConceptData;
 import org.ihtsdo.concept.component.refsetmember.array.bytearray.ArrayOfBytearrayMember;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.tk.Ts;
@@ -59,7 +60,7 @@ public class RefsetMemberFactory {
             member.enclosingConceptNid = Ts.get().getConceptNidForNid(rcNid);
             Bdb.getNidCNidMap().setCNidForNid(member.enclosingConceptNid, member.nid);
             if (refexColCon.isAnnotationIndex()) {
-                refexColCon.getData().add(member);
+                refexColCon.getData().getMemberNids().add(member.nid);
             }
         } else {
             member.enclosingConceptNid = refexColCon.getNid();
