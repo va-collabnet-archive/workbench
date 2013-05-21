@@ -108,7 +108,7 @@ public class EConceptChangeSetReader implements I_ReadChangeSet {
         while ((nextCommitTime() <= endTime) && (nextCommitTime() != Long.MAX_VALUE)) {
             try {
                 EConcept eConcept = new EConcept(dataStream);
-//                if (eConcept.getPrimordialUuid().compareTo(UUID.fromString("d439284a-21d1-3ef9-842c-27f017c9f042")) == 0) {
+//                if (eConcept.getPrimordialUuid().compareTo(UUID.fromString("d4185340-1733-4f07-9768-6013bd734f6e")) == 0) {
 //                    System.out.println(":!!!:DEBUG: EConceptChangeSetReader ...AAA... \n" + eConcept.toString());
 //                }
                 if (csreOut != null) {
@@ -136,9 +136,9 @@ public class EConceptChangeSetReader implements I_ReadChangeSet {
                             AceLog.getEditLog().fine("Read eConcept... " + eConcept);
                         }
                         if (!noCommit) {
-                            if (eConcept.getPrimordialUuid().compareTo(UUID.fromString("d439284a-21d1-3ef9-842c-27f017c9f042")) == 0) {
-                                System.out.println(":!!!:DEBUG: EConceptChangeSetReader ...BBB... \n" + eConcept.toString());
-                            }
+//                            if (eConcept.getPrimordialUuid().compareTo(UUID.fromString("d4185340-1733-4f07-9768-6013bd734f6e")) == 0) {
+//                                System.out.println(":!!!:DEBUG: EConceptChangeSetReader ...BBB... \n" + eConcept.toString());
+//                            }
                             commitEConcept(eConcept, nextCommit, values, annotatedIndexes);
                         }
                 } else {
