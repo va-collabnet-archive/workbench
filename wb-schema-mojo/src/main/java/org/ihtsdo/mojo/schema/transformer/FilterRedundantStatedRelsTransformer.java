@@ -245,7 +245,7 @@ public class FilterRedundantStatedRelsTransformer extends AbstractTransformer {
         }
         return true;
     }
-    private static final UUID watchUuid = UUID.fromString("80047350-83f2-3d0b-812c-90912af86ba7");
+//    private static final UUID watchUuid = UUID.fromString("80047350-83f2-3d0b-812c-90912af86ba7");
 
     private void filterRedundantStatedRelationships(TkConcept eConcept)
             throws NoSuchAlgorithmException, UnsupportedEncodingException, IOException {
@@ -262,9 +262,9 @@ public class FilterRedundantStatedRelsTransformer extends AbstractTransformer {
             }
         }
 
-        if (eConcept.getPrimordialUuid().compareTo(watchUuid) == 0) {
-            System.out.println(":DEBUG: found watch concept");
-        }
+//        if (eConcept.getPrimordialUuid().compareTo(watchUuid) == 0) {
+//            System.out.println(":DEBUG: found watch concept");
+//        }
         statedRels = LogicalRelComputer.addLogicalUuidsWithSort(statedRels);
         if (statedRels.size() <= 1) {
             return;
