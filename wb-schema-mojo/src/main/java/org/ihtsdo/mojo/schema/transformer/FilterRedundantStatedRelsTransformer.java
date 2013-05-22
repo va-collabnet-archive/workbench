@@ -15,8 +15,6 @@
  */
 package org.ihtsdo.mojo.schema.transformer;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
@@ -24,29 +22,23 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.etypes.EDescription;
 import org.ihtsdo.helper.rf2.LogicalRel;
 import org.ihtsdo.helper.rf2.LogicalRelComputer;
 import org.ihtsdo.mojo.schema.AbstractTransformer;
 import org.ihtsdo.mojo.schema.config.TransformersConfigApi;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.TerminologyStoreDI;
-import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 import org.ihtsdo.tk.dto.concept.TkConcept;
 import org.ihtsdo.tk.dto.concept.component.TkComponent;
 import org.ihtsdo.tk.dto.concept.component.attribute.TkConceptAttributes;
 import org.ihtsdo.tk.dto.concept.component.description.TkDescription;
-import org.ihtsdo.tk.dto.concept.component.description.TkDescriptionRevision;
-import org.ihtsdo.tk.dto.concept.component.identifier.TkIdentifier;
 import org.ihtsdo.tk.dto.concept.component.refex.TkRefexAbstractMember;
 import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationship;
 import org.ihtsdo.tk.spec.ValidationException;
-import org.ihtsdo.tk.uuid.UuidT5Generator;
 
 /**
  * This transformer checks for logically redundant relationship. This first
@@ -72,12 +64,10 @@ public class FilterRedundantStatedRelsTransformer extends AbstractTransformer {
     private final UUID snomedIntId;
     private final UUID snomedCorePathUuid;
     private final int snomedCorePathNid;
-    private final UUID kpExtensionPath;
+    private final UUID extensionPath;
     private final int kpExtensionPathNid;
-    private final UUID editTemplatePath;
+    private final UUID developmentPath;
     private HashSet<UUID> duplicateUuidSet;
-    private static final UUID unDupNameSpace =
-            UUID.fromString("0a321020-beb4-11e2-9e96-0800200c9a66");
     // Statistics
     private transient int totalMembersConverted = 0;
     private int totalZeros;
@@ -103,8 +93,8 @@ public class FilterRedundantStatedRelsTransformer extends AbstractTransformer {
         statedUuid = SnomedMetadataRf2.STATED_RELATIONSHIP_RF2.getLenient().getPrimUuid();
         snomedIntId = ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.getPrimoridalUid();
         snomedCorePathUuid = ArchitectonicAuxiliary.Concept.SNOMED_CORE.getPrimoridalUid();
-        kpExtensionPath = UUID.fromString("2bfc4102-f630-5fbe-96b8-625f2a6b3d5a");
-        editTemplatePath = UUID.fromString("8a6447b8-4a57-56b0-960f-075f430cd02f");
+        extensionPath = UUID.fromString("2bfc4102-f630-5fbe-96b8-625f2a6b3d5a");
+        developmentPath = UUID.fromString("3770e517-7adc-5a24-a447-77a9daa3eedf");
 
         totalZeros = 0;
         totalSingletonsDropped = 0;
@@ -121,7 +111,7 @@ public class FilterRedundantStatedRelsTransformer extends AbstractTransformer {
         totalResidual = 0;
 
         ts = Ts.get();
-        kpExtensionPathNid = ts.getNidForUuids(kpExtensionPath);
+        kpExtensionPathNid = ts.getNidForUuids(extensionPath);
         snomedCorePathNid = ts.getNidForUuids(snomedCorePathUuid);
 
         report = new StringBuilder();
@@ -292,7 +282,7 @@ public class FilterRedundantStatedRelsTransformer extends AbstractTransformer {
             if (sameLogicalIdRels.size() == 1) {
                 LogicalRel a = sameLogicalIdRels.get(0);
                 if (a.relSctIdPath != null
-                        && a.relSctIdPath.compareTo(editTemplatePath) == 0) {
+                        && isExtensionSctId(a.relSctId)) {
                     totalSingletonsDropped++;
                     System.out.println(toStr("singleton dropped", eConcept, a));
                 } else {
@@ -302,8 +292,8 @@ public class FilterRedundantStatedRelsTransformer extends AbstractTransformer {
             }
 
             if (sameLogicalIdRels.size() > 2) {
-                if (findOnPathCount(sameLogicalIdRels, editTemplatePath) == 1) {
-                    int idx = findOnPathIdx(sameLogicalIdRels, editTemplatePath);
+                if (findOnPathCount(sameLogicalIdRels, developmentPath) == 1) {
+                    int idx = findOnPathIdx(sameLogicalIdRels, developmentPath);
                     sameLogicalIdRels.remove(idx);
                 } else {
                     throw new UnsupportedOperationException("\n:!!!: sameLogicalIdRels.size() > 2 not expected");
@@ -379,7 +369,7 @@ public class FilterRedundantStatedRelsTransformer extends AbstractTransformer {
                 keepRels.add(b);
                 totalNonCoreBothActive++;
                 System.out.println(toStr("both non-core, both active", eConcept, a));
-            } else if (a.pathUuid.compareTo(kpExtensionPath) == 0
+            } else if (a.pathUuid.compareTo(extensionPath) == 0
                     && b.pathUuid.compareTo(snomedCorePathUuid) == 0
                     && a.statusUuid.compareTo(activeUuid) == 0
                     && b.statusUuid.compareTo(activeUuid) == 0) {
@@ -388,14 +378,14 @@ public class FilterRedundantStatedRelsTransformer extends AbstractTransformer {
                 totalExtensionBothActive++;
                 System.out.println(toStr("extension, both active", eConcept, a));
             } else if (a.pathUuid.compareTo(snomedCorePathUuid) == 0
-                    && b.pathUuid.compareTo(kpExtensionPath) == 0
+                    && b.pathUuid.compareTo(extensionPath) == 0
                     && a.statusUuid.compareTo(activeUuid) == 0
                     && b.statusUuid.compareTo(activeUuid) == 0) {
                 keepRels.add(a);
                 // keepRels.add(b);
                 totalExtensionBothActive++;
                 System.out.println(toStr("extension, both active", eConcept, a));
-            } else if (a.pathUuid.compareTo(kpExtensionPath) == 0
+            } else if (a.pathUuid.compareTo(extensionPath) == 0
                     && b.pathUuid.compareTo(snomedCorePathUuid) == 0
                     && a.statusUuid.compareTo(activeUuid) == 0
                     && b.statusUuid.compareTo(activeUuid) != 0) {
@@ -404,7 +394,7 @@ public class FilterRedundantStatedRelsTransformer extends AbstractTransformer {
                 totalExtensionCoreInactive++;
                 System.out.println(toStr("extension, core inactive", eConcept, a));
             } else if (a.pathUuid.compareTo(snomedCorePathUuid) == 0
-                    && b.pathUuid.compareTo(kpExtensionPath) == 0
+                    && b.pathUuid.compareTo(extensionPath) == 0
                     && a.statusUuid.compareTo(activeUuid) != 0
                     && b.statusUuid.compareTo(activeUuid) == 0) {
                 keepRels.add(a);
@@ -452,7 +442,7 @@ public class FilterRedundantStatedRelsTransformer extends AbstractTransformer {
         for (LogicalRel logicalRel : keepRels) {
             relList.add(logicalRel.tkr);
             if (logicalRel.relSctIdPath != null
-                    && logicalRel.relSctIdPath.compareTo(editTemplatePath) == 0) {
+                    && isExtensionSctId(logicalRel.relSctId)) {
                 totalResidual++;
                 System.out.println(toStr("residual", eConcept, logicalRel));
             }
@@ -460,6 +450,21 @@ public class FilterRedundantStatedRelsTransformer extends AbstractTransformer {
         eConcept.setRelationships(relList);
     }
 
+    // isExtensionSctId (sameLogicalIdRels.get(2).relSctId)
+    private boolean isExtensionSctId(Long sctid) {
+        String sctidStr = Long.toString(sctid);
+        int length = sctidStr.length();
+        if (length < 10) {
+            return false;
+        } 
+        String nameSpaceIdentifier = sctidStr.substring(length - 10, length - 3);
+        if (nameSpaceIdentifier.equalsIgnoreCase("1000119")) {
+            // :NYI: "1000119" needs to be generalized for broader applications
+            return true;
+        }
+        return false;
+    }
+    
     private String toStr(String s, TkConcept eConcept, LogicalRel rel)
             throws IOException {
 
