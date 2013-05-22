@@ -733,7 +733,8 @@ public class BinaryChangeSetResolveIds {
 //    }
     private UUID remapAuthor(UUID authorUuid, UUID pathUuid) {
         if (authorUuid == null || pathUuid == null) {
-            return null;
+            // return null;
+            throw new UnsupportedOperationException("remapPath is null");
         }
         UUID mappedAuthor = pathToAuthorMap.get(pathUuid);
         if (mappedAuthor == null) {
@@ -745,11 +746,16 @@ public class BinaryChangeSetResolveIds {
 
     private UUID remapPath(UUID authorUuid, UUID pathUuid) {
         if (authorUuid == null || pathUuid == null) {
-            return null;
+            // return null;
+            throw new UnsupportedOperationException("remapPath is null");
         }
         UUID mappedAuthor = pathToAuthorMap.get(pathUuid);
         if (mappedAuthor == null) {
-            return pathUuid;
+            if (pathsToNotChange.contains(pathUuid)) {
+                return pathUuid;
+            } else {
+                throw new UnsupportedOperationException("case not supported");
+            }
         } else {
             return pathToPath;
         }
@@ -794,8 +800,8 @@ public class BinaryChangeSetResolveIds {
         if (descriptions != null) {
             for (TkDescription tkd : descriptions) {
                 // printPathAuthor(tkd.authorUuid, tkd.pathUuid);
-                    tkd.authorUuid = remapAuthor(tkd.authorUuid, tkd.pathUuid);
-                    tkd.pathUuid = remapPath(tkd.authorUuid, tkd.pathUuid);
+                tkd.authorUuid = remapAuthor(tkd.authorUuid, tkd.pathUuid);
+                tkd.pathUuid = remapPath(tkd.authorUuid, tkd.pathUuid);
                 // IDS
                 if (tkd.additionalIds != null) {
                     List<TkIdentifier> ids = tkd.additionalIds;
