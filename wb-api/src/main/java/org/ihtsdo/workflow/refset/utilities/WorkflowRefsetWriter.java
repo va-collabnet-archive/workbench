@@ -8,12 +8,10 @@ import org.dwfa.ace.api.I_GetConceptData;
 
 import org.dwfa.ace.api.RefsetPropertyMap;
 import org.dwfa.ace.api.Terms;
-import org.dwfa.ace.api.RefsetPropertyMap.REFSET_PROPERTY;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.I_ConceptualizeUniversally;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.TerminologyBuilderBI;
@@ -25,7 +23,6 @@ import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.refex.type_string.RefexStringVersionBI;
 import org.ihtsdo.tk.dto.concept.component.refex.TK_REFEX_TYPE;
-import org.ihtsdo.tk.refset.SpecRefsetHelper;
 import org.ihtsdo.tk.spec.ConceptSpec;
 import org.ihtsdo.workflow.refset.WorkflowRefset;
 
@@ -58,6 +55,7 @@ public abstract class WorkflowRefsetWriter extends WorkflowRefset {
                         fields.getReferencedComponentNid(),
                         refsetNid);
                 memberBp.put(RefexCAB.RefexProperty.STRING1, fieldsToRefsetString());
+                memberBp.setMemberUuid(memberBp.computeMemberContentUuid());
                 TerminologyBuilderBI builder = Ts.get().getTerminologyBuilder(config.getEditCoordinate(), config.getViewCoordinate());
                 ref = builder.construct(memberBp);
                 if (ref != null) {
