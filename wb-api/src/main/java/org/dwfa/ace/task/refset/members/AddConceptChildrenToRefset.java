@@ -45,6 +45,7 @@ import org.ihtsdo.tk.refset.SpecRefsetHelper;
 /**
  * Adds a single concept as a member of the working refset
  */
+//REFSET PERFORMANCE CHANGE, NEEDS TESTING
 @BeanList(specs = { @Spec(directory = "tasks/ide/refset/membership", type = BeanType.TASK_BEAN) })
 public class AddConceptChildrenToRefset extends AbstractTask {
 

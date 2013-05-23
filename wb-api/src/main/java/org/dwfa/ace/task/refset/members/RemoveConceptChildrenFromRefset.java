@@ -39,6 +39,8 @@ import org.ihtsdo.tk.api.NidBitSetBI;
 import org.ihtsdo.tk.api.NidBitSetItrBI;
 import org.ihtsdo.tk.refset.SpecRefsetHelper;
 
+//REFSET PERFORMANCE CHANGE, NEEDS TESTING
+
 @BeanList(specs = { @Spec(directory = "tasks/ide/refset/membership", type = BeanType.TASK_BEAN) })
 public class RemoveConceptChildrenFromRefset extends AbstractTask {
 
