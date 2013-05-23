@@ -66,11 +66,11 @@ public abstract class WorkflowRefsetWriter extends WorkflowRefset {
 	                	// Workflow history refset only annotated workflow refset at this point
 		                if (autoCommit) {
 		                	// Updated via AdvanceWf, Undo, override
-			                Ts.get().addUncommittedNoChecks(rc);
+			                Terms.get().addUncommittedNoChecks((I_ExtendByRef) ref);
 		                	Ts.get().commit(rc);
 		                } else {
 		                	// Updated via UpdateWorkflowUponCommit (includes autoApprove) 
-		                	Ts.get().addUncommittedNoChecks(rc);
+		                	Terms.get().addUncommittedNoChecks((I_ExtendByRef) ref);
 		                }
 	                } else {
                             UUID refsetUuid = Ts.get().getUuidPrimordialForNid(refsetNid);
