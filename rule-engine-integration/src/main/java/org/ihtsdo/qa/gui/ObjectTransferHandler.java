@@ -25,6 +25,7 @@ import java.util.Vector;
 import javax.swing.DefaultListModel;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JTable;
 import javax.swing.JTextField;
@@ -126,7 +127,21 @@ public class ObjectTransferHandler extends TransferHandler {
 				conceptBeanFlavor = this.conceptBeanFlavor;
 
 				if (hasConceptBeanFlavor(t.getTransferDataFlavors(), conceptBeanFlavor)) {
-					if (c instanceof JTextField) {
+					if (c instanceof JLabel) {
+						
+						I_GetConceptData concept = (I_GetConceptData) t.getTransferData(conceptBeanFlavor);
+						if (getItem == null) {
+							((JLabel) c).setText(concept.toString());
+						} else {
+							try {
+								getItem.getItemFromConcept(concept);
+							} catch (Exception e) {
+								AceLog.getAppLog().info(e.getMessage());
+								AceLog.getAppLog().alertAndLogException(e);
+								return false;
+							}
+						}
+					} else if (c instanceof JTextField) {
 
 						I_GetConceptData concept = (I_GetConceptData) t.getTransferData(conceptBeanFlavor);
 						if (getItem == null) {
