@@ -15,6 +15,9 @@
  */
 package org.ihtsdo.mojo.schema.transformer;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
@@ -22,6 +25,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
@@ -67,7 +71,8 @@ public class FilterRedundantStatedRelsTransformer extends AbstractTransformer {
     private final UUID extensionPath;
     private final int kpExtensionPathNid;
     private final UUID developmentPath;
-    private HashSet<UUID> duplicateUuidSet;
+    private HashSet<UUID> skipUuidSet;
+    private HashSet<UUID> refsetsToFilter;
     // Statistics
     private transient int totalMembersConverted = 0;
     private int totalZeros;
@@ -82,7 +87,8 @@ public class FilterRedundantStatedRelsTransformer extends AbstractTransformer {
     private int totalSuppressNonSnomedId;
     private int totalNotProcessedKeptBoth;
     private int totalResidual;
-    private final StringBuilder report;
+    // private final StringBuilder report;
+    private final BufferedWriter reportWriter;
 
     /**
      * Instantiates a new transformer.
@@ -114,7 +120,9 @@ public class FilterRedundantStatedRelsTransformer extends AbstractTransformer {
         kpExtensionPathNid = ts.getNidForUuids(extensionPath);
         snomedCorePathNid = ts.getNidForUuids(snomedCorePathUuid);
 
-        report = new StringBuilder();
+        // report = new StringBuilder();
+        File reportFile = new File("report.txt");
+        reportWriter = new BufferedWriter(new FileWriter(reportFile));
     }
 
     /*
@@ -128,13 +136,18 @@ public class FilterRedundantStatedRelsTransformer extends AbstractTransformer {
 
     @Override
     public void setupFromXml(String xmlFile) throws Exception {
-        // setup check for duplicate UUIDs
-        // parameters.duplicateUuidList.uuid
-        duplicateUuidSet = new HashSet();
+        // setup check for skips UUIDs of concepts to be exclude from export
+        // parameters.skipUuidList.uuid
+        skipUuidSet = new HashSet();
         TransformersConfigApi api = new TransformersConfigApi(xmlFile);
         for (String loopValue : api.getCollectionAt(api.getIntId(id),
-                "parameters.duplicateUuidList.uuid")) {
-            duplicateUuidSet.add(UUID.fromString(loopValue));
+                "parameters.skipUuidList.uuid")) {
+            skipUuidSet.add(UUID.fromString(loopValue));
+        }
+        refsetsToFilter = new HashSet();
+        for (String loopValue : api.getCollectionAt(api.getIntId(id),
+                "parameters.refsetsToFilter.uuid")) {
+            refsetsToFilter.add(UUID.fromString(loopValue));
         }
     }
 
@@ -145,45 +158,7 @@ public class FilterRedundantStatedRelsTransformer extends AbstractTransformer {
 
     @Override
     public void transformDescription(TkDescription description, TkConcept concept) {
-//        if (duplicateUuidSet.contains(description.primordialUuid)) {
-//            if (concept.hasSnomedIsa()) {
-//                UUID newUuid = null;
-//                try {
-//                    newUuid = UuidT5Generator.get(unDupNameSpace,
-//                            description.primordialUuid.toString());
-//                } catch (NoSuchAlgorithmException | UnsupportedEncodingException ex) {
-//                    Logger.getLogger(FilterRedundantStatedRelsTransformer.class.getName()).log(Level.SEVERE, null, ex);
-//                }
-//                report.append("Description UUID Change :: ");
-//                report.append(description.primordialUuid);
-//                report.append(" >> ");
-//                report.append(newUuid);
-//                report.append("\n");
-//                description.primordialUuid = newUuid;
-//
-//                description.additionalIds = null;
-//
-//                List<TkRefexAbstractMember<?>> aList = description.annotations;
-//                if (aList != null) {
-//                    for (TkRefexAbstractMember<?> tkram : aList) {
-//                        UUID newRamUuid = null;
-//                        try {
-//                            newRamUuid = UuidT5Generator.get(unDupNameSpace,
-//                                    tkram.primordialUuid.toString());
-//                        } catch (NoSuchAlgorithmException | UnsupportedEncodingException ex) {
-//                            Logger.getLogger(FilterRedundantStatedRelsTransformer.class.getName()).log(Level.SEVERE, null, ex);
-//                        }
-//                        report.append("Annotation UUID Change :: ");
-//                        report.append(tkram.primordialUuid);
-//                        report.append(" >> ");
-//                        report.append(newRamUuid);
-//                        report.append("\n");
-//                        tkram.primordialUuid = newRamUuid;
-//                        tkram.componentUuid = newUuid;
-//                    }
-//                }
-//            }
-//        }
+        // nothing to do
     }
 
     @Override
@@ -193,38 +168,29 @@ public class FilterRedundantStatedRelsTransformer extends AbstractTransformer {
 
     @Override
     public void transformAnnotation(TkRefexAbstractMember<?> annotation, TkComponent<?> component) {
-        /* 
-         if (duplicateUuidSet.contains(annotation.primordialUuid)) {
-         if (component instanceof EDescription) {
-         EDescription d = (EDescription) component;
-         try {
-         ConceptChronicleBI c = ts.getConcept(d.conceptUuid);
-         int cPathNid = c.getConceptAttributes().getPrimordialVersion().getPathNid();
-         if (cPathNid != kpExtensionPathNid) {
-         annotation.primordialUuid = UUID.randomUUID();
-         annotation.additionalIds = null;
-         }
-         } catch (IOException ex) {
-         Logger.getLogger(FilterRedundantStatedRelsTransformer.class.getName()).log(Level.SEVERE, null, ex);
-         }
-         }
-         }
-         */
+        // nothing to do
     }
 
     @Override
     public void transformMember(TkRefexAbstractMember<?> member, TkConcept concept) {
-//        if (duplicateUuidSet.contains(member.primordialUuid)) {
-//            if (concept.hasSnomedIsa()) {
-//                member.primordialUuid = UUID.randomUUID();
-//                member.additionalIds = null;
-//            }
-//        }
+        // nothing to do
     }
 
     @Override
     public boolean postProcessConcept(TkConcept eConcept) {
+        if (skipUuidSet.contains(eConcept.primordialUuid)) {
+            return false;
+        }
+        if (refsetsToFilter.contains(eConcept.primordialUuid)) {
+            filterMembersByComponentUuid(eConcept);
+        }        
         try {
+            if (eConcept.hasAuxIsa() && eConcept.hasSnomedIsa()) {
+                reportWriter.append(toStr("DATA CHECK: eConcept hasActiveAuxIsa && hasActiveSnomedIsa ", eConcept, null));
+            }
+            if (eConcept.hasAuxIsa() == false && eConcept.hasSnomedIsa() == false) {
+                reportWriter.append(toStr("DATA CHECK: eConcept is root or orphan ", eConcept, null));
+            }
             if (eConcept.hasSnomedIsa()) {
                 filterRedundantStatedRelationships(eConcept);
             }
@@ -235,8 +201,18 @@ public class FilterRedundantStatedRelsTransformer extends AbstractTransformer {
         }
         return true;
     }
-//    private static final UUID watchUuid = UUID.fromString("80047350-83f2-3d0b-812c-90912af86ba7");
 
+    private void filterMembersByComponentUuid(TkConcept eConcept) {
+        ArrayList<TkRefexAbstractMember<?>> keepMemberList = new ArrayList<>();
+        for (TkRefexAbstractMember<?> member : eConcept.refsetMembers) {
+            if (!skipUuidSet.contains(member.componentUuid)) {
+                keepMemberList.add(member);
+            }
+        }
+        eConcept.refsetMembers = keepMemberList;
+    }
+    
+    //    private static final UUID watchUuid = UUID.fromString("80047350-83f2-3d0b-812c-90912af86ba7");
     private void filterRedundantStatedRelationships(TkConcept eConcept)
             throws NoSuchAlgorithmException, UnsupportedEncodingException, IOException {
 
@@ -284,7 +260,8 @@ public class FilterRedundantStatedRelsTransformer extends AbstractTransformer {
                 if (a.relSctIdPath != null
                         && isExtensionSctId(a.relSctId)) {
                     totalSingletonsDropped++;
-                    System.out.println(toStr("singleton dropped", eConcept, a));
+                    keepRels.addAll(sameLogicalIdRels);
+                    reportWriter.append(toStr("singleton with KP SCTID kept", eConcept, a));
                 } else {
                     keepRels.addAll(sameLogicalIdRels);
                 }
@@ -311,12 +288,12 @@ public class FilterRedundantStatedRelsTransformer extends AbstractTransformer {
                 keepRels.add(b);
                 totalSupressedTypeZero++;
                 totalMembersConverted++;
-                System.out.println(toStr("one redundancy missing sctid", eConcept, b));
+                reportWriter.append(toStr("one redundancy missing sctid", eConcept, b));
             } else if (a.relSctIdPath == null && b.relSctIdPath != null) {
                 keepRels.add(a);
                 totalSupressedTypeZero++;
                 totalMembersConverted++;
-                System.out.println(toStr("one redundancy missing sctid", eConcept, a));
+                reportWriter.append(toStr("one redundancy missing sctid", eConcept, a));
             } else if (a.pathUuid.compareTo(snomedCorePathUuid) == 0
                     && b.pathUuid.compareTo(snomedCorePathUuid) == 0
                     && a.statusUuid.compareTo(activeUuid) == 0
@@ -325,7 +302,7 @@ public class FilterRedundantStatedRelsTransformer extends AbstractTransformer {
                     && b.relSctIdPath.compareTo(snomedCorePathUuid) == 0) {
                 keepRels.add(a);
                 keepRels.add(b);
-                System.out.println(toStr("SNOMED Core Redundancy", eConcept, a));
+                reportWriter.append(toStr("SNOMED Core Redundancy", eConcept, a));
                 totalSnomedCoreRedunancy++;
             } else if (a.pathUuid.compareTo(snomedCorePathUuid) == 0
                     && b.pathUuid.compareTo(snomedCorePathUuid) == 0
@@ -335,7 +312,7 @@ public class FilterRedundantStatedRelsTransformer extends AbstractTransformer {
                     && b.relSctIdPath.compareTo(snomedCorePathUuid) == 0) {
                 keepRels.add(a);
                 keepRels.add(b);
-                System.out.println(toStr("SNOMED Core Retired", eConcept, a));
+                reportWriter.append(toStr("SNOMED Core Retired", eConcept, a));
                 totalSnomedCoreRetired++;
             } else if (a.pathUuid.compareTo(snomedCorePathUuid) == 0
                     && b.pathUuid.compareTo(snomedCorePathUuid) == 0
@@ -345,7 +322,7 @@ public class FilterRedundantStatedRelsTransformer extends AbstractTransformer {
                     && b.relSctIdPath.compareTo(snomedCorePathUuid) == 0) {
                 keepRels.add(a);
                 keepRels.add(b);
-                System.out.println(toStr("SNOMED Core Retired", eConcept, a));
+                reportWriter.append(toStr("SNOMED Core Retired", eConcept, a));
                 totalSnomedCoreRetired++;
             } else if (a.pathUuid.compareTo(snomedCorePathUuid) == 0
                     && b.pathUuid.compareTo(snomedCorePathUuid) == 0
@@ -368,7 +345,7 @@ public class FilterRedundantStatedRelsTransformer extends AbstractTransformer {
                 keepRels.add(a);
                 keepRels.add(b);
                 totalNonCoreBothActive++;
-                System.out.println(toStr("both non-core, both active", eConcept, a));
+                reportWriter.append(toStr("both non-core, both active", eConcept, a));
             } else if (a.pathUuid.compareTo(extensionPath) == 0
                     && b.pathUuid.compareTo(snomedCorePathUuid) == 0
                     && a.statusUuid.compareTo(activeUuid) == 0
@@ -376,7 +353,7 @@ public class FilterRedundantStatedRelsTransformer extends AbstractTransformer {
                 // keepRels.add(a);
                 keepRels.add(b);
                 totalExtensionBothActive++;
-                System.out.println(toStr("extension, both active", eConcept, a));
+                reportWriter.append(toStr("extension, both active", eConcept, a));
             } else if (a.pathUuid.compareTo(snomedCorePathUuid) == 0
                     && b.pathUuid.compareTo(extensionPath) == 0
                     && a.statusUuid.compareTo(activeUuid) == 0
@@ -384,7 +361,7 @@ public class FilterRedundantStatedRelsTransformer extends AbstractTransformer {
                 keepRels.add(a);
                 // keepRels.add(b);
                 totalExtensionBothActive++;
-                System.out.println(toStr("extension, both active", eConcept, a));
+                reportWriter.append(toStr("extension, both active", eConcept, a));
             } else if (a.pathUuid.compareTo(extensionPath) == 0
                     && b.pathUuid.compareTo(snomedCorePathUuid) == 0
                     && a.statusUuid.compareTo(activeUuid) == 0
@@ -392,7 +369,7 @@ public class FilterRedundantStatedRelsTransformer extends AbstractTransformer {
                 keepRels.add(a);
                 keepRels.add(b);
                 totalExtensionCoreInactive++;
-                System.out.println(toStr("extension, core inactive", eConcept, a));
+                reportWriter.append(toStr("extension, core inactive", eConcept, a));
             } else if (a.pathUuid.compareTo(snomedCorePathUuid) == 0
                     && b.pathUuid.compareTo(extensionPath) == 0
                     && a.statusUuid.compareTo(activeUuid) != 0
@@ -400,7 +377,7 @@ public class FilterRedundantStatedRelsTransformer extends AbstractTransformer {
                 keepRels.add(a);
                 keepRels.add(b);
                 totalExtensionCoreInactive++;
-                System.out.println(toStr("extension, core inactive", eConcept, a));
+                reportWriter.append(toStr("extension, core inactive", eConcept, a));
             } else if (a.pathUuid.compareTo(snomedCorePathUuid) == 0
                     && b.pathUuid.compareTo(snomedCorePathUuid) == 0
                     && a.relSctIdPath.compareTo(snomedCorePathUuid) == 0
@@ -410,7 +387,7 @@ public class FilterRedundantStatedRelsTransformer extends AbstractTransformer {
                 // keep only the one on with id on snomed core
                 keepRels.add(a);
                 totalSuppressNonSnomedId++;
-                System.out.println(toStr("suppressed non-snomed id", eConcept, a));
+                reportWriter.append(toStr("suppressed non-snomed id", eConcept, a));
 
             } else if (a.pathUuid.compareTo(snomedCorePathUuid) == 0
                     && b.pathUuid.compareTo(snomedCorePathUuid) == 0
@@ -421,16 +398,16 @@ public class FilterRedundantStatedRelsTransformer extends AbstractTransformer {
                 // keep only the one on with id on snomed core
                 keepRels.add(b);
                 totalSuppressNonSnomedId++;
-                System.out.println(toStr("suppressed non-snomed id", eConcept, b));
+                reportWriter.append(toStr("suppressed non-snomed id", eConcept, b));
             } else {
                 keepRels.add(a);
                 keepRels.add(b);
                 totalNotProcessedKeptBoth++;
-                System.out.println(toStr("some other case", eConcept, a));
+                reportWriter.append(toStr("some other case", eConcept, a));
                 if (totalNotProcessedKeptBoth < 10) {
                     if (a.tkr != null && b.tkr != null) {
-                        System.out.println("\n:::some other case DETAIL_A " + a.tkr.toString());
-                        System.out.println("\n:::some other case DETAIL_B " + b.tkr.toString());
+                        reportWriter.append("\n:::some other case DETAIL_A " + a.tkr.toString());
+                        reportWriter.append("\n:::some other case DETAIL_B " + b.tkr.toString());
                     }
                 }
             }
@@ -444,7 +421,7 @@ public class FilterRedundantStatedRelsTransformer extends AbstractTransformer {
             if (logicalRel.relSctIdPath != null
                     && isExtensionSctId(logicalRel.relSctId)) {
                 totalResidual++;
-                System.out.println(toStr("residual", eConcept, logicalRel));
+                reportWriter.append(toStr("residual", eConcept, logicalRel));
             }
         }
         eConcept.setRelationships(relList);
@@ -456,7 +433,7 @@ public class FilterRedundantStatedRelsTransformer extends AbstractTransformer {
         int length = sctidStr.length();
         if (length < 10) {
             return false;
-        } 
+        }
         String nameSpaceIdentifier = sctidStr.substring(length - 10, length - 3);
         if (nameSpaceIdentifier.equalsIgnoreCase("1000119")) {
             // :NYI: "1000119" needs to be generalized for broader applications
@@ -464,21 +441,24 @@ public class FilterRedundantStatedRelsTransformer extends AbstractTransformer {
         }
         return false;
     }
-    
+
     private String toStr(String s, TkConcept eConcept, LogicalRel rel)
             throws IOException {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("\n::: ");
+        sb.append("\n:: ");
         sb.append(s);
         sb.append(" :: ");
         sb.append(eConcept.primordialUuid.toString());
         sb.append(" :: ");
         sb.append(ts.getConcept(eConcept.primordialUuid).toUserString());
-        sb.append(" | ");
-        sb.append(ts.getConcept(rel.roleTypeSnoId).toUserString());
-        sb.append(" | ");
-        sb.append(ts.getConcept(rel.c2SnoId).toUserString());
+        
+        if (rel != null) {
+            sb.append(" | ");
+            sb.append(ts.getConcept(rel.roleTypeSnoId).toUserString());
+            sb.append(" | ");
+            sb.append(ts.getConcept(rel.c2SnoId).toUserString());
+        }
 
         return sb.toString();
     }
@@ -494,26 +474,51 @@ public class FilterRedundantStatedRelsTransformer extends AbstractTransformer {
 
     @Override
     public List<TkConcept> postProcessIteration() {
-        System.out.println("**** Final, total converted " + totalMembersConverted + " members");
+            StringBuilder sb = new StringBuilder();
+            sb.append("**** Final, total converted ");
+            sb.append(totalMembersConverted);
+            sb.append(" members");
 
-        System.out.println("::: totalZeros " + totalZeros);
-        System.out.println("::: totalSingletons " + totalSingletonsDropped);
+            sb.append("\n::: totalZeros ");
+            sb.append(totalZeros);
+            sb.append("\n::: totalSingletons ");
+            sb.append(totalSingletonsDropped);
 
-        System.out.println("::: totalSnomedCoreRedunancy " + totalSnomedCoreRedunancy);
-        System.out.println("::: totalSnomedCoreRetired " + totalSnomedCoreRetired);
+            sb.append("\n::: totalSnomedCoreRedunancy ");
+            sb.append(totalSnomedCoreRedunancy);
+            sb.append("\n");
+            sb.append("\n::: totalSnomedCoreRetired ");
+            sb.append(totalSnomedCoreRetired);
 
-        System.out.println("::: totalSupressedTypeZero " + totalSupressedTypeZero);
-        System.out.println("::: totalSupressedTypeOne " + totalSupressedTypeOne);
-        System.out.println("::: totalNonCoreBothActive " + totalNonCoreBothActive);
-        System.out.println("::: totalExtensionBothActive " + totalExtensionBothActive);
-        System.out.println("::: totalExtensionCoreInactive " + totalExtensionCoreInactive);
-        System.out.println("::: totalSuppressNonSnomedId " + totalSuppressNonSnomedId);
-        System.out.println("::: totalNotProcessedKeptBoth " + totalNotProcessedKeptBoth);
+            sb.append("\n::: totalSupressedTypeZero ");
+            sb.append(totalSupressedTypeZero);
+            sb.append("\n::: totalSupressedTypeOne ");
+            sb.append(totalSupressedTypeOne);
+            sb.append("\n::: totalNonCoreBothActive ");
+            sb.append(totalNonCoreBothActive);
+            sb.append("\n::: totalExtensionBothActive ");
+            sb.append(totalExtensionBothActive);
+            sb.append("\n::: totalExtensionCoreInactive ");
+            sb.append(totalExtensionCoreInactive);
+            sb.append("\n::: totalSuppressNonSnomedId ");
+            sb.append(totalSuppressNonSnomedId);
+            sb.append("\n::: totalNotProcessedKeptBoth ");
+            sb.append(totalNotProcessedKeptBoth);
 
-        System.out.println("::: totalResidual " + totalResidual);
-        System.out.println();
-        System.out.println(report.toString());
+            sb.append("\n::: totalResidual ");
+            sb.append(totalResidual);
+            sb.append("\n");
+            System.out.println(sb.toString());
 
+        try {
+            reportWriter.append(sb.toString());
+
+            reportWriter.flush();
+            reportWriter.close();
+
+        } catch (IOException ex) {
+            Logger.getLogger(FilterRedundantStatedRelsTransformer.class.getName()).log(Level.SEVERE, null, ex);
+        }
         List<TkConcept> postProcessList = new ArrayList<>();
         return postProcessList;
     }

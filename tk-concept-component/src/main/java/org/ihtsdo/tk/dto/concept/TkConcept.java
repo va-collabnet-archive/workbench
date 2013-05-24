@@ -74,7 +74,10 @@ import org.ihtsdo.tk.api.refex.type_member.RefexMemberVersionBI;
 import org.ihtsdo.tk.api.refex.type_string.RefexStringVersionBI;
 import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
 import org.ihtsdo.tk.binding.snomed.Snomed;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
+import org.ihtsdo.tk.binding.snomed.TermAux;
 import org.ihtsdo.tk.dto.concept.component.refex.type_array_of_bytearray.TkRefexArrayOfBytearrayMember;
+import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationshipRevision;
 
 /**
  * The Class TkConcept contains methods for importing/exporting a concept.
@@ -1004,13 +1007,43 @@ public class TkConcept {
     public void setRelationships(List<TkRelationship> relationships) {
         this.relationships = relationships;
     }
-
+    
+    /**
+     * does the latest revision of any concept relationship 
+     * have type SNOMED 'Is a' that is 'Active'
+     * 
+     * @return boolean
+     */
     public boolean hasSnomedIsa() {
         if (this.relationships != null) {
             for (TkRelationship tkr : this.relationships) {
-                for (UUID isaUuid : Snomed.IS_A.getUuids()) {
-                    if (tkr.typeUuid.compareTo(isaUuid) == 0) {
-                        return true;
+                if (tkr.revisions == null) {
+                    for (UUID isaUuid : Snomed.IS_A.getUuids()) {
+                        if (tkr.typeUuid.compareTo(isaUuid) == 0) {
+                            for (UUID activeUuid : SnomedMetadataRf2.ACTIVE_VALUE_RF2.getUuids()) {
+                                if (tkr.statusUuid.compareTo(activeUuid) == 0) {
+                                    return true;
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    TkRelationshipRevision latestRevision = null;
+                    long time = Long.MIN_VALUE;
+                    for (TkRelationshipRevision tkrrev : tkr.revisions) {
+                        if (tkrrev.time > time) {
+                            latestRevision = tkrrev;
+                            time = tkrrev.time;
+                        }
+                    }
+                    for (UUID isaUuid : Snomed.IS_A.getUuids()) {
+                        if (latestRevision.typeUuid.compareTo(isaUuid) == 0) {
+                            for (UUID activeUuid : SnomedMetadataRf2.ACTIVE_VALUE_RF2.getUuids()) {
+                                if (latestRevision.statusUuid.compareTo(activeUuid) == 0) {
+                                    return true;
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -1018,4 +1051,58 @@ public class TkConcept {
         return false;
     }
 
+
+
+    /**
+     * does the latest revision of any concept relationship have type Auxiliary
+     * 'is a' which is either 'Active' or 'current'
+     *
+     * @return boolean
+     */
+    public boolean hasAuxIsa() {
+        if (this.relationships != null) {
+            for (TkRelationship tkr : this.relationships) {
+                if (tkr.revisions == null) {
+                    for (UUID isaUuid : TermAux.IS_A.getUuids()) {
+                        if (tkr.typeUuid.compareTo(isaUuid) == 0) {
+                            for (UUID activeUuid : SnomedMetadataRf2.ACTIVE_VALUE_RF2.getUuids()) {
+                                if (tkr.statusUuid.compareTo(activeUuid) == 0) {
+                                    return true;
+                                }
+                            }
+                            for (UUID currentUuid : TermAux.CURRENT.getUuids()) {
+                                if (tkr.statusUuid.compareTo(currentUuid) == 0) {
+                                    return true;
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    TkRelationshipRevision latestRevision = null;
+                    long time = Long.MIN_VALUE;
+                    for (TkRelationshipRevision tkrrev : tkr.revisions) {
+                        if (tkrrev.time > time) {
+                            latestRevision = tkrrev;
+                            time = tkrrev.time;
+                        }
+                    }
+                    for (UUID isaUuid : TermAux.IS_A.getUuids()) {
+                        if (latestRevision.typeUuid.compareTo(isaUuid) == 0) {
+                            for (UUID activeUuid : SnomedMetadataRf2.ACTIVE_VALUE_RF2.getUuids()) {
+                                if (latestRevision.statusUuid.compareTo(activeUuid) == 0) {
+                                    return true;
+                                }
+                            }
+                            for (UUID currentUuid : TermAux.CURRENT.getUuids()) {
+                                if (latestRevision.statusUuid.compareTo(currentUuid) == 0) {
+                                    return true;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
 }

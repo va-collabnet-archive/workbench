@@ -20,6 +20,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 import org.ihtsdo.tk.dto.concept.component.identifier.TkIdentifier;
 import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationship;
 import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationshipRevision;
@@ -46,6 +47,7 @@ public class LogicalRel implements Comparable<LogicalRel> {
     private final static UUID SNOMED_CORE_PATH_UUID = UUID.fromString("8c230474-9f11-30ce-9cad-185a96fd03a2");
     private final static UUID SNOMED_INT_RF1_UUID = UUID.fromString("0418a591-f75b-39ad-be2c-3ab849326da9");
     private final static UUID SNOMED_INT_RF2_UUID = UUID.fromString("87360947-e603-3397-804b-efd0fcc509b9");
+    private final static UUID SNOMED_RF2_ACTIVE_UUID = SnomedMetadataRf2.ACTIVE_VALUE_RF2.getUuids()[0];
 
     public LogicalRel(TkRelationship tkr) {
         this.tkr = tkr;
