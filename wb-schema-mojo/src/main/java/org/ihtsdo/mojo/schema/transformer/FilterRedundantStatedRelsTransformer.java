@@ -29,6 +29,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.etypes.ERefsetCidIntMember;
+import org.ihtsdo.etypes.ERefsetCidMember;
 import org.ihtsdo.helper.rf2.LogicalRel;
 import org.ihtsdo.helper.rf2.LogicalRelComputer;
 import org.ihtsdo.mojo.schema.AbstractTransformer;
@@ -73,6 +75,7 @@ public class FilterRedundantStatedRelsTransformer extends AbstractTransformer {
     private final UUID developmentPath;
     private HashSet<UUID> skipUuidSet;
     private HashSet<UUID> refsetsToFilter;
+    private HashSet<UUID> watchUuidSet;
     // Statistics
     private transient int totalMembersConverted = 0;
     private int totalZeros;
@@ -149,6 +152,14 @@ public class FilterRedundantStatedRelsTransformer extends AbstractTransformer {
                 "parameters.refsetsToFilter.uuid")) {
             refsetsToFilter.add(UUID.fromString(loopValue));
         }
+        watchUuidSet = new HashSet();
+        watchUuidSet.add(UUID.fromString("ded44500-d486-59ab-9749-68aa719e74a4")); // KPET CMT Project release candidate path
+        watchUuidSet.add(UUID.fromString("3770e517-7adc-5a24-a447-77a9daa3eedf")); // KPET CMT Project development path
+        watchUuidSet.add(UUID.fromString("098eed03-204c-5bf0-91c0-3c9610beec6b")); // KPET CMT Project development origin path
+        watchUuidSet.add(UUID.fromString("2bfc4102-f630-5fbe-96b8-625f2a6b3d5a")); // KPET Extension Path
+        watchUuidSet.add(UUID.fromString("7b6ace72-4604-5ff1-b8c0-48e8f6204e3d")); // source baseline
+        watchUuidSet.add(UUID.fromString("8c230474-9f11-30ce-9cad-185a96fd03a2")); // SNOMED Core
+        watchUuidSet.add(UUID.fromString("2faa9260-8fb2-11db-b606-0800200c9a66")); // Workbench Auxiliary
     }
 
     @Override
@@ -178,6 +189,9 @@ public class FilterRedundantStatedRelsTransformer extends AbstractTransformer {
 
     @Override
     public boolean postProcessConcept(TkConcept eConcept) {
+        if (watchUuidSet.contains(eConcept.primordialUuid)) {
+            System.out.println("FilterRedundantStatedRelsTransformer :: watch found :: " + eConcept.primordialUuid);
+        }
         if (skipUuidSet.contains(eConcept.primordialUuid)) {
             return false;
         }
@@ -204,9 +218,25 @@ public class FilterRedundantStatedRelsTransformer extends AbstractTransformer {
 
     private void filterMembersByComponentUuid(TkConcept eConcept) {
         ArrayList<TkRefexAbstractMember<?>> keepMemberList = new ArrayList<>();
-        for (TkRefexAbstractMember<?> member : eConcept.refsetMembers) {
-            if (!skipUuidSet.contains(member.componentUuid)) {
-                keepMemberList.add(member);
+        // Path origin reference set
+        if (eConcept.primordialUuid.compareTo(UUID.fromString("1239b874-41b4-32a1-981f-88b448829b4b")) == 0) {
+            for (TkRefexAbstractMember<?> member : eConcept.refsetMembers) {
+                UUID uuid = member.componentUuid;
+                if (uuid != null && !skipUuidSet.contains(uuid)) {
+                    keepMemberList.add(member);
+                }
+            }
+        }
+        // Path reference set
+        if (eConcept.primordialUuid.compareTo(UUID.fromString("fd9d47b7-c0a4-3eea-b3ab-2b5a3f9e888f")) == 0) {
+            for (TkRefexAbstractMember<?> member : eConcept.refsetMembers) {
+                UUID uuid = null;
+                if (ERefsetCidMember.class.isAssignableFrom(member.getClass())) {
+                    uuid = ((ERefsetCidMember) member).uuid1;
+                    if (uuid != null && !skipUuidSet.contains(uuid)) {
+                        keepMemberList.add(member);
+                    }
+                }
             }
         }
         eConcept.refsetMembers = keepMemberList;

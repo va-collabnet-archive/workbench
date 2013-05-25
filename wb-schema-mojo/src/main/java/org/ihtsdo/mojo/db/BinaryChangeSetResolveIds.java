@@ -42,6 +42,7 @@ import org.ihtsdo.helper.rf2.UuidUuidRemapper;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf1;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 import org.ihtsdo.tk.dto.concept.TkConcept;
+import org.ihtsdo.tk.dto.concept.component.TkRevision;
 import org.ihtsdo.tk.dto.concept.component.attribute.TkConceptAttributes;
 import org.ihtsdo.tk.dto.concept.component.attribute.TkConceptAttributesRevision;
 import org.ihtsdo.tk.dto.concept.component.description.TkDescription;
@@ -734,7 +735,7 @@ public class BinaryChangeSetResolveIds {
     private UUID remapAuthor(UUID authorUuid, UUID pathUuid) {
         if (authorUuid == null || pathUuid == null) {
             // return null;
-            throw new UnsupportedOperationException("remapPath is null");
+            throw new UnsupportedOperationException("null in remapAuthor (authorUuid == null || pathUuid == null)");
         }
         UUID mappedAuthor = pathToAuthorMap.get(pathUuid);
         if (mappedAuthor == null) {
@@ -747,7 +748,7 @@ public class BinaryChangeSetResolveIds {
     private UUID remapPath(UUID authorUuid, UUID pathUuid) {
         if (authorUuid == null || pathUuid == null) {
             // return null;
-            throw new UnsupportedOperationException("remapPath is null");
+            throw new UnsupportedOperationException("null in remapPath (authorUuid == null || pathUuid == null)");
         }
         UUID mappedAuthor = pathToAuthorMap.get(pathUuid);
         if (mappedAuthor == null) {
@@ -783,6 +784,18 @@ public class BinaryChangeSetResolveIds {
                     // printPathAuthor(tkram.authorUuid, tkram.pathUuid);
                     tkram.authorUuid = remapAuthor(tkram.authorUuid, tkram.pathUuid);
                     tkram.pathUuid = remapPath(tkram.authorUuid, tkram.pathUuid);
+                    List<?> revisions = tkram.revisions;
+                    if (revisions != null) {
+                        for (Object o : revisions) {
+                            if (TkRevision.class.isAssignableFrom(o.getClass())) {
+                                TkRevision trur = (TkRevision) o;
+                                trur.authorUuid = remapAuthor(trur.authorUuid, trur.pathUuid);
+                                trur.pathUuid = remapAuthor(trur.authorUuid, trur.pathUuid);
+                            } else {
+                                throw new UnsupportedOperationException("remapPathUuids attributes revision" + o.getClass());
+                            }
+                        }
+                    }
                 }
             }
             // REVISIONS
@@ -818,6 +831,18 @@ public class BinaryChangeSetResolveIds {
                         // printPathAuthor(tkram.authorUuid, tkram.pathUuid);
                         tkram.authorUuid = remapAuthor(tkram.authorUuid, tkram.pathUuid);
                         tkram.pathUuid = remapPath(tkram.authorUuid, tkram.pathUuid);
+                        List<?> revisions = tkram.revisions;
+                        if (revisions != null) {
+                            for (Object o : revisions) {
+                                if (TkRevision.class.isAssignableFrom(o.getClass())) {
+                                    TkRevision trur = (TkRevision) o;
+                                    trur.authorUuid = remapAuthor(trur.authorUuid, trur.pathUuid);
+                                    trur.pathUuid = remapAuthor(trur.authorUuid, trur.pathUuid);
+                                } else {
+                                    throw new UnsupportedOperationException("remapPathUuids description revision" + o.getClass());
+                                }
+                            }
+                        }
                     }
                 }
                 // REVISIONS
@@ -854,6 +879,18 @@ public class BinaryChangeSetResolveIds {
                         // printPathAuthor(tkram.authorUuid, tkram.pathUuid);
                         tkram.authorUuid = remapAuthor(tkram.authorUuid, tkram.pathUuid);
                         tkram.pathUuid = remapPath(tkram.authorUuid, tkram.pathUuid);
+                        List<?> revisions = tkram.revisions;
+                        if (revisions != null) {
+                            for (Object o : revisions) {
+                                if (TkRevision.class.isAssignableFrom(o.getClass())) {
+                                    TkRevision trur = (TkRevision) o;
+                                    trur.authorUuid = remapAuthor(trur.authorUuid, trur.pathUuid);
+                                    trur.pathUuid = remapAuthor(trur.authorUuid, trur.pathUuid);
+                                } else {
+                                    throw new UnsupportedOperationException("remapPathUuids relationship revision" + o.getClass());
+                                }
+                            }
+                        }
                     }
                 }
                 // REVISIONS
@@ -908,7 +945,7 @@ public class BinaryChangeSetResolveIds {
             eccsLogExceptionsWriter.append("remapped UUID from :: " + eConcept.primordialUuid + " :: to :: " + enclosingPrimordialUuid);
             eConcept.primordialUuid = enclosingPrimordialUuid;
         } else {
-            enclosingPrimordialUuid = eConcept.primordialUuid;
+            enclosingPrimordialUuid = eConcept.primordialUuid; // keep original
         }
 
         if (eConcept.conceptAttributes != null) {
@@ -943,6 +980,10 @@ public class BinaryChangeSetResolveIds {
             List<TkDescription> descriptions = eConcept.descriptions;
             for (TkDescription tkd : descriptions) {
                 tkd.conceptUuid = enclosingPrimordialUuid;
+                UUID uuid = sctPrimorialUuidRemapper.getUuid(tkd.primordialUuid);
+                if (uuid != null) {
+                   tkd.primordialUuid = uuid;
+                }
                 // description revisions do not have any remappable uuids
             }
         }
@@ -964,6 +1005,7 @@ public class BinaryChangeSetResolveIds {
                 if (typeUuid != null) {
                     tkr.typeUuid = typeUuid;
                 }
+                // REVISIONS
                 if (tkr.revisions != null) {
                     List<TkRelationshipRevision> revisions = tkr.revisions;
                     for (TkRelationshipRevision tkrr : revisions) {
@@ -972,7 +1014,7 @@ public class BinaryChangeSetResolveIds {
                             tkrr.typeUuid = revTypeUuid;
                         }
                     }
-                }
+                }                
             }
         }
 
@@ -1087,31 +1129,96 @@ public class BinaryChangeSetResolveIds {
 
     private void setupPathRemapping() {
         this.pathsToNotChange = new HashSet<>();
+        // KPET CMT Project release candidate path
+        this.pathsToNotChange.add(UUID.fromString("ded44500-d486-59ab-9749-68aa719e74a4"));
+        // KPET CMT Project development path
+        this.pathsToNotChange.add(UUID.fromString("3770e517-7adc-5a24-a447-77a9daa3eedf"));
+        // KPET CMT Project development origin path
+        this.pathsToNotChange.add(UUID.fromString("098eed03-204c-5bf0-91c0-3c9610beec6b"));
+        // 2bfc4102-f630-5fbe-96b8-625f2a6b3d5a KPET Extension Path
         this.pathsToNotChange.add(UUID.fromString("2bfc4102-f630-5fbe-96b8-625f2a6b3d5a"));
+        // 7b6ace72-4604-5ff1-b8c0-48e8f6204e3d source baseline
+        this.pathsToNotChange.add(UUID.fromString("7b6ace72-4604-5ff1-b8c0-48e8f6204e3d"));
+        // 8c230474-9f11-30ce-9cad-185a96fd03a2 SNOMED Core
         this.pathsToNotChange.add(UUID.fromString("8c230474-9f11-30ce-9cad-185a96fd03a2"));
+        // Workbench Auxiliary
         this.pathsToNotChange.add(UUID.fromString("2faa9260-8fb2-11db-b606-0800200c9a66"));
 
         this.pathToAuthorMap = new HashMap<>();
+        // Peter Hender dev path
         pathToAuthorMap.put(UUID.fromString("0d6f7564-7fd0-5b5b-8266-323f1afdbcd5"), UUID.fromString("5aaf8f31-65e4-5eac-85db-bf83333547e0"));
+        // Alan Abilla M dev path
         pathToAuthorMap.put(UUID.fromString("1d4bb71f-849c-5b4d-9e72-e818794bf7e4"), UUID.fromString("9b09b43b-ee48-57f3-bcd8-ac134a850c5d"));
+        // Sarah Albo dev path
         pathToAuthorMap.put(UUID.fromString("6a8348da-7d95-5640-8ba2-4d20c440bd54"), UUID.fromString("3b463a64-ccf0-5957-a49d-2f1c48e85995"));
+        // Robert Clements dev path
         pathToAuthorMap.put(UUID.fromString("41bfa888-2d01-5b5d-9344-38ad0f704ab2"), UUID.fromString("260b19f2-f152-5d45-ab84-c3d9084d8ea1"));
+        // Denny Cordy dev path
         pathToAuthorMap.put(UUID.fromString("67cb4ddc-321b-5976-881f-7bd3c3897bd8"), UUID.fromString("b025678a-e524-5a3b-9762-8bdbb0f8f06f"));
+        // Moon Hee Lee dev path
         pathToAuthorMap.put(UUID.fromString("75f06c8b-c18f-5a77-92f9-daa6bfac0ec5"), UUID.fromString("30d445cb-5c76-5f9a-bcc4-99ca2103704e"));
+        // Ellen Torres dev path
         pathToAuthorMap.put(UUID.fromString("159c33ec-818e-5889-a130-be23aa467043"), UUID.fromString("162b0ef8-2daf-5713-aa3f-6d6248c8fa85"));
+        // Andrew Kim dev path
         pathToAuthorMap.put(UUID.fromString("311c12c3-d901-5fa7-afd4-715e885dc40a"), UUID.fromString("f54e3a41-5d59-50a9-9649-d7316c501cc6"));
+        // Bruce Goldberg dev path
         pathToAuthorMap.put(UUID.fromString("673ffe19-9da3-5b8e-ba08-45e813bc350a"), UUID.fromString("3de4c63a-74c7-5675-8895-8230d803ed64"));
+        // Gerry Lazzraschi dev path
         pathToAuthorMap.put(UUID.fromString("1136c0b8-572c-5e3d-9fd1-2dabbb4a6851"), UUID.fromString("8c398123-36c4-5e7b-9387-5686e7964121"));
+        // Jonathan Lukoff dev path
         pathToAuthorMap.put(UUID.fromString("141452fa-1c2c-5fa9-af07-aa4ec5fec623"), UUID.fromString("ace60f65-6a6d-54f0-a514-6e31ea052c43"));
+        // Kathleen Schwarz dev path
         pathToAuthorMap.put(UUID.fromString("a3cac37a-0964-5750-a8ea-addd90a848a2"), UUID.fromString("ca477462-6390-5737-bcec-e280da403066"));
+        // Rita Barsoum M dev path
         pathToAuthorMap.put(UUID.fromString("a860a481-c06a-5655-9e90-fb8e1f1cdd6b"), UUID.fromString("11a8781e-b5cd-52a1-99d7-f7382f4c77e8"));
+        // Ross Hansen dev path
         pathToAuthorMap.put(UUID.fromString("aeaf539c-7c59-57fd-a7e1-2a296a0a9ca8"), UUID.fromString("fd6e21e0-718e-56f0-a52e-f0a7a3c4bf46"));
+        // Xiang Mack dev path
         pathToAuthorMap.put(UUID.fromString("bf4692ca-00df-5f1b-a90e-b095fbc66e62"), UUID.fromString("07efce48-0738-5be2-bca8-fdf9dee6c663"));
+        // Mary Gerard dev path
         pathToAuthorMap.put(UUID.fromString("e6fb5c3e-5327-589e-8bbc-8f05bb6ceb37"), UUID.fromString("fc1ade4c-9646-5291-8006-1a174207cd39"));
-        //
+        ///////////////
+        // Alisa Papotto dev path
+        pathToAuthorMap.put(UUID.fromString("2e2a2614-e80b-5f16-90d5-b743b9448e16"), UUID.fromString("8fa1be59-6899-52d1-8a5b-2a02a86d58af"));
+        // Diane Carter dev path
+        pathToAuthorMap.put(UUID.fromString("33fc12fd-0f1d-5bfa-9362-09d097cca05b"), UUID.fromString("7b37e356-a4ee-5e54-ac3e-40da8d3a9d73"));
+        // Esther Straus dev path
+        pathToAuthorMap.put(UUID.fromString("54735cdf-2577-5a88-b607-f3664877ba5f"), UUID.fromString("9cd9f981-8f4e-56a1-a640-7f2b2f4f8fab"));
+        // Gail Danelius dev path
+        pathToAuthorMap.put(UUID.fromString("2cdad18c-7e90-575c-9a9a-8bea2a418f9d"), UUID.fromString("56e83fe2-2a4e-5fda-9580-30b29e32ded9"));
+        // Georgina Kurtovich dev path
+        pathToAuthorMap.put(UUID.fromString("175f1530-9046-5c19-ace3-cd3e21e9daa2"), UUID.fromString("943a411c-ec36-5ec0-a3b2-d30f93465e9d"));
+        // Harry Abilla dev path
+        pathToAuthorMap.put(UUID.fromString("255ccf60-ec14-5775-b9da-b6a6f52cbf47"), UUID.fromString("c23c87aa-b874-5d09-b269-f26dc62419c6"));
+        // Karen Jahn dev path
+        pathToAuthorMap.put(UUID.fromString("c657a7f1-bc8b-561b-a9fc-82c8724e9b70"), UUID.fromString("43c61474-7490-56a5-8d97-f40071f95fc5"));
+        // Karen Vournas dev path
+        pathToAuthorMap.put(UUID.fromString("d2cb5eb4-a717-5ffb-8adc-f8fbba3b0e7f"), UUID.fromString("9bd23a9d-8ab3-5588-894a-64258764a3d7"));
+        // Kate Christensen dev path
+        pathToAuthorMap.put(UUID.fromString("e95c4d35-a241-59c0-a50f-a211efc67664"), UUID.fromString("da6aa7d7-f189-5bcb-9ff3-82edf2cf0197"));
+        // Lonette McCauley dev path
+        pathToAuthorMap.put(UUID.fromString("53ae63b6-7258-5517-8d44-5836b0c9980d"), UUID.fromString("2aa8ebf5-5708-569c-8deb-9c981d3b1fd7"));
+        // Margo X Imel dev path
+        pathToAuthorMap.put(UUID.fromString("544aeb09-6bfd-5484-8f6b-8e7696d8ee03"), UUID.fromString("f201b7cc-fa78-5dc9-b8f0-79e03da111bb"));
+        // Mark Groshek dev path
+        pathToAuthorMap.put(UUID.fromString("faf553f7-bd4e-5717-a3fd-5b2ac7186189"), UUID.fromString("a99607e3-d0ec-5ffd-bb93-971f788b6a78"));
+        // Michael B. Smith dev path
+        pathToAuthorMap.put(UUID.fromString("28f904d6-7180-5283-b83c-0d46c8c265cf"), UUID.fromString("832ff735-dd6a-5ddc-a2eb-8974d09a826c"));
+        // Michael Madden dev path
+        pathToAuthorMap.put(UUID.fromString("5688036b-36f3-59f2-a220-7240ee80056f"), UUID.fromString("3622c55c-a33f-560a-b769-e4723374df57"));
+        // Mirzet Halilovic dev path
+        pathToAuthorMap.put(UUID.fromString("1d4d02b7-4255-51c2-845f-349740436e11"), UUID.fromString("f83d2307-e72b-5bec-b9f1-efe9e1be091a"));
+        // Nancy Dirgo dev path
+        pathToAuthorMap.put(UUID.fromString("41214b5e-4f4b-5e16-a1d2-101be39eb94f"), UUID.fromString("cd44a00d-3758-5d87-9fc5-871ddeff1c72"));
+        // Tim Hearvy dev path
+        pathToAuthorMap.put(UUID.fromString("da88e272-3f90-51b2-a0f5-fecd0ef233e4"), UUID.fromString("5d069252-3928-5fa2-9e50-118cdef69d61"));
+        // Yasmeen Wengrow dev path
+        pathToAuthorMap.put(UUID.fromString("43f67b8d-2b94-5919-81e9-416a158bb5df"), UUID.fromString("f637752b-10f9-527f-8ba4-ef7690d655bd"));
+        // kp_admin dev path <> kp_admin
         pathToAuthorMap.put(UUID.fromString("cc8c1851-1981-52b7-b19c-22941710171d"), UUID.fromString("4239726b-588c-5c0a-b622-605ea9824d78"));
+        // edit template path <> user
         pathToAuthorMap.put(UUID.fromString("8a6447b8-4a57-56b0-960f-075f430cd02f"), UUID.fromString("f7495b58-6630-3499-a44e-2052b5fcf06c"));
-        //
-        pathToPath = UUID.fromString("3770e517-7adc-5a24-a447-77a9daa3eedf"); // destination edit path
+        /////
+        pathToPath = UUID.fromString("3770e517-7adc-5a24-a447-77a9daa3eedf"); // destination edit path :: KPET CMT Project development path
     }
 }
