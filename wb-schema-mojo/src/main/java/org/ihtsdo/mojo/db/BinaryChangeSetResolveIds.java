@@ -335,6 +335,8 @@ public class BinaryChangeSetResolveIds {
                         }
 
                         remapPathUuids(eConcept);
+                        
+                        removeLegacyGBDialectExceptionsAnnotation(eConcept);
 
                         if (skipUuidSet != null
                                 && skipUuidSet.contains(eConcept.primordialUuid)) {
@@ -758,7 +760,7 @@ public class BinaryChangeSetResolveIds {
                 throw new UnsupportedOperationException("case not supported");
             }
         } else {
-            return pathToPath;
+            return developmentPath;
         }
     }
 
@@ -790,7 +792,7 @@ public class BinaryChangeSetResolveIds {
                             if (TkRevision.class.isAssignableFrom(o.getClass())) {
                                 TkRevision trur = (TkRevision) o;
                                 trur.authorUuid = remapAuthor(trur.authorUuid, trur.pathUuid);
-                                trur.pathUuid = remapAuthor(trur.authorUuid, trur.pathUuid);
+                                trur.pathUuid = remapPath(trur.authorUuid, trur.pathUuid);
                             } else {
                                 throw new UnsupportedOperationException("remapPathUuids attributes revision" + o.getClass());
                             }
@@ -837,7 +839,7 @@ public class BinaryChangeSetResolveIds {
                                 if (TkRevision.class.isAssignableFrom(o.getClass())) {
                                     TkRevision trur = (TkRevision) o;
                                     trur.authorUuid = remapAuthor(trur.authorUuid, trur.pathUuid);
-                                    trur.pathUuid = remapAuthor(trur.authorUuid, trur.pathUuid);
+                                    trur.pathUuid = remapPath(trur.authorUuid, trur.pathUuid);
                                 } else {
                                     throw new UnsupportedOperationException("remapPathUuids description revision" + o.getClass());
                                 }
@@ -885,7 +887,7 @@ public class BinaryChangeSetResolveIds {
                                 if (TkRevision.class.isAssignableFrom(o.getClass())) {
                                     TkRevision trur = (TkRevision) o;
                                     trur.authorUuid = remapAuthor(trur.authorUuid, trur.pathUuid);
-                                    trur.pathUuid = remapAuthor(trur.authorUuid, trur.pathUuid);
+                                    trur.pathUuid = remapPath(trur.authorUuid, trur.pathUuid);
                                 } else {
                                     throw new UnsupportedOperationException("remapPathUuids relationship revision" + o.getClass());
                                 }
@@ -1035,6 +1037,29 @@ public class BinaryChangeSetResolveIds {
         }
     }
 
+    private final UUID legacyGbDialectExceptionsRefsetUuid = UUID.fromString("e8191494-ce3c-5bd8-803e-31d31c831f8a");
+    private void removeLegacyGBDialectExceptionsAnnotation(TkConcept eConcept) {
+        if (eConcept.primordialUuid.compareTo(UUID.fromString("c7b73676-d9fb-322d-a721-1c0bdf3f11c2")) == 0 ||
+                eConcept.primordialUuid.compareTo(UUID.fromString("123f303c-9c8a-5092-81d5-db0d2ffc4d62")) == 0) {
+            System.out.println(":!!!:DEBUG:");
+        }
+        if (eConcept.descriptions != null) {
+            for (TkDescription tkd : eConcept.descriptions) {
+                if (tkd.annotations != null) {
+                    List<TkRefexAbstractMember<?>> keepAnnotations = new ArrayList<>();
+                    for (TkRefexAbstractMember<?> tkram : tkd.annotations) {
+                        if (tkram.getRefexUuid().compareTo(legacyGbDialectExceptionsRefsetUuid) != 0) {
+                            keepAnnotations.add(tkram);
+                        } else {
+                            System.out.println(":!!!:DEBUG: ... dropped legacyGbDialectExceptionsRefsetUuid");
+                        }
+                    }
+                    tkd.annotations = keepAnnotations;
+                }
+            }
+        }
+    }
+
     private Long findIdListFirstUseDate(List<TkIdentifier> idList, Long firstDate) {
         Long aDate = firstDate;
         for (TkIdentifier tki : idList) {
@@ -1125,7 +1150,7 @@ public class BinaryChangeSetResolveIds {
     //################## :TODO: generalize these as parameters ##########################
     HashSet<UUID> pathsToNotChange;
     HashMap<UUID, UUID> pathToAuthorMap; // <pathUuid, authorUuid>
-    UUID pathToPath;
+    UUID developmentPath;
 
     private void setupPathRemapping() {
         this.pathsToNotChange = new HashSet<>();
@@ -1219,6 +1244,6 @@ public class BinaryChangeSetResolveIds {
         // edit template path <> user
         pathToAuthorMap.put(UUID.fromString("8a6447b8-4a57-56b0-960f-075f430cd02f"), UUID.fromString("f7495b58-6630-3499-a44e-2052b5fcf06c"));
         /////
-        pathToPath = UUID.fromString("3770e517-7adc-5a24-a447-77a9daa3eedf"); // destination edit path :: KPET CMT Project development path
+        developmentPath = UUID.fromString("3770e517-7adc-5a24-a447-77a9daa3eedf"); // destination development path :: KPET CMT Project development path
     }
 }
