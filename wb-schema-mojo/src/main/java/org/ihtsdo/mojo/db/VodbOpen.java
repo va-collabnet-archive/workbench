@@ -19,12 +19,17 @@ package org.ihtsdo.mojo.db;
 import java.io.File;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
+import java.util.List;
+import java.util.UUID;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.dwfa.ace.api.DatabaseSetupConfig;
 import org.dwfa.ace.api.Terms;
+import org.ihtsdo.concept.Concept;
+import org.ihtsdo.helper.bdb.AnnotationIndexer;
+import org.ihtsdo.tk.Ts;
 
 /**
  * @goal vodb-open
@@ -83,6 +88,14 @@ public class VodbOpen extends AbstractMojo {
      * @required
      */
     private File targetDirectory;
+    
+   /**
+    * watch concepts
+    *
+    * @parameter
+    */
+   private List<ConceptDescriptor> watchConcepts;
+
 
     public void execute() throws MojoExecutionException, MojoFailureException {
         System.setProperty("java.awt.headless", "true");
@@ -97,6 +110,15 @@ public class VodbOpen extends AbstractMojo {
             }
             getLog().info("vodb dir: " + vodbDirectory);
             Terms.createFactory(vodbDirectory, readOnly, cacheSize, dbSetupConfig);
+            getLog().info("Watches: " + watchConcepts);
+         if (watchConcepts != null) {
+            for (ConceptDescriptor cd : watchConcepts) {
+               Concept c =
+                  (Concept) Ts.get().getConcept(UUID.fromString(cd.getUuid()));
+
+               getLog().info("Watch: " + c.toLongString());
+            }
+         }
         } catch (InstantiationException e) {
             throw new MojoExecutionException(e.getLocalizedMessage(), e);
         } catch (IllegalAccessException e) {
