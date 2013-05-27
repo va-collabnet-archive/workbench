@@ -32,6 +32,9 @@ import org.ihtsdo.mojo.maven.MojoUtil;
 import java.io.File;
 
 import java.security.NoSuchAlgorithmException;
+import java.util.List;
+import java.util.UUID;
+import org.ihtsdo.tk.Ts;
 
 /**
  *
@@ -60,10 +63,25 @@ public class VodbClose extends AbstractMojo {
      */
     private boolean testForDupUuids;
 
+    /**
+     * watch concepts
+     *
+     * @parameter
+     */
+    private List<ConceptDescriptor> watchConcepts;
     //~--- methods -------------------------------------------------------------
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         try {
+                getLog().info("Watches: " + watchConcepts);
+                if (watchConcepts != null) {
+                    for (ConceptDescriptor cd : watchConcepts) {
+                        Concept c =
+                                (Concept) Ts.get().getConcept(UUID.fromString(cd.getUuid()));
+
+                        getLog().info("Watch: " + c.toLongString());
+                    }
+                }
 
             if (testForNullComponents) {
                 getLog().info("Testing for Null Components Started.");
