@@ -89,6 +89,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
+import org.ihtsdo.helper.bdb.AnnotationIndexer;
 import org.ihtsdo.tk.api.blueprint.IdDirective;
 
 /**
@@ -172,6 +173,13 @@ public class LoadBdbMulti extends AbstractMojo {
     * @parameter
     */
    private List<ConceptDescriptor> annotationIndexes;
+
+   /**
+    * True if annotation indexes should be reindexed. 
+    *
+    * @parameter default-value=false
+    */
+   private boolean reindexAnnotationIndexes;
 
    /**
     * Watch concepts that will be printed to log when encountered.
@@ -371,10 +379,16 @@ public class LoadBdbMulti extends AbstractMojo {
                   (Concept) Ts.get().getConcept(UUID.fromString(cd.getUuid()));
 
                c.setAnnotationIndex(true);
-               Ts.get().addUncommitted(c);
+               if (reindexAnnotationIndexes) {
+                   AnnotationIndexer ai = new AnnotationIndexer(c.getNid());
+                   Ts.get().iterateConceptDataInParallel(ai);
+                   getLog().info("Annotation indexed: "
+                             + c.toLongString());
+               }
+               Ts.get().addUncommittedNoChecks(c);
                Ts.get().commit();
                getLog().info("Setting concept to annotation index: "
-                             + cd.getDescription());
+                             + c.toLongString());
             }
          }
 
@@ -396,6 +410,10 @@ public class LoadBdbMulti extends AbstractMojo {
                                    + eConcept.getRefsetMembers().size()
                                    + " annotations");
                      Bdb.addAsAnnotations(eConcept.getRefsetMembers());
+                     getLog().info("After adding: "
+                                   + Ts.get().getConcept(eConcept.primordialUuid).toLongString());
+                     
+                     
                   }
                } catch (EOFException e) {
                   in.close();
