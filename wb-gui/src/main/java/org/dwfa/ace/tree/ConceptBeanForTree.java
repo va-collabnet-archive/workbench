@@ -86,6 +86,11 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
    List<DefaultMutableTreeNode> extraParentNodes = new ArrayList<DefaultMutableTreeNode>();
    I_GetConceptData             bean;
 
+    @Override
+    public void addAnnotationIndex(int nid)  throws IOException {
+        bean.addAnnotationIndex(nid);
+    }
+
     public Collection<Integer> getAllNids() throws IOException {
         return bean.getAllNids();
     }
