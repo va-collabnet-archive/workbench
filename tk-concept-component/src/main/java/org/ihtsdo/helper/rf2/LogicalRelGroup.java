@@ -21,10 +21,9 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.UUID;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.TerminologyStoreDI;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 import org.ihtsdo.tk.uuid.UuidT5Generator;
 
 /**
@@ -34,6 +33,7 @@ import org.ihtsdo.tk.uuid.UuidT5Generator;
 public class LogicalRelGroup {
 
     private static final String REL_ID_NAMESPACE_UUID_TYPE1 = "84fd0460-2270-11df-8a39-0800200c9a66";
+    private final static UUID SNOMED_RF2_ACTIVE_UUID = SnomedMetadataRf2.ACTIVE_VALUE_RF2.getUuids()[0];
     private String groupListStr;
     UUID groupListStrHash;
     public ArrayList<LogicalRel> logicalRels;
@@ -62,9 +62,11 @@ public class LogicalRelGroup {
         Collections.sort(logicalRels);
         StringBuilder sb = new StringBuilder();
         for (LogicalRel r : logicalRels) {
-            sb.append(r.c1SnoId).append("|");
-            sb.append(r.typeSnoId).append("|");
-            sb.append(r.c2SnoId).append(";");
+            if (r.statusUuid.compareTo(SNOMED_RF2_ACTIVE_UUID) == 0) {
+                sb.append(r.c1SnoId).append("|");
+                sb.append(r.typeSnoId).append("|");
+                sb.append(r.c2SnoId).append(";");
+            }
         }
         groupListStr = sb.toString();
 

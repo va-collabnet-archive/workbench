@@ -184,6 +184,9 @@ public class FilterRedundantStatedRelsTransformer extends AbstractTransformer {
         if (watchUuidSet.contains(eConcept.primordialUuid)) {
             System.out.println("FilterRedundantStatedRelsTransformer :: watch found :: " + eConcept.primordialUuid);
         }
+        if (skipUuidSet.contains(eConcept.primordialUuid)) {
+            return false;
+        }
         if (skipPathUuidSet.contains(eConcept.primordialUuid)) {
             return false;
         }

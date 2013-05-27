@@ -59,7 +59,11 @@ public class TransformProcessor implements ProcessUnfetchedConceptDataBI{
                     allConcepts = Ts.get().getAllConceptNids();
                     this.transformer = transformer;
                     this.eConceptDOS = eConceptDOS;
-
+                    // <!-- Path origin reference set -->
+                    watchUuids.add(UUID.fromString("1239b874-41b4-32a1-981f-88b448829b4b"));
+                    // <!-- Path reference set -->
+                    watchUuids.add(UUID.fromString("fd9d47b7-c0a4-3eea-b3ab-2b5a3f9e888f"));
+                                
 //                    watchUuids.add(UUID.fromString("c7b73676-d9fb-322d-a721-1c0bdf3f11c2")); // Late effect, epidural hematoma due to trauma ... 
 //                    watchUuids.add(UUID.fromString("123f303c-9c8a-5092-81d5-db0d2ffc4d62")); // Idiopathic bronchiolitis obliterans organizing pneumonia (disorder)
 

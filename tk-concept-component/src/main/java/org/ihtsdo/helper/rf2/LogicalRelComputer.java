@@ -25,6 +25,7 @@ import java.util.HashSet;
 import java.util.UUID;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.TerminologyStoreDI;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 
 /**
  *
@@ -35,6 +36,7 @@ public class LogicalRelComputer {
     private final UUID snomedPathUuid = UUID.fromString("8c230474-9f11-30ce-9cad-185a96fd03a2");
     private final UUID extensionPathUuid = UUID.fromString("2bfc4102-f630-5fbe-96b8-625f2a6b3d5a");
     private final UUID developmentPathUuid = UUID.fromString("3770e517-7adc-5a24-a447-77a9daa3eedf");
+    private final static UUID SNOMED_RF2_ACTIVE_UUID = SnomedMetadataRf2.ACTIVE_VALUE_RF2.getUuids()[0];
     private final TerminologyStoreDI ts;
     // 
     private final BufferedWriter reportGroupAdditionsWriter;
@@ -133,6 +135,9 @@ public class LogicalRelComputer {
             }
         }
 
+        if (keepList.isEmpty()) {
+            System.out.println(":WARNING: empty stated rels list :: " + a.get(0).c1SnoId);
+        }
         return keepList;
     }
 
@@ -186,7 +191,8 @@ public class LogicalRelComputer {
         return false;
     }
 
-    private ArrayList<LogicalRelGroup> convertToRelGroups(ArrayList<LogicalRel> a) throws NoSuchAlgorithmException, UnsupportedEncodingException {
+    private ArrayList<LogicalRelGroup> convertToRelGroups(ArrayList<LogicalRel> a, boolean keepHistory)
+            throws NoSuchAlgorithmException, UnsupportedEncodingException {
         ArrayList<LogicalRelGroup> logicalRelGroupList = new ArrayList<>();
         // SORT BY [C1-Group-RoleType-C2]
         Collections.sort(a);
@@ -203,7 +209,11 @@ public class LogicalRelComputer {
                 thisRelGroup = new LogicalRelGroup();
                 prevRelGroup = thisRel.group;
             }
-            thisRelGroup.add(thisRel);
+            if (keepHistory) {
+                thisRelGroup.add(thisRel);
+            } else if (thisRel.statusUuid.compareTo(SNOMED_RF2_ACTIVE_UUID) == 0) {
+                thisRelGroup.add(thisRel);
+            }
         }
         return logicalRelGroupList;
     }
@@ -230,8 +240,8 @@ public class LogicalRelComputer {
         }
 
         // CREATE REL GROUPS
-        ArrayList<LogicalRelGroup> groupsSnomedReleaseList = convertToRelGroups(relsSnomedReleaseList);
-        ArrayList<LogicalRelGroup> groupsViaKpList = convertToRelGroups(relsViaKpList);
+        ArrayList<LogicalRelGroup> groupsSnomedReleaseList = convertToRelGroups(relsSnomedReleaseList, true);
+        ArrayList<LogicalRelGroup> groupsViaKpList = convertToRelGroups(relsViaKpList, false);
 
         // trivial cases, all on one side
         if (!groupsSnomedReleaseList.isEmpty() && groupsViaKpList.isEmpty()) {
