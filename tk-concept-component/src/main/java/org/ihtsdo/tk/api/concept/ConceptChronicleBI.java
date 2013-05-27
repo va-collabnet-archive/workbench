@@ -331,4 +331,11 @@ public interface ConceptChronicleBI extends ComponentChronicleBI<ConceptVersionB
      * @throws IOException signals that an I/O exception has occurred
      */
     Collection<Integer> getAllNids() throws IOException;
+
+    /**
+     * Add an annotation to the index of annotations on this refex concept
+     * @param nid of the annotation to add to the index.
+     * @throws IOException 
+     */
+    public void addAnnotationIndex(int nid)  throws IOException;
 }
