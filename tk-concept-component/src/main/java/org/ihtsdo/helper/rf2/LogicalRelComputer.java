@@ -15,12 +15,16 @@
  */
 package org.ihtsdo.helper.rf2;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.UUID;
-import org.ihtsdo.tk.uuid.UuidT5Generator;
+import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.TerminologyStoreDI;
 
 /**
  *
@@ -28,59 +32,344 @@ import org.ihtsdo.tk.uuid.UuidT5Generator;
  */
 public class LogicalRelComputer {
 
-    private static final String REL_ID_NAMESPACE_UUID_TYPE1 = "84fd0460-2270-11df-8a39-0800200c9a66";
+    private final UUID snomedPathUuid = UUID.fromString("8c230474-9f11-30ce-9cad-185a96fd03a2");
+    private final UUID extensionPathUuid = UUID.fromString("2bfc4102-f630-5fbe-96b8-625f2a6b3d5a");
+    private final UUID developmentPathUuid = UUID.fromString("3770e517-7adc-5a24-a447-77a9daa3eedf");
+    private final TerminologyStoreDI ts;
+    // 
+    private final BufferedWriter reportGroupAdditionsWriter;
+    private final BufferedWriter reportListRoleGroupAdditionsWriter;
 
-    public static ArrayList<LogicalRel> addLogicalUuidsWithSort(ArrayList<LogicalRel> a)
+    public LogicalRelComputer(BufferedWriter reportGroupAdditionsWriter, BufferedWriter reportListRoleGroupAdditionsWriter) {
+        this.ts = Ts.get();
+        this.reportItemList = new ArrayList<>();
+        this.reportGroupAdditionsWriter = reportGroupAdditionsWriter;
+        this.reportListRoleGroupAdditionsWriter = reportListRoleGroupAdditionsWriter;
+    }
+
+    // exceptions list:  SCTID or UUID <tab> short name <\n>
+    public ArrayList<LogicalRel> processRelsGroup0(ArrayList<LogicalRel> a)
             throws NoSuchAlgorithmException, UnsupportedEncodingException {
+        ArrayList<LogicalRel> keepList = new ArrayList<>();
         // SORT BY [C1-Group-RoleType-C2]
         Collections.sort(a);
 
-        UUID lastC1 = a.get(0).c1SnoId;
-        int lastGroup = a.get(0).group;
-        String GroupListStr = getGroupListString(a, 0);
-        int max = a.size();
-        for (int i = 0; i < max; i++) {
-            // DETERMINE IF NEW GroupListStr IS NEEDED
-            if (lastC1.compareTo(a.get(i).c1SnoId) != 0
-                    || lastGroup != a.get(i).group) {
-                GroupListStr = getGroupListString(a, i);
+        LogicalRel relSnomed = null;
+        LogicalRel relExtension = null;
+        LogicalRel relEccs = null;
+
+        for (int i = 0; i < a.size(); i++) {
+            LogicalRel thisRel = a.get(i);
+
+            if (thisRel.relSctIdPath != null
+                    && thisRel.relSctIdPath.compareTo(snomedPathUuid) != 0
+                    && thisRel.pathLastRevisionUuid.compareTo(snomedPathUuid) == 0) {
+                // disregard snomed relationships to which KPs only change is to add an id 
+            } else if (thisRel.relSctIdPath != null
+                    && thisRel.relSctIdPath.compareTo(snomedPathUuid) == 0) {
+                if (relSnomed == null) {
+                    relSnomed = thisRel;
+                } else {
+                    addReportItem(relSnomed, relExtension, relEccs, "processGroup0Rels snomedPathUuid");
+                }
+            } else if (thisRel.relSctIdPath != null
+                    && thisRel.relSctIdPath.compareTo(extensionPathUuid) == 0) {
+                if (relExtension == null) {
+                    relExtension = thisRel;
+                } else {
+                    addReportItem(relSnomed, relExtension, relEccs, "processGroup0Rels extensionPathUuid");
+                }
+            } else {
+                if (relEccs == null) {
+                    relEccs = thisRel;
+                } else {
+                    addReportItem(relSnomed, relExtension, relEccs, "processGroup0Rels development");
+                }
             }
 
-            // SET RELATIONSHIP UUID
-            UUID uuidComputed = UuidT5Generator.get(REL_ID_NAMESPACE_UUID_TYPE1
-                    + a.get(i).c1SnoId
-                    + a.get(i).roleTypeSnoId
-                    + a.get(i).c2SnoId
-                    + GroupListStr);
+            // 
+            boolean doKeepCheck = false;
+            if (i == a.size() - 1) {
+                doKeepCheck = true;
+            } else {
+                LogicalRel nextRel = a.get(i + 1);
+                if (thisRel.c2SnoId.compareTo(nextRel.c2SnoId) != 0
+                        || thisRel.typeSnoId.compareTo(nextRel.typeSnoId) != 0) {
+                    doKeepCheck = true;
+                }
+            }
 
-            a.get(i).logicalRelUuid = uuidComputed;
+            // 
+            if (doKeepCheck) {
+                if (relSnomed == null && relExtension == null && relEccs == null) {
+                    // nothing to keep
+                } else if (relSnomed != null && relExtension == null && relEccs == null) {
+                    keepList.add(relSnomed);
+                } else if (relSnomed == null && relExtension != null && relEccs == null) {
+                    keepList.add(relExtension);
+                } else if (relSnomed == null && relExtension == null && relEccs != null) {
+                    keepList.add(relEccs);
+                } else if (relSnomed != null && relExtension == null && relEccs != null) {
+                    if (isSnomedCloseEnough(relSnomed, relEccs)) {
+                        keepList.add(relSnomed);
+                    } else if (isEccsNonConflictingRevision(relSnomed, relEccs)) {
+                        keepList.add(relEccs);
+                    } else {
+                        addReportItem(relSnomed, relExtension, relEccs, "not isSnomedCloseEnough, isEccsNonConflictingRevision");
+                    }
+                } else if (relSnomed != null && relExtension != null && relEccs == null) {
+                    if (isSnomedCloseEnough(relSnomed, relExtension)) {
+                        keepList.add(relSnomed);
+                    } else {
+                        addReportItem(relSnomed, relExtension, relEccs, "not isSnomedCloseEnough() Extension");
+                    }
+                } else {
+                    addReportItem(relSnomed, relExtension, relEccs, "doKeepCheck");
+                }
 
-            lastC1 = a.get(i).c1SnoId;
-            lastGroup = a.get(i).group;
+                relSnomed = null;
+                relExtension = null;
+                relEccs = null;
+            }
         }
 
-        LogicalRel.sortByLogicalRelUuid(a);
-
-        return a;
+        return keepList;
     }
 
-    private static String getGroupListString(ArrayList<LogicalRel> a, int startIdx) {
-        StringBuilder sb = new StringBuilder();
+    /**
+     * does the snomedRel match all critical files where b is redundant
+     */
+    private boolean isSnomedCloseEnough(LogicalRel snomedRel, LogicalRel b) {
+        if (snomedRel.statusUuid.compareTo(b.statusUuid) == 0
+                && snomedRel.refinabilityUuid.compareTo(b.refinabilityUuid) == 0) {
+            return true;
+        }
+        return false;
+    }
 
-        int max = a.size();
-        if (a.get(startIdx).group > 0) {
-            UUID keepC1 = a.get(startIdx).c1SnoId;
-            int keepGroup = a.get(startIdx).group;
-            int i = startIdx;
-            while ((i < max - 1)
-                    && (a.get(i).c1SnoId.compareTo(keepC1) == 0)
-                    && (a.get(i).group == keepGroup)) {
-                sb.append(a.get(i).c1SnoId).append("|");
-                sb.append(a.get(i).roleTypeSnoId).append("|");
-                sb.append(a.get(i).c2SnoId).append(";");
-                i++;
+    /**
+     * is eccsRel a non-conflicting revision? if yes, keep eccsRel with
+     * snomedIdentifier
+     */
+    private boolean isEccsNonConflictingRevision(LogicalRel snomedRel, LogicalRel eccsRel) {
+        if (snomedRel.tkr.revisions == null
+                && eccsRel.tkr.revisions != null
+                && snomedRel.tkr.typeUuid.compareTo(eccsRel.tkr.typeUuid) == 0
+                && snomedRel.tkr.refinabilityUuid.compareTo(eccsRel.tkr.refinabilityUuid) == 0
+                && eccsRel.tkr.pathUuid.compareTo(snomedPathUuid) == 0
+                && eccsRel.time > snomedRel.time) {
+
+            eccsRel.relSctId = snomedRel.relSctId;
+            eccsRel.relSctIdPath = snomedRel.relSctIdPath;
+            eccsRel.relSctIdTime = snomedRel.relSctIdTime;
+            snomedRel.tkr.revisions = eccsRel.tkr.revisions; // move over revisions
+            eccsRel.tkr = snomedRel.tkr;
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * checks name space of sctid
+     */
+    private boolean isExtensionSctId(Long sctid) {
+        String sctidStr = Long.toString(sctid);
+        int length = sctidStr.length();
+        if (length < 10) {
+            return false;
+        }
+        String nameSpaceIdentifier = sctidStr.substring(length - 10, length - 3);
+        if (nameSpaceIdentifier.equalsIgnoreCase("1000119")) {
+            // :NYI: "1000119" needs to be generalized for broader applications
+            return true;
+        }
+        return false;
+    }
+
+    private ArrayList<LogicalRelGroup> convertToRelGroups(ArrayList<LogicalRel> a) throws NoSuchAlgorithmException, UnsupportedEncodingException {
+        ArrayList<LogicalRelGroup> logicalRelGroupList = new ArrayList<>();
+        // SORT BY [C1-Group-RoleType-C2]
+        Collections.sort(a);
+
+        int prevRelGroup = -1;
+        LogicalRelGroup thisRelGroup = null;
+        for (LogicalRel thisRel : a) {
+            // check role group number
+            if (thisRel.group != prevRelGroup) {
+                if (thisRelGroup != null) {
+                    thisRelGroup.updateLogicalIds();
+                    logicalRelGroupList.add(thisRelGroup);
+                }
+                thisRelGroup = new LogicalRelGroup();
+                prevRelGroup = thisRel.group;
+            }
+            thisRelGroup.add(thisRel);
+        }
+        return logicalRelGroupList;
+    }
+
+    public ArrayList<LogicalRel> processRelGroups(ArrayList<LogicalRel> a)
+            throws NoSuchAlgorithmException, UnsupportedEncodingException, IOException {
+        ArrayList<LogicalRel> keepRels = new ArrayList<>();
+        // SORT BY [C1-Group-RoleType-C2]
+        Collections.sort(a);
+
+        // SPLIT RELS INTO CATEGORIES
+        ArrayList<LogicalRel> relsSnomedReleaseList = new ArrayList<>();
+        ArrayList<LogicalRel> relsViaKpList = new ArrayList<>();
+        for (LogicalRel thisRel : a) {
+            // must be a SNOMED rel with a SNOMED released sctid, otherwise skip
+            if (thisRel.pathLastRevisionUuid.compareTo(snomedPathUuid) == 0
+                    && thisRel.relSctIdPath != null
+                    && thisRel.relSctIdPath.compareTo(snomedPathUuid) == 0
+                    && isExtensionSctId(thisRel.relSctId) == false) {
+                relsSnomedReleaseList.add(thisRel);
+            } else {
+                relsViaKpList.add(thisRel);
             }
         }
+
+        // CREATE REL GROUPS
+        ArrayList<LogicalRelGroup> groupsSnomedReleaseList = convertToRelGroups(relsSnomedReleaseList);
+        ArrayList<LogicalRelGroup> groupsViaKpList = convertToRelGroups(relsViaKpList);
+
+        // trivial cases, all on one side
+        if (!groupsSnomedReleaseList.isEmpty() && groupsViaKpList.isEmpty()) {
+            for (LogicalRelGroup rg : groupsSnomedReleaseList) {
+                for (LogicalRel r : rg.logicalRels) {
+                    keepRels.add(r);
+                }
+            }
+            return keepRels;
+        }
+        if (groupsSnomedReleaseList.isEmpty() && !groupsViaKpList.isEmpty()) {
+            for (LogicalRelGroup rg : groupsViaKpList) {
+                for (LogicalRel r : rg.logicalRels) {
+                    keepRels.add(r);
+                }
+            }
+            return keepRels;
+        }
+
+        // HANDLE LOGICAL EQUIVALENT GROUPS
+        HashSet<UUID> groupsSnomedReleaseSet = new HashSet<>();
+        for (LogicalRelGroup logicalRelGroup : groupsSnomedReleaseList) {
+            groupsSnomedReleaseSet.add(logicalRelGroup.groupListStrHash);
+        }
+
+        ArrayList<LogicalRelGroup> groupsViaKpUnMatchedList = new ArrayList<>();
+        for (LogicalRelGroup groupKp : groupsViaKpList) {
+            if (groupsSnomedReleaseSet.contains(groupKp.groupListStrHash)) {
+                // System.out.println("matched group");
+            } else {
+                groupsViaKpUnMatchedList.add(groupKp);
+            }
+        }
+        // easy case, everything matched
+        if (groupsViaKpUnMatchedList.isEmpty()) {
+            for (LogicalRelGroup rg : groupsSnomedReleaseList) {
+                for (LogicalRel r : rg.logicalRels) {
+                    keepRels.add(r);
+                }
+            }
+            return keepRels;
+        }
+
+        // >>>>>>>> DOES RESIDUAL CONTAIN ??? <<<<<<<<<<<<<
+        UUID c1Uuid = groupsSnomedReleaseList.get(0).logicalRels.get(0).c1SnoId;
+        reportListRoleGroupAdditionsWriter.append(c1Uuid.toString());
+        reportListRoleGroupAdditionsWriter.append("\t");
+        reportListRoleGroupAdditionsWriter.append(ts.getConcept(c1Uuid).toUserString());
+        reportListRoleGroupAdditionsWriter.append("\n");
+        reportGroupAdditionsWriter.append("\n############################\n");
+        for (LogicalRelGroup rg : groupsSnomedReleaseList) {
+            for (LogicalRel r : rg.logicalRels) {
+                keepRels.add(r);
+            }
+            reportGroupAdditionsWriter.append(rg.toStringUser());
+        }
+        reportGroupAdditionsWriter.append("\n......\n");
+        for (LogicalRelGroup rg : groupsViaKpUnMatchedList) {
+            for (LogicalRel r : rg.logicalRels) {
+                r.group += 90;
+                r.setGroup(r.group);
+                keepRels.add(r);
+            }
+            reportGroupAdditionsWriter.append(rg.toStringUser());
+        }
+        return keepRels;
+    }
+    private ArrayList<ReportItem> reportItemList;
+
+    public String toStringReport() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("\n");
+        sb.append("#############################\n");
+        sb.append("# LOGICAL RELATIONSHIP REPORT\n");
+        sb.append("#############################\n");
+        for (ReportItem reportItem : reportItemList) {
+            sb.append(reportItem.comment);
+            sb.append("\n");
+            if (reportItem.relSnomed != null) {
+                sb.append("# snomed core # \n");
+                sb.append(reportItem.relSnomed.tkr.toString());
+                sb.append("\n");
+            }
+            if (reportItem.relExtension != null) {
+                sb.append("# extension # \n");
+                sb.append(reportItem.relExtension.tkr.toString());
+                sb.append("\n");
+            }
+            if (reportItem.relEccs != null) {
+                sb.append("# change set # \n");
+                sb.append(reportItem.relEccs.tkr.toString());
+                sb.append("\n");
+            }
+            sb.append("#########\n");
+        }
         return sb.toString();
+    }
+
+    public String toStringReportList() throws IOException {
+        StringBuilder sb = new StringBuilder();
+        for (ReportItem reportItem : reportItemList) {
+            UUID c1Uuid;
+            if (reportItem.relSnomed != null) {
+                c1Uuid = reportItem.relSnomed.tkr.c1Uuid;
+            } else if (reportItem.relExtension != null) {
+                c1Uuid = reportItem.relExtension.tkr.c1Uuid;
+            } else {
+                c1Uuid = reportItem.relEccs.tkr.c1Uuid;
+            }
+            sb.append(c1Uuid.toString());
+            sb.append("\t");
+            sb.append(Ts.get().getConcept(c1Uuid).toUserString());
+            sb.append("\n");
+        }
+        return sb.toString();
+    }
+
+    private void addReportItem(LogicalRel relSnomed,
+            LogicalRel relExtension,
+            LogicalRel relEccs,
+            String comment) {
+        ReportItem item;
+        item = new ReportItem(relSnomed, relExtension, relEccs, comment);
+        reportItemList.add(item);
+    }
+
+    private class ReportItem {
+
+        LogicalRel relSnomed;
+        LogicalRel relExtension;
+        LogicalRel relEccs;
+        String comment;
+
+        public ReportItem(LogicalRel relSnomed, LogicalRel relExtension, LogicalRel relEccs, String comment) {
+            this.relSnomed = relSnomed;
+            this.relExtension = relExtension;
+            this.relEccs = relEccs;
+            this.comment = comment;
+        }
     }
 }

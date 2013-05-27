@@ -37,12 +37,14 @@ public class LogicalRel implements Comparable<LogicalRel> {
     public UUID relSctIdPath;
     public UUID c1SnoId;
     public UUID c2SnoId;
-    public UUID roleTypeSnoId;
-    public UUID pathUuid;
+    public UUID typeSnoId;
+    public UUID pathLastRevisionUuid;
     public UUID statusUuid;
+    public UUID characteristicUuid;
+    public UUID refinabilityUuid;
     public int group;
     public long time;
-    public final TkRelationship tkr;
+    public TkRelationship tkr;
     //
     private final static UUID SNOMED_CORE_PATH_UUID = UUID.fromString("8c230474-9f11-30ce-9cad-185a96fd03a2");
     private final static UUID SNOMED_INT_RF1_UUID = UUID.fromString("0418a591-f75b-39ad-be2c-3ab849326da9");
@@ -51,34 +53,38 @@ public class LogicalRel implements Comparable<LogicalRel> {
 
     public LogicalRel(TkRelationship tkr) {
         this.tkr = tkr;
-        this.logicalRelUuid = null; // to be assigned later
+        this.logicalRelUuid = null; // not assigned on initial creation
         this.c1SnoId = tkr.c1Uuid; // not versioned
         this.c2SnoId = tkr.c2Uuid; // not versioned
 
         List<TkRelationshipRevision> revisions = tkr.revisions;
         if (revisions == null) {
-            this.roleTypeSnoId = tkr.typeUuid;
+            this.typeSnoId = tkr.typeUuid;
             this.group = tkr.relGroup;
             this.statusUuid = tkr.statusUuid;
             this.time = tkr.time;
-            this.pathUuid = tkr.getPathUuid();
+            this.pathLastRevisionUuid = tkr.getPathUuid();
+            this.characteristicUuid = tkr.characteristicUuid;
+            this.refinabilityUuid = tkr.refinabilityUuid;
         } else {
             int i = 0;
             TkRelationshipRevision rev = revisions.get(i);
-            this.roleTypeSnoId = rev.typeUuid;
+            this.typeSnoId = rev.typeUuid;
             this.group = rev.group;
             this.statusUuid = rev.statusUuid;
             this.time = rev.time;
-            this.pathUuid = rev.getPathUuid();
+            this.pathLastRevisionUuid = rev.getPathUuid();
             for (; i < revisions.size(); i++) {
                 // get the most recent snapshot
                 rev = revisions.get(i);
                 if (rev.time > this.time) {
-                    this.roleTypeSnoId = rev.typeUuid;
+                    this.typeSnoId = rev.typeUuid;
                     this.group = rev.group;
                     this.statusUuid = rev.statusUuid;
                     this.time = rev.time;
-                    this.pathUuid = rev.getPathUuid();
+                    this.pathLastRevisionUuid = rev.getPathUuid();
+                    this.characteristicUuid = rev.characteristicUuid;
+                    this.refinabilityUuid = rev.refinabilityUuid;
                 }
             }
         }
@@ -118,9 +124,9 @@ public class LogicalRel implements Comparable<LogicalRel> {
                 return thisLess;
             } else {
                 // ROLE TYPE
-                if (this.roleTypeSnoId.compareTo(o2.roleTypeSnoId) > 0) {
+                if (this.typeSnoId.compareTo(o2.typeSnoId) > 0) {
                     return thisMore;
-                } else if (this.roleTypeSnoId.compareTo(o2.roleTypeSnoId) < 0) {
+                } else if (this.typeSnoId.compareTo(o2.typeSnoId) < 0) {
                     return thisLess;
                 } else {
                     // C2
@@ -158,5 +164,22 @@ public class LogicalRel implements Comparable<LogicalRel> {
             }
         };
         Collections.sort(a, byLogicalRelUuid);
+    }
+
+    void setGroup(int group) {
+        if (tkr.revisions == null) {
+            tkr.relGroup = group;
+            return;
+        }
+        List<TkRelationshipRevision> revisions = tkr.revisions;
+        int i = 0;
+        TkRelationshipRevision latestRev = revisions.get(i);
+        for (; i < revisions.size(); i++) {
+            TkRelationshipRevision rev = revisions.get(i);
+            if (rev.time > latestRev.time) {
+                latestRev = rev; // get the most recent revision
+            }
+        }
+        latestRev.group = group;
     }
 }
