@@ -1042,6 +1042,11 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
 
    @Override
    public boolean hasUncommittedComponents() {
+      if (annotationIndex != null && annotationIndex == true) {
+          if (lastChange > BdbCommitManager.getLastCommit()) {
+              return true;
+          }
+      }
       if (hasUncommittedVersion(attributes.get())) {
          return true;
       }

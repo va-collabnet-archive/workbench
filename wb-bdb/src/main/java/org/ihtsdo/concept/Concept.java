@@ -192,6 +192,11 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
         }
     }
 
+    @Override
+    public void addAnnotationIndex(int nid) throws IOException {
+       addMemberNid(nid);
+    }
+
     //~--- methods -------------------------------------------------------------
     @Override
     public void abort() throws IOException {
@@ -334,6 +339,27 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
 
     public void flushVersions() throws Exception {
         processComponentChronicles(new VersionFlusher());
+    }
+    private void formatCollection(StringBuffer buff, Collection<?> list, 
+            int cuttoff) {
+        if ((list != null) && (list.size() > 0)) {
+            buff.append("[\n");
+            int count = 0;
+            for (Object obj : list) {
+                if (count > cuttoff) {
+                    buff.append("...");
+                    break;
+                }
+                count++;
+                buff.append("   ");
+                buff.append(obj);
+                buff.append(",\n");
+            }
+
+            buff.append("]");
+        } else {
+            buff.append("[]");
+        }
     }
 
     private void formatCollection(StringBuffer buff, Collection<?> list) {
@@ -849,16 +875,30 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
             formatCollection(buff, getImages());
 
             if (!isAnnotationStyleRefex()) {
-                buff.append("\n refset members: ");
-                formatCollection(buff, getExtensions());
-            }
+                if (getExtensions().size() < 50) {
+                    buff.append("\n refset members: ");
+                    formatCollection(buff, getExtensions());
+                } else {
+                    buff.append("\n refset members[first 50]: ");
+                    formatCollection(buff, getExtensions(), 50);
+                    buff.append("\n total count: ").append(getExtensions().size());               
+                }
+             }
 
             buff.append("\n desc nids: ");
             buff.append(data.getDescNids());
             buff.append("\n src rel nids: ");
             buff.append(data.getSrcRelNids());
-            buff.append("\n member nids: ");
-            buff.append(data.getMemberNids());
+            
+            if (data.getMemberNids().size() < 50) {
+                buff.append("\n member nids: ");
+                buff.append(data.getMemberNids());
+            } else {
+                 buff.append("\n member nids[first 50]: ");
+                 formatCollection(buff, data.getMemberNids(), 50);
+                 buff.append("\n total count: ").append(data.getMemberNids().size());
+            }
+
             buff.append("\n image nids: ");
             buff.append(data.getImageNids());
             buff.append("\n");
@@ -1943,7 +1983,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
 
                                 // get Preferred or other
                                 I_DescriptionTuple answer = getPreferredAcceptability(descriptions,
-                                        ReferenceConcepts.SYNONYM_RF1.getNid(), vc,
+                                        ReferenceConcepts.SYNONYM_RF2.getNid(), vc,
                                         langRefexNid);
 
                                 if (answer != null) {

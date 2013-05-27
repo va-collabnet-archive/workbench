@@ -76,6 +76,11 @@ public class ConceptVersion implements ConceptVersionBI, Comparable<ConceptVersi
     private Concept concept;
 
     @Override
+    public void addAnnotationIndex(int nid)  throws IOException {
+        concept.addAnnotationIndex(nid);
+    }
+
+    @Override
     public Collection<Integer> getAllNids() throws IOException {
         return concept.getAllNids();
     }
