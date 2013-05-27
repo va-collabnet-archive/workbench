@@ -427,7 +427,7 @@ public final class ConceptCB extends CreateOrAmendBlueprint {
      * @throws ContradictionException if more than one version is found for a
      * given position or view coordinate
      */
-    private void addFullySpecifiedNameDialectRefexes(DescriptionCAB fullySpecifiedNameBlueprint, LANG_CODE dialect) throws NoSuchAlgorithmException,
+    public void addFullySpecifiedNameDialectRefexes(DescriptionCAB fullySpecifiedNameBlueprint, LANG_CODE dialect) throws NoSuchAlgorithmException,
             UnsupportedEncodingException, IOException, InvalidCAB, ContradictionException {
         RefexCAB usAnnot;
         RefexCAB gbAnnot;
@@ -589,6 +589,55 @@ public final class ConceptCB extends CreateOrAmendBlueprint {
         this.recomputeUuid();
         addPreferredNameDialectRefexes(perferredNameBlueprint, dialect);
     }
+    /**
+     * Adds the appropriate dialect refexes to the synonym name description
+     * blueprint.
+     *
+     * @param synonymBlueprint the preferred name description blueprint
+     * @param dialect the dialect of the preferred name, only supports en-gb and
+     * en-us
+     * @throws NoSuchAlgorithmException indicates a no such algorithm exception
+     * has occurred
+     * @throws UnsupportedEncodingException indicates an unsupported encoding
+     * exception has occurred
+     * @throws IOException signals that an I/O exception has occurred
+     * @throws InvalidCAB if the any of the values in blueprint to make are
+     * invalid
+     * @throws ContradictionException if more than one version is found for a
+     * given position or view coordinate
+     */
+    public void addSynonymDialectRefexes(DescriptionCAB synonymBlueprint, LANG_CODE dialect) throws NoSuchAlgorithmException,
+            UnsupportedEncodingException, IOException, InvalidCAB, ContradictionException {
+        RefexCAB usAnnot;
+        RefexCAB gbAnnot;
+        if (dialect == LANG_CODE.EN) {
+            usAnnot = new RefexCAB(TK_REFEX_TYPE.CID,
+                    synonymBlueprint.getComponentUuid(),
+                    usRefexNid, null, null, idDirective, refexDirective);
+            usAnnot.put(RefexCAB.RefexProperty.CNID1, SnomedMetadataRfx.getDESC_ACCEPTABLE_NID());
+
+            gbAnnot = new RefexCAB(TK_REFEX_TYPE.CID,
+                    synonymBlueprint.getComponentUuid(),
+                    gbRefexNid, null, null, idDirective, refexDirective);
+            gbAnnot.put(RefexCAB.RefexProperty.CNID1, SnomedMetadataRfx.getDESC_ACCEPTABLE_NID());
+            synonymBlueprint.addAnnotationBlueprint(usAnnot);
+            synonymBlueprint.addAnnotationBlueprint(gbAnnot);
+        } else if (dialect == LANG_CODE.EN_US) {
+            usAnnot = new RefexCAB(TK_REFEX_TYPE.CID,
+                    synonymBlueprint.getComponentUuid(),
+                    usRefexNid, null, null, idDirective, refexDirective);
+            usAnnot.put(RefexCAB.RefexProperty.CNID1, SnomedMetadataRfx.getDESC_ACCEPTABLE_NID());
+            synonymBlueprint.addAnnotationBlueprint(usAnnot);
+        } else if (dialect == LANG_CODE.EN_GB) {
+            gbAnnot = new RefexCAB(TK_REFEX_TYPE.CID,
+                    synonymBlueprint.getComponentUuid(),
+                    gbRefexNid, null, null, idDirective, refexDirective);
+            gbAnnot.put(RefexCAB.RefexProperty.CNID1, SnomedMetadataRfx.getDESC_ACCEPTABLE_NID());
+            synonymBlueprint.addAnnotationBlueprint(gbAnnot);
+        } else {
+            throw new InvalidCAB("Dialect not supported: " + dialect.getFormatedLanguageCode());
+        }
+    }
 
     /**
      * Adds the appropriate dialect refexes to the preferred name description
@@ -607,7 +656,7 @@ public final class ConceptCB extends CreateOrAmendBlueprint {
      * @throws ContradictionException if more than one version is found for a
      * given position or view coordinate
      */
-    private void addPreferredNameDialectRefexes(DescriptionCAB preferredBlueprint, LANG_CODE dialect) throws NoSuchAlgorithmException,
+    public void addPreferredNameDialectRefexes(DescriptionCAB preferredBlueprint, LANG_CODE dialect) throws NoSuchAlgorithmException,
             UnsupportedEncodingException, IOException, InvalidCAB, ContradictionException {
         RefexCAB usAnnot;
         RefexCAB gbAnnot;
