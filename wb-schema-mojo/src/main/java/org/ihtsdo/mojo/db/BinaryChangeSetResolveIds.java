@@ -1041,7 +1041,7 @@ public class BinaryChangeSetResolveIds {
     private void removeLegacyGBDialectExceptionsAnnotation(TkConcept eConcept) {
         if (eConcept.primordialUuid.compareTo(UUID.fromString("c7b73676-d9fb-322d-a721-1c0bdf3f11c2")) == 0 ||
                 eConcept.primordialUuid.compareTo(UUID.fromString("123f303c-9c8a-5092-81d5-db0d2ffc4d62")) == 0) {
-            System.out.println(":!!!:DEBUG:");
+            // System.out.println(":!!!:DEBUG:");
         }
         if (eConcept.descriptions != null) {
             for (TkDescription tkd : eConcept.descriptions) {
@@ -1051,7 +1051,7 @@ public class BinaryChangeSetResolveIds {
                         if (tkram.getRefexUuid().compareTo(legacyGbDialectExceptionsRefsetUuid) != 0) {
                             keepAnnotations.add(tkram);
                         } else {
-                            System.out.println(":!!!:DEBUG: ... dropped legacyGbDialectExceptionsRefsetUuid");
+                            // System.out.println(":!!!:DEBUG: ... dropped legacyGbDialectExceptionsRefsetUuid");
                         }
                     }
                     tkd.annotations = keepAnnotations;
