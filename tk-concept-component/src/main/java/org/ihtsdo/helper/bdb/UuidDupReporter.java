@@ -251,8 +251,9 @@ public class UuidDupReporter implements ProcessUnfetchedConceptDataBI {
 
         @Override
         public String toString() {
+            
             return "DupEntry{" + "dup=\n" + dup + ",\n\n enclosingConcept=\n" + 
-                    enclosingConcept.toLongString() + "\n}\n";
+                    enclosingConcept.toUserString() + "\n}\n";
         }
         
         
