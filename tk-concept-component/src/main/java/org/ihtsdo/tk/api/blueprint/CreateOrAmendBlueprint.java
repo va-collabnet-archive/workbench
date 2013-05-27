@@ -165,14 +165,19 @@ public abstract class CreateOrAmendBlueprint implements PropertyChangeListener {
         statusUuid = currentStatusUuid;
         this.componentUuid = componentUuid;
         if (idDirective == IdDirective.PRESERVE) {
-            this.componentUuid = componentVersion.getPrimUuid();
+            if (componentVersion != null) {
+                this.componentUuid = componentVersion.getPrimUuid();
+            } else {
+                this.componentUuid = UUID.randomUUID(); // nothing to preserve. 
+            }
+            
         } else if (idDirective == IdDirective.GENERATE_RANDOM) {
             this.componentUuid = UUID.randomUUID();
         } else if (cv instanceof ConceptVersionBI
                 && idDirective == IdDirective.GENERATE_RANDOM_CONCEPT_REST_HASH) {
             this.componentUuid = UUID.randomUUID();
         } else if (cv instanceof ConceptVersionBI
-                && idDirective == IdDirective.PRESERVE_CONCEPT_REST_HASH) {
+                && idDirective == IdDirective.PRESERVE_CONCEPT_REST_HASH && componentVersion != null) {
             this.componentUuid = componentVersion.getPrimUuid();
         }
         this.idDirective = idDirective;
