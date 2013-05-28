@@ -46,11 +46,8 @@ public class LogicalRelGroup {
         logicalRels.add(thisRel);
     }
 
-    public boolean isNotEmpty() {
-        if (logicalRels.isEmpty()) {
-            return false;
-        }
-        return true;
+    public boolean isEmpty() {
+        return logicalRels.isEmpty();
     }
 
     public int size() {

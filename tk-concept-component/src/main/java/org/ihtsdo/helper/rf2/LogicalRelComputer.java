@@ -215,7 +215,8 @@ public class LogicalRelComputer {
                 thisRelGroup.add(thisRel);
             }
         }
-        if (thisRelGroup != null && !thisRelGroup.isNotEmpty()) {
+        if (thisRelGroup != null && !thisRelGroup.isEmpty()) {
+            thisRelGroup.updateLogicalIds();
             logicalRelGroupList.add(thisRelGroup);
         }
         return logicalRelGroupList;
@@ -242,11 +243,19 @@ public class LogicalRelComputer {
             }
         }
 
+        // most trivial case, rels all on one side
+        if (!relsSnomedReleaseList.isEmpty() && relsViaKpList.isEmpty()) {
+            return relsSnomedReleaseList;
+        }
+        if (relsSnomedReleaseList.isEmpty() && !relsViaKpList.isEmpty()) {
+            return relsViaKpList;
+        }
+
         // CREATE REL GROUPS
         ArrayList<LogicalRelGroup> groupsSnomedReleaseList = convertToRelGroups(relsSnomedReleaseList, true);
         ArrayList<LogicalRelGroup> groupsViaKpList = convertToRelGroups(relsViaKpList, false);
 
-        // trivial cases, all on one side
+        // trivial case, groups all on one side
         if (!groupsSnomedReleaseList.isEmpty() && groupsViaKpList.isEmpty()) {
             for (LogicalRelGroup rg : groupsSnomedReleaseList) {
                 for (LogicalRel r : rg.logicalRels) {
