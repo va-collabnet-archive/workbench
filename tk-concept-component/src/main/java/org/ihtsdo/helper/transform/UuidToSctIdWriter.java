@@ -1393,7 +1393,7 @@ public class UuidToSctIdWriter {
      */
     private void processSimpleRefsets() throws  IOException {
         for (File inputFile : uuidFiles) {
-            if (inputFile.getName().toLowerCase().contains("simple-refset")) {
+            if (inputFile.getName().toLowerCase().contains("simplerefset")) {
                 BufferedReader simpleRefsetReader = new BufferedReader(new InputStreamReader(new FileInputStream(inputFile), "UTF8"));
                 File simpleRefsetFile = new File(content,
                         inputFile.getName().replace("UUID_", ""));

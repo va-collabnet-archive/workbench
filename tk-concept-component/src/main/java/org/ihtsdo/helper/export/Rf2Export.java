@@ -519,8 +519,16 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
         Collection<? extends ConceptVersionBI> childRefsetConcepts = refsetParentConcept.getRelationshipsTargetSourceConceptsActiveIsa();
         for (ConceptVersionBI childRefset : childRefsetConcepts) {
             if (childRefset.getModuleNid() == Ts.get().getNidForUuids(UUID.fromString(module))) {
-                String refsetName = childRefset.getDescriptionPreferred().getText();
-                refsetName = refsetName.replace(" ", "");
+                String refsetNameOld = childRefset.getDescriptionPreferred().getText();
+                String[] parts = refsetNameOld.split(" ");
+                String refsetName = "";
+                for(String part : parts){
+                    String first = part.substring(0, 1);
+                    String rest = part.substring(1);
+                    first = first.toUpperCase();
+                    part = first + rest;
+                    refsetName = refsetName + part;
+                }
                 if(!refsetName.toLowerCase().contains("SimpleRefset")){
                     refsetName = refsetName.concat("SimpleRefset");
                 }
@@ -621,7 +629,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
             boolean write = true;
             if (sameCycleStampNids.contains(conceptAttributeChronicle.getPrimordialVersion().getStampNid())) {
                 ConceptAttributeVersionBI version = conceptAttributeChronicle.getVersion(viewCoordinateAllStatus);
-                if(version !=null || !version.isActive(viewCoordinate)){
+                if(version == null && !version.isActive(viewCoordinate)){
                     write = false;
                 }
             }
