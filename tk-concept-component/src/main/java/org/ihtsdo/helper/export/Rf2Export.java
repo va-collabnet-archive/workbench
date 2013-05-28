@@ -183,65 +183,65 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
         
         File conceptsFile = new File(directory,
                 "sct2_Concept_UUID_" + releaseType.suffix + "_"
-                + country.getFormatedCountryCode() + namespace + "_"
+                + country.getFormatedCountryCode().toUpperCase() + namespace + "_"
                 + TimeHelper.getShortFileDateFormat().format(effectiveDate) + ".txt");
         File descriptionsFile = new File(directory,
                 "sct2_Description_UUID_" + releaseType.suffix + "_"
                 + language.getFormatedLanguageCode() + "_"
-                + country.getFormatedCountryCode() + namespace + "_"
+                + country.getFormatedCountryCode().toUpperCase() + namespace + "_"
                 + TimeHelper.getShortFileDateFormat().format(effectiveDate) + ".txt");
         File relationshipsFile = new File(directory,
                 "sct2_Relationship_UUID_" + releaseType.suffix + "_"
-                + country.getFormatedCountryCode() + namespace + "_"
+                + country.getFormatedCountryCode().toUpperCase() + namespace + "_"
                 + TimeHelper.getShortFileDateFormat().format(effectiveDate) + ".txt");
         File relationshipsStatedFile = new File(directory,
                 "sct2_StatedRelationship_UUID_" + releaseType.suffix + "_"
-                + country.getFormatedCountryCode() + namespace + "_"
+                + country.getFormatedCountryCode().toUpperCase() + namespace + "_"
                 + TimeHelper.getShortFileDateFormat().format(effectiveDate) + ".txt");
         File privateIdentifiersFile = null;
         File identifiersFile = null;
         if (makePrivateIdFile) {
             privateIdentifiersFile = new File(directory,
                     "sct2_Identifier_Auxiliary_UUID_" + releaseType.suffix + "_"
-                    + country.getFormatedCountryCode() + namespace + "_"
+                    + country.getFormatedCountryCode().toUpperCase() + namespace + "_"
                     + TimeHelper.getShortFileDateFormat().format(effectiveDate) + ".txt");
             identifiersFile = new File(directory,
                     "sct2_Identifier_UUID_" + releaseType.suffix + "_"
-                    + country.getFormatedCountryCode() + namespace + "_"
+                    + country.getFormatedCountryCode().toUpperCase() + namespace + "_"
                     + TimeHelper.getShortFileDateFormat().format(effectiveDate) + ".txt");
         } else {
             identifiersFile = new File(directory,
                     "sct2_Identifier_UUID_" + releaseType.suffix + "_"
-                    + country.getFormatedCountryCode() + namespace + "_"
+                    + country.getFormatedCountryCode().toUpperCase() + namespace + "_"
                     + TimeHelper.getShortFileDateFormat().format(effectiveDate) + ".txt");
         }
         File associationFile = new File(directory,
                 "der2_cRefset_AssociationReference_UUID_" + releaseType.suffix + "-"
-                + LANG_CODE.EN.getFormatedLanguageCode() + namespace + "_"
+                + LANG_CODE.EN.getFormatedLanguageCode().toUpperCase() + namespace + "_"
                 + TimeHelper.getShortFileDateFormat().format(effectiveDate) + ".txt");
         File attributeValueFile = new File(directory,
                 "der2_cRefset_AttributeValue_UUID_" + releaseType.suffix + "-"
-                + LANG_CODE.EN.getFormatedLanguageCode() + namespace + "_"
+                + LANG_CODE.EN.getFormatedLanguageCode().toUpperCase() + namespace + "_"
                 + TimeHelper.getShortFileDateFormat().format(effectiveDate) + ".txt");
         File langRefsetsFile = new File(directory,
                 "der2_cRefset_Language_UUID_" + releaseType.suffix + "-"
-                + LANG_CODE.EN.getFormatedLanguageCode() + namespace + "_"
+                + LANG_CODE.EN.getFormatedLanguageCode().toUpperCase() + namespace + "_"
                 + TimeHelper.getShortFileDateFormat().format(effectiveDate) + ".txt");
         File otherLangRefsetsFile = new File(directory,
                 "der2_cRefset_Language_UUID_" + releaseType.suffix + "-"
-                + country.getFormatedCountryCode() + namespace + "_"
+                + country.getFormatedCountryCode().toUpperCase() + namespace + "_"
                 + TimeHelper.getShortFileDateFormat().format(effectiveDate) + ".txt");
         File modDependFile = new File(directory,
                 "der2_ssRefset_ModuleDependency_UUID_" + releaseType.suffix + "_"
-                + country.getFormatedCountryCode() + namespace + "_"
+                + country.getFormatedCountryCode().toUpperCase() + namespace + "_"
                 + TimeHelper.getShortFileDateFormat().format(effectiveDate) + ".txt");
         File descTypeFile = new File(directory,
                 "der2_ciRefset_DescriptionType_UUID_" + releaseType.suffix + "_"
-                + country.getFormatedCountryCode() + namespace + "_"
+                + country.getFormatedCountryCode().toUpperCase() + namespace + "_"
                 + TimeHelper.getShortFileDateFormat().format(effectiveDate) + ".txt");
         File refsetDescFile = new File(directory,
                 "der2_cciRefset_RefsetDescriptor_UUID_" + releaseType.suffix + "_"
-                + country.getFormatedCountryCode() + namespace + "_"
+                + country.getFormatedCountryCode().toUpperCase() + namespace + "_"
                 + TimeHelper.getShortFileDateFormat().format(effectiveDate) + ".txt");
 
         FileOutputStream conceptOs = new FileOutputStream(conceptsFile);
@@ -520,13 +520,13 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
         for (ConceptVersionBI childRefset : childRefsetConcepts) {
             if (childRefset.getModuleNid() == Ts.get().getNidForUuids(UUID.fromString(module))) {
                 String refsetName = childRefset.getDescriptionPreferred().getText();
-                refsetName = refsetName.replace(" ", "-");
-                if(!refsetName.toLowerCase().contains("simple-refset")){
-                    refsetName = refsetName.concat("-simple-refset");
+                refsetName = refsetName.replace(" ", "");
+                if(!refsetName.toLowerCase().contains("SimpleRefset")){
+                    refsetName = refsetName.concat("SimpleRefset");
                 }
                 File simpleRefsetFile = new File(directory,
                         "der2_Refset_" + refsetName + "_UUID_" + releaseType.suffix + "_"
-                        + country.getFormatedCountryCode() + namespace + "_"
+                        + country.getFormatedCountryCode().toUpperCase() + namespace + "_"
                         + TimeHelper.getShortFileDateFormat().format(effectiveDate) + ".txt");
                 FileOutputStream simpleRefsetOs = new FileOutputStream(simpleRefsetFile);
                 Writer simpleRefsetWriter = new BufferedWriter(new OutputStreamWriter(simpleRefsetOs, "UTF8"));
@@ -870,7 +870,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                     break;
 
                 case MODIFIER_ID:
-                    relationshipsWriter.write(store.getUuidPrimordialForNid(relationshipVersion.getRefinabilityNid())
+                    relationshipsWriter.write(Snomed.SOME.getLenient().getPrimUuid()
                             + field.seperator);
 
                     break;
@@ -941,7 +941,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                     break;
 
                 case MODIFIER_ID:
-                    relationshipsStatedWriter.write(store.getUuidPrimordialForNid(relationshipVersion.getRefinabilityNid())
+                    relationshipsStatedWriter.write(Snomed.SOME.getLenient().getPrimUuid()
                             + field.seperator);
 
                     break;
