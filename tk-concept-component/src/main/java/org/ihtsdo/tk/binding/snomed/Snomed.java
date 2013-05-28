@@ -540,4 +540,7 @@ public class Snomed {
     public static ConceptSpec CONCENTRATION =
 		new ConceptSpec("Concentration reference set",
 		UUID.fromString("29f8b0a9-daf8-3df8-bc46-710a76298c4c"));
+    public static ConceptSpec SOME =
+                new ConceptSpec("Some", 
+                UUID.fromString("a526d5af-b083-3f20-86af-9a6ce17a8b72"));
 }
