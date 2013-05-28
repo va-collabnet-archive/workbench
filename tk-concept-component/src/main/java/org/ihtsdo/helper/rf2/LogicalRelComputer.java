@@ -215,6 +215,9 @@ public class LogicalRelComputer {
                 thisRelGroup.add(thisRel);
             }
         }
+        if (thisRelGroup != null && !thisRelGroup.isNotEmpty()) {
+            logicalRelGroupList.add(thisRelGroup);
+        }
         return logicalRelGroupList;
     }
 
