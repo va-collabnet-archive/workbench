@@ -258,4 +258,7 @@ public class Snomed {
     public static ConceptSpec USING_SUBSTANCE =
 		new ConceptSpec("Using substance (attribute)",
 		UUID.fromString("996261c3-3c12-3f09-8f14-e30e85e9e70d"));
+    public static ConceptSpec SOME =
+                new ConceptSpec("Some", 
+                UUID.fromString("a526d5af-b083-3f20-86af-9a6ce17a8b72"));
 }
