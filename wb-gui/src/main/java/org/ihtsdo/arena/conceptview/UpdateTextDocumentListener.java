@@ -361,13 +361,16 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
 
     private void doFsnUpdate(RefexNidAnalogBI gbRefex, RefexNidAnalogBI usRefex)
             throws PropertyVetoException, IOException, InvalidCAB, UnsupportedDialectOrLanguage {
-        TerminologyBuilderBI tc = Ts.get().getTerminologyBuilder(config.getEditCoordinate(),
-                config.getViewCoordinate());
 
         desc.setText(text);
 
-        usRefex.setNid1(prefNid);
-        gbRefex.setNid1(prefNid);
+        if (usRefex != null) {
+            usRefex.setNid1(prefNid);
+        }
+        if (gbRefex != null) {
+            gbRefex.setNid1(prefNid);
+        }
+        
     }
 
     private void doSynUpdate(RefexNidAnalogBI gbRefex, RefexNidAnalogBI usRefex) throws PropertyVetoException,
