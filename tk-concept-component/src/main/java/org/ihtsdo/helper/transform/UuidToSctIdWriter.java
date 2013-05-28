@@ -393,9 +393,9 @@ public class UuidToSctIdWriter {
         File statedRelFile = new File(terminology,
                 statedRelFileUuid.getName().replace("sct2_StatedRelationship_UUID_", "sct2_StatedRelationship_"));
         File associationFile = new File(languageDir,
-                associationFileUuid.getName().replace("der2_cRefset_AssociationReference_UUID_", "der2_cRefset_Language_"));
+                associationFileUuid.getName().replace("der2_cRefset_AssociationReference_UUID_", "der2_cRefset_AssociationReference_"));
         File attributeValueFile = new File(languageDir,
-                attributeValueFileUuid.getName().replace("der2_cRefset_AttributeValue_UUID_", "der2_cRefset_Language_"));
+                attributeValueFileUuid.getName().replace("der2_cRefset_AttributeValue_UUID_", "der2_cRefset_AttributeValue_"));
         File langRefsetsFile = new File(languageDir,
                 langRefsetsFileUuid.getName().replace("der2_cRefset_Language_UUID_", "der2_cRefset_Language_"));
         File otherLangRefsetsFile = new File(languageDir,
