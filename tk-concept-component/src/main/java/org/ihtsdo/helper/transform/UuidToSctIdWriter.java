@@ -358,11 +358,11 @@ public class UuidToSctIdWriter {
                 attributeValueFileUuid = inputFile;
                 attributeValueReader = new BufferedReader(new InputStreamReader(new FileInputStream(inputFile), "UTF8"));
             }else if (inputFile.getName().startsWith("der2_cRefset_Language_UUID_" + this.releaseType.suffix)
-                    && inputFile.getName().contains(LANG_CODE.EN.getFormatedLanguageCode())) {
+                    && inputFile.getName().contains(LANG_CODE.EN.getFormatedLanguageCode().toUpperCase())) {
                 langRefsetsFileUuid = inputFile;
                 langRefsetsReader = new BufferedReader(new InputStreamReader(new FileInputStream(inputFile), "UTF8"));
             } else if (inputFile.getName().startsWith("der2_cRefset_Language_UUID_" + this.releaseType.suffix)
-                    && !inputFile.getName().contains(LANG_CODE.EN.getFormatedLanguageCode())) {
+                    && !inputFile.getName().contains(LANG_CODE.EN.getFormatedLanguageCode().toUpperCase())) {
                 otherLangRefsetsFileUuid = inputFile;
                 otherLangRefsetsReader = new BufferedReader(new InputStreamReader(new FileInputStream(inputFile), "UTF8"));
             } else if (inputFile.getName().startsWith("der2_ssRefset_ModuleDependency_UUID_" + this.releaseType.suffix)) {
