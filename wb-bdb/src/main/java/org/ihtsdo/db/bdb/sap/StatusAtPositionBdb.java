@@ -106,7 +106,7 @@ public class StatusAtPositionBdb extends ComponentBdb {
     private void checkTimeAndAdd(long startTime, long endTime, IntSet specifiedSapNids, int sapNid) {
         long time = getTime(sapNid);
 
-        if ((time >= startTime) && (time <= endTime)) {
+        if ((time > startTime) && (time <= endTime)) {
             specifiedSapNids.add(sapNid);
         }
     }
