@@ -341,7 +341,12 @@ public class BatchQACheck extends AbstractMojo {
 					}
 					String ditaUid = (String) loopRule.getMetaData().get("DITA_UID");
 					String severityUid = (String) loopRule.getMetaData().get("SEVERITY");
-					String ruleCode = (String) loopRule.getMetaData().get("RULE_CODE");
+					String ruleCode = "";
+					try {
+						ruleCode = (String) loopRule.getMetaData().get("RULE_CODE");
+					} catch (Exception e) {
+						ruleCode = "Code read error";
+					}
 					I_GetConceptData roleInContext = contextHelper.getRoleInContext(ruleUid, context); // STATUS
 
 					// Write to rules file
