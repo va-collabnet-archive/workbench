@@ -725,7 +725,10 @@ public class TkConcept {
         buff.append(TkRevision.informAboutUuid(this.primordialUuid));
         buff.append("\n   ConceptAttributes: \n");
         buff.append(PADDING);
-
+        buff.append(": \n   annotation refex: ");
+        buff.append(this.annotationStyleRefex);
+        buff.append(": \n   indexed annotation: ");
+        buff.append(this.annotationIndexStyleRefex);
         if (this.conceptAttributes == null) {
             buff.append(PADDING + "none\n");
         } else {
