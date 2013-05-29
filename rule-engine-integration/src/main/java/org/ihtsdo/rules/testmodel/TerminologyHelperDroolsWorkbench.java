@@ -226,8 +226,12 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 	/* (non-Javadoc)
 	 * @see org.ihtsdo.tk.helper.TerminologyHelperDrools#isParentOf(java.lang.String, java.lang.String)
 	 */
-	public boolean isParentOf(String parent, String subtype) throws Exception {
+	public boolean isParentOf(String parent, String subtype) throws Exception {		
 		boolean result = false;
+		if (!Ts.get().hasUuid(uuidFromString(parent))) {
+			// missing concept
+			return result;
+		}
 		I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
 		ConceptVersionBI parentConcept;
 		ConceptVersionBI subtypeConcept;

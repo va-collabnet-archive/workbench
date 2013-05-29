@@ -38,10 +38,10 @@ import org.apache.maven.doxia.markup.HtmlMarkup;
 import org.apache.maven.doxia.sink.Sink;
 import org.apache.maven.doxia.sink.SinkEventAttributeSet;
 import org.apache.maven.doxia.sink.SinkEventAttributes;
+import org.apache.maven.doxia.siterenderer.Renderer;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.reporting.AbstractMavenReport;
 import org.apache.maven.reporting.MavenReportException;
-import org.codehaus.doxia.site.renderer.SiteRenderer;
 import org.xml.sax.SAXException;
 
 import com.googlecode.sardine.util.SardineException;
@@ -82,13 +82,12 @@ public class TechnicalRulesReport extends AbstractMavenReport {
 	 */
 	private String brlinputfolder;
 
-
 	/**
 	 * @component
 	 * @required
 	 * @readonly
 	 */
-	private SiteRenderer siteRenderer;
+	private Renderer siteRenderer;
 
 	private static Logger log = Logger.getLogger(TechnicalRulesReport.class);
 
@@ -193,10 +192,7 @@ public class TechnicalRulesReport extends AbstractMavenReport {
 
 		tableAttr = new SinkEventAttributeSet();
 		tableAttr.addAttribute(SinkEventAttributes.ID, "results");
-		tableAttr
-				.addAttribute(
-						SinkEventAttributes.CLASS,
-						"bodyTable no-arrow rowstyle-alt colstyle-alt paginate-20 max-pages-7 paginationcallback-callbackTest-calculateTotalRating paginationcallback-callbackTest-displayTextInfo sortcompletecallback-callbackTest-calculateTotalRating");
+		tableAttr.addAttribute(SinkEventAttributes.CLASS, "bodyTable no-arrow rowstyle-alt colstyle-alt paginate-20 max-pages-7 paginationcallback-callbackTest-calculateTotalRating paginationcallback-callbackTest-displayTextInfo sortcompletecallback-callbackTest-calculateTotalRating");
 
 		sink.table(tableAttr);
 		sink.tableRow();
@@ -282,7 +278,7 @@ public class TechnicalRulesReport extends AbstractMavenReport {
 	}
 
 	@Override
-	protected SiteRenderer getSiteRenderer() {
+	protected Renderer getSiteRenderer() {
 		return siteRenderer;
 	}
 
