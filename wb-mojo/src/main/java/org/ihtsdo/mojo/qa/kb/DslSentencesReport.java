@@ -30,10 +30,10 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.apache.log4j.Logger;
 import org.apache.maven.doxia.sink.Sink;
-import org.apache.maven.doxia.siterenderer.Renderer;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.reporting.AbstractMavenReport;
 import org.apache.maven.reporting.MavenReportException;
+import org.codehaus.doxia.site.renderer.SiteRenderer;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -85,7 +85,7 @@ public class DslSentencesReport extends AbstractMavenReport {
 	 * @required
 	 * @readonly
 	 */
-	private Renderer siteRenderer;
+	private SiteRenderer siteRenderer;
 
 	private static Logger log = Logger.getLogger(DslSentencesReport.class);
 
@@ -239,7 +239,7 @@ public class DslSentencesReport extends AbstractMavenReport {
 	}
 
 	@Override
-	protected Renderer getSiteRenderer() {
+	protected SiteRenderer getSiteRenderer() {
 		return siteRenderer;
 	}
 

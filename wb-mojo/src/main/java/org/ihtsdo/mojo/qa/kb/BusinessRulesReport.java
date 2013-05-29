@@ -19,6 +19,7 @@ package org.ihtsdo.mojo.qa.kb;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -26,14 +27,14 @@ import java.util.ResourceBundle;
 
 import org.apache.log4j.Logger;
 import org.apache.maven.doxia.markup.HtmlMarkup;
-import org.apache.maven.doxia.module.xhtml.XhtmlSinkFactory;
+import org.apache.maven.doxia.module.xhtml.XhtmlSink;
 import org.apache.maven.doxia.sink.Sink;
 import org.apache.maven.doxia.sink.SinkEventAttributeSet;
 import org.apache.maven.doxia.sink.SinkEventAttributes;
-import org.apache.maven.doxia.siterenderer.Renderer;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.reporting.AbstractMavenReport;
 import org.apache.maven.reporting.MavenReportException;
+import org.codehaus.doxia.site.renderer.SiteRenderer;
 import org.dom4j.Document;
 import org.dom4j.Node;
 import org.dom4j.io.SAXReader;
@@ -89,7 +90,7 @@ public class BusinessRulesReport extends AbstractMavenReport {
 	 * @required
 	 * @readonly
 	 */
-	private Renderer siteRenderer;
+	private SiteRenderer siteRenderer;
 
 	private static Logger log = Logger.getLogger(BusinessRulesReport.class);
 
@@ -111,7 +112,7 @@ public class BusinessRulesReport extends AbstractMavenReport {
 		File rulesHtmlFolder = new File(outputDirectory + "/" + BRLRULES);
 		rulesHtmlFolder.mkdirs();
 		File file = new File(rulesHtmlFolder, brlFile.getName().replaceAll(".brl", ".html").replaceAll(" ", ""));
-		Sink srs = new XhtmlSinkFactory().createSink(rulesHtmlFolder, brlFile.getName().replaceAll(".brl", ".html").replaceAll(" ", ""));
+		XhtmlSink srs = new XhtmlSink(new FileWriter(file));
 
 		srs.body();
 
@@ -135,7 +136,7 @@ public class BusinessRulesReport extends AbstractMavenReport {
 	}
 
 	@SuppressWarnings("unchecked")
-	private void createAttribtesTable(Document document, Sink srs) {
+	private void createAttribtesTable(Document document, XhtmlSink srs) {
 		List<Node> attributes = document.selectNodes("//rule/attributes/attribute");
 		List<Node> metadataList = document.selectNodes("//rule/metadataList/metadata");
 
@@ -175,7 +176,7 @@ public class BusinessRulesReport extends AbstractMavenReport {
 	}
 
 	@SuppressWarnings("unchecked")
-	private void createThenTable(Document document, Sink srs) {
+	private void createThenTable(Document document, XhtmlSink srs) {
 		Node factType = document.selectSingleNode("//rule/rhs/assert/factType");
 		List<Node> asserts = document.selectNodes("//rule/rhs/assert");
 		srs.table();
@@ -255,7 +256,7 @@ public class BusinessRulesReport extends AbstractMavenReport {
 	}
 
 	@SuppressWarnings("unchecked")
-	private void createWhenTable(Document document, Sink srs) throws Exception {
+	private void createWhenTable(Document document, XhtmlSink srs) throws Exception {
 		List<Node> facts = document.selectNodes("//rule/lhs/fact");
 		List<Node> fromCompositePattern = document.selectNodes("//rule/lhs/fromCompositePattern");
 
@@ -323,7 +324,7 @@ public class BusinessRulesReport extends AbstractMavenReport {
 	}
 
 	@SuppressWarnings("unchecked")
-	private void processformCompositePatterns(Sink srs, List<Node> formCompositePatterns, StringBuffer factLine, boolean compositePattern) throws Exception {
+	private void processformCompositePatterns(XhtmlSink srs, List<Node> formCompositePatterns, StringBuffer factLine, boolean compositePattern) throws Exception {
 		for (Node fact : formCompositePatterns) {
 			List<Node> fieldConstraints = fact.selectNodes("factPattern/constraintList/constraints/fieldConstraint");
 			List<Node> compositeConstraints = fact.selectNodes("factPattern/constraintList/constraints/compositeConstraint");
@@ -376,7 +377,7 @@ public class BusinessRulesReport extends AbstractMavenReport {
 	}
 
 	@SuppressWarnings("unchecked")
-	private void processFacts(Sink srs, List<Node> facts, boolean isComposite) throws Exception {
+	private void processFacts(XhtmlSink srs, List<Node> facts, boolean isComposite) throws Exception {
 		for (Node fact : facts) {
 			List<Node> fieldConstraints = fact.selectNodes("constraintList/constraints/fieldConstraint");
 			List<Node> compositeConstraints = fact.selectNodes("constraintList/constraints/compositeConstraint");
@@ -581,7 +582,10 @@ public class BusinessRulesReport extends AbstractMavenReport {
 
 		SinkEventAttributes tableAttr = new SinkEventAttributeSet();
 		tableAttr.addAttribute(SinkEventAttributes.ID, "results");
-		tableAttr.addAttribute(SinkEventAttributes.CLASS, "bodyTable no-arrow rowstyle-alt colstyle-alt paginate-20 max-pages-7 paginationcallback-callbackTest-calculateTotalRating paginationcallback-callbackTest-displayTextInfo sortcompletecallback-callbackTest-calculateTotalRating");
+		tableAttr
+				.addAttribute(
+						SinkEventAttributes.CLASS,
+						"bodyTable no-arrow rowstyle-alt colstyle-alt paginate-20 max-pages-7 paginationcallback-callbackTest-calculateTotalRating paginationcallback-callbackTest-displayTextInfo sortcompletecallback-callbackTest-calculateTotalRating");
 
 		sink.table(tableAttr);
 		sink.tableRow();
@@ -649,7 +653,7 @@ public class BusinessRulesReport extends AbstractMavenReport {
 	}
 
 	@Override
-	protected Renderer getSiteRenderer() {
+	protected SiteRenderer getSiteRenderer() {
 		return siteRenderer;
 	}
 

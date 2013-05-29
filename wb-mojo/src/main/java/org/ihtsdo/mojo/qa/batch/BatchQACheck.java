@@ -51,17 +51,18 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_ImplementTermFactory;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
+import org.ihtsdo.tk.api.cs.ChangeSetPolicy;
+import org.ihtsdo.tk.api.cs.ChangeSetWriterThreading;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.tk.api.contradiction.EditPathWinsStrategy;
+import org.ihtsdo.tk.api.contradiction.LastCommitWinsContradictionResolutionStrategy;
 import org.ihtsdo.db.bdb.BdbTermFactory;
 import org.ihtsdo.rules.context.RulesContextHelper;
 import org.ihtsdo.rules.context.RulesDeploymentPackageReference;
 import org.ihtsdo.rules.context.RulesDeploymentPackageReferenceHelper;
 import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.RelAssertionType;
-import org.ihtsdo.tk.api.contradiction.LastCommitWinsContradictionResolutionStrategy;
-import org.ihtsdo.tk.api.cs.ChangeSetPolicy;
-import org.ihtsdo.tk.api.cs.ChangeSetWriterThreading;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
@@ -340,12 +341,7 @@ public class BatchQACheck extends AbstractMojo {
 					}
 					String ditaUid = (String) loopRule.getMetaData().get("DITA_UID");
 					String severityUid = (String) loopRule.getMetaData().get("SEVERITY");
-					String ruleCode = "";
-					try {
-						ruleCode = (String) loopRule.getMetaData().get("RULE_CODE");
-					} catch (Exception e) {
-						ruleCode = "Code read error";
-					}
+					String ruleCode = (String) loopRule.getMetaData().get("RULE_CODE");
 					I_GetConceptData roleInContext = contextHelper.getRoleInContext(ruleUid, context); // STATUS
 
 					// Write to rules file
