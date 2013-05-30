@@ -3,15 +3,14 @@ package org.ihtsdo.project.workflow.api.wf2.implementation;
 import java.beans.PropertyChangeEvent;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CancellationException;
-import java.util.concurrent.ExecutionException;
 
-import javax.swing.SwingWorker;
+import javax.swing.SwingUtilities;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
@@ -22,10 +21,10 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.ihtsdo.project.TerminologyProjectDAO;
 import org.ihtsdo.project.model.I_TerminologyProject;
 import org.ihtsdo.project.model.WorkList;
-import org.ihtsdo.project.workflow.api.wf2.implementation.WorkflowInitiator.LruCache;
 import org.ihtsdo.project.workflow.model.WfState;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.NidBitSetItrBI;
+import org.ihtsdo.tk.api.NidSet;
 import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
 import org.ihtsdo.tk.api.changeset.ChangeSetGenerationThreadingPolicy;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
@@ -40,12 +39,14 @@ public class WorkflowInitiator implements WorkflowInitiatiorBI {
 	private static WorkflowStoreBI wfStore;
 	private PropertyChangeEvent myEvt;
 
+
 	public WorkflowInitiator() {
-		alreadySeen = new HashMap<Integer, LruCache>();
+		alreadySeen = new HashMap<Integer,LruCache>();
 	}
 
 	@Override
-	public boolean evaluateForWorkflowInitiation(PropertyChangeEvent event) throws Exception {
+	public boolean evaluateForWorkflowInitiation(
+			PropertyChangeEvent event) throws Exception {
 		myEvt = event;
 		I_GetConceptData workflow = Terms.get().getActiveAceFrameConfig().getDefaultWorkflowForChangedConcept();
 		final Integer workflowNid;
@@ -59,70 +60,11 @@ public class WorkflowInitiator implements WorkflowInitiatiorBI {
 			alreadySeen.put(workflowNid, new LruCache<Integer, Long>(1000));
 		}
 
-		WorkflowInitiartorWorker membersWorker = new WorkflowInitiartorWorker(alreadySeen, rootConcept, wfStore, myEvt, workflowNid);
-		membersWorker.execute();
 
-		return true;
-	}
-
-	class LruCache<A, B> extends LinkedHashMap<A, B> {
-		private final int maxEntries;
-
-		public LruCache(final int maxEntries) {
-			super(maxEntries + 1, 1.0f, true);
-			this.maxEntries = maxEntries;
-		}
-
-		/**
-		 * Returns <tt>true</tt> if this <code>LruCache</code> has more entries
-		 * than the maximum specified when it was created.
-		 * 
-		 * <p>
-		 * This method <em>does not</em> modify the underlying <code>Map</code>;
-		 * it relies on the implementation of <code>LinkedHashMap</code> to do
-		 * that, but that behavior is documented in the JavaDoc for
-		 * <code>LinkedHashMap</code>.
-		 * </p>
-		 * 
-		 * @param eldest
-		 *            the <code>Entry</code> in question; this implementation
-		 *            doesn't care what it is, since the implementation is only
-		 *            dependent on the size of the cache
-		 * @return <tt>true</tt> if the oldest
-		 * @see java.util.LinkedHashMap#removeEldestEntry(Map.Entry)
-		 */
-		@Override
-		protected boolean removeEldestEntry(final Map.Entry<A, B> eldest) {
-			return super.size() > maxEntries;
-		}
-	}
-
-}
-
-class WorkflowInitiartorWorker extends SwingWorker<String, Object[]> {
-
-	private Map<Integer, LruCache> alreadySeen;
-
-	private ConceptChronicleBI rootConcept;
-	private WorkflowStoreBI wfStore;
-	private PropertyChangeEvent myEvt;
-	private Integer workflowNid;
-
-	public WorkflowInitiartorWorker(Map<Integer, LruCache> alreadySeen, ConceptChronicleBI rootConcept, WorkflowStoreBI wfStore, PropertyChangeEvent myEvt, Integer workflowNid) {
-		super();
-		this.alreadySeen = alreadySeen;
-		this.rootConcept = rootConcept;
-		this.wfStore = wfStore;
-		this.myEvt = myEvt;
-		this.workflowNid = workflowNid;
-	}
-
-	@Override
-	protected String doInBackground() throws Exception {
-		ConceptChronicleBI concept = null;
+		ConceptChronicleBI concept=null;
 		try {
-			I_RepresentIdSet idSet = (I_RepresentIdSet) myEvt.getNewValue();
-			if (idSet != null) {
+			I_RepresentIdSet idSet=(I_RepresentIdSet)myEvt.getNewValue();
+			if (idSet!=null){
 				boolean individualCommit = (idSet.cardinality() < 10);
 				NidBitSetItrBI possibleItr = idSet.iterator();
 				while (possibleItr.next()) {
@@ -133,10 +75,10 @@ class WorkflowInitiartorWorker extends SwingWorker<String, Object[]> {
 						System.out.println("Diff cache time: " + timeDiff);
 					}
 					alreadySeen.get(workflowNid).put(possibleItr.nid(), System.currentTimeMillis());
-
-					if (timeDiff == Long.MIN_VALUE || timeDiff > 3000) {
-						concept = Ts.get().getConcept(possibleItr.nid());
-						if (concept != null) {
+					
+					if ( timeDiff == Long.MIN_VALUE || timeDiff >  3000) {
+						concept=Ts.get().getConcept(possibleItr.nid());
+						if (concept!=null){
 							System.out.println("Sending to workflow: " + concept.toString());
 							addComponentToDefaultWorklist(concept, individualCommit);
 						}
@@ -153,26 +95,11 @@ class WorkflowInitiartorWorker extends SwingWorker<String, Object[]> {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		return "Done";
+		return true;
 	}
 
-	@Override
-	protected void process(List<Object[]> chunks) {
-	}
-
-	@Override
-	public void done() {
-		try {
-			get();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-
-	private boolean addComponentToDefaultWorklist(ConceptChronicleBI concept, boolean commit) {
+	private static boolean addComponentToDefaultWorklist(
+			ConceptChronicleBI concept, boolean commit) {
 		I_ConfigAceFrame config;
 		try {
 			config = Terms.get().getActiveAceFrameConfig();
@@ -186,13 +113,13 @@ class WorkflowInitiartorWorker extends SwingWorker<String, Object[]> {
 				I_GetConceptData worklistConcept = config.getDefaultWorkflowForChangedConcept();
 				I_GetConceptData projectConcept = config.getDefaultProjectForChangedConcept();
 
-				// System.out.println("worklistConcept: " + worklistConcept);
+				//System.out.println("worklistConcept: " + worklistConcept);
 
-				if (worklistConcept == null) {
+				if (worklistConcept==null){
 					return false;
 				}
-				if (wfStore == null) {
-					wfStore = new WorkflowStore();
+				if (wfStore==null){
+					wfStore=new WorkflowStore();
 				}
 				WorkList workList = (WorkList) wfStore.getWorklist(worklistConcept.getPrimUuid());
 				Collection<WfProcessInstanceBI> instances = wfStore.getProcessInstances(concept.getPrimUuid());
@@ -201,7 +128,7 @@ class WorkflowInitiartorWorker extends SwingWorker<String, Object[]> {
 				WfProcessInstanceBI completeInstanceInSameWorklist = null;
 
 				for (WfProcessInstanceBI loopInstance : instances) {
-					if (!loopInstance.isCompleted()) {
+					if (!loopInstance.isCompleted()){
 						I_TerminologyProject loopProject = TerminologyProjectDAO.getProjectForWorklist((WorkList) loopInstance.getWorkList(), config);
 						if (projectConcept.getNid() == loopProject.getId()) {
 							alreadyActiveInProject = true;
@@ -214,20 +141,18 @@ class WorkflowInitiartorWorker extends SwingWorker<String, Object[]> {
 					}
 				}
 
-				// WfProcessInstanceBI instance =
-				// wfStore.getProcessInstance(workList, concept.getPrimUuid());
-				//
-				// System.out.println("instance: " + instance);
-				// System.out.println("instance.isActive(): " +
-				// instance.isActive());
-				// System.out.println("instance.isCompleted(): " +
-				// instance.isCompleted());
+//				WfProcessInstanceBI instance = wfStore.getProcessInstance(workList, concept.getPrimUuid());
+//
+//				System.out.println("instance: " + instance);
+//				System.out.println("instance.isActive(): " + instance.isActive());
+//				System.out.println("instance.isCompleted(): " + instance.isCompleted());
 
-				if (alreadyActiveInProject) { // instance!=null
+				if ( alreadyActiveInProject ){ //instance!=null
 					return false;
 				}
-
-				if (completeInstanceInSameWorklist != null && (System.currentTimeMillis() - completeInstanceInSameWorklist.getLastChangeTime()) > 3000) {
+				
+				if (completeInstanceInSameWorklist != null && 
+						(System.currentTimeMillis() - completeInstanceInSameWorklist.getLastChangeTime()) > 3000 ) {
 					I_GetConceptData assingStatus = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_ASSIGNED_STATUS.getUids());
 					completeInstanceInSameWorklist.setState(new WfState(assingStatus.toString(), assingStatus.getPrimUuid()));
 					if (commit) {
@@ -246,4 +171,36 @@ class WorkflowInitiartorWorker extends SwingWorker<String, Object[]> {
 		}
 		return false;
 	}
+
+	private class LruCache<A, B> extends LinkedHashMap<A, B> {
+		private final int maxEntries;
+
+		public LruCache(final int maxEntries) {
+			super(maxEntries + 1, 1.0f, true);
+			this.maxEntries = maxEntries;
+		}
+
+		/**
+		 * Returns <tt>true</tt> if this <code>LruCache</code> has more entries than the maximum specified when it was
+		 * created.
+		 *
+		 * <p>
+		 * This method <em>does not</em> modify the underlying <code>Map</code>; it relies on the implementation of
+		 * <code>LinkedHashMap</code> to do that, but that behavior is documented in the JavaDoc for
+		 * <code>LinkedHashMap</code>.
+		 * </p>
+		 *
+		 * @param eldest
+		 *            the <code>Entry</code> in question; this implementation doesn't care what it is, since the
+		 *            implementation is only dependent on the size of the cache
+		 * @return <tt>true</tt> if the oldest
+		 * @see java.util.LinkedHashMap#removeEldestEntry(Map.Entry)
+		 */
+		@Override
+		protected boolean removeEldestEntry(final Map.Entry<A, B> eldest) {
+			return super.size() > maxEntries;
+		}
+	}
+
+
 }

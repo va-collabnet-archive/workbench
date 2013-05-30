@@ -395,6 +395,7 @@ public class WorkflowInterpreter {
 				tworker.writeAttachment(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name(), Terms.get().getActiveAceFrameConfig());
 			} else {
 				tworker = worker;
+
 			}
 
 			tworker.execute(bp);
