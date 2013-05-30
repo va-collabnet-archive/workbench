@@ -110,10 +110,16 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
     */
    @Override
    public void add(RefsetMember<?, ?> refsetMember) throws IOException {
-      getRefsetMembers().addDirect(refsetMember);
-      getMemberNids().add(refsetMember.nid);
-      addToMemberMap(refsetMember);
-      modified();
+      if (isAnnotationStyleRefex()) {
+        if (isAnnotationIndex()) {
+            getMemberNids().add(refsetMember.nid);
+            modified();
+        }
+      } else {
+          getRefsetMembers().addDirect(refsetMember);
+          addToMemberMap(refsetMember);
+          modified();
+      }
    }
 
    private void addConceptNidsAffectedByCommit(Collection<? extends ConceptComponent<?, ?>> componentList,
