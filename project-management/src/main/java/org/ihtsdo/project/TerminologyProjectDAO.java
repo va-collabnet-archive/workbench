@@ -409,9 +409,11 @@ public class TerminologyProjectDAO {
 
 	/**
 	 * This method returns the parameter projects default configuration file<br>
-	 * if the file does not exists, it creates a new default configuration file<br>.
-	 *
-	 * @param project the project
+	 * if the file does not exists, it creates a new default configuration file<br>
+	 * .
+	 * 
+	 * @param project
+	 *            the project
 	 * @return The project file
 	 */
 	public static File getTranslationProjectDefaultConfigFile(TranslationProject project) {
@@ -430,7 +432,7 @@ public class TerminologyProjectDAO {
 		}
 		if (configFile == null) {
 			configFile = new File("profiles/shared/" + project.getUids().get(0) + "-translation-config.cfg");
-			if(!configFile.exists()){
+			if (!configFile.exists()) {
 				try {
 					configFile.createNewFile();
 				} catch (IOException e) {
@@ -2887,6 +2889,9 @@ public class TerminologyProjectDAO {
 		} catch (IOException e) {
 			AceLog.getAppLog().alertAndLogException(e);
 		}
+		if (workSetMember == null) {
+			AceLog.getAppLog().log(Level.WARNING, "NULL workset member: " + workSetMemberConcept.toString() + " UUID: " + workSetMemberConcept.getPrimUuid());
+		}
 		return workSetMember;
 	}
 
@@ -2941,7 +2946,10 @@ public class TerminologyProjectDAO {
 			for (I_ExtendByRef extension : membersExtensions) {
 				I_ExtendByRefPart lastPart = getLastExtensionPart(extension);
 				if (isActive(lastPart.getStatusNid())) {
-					workSetMembers.add(getWorkSetMember(termFactory.getConcept(extension.getComponentNid()), workset.getId(), config));
+					WorkSetMember workSetMember = getWorkSetMember(termFactory.getConcept(extension.getComponentNid()), workset.getId(), config);
+					if (workSetMember != null) {
+						workSetMembers.add(workSetMember);
+					}
 				}
 			}
 		} catch (Exception e) {
@@ -3344,7 +3352,7 @@ public class TerminologyProjectDAO {
 		}
 		return nacWorkLists;
 	}
-	
+
 	public static WorkListMember addConceptAsNacWorklistMember(WorkList workList, I_GetConceptData concept, I_ConfigAceFrame config) throws IOException {
 		return addConceptAsNacWorklistMember(workList, concept, config, true);
 	}
@@ -3360,7 +3368,7 @@ public class TerminologyProjectDAO {
 	 *            the destination
 	 * @param config
 	 *            the config
-	 * @param commit 
+	 * @param commit
 	 * @return the work list member
 	 * @throws IOException
 	 *             Signals that an I/O exception has occurred.
@@ -3466,7 +3474,7 @@ public class TerminologyProjectDAO {
 		termFactory.newDescription(UUID.randomUUID(), newPromotionConcept, "en", name + " - promotion refset", termFactory.getConcept(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids()), config);
 		termFactory.newRelationship(UUID.randomUUID(), newPromotionConcept, termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()), workListsRoot, defining, refinability, current, 0, config);
 		termFactory.newRelationship(UUID.randomUUID(), newConcept, promotionRelConcept, newPromotionConcept, defining, refinability, current, 0, config);
-                newPromotionConcept.setAnnotationStyleRefex(true);
+		newPromotionConcept.setAnnotationStyleRefex(true);
 
 		workList = new WorkList(workListWithMetadata.getName(), newConcept.getConceptNid(), newConcept.getUids(), workListWithMetadata.getPartitionUUID());
 		workList.setWorkflowDefinition(workListWithMetadata.getWorkflowDefinition());
@@ -5688,10 +5696,12 @@ public class TerminologyProjectDAO {
 		// // // loopExtension.promote(viewPosition,
 		// config.getPromotionPathSetReadOnly(),
 		// // // allowedStatusWithRetired, Precedence.TIME);
-		// // // tf.addUncommittedNoChecks(tf.getConcept(loopExtension.getRefsetId()));
+		// // //
+		// tf.addUncommittedNoChecks(tf.getConcept(loopExtension.getRefsetId()));
 		// // // } else if ((originVersion != null && targetVersion != null)) {
 		// // // if (originVersion.getVersion() != targetVersion.getVersion()) {
-		// // // tf.addUncommittedNoChecks(tf.getConcept(loopExtension.getRefsetId()));
+		// // //
+		// tf.addUncommittedNoChecks(tf.getConcept(loopExtension.getRefsetId()));
 		// // // loopExtension.promote(viewPosition,
 		// config.getPromotionPathSetReadOnly(),
 		// // // allowedStatusWithRetired, Precedence.TIME);
@@ -5889,7 +5899,7 @@ public class TerminologyProjectDAO {
 
 	public static void promoteContent(int conceptNid, ViewCoordinate sourceViewCoordinate, int targetPathNid) throws Exception {
 		EditCoordinate editCoord = Terms.get().getActiveAceFrameConfig().getEditCoordinate();
-		
+
 		PositionBI[] positionSet = sourceViewCoordinate.getPositionSet().getPositionArray();
 		PositionBI originPosition = positionSet[0].getAllOrigins().iterator().next();
 
