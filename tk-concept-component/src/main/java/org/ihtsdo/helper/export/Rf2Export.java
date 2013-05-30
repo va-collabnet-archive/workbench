@@ -1400,6 +1400,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
      * @throws IOException signals that an I/O exception has occurred
      */
     private void processLang(RefexVersionBI refexVersion) throws IOException {
+        RefexNidVersionBI refexNidVersion = (RefexNidVersionBI) refexVersion;
         if (refexVersion != null) {
             for (Rf2File.LanguageRefsetFileFields field : Rf2File.LanguageRefsetFileFields.values()) {
                 switch (field) {
@@ -1438,7 +1439,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                         break;
 
                     case ACCEPTABILITY:
-                        langRefsetsWriter.write(store.getComponent(refexVersion.getReferencedComponentNid()).getPrimUuid() + field.seperator);
+                        langRefsetsWriter.write(store.getComponent(refexNidVersion.getNid1()).getPrimUuid() + field.seperator);
 
                         break;
                 }
@@ -1456,6 +1457,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
      * @throws IOException signals that an I/O exception has occurred
      */
     private void processOtherLang(RefexVersionBI refexVersion) throws IOException {
+        RefexNidVersionBI refexNidVersion = (RefexNidVersionBI) refexVersion;
         if (refexVersion != null) {
             for (Rf2File.LanguageRefsetFileFields field : Rf2File.LanguageRefsetFileFields.values()) {
                 switch (field) {
@@ -1494,7 +1496,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                         break;
 
                     case ACCEPTABILITY:
-                        otherLangRefsetsWriter.write(store.getComponent(refexVersion.getReferencedComponentNid()).getPrimUuid() + field.seperator);
+                        otherLangRefsetsWriter.write(store.getComponent(refexNidVersion.getNid1()).getPrimUuid() + field.seperator);
 
                         break;
                 }
