@@ -726,12 +726,6 @@ public class TkConcept {
         buff.append(this.getClass().getSimpleName());
         buff.append(": \n   primordial UUID: ");
         buff.append(TkRevision.informAboutUuid(this.primordialUuid));
-        buff.append(": \n   annotation refex: ");
-        buff.append(this.annotationStyleRefex);
-        buff.append(": \n   indexed annotation: ");
-        buff.append(this.annotationIndexStyleRefex);
-        buff.append(": \n   primordial UUID: ");
-        buff.append(TkRevision.informAboutUuid(this.primordialUuid));
         buff.append("\n   ConceptAttributes: \n");
         buff.append(PADDING);
 

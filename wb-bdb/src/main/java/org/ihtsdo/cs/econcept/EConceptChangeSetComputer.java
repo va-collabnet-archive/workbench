@@ -432,8 +432,6 @@ public class EConceptChangeSetComputer implements I_ComputeEConceptForChangeSet 
     public EConcept getEConcept(final Concept c) throws IOException {
         EConcept ec = new EConcept();
         AtomicBoolean changed = new AtomicBoolean(false);
-        ec.annotationIndexStyleRefex = c.isAnnotationIndex();
-        ec.annotationStyleRefex = c.isAnnotationStyleRefex();
 
         ec.setPrimordialUuid(c.getPrimUuid());
         ec.setConceptAttributes(processConceptAttributes(c, changed));
