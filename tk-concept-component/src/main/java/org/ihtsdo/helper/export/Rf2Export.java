@@ -537,7 +537,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                     refsetName = refsetName.concat("SimpleRefset");
                 }
                 File simpleRefsetFile = new File(directory,
-                        "der2_Refset_" + refsetName + "_UUID_" + releaseType.suffix + "_"
+                        "der2_cRefset_" + refsetName + "_UUID_" + releaseType.suffix + "_"
                         + country.getFormatedCountryCode().toUpperCase() + namespace + "_"
                         + TimeHelper.getShortFileDateFormat().format(effectiveDate) + ".txt");
                 FileOutputStream simpleRefsetOs = new FileOutputStream(simpleRefsetFile);
