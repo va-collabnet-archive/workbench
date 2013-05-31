@@ -72,6 +72,7 @@ public class FilterRedundantStatedRelsTransformer extends AbstractTransformer {
     private final UUID extensionPath;
     private final int kpExtensionPathNid;
     private final UUID developmentPath;
+    private final UUID terminologyAuxiliaryModule;
     private HashSet<UUID> skipUuidSet;
     private HashSet<UUID> skipPathUuidSet;
     private HashSet<UUID> refsetsToFilter;
@@ -97,6 +98,8 @@ public class FilterRedundantStatedRelsTransformer extends AbstractTransformer {
         snomedCorePathUuid = ArchitectonicAuxiliary.Concept.SNOMED_CORE.getPrimoridalUid();
         extensionPath = UUID.fromString("2bfc4102-f630-5fbe-96b8-625f2a6b3d5a");
         developmentPath = UUID.fromString("3770e517-7adc-5a24-a447-77a9daa3eedf");
+        terminologyAuxiliaryModule = UUID.fromString("dacb22ed-b2df-3667-88b8-2c17a545d37e");
+        
 
         ts = Ts.get();
         kpExtensionPathNid = ts.getNidForUuids(extensionPath);
@@ -218,6 +221,7 @@ public class FilterRedundantStatedRelsTransformer extends AbstractTransformer {
             for (TkRefexAbstractMember<?> member : eConcept.refsetMembers) {
                 UUID uuid = member.componentUuid;
                 if (uuid != null && !skipPathUuidSet.contains(uuid)) {
+                    member.moduleUuid = terminologyAuxiliaryModule;
                     keepMemberList.add(member);
                 }
             }
@@ -228,6 +232,7 @@ public class FilterRedundantStatedRelsTransformer extends AbstractTransformer {
                 if (ERefsetCidMember.class.isAssignableFrom(member.getClass())) {
                     UUID uuid = ((ERefsetCidMember) member).uuid1;
                     if (uuid != null && !skipPathUuidSet.contains(uuid)) {
+                        member.moduleUuid = terminologyAuxiliaryModule;
                         keepMemberList.add(member);
                     }
                 }
