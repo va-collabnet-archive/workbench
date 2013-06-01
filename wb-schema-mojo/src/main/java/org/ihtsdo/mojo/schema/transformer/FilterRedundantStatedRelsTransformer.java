@@ -148,13 +148,13 @@ public class FilterRedundantStatedRelsTransformer extends AbstractTransformer {
             refsetsToFilter.add(UUID.fromString(loopValue));
         }
         watchUuidSet = new HashSet();
-        watchUuidSet.add(UUID.fromString("ded44500-d486-59ab-9749-68aa719e74a4")); // KPET CMT Project release candidate path
-        watchUuidSet.add(UUID.fromString("3770e517-7adc-5a24-a447-77a9daa3eedf")); // KPET CMT Project development path
-        watchUuidSet.add(UUID.fromString("098eed03-204c-5bf0-91c0-3c9610beec6b")); // KPET CMT Project development origin path
-        watchUuidSet.add(UUID.fromString("2bfc4102-f630-5fbe-96b8-625f2a6b3d5a")); // KPET Extension Path
-        watchUuidSet.add(UUID.fromString("7b6ace72-4604-5ff1-b8c0-48e8f6204e3d")); // source baseline
-        watchUuidSet.add(UUID.fromString("8c230474-9f11-30ce-9cad-185a96fd03a2")); // SNOMED Core
-        watchUuidSet.add(UUID.fromString("2faa9260-8fb2-11db-b606-0800200c9a66")); // Workbench Auxiliary
+        // watchUuidSet.add(UUID.fromString("ded44500-d486-59ab-9749-68aa719e74a4")); // KPET CMT Project release candidate path
+        // watchUuidSet.add(UUID.fromString("3770e517-7adc-5a24-a447-77a9daa3eedf")); // KPET CMT Project development path
+        // watchUuidSet.add(UUID.fromString("098eed03-204c-5bf0-91c0-3c9610beec6b")); // KPET CMT Project development origin path
+        // watchUuidSet.add(UUID.fromString("2bfc4102-f630-5fbe-96b8-625f2a6b3d5a")); // KPET Extension Path
+        // watchUuidSet.add(UUID.fromString("7b6ace72-4604-5ff1-b8c0-48e8f6204e3d")); // source baseline
+        // watchUuidSet.add(UUID.fromString("8c230474-9f11-30ce-9cad-185a96fd03a2")); // SNOMED Core
+        // watchUuidSet.add(UUID.fromString("2faa9260-8fb2-11db-b606-0800200c9a66")); // Workbench Auxiliary
     }
 
     @Override
