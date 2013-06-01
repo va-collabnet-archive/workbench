@@ -60,36 +60,10 @@ public class TransformProcessor implements ProcessUnfetchedConceptDataBI{
                     this.transformer = transformer;
                     this.eConceptDOS = eConceptDOS;
                     // <!-- Path origin reference set -->
-                    watchUuids.add(UUID.fromString("1239b874-41b4-32a1-981f-88b448829b4b"));
+                    // watchUuids.add(UUID.fromString("1239b874-41b4-32a1-981f-88b448829b4b"));
                     // <!-- Path reference set -->
-                    watchUuids.add(UUID.fromString("fd9d47b7-c0a4-3eea-b3ab-2b5a3f9e888f"));
+                    // watchUuids.add(UUID.fromString("fd9d47b7-c0a4-3eea-b3ab-2b5a3f9e888f"));
                                 
-//                    watchUuids.add(UUID.fromString("c7b73676-d9fb-322d-a721-1c0bdf3f11c2")); // Late effect, epidural hematoma due to trauma ... 
-//                    watchUuids.add(UUID.fromString("123f303c-9c8a-5092-81d5-db0d2ffc4d62")); // Idiopathic bronchiolitis obliterans organizing pneumonia (disorder)
-
-                    // 'Pleural thickening' follow the SCTIDs
-                    // watchUuids.add(UUID.fromString("ba76565d-cf05-347e-9a8b-6de2e099f2fe"));
-                    // watchUuids.add(UUID.fromString("b8bf6a01-d840-5169-a021-fb1131878da8"));
-
-          //            watchUuids.add(UUID.fromString("d439284a-21d1-3ef9-842c-27f017c9f042")); // Acquired anomaly of ear ... to check redundant roles
-            
-//            watchUuids.add(UUID.fromString("ef6ae557-83da-5664-ac23-a393ae6a7a1c")); // ABDOMINAL AND PELVIC PAIN --> ICD10-CM Concept
-//            watchUuids.add(UUID.fromString("32bf3aa1-8287-5302-a62a-aa354e66b845")); // ABNORMALITY OF FORCES OF LABOR --> ICD9-CM Concept
-//            watchUuids.add(UUID.fromString("1c1540af-59b1-5e18-8c51-a72672e74246")); // Category Lists --> KP HealthConnect --> KP Taxonomy
-//            watchUuids.add(UUID.fromString("5e1fe940-8faf-11db-b606-0800200c9a66")); // fully specified name RF1
-//            watchUuids.add(UUID.fromString("693e7426-8145-53ff-90a7-b43c6aa2e863")); // Presbylarynx (disorder)
-//            watchUuids.add(UUID.fromString("814b4598-07f1-5548-a887-c5371dbaaf84")); // Cares for sick or handicapped family member
-//            watchUuids.add(UUID.fromString("ae72b74d-92ad-f699-c019-10bbc1fbe0ec")); //
-
-//            watchUuids.add(UUID.fromString("bca0a686-3516-3daf-8fcf-fe396d13cfad")); // United States of America English language reference set
-//            watchUuids.add(UUID.fromString("eb9a5e42-3cba-356d-b623-3ed472e20b30")); // Great Britain English language reference set
-//              watchUuids.add(UUID.fromString("29bf812c-7a77-595d-8b12-ea37c473a5e6")); // US English Dialect Subset
-//              watchUuids.add(UUID.fromString("e8191494-ce3c-5bd8-803e-31d31c831f8a")); // GB English Dialect Exceptions Subset
-//              watchUuids.add(UUID.fromString("a0982f18-ec51-56d2-a8b1-6ff8964813dd")); // GB English Dialect Subset
-
-//            watchUuids.add(UUID.fromString("8c473da3-eb41-5415-9108-6b43adc0a42e")); // Hypothyroidism in pregnancy, antepartum -- KP
-//            watchUuids.add(UUID.fromString("ac4744c9-ea2b-11e0-9572-0800200c9a66")); // Hypothyroidism in pregnancy, antepartum -- SCT
-//            watchUuids.add(UUID.fromString("0313cfbf-a4db-3793-aa8c-595b4e383156")); // Hypothyroidism in pregnancy 
                 } catch (IOException e) {
 			e.printStackTrace();
 		}
