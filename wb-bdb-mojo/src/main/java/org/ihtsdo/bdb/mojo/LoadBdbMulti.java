@@ -383,12 +383,12 @@ public class LoadBdbMulti extends AbstractMojo {
                    AnnotationIndexer ai = new AnnotationIndexer(c.getNid());
                    Ts.get().iterateConceptDataInParallel(ai);
                    getLog().info("Annotation indexed: "
-                             + c.toLongString());
+                             + c.toUserString());
                }
                Ts.get().addUncommittedNoChecks(c);
                Ts.get().commit();
                getLog().info("Setting concept to annotation index: "
-                             + c.toLongString());
+                             + c.toUserString());
             }
          }
 
@@ -411,7 +411,7 @@ public class LoadBdbMulti extends AbstractMojo {
                                    + " annotations");
                      Bdb.addAsAnnotations(eConcept.getRefsetMembers());
                      getLog().info("After adding: "
-                                   + Ts.get().getConcept(eConcept.primordialUuid).toLongString());
+                                   + Ts.get().getConcept(eConcept.primordialUuid).toUserString());
                      
                      
                   }
