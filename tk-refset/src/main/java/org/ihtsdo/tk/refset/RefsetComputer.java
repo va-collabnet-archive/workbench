@@ -7,6 +7,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -61,6 +63,7 @@ public class RefsetComputer implements ProcessUnfetchedConceptDataBI {
     private AtomicInteger members = new AtomicInteger();
     private AtomicInteger newMembers = new AtomicInteger();
     private AtomicInteger retiredMembers = new AtomicInteger();
+    private AtomicInteger processed = new AtomicInteger();
     private boolean canceled = false;
     private boolean informed = false;
     private long startTime = System.currentTimeMillis();
@@ -76,6 +79,7 @@ public class RefsetComputer implements ProcessUnfetchedConceptDataBI {
     private boolean persist;
     private int normalMemberNid;
     NidBitSetBI resultSet;
+    Set<Integer> newMarkedParents = new HashSet<>();
     
      public RefsetComputer(RefsetSpecQuery query, ViewCoordinate viewCoordinate,
             NidBitSetBI possibleIds, ComputeType computeType) throws Exception {
@@ -120,6 +124,18 @@ public class RefsetComputer implements ProcessUnfetchedConceptDataBI {
         normalMemberNid = ts.getNidForUuids(RefsetAuxiliary.Concept.NORMAL_MEMBER.getUids());
         resultSet = ts.getEmptyNidSet();
     }
+    
+    public void compute() throws Exception{
+        System.out.println("Starting refset computation.");
+        Ts.get().iterateConceptDataInParallel(this);
+        System.out.println("Finished refset computation.");
+        if(persist){
+            System.out.println("Updating marked parents.");
+            MarkedParentEditor helper = new MarkedParentEditor();
+            Ts.get().iterateConceptDataInParallel(helper);
+            System.out.println("Marked parents complete.");
+        }
+    }
 
     @Override
     public void processUnfetchedConceptData(int cNid, ConceptFetcherBI fcfc) throws Exception {
@@ -131,9 +147,6 @@ public class RefsetComputer implements ProcessUnfetchedConceptDataBI {
             switch (computeType) {
                 case CONCEPT:
                     ConceptChronicleBI concept = fcfc.fetch();
-                    if(concept.getPrimUuid().equals(UUID.fromString("da184cdc-b6fa-3bd5-8759-7d87e686a3f1"))){
-                        System.out.println("DEBUG");
-                    }
                     executeComponent(concept, cNid, cNid);
                     break;
                 case DESCRIPTION:
@@ -193,13 +206,12 @@ public class RefsetComputer implements ProcessUnfetchedConceptDataBI {
                 resultNids.add(componentNid);
                 members.incrementAndGet();
                 if(persist){
-                    if(!activeRefsetRefCompNids.isMember(conceptNid)){
                         activeRefsetRefCompNids.setMember(conceptNid);
                         newMembers.incrementAndGet();
                         memberRefsetHelper.newRefsetExtension(refsetNid, conceptNid,
                                 normalMemberNid);
-                        markedParentRefsetHelper.addParentMembers(conceptNid);
-                    }
+                        Set<Integer> parents = ts.getAncestors(conceptNid, viewCoordinate);
+                        newMarkedParents.addAll(parents);
                 }
             }else if (persist){
                 if(activeRefsetRefCompNids.isMember(conceptNid)){
@@ -208,88 +220,49 @@ public class RefsetComputer implements ProcessUnfetchedConceptDataBI {
                     retiredMembers.incrementAndGet();
                     memberRefsetHelper.retireRefsetExtension(refsetNid, conceptNid,
                             normalMemberNid);
-                    markedParentRefsetHelper.removeParentMembers(conceptNid);
                 }
+            }
+            processed.incrementAndGet();
+            if(processed.get() % 500 == 0){
+                System.out.println("processed: " + processed + " time: " + System.currentTimeMillis());
+            }
+            if(processed.get() == possibleCNids.cardinality()){
+                System.out.println("processed last concept: " + processed + " time: " + System.currentTimeMillis());
             }
         }
     }
+    
+    private class MarkedParentEditor implements ProcessUnfetchedConceptDataBI{
+        NidBitSetBI processSet;
 
-//TODO: should this be in parallel? -- YES
-//    public void persistResults(int refsetNid, EditCoordinate editCoordinate) throws Exception {
-//        this.refsetNid = refsetNid;
-//        this.refsetConcept = ts.getConcept(refsetNid);
-//        this.retiredRefsetRefCompNids = ts.getEmptyNidSet();
-//        this.activeRefsetRefCompNids = ts.getEmptyNidSet();
-//        this.activeMarkedParentRefCompNids = ts.getEmptyNidSet();
-//        for(RefexChronicleBI r : refsetConcept.getRefsetMembers()){
-//            if(r.getVersions(viewCoordinate).isEmpty()){
-//                retiredRefsetRefCompNids.setMember(r.getNid());
-//            }else{
-//                activeRefsetRefCompNids.setMember(r.getNid());
-//            }
-//        }
-//        memberRefsetHelper = new SpecRefsetHelper(viewCoordinate, editCoordinate);
-//        markedParentRefsetHelper = new SpecMarkedParentRefsetHelper(viewCoordinate, editCoordinate, refsetNid);
-//        markedParentRefsetConcept = ts.getConcept(markedParentRefsetHelper.getParentRefsetNid());
-//        for(RefexChronicleBI r : markedParentRefsetConcept.getRefsetMembers()){
-//            if(!r.getVersions(viewCoordinate).isEmpty()){
-//                activeMarkedParentRefCompNids.setMember(r.getNid());
-//            }
-//        }
-//        int normalMemberNid = ts.getNidForUuids(RefsetAuxiliary.Concept.NORMAL_MEMBER.getUids());
-//        NidBitSetBI resultSet = ts.getEmptyNidSet();
-//        for (int result : resultNids) {
-//            resultSet.setMember(result);
-//        }
-//        //find the active members that are NOT part of the result set --> retire
-//        NidBitSetBI membersToRetire = ts.getEmptyNidSet();
-//        membersToRetire.union(resultSet);
-//        membersToRetire.andNot(activeRefsetRefCompNids);
-//        //find the results that are NOT part of the active members --> add
-//        NidBitSetBI membersToAdd = ts.getEmptyNidSet();
-//        membersToAdd.union(activeRefsetRefCompNids);
-//        membersToAdd.andNot(resultSet);
-//
-//        NidBitSetItrBI addItr = membersToAdd.iterator();
-//        while (addItr.next()) {
-//            int resultNid = addItr.nid();
-//            activeRefsetRefCompNids.setMember(resultNid);
-//            members.incrementAndGet();
-//            newMembers.incrementAndGet();
-//            memberRefsetHelper.newRefsetExtension(refsetNid, resultNid,
-//                    normalMemberNid);
-//            markedParentRefsetHelper.addParentMembers(resultNid);
-//        }
-//        NidBitSetItrBI retireItr = membersToRetire.iterator();
-//        while (retireItr.next()) {
-//            int retireNid = retireItr.nid();
-//            activeRefsetRefCompNids.setNotMember(retireNid);
-//            retiredRefsetRefCompNids.setMember(retireNid);
-//            retiredMembers.incrementAndGet();
-//            memberRefsetHelper.retireRefsetExtension(refsetNid, retireNid,
-//                    normalMemberNid);
-//            markedParentRefsetHelper.removeParentMembers(retireNid);
-//        }
-//        int completed = processedCount.incrementAndGet();
-//        if (completed % 500 == 0) {
-//            if (!canceled) {
-//                long endTime = System.currentTimeMillis();
-//
-//                long elapsed = endTime - startTime;
-//                String elapsedStr = TimeHelper.getElapsedTimeString(elapsed);
-//
-//                String remainingStr = TimeHelper.getRemainingTimeString(completed,
-//                        conceptCount, elapsed);
-//
-//                System.out.println("Elapsed: " + elapsedStr
-//                        + ";  Remaining: " + remainingStr
-//                        + ";  Members: " + members.get()
-//                        + " New: " + newMembers.get() + " Ret: "
-//                        + retiredMembers.get());
-//            } else {
-//            }
-//        }
-//    }
+        @Override
+        public void processUnfetchedConceptData(int conceptNid, ConceptFetcherBI conceptFetcher) throws Exception {
+            if(processSet.isMember(conceptNid)){
+                if(!newMarkedParents.contains(conceptNid) && activeMarkedParentRefCompNids.isMember(conceptNid)){
+                    markedParentRefsetHelper.removeParentMembers(conceptNid);
+                }
+                if(!activeMarkedParentRefCompNids.isMember(conceptNid) && newMarkedParents.contains(conceptNid)){
+                    markedParentRefsetHelper.addParentMembers(conceptNid);
+                }
+            }
+        }
+
+        @Override
+        public NidBitSetBI getNidSet() throws IOException {
+            processSet = Ts.get().getEmptyNidSet();
+            for(int nid : newMarkedParents){
+                processSet.setMember(nid);
+            }
+            processSet.or(activeMarkedParentRefCompNids);
+            return processSet;
+        }
+
+        @Override
+        public boolean continueWork() {
+            return true;
+        }
+        
+    }
 
     protected void addUncommitted() throws Exception {
         if (!canceled) {

@@ -57,7 +57,7 @@ public class RefsetSpecFactory {
         // create tree object that corresponds to the database's refset spec
         
         Collection<? extends RefexChronicleBI> extensions =
-                refsetSpec.getRefsetMembers();
+                refsetSpec.getRefsetMembersActive(vc);
         HashMap<Integer, DefaultMutableTreeNode> extensionMap = new HashMap<Integer, DefaultMutableTreeNode>();
         HashSet<Integer> fetchedComponents = new HashSet<Integer>();
         fetchedComponents.add(refsetSpec.getConceptNid());

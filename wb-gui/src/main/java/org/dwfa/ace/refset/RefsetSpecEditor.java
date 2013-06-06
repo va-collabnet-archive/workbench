@@ -345,7 +345,6 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
 
         if (refset != null) {
             RefsetSpec spec = new RefsetSpec(refset, true, ace.getAceFrameConfig().getViewCoordinate());
-//TODO
             refsetStatusValueLabel.setText("none");
             computeTypeValueLabel.setText(spec.getComputeTypeString());
 

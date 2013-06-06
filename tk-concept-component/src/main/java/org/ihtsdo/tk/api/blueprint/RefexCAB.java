@@ -227,7 +227,7 @@ public class RefexCAB extends CreateOrAmendBlueprint {
     public RefexCAB(TK_REFEX_TYPE memberType,
             int referencedComponentNid, int collectionNid) throws IOException, InvalidCAB, ContradictionException {
         this(memberType, Ts.get().getUuidPrimordialForNid(referencedComponentNid), collectionNid, null, null, null);
-
+        this.properties.put(RefexProperty.RC_NID, referencedComponentNid);
         this.properties.put(RefexProperty.MEMBER_UUID,
                 computeMemberComponentUuid());
     }
@@ -823,7 +823,9 @@ public class RefexCAB extends CreateOrAmendBlueprint {
                     refexAnalog.setCollectionNid((Integer) entry.getValue());
                     break;
                 case RC_UUID:
-                    refexAnalog.setReferencedComponentNid(Ts.get().getNidForUuids((UUID) entry.getValue()));
+                    if(!hasProperty(RefexProperty.RC_NID)){
+                        refexAnalog.setReferencedComponentNid(Ts.get().getNidForUuids((UUID) entry.getValue()));
+                    }
                     break;
                 case RC_NID:
                     refexAnalog.setReferencedComponentNid((Integer) entry.getValue());

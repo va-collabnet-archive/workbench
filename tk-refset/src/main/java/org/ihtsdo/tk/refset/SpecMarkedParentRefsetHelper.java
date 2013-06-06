@@ -25,6 +25,7 @@ import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 
 public class SpecMarkedParentRefsetHelper extends SpecRefsetHelper{
 
@@ -41,17 +42,13 @@ public class SpecMarkedParentRefsetHelper extends SpecRefsetHelper{
         this.parentMemberTypeId =
                 ts.getNidForUuids(RefsetAuxiliary.Concept.MARKED_PARENT.getUids());
         this.parentRefsetId = getParentRefsetNid();
-        ConceptVersionBI markedParentRefset = ts.getConceptVersion(vc, parentRefsetId);
-        markedParentNids = markedParentRefset.getRefsetMemberNidsActive();
         ConceptVersionBI refset = ts.getConceptVersion(viewCoordinate, refsetId);
         refsetMemberNids = refset.getRefsetMemberNidsActive();
     }
 
     public void addParentMembers(Integer... conceptNids) throws Exception {
         for (int conceptId : conceptNids) {
-            for (int parentNid : ts.getAncestors(conceptId, vc)) {
-                newRefsetExtension(parentRefsetId, parentNid, parentMemberTypeId);
-            }
+            newRefsetExtension(parentRefsetId, conceptId, parentMemberTypeId);
         }
     }
 
@@ -68,39 +65,8 @@ public class SpecMarkedParentRefsetHelper extends SpecRefsetHelper{
 
     public void removeParentMembers(Integer... conceptIds) throws Exception {
         // Get all ancestors
-        Set<Integer> toBeRetired = new HashSet<Integer>();
         for (Integer conceptId : conceptIds) {
-            if (markedParentNids.contains(conceptId)) {
-                toBeRetired.add(conceptId);
-            }
-            toBeRetired.addAll(ts.getAncestors(conceptId, vc));
-        }
-
-        // For each ancestor, check immediate children for a member of either
-        // refset (member or marked parent)
-        // that is not in the existing ancestor set. This means we've found a
-        // lineage that should not be modified.
-        Set<Integer> lineageToExclude = new HashSet<Integer>();
-        for (Integer parentId : toBeRetired) {
-            for (Integer childId : ts.getChildren(parentId, vc)) {
-                if (!toBeRetired.contains(childId) && (markedParentNids.contains(childId) || refsetMemberNids.contains(childId))) {
-                    lineageToExclude.add(childId);
-                }
-            }
-        }
-
-        // Find all ancestors of the lineages not to be modified
-        Set<Integer> ancestorIdsToExclude = new HashSet<Integer>();
-        for (Integer conceptId : lineageToExclude) {
-           ancestorIdsToExclude.addAll(ts.getAncestors(conceptId, vc));
-        }
-
-        // Exclude these lineages
-        toBeRetired.removeAll(ancestorIdsToExclude);
-
-        // Retire the rest
-        for (Integer markedParentId : toBeRetired) {
-            retireRefsetExtension(parentRefsetId, markedParentId, parentMemberTypeId);
+            RefexChronicleBI retireRefsetExtension = retireRefsetExtension(parentRefsetId, conceptId, parentMemberTypeId);
         }
     }
 

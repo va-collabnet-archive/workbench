@@ -59,13 +59,9 @@ public class RefsetMemberFactory {
         if (refexColCon.isAnnotationStyleRefex()) {
             member.enclosingConceptNid = Ts.get().getConceptNidForNid(rcNid);
             Bdb.getNidCNidMap().setCNidForNid(member.enclosingConceptNid, member.nid);
-            if (refexColCon.isAnnotationIndex()) {
-                refexColCon.getData().getMemberNids().add(member.nid);
-            }
         } else {
             member.enclosingConceptNid = refexColCon.getNid();
             Bdb.getNidCNidMap().setCNidForNid(member.enclosingConceptNid, member.nid);
-            refexColCon.getData().add(member);
         }
         for (int i = 0; i < ec.getEditPaths().length; i++) {
             if (i == 0) {
@@ -90,7 +86,12 @@ public class RefsetMemberFactory {
                         ec.getEditPaths()[i]);
             }
 
-        }
+            if (refexColCon.isAnnotationIndex()) {
+                refexColCon.getData().getMemberNids().add(member.nid);
+            }else {
+                refexColCon.getData().add(member);
+            }
+        }        
         return member;
     }
 
