@@ -73,8 +73,8 @@ public class ConceptViewSettings extends ArenaComponentSettings {
 	private static ImageIcon statedView = new ImageIcon(ConceptViewRenderer.class.getResource("/16x16/plain/graph_edge.png"));
 	private static ImageIcon inferredView = new ImageIcon(ConceptViewRenderer.class.getResource("/16x16/plain/chrystal_ball.png"));
 	private static ImageIcon inferredAndStatedView = new ImageIcon(ConceptViewRenderer.class.getResource("/16x16/plain/inferred-then-stated.png"));
-        private static ImageIcon shortNormalView = new ImageIcon(ConceptViewRenderer.class.getResource("/16x16/plain/pin_green.png"));
-        private static ImageIcon longNormalView = new ImageIcon(ConceptViewRenderer.class.getResource("/16x16/plain/yinyang.png"));
+        private static ImageIcon shortNormalView = new ImageIcon(ConceptViewRenderer.class.getResource("/16x16/plain/pencil--minus.png"));
+        private static ImageIcon longNormalView = new ImageIcon(ConceptViewRenderer.class.getResource("/16x16/plain/pencil--plus.png"));
 	public static HashMap<Integer, Set<WeakReference>> arenaPanelMap = new HashMap<>();
 	// ~--- fields
 	// --------------------------------------------------------------
