@@ -807,9 +807,6 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
                             longNormRelGroups = new ArrayList<>();
                             HashSet<RelationshipVersionBI> roleRelsToDisplay = findLongNormRoleRelsToDisplay(roleRels);
                             for (RelationshipVersionBI rel : roleRelsToDisplay) {
-                                if(rel == null){
-                                    System.out.println("DEBUG");
-                                }
                                 if(rel.getGroup() == 0){
                                     DragPanelRel dragPanel = getRelComponent(rel, cpe, true);
                                     activeLongNormRelPanels.add(dragPanel);
