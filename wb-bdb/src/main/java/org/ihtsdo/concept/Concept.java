@@ -674,29 +674,34 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
     public void processComponentChronicles(ProcessComponentChronicleBI processor) throws Exception {
         if (getConAttrs() != null) {
             processor.process(getConAttrs());
+            recursiveProcessAnnotations(getConAttrs(), processor);
         }
 
         if (getDescs() != null) {
             for (ComponentChronicleBI cc : getDescs()) {
                 processor.process(cc);
+                recursiveProcessAnnotations(cc, processor);
             }
         }
 
         if (getSourceRels() != null) {
             for (ComponentChronicleBI cc : getSourceRels()) {
                 processor.process(cc);
+                recursiveProcessAnnotations(cc, processor);
             }
         }
 
         if (getImages() != null) {
             for (ComponentChronicleBI cc : getImages()) {
                 processor.process(cc);
+                recursiveProcessAnnotations(cc, processor);
             }
         }
 
         if (getRefsetMembers() != null) {
             for (ComponentChronicleBI cc : getRefsetMembers()) {
                 processor.process(cc);
+                recursiveProcessAnnotations(cc, processor);
             }
         }
     }
@@ -2753,6 +2758,13 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
             ChangeNotifier.touch(r.getTargetNid(), ChangeNotifier.Change.REL_XREF);
 
             c.data.add(r);
+        }
+    }
+
+    private void recursiveProcessAnnotations(ComponentChronicleBI cc, ProcessComponentChronicleBI processor) throws Exception {
+        for (RefexChronicleBI<?> annotation: cc.getAnnotations()) {
+            processor.process(annotation);
+            recursiveProcessAnnotations(annotation, processor);
         }
     }
 

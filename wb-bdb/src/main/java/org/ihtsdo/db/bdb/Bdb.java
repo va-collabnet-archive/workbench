@@ -32,8 +32,9 @@ import org.ihtsdo.db.bdb.computer.ReferenceConcepts;
 import org.ihtsdo.db.bdb.id.NidCNidMapBdb;
 import org.ihtsdo.db.bdb.nidmaps.UuidToNidMapBdb;
 import org.ihtsdo.db.bdb.sap.StatusAtPositionBdb;
+import org.ihtsdo.db.bdb.uuid.UuidNidMapGenerator;
+import org.ihtsdo.db.bdb.uuid.UuidRetriever;
 import org.ihtsdo.db.util.ConsoleActivityViewer;
-import org.ihtsdo.db.util.NidPair;
 import org.ihtsdo.db.util.NidPairForRefex;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 import org.ihtsdo.helper.io.FileIO;
@@ -346,6 +347,24 @@ public class Bdb {
                     + Bdb.readOnly.bdbEnv.getConfig().getConfigParam("je.maxMemory"));
             AceLog.getAppLog().info("readOnly shared cache: "
                     + Bdb.readOnly.bdbEnv.getConfig().getSharedCache());
+            long start = System.currentTimeMillis();
+            UuidRetriever retriever = new UuidRetriever(conceptDb.getConceptNidSet());
+            conceptDb.iterateConceptDataInParallel(retriever);
+            
+            long end = System.currentTimeMillis();
+            
+            System.out.println("Iteration elapsed time: " + (end - start)/1000);
+           System.out.println(retriever);
+           start = System.currentTimeMillis();
+           UuidNidMapGenerator generator = new UuidNidMapGenerator(retriever.getConceptNids(), 
+                   retriever.getUuidCount());
+            conceptDb.iterateConceptDataInParallel(generator);
+            
+            end = System.currentTimeMillis();
+            
+            System.out.println("Iteration2 elapsed time: " + (end - start)/1000);
+           System.out.println(generator);
+           uuidsToNidMapDb.setMap(generator.getMap(), generator.getReverseMap());
 
         } catch (Exception e) {
             throw new RuntimeException(e);
