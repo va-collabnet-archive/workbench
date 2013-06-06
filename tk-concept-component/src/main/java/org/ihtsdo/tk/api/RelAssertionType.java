@@ -40,7 +40,11 @@ public enum RelAssertionType {
     /**
      * Displays the short normal form of a concept.
      */
-    SHORT_NORMAL_FORM("short normal form");
+    SHORT_NORMAL_FORM("short normal form"),
+    /**
+     * Displays the long normal form of a concept.
+     */
+    LONG_NORMAL_FORM("long normal form");
     /**
      * The string to display.
      */
