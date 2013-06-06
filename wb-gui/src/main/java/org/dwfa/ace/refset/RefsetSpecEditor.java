@@ -1408,6 +1408,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
                 } catch (Exception e) {
                     AceLog.getAppLog().alertAndLogException(e);
                 }
+                specTree.expandPath(selectionPath);
             } else {
                 try {
                     List<ReflexiveRefsetFieldData> columns = new ArrayList<ReflexiveRefsetFieldData>();
