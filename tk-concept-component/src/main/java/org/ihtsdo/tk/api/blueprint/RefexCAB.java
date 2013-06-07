@@ -897,10 +897,14 @@ public class RefexCAB extends CreateOrAmendBlueprint {
         for (Entry<RefexProperty, Object> entry : properties.entrySet()) {
             switch (entry.getKey()) {
                 case RC_UUID:
-                        if (!entry.getValue().equals(refexVersion.getPrimUuid())) {
+                    try {
+                        if (!entry.getValue().equals(Ts.get().getUuidPrimordialForNid(refexVersion.getReferencedComponentNid()))) {
                             return false;
                         }
-                        break;
+                    } catch (IOException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                    break;
                 case RC_NID:
                         if (!entry.getValue().equals(refexVersion.getReferencedComponentNid())) {
                             return false;
