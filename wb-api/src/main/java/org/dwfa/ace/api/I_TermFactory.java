@@ -215,18 +215,6 @@ public interface I_TermFactory {
     */
    I_DescriptionPart newDescriptionPart();
 
-   /**
-    * @deprecated use form with <code>UUID memberPrimUuid</code>
-    * @param refsetId
-    * @param memberId
-    * @param componentId
-    * @param partType
-    * @return
-    * @throws IOException
-    */
-   I_ExtendByRef newExtension(int refsetId, int memberId, int componentId,
-                              Class<? extends I_ExtendByRefPart> partType)
-           throws IOException;
 
    I_ExtendByRef newExtension(int refsetId, UUID memberPrimUuid, int componentId,
                               Class<? extends I_ExtendByRefPart> partType)
