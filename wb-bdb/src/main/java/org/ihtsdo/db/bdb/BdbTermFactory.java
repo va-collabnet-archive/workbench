@@ -699,24 +699,6 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     }
 
     @Override
-    @Deprecated
-    public I_ExtendByRef newExtension(int refsetId, int memberId, int componentId,
-            Class<? extends I_ExtendByRefPart> partType)
-            throws IOException {
-        Concept refsetConcept = Concept.get(refsetId);
-        I_ConfigAceFrame config = getActiveAceFrameConfig();
-
-        Bdb.getNidCNidMap().setCNidForNid(refsetId, memberId);
-
-        RefsetMember<?, ?> member = createMember(memberId, componentId,
-                EConcept.REFSET_TYPES.classToType(partType), refsetConcept, config);
-
-        addUncommitted(refsetConcept);
-
-        return member;
-    }
-
-    @Override
     public I_ExtendByRef newExtension(int refsetId, UUID memberPrimUuid, int componentId,
             Class<? extends I_ExtendByRefPart> partType)
             throws IOException {

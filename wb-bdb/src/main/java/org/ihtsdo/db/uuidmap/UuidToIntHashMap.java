@@ -1,16 +1,18 @@
 package org.ihtsdo.db.uuidmap;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.logging.Level;
+import org.apache.mahout.math.function.DoubleProcedure;
+import org.apache.mahout.math.list.ByteArrayList;
+import org.apache.mahout.math.list.IntArrayList;
+import org.apache.mahout.math.map.HashFunctions;
+import org.apache.mahout.math.map.PrimeFinder;
 
 import org.dwfa.ace.log.AceLog;
-import org.ihtsdo.cern.colt.function.DoubleProcedure;
-import org.ihtsdo.cern.colt.list.ByteArrayList;
-import org.ihtsdo.cern.colt.list.IntArrayList;
-import org.ihtsdo.cern.colt.map.HashFunctions;
-import org.ihtsdo.cern.colt.map.PrimeFinder;
 import org.ihtsdo.time.TimeUtil;
 
 public class UuidToIntHashMap extends AbstractUuidToIntHashMap {
@@ -74,7 +76,7 @@ public class UuidToIntHashMap extends AbstractUuidToIntHashMap {
 	 *             if the initial capacity is less than zero.
 	 */
 	public UuidToIntHashMap(int initialCapacity) {
-		this(initialCapacity, defaultMinLoadFactor, defaultMaxLoadFactor);
+		this(initialCapacity, 0, 0.8);
 	}
 
 	/**
@@ -372,6 +374,18 @@ public class UuidToIntHashMap extends AbstractUuidToIntHashMap {
 
 		return -1; // not found
 	}
+	protected List<Integer> indexesOfValue(int value) {
+                List<Integer> indexes = new ArrayList<>();
+		final int val[] = values;
+		final byte stat[] = state;
+
+		for (int i = stat.length; --i >= 0;) {
+			if (stat[i] == FULL && val[i] == value)
+				indexes.add(i);
+		}
+
+		return indexes; // not found
+	}
 
 	/**
 	 * Returns the first key the given value is associated with. It is often a
@@ -397,6 +411,17 @@ public class UuidToIntHashMap extends AbstractUuidToIntHashMap {
 		uuid[0] = table[msb];
 		uuid[1] = table[lsb];
 		return uuid;
+	}
+	public List<UUID> keysOf(int value) {
+		List<Integer> indexes = indexesOfValue(value);
+                List<UUID> keys = new ArrayList<>(indexes.size());
+		
+                for (int index: indexes) {
+                    int msb = index * 2;
+                    int lsb = msb + 1;
+                    keys.add(new UUID(table[msb], table[lsb]));
+                }
+		return keys;
 	}
 
 	/**
@@ -431,7 +456,9 @@ public class UuidToIntHashMap extends AbstractUuidToIntHashMap {
 			}
 		}
 	}
-
+        public boolean put(UUID key, int value) {
+            return put(UuidUtil.convert(key), value);
+        }
 	/**
 	 * Associates the given key with the given value. Replaces any old
 	 * <tt>(key,someOtherValue)</tt> association, if existing.

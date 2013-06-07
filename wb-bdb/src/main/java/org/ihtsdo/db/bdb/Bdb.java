@@ -32,7 +32,7 @@ import org.ihtsdo.db.bdb.computer.ReferenceConcepts;
 import org.ihtsdo.db.bdb.id.NidCNidMapBdb;
 import org.ihtsdo.db.bdb.nidmaps.UuidToNidMapBdb;
 import org.ihtsdo.db.bdb.sap.StatusAtPositionBdb;
-import org.ihtsdo.db.bdb.uuid.UuidNidMapGenerator;
+import org.ihtsdo.db.bdb.uuid.PimitiveUuidNidMapGenerator;
 import org.ihtsdo.db.bdb.uuid.UuidRetriever;
 import org.ihtsdo.db.util.ConsoleActivityViewer;
 import org.ihtsdo.db.util.NidPairForRefex;
@@ -356,7 +356,7 @@ public class Bdb {
             System.out.println("Iteration elapsed time: " + (end - start)/1000);
            System.out.println(retriever);
            start = System.currentTimeMillis();
-           UuidNidMapGenerator generator = new UuidNidMapGenerator(retriever.getConceptNids(), 
+           PimitiveUuidNidMapGenerator generator = new PimitiveUuidNidMapGenerator(retriever.getConceptNids(), 
                    retriever.getUuidCount());
             conceptDb.iterateConceptDataInParallel(generator);
             
@@ -364,7 +364,7 @@ public class Bdb {
             
             System.out.println("Iteration2 elapsed time: " + (end - start)/1000);
            System.out.println(generator);
-           uuidsToNidMapDb.setMap(generator.getMap(), generator.getReverseMap());
+           uuidsToNidMapDb.setMap(generator.getMap());
 
         } catch (Exception e) {
             throw new RuntimeException(e);

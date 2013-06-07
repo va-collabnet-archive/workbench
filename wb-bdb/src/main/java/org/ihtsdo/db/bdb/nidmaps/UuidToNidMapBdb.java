@@ -39,6 +39,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.ihtsdo.concurrency.ConcurrentReentrantReadWriteLocks;
+import org.ihtsdo.db.uuidmap.UuidToIntHashMap;
 
 /**
  *
@@ -69,13 +70,10 @@ public class UuidToNidMapBdb extends ComponentBdb {
    private boolean       useBackingSet  = false;
    private IdSequence    idSequence;
    
-    ConcurrentHashMap<UUID, Integer> map;
-    ConcurrentHashMap<Integer, List<UUID>> reverseMap;
+    UuidToIntHashMap map;
 
-    public void setMap(ConcurrentHashMap<UUID, Integer> map, 
-            ConcurrentHashMap<Integer, List<UUID>> reverseMap) {
+    public void setMap(UuidToIntHashMap map) {
         this.map = map;
-        this.reverseMap = reverseMap;
    }
 
     //~--- constructors --------------------------------------------------------
@@ -120,10 +118,6 @@ public class UuidToNidMapBdb extends ComponentBdb {
    private void addToDb(UUID key, int nid) {
        if (map != null) {
            map.put(key, nid);
-           if (!reverseMap.containsKey(nid)) {
-               reverseMap.put(nid, new ArrayList<UUID>());
-           }
-           reverseMap.get(nid).add(key);
            return;
        }
       unwrittenCount.incrementAndGet();
@@ -354,7 +348,7 @@ public class UuidToNidMapBdb extends ComponentBdb {
 
    private List<UUID> getFromDb(int nid) {
        if (map != null) {
-           return reverseMap.get(nid);
+           return map.keysOf(nid);
        }
       List<UUID> uuids = new ArrayList<>(2);
 
@@ -469,8 +463,8 @@ public class UuidToNidMapBdb extends ComponentBdb {
 
    private int getNoGen(UUID key, boolean force) {
        if (map != null) {
-           Integer nid = map.get(key);
-           if (nid == null) {
+           int nid = map.get(key);
+           if (nid == Integer.MAX_VALUE) {
                nid = Integer.MIN_VALUE;
            }
            return nid;
@@ -531,7 +525,7 @@ public class UuidToNidMapBdb extends ComponentBdb {
 
    public List<UUID> getUuidsForNid(int nid) throws IOException {
        if (map != null) {
-           return reverseMap.get(nid);
+           return map.keysOf(nid);
        }
       ComponentBI component = Bdb.getComponent(nid);
 

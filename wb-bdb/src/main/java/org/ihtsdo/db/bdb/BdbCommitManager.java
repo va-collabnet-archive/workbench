@@ -644,7 +644,7 @@ public class BdbCommitManager {
         WriteLock datacheckWriteLock = dataCheckLock.writeLock();
         try {
             AceLog.getAppLog().info("Committing concept: " + c.toUserString() + " UUID: "
-                    + Ts.get().getUuidsForNid(c.getNid()).toString());
+                    + c.getPrimUuid().toString());
 
             int errorCount = 0;
             int warningCount = 0;

@@ -719,21 +719,6 @@ public class UuidArrayList extends AbstractUuidList {
 		elements[index * 2 + 1] = element[1];
 	}
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public void replaceFromWith(int arg0, Collection arg1) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public ArrayList<UUID> toList() {
-		ArrayList<UUID> resultList = new ArrayList<UUID>(size);
-		for (int i = 0; i < size; i++) {
-			resultList.add(new UUID(elements[i * 2], elements[i * 2 + 1]));
-		}
-		return resultList;
-	}
-
 	@Override
 	public int hashCode() {
 		return super.hashCode();

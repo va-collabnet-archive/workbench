@@ -1,11 +1,10 @@
 package org.ihtsdo.db.uuidmap;
 
 import java.util.UUID;
+import org.apache.mahout.math.list.IntArrayList;
+import org.apache.mahout.math.set.AbstractSet;
 
-import org.ihtsdo.cern.colt.list.IntArrayList;
-import org.ihtsdo.cern.colt.map.AbstractMap;
-
-public abstract class AbstractUuidToIntHashMap extends AbstractMap {
+public abstract class AbstractUuidToIntHashMap extends AbstractSet {
 	/**
 	 * 
 	 */
