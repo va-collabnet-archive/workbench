@@ -198,39 +198,39 @@ public class RelationshipCAB extends CreateOrAmendBlueprint {
         switch (relationshipType) {
             case STATED_HIERARCHY:
                 characteristicUuid =
-                        ts.getUuidsForNid(SnomedMetadataRfx.getREL_CH_STATED_RELATIONSHIP_NID()).get(0);
+                        ts.getUuidPrimordialForNid(SnomedMetadataRfx.getREL_CH_STATED_RELATIONSHIP_NID());
                 refinabilityUuid =
-                        ts.getUuidsForNid(SnomedMetadataRfx.getREL_NOT_REFINABLE_NID()).get(0);
+                        ts.getUuidPrimordialForNid(SnomedMetadataRfx.getREL_NOT_REFINABLE_NID());
                 break;
             case STATED_ROLE:
                 characteristicUuid =
-                        ts.getUuidsForNid(SnomedMetadataRfx.getREL_CH_STATED_RELATIONSHIP_NID()).get(0);
+                        ts.getUuidPrimordialForNid(SnomedMetadataRfx.getREL_CH_STATED_RELATIONSHIP_NID());
                 refinabilityUuid =
-                        ts.getUuidsForNid(SnomedMetadataRfx.getREL_OPTIONAL_REFINABILITY_NID()).get(0);
+                        ts.getUuidPrimordialForNid(SnomedMetadataRfx.getREL_OPTIONAL_REFINABILITY_NID());
                 break;
             case INFERRED_HIERARCY:
                 characteristicUuid =
-                        ts.getUuidsForNid(SnomedMetadataRfx.getREL_CH_INFERRED_RELATIONSHIP_NID()).get(0);
+                        ts.getUuidPrimordialForNid(SnomedMetadataRfx.getREL_CH_INFERRED_RELATIONSHIP_NID());
                 refinabilityUuid =
-                        ts.getUuidsForNid(SnomedMetadataRfx.getREL_NOT_REFINABLE_NID()).get(0);
+                        ts.getUuidPrimordialForNid(SnomedMetadataRfx.getREL_NOT_REFINABLE_NID());
                 break;
             case QUALIFIER:
                 characteristicUuid =
-                        ts.getUuidsForNid(SnomedMetadataRfx.getREL_CH_QUALIFIER_CHARACTERISTIC_NID()).get(0);
+                        ts.getUuidPrimordialForNid(SnomedMetadataRfx.getREL_CH_QUALIFIER_CHARACTERISTIC_NID());
                 refinabilityUuid =
-                        ts.getUuidsForNid(SnomedMetadataRfx.getREL_MANDATORY_REFINABILITY_NID()).get(0);
+                        ts.getUuidPrimordialForNid(SnomedMetadataRfx.getREL_MANDATORY_REFINABILITY_NID());
                 break;
             case INFERRED_ROLE:
                 characteristicUuid =
-                        ts.getUuidsForNid(SnomedMetadataRfx.getREL_CH_INFERRED_RELATIONSHIP_NID()).get(0);
+                        ts.getUuidPrimordialForNid(SnomedMetadataRfx.getREL_CH_INFERRED_RELATIONSHIP_NID());
                 refinabilityUuid =
-                        ts.getUuidsForNid(SnomedMetadataRfx.getREL_OPTIONAL_REFINABILITY_NID()).get(0);
+                        ts.getUuidPrimordialForNid(SnomedMetadataRfx.getREL_OPTIONAL_REFINABILITY_NID());
                 break;
             case HISTORIC:
                 characteristicUuid =
-                        ts.getUuidsForNid(SnomedMetadataRfx.getREL_HISTORY_HISTORIC_NID()).get(0);
+                        ts.getUuidPrimordialForNid(SnomedMetadataRfx.getREL_HISTORY_HISTORIC_NID());
                 refinabilityUuid =
-                        ts.getUuidsForNid(SnomedMetadataRfx.getREL_NOT_REFINABLE_NID()).get(0);
+                        ts.getUuidPrimordialForNid(SnomedMetadataRfx.getREL_NOT_REFINABLE_NID());
                 break;
         }
         if (getComponentUuid() == null) {

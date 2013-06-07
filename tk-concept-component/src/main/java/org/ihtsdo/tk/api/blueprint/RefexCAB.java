@@ -195,10 +195,6 @@ public class RefexCAB extends CreateOrAmendBlueprint {
         if (component != null) {
             return component.getPrimUuid().toString();
         }
-        List<UUID> uuids = Ts.get().getUuidsForNid(nid);
-        if (uuids.size() == 1) {
-            return uuids.get(0).toString();
-        }
         throw new InvalidCAB("Can't find nid for: " + refexProperty
                 + " props: " + this.properties);
     }
