@@ -7,7 +7,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentSkipListSet;
@@ -79,7 +78,7 @@ public class RefsetComputer implements ProcessUnfetchedConceptDataBI {
     private boolean persist;
     private int normalMemberNid;
     NidBitSetBI resultSet;
-    Set<Integer> newMarkedParents = new HashSet<>();
+    ConcurrentSkipListSet<Integer> newMarkedParents = new ConcurrentSkipListSet<>();
     
      public RefsetComputer(RefsetSpecQuery query, ViewCoordinate viewCoordinate,
             NidBitSetBI possibleIds, ComputeType computeType) throws Exception {
