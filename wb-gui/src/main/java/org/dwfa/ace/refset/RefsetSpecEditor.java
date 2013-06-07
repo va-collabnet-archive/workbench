@@ -111,9 +111,12 @@ import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JToggleButton;
 import javax.swing.JTree;
+import javax.swing.RowSorter;
+import javax.swing.RowSorter.SortKey;
 import javax.swing.SwingUtilities;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
+import javax.swing.table.TableModel;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 import org.ihtsdo.tk.api.NidSetBI;
@@ -900,7 +903,6 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
 
     public void setTermComponent(final I_AmTermComponent termComponent) {
         tempComponent = termComponent;
-
         if (SwingUtilities.isEventDispatchThread()) {
             label.setTermComponent(termComponent);
         } else {
@@ -1186,6 +1188,9 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
 
         @Override
         public void propertyChange(PropertyChangeEvent evt) {
+            RowSorter<? extends TableModel> rowSorter = refsetSpecPanel.getRefsetTable().getRowSorter();
+            List<SortKey> emptyList = new ArrayList<SortKey>();
+            rowSorter.setSortKeys(emptyList);
             updatePanel();
             firePropertyChange(evt.getPropertyName(), evt.getOldValue(), evt.getNewValue());
         }

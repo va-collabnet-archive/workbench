@@ -115,6 +115,7 @@ import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.logging.Level;
 
 import jsr166y.ConcurrentReferenceHashMap;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 //~--- JDK imports ------------------------------------------------------------
 
 public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI, Comparable<Concept> {
@@ -1898,15 +1899,10 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
 
         for (I_DescriptionTuple d : descriptions) {
             if (d.getTypeNid() == typePrefNid) {
-                for (RefexVersionBI<?> refex : d.getRefexesActive(vc)) {
-                    if (refex.getRefexNid() == langRefexNid) {
-                        RefexNidVersionBI<?> langRefex = (RefexNidVersionBI<?>) refex;
-
-                        if ((langRefex.getNid1() == ReferenceConcepts.PREFERRED_ACCEPTABILITY_RF1.getNid())
-                                || (langRefex.getNid1()
-                                == ReferenceConcepts.PREFERRED_ACCEPTABILITY_RF2.getNid())) {
-                            return d;
-                        }
+                for (RefexVersionBI<?> refex : d.getRefexMembersActive(vc, langRefexNid)) {
+                    RefexNidVersionBI<?> langRefex = (RefexNidVersionBI<?>) refex;
+                    if (langRefex.getNid1() == SnomedMetadataRfx.getDESC_PREFERRED_NID()) {
+                        return d;
                     }
                 }
             }

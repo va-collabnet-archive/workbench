@@ -300,12 +300,12 @@ public class ReflexiveRefsetTableModel extends ReflexiveTableModel {
             } catch (ExecutionException ex) {
                 AceLog.getAppLog().alertAndLogException(ex);
             }
-            
+
             try {
-				fireTableDataChanged();
-			} catch (Exception e) {
-				AceLog.getAppLog().log(Level.WARNING, e.toString(), e);
-			}
+                fireTableDataChanged();
+            } catch (Exception e) {
+                AceLog.getAppLog().log(Level.WARNING, e.toString(), e);
+            }
 
         }
 
@@ -382,7 +382,7 @@ public class ReflexiveRefsetTableModel extends ReflexiveTableModel {
                 } catch (InterruptedException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
-    }
+                }
             }
             tableChangedSwingWorker = new TableChangedSwingWorker(tableComponentId2, promotionFilterId);
         }
