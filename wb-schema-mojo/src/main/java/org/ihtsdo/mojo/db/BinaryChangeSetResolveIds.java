@@ -340,7 +340,7 @@ public class BinaryChangeSetResolveIds {
 
                         if (skipUuidSet != null
                                 && skipUuidSet.contains(eConcept.primordialUuid)) {
-                            eccsLogExceptionsWriter.append("skipped UUID :: " + enclosingUuid.toString());
+                            eccsLogExceptionsWriter.append("skipped UUID :: " + enclosingUuid.toString() + "\n");
                             continue;
                         }
 
@@ -944,7 +944,7 @@ public class BinaryChangeSetResolveIds {
     private void remapPrimordialUuids(TkConcept eConcept) throws IOException {
         UUID enclosingPrimordialUuid = sctPrimorialUuidRemapper.getUuid(eConcept.primordialUuid);
         if (enclosingPrimordialUuid != null) {
-            eccsLogExceptionsWriter.append("remapped UUID from :: " + eConcept.primordialUuid + " :: to :: " + enclosingPrimordialUuid);
+            eccsLogExceptionsWriter.append("remapped UUID from :: " + eConcept.primordialUuid + " :: to :: " + enclosingPrimordialUuid + "\n");
             eConcept.primordialUuid = enclosingPrimordialUuid;
         } else {
             enclosingPrimordialUuid = eConcept.primordialUuid; // keep original
