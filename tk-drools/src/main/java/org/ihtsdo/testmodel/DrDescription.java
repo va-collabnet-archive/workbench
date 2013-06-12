@@ -19,7 +19,6 @@ public class DrDescription extends DrComponent {
 	private String languageRefsetUuid;
 
 	private List<DrIdentifier> identifiers;
-	private List<DrRefsetExtension> extensions;
 
 	// Inferred properties
 	private String referToConceptUuid = ""; // null if has no refer to concept
@@ -30,7 +29,7 @@ public class DrDescription extends DrComponent {
 
 	public DrDescription() {
 		identifiers = new ArrayList<DrIdentifier>();
-		extensions = new ArrayList<DrRefsetExtension>();
+		setExtensions(new ArrayList<DrRefsetExtension>());
 		referToConceptUuid = null;
 	}
 
@@ -64,10 +63,10 @@ public class DrDescription extends DrComponent {
 			}
 			descriptionSb.append(" DRCOMPONENT FIELDS: {" + super.toString() + "}, ");
 			descriptionSb.append("Extensions: [");
-			if (extensions != null) {
+			if (getExtensions() != null) {
 				int i = 0;
-				for (DrRefsetExtension ext : extensions) {
-					descriptionSb.append(ext.toString() + (i == extensions.size() - 1 ? "" : ","));
+				for (DrRefsetExtension ext : getExtensions()) {
+					descriptionSb.append(ext.toString() + (i == getExtensions().size() - 1 ? "" : ","));
 					i++;
 				}
 			}
@@ -150,14 +149,6 @@ public class DrDescription extends DrComponent {
 
 	public void setLanguageRefsetUuid(String languageRefsetUuid) {
 		this.languageRefsetUuid = languageRefsetUuid;
-	}
-
-	public List<DrRefsetExtension> getExtensions() {
-		return extensions;
-	}
-
-	public void setExtensions(List<DrRefsetExtension> extensions) {
-		this.extensions = extensions;
 	}
 
 	public String getAcceptabilityUuid() {
