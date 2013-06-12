@@ -347,24 +347,6 @@ public class Bdb {
                     + Bdb.readOnly.bdbEnv.getConfig().getConfigParam("je.maxMemory"));
             AceLog.getAppLog().info("readOnly shared cache: "
                     + Bdb.readOnly.bdbEnv.getConfig().getSharedCache());
-            long start = System.currentTimeMillis();
-            UuidRetriever retriever = new UuidRetriever(conceptDb.getConceptNidSet());
-            conceptDb.iterateConceptDataInParallel(retriever);
-            
-            long end = System.currentTimeMillis();
-            
-            System.out.println("Iteration elapsed time: " + (end - start)/1000);
-           System.out.println(retriever);
-           start = System.currentTimeMillis();
-           PimitiveUuidNidMapGenerator generator = new PimitiveUuidNidMapGenerator(retriever.getConceptNids(), 
-                   retriever.getUuidCount());
-            conceptDb.iterateConceptDataInParallel(generator);
-            
-            end = System.currentTimeMillis();
-            
-            System.out.println("Iteration2 elapsed time: " + (end - start)/1000);
-           System.out.println(generator);
-           uuidsToNidMapDb.setMap(generator.getMap());
 
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -381,6 +363,7 @@ public class Bdb {
     }
 
     public static Database setupDatabase(boolean readOnly, String dbName, Bdb bdb) throws IOException, DatabaseException {
+        readOnly = false;
         DatabaseConfig dbConfig = new DatabaseConfig();
         dbConfig.setReadOnly(readOnly);
         dbConfig.setAllowCreate(!readOnly);
@@ -393,6 +376,7 @@ public class Bdb {
 
     private Bdb(boolean readOnly, File directory) throws IOException {
         try {
+            readOnly = false;
             directory.mkdirs();
             EnvironmentConfig envConfig = new EnvironmentConfig();
             envConfig.setSharedCache(true);

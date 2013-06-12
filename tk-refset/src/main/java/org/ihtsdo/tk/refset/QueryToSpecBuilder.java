@@ -107,12 +107,6 @@ public class QueryToSpecBuilder implements QueryBuilderBI{
                 spec.addSubquery(getGroupingConcept(topGrouping),
                     true,
                     subquery);
-//                else if(computeType.equals(ComputeType.DESCRIPTION)){
-//                    RefsetSpecQuery subquery = processDescriptionSubquery((Query) b);
-//                    spec.addSubquery(getGroupingConcept(topGrouping),
-//                        true,
-//                        subquery);
-//                }
                 
             }else{
                 throw new QueryException("Branch type not supported for branch: " + b);
@@ -253,29 +247,6 @@ public class QueryToSpecBuilder implements QueryBuilderBI{
         return descBranch;
     }
         
-//    private RefsetSpecQuery processDescriptionSubquery(Query q) throws Exception{
-//        Branch[] topBranches = q.getBranches();
-//        RefsetSpecQuery subQuerySpec = null;
-//        
-//        for(Branch b : topBranches){
-//            if(Description.class.isAssignableFrom(b.getClass())){
-//                RefsetSpecQuery descBranch = processDescriptionBranch(((Description) b));
-//                subQuerySpec.addSubquery(getGroupingConcept(q.getGrouping()),
-//                        true,
-//                        descBranch);
-//            }else if(Query.class.isAssignableFrom(b.getClass())){
-//                Query subQuery = (Query) b;
-//                RefsetSpecQuery subQueryBranch = processDescriptionSubquery(subQuery);
-//                subQuerySpec.addSubquery(getGroupingConcept(subQuery.getGrouping()),
-//                        true,
-//                        subQueryBranch);
-//            }else{
-//                throw new QueryException("Branch type not supported for branch: " + b);
-//            }
-//        }
-//        return subQuerySpec;
-//    }
-    
     private RefsetSpecQuery processDescriptionClause(boolean trueStatement, TOKENS token,
             Clause c, ViewCoordinate v1, ViewCoordinate v2) throws IOException, Exception{
         Grouping g = c.getGrouping();

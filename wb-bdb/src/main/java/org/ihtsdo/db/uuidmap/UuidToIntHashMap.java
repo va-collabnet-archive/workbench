@@ -1,5 +1,12 @@
 package org.ihtsdo.db.uuidmap;
 
+import com.sleepycat.bind.tuple.IntegerBinding;
+import com.sleepycat.bind.tuple.TupleBinding;
+import com.sleepycat.bind.tuple.TupleInput;
+import com.sleepycat.bind.tuple.TupleOutput;
+import com.sleepycat.je.DatabaseEntry;
+import com.sleepycat.je.LockMode;
+import com.sleepycat.je.OperationStatus;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -13,6 +20,8 @@ import org.apache.mahout.math.map.HashFunctions;
 import org.apache.mahout.math.map.PrimeFinder;
 
 import org.dwfa.ace.log.AceLog;
+import org.ihtsdo.db.bdb.nidmaps.UuidIntConcurrentHashMapBinder;
+import org.ihtsdo.db.bdb.nidmaps.UuidIntConcurrentHashMapBinder.DB_TYPE;
 import org.ihtsdo.time.TimeUtil;
 
 public class UuidToIntHashMap extends AbstractUuidToIntHashMap {
@@ -58,6 +67,10 @@ public class UuidToIntHashMap extends AbstractUuidToIntHashMap {
 	protected static final byte FREE = 0;
 	protected static final byte FULL = 1;
 	protected static final byte REMOVED = 2;
+
+    public static UuidToIntHashMapBinder getUuidIntMapBinder() {
+        return new UuidToIntHashMapBinder();
+    }
 
 	/**
 	 * Constructs an empty map with default capacity and default load factors.
@@ -700,4 +713,54 @@ public class UuidToIntHashMap extends AbstractUuidToIntHashMap {
 		return true;
 	}
 
+        public static class UuidToIntHashMapBinder extends TupleBinding<UuidToIntHashMap> {
+        public boolean needToWriteBack = false;
+
+        @Override
+        public UuidToIntHashMap entryToObject(TupleInput input) {
+            int type = input.readInt();
+            if (type == DB_TYPE.READ_ONLY.getInt()) {
+                int length = input.readInt();
+                UuidToIntHashMap map = new UuidToIntHashMap(length);
+
+                for (int i = 0; i < length; i++) {
+                    map.values[i] = input.readInt();
+                    map.state[i] = input.readByte();
+                }
+
+                length = input.readInt();
+                for (int i = 0; i < length; i++) {
+                    map.table[i] = input.readLong();
+                }
+                return map;
+            }else {
+                // read
+                int length = input.readInt();
+                UuidToIntHashMap map = new UuidToIntHashMap(length);
+                for (int i = 0; i < length; i++) {
+                    long lsb = input.readLong();
+                    long msb = input.readLong();
+                    int nid = input.readInt();
+                    map.put(new UUID(msb, lsb), nid);
+                }
+                //write back
+                needToWriteBack = true;
+                return map;
+            }
+        }
+
+        @Override
+        public void objectToEntry(UuidToIntHashMap map, TupleOutput output) {
+            output.writeInt(DB_TYPE.READ_ONLY.getInt()); 
+            output.writeInt(map.values.length);
+            for (int i = 0; i < map.values.length; i++) {
+                output.writeInt(map.values[i]);
+                output.writeByte(map.state[i]);
+            }
+            output.writeInt(map.table.length);
+            for (int i = 0; i < map.table.length; i++) {
+                output.writeLong(map.table[i]);
+            }
+        }
+    }
 }
