@@ -907,25 +907,23 @@ public class PromotionEditorFrame extends ComponentFrame implements PropertyChan
 
         //results
         ArrayList<NidBitSetBI> results = builder.getResults(q1, q2, q3, q4);
-//TODO: do this better            
-        int count = 0;
-        for (NidBitSetBI result : results) {
+        for (int i = 0; i <= results.size(); i++) {
+            NidBitSetBI result = results.get(i);
             System.out.println(result);
-            if (count == 0) {
+            if (i == 0) {
                 descChange = result;
                 allChange.or(result);
-            } else if (count == 1) {
+            } else if (i == 1) {
                 infChange = result;
                 allChange.or(result);
-            } else if (count == 2) {
+            } else if (i == 2) {
                 statedChange = result;
                 allChange.or(result);
-            } else if (count == 3) {
+            } else if (i == 3) {
                 //need to combine stated rel changes with concept defined change
                 statedChange.or(result);
                 allChange.or(result);
             }
-            count++;
         }
 
         long elapsedTime = System.currentTimeMillis() - startTime;
