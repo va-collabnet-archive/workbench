@@ -656,7 +656,7 @@ public class RefreshSpecClausePanel extends JPanel implements ActionListener {
         boolean writeComment = editorComments.getText().length() > 3;
         I_ExtendByRef comment = null;
         RefsetSpec refsetSpecHelper = new RefsetSpec(refsetSpec, frameConfig.getViewCoordinate());
-        I_GetConceptData commentRefset = (I_GetConceptData) refsetSpecHelper.getCommentsRefsetConcepts().iterator().next();
+        I_GetConceptData commentRefset = (I_GetConceptData) refsetSpecHelper.getCommentsRefsetConcepts().iterator().next().getChronicle();
 
         if (updateOptions.getSelectedItem().equals(REPLACE_OPTION)) {
             // Do replacement here...

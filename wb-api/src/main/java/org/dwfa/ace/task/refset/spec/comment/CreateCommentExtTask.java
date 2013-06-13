@@ -107,7 +107,7 @@ public class CreateCommentExtTask extends AbstractTask {
                     Collection<? extends ConceptVersionBI> commentsRefsetConcepts = refsetSpec.getCommentsRefsetConcepts();
                     I_GetConceptData commentsRefset = null;
                     if(!commentsRefsetConcepts.isEmpty()){
-                        commentsRefset = (I_GetConceptData) commentsRefsetConcepts.iterator().next();
+                        commentsRefset = (I_GetConceptData) commentsRefsetConcepts.iterator().next().getChronicle();
                     }
                     I_GetConceptData memberRefset = (I_GetConceptData) refsetSpec.getMemberRefsetConcept();
                     if (commentsRefset == null) {

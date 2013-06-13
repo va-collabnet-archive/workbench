@@ -364,7 +364,7 @@ public class TupleFileUtil {
         Collection<? extends ConceptVersionBI> commentsRefsetConcepts = refsetSpecHelper.getCommentsRefsetConcepts();
         I_GetConceptData commentsRefset = null;
         if(!commentsRefsetConcepts.isEmpty()){
-            commentsRefset = (I_GetConceptData) commentsRefsetConcepts.iterator().next();
+            commentsRefset = (I_GetConceptData) commentsRefsetConcepts.iterator().next().getChronicle();
         }
         I_GetConceptData promotionRefset = (I_GetConceptData) refsetSpecHelper.getPromotionRefsetConcept();
         I_GetConceptData editTimeRefset = (I_GetConceptData) refsetSpecHelper.getEditConcept();
