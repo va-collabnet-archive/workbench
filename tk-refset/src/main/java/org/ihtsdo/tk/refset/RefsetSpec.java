@@ -195,7 +195,7 @@ public class RefsetSpec {
             Collection<? extends ConceptVersionBI> specConcepts = getRefsetSpecConcept().getVersion(vc).getRelationshipsOutgoingTargetConceptsActive(
                                                                                                        specifiesRefsetRelNid);
             if(!specConcepts.isEmpty()){
-                refsetConcept = specConcepts.iterator().next();
+                refsetConcept = specConcepts.iterator().next().getChronicle();
             }
             return refsetConcept;
         } catch (Exception e) {
@@ -214,7 +214,7 @@ public class RefsetSpec {
             }
 
             return memberRefsetConcept.getVersion(vc).getRelationshipsOutgoingTargetConceptsActive(
-                    markedParentRelNid).iterator().next();
+                    markedParentRelNid).iterator().next().getChronicle();
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -234,7 +234,7 @@ public class RefsetSpec {
             if(promotionConcepts.isEmpty()){
                 return null;
             }
-            return promotionConcepts.iterator().next();
+            return promotionConcepts.iterator().next().getChronicle();
         } catch (Exception e) {
             e.printStackTrace();
             return null;
