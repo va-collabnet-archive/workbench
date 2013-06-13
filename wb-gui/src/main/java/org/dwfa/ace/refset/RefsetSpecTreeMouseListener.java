@@ -489,7 +489,7 @@ public class RefsetSpecTreeMouseListener extends MouseAdapter {
                             retireClause(thinExtByRefTuple);
 
                             retireAllDescendants(selectedRoot);
-
+                            Terms.get().addUncommitted(Terms.get().getConcept(clauseBeingRetired.getRefsetId()));
                         } catch (Exception e) {
                             AceLog.getAppLog().alertAndLogException(e);
                         }
@@ -556,7 +556,7 @@ public class RefsetSpecTreeMouseListener extends MouseAdapter {
                 helper.newLongRefsetExtension(editTimeConcept.getConceptNid(), specConcept.getConceptNid(), System
                     .currentTimeMillis());
     }
-            Terms.get().addUncommitted(currentExtVersion.getCore());
+//            Terms.get().addUncommitted(currentExtVersion.getCore());
         }
     }
 
@@ -699,7 +699,7 @@ public class RefsetSpecTreeMouseListener extends MouseAdapter {
                         current.getPathNid());
 
             thinExtByRefTuple.getCore().addVersion(newPart);
-            Terms.get().addUncommitted(thinExtByRefTuple.getCore());
+//            Terms.get().addUncommitted(thinExtByRefTuple.getCore());
             specEditor.updateSpecTree(false);
             aceConfig.refreshRefsetTab();
         }
