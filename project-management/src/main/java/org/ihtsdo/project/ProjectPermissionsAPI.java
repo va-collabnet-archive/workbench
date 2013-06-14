@@ -43,6 +43,7 @@ import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
 import org.ihtsdo.tk.api.changeset.ChangeSetGenerationThreadingPolicy;
+import org.ihtsdo.tk.binding.snomed.Snomed;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 
 /**
@@ -357,6 +358,7 @@ public class ProjectPermissionsAPI {
             // TODO add config as parameter
             I_ConfigAceFrame config = termFactory.getActiveAceFrameConfig();
             I_IntSet allowedDestRelTypes = termFactory.newIntSet();
+            allowedDestRelTypes.add(Snomed.IS_A.getLenient().getNid());
             allowedDestRelTypes.add(termFactory.uuidToNative(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()));
             Set<I_GetConceptData> childrenSet = new HashSet<I_GetConceptData>();
             childrenSet.addAll(concept.getDestRelOrigins(config.getAllowedStatus(), allowedDestRelTypes, config.getViewPositionSetReadOnly(), config.getPrecedence(),
