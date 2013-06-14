@@ -19,6 +19,7 @@ package org.ihtsdo.project.workflow.api;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -52,7 +53,14 @@ import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
+import org.ihtsdo.tk.api.refex.RefexChronicleBI;
+import org.ihtsdo.tk.api.refex.RefexVersionBI;
+import org.ihtsdo.tk.api.refex.type_nid.RefexNidVersionBI;
+import org.ihtsdo.tk.binding.snomed.RefsetAux;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 
 /**
  * The Class WfComponentProvider.
@@ -126,8 +134,10 @@ public class WfComponentProvider {
 
 			ConceptVersionBI conceptBi = ((ConceptChronicleBI) concept).getVersion(config.getViewCoordinate());
 
-			for (DescriptionVersionBI loopDesc : conceptBi.getDescriptionsActive()) {
+			for (DescriptionVersionBI<?> loopDesc : conceptBi.getDescriptionsActive()) {
 				if (loopDesc.getTypeNid() == ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize().getNid()) {
+					return loopDesc.getText();
+				} else if (isPreferredTerm(loopDesc, config.getViewCoordinate())) {
 					return loopDesc.getText();
 				}
 			}
@@ -468,4 +478,42 @@ public class WfComponentProvider {
 		return retFiles;
 	}
 
+
+    private boolean isPreferredTerm(DescriptionVersionBI<?> desc, ViewCoordinate vc) {
+        boolean isPreferredTerm = false;
+        try {
+        	if (desc.getTypeNid() == SnomedMetadataRf2.SYNONYM_RF2.getLenient().getNid()) {
+        		 Collection<? extends RefexChronicleBI<?>> annotations = desc.getAnnotations();
+        		 
+        		 for (RefexChronicleBI<?> annot : annotations) {
+        			 // Is it in EN_US Refset?
+        			 if (annot.getRefexNid() == RefsetAux.EN_US_REFEX.getLenient().getNid()) {
+                        
+        				 // Is it versionable?
+        				 if (RefexVersionBI.class.isAssignableFrom(annot.getClass())) {
+                            RefexVersionBI<?> rv = (RefexVersionBI<?>) annot;
+
+                            // Is it a CidRefset Member?
+                            if (RefexNidVersionBI.class.isAssignableFrom(rv.getClass())) {
+                                int cnid = ((RefexNidVersionBI<?>) rv).getNid1();
+                                
+                                // Is the Cid Preferred?
+                                if (cnid == SnomedMetadataRfx.getDESC_PREFERRED_NID()) {
+                                    isPreferredTerm = true;
+                                }
+                            } else {
+                                System.out.println("Can't convert: RefexCnidVersionBI:  " + rv);
+                            }
+                        } else {
+                            System.out.println("Can't convert: RefexVersionBI:  " + annot);
+                        }
+                    }
+                }
+            }
+        	
+            return isPreferredTerm;
+        } catch (IOException e) {
+            return isPreferredTerm;
+        }
+    }
 }
