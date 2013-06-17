@@ -33,12 +33,14 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.rules.RulesLibrary;
+import org.ihtsdo.rules.testmodel.DrComponentHelper;
 import org.ihtsdo.testmodel.DrRelationship;
 import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.PositionSet;
 import org.ihtsdo.tk.api.RelAssertionType;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 
 /**
@@ -693,7 +695,7 @@ ROLEGROUPS_CROSSOVER};
 		 * @param factContextName the fact context name
 		 * @return the constraint normal form
 		 */
-		public List<DrRelationship> getConstraintNormalForm(I_GetConceptData conceptData, String factContextName){
+		public List<DrRelationship> getConstraintNormalForm(I_GetConceptData conceptData, String factContextName, ViewCoordinate mockVc){
 
 			List<DrRelationship> rels = new ArrayList<DrRelationship>();
 			try {
@@ -713,6 +715,7 @@ ROLEGROUPS_CROSSOVER};
 					loopRel.setTime(relTuple.getTime());
 					loopRel.setTypeUuid(termFactory.nidToUuid(relTuple.getTypeNid()).toString());
 					loopRel.setFactContextName(factContextName);
+					DrComponentHelper.addAnnotationsToComponent(loopRel, relTuple, mockVc, factContextName);
 					rels.add(loopRel);
 				}
 				//Inherited grouped roles

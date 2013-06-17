@@ -1,5 +1,6 @@
 package org.ihtsdo.testmodel;
 
+import java.util.List;
 import java.util.UUID;
 
 import org.ihtsdo.tk.Ts;
@@ -11,6 +12,7 @@ public abstract class DrComponent {
 	private String pathUuid;
 	private String authorUuid;
 	private Long time;
+	private List<DrRefsetExtension> extensions;
 
 	private String factContextName;
 
@@ -124,5 +126,14 @@ public abstract class DrComponent {
 	public void setActive(boolean active) {
 		this.active = active;
 	}
+	
+	public List<DrRefsetExtension> getExtensions() {
+		return extensions;
+	}
+
+	public void setExtensions(List<DrRefsetExtension> extensions) {
+		this.extensions = extensions;
+	}
+
 
 }

@@ -1,5 +1,6 @@
 package org.ihtsdo.testmodel;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -54,6 +55,15 @@ public class DrRelationship extends DrComponent {
 
 			relSb.append(" Relationship group: " + relGroup + ",");
 			relSb.append(" DRCOMPONENT FIELDS: {" + super.toString() + "}, ");
+			relSb.append("Extensions: [");
+			if (getExtensions() != null) {
+				int i = 0;
+				for (DrRefsetExtension ext : getExtensions()) {
+					relSb.append(ext.toString() + (i == getExtensions().size() - 1 ? "" : ","));
+					i++;
+				}
+			}
+			relSb.append("], ");
 			relSb.append("\nIdentifiers: [");
 			if (identifiers != null) {
 				for (DrIdentifier identifier : identifiers) {
@@ -71,6 +81,7 @@ public class DrRelationship extends DrComponent {
 	}
 
 	public DrRelationship() {
+		setExtensions(new ArrayList<DrRefsetExtension>());
 	}
 
 	public String getPrimordialUuid() {

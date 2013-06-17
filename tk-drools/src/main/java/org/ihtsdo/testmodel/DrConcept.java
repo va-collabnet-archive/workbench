@@ -17,7 +17,6 @@ public class DrConcept extends DrComponent {
 	private List<DrRelationship> outgoingRelationships;
 	private List<DrDefiningRolesSet> definingRoleSets;
 	private List<DrLanguageDesignationSet> languageDesignationSets;
-	private List<DrRefsetExtension> extensions;
 	private List<DrIdentifier> identifiers;
 
 	// Inferred properties
@@ -117,10 +116,10 @@ public class DrConcept extends DrComponent {
 			conceptSb.append("], ");
 
 			conceptSb.append("Extensions: [");
-			if (extensions != null) {
+			if (getExtensions() != null) {
 				int i = 0;
-				for (DrRefsetExtension ext : extensions) {
-					conceptSb.append(ext.toString() + (i == extensions.size() - 1 ? "" : ","));
+				for (DrRefsetExtension ext : getExtensions()) {
+					conceptSb.append(ext.toString() + (i == getExtensions().size() - 1 ? "" : ","));
 					i++;
 				}
 			}
@@ -147,7 +146,7 @@ public class DrConcept extends DrComponent {
 		outgoingRelationships = new ArrayList<DrRelationship>();
 		definingRoleSets = new ArrayList<DrDefiningRolesSet>();
 		languageDesignationSets = new ArrayList<DrLanguageDesignationSet>();
-		extensions = new ArrayList<DrRefsetExtension>();
+		setExtensions(new ArrayList<DrRefsetExtension>());
 		identifiers = new ArrayList<DrIdentifier>();
 		numberOfStatedParents = 0;
 		variantEvaluationCandidate = true;
@@ -196,14 +195,6 @@ public class DrConcept extends DrComponent {
 
 	public void setOutgoingRelationships(List<DrRelationship> outgoingRelationships) {
 		this.outgoingRelationships = outgoingRelationships;
-	}
-
-	public List<DrRefsetExtension> getExtensions() {
-		return extensions;
-	}
-
-	public void setExtensions(List<DrRefsetExtension> extensions) {
-		this.extensions = extensions;
 	}
 
 	public List<DrIdentifier> getIdentifiers() {

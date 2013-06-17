@@ -271,7 +271,7 @@ public class ConceptDetailsPanel extends JPanel {
 	 */
 	private void createTree(DefaultMutableTreeNode top) throws IOException, TerminologyException {
 		RelationshipsDAO rDao = new RelationshipsDAO();
-		List<DrRelationship> inhRel = rDao.getConstraintNormalForm(concept, "");
+		List<DrRelationship> inhRel = rDao.getConstraintNormalForm(concept, "", Terms.get().getActiveAceFrameConfig().getViewCoordinate());
 
 		DefaultMutableTreeNode constNormalFormNode = new DefaultMutableTreeNode(new TreeEditorObjectWrapper("Constraint Normal Form", IconUtilities.getFsndescription(), null));
 

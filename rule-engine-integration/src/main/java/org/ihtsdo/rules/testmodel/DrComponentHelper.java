@@ -39,6 +39,7 @@ import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.qa.inheritance.RelationshipsDAO;
 import org.ihtsdo.rules.RulesLibrary;
 import org.ihtsdo.rules.RulesLibrary.INFERRED_VIEW_ORIGIN;
+import org.ihtsdo.testmodel.DrComponent;
 import org.ihtsdo.testmodel.DrConcept;
 import org.ihtsdo.testmodel.DrDefiningRolesSet;
 import org.ihtsdo.testmodel.DrDescription;
@@ -47,6 +48,8 @@ import org.ihtsdo.testmodel.DrLanguageDesignationSet;
 import org.ihtsdo.testmodel.DrRefsetExtension;
 import org.ihtsdo.testmodel.DrRelationship;
 import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.ComponentVersionBI;
+import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.PositionSet;
@@ -55,6 +58,7 @@ import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.api.id.IdBI;
+import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.refex.type_float.RefexFloatVersionBI;
 import org.ihtsdo.tk.api.refex.type_int.RefexIntVersionBI;
@@ -68,6 +72,7 @@ import org.ihtsdo.tk.api.refex.type_nid_nid_nid.RefexNidNidNidVersionBI;
 import org.ihtsdo.tk.api.refex.type_nid_nid_string.RefexNidNidStringVersionBI;
 import org.ihtsdo.tk.api.refex.type_nid_string.RefexNidStringVersionBI;
 import org.ihtsdo.tk.api.refex.type_string.RefexStringVersionBI;
+import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 import org.ihtsdo.tk.spec.ConceptSpec;
@@ -166,7 +171,7 @@ public class DrComponentHelper {
 				loopDescription.setTypeUuid(tf.nidToUuid(descriptionVersion.getTypeNid()).toString());
 				loopDescription.setPublished(!getSnomedIntId(descriptionVersion.getNid()).equals("0"));
 				loopDescription.setFactContextName(factContextName);
-				addAnnotationsToDescription(loopDescription, descriptionVersion, mockVc, factContextName);
+				addAnnotationsToComponent(loopDescription, descriptionVersion, mockVc, factContextName);
 
 				loopDescription.setIdentifiers(new ArrayList<DrIdentifier>());
 				for (IdBI id : descriptionVersion.getAllIds()) {
@@ -242,10 +247,8 @@ public class DrComponentHelper {
 			int historical = tf.uuidToNative(ArchitectonicAuxiliary.Concept.HISTORICAL_CHARACTERISTIC.getUids());
 
 			if (inferredOrigin == INFERRED_VIEW_ORIGIN.STATED) {
-				for (RelationshipVersionBI<?> relTuple : oldStyleConcept.getSourceRelTuples(null, 
-						null, 
-						mockViewSet, config.getPrecedence(), 
-						config.getConflictResolutionStrategy())) {
+				for (RelationshipChronicleBI relChronicle : conceptBi.getRelationshipsOutgoing()) {
+					RelationshipVersionBI<?> relTuple = relChronicle.getVersion(mockVc);
 					if (relTuple.getCharacteristicNid() == stated) {
 						DrRelationship loopRel = new DrRelationship();
 						loopRel.setModifierUuid("someUuid");
@@ -273,14 +276,13 @@ public class DrComponentHelper {
 							drId.setExtensionId(tf.nidToUuid(id.getModuleNid()).toString());
 							loopRel.getIdentifiers().add(drId);
 						}
+						addAnnotationsToComponent(loopRel, relTuple, mockVc, factContextName);
 						concept.getOutgoingRelationships().add(loopRel);
 					}
 				}
 			} else if (inferredOrigin == INFERRED_VIEW_ORIGIN.INFERRED) {
-				for (RelationshipVersionBI<?> relTuple : oldStyleConcept.getSourceRelTuples(null, 
-						null, 
-						mockViewSet, config.getPrecedence(), 
-						config.getConflictResolutionStrategy())) {
+				for (RelationshipChronicleBI relChronicle : conceptBi.getRelationshipsOutgoing()) {
+					RelationshipVersionBI<?> relTuple = relChronicle.getVersion(mockVc);
 					if (relTuple.getCharacteristicNid() == inferred) {
 						DrRelationship loopRel = new DrRelationship();
 						loopRel.setModifierUuid("someUuid");
@@ -308,12 +310,13 @@ public class DrComponentHelper {
 							drId.setExtensionId(tf.nidToUuid(id.getModuleNid()).toString());
 							loopRel.getIdentifiers().add(drId);
 						}
+						addAnnotationsToComponent(loopRel, relTuple, mockVc, factContextName);
 						concept.getOutgoingRelationships().add(loopRel);
 					}
 				}
 			}else if (inferredOrigin == INFERRED_VIEW_ORIGIN.CONSTRAINT_NORMAL_FORM) {
 				RelationshipsDAO rDao=new RelationshipsDAO();
-				concept.getOutgoingRelationships().addAll(rDao.getConstraintNormalForm(oldStyleConcept, factContextName));
+				concept.getOutgoingRelationships().addAll(rDao.getConstraintNormalForm(oldStyleConcept, factContextName, mockVc));
 				rDao=null;
 			}
 
@@ -420,7 +423,7 @@ public class DrComponentHelper {
 				drId.setExtensionId(tf.nidToUuid(id.getModuleNid()).toString());
 				concept.getIdentifiers().add(drId);
 			}
-			addAnnotationsToConcept(concept, conceptBi, mockVc, factContextName);
+			addAnnotationsToComponent(concept, conceptBi.getConceptAttributesActive(), mockVc, factContextName);
 
 		} catch (IOException e) {
 			AceLog.getAppLog().alertAndLogException(e);
@@ -491,119 +494,14 @@ public class DrComponentHelper {
 		return descriptionId.toString();
 	}
 
-	private static void addAnnotationsToConcept(DrConcept concept, ConceptVersionBI componentBi, 
-			ViewCoordinate mockVc, String factContextName) throws Exception {
+	public static void addAnnotationsToComponent(DrComponent component, ComponentVersionBI componentBi, 
+			ViewCoordinate mockVc, String factContextName) throws IOException, ContradictionException {
 		I_TermFactory tf = Terms.get();
-		if (componentBi != null && componentBi.getConceptAttributesActive() != null) {
-			Collection<? extends RefexVersionBI<?>> annotations = componentBi.getConceptAttributesActive().getAnnotationsActive(mockVc);
+		Collection<? extends RefexChronicleBI<?>> annotations = componentBi.getAnnotations();
 
-			for (RefexVersionBI annotation : annotations) {
-				DrRefsetExtension extension = new DrRefsetExtension();
-				extension.setActive(true);
-				extension.setComponentUuid(tf.nidToUuid(annotation.getReferencedComponentNid()).toString());
-				extension.setRefsetUuid(tf.nidToUuid(annotation.getRefexNid()).toString());
-				extension.setPrimordialUuid(annotation.getPrimUuid().toString());
-				extension.setFactContextName(factContextName); 
-				if (annotation instanceof RefexNidVersionBI) {
-					RefexNidVersionBI annotationTyped = (RefexNidVersionBI) annotation;
-					extension.setC1Uuid(tf.nidToUuid(annotationTyped.getNid1()).toString());
-					extension.setStatusUuid(tf.nidToUuid(annotationTyped.getStatusNid()).toString());
-					extension.setTime(annotationTyped.getTime());
-					extension.setAuthorUuid(tf.nidToUuid(annotationTyped.getAuthorNid()).toString());
-				} else if (annotation instanceof RefexNidNidNidVersionBI) {
-					RefexNidNidNidVersionBI annotationTyped = (RefexNidNidNidVersionBI) annotation;
-					extension.setC1Uuid(tf.nidToUuid(annotationTyped.getNid1()).toString());
-					extension.setC2Uuid(tf.nidToUuid(annotationTyped.getNid2()).toString());
-					extension.setC3Uuid(tf.nidToUuid(annotationTyped.getNid3()).toString());
-					extension.setStatusUuid(tf.nidToUuid(annotationTyped.getStatusNid()).toString());
-					extension.setTime(annotationTyped.getTime());
-					extension.setAuthorUuid(tf.nidToUuid(annotationTyped.getAuthorNid()).toString());
-				} else if (annotation instanceof RefexNidNidStringVersionBI) {
-					RefexNidNidStringVersionBI annotationTyped = (RefexNidNidStringVersionBI) annotation;
-					extension.setC1Uuid(tf.nidToUuid(annotationTyped.getNid1()).toString());
-					extension.setC2Uuid(tf.nidToUuid(annotationTyped.getNid2()).toString());
-					extension.setStrValue(annotationTyped.getString1());
-					extension.setStatusUuid(tf.nidToUuid(annotationTyped.getStatusNid()).toString());
-					extension.setTime(annotationTyped.getTime());
-					extension.setAuthorUuid(tf.nidToUuid(annotationTyped.getAuthorNid()).toString());
-				} else if (annotation instanceof RefexNidNidVersionBI) {
-					RefexNidNidVersionBI annotationTyped = (RefexNidNidVersionBI) annotation;
-					extension.setC1Uuid(tf.nidToUuid(annotationTyped.getNid1()).toString());
-					extension.setC2Uuid(tf.nidToUuid(annotationTyped.getNid2()).toString());
-					extension.setStatusUuid(tf.nidToUuid(annotationTyped.getStatusNid()).toString());
-					extension.setTime(annotationTyped.getTime());
-					extension.setAuthorUuid(tf.nidToUuid(annotationTyped.getAuthorNid()).toString());
-				} else if (annotation instanceof RefexNidFloatVersionBI) {
-					RefexNidFloatVersionBI annotationTyped = (RefexNidFloatVersionBI) annotation;
-					extension.setC1Uuid(tf.nidToUuid(annotationTyped.getNid1()).toString());
-					extension.setFloatValue(annotationTyped.getFloat1());
-					extension.setStatusUuid(tf.nidToUuid(annotationTyped.getStatusNid()).toString());
-					extension.setTime(annotationTyped.getTime());
-					extension.setAuthorUuid(tf.nidToUuid(annotationTyped.getAuthorNid()).toString());
-				} else if (annotation instanceof RefexNidIntVersionBI) {
-					RefexNidIntVersionBI annotationTyped = (RefexNidIntVersionBI) annotation;
-					extension.setC1Uuid(tf.nidToUuid(annotationTyped.getNid1()).toString());
-					extension.setIntValue(annotationTyped.getInt1());
-					extension.setStatusUuid(tf.nidToUuid(annotationTyped.getStatusNid()).toString());
-					extension.setTime(annotationTyped.getTime());
-					extension.setAuthorUuid(tf.nidToUuid(annotationTyped.getAuthorNid()).toString());
-				} else if (annotation instanceof RefexNidLongVersionBI) {
-					RefexNidLongVersionBI annotationTyped = (RefexNidLongVersionBI) annotation;
-					extension.setC1Uuid(tf.nidToUuid(annotationTyped.getNid1()).toString());
-					extension.setLongValue(annotationTyped.getLong1());
-					extension.setStatusUuid(tf.nidToUuid(annotationTyped.getStatusNid()).toString());
-					extension.setTime(annotationTyped.getTime());
-					extension.setAuthorUuid(tf.nidToUuid(annotationTyped.getAuthorNid()).toString());
-				} else if (annotation instanceof RefexNidStringVersionBI) {
-					RefexNidStringVersionBI annotationTyped = (RefexNidStringVersionBI) annotation;
-					extension.setC1Uuid(tf.nidToUuid(annotationTyped.getNid1()).toString());
-					extension.setStrValue(annotationTyped.getString1());
-					extension.setStatusUuid(tf.nidToUuid(annotationTyped.getStatusNid()).toString());
-					extension.setTime(annotationTyped.getTime());
-					extension.setAuthorUuid(tf.nidToUuid(annotationTyped.getAuthorNid()).toString());
-				} else if (annotation instanceof RefexFloatVersionBI) {
-					RefexFloatVersionBI annotationTyped = (RefexFloatVersionBI) annotation;
-					extension.setFloatValue(annotationTyped.getFloat1());
-					extension.setStatusUuid(tf.nidToUuid(annotationTyped.getStatusNid()).toString());
-					extension.setTime(annotationTyped.getTime());
-					extension.setAuthorUuid(tf.nidToUuid(annotationTyped.getAuthorNid()).toString());
-				} else if (annotation instanceof RefexIntVersionBI) {
-					RefexIntVersionBI annotationTyped = (RefexIntVersionBI) annotation;
-					extension.setIntValue(annotationTyped.getInt1());
-					extension.setStatusUuid(tf.nidToUuid(annotationTyped.getStatusNid()).toString());
-					extension.setTime(annotationTyped.getTime());
-					extension.setAuthorUuid(tf.nidToUuid(annotationTyped.getAuthorNid()).toString());
-				} else if (annotation instanceof RefexLongVersionBI) {
-					RefexLongVersionBI annotationTyped = (RefexLongVersionBI) annotation;
-					extension.setLongValue(annotationTyped.getLong1());
-					extension.setStatusUuid(tf.nidToUuid(annotationTyped.getStatusNid()).toString());
-					extension.setTime(annotationTyped.getTime());
-					extension.setAuthorUuid(tf.nidToUuid(annotationTyped.getAuthorNid()).toString());
-				} else if (annotation instanceof RefexStringVersionBI) {
-					RefexStringVersionBI annotationTyped = (RefexStringVersionBI) annotation;
-					extension.setStrValue(annotationTyped.getString1());
-					extension.setStatusUuid(tf.nidToUuid(annotationTyped.getStatusNid()).toString());
-					extension.setTime(annotationTyped.getTime());
-					extension.setAuthorUuid(tf.nidToUuid(annotationTyped.getAuthorNid()).toString());
-				} else {
-					// unknown refset
-				}
-				if (concept.getExtensions() == null) {
-					concept.setExtensions(new ArrayList<DrRefsetExtension>());
-				}
-				concept.getExtensions().add(extension);
-			}
-		}
-	}
-
-	private static void addAnnotationsToDescription(DrDescription description, DescriptionVersionBI componentBi, 
-			ViewCoordinate mockVc, String factContextName) throws IOException {
-		I_TermFactory tf = Terms.get();
-		Collection<? extends RefexVersionBI<?>> annotations = componentBi.getAnnotationsActive(mockVc);
-
-		for (RefexVersionBI annotation : annotations) {
+		for (RefexChronicleBI<?> loopAnnotation : annotations) {
+			RefexVersionBI annotation = loopAnnotation.getVersion(mockVc);
 			DrRefsetExtension extension = new DrRefsetExtension();
-			extension.setActive(true);
 			extension.setComponentUuid(tf.nidToUuid(annotation.getReferencedComponentNid()).toString());
 			extension.setRefsetUuid(tf.nidToUuid(annotation.getRefexNid()).toString());
 			extension.setPrimordialUuid(annotation.getPrimUuid().toString());
@@ -692,10 +590,10 @@ public class DrComponentHelper {
 			} else {
 				// unknown refset
 			}
-			if (description.getExtensions() == null) {
-				description.setExtensions(new ArrayList<DrRefsetExtension>());
+			if (component.getExtensions() == null) {
+				component.setExtensions(new ArrayList<DrRefsetExtension>());
 			}
-			description.getExtensions().add(extension);
+			component.getExtensions().add(extension);
 		}
 	}
 
