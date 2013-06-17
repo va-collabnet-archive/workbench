@@ -136,7 +136,7 @@ public class ExportAnnotatedBeans extends AbstractMojo implements ExceptionListe
      */
     private MavenSession session;
 
-    private String[] allowedGoals = new String[] { "install", "deploy", "export-beans" };
+    private String[] allowedGoals = new String[] { "install", "deploy", "package", "export-beans" };
 
     /**
      * Location of the build directory.
