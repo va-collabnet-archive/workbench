@@ -24,6 +24,7 @@ import java.util.logging.Logger;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.tapi.ComputationCanceled;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.helper.time.TimeHelper;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.NidBitSetBI;
 import org.ihtsdo.tk.api.TerminologyStoreDI;
@@ -33,6 +34,7 @@ import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.cs.ChangeSetPolicy;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.refset.RefsetComputer.ComputeType;
+import org.ihtsdo.tk.refset.persistance.PersistanceEngine;
 
 /**
  * The class ComputeFromSpec provides methods for computing and persisting a
@@ -55,7 +57,7 @@ public class ComputeFromSpec {
      * @throws Exception indicates an exception has occurred
      */
     public static Condition computeRefset(RefsetSpecQuery query, ViewCoordinate viewCoordinate,
-            EditCoordinate editCoordinate, int refsetNid, boolean writeChangesets)
+            EditCoordinate editCoordinate, int refsetNid,  ChangeSetPolicy csPolicy)
             throws Exception {
         Logger logger = Logger.getLogger(ComputeFromSpec.class.getName());
         TerminologyStoreDI ts = Ts.get();
@@ -80,7 +82,7 @@ public class ComputeFromSpec {
         RefsetSpec specHelper = new RefsetSpec(refsetConcept, true, viewCoordinate);
 
 
-        RefsetComputer computer;
+        RefsetComputer refsetComputer;
         Ts.get().suspendChangeNotifications();
 
         try {
@@ -101,28 +103,37 @@ public class ComputeFromSpec {
             // add the current members to the list of possible concepts to check (in case some need to be retired)
             possibleIds.or(currentMemberSet);
             logger.log(Level.INFO, ">>>>>>>>>> Search space (concept count): " + possibleIds.cardinality());
-            computer = new RefsetComputer(query, viewCoordinate, possibleIds, computeType, refsetNid, editCoordinate);
+            refsetComputer = new RefsetComputer(query, viewCoordinate, possibleIds, computeType);
+            long startTime = System.currentTimeMillis();
+            ts.iterateConceptDataInParallel(refsetComputer);
             logger.log(Level.INFO, ">>>>>>>>> Iterating concepts in parallel.");
-            computer.compute();
 
-            if (!computer.continueWork()) {
+            if (!refsetComputer.continueWork()) {
                 throw new ComputationCanceled("Computation cancelled");
             }
-
-            logger.log(Level.INFO, ">>>>>>>>> Finished computing spec - adding uncommitted.");
             specHelper.setLastComputeTime(System.currentTimeMillis(), editCoordinate);
-            computer.addUncommitted();
-
-            if (!computer.continueWork()) {
+            logger.log(Level.INFO, ">>>>>>>>> Finished computing spec.");
+            
+            logger.log(Level.INFO, ">>>>>>>>> Computing marked parents.");
+            NidBitSetBI memberNids = refsetComputer.getMemberNids();
+            MarkedParentComputer markedParentComputer = new MarkedParentComputer(memberNids, viewCoordinate);
+            ts.iterateConceptDataInParallel(markedParentComputer);
+            logger.log(Level.INFO, ">>>>>>>>> Finished computing marked parents.");
+            logger.log(Level.INFO, ">>>>>>>>> Persisting results.");
+            PersistanceEngine persister = new PersistanceEngine(viewCoordinate, editCoordinate, refsetNid, true, csPolicy);
+            persister.persistRefsetAndMarkedParents(memberNids, markedParentComputer.getMarkedParentNids());
+            
+            long endTime = System.currentTimeMillis();
+            long elapsed = endTime - startTime;
+            String elapsedStr = TimeHelper.getElapsedTimeString(elapsed);
+            System.out.println("Total computation time: " + elapsedStr);
+            
+            if (!refsetComputer.continueWork()) {
                 throw new ComputationCanceled("Computation cancelled");
             }
 
-            logger.log(Level.INFO, ">>>>>>>>> Finished computing spec - committing.");
-            ChangeSetPolicy csPolicy = ChangeSetPolicy.OFF;
-            if(writeChangesets){
-                csPolicy = ChangeSetPolicy.INCREMENTAL;
-            }
-            ts.commit(csPolicy);
+            logger.log(Level.INFO, ">>>>>>>>> Finished");
+            
 
         } catch (ComputationCanceled e) {
         } catch (InterruptedException e) {

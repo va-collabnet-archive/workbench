@@ -108,10 +108,6 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
         
         try {
             ChangeSetPolicy csPolicy = configFrame.getDbConfig().getRefsetChangesChangeSetPolicy();
-                    boolean writeCs = true;
-                    if(csPolicy == ChangeSetPolicy.OFF){
-                        writeCs = false;
-                    }
             RefsetSpec refsetSpecHelper = new RefsetSpec(refset, true, vc);
             ConceptChronicleBI refsetSpec = refsetSpecHelper.getRefsetSpecConcept();
             AceLog.getAppLog().info("Refset: " + refset.toUserString() + " " + refset.getPrimUuid());
@@ -119,7 +115,7 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
                 AceLog.getAppLog().info("Refset not a spec refset: " + refset.toUserString());
                 if (!refset.getRefsetMembers().isEmpty()) {
                     AceLog.getAppLog().info("Refset has members. Will compute marked parents for members.");
-                    ComputeFromSpec.computeRefset(null, vc, ec, refset.getNid(), writeCs);
+                    ComputeFromSpec.computeRefset(null, vc, ec, refset.getNid(), csPolicy);
                 }
                 return Condition.ITEM_COMPLETE;
             }else{
@@ -160,7 +156,7 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
 
             AceLog.getAppLog().info("Start execution of refset spec : " + refsetSpec.toUserString());
             
-            Condition condition = ComputeFromSpec.computeRefset(query, vc, ec, refset.getNid(), writeCs);
+            Condition condition = ComputeFromSpec.computeRefset(query, vc, ec, refset.getNid(), csPolicy);
             if (!DwfaEnv.isHeadless()) {
                 Terms.get().getActiveAceFrameConfig().refreshRefsetTab();
             }
