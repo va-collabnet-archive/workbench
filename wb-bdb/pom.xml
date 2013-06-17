@@ -30,11 +30,6 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.ihtsdo</groupId>
-            <artifactId>tk-refset</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
             <groupId>org.apache.mahout</groupId>
             <artifactId>mahout-collections</artifactId>
             <version>1.0</version>

@@ -56,8 +56,8 @@ import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
-import org.ihtsdo.tk.refset.RefsetSpec;
-import org.ihtsdo.tk.refset.SpecRefsetHelper;
+import org.ihtsdo.tk.query.RefsetSpec;
+import org.ihtsdo.tk.query.helper.SpecRefsetHelper;
 
 public class RefsetSpecTreeMouseListener extends MouseAdapter {
 

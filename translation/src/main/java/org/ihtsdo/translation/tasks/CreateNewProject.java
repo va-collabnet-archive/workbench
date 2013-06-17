@@ -61,7 +61,7 @@ import org.ihtsdo.project.model.TranslationProject;
 import org.ihtsdo.project.model.WorkList;
 import org.ihtsdo.project.model.WorkSet;
 import org.ihtsdo.project.refset.partition.RefsetSplitter;
-import org.ihtsdo.tk.refset.SpecRefsetHelper;
+import org.ihtsdo.tk.query.helper.SpecRefsetHelper;
 
 /**
  * The Class CreateNewProject.

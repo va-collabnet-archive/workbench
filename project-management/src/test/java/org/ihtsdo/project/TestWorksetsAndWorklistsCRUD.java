@@ -60,7 +60,7 @@ import org.ihtsdo.project.refset.partition.IsDescendantOfPartitioner;
 import org.ihtsdo.project.refset.partition.QuantityPartitioner;
 import org.ihtsdo.project.refset.partition.RefsetSplitter;
 import org.ihtsdo.tk.api.Precedence;
-import org.ihtsdo.tk.refset.SpecRefsetHelper;
+import org.ihtsdo.tk.query.helper.SpecRefsetHelper;
 
 /**
  * The Class TestContextualizedDescriptions.

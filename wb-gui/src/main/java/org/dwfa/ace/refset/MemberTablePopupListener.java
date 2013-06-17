@@ -38,8 +38,8 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.table.refset.ReflexiveTableModel;
 import org.dwfa.ace.table.refset.StringWithExtTuple;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
-import org.ihtsdo.tk.refset.RefsetSpec;
-import org.ihtsdo.tk.refset.SpecRefsetHelper;
+import org.ihtsdo.tk.query.RefsetSpec;
+import org.ihtsdo.tk.query.helper.SpecRefsetHelper;
 
 public class MemberTablePopupListener extends MouseAdapter {
 

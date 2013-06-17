@@ -36,7 +36,7 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.task.util.DynamicWidthComboBox;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.ihtsdo.tk.api.NidSetBI;
-import org.ihtsdo.tk.refset.RefsetSpec;
+import org.ihtsdo.tk.query.RefsetSpec;
 
 /**
  * This panel allows the user to input data required for a new refset grouping

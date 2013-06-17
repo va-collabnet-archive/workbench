@@ -62,7 +62,7 @@ import java.util.UUID;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import org.ihtsdo.tk.api.NidSetBI;
-import org.ihtsdo.tk.refset.RefsetSpec;
+import org.ihtsdo.tk.query.RefsetSpec;
 
 /**
  * Creates meta data required for a new refset.

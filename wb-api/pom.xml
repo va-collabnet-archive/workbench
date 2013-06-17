@@ -73,7 +73,7 @@
         </dependency>
         <dependency>
             <groupId>org.ihtsdo</groupId>
-            <artifactId>tk-refset</artifactId>
+            <artifactId>tk-query</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

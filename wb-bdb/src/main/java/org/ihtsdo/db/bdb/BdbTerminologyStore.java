@@ -29,7 +29,6 @@ import org.ihtsdo.cs.ChangeSetWriterHandler;
 import org.ihtsdo.cs.econcept.EConceptChangeSetWriter;
 import org.ihtsdo.db.change.ChangeNotifier;
 import org.ihtsdo.helper.promote.TerminologyPromoterBI;
-import org.ihtsdo.helper.query.QueryBuilderBI;
 import org.ihtsdo.lucene.LuceneManager;
 import org.ihtsdo.lucene.SearchResult;
 import org.ihtsdo.lucene.WfHxIndexGenerator;
@@ -54,7 +53,6 @@ import org.ihtsdo.tk.contradiction.ContradictionIdentifierBI;
 import org.ihtsdo.tk.db.DbDependency;
 import org.ihtsdo.tk.db.EccsDependency;
 import org.ihtsdo.tk.dto.concept.component.TkRevision;
-import org.ihtsdo.tk.refset.QueryToSpecBuilder;
 import org.ihtsdo.tk.spec.ValidationException;
 import org.ihtsdo.tk.uuid.UuidFactory;
 
@@ -883,10 +881,6 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
         return false;
     }
     
-    @Override
-    public QueryBuilderBI getQueryBuilder(ViewCoordinate viewCoordinate){
-        return new QueryToSpecBuilder(viewCoordinate.getViewCoordinateWithAllStatusValues());
-    }
     
     @Override
      public TerminologyPromoterBI getTerminologyPromoter(ViewCoordinate sourceViewCoordinate, EditCoordinate sourceEditCoordinate,

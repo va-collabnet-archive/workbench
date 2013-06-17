@@ -61,8 +61,8 @@ import org.ihtsdo.time.TimeUtil;
 import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
-import org.ihtsdo.tk.refset.RefsetSpec;
-import org.ihtsdo.tk.refset.RefsetSpecFactory;
+import org.ihtsdo.tk.query.RefsetSpec;
+import org.ihtsdo.tk.query.RefsetSpecFactory;
 
 public class TupleFileUtil {
 

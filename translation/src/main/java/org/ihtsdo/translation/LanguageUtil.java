@@ -90,7 +90,7 @@ import org.ihtsdo.translation.ui.SimpleTranslationConceptEditor;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
-import org.ihtsdo.tk.refset.SpecRefsetHelper;
+import org.ihtsdo.tk.query.helper.SpecRefsetHelper;
 
 /**
  * The Class LanguageUtil.

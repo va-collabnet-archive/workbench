@@ -62,8 +62,8 @@ import javax.swing.JTree;
 import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
-import org.ihtsdo.tk.refset.RefsetSpec;
-import org.ihtsdo.tk.refset.SpecRefsetHelper;
+import org.ihtsdo.tk.query.RefsetSpec;
+import org.ihtsdo.tk.query.helper.SpecRefsetHelper;
 
 public abstract class AbstractAddRefsetSpecTask extends AbstractTask {
    private static final int dataVersion = 4;

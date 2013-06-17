@@ -35,7 +35,7 @@ import org.dwfa.bpa.tasks.AbstractTask;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
-import org.ihtsdo.tk.refset.SpecMarkedParentRefsetHelper;
+import org.ihtsdo.tk.query.helper.SpecMarkedParentRefsetHelper;
 
 /**
  * Picks up a refset concept from a property and sets into the users

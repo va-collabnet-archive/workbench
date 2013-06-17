@@ -27,7 +27,7 @@ import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.ihtsdo.project.TerminologyProjectDAO;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
-import org.ihtsdo.tk.refset.SpecRefsetHelper;
+import org.ihtsdo.tk.query.helper.SpecRefsetHelper;
 
 /**
  * The Class RefsetMemberValueMgr.

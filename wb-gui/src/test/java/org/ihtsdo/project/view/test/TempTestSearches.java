@@ -47,10 +47,10 @@ import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.project.refset.LanguageMembershipRefset;
 import org.ihtsdo.project.refset.LanguageSpecRefset;
 import org.ihtsdo.tk.api.PathBI;
-import org.ihtsdo.tk.refset.RefsetComputer.ComputeType;
-import org.ihtsdo.tk.refset.RefsetSpecFactory;
-import org.ihtsdo.tk.refset.RefsetSpecQuery;
-import org.ihtsdo.tk.refset.SpecRefsetHelper;
+import org.ihtsdo.tk.query.RefsetComputer.ComputeType;
+import org.ihtsdo.tk.query.RefsetSpecFactory;
+import org.ihtsdo.tk.query.RefsetSpecQuery;
+import org.ihtsdo.tk.query.helper.SpecRefsetHelper;
 
 /**
  * The Class TestContextualizedDescriptions.

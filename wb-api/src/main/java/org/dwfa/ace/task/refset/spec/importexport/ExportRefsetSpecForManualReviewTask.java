@@ -60,8 +60,8 @@ import org.dwfa.util.bean.Spec;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
-import org.ihtsdo.tk.refset.RefsetSpec;
-import org.ihtsdo.tk.refset.SpecRefsetHelper;
+import org.ihtsdo.tk.query.RefsetSpec;
+import org.ihtsdo.tk.query.helper.SpecRefsetHelper;
 
 /**
  * Exports the refset currently in the refset spec panel to the specified file,

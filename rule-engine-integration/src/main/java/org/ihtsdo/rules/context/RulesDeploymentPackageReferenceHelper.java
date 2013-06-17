@@ -50,8 +50,8 @@ import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.refex.type_string.RefexStringVersionBI;
-import org.ihtsdo.tk.refset.SpecMarkedParentRefsetHelper;
-import org.ihtsdo.tk.refset.SpecRefsetHelper;
+import org.ihtsdo.tk.query.helper.SpecMarkedParentRefsetHelper;
+import org.ihtsdo.tk.query.helper.SpecRefsetHelper;
 
 /**
  * The Class RulesDeploymentPackageReferenceHelper.

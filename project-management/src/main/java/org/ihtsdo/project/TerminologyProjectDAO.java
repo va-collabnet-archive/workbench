@@ -123,7 +123,7 @@ import org.ihtsdo.tk.workflow.api.WfFilterBI;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.json.JettisonMappedXmlDriver;
-import org.ihtsdo.tk.refset.SpecRefsetHelper;
+import org.ihtsdo.tk.query.helper.SpecRefsetHelper;
 
 /**
  * The Class TerminologyProjectDAO.

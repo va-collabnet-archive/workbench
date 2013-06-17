@@ -35,7 +35,7 @@ import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
-import org.ihtsdo.tk.refset.RefsetSpec;
+import org.ihtsdo.tk.query.RefsetSpec;
 
 /**
  * Tests if the refset spec contains a negated OR. These aren't allowed due to

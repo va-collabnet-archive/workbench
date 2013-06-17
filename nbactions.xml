@@ -29,4 +29,17 @@
                 <Env.MAVEN_OPTS>-ea -XX:MaxPermSize=256M -d64 -XX:+UseCompressedOops -Xmx4g -Xms2g</Env.MAVEN_OPTS>
             </properties>
         </action>
+        <action>
+            <actionName>CUSTOM-clean install no tests</actionName>
+            <displayName>clean install no tests</displayName>
+            <goals>
+                <goal>clean</goal>
+                <goal>install</goal>
+                <goal>-e</goal>
+            </goals>
+            <properties>
+                <Env.MAVEN_OPTS>-ea -XX:MaxPermSize=256M -d64 -XX:+UseCompressedOops -Xmx4g -Xms2g</Env.MAVEN_OPTS>
+                <skipTests>true</skipTests>
+            </properties>
+        </action>
     </actions>

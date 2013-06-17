@@ -53,7 +53,7 @@ import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
-import org.ihtsdo.tk.refset.RefsetSpec;
+import org.ihtsdo.tk.query.RefsetSpec;
 
 /**
  * The RefreshRefsetSpecCompareTask uses the information

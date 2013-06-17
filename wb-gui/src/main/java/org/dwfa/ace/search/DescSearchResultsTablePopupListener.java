@@ -71,7 +71,7 @@ import org.ihtsdo.taxonomy.model.NodePath;
 import org.ihtsdo.taxonomy.model.TaxonomyModel;
 import org.ihtsdo.taxonomy.nodes.RootNode;
 import org.ihtsdo.taxonomy.nodes.TaxonomyNode;
-import org.ihtsdo.tk.refset.RefsetSpec;
+import org.ihtsdo.tk.query.RefsetSpec;
 
 public class DescSearchResultsTablePopupListener extends MouseAdapter implements ActionListener {
    private ACE                ace;

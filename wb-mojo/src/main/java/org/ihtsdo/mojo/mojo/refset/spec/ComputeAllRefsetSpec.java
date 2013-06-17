@@ -35,7 +35,7 @@ import org.dwfa.cement.RefsetAuxiliary;
 import org.ihtsdo.mojo.maven.MojoUtil;
 import org.ihtsdo.mojo.mojo.ConceptDescriptor;
 import org.ihtsdo.tk.api.NidSetBI;
-import org.ihtsdo.tk.refset.RefsetSpec;
+import org.ihtsdo.tk.query.RefsetSpec;
 
 /**
  * Computes the membership of the specified refset spec.

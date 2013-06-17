@@ -40,7 +40,7 @@ import org.ihtsdo.project.ContextualizedDescription;
 import org.ihtsdo.project.TerminologyProjectDAO;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
-import org.ihtsdo.tk.refset.RefsetSpec;
+import org.ihtsdo.tk.query.RefsetSpec;
 //import org.ihtsdo.rf2.util.ExportUtil;
 
 /**

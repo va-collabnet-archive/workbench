@@ -26,7 +26,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import org.ihtsdo.helper.promote.TerminologyPromoterBI;
-import org.ihtsdo.helper.query.QueryBuilderBI;
 import org.ihtsdo.tk.api.blueprint.CreateOrAmendBlueprint;
 import org.ihtsdo.tk.api.conceptattribute.ConceptAttributeVersionBI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
@@ -990,12 +989,6 @@ public interface TerminologyStoreDI extends TerminologyDI {
      */
     boolean regenerateWfHxLuceneIndex(ViewCoordinate viewCoordinate) throws Exception;
     
-    /**
-     * Gets a query builder for getting results from a query.
-     * @param viewCoordinate the <code>ViewCoordinate</code> representing the end position of the query
-     * @return a <code>QueryBuilderBI</code> object based on the specified view coordinate.
-     */
-    QueryBuilderBI getQueryBuilder(ViewCoordinate viewCoordinate);
     /**
      * Promotes terminology from the path specified by the source view coordinate to the path specified by the target view coordinate.
      * Uses the metadata from the source edit coordinate to write to the target path. Use this method if the origin 

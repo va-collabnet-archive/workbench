@@ -27,7 +27,7 @@ import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.rf2.util.ExportUtil;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.Precedence;
-import org.ihtsdo.tk.refset.SpecRefsetHelper;
+import org.ihtsdo.tk.query.helper.SpecRefsetHelper;
 
 public class ContextualizedDescription implements I_ContextualizeDescription {
 	private int descId;

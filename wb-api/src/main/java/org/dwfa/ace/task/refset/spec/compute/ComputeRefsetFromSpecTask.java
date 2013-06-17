@@ -47,11 +47,11 @@ import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.cs.ChangeSetPolicy;
-import org.ihtsdo.tk.refset.RefsetSpec;
-import org.ihtsdo.tk.refset.ComputeFromSpec;
-import org.ihtsdo.tk.refset.RefsetSpecFactory;
-import org.ihtsdo.tk.refset.RefsetSpecQuery;
-import org.ihtsdo.tk.refset.RefsetComputer.ComputeType;
+import org.ihtsdo.tk.query.RefsetSpec;
+import org.ihtsdo.tk.query.ComputeFromSpec;
+import org.ihtsdo.tk.query.RefsetSpecFactory;
+import org.ihtsdo.tk.query.RefsetSpecQuery;
+import org.ihtsdo.tk.query.RefsetComputer.ComputeType;
 
 /**
  * Computes the members of a refset given a refset spec. This refset spec is the
