@@ -43,7 +43,7 @@ import javax.swing.JTree;
 import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultMutableTreeNode;
 import org.ihtsdo.tk.query.RefsetSpec;
-import org.ihtsdo.tk.query.helper.SpecRefsetHelper;
+import org.ihtsdo.tk.query.helper.RefsetHelper;
 
 @BeanList(specs = { @Spec(
    directory = "tasks/refset/spec",
@@ -93,7 +93,7 @@ public class AddTopLevelOr extends AbstractTask {
             int               componentId  = specRefsetId;
             I_TermFactory     tf           = Terms.get();
             RefsetPropertyMap propMap      = getRefsetPropertyMap(tf, configFrame);
-            SpecRefsetHelper helper = new SpecRefsetHelper(configFrame.getViewCoordinate(), configFrame.getEditCoordinate());
+            RefsetHelper helper = new RefsetHelper(configFrame.getViewCoordinate(), configFrame.getEditCoordinate());
             I_ExtendByRef     ext = (I_ExtendByRef) helper.newConceptRefsetExtension(
                        specRefsetId, componentId, propMap.getMemberType().getTypeNid());
 

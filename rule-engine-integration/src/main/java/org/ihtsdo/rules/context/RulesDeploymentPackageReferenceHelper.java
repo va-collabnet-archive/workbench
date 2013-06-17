@@ -50,8 +50,8 @@ import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.refex.type_string.RefexStringVersionBI;
-import org.ihtsdo.tk.query.helper.SpecMarkedParentRefsetHelper;
-import org.ihtsdo.tk.query.helper.SpecRefsetHelper;
+import org.ihtsdo.tk.query.helper.MarkedParentRefsetHelper;
+import org.ihtsdo.tk.query.helper.RefsetHelper;
 
 /**
  * The Class RulesDeploymentPackageReferenceHelper.
@@ -120,7 +120,7 @@ public class RulesDeploymentPackageReferenceHelper {
 
 			rulesPackage.setUuids(newConcept.getUids());
 			String stringExtValue = url;
-                        SpecRefsetHelper helper = new SpecRefsetHelper(config.getViewCoordinate(), config.getEditCoordinate());
+                        RefsetHelper helper = new RefsetHelper(config.getViewCoordinate(), config.getEditCoordinate());
                         helper.newStringRefsetExtension(rulesPackagesRefset.getConceptNid(), newConcept.getConceptNid(), stringExtValue);
 
 			termFactory.addUncommittedNoChecks(newConcept);

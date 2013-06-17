@@ -72,7 +72,7 @@ import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
-import org.ihtsdo.tk.query.helper.SpecRefsetHelper;
+import org.ihtsdo.tk.query.helper.RefsetHelper;
 
 /**
  * The Class DroolsEnumUpdatePanel.
@@ -211,7 +211,7 @@ public class DroolsEnumUpdatePanel extends JPanel {
 
 						if (newMember) {
 							// is new member
-                                                        SpecRefsetHelper helper = new SpecRefsetHelper(config.getViewCoordinate(), config.getEditCoordinate());
+                                                        RefsetHelper helper = new RefsetHelper(config.getViewCoordinate(), config.getEditCoordinate());
                                                         helper.newConceptRefsetExtension(selectedRefset.getConceptNid(), member.getConceptNid(), member.getConceptNid());
 							tf.addUncommittedNoChecks(selectedRefset);
 							tf.addUncommittedNoChecks(member);

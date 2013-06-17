@@ -33,7 +33,7 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
-import org.ihtsdo.tk.query.helper.SpecRefsetHelper;
+import org.ihtsdo.tk.query.helper.RefsetHelper;
 
 @BeanList(specs = { @Spec(directory = "tasks/ide/refset/membership", type = BeanType.TASK_BEAN) })
 public class AddConceptToRefset extends AbstractTask {
@@ -95,7 +95,7 @@ public class AddConceptToRefset extends AbstractTask {
                 "Adding concept '" + member.getInitialText() + "' as member of refset '" + refset.getInitialText()
                     + "' with a value '" + value.getInitialText() + "'.");
 
-            SpecRefsetHelper helper = new SpecRefsetHelper(Terms.get().getActiveAceFrameConfig().getViewCoordinate(),
+            RefsetHelper helper = new RefsetHelper(Terms.get().getActiveAceFrameConfig().getViewCoordinate(),
                     Terms.get().getActiveAceFrameConfig().getEditCoordinate());
             helper.newConceptRefsetExtension(refset.getConceptNid(), member.getConceptNid(), value.getConceptNid());
 

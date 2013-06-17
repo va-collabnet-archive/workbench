@@ -63,7 +63,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 import org.ihtsdo.tk.query.RefsetSpec;
-import org.ihtsdo.tk.query.helper.SpecRefsetHelper;
+import org.ihtsdo.tk.query.helper.RefsetHelper;
 
 public abstract class AbstractAddRefsetSpecTask extends AbstractTask {
    private static final int dataVersion = 4;
@@ -147,7 +147,7 @@ public abstract class AbstractAddRefsetSpecTask extends AbstractTask {
                      String msg = "Unable to add to spec. No concept is selected in taxonomy.";
                      JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null), msg);
                  } else {
-                     SpecRefsetHelper helper = new SpecRefsetHelper(configFrame.getViewCoordinate(), configFrame.getEditCoordinate());
+                     RefsetHelper helper = new RefsetHelper(configFrame.getViewCoordinate(), configFrame.getEditCoordinate());
                      I_ExtendByRef ext = null;
                      if (propMap.containsKey(RefsetPropertyMap.REFSET_PROPERTY.CID_THREE)) {
                          ext = (I_ExtendByRef) helper.newConceptConceptConceptRefsetExtension(

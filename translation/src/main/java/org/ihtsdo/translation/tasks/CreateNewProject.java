@@ -61,7 +61,7 @@ import org.ihtsdo.project.model.TranslationProject;
 import org.ihtsdo.project.model.WorkList;
 import org.ihtsdo.project.model.WorkSet;
 import org.ihtsdo.project.refset.partition.RefsetSplitter;
-import org.ihtsdo.tk.query.helper.SpecRefsetHelper;
+import org.ihtsdo.tk.query.helper.RefsetHelper;
 
 /**
  * The Class CreateNewProject.
@@ -184,7 +184,7 @@ public class CreateNewProject extends AbstractTask {
 					config.getConflictResolutionStrategy());
 			//TODO review!!
 			I_GetConceptData refset = tf.getConcept(RefsetAuxiliary.Concept.REFSET_TYPE.getUids());
-                        SpecRefsetHelper helper = new SpecRefsetHelper(config.getViewCoordinate(), config.getEditCoordinate());
+                        RefsetHelper helper = new RefsetHelper(config.getViewCoordinate(), config.getEditCoordinate());
 			for (I_RelTuple rel : relationships) {
 				I_GetConceptData member = tf.getConcept(rel.getC1Id());
                                 helper.newConceptRefsetExtension(refset.getConceptNid(), 

@@ -41,7 +41,7 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
-import org.ihtsdo.tk.query.helper.SpecRefsetHelper;
+import org.ihtsdo.tk.query.helper.RefsetHelper;
 
 /**
  * Adds a single concept as a member of the working refset
@@ -122,7 +122,7 @@ public class ImportRefsetFromFile extends AbstractTask {
 
 //            I_HelpMemberRefsets refsetHelper = Terms.get().getMemberRefsetHelper(Terms.get().getActiveAceFrameConfig(),
 //                    refset.getConceptNid(), value.getConceptNid());
-            SpecRefsetHelper refsetHelper = new SpecRefsetHelper(Terms.get().getActiveAceFrameConfig().getViewCoordinate(),
+            RefsetHelper refsetHelper = new RefsetHelper(Terms.get().getActiveAceFrameConfig().getViewCoordinate(),
                     Terms.get().getActiveAceFrameConfig().getEditCoordinate());
 
             // Find existing members of the refset that are not in the import

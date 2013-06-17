@@ -1,11 +1,6 @@
 package org.ihtsdo.tk.query.helper;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 import java.util.logging.Logger;
 import org.dwfa.cement.RefsetAuxiliary;
 
@@ -24,16 +19,19 @@ import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.dto.concept.component.refex.TK_REFEX_TYPE;
 
 @AllowDataCheckSuppression
-public class SpecRefsetHelper {
+/**
+ * The class RefsetHelper contains convenience methods for creating refset membership.
+ */
+public class RefsetHelper {
 
     protected Set<PathBI> editPaths;
-    private Logger logger = Logger.getLogger(SpecRefsetHelper.class.getName());
+    private Logger logger = Logger.getLogger(RefsetHelper.class.getName());
     private EditCoordinate ec;
     protected ViewCoordinate vc;
     protected TerminologyStoreDI ts;
     private TerminologyBuilderBI builder;
 
-    public SpecRefsetHelper(ViewCoordinate viewCoordinate, EditCoordinate editCoordinate) throws Exception {
+    public RefsetHelper(ViewCoordinate viewCoordinate, EditCoordinate editCoordinate) throws Exception {
         this.ec = editCoordinate;
         this.vc = viewCoordinate;
         this.ts = Ts.get();

@@ -68,7 +68,7 @@ import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.conceptattribute.ConceptAttributeVersionBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
-import org.ihtsdo.tk.query.helper.SpecRefsetHelper;
+import org.ihtsdo.tk.query.helper.RefsetHelper;
 
 /**
  * The Class RulesContextHelper.
@@ -402,7 +402,7 @@ public class RulesContextHelper {
 
 			if (currentRolePart == null && newRole != null) {
 				//new member in context refset
-                                SpecRefsetHelper helper = new SpecRefsetHelper(config.getViewCoordinate(), config.getEditCoordinate());
+                                RefsetHelper helper = new RefsetHelper(config.getViewCoordinate(), config.getEditCoordinate());
                                 helper.newConceptStringRefsetExtension(contextRefset.getConceptNid(), context.getConceptNid(),
                                         newRole.getConceptNid(), ruleUid);
 				tf.addUncommittedNoChecks(contextRefset);

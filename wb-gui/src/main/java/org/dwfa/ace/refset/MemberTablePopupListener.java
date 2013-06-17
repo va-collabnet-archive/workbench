@@ -39,7 +39,7 @@ import org.dwfa.ace.table.refset.ReflexiveTableModel;
 import org.dwfa.ace.table.refset.StringWithExtTuple;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.query.RefsetSpec;
-import org.ihtsdo.tk.query.helper.SpecRefsetHelper;
+import org.ihtsdo.tk.query.helper.RefsetHelper;
 
 public class MemberTablePopupListener extends MouseAdapter {
 
@@ -58,7 +58,7 @@ public class MemberTablePopupListener extends MouseAdapter {
             if (commentText != null && commentText.length() > 2) {
                 try {
                     I_GetConceptData refsetIdentityConcept = config.getRefsetInSpecEditor();
-                    SpecRefsetHelper refsetHelper = new SpecRefsetHelper(config.getViewCoordinate(), config.getEditCoordinate());
+                    RefsetHelper refsetHelper = new RefsetHelper(config.getViewCoordinate(), config.getEditCoordinate());
                     RefsetSpec specHelper = new RefsetSpec(refsetIdentityConcept, true, config.getViewCoordinate());
                     Collection<? extends ConceptVersionBI> commentRefsets = 
                     	specHelper.getCommentsRefsetConcepts();

@@ -61,7 +61,7 @@ import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.query.RefsetSpec;
-import org.ihtsdo.tk.query.helper.SpecRefsetHelper;
+import org.ihtsdo.tk.query.helper.RefsetHelper;
 
 /**
  * Exports the refset currently in the refset spec panel to the specified file,

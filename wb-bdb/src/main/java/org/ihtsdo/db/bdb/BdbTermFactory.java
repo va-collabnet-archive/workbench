@@ -156,7 +156,7 @@ import com.sleepycat.je.DatabaseException;
 import org.ihtsdo.db.change.ChangeNotifier;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
-import org.ihtsdo.tk.query.helper.SpecRefsetHelper;
+import org.ihtsdo.tk.query.helper.RefsetHelper;
 
 public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_Search {
 
@@ -166,7 +166,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     private File envHome;
     private HashMap<Integer, KnowledgeBase> knowledgeBaseCache;
     private BdbPathManager pathManager;
-    SpecRefsetHelper specRefsetHelper;
+    RefsetHelper specRefsetHelper;
 
     //~--- methods -------------------------------------------------------------
     @Override

@@ -27,16 +27,19 @@ import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 
-public class SpecMarkedParentRefsetHelper extends SpecRefsetHelper{
+/**
+ * The class SpecMarkedParentRefsetHelper contains methods for working with marked parents.
+ */
+public class MarkedParentRefsetHelper extends RefsetHelper{
 
-    private static final Logger logger = Logger.getLogger(SpecMarkedParentRefsetHelper.class.getName());
+    private static final Logger logger = Logger.getLogger(MarkedParentRefsetHelper.class.getName());
     private int refsetId;
     private int parentRefsetId;
     private int parentMemberTypeId;
     Collection<Integer> markedParentNids;
     Collection<Integer> refsetMemberNids;
 
-    public SpecMarkedParentRefsetHelper(ViewCoordinate viewCoordinate, EditCoordinate editCoordinate, int refsetId) throws Exception {
+    public MarkedParentRefsetHelper(ViewCoordinate viewCoordinate, EditCoordinate editCoordinate, int refsetId) throws Exception {
         super(viewCoordinate, editCoordinate);
         this.refsetId = refsetId;
         this.parentMemberTypeId =

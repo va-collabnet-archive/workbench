@@ -33,7 +33,7 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
-import org.ihtsdo.tk.query.helper.SpecRefsetHelper;
+import org.ihtsdo.tk.query.helper.RefsetHelper;
 
 @BeanList(specs = { @Spec(directory = "tasks/ide/refset/membership", type = BeanType.TASK_BEAN) })
 public class RemoveConceptFromRefset extends AbstractTask {
@@ -94,7 +94,7 @@ public class RemoveConceptFromRefset extends AbstractTask {
             getLogger().info(
                 "Removing concept '" + member.getInitialText() + "' as a '" + value.getInitialText()
                     + "' from refset '" + refset.getInitialText() + "'.");
-            SpecRefsetHelper helper = new SpecRefsetHelper(Terms.get().getActiveAceFrameConfig().getViewCoordinate(),
+            RefsetHelper helper = new RefsetHelper(Terms.get().getActiveAceFrameConfig().getViewCoordinate(),
                     Terms.get().getActiveAceFrameConfig().getEditCoordinate());
             helper.retireRefsetExtension(refset.getConceptNid(), member.getConceptNid(), value.getConceptNid());
 

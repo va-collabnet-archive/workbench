@@ -43,7 +43,7 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
-import org.ihtsdo.tk.query.helper.SpecRefsetHelper;
+import org.ihtsdo.tk.query.helper.RefsetHelper;
 
 @BeanList(specs = { @Spec(directory = "tasks/ide/refset/membership", type = BeanType.TASK_BEAN) })
 public class RefreshMemberRefsetUsingListViewConcepts extends AbstractTask {
@@ -123,7 +123,7 @@ public class RefreshMemberRefsetUsingListViewConcepts extends AbstractTask {
                 newMembers.add(model.getElementAt(i));
             }
 
-            SpecRefsetHelper helper = new SpecRefsetHelper(config.getViewCoordinate(), config.getEditCoordinate());
+            RefsetHelper helper = new RefsetHelper(config.getViewCoordinate(), config.getEditCoordinate());
             for(I_GetConceptData c : newMembers){
                 helper.newConceptRefsetExtension(refset.getConceptNid(), c.getNid(), value.getConceptNid());    
             }

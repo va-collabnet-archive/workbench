@@ -35,7 +35,7 @@ import org.dwfa.bpa.tasks.AbstractTask;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
-import org.ihtsdo.tk.query.helper.SpecMarkedParentRefsetHelper;
+import org.ihtsdo.tk.query.helper.MarkedParentRefsetHelper;
 
 /**
  * Picks up a refset concept from a property and sets into the users
@@ -95,7 +95,7 @@ public class SelectWorkingRefset extends AbstractTask {
             refsetsToShow.add(refset.getConceptNid());
 
             // view ancillary refsets
-            SpecMarkedParentRefsetHelper parentHelper = new SpecMarkedParentRefsetHelper(config.getViewCoordinate(), config.getEditCoordinate(), refset.getConceptNid());
+            MarkedParentRefsetHelper parentHelper = new MarkedParentRefsetHelper(config.getViewCoordinate(), config.getEditCoordinate(), refset.getConceptNid());
             int parentRefsetId = parentHelper.getParentRefsetNid();
             refsetsToShow.add(parentRefsetId);
 

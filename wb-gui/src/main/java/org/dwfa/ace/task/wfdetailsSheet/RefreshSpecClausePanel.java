@@ -82,7 +82,7 @@ import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.dto.concept.component.refex.TK_REFEX_TYPE;
 import org.ihtsdo.tk.query.RefsetSpec;
-import org.ihtsdo.tk.query.helper.SpecRefsetHelper;
+import org.ihtsdo.tk.query.helper.RefsetHelper;
 
 public class RefreshSpecClausePanel extends JPanel implements ActionListener {
 
@@ -114,7 +114,7 @@ public class RefreshSpecClausePanel extends JPanel implements ActionListener {
 
     private HostProxy host = new HostProxy();
 
-    private SpecRefsetHelper refsetHelper;
+    private RefsetHelper refsetHelper;
 
     @SuppressWarnings("unchecked")
     public RefreshSpecClausePanel(I_GetConceptData refsetIdentityConcept, PositionSetReadOnly refsetSpecVersionSet,
@@ -125,7 +125,7 @@ public class RefreshSpecClausePanel extends JPanel implements ActionListener {
         replacementConceptLabel = new ArrayList<TermComponentLabel>();
         replacementConceptLabel.add(new TermComponentLabel(frameConfig));
 
-        this.refsetHelper = new SpecRefsetHelper(frameConfig.getViewCoordinate(), frameConfig.getEditCoordinate());
+        this.refsetHelper = new RefsetHelper(frameConfig.getViewCoordinate(), frameConfig.getEditCoordinate());
         RefsetSpec specHelper = new RefsetSpec((ConceptChronicleBI) refsetIdentityConcept, true, frameConfig.getViewCoordinate());
         this.refsetSpec = (I_GetConceptData) specHelper.getRefsetSpecConcept();
         this.refsetSpecVersionSet = refsetSpecVersionSet;

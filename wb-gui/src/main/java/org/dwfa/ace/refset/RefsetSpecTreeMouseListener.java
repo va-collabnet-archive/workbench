@@ -57,7 +57,7 @@ import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.query.RefsetSpec;
-import org.ihtsdo.tk.query.helper.SpecRefsetHelper;
+import org.ihtsdo.tk.query.helper.RefsetHelper;
 
 public class RefsetSpecTreeMouseListener extends MouseAdapter {
 
@@ -402,7 +402,7 @@ public class RefsetSpecTreeMouseListener extends MouseAdapter {
                 try {
                     I_GetConceptData refsetIdentityConcept = aceConfig.getRefsetInSpecEditor();
                     RefsetSpec refsetSpecHelper = new RefsetSpec(refsetIdentityConcept, true, aceConfig.getViewCoordinate());
-                    SpecRefsetHelper refsetHelper = new SpecRefsetHelper(aceConfig.getViewCoordinate(), aceConfig.getEditCoordinate());
+                    RefsetHelper refsetHelper = new RefsetHelper(aceConfig.getViewCoordinate(), aceConfig.getEditCoordinate());
                     Collection<? extends ConceptVersionBI> commentRefsets = refsetSpecHelper.getCommentsRefsetConcepts();
                     if (commentRefsets.size() > 0) {
                         for (ConceptChronicleBI commentRefsetIdentityConcept : commentRefsets) {
@@ -552,7 +552,7 @@ public class RefsetSpecTreeMouseListener extends MouseAdapter {
             I_GetConceptData editTimeConcept = (I_GetConceptData) refsetSpec.getEditConcept();
 
             if (specConcept != null && editTimeConcept != null) {
-                SpecRefsetHelper helper = new SpecRefsetHelper(aceConfig.getViewCoordinate(), aceConfig.getEditCoordinate());
+                RefsetHelper helper = new RefsetHelper(aceConfig.getViewCoordinate(), aceConfig.getEditCoordinate());
                 helper.newLongRefsetExtension(editTimeConcept.getConceptNid(), specConcept.getConceptNid(), System
                     .currentTimeMillis());
     }

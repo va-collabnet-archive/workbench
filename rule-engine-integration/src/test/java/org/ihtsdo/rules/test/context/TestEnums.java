@@ -45,7 +45,7 @@ import org.ihtsdo.rules.context.RulesContextHelper;
 import org.ihtsdo.rules.context.RulesDeploymentPackageReference;
 import org.ihtsdo.rules.context.RulesDeploymentPackageReferenceHelper;
 import org.ihtsdo.tk.api.Precedence;
-import org.ihtsdo.tk.query.helper.SpecRefsetHelper;
+import org.ihtsdo.tk.query.helper.RefsetHelper;
 
 /**
  * The Class TestEnums.
@@ -117,7 +117,7 @@ public class TestEnums extends TestCase {
 				ArchitectonicAuxiliary.Concept.GUVNOR_ENUM_PROPERTY_DESC_TYPE.getUids());
 		tf.newDescription(UUID.randomUUID(), refset, "en", "DrConcept.primordialUuid",
 				guvnorType, config);
-		SpecRefsetHelper helper = new SpecRefsetHelper(config.getViewCoordinate(), config.getEditCoordinate());
+		RefsetHelper helper = new RefsetHelper(config.getViewCoordinate(), config.getEditCoordinate());
                 helper.newConceptRefsetExtension(refset.getConceptNid(), 
 				pneumonitis.getConceptNid(), pneumonitis.getConceptNid());
                 helper.newConceptRefsetExtension(refset.getConceptNid(), 

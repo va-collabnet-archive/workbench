@@ -48,7 +48,7 @@ import org.dwfa.cement.RefsetAuxiliary;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
-import org.ihtsdo.tk.query.helper.SpecRefsetHelper;
+import org.ihtsdo.tk.query.helper.RefsetHelper;
 
 /**
  * Compare two version of SNOMED
@@ -218,7 +218,7 @@ public class VersionDiff extends DiffBase {
     private void addToRefset(int concept_id, int change_id, String comment)
             throws Exception {
         I_TermFactory tf = Terms.get();
-        SpecRefsetHelper helper = new SpecRefsetHelper(tf.getActiveAceFrameConfig().getViewCoordinate(), tf.getActiveAceFrameConfig().getEditCoordinate());
+        RefsetHelper helper = new RefsetHelper(tf.getActiveAceFrameConfig().getViewCoordinate(), tf.getActiveAceFrameConfig().getEditCoordinate());
         if (!noop) {
             // refset_map.put(REFSET_PROPERTY.CID_ONE, concept_id);
             // refset_map.put(REFSET_PROPERTY.CID_TWO, change_id);

@@ -44,7 +44,7 @@ import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
-import org.ihtsdo.tk.query.helper.SpecRefsetHelper;
+import org.ihtsdo.tk.query.helper.RefsetHelper;
 
 /**
  * The Class ContextualizedDescription.
@@ -418,7 +418,7 @@ public class ContextualizedDescription implements I_ContextualizeDescription {
         I_GetConceptData acceptabilityConcept = tf.getConcept(SnomedMetadataRf2.ACCEPTABLE_RF2.getLenient().getNid());
         I_GetConceptData languagerefsetConcept = tf.getConcept(languageRefsetId);
         
-        SpecRefsetHelper refsetHelper = new SpecRefsetHelper(config.getViewCoordinate(), config.getEditCoordinate());
+        RefsetHelper refsetHelper = new RefsetHelper(config.getViewCoordinate(), config.getEditCoordinate());
         refsetHelper.newConceptRefsetExtension(languageRefsetId, newDescription.getDescId(), acceptabilityConcept.getConceptNid());
 
         AceLog.getAppLog().info("addUncommittedNoChecks fired");
@@ -459,7 +459,7 @@ public class ContextualizedDescription implements I_ContextualizeDescription {
             }
             return newContextualizedDescription;
         } else {
-            SpecRefsetHelper refsetHelper = new SpecRefsetHelper(config.getViewCoordinate(), config.getEditCoordinate());
+            RefsetHelper refsetHelper = new RefsetHelper(config.getViewCoordinate(), config.getEditCoordinate());
             refsetHelper.newConceptRefsetExtension(newLanguageRefsetId, descId, acceptabilityId);
 
             for (I_ExtendByRef extension : tf.getAllExtensionsForComponent(descId, true)) {

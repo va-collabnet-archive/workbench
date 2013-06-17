@@ -50,7 +50,7 @@ import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.query.RefsetComputer.ComputeType;
 import org.ihtsdo.tk.query.RefsetSpecFactory;
 import org.ihtsdo.tk.query.RefsetSpecQuery;
-import org.ihtsdo.tk.query.helper.SpecRefsetHelper;
+import org.ihtsdo.tk.query.helper.RefsetHelper;
 
 /**
  * The Class TestContextualizedDescriptions.
@@ -127,7 +127,7 @@ public class TempTestSearches extends TestCase {
             List<? extends I_RelTuple> relationships = rootConcept.getDestRelTuples(config.getAllowedStatus(),
                     allowedTypes, config.getViewPositionSetReadOnly(), config.getPrecedence(), config.getConflictResolutionStrategy());
             I_GetConceptData refset = tf.getConcept(RefsetAuxiliary.Concept.GB_UKTC_CAB.getUids());
-            SpecRefsetHelper helper = new SpecRefsetHelper(config.getViewCoordinate(), config.getEditCoordinate());
+            RefsetHelper helper = new RefsetHelper(config.getViewCoordinate(), config.getEditCoordinate());
             for (I_RelTuple rel : relationships) {
                 I_GetConceptData member = tf.getConcept(rel.getC1Id());
                 helper.newConceptRefsetExtension(refset.getConceptNid(), member.getConceptNid(), member.getConceptNid());

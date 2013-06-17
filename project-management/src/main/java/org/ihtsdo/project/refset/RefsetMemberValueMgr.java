@@ -27,7 +27,7 @@ import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.ihtsdo.project.TerminologyProjectDAO;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
-import org.ihtsdo.tk.query.helper.SpecRefsetHelper;
+import org.ihtsdo.tk.query.helper.RefsetHelper;
 
 /**
  * The Class RefsetMemberValueMgr.
@@ -101,7 +101,7 @@ public class RefsetMemberValueMgr {
         }
 
         if (!alreadyMember) {
-            SpecRefsetHelper helper = new SpecRefsetHelper(config.getViewCoordinate(), config.getEditCoordinate());
+            RefsetHelper helper = new RefsetHelper(config.getViewCoordinate(), config.getEditCoordinate());
             helper.newConceptRefsetExtension(refsetId, conceptMemberId, memberType);
 
             for (I_ExtendByRef extension : termFactory.getRefsetExtensionMembers(refsetConcept.getConceptNid())) {

@@ -44,7 +44,7 @@ import org.dwfa.util.bean.Spec;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.NidBitSetBI;
 import org.ihtsdo.tk.api.NidBitSetItrBI;
-import org.ihtsdo.tk.query.helper.SpecRefsetHelper;
+import org.ihtsdo.tk.query.helper.RefsetHelper;
 
 @BeanList(specs = { @Spec(directory = "tasks/ide/refset/membership", type = BeanType.TASK_BEAN) })
 public class AddListViewConceptsToRefset extends AbstractTask {
@@ -107,7 +107,7 @@ public class AddListViewConceptsToRefset extends AbstractTask {
             }
 
             getLogger().info("Adding concepts from list view to refset");
-            SpecRefsetHelper helper = new SpecRefsetHelper(config.getViewCoordinate(), config.getEditCoordinate());
+            RefsetHelper helper = new RefsetHelper(config.getViewCoordinate(), config.getEditCoordinate());
             for(I_GetConceptData member : newMembers){
                 helper.newConceptRefsetExtension(refset.getConceptNid(), member.getConceptNid(), value.getConceptNid());
             }

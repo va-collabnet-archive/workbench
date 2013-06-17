@@ -90,7 +90,7 @@ import org.ihtsdo.translation.ui.SimpleTranslationConceptEditor;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
-import org.ihtsdo.tk.query.helper.SpecRefsetHelper;
+import org.ihtsdo.tk.query.helper.RefsetHelper;
 
 /**
  * The Class LanguageUtil.
@@ -328,7 +328,7 @@ public class LanguageUtil {
 							acceptabilityConcept = tf.getConcept(SnomedMetadataRf2.PREFERRED_RF2.getLenient().getNid());
 						}
 						I_GetConceptData languagerefsetConcept = tf.getConcept(languageRefset.getConceptNid());
-                                                SpecRefsetHelper helper = new SpecRefsetHelper(config.getViewCoordinate(), config.getEditCoordinate());
+                                                RefsetHelper helper = new RefsetHelper(config.getViewCoordinate(), config.getEditCoordinate());
                                                 helper.newConceptRefsetExtension(languageRefset.getConceptNid(), newDescription.getDescId(), acceptabilityConcept.getConceptNid());
                                                 helper.newConceptRefsetExtension(dnid, cnid, cnid);
 
@@ -908,7 +908,7 @@ public class LanguageUtil {
 				tf.addUncommitted(concept);
 
 				I_GetConceptData acceptabilityConcept = tf.getConcept(acceptabilityId);
-                                SpecRefsetHelper helper = new SpecRefsetHelper(config.getViewCoordinate(), config.getEditCoordinate());
+                                RefsetHelper helper = new RefsetHelper(config.getViewCoordinate(), config.getEditCoordinate());
                                 helper.newConceptRefsetExtension(languageRefsetId, newDescription.getDescId(), acceptabilityConcept.getConceptNid());
 				tf.commit();
 				return;
@@ -957,7 +957,7 @@ public class LanguageUtil {
 					tf.commit();
 				} else {
 					I_GetConceptData acceptabilityConcept = tf.getConcept(acceptabilityId);
-                                        SpecRefsetHelper helper = new SpecRefsetHelper(config.getViewCoordinate(), config.getEditCoordinate());
+                                        RefsetHelper helper = new RefsetHelper(config.getViewCoordinate(), config.getEditCoordinate());
                                         helper.newConceptRefsetExtension(languageRefsetId, description.getDescId(), acceptabilityConcept.getConceptNid());
 					tf.commit();
 				}
@@ -1215,7 +1215,7 @@ public class LanguageUtil {
 					}
 					tf.addUncommitted(currentMember);
 				} else {
-                                        SpecRefsetHelper helper = new SpecRefsetHelper(config.getViewCoordinate(), config.getEditCoordinate());
+                                        RefsetHelper helper = new RefsetHelper(config.getViewCoordinate(), config.getEditCoordinate());
                                         helper.newConceptRefsetExtension(languageMembershipConcept.getConceptNid(), loopDescId, descIdAcceptabilityMap.get(loopDescId));
 				}
 				// }

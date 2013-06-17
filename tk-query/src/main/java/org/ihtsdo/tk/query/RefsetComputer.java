@@ -22,11 +22,33 @@ import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 
+/**
+ * The class RefsetComputer provides methods for computing refset membership.
+ * Use <code>PersistanceEngine</code> to persist results.
+ */
 public class RefsetComputer implements ProcessUnfetchedConceptDataBI {
 
+    /**
+     *
+     */
     public enum ComputeType {
 
-        CONCEPT, DESCRIPTION, RELATIONSHIP, MIXED
+        /**
+         * Refset query is concept based.
+         */
+        CONCEPT,
+        /**
+         * Refset query is description based.
+         */
+        DESCRIPTION,
+        /**
+         * Refset query is relationship based.
+         */
+        RELATIONSHIP,
+        /**
+         * Refset query is mixed. Not supported.
+         */
+        MIXED
     };
 
     public class StopActionListener implements ActionListener {
@@ -53,8 +75,16 @@ public class RefsetComputer implements ProcessUnfetchedConceptDataBI {
     private ViewCoordinate viewCoordinate;
     NidBitSetBI resultSet;
     private AtomicBoolean continueWorking = new AtomicBoolean(true);
-    
-     public RefsetComputer(RefsetSpecQuery query, ViewCoordinate viewCoordinate,
+
+    /**
+     * Creates a new RefsetComputer.
+     * @param query represents the query specifying the refset members
+     * @param viewCoordinate indicates active/inactive versions
+     * @param possibleIds a nid set of possible members
+     * @param computeType the type of refset
+     * @throws Exception indicates an exception occurred
+     */
+    public RefsetComputer(RefsetSpecQuery query, ViewCoordinate viewCoordinate,
             NidBitSetBI possibleIds, ComputeType computeType) throws Exception {
         super();
         ts = Ts.get();
@@ -62,7 +92,7 @@ public class RefsetComputer implements ProcessUnfetchedConceptDataBI {
         this.viewCoordinate = viewCoordinate;
         this.computeType = computeType;
         this.query = query;
-     }
+    }
 
     @Override
     public void processUnfetchedConceptData(int cNid, ConceptFetcherBI fcfc) throws Exception {
@@ -122,9 +152,11 @@ public class RefsetComputer implements ProcessUnfetchedConceptDataBI {
             }
         }
     }
-    
 
-
+    /**
+     * Gets the number of refset members processed.
+     * @return the number of refset members processed.
+     */
     public AtomicInteger getProcessedCount() {
         return processedCount;
     }
@@ -139,6 +171,11 @@ public class RefsetComputer implements ProcessUnfetchedConceptDataBI {
         return possibleCNids;
     }
 
+    /**
+     * Gets the nids of the refset members. Use <code>PersistanceEngine</code> to persist results.
+     * @return a nid set representing the refset members.
+     * @throws IOException indicates an I/O exception occurred
+     */
     public NidBitSetBI getMemberNids() throws IOException {
         NidBitSetBI result = Ts.get().getEmptyNidSet();
         for (int nid : resultNids) {

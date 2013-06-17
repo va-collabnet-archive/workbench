@@ -37,7 +37,7 @@ import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
-import org.ihtsdo.tk.query.helper.SpecRefsetHelper;
+import org.ihtsdo.tk.query.helper.RefsetHelper;
 
 /**
  * The Class LanguageSpecRefset.
@@ -321,7 +321,7 @@ public class LanguageSpecRefset extends WorkflowRefset {
                         tf.addUncommittedNoChecks(currentMember);
                         tf.commit();
                     } else {
-                        SpecRefsetHelper helper = new SpecRefsetHelper(config.getViewCoordinate(), config.getEditCoordinate());
+                        RefsetHelper helper = new RefsetHelper(config.getViewCoordinate(), config.getEditCoordinate());
                         helper.newConceptRefsetExtension(languageMembershipConcept.getConceptNid(), loopDescId, descIdAcceptabilityMap.get(loopDescId));
                         for (I_ExtendByRef extension : tf.getAllExtensionsForComponent(loopDescId)) {
                             if (extension.getMutableParts().iterator().next().getTime() == Long.MAX_VALUE) {

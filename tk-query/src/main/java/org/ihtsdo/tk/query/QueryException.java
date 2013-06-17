@@ -16,8 +16,7 @@
 package org.ihtsdo.tk.query;
 
 /**
- *
- * @author aimeefurber
+ * The class QueryException provides methods for reporting an exception in creating a <code>Query</code>.
  */
 public class QueryException extends Exception{
 

@@ -25,44 +25,56 @@ import org.ihtsdo.tk.api.ProcessUnfetchedConceptDataBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 
 /**
- *
- * @author aimeefurber
+ * The class MarkedParentComputer provides methods for computing the marked
+ * parents of a refset.
  */
-public class MarkedParentComputer implements ProcessUnfetchedConceptDataBI{
-        NidBitSetBI newMembers;
-        ConcurrentSkipListSet<Integer> resultNids = new ConcurrentSkipListSet<>();
-        ViewCoordinate vc;
+public class MarkedParentComputer implements ProcessUnfetchedConceptDataBI {
 
-    public MarkedParentComputer(NidBitSetBI newMembers, ViewCoordinate viewCoordinate) {
-        this.newMembers = newMembers;
+    NidBitSetBI newMembers;
+    ConcurrentSkipListSet<Integer> resultNids = new ConcurrentSkipListSet<>();
+    ViewCoordinate vc;
+
+    /**
+     * Creates a new marked parent computer based on the given
+     * <code>refsetMembers</code> and
+     * <code>viewCoordinate</code>.
+     *
+     * @param refsetMembers a nid set representing the refset members
+     * @param viewCoordinate specifies active/inactive versions
+     */
+    public MarkedParentComputer(NidBitSetBI refsetMembers, ViewCoordinate viewCoordinate) {
+        this.newMembers = refsetMembers;
         this.vc = viewCoordinate;
     }
-        
 
-        @Override
-        public void processUnfetchedConceptData(int conceptNid, ConceptFetcherBI conceptFetcher) throws Exception {
-            if(newMembers.isMember(conceptNid)){
-                Set<Integer> parents = Ts.get().getAncestors(conceptNid, vc);
-                resultNids.addAll(parents);
-            }
+    @Override
+    public void processUnfetchedConceptData(int conceptNid, ConceptFetcherBI conceptFetcher) throws Exception {
+        if (newMembers.isMember(conceptNid)) {
+            Set<Integer> parents = Ts.get().getAncestors(conceptNid, vc);
+            resultNids.addAll(parents);
         }
+    }
 
-        @Override
-        public NidBitSetBI getNidSet() throws IOException {
-            return newMembers;
-        }
+    @Override
+    public NidBitSetBI getNidSet() throws IOException {
+        return newMembers;
+    }
 
-        @Override
-        public boolean continueWork() {
-            return true;
-        }
-        
-        public NidBitSetBI getMarkedParentNids() throws IOException {
+    @Override
+    public boolean continueWork() {
+        return true;
+    }
+
+    /**
+     * Returns a set of nids representing the marked parents.
+     * @return a <code>NidBitSetBI</code> representing the marked parent nids
+     * @throws IOException indicates and I/O exception has occurred
+     */
+    public NidBitSetBI getMarkedParentNids() throws IOException {
         NidBitSetBI result = Ts.get().getEmptyNidSet();
         for (int nid : resultNids) {
             result.setMember(nid);
         }
         return result;
     }
-        
-    }
+}

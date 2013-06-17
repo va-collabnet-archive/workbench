@@ -16,7 +16,7 @@
  */
 package org.ihtsdo.tk.query;
 
-import org.ihtsdo.tk.query.helper.SpecRefsetHelper;
+import org.ihtsdo.tk.query.helper.RefsetHelper;
 import java.io.IOException;
 import java.util.Collection;
 import org.dwfa.cement.RefsetAuxiliary;
@@ -252,7 +252,7 @@ public class RefsetSpec {
             return; // 
         }
 
-        SpecRefsetHelper helper = new SpecRefsetHelper(vc, ec);
+        RefsetHelper helper = new RefsetHelper(vc, ec);
 
         if (spec != null && lastComputeTimeConcept != null) {
             helper.newLongRefsetExtension(lastComputeTimeConcept.getConceptNid(), spec.getConceptNid(), time);
@@ -311,7 +311,7 @@ public class RefsetSpec {
         }
         try {
 
-            SpecRefsetHelper helper = new SpecRefsetHelper(vc, ec);
+            RefsetHelper helper = new RefsetHelper(vc, ec);
             ConceptChronicleBI lastEditTimeConcept = getEditConcept();
 
             if (spec != null && lastEditTimeConcept != null) {

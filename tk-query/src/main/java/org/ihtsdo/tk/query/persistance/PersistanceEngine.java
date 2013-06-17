@@ -31,8 +31,8 @@ import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.cs.ChangeSetPolicy;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
-import org.ihtsdo.tk.query.helper.SpecMarkedParentRefsetHelper;
-import org.ihtsdo.tk.query.helper.SpecRefsetHelper;
+import org.ihtsdo.tk.query.helper.MarkedParentRefsetHelper;
+import org.ihtsdo.tk.query.helper.RefsetHelper;
 
 /**
  *
@@ -48,7 +48,7 @@ public class PersistanceEngine {
     private AtomicInteger newMarkedParentCount = new AtomicInteger();
     private AtomicInteger retiredMarkedParentCount = new AtomicInteger();
     private ViewCoordinate viewCoordinate;
-    private SpecMarkedParentRefsetHelper markedParentRefsetHelper;
+    private MarkedParentRefsetHelper markedParentRefsetHelper;
     private ConceptChronicleBI refsetConcept;
     private ConceptChronicleBI markedParentRefsetConcept;
     private TerminologyStoreDI ts;
@@ -57,7 +57,7 @@ public class PersistanceEngine {
     protected NidBitSetBI originalActiveMarkedParentRefCompNids;
     NidBitSetBI resultSet;
     private int normalMemberNid;
-    private SpecRefsetHelper memberRefsetHelper;
+    private RefsetHelper memberRefsetHelper;
     private AtomicBoolean continueWorking = new AtomicBoolean(true);
     private long startTime;
     private boolean commit = false;
@@ -80,8 +80,8 @@ public class PersistanceEngine {
                 originalActiveRefsetRefCompNids.setMember(r.getReferencedComponentNid());
             }
         }
-        memberRefsetHelper = new SpecRefsetHelper(viewCoordinate, editCoordinate);
-        markedParentRefsetHelper = new SpecMarkedParentRefsetHelper(viewCoordinate, editCoordinate, refsetNid);
+        memberRefsetHelper = new RefsetHelper(viewCoordinate, editCoordinate);
+        markedParentRefsetHelper = new MarkedParentRefsetHelper(viewCoordinate, editCoordinate, refsetNid);
         markedParentRefsetConcept = ts.getConcept(markedParentRefsetHelper.getParentRefsetNid());
         for (RefexChronicleBI r : markedParentRefsetConcept.getRefsetMembers()) {
             if (!r.getVersions(viewCoordinate).isEmpty()) {

@@ -37,7 +37,7 @@ import org.dwfa.util.bean.Spec;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.NidBitSetBI;
 import org.ihtsdo.tk.api.NidBitSetItrBI;
-import org.ihtsdo.tk.query.helper.SpecRefsetHelper;
+import org.ihtsdo.tk.query.helper.RefsetHelper;
 
 //REFSET PERFORMANCE CHANGE, NEEDS TESTING
 
@@ -103,7 +103,7 @@ public class RemoveConceptChildrenFromRefset extends AbstractTask {
                 "Removing children of concept '" + member.getInitialText() + "' as '" + value.getInitialText()
                     + "' members from refset '" + refset.getInitialText() + "'.");
 
-            SpecRefsetHelper helper = new SpecRefsetHelper(Terms.get().getActiveAceFrameConfig().getViewCoordinate(),
+            RefsetHelper helper = new RefsetHelper(Terms.get().getActiveAceFrameConfig().getViewCoordinate(),
                     Terms.get().getActiveAceFrameConfig().getEditCoordinate());
             NidBitSetBI kindOfNids = Ts.get().getKindOf(member.getNid(),
                     Terms.get().getActiveAceFrameConfig().getViewCoordinate());

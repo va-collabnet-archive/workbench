@@ -60,7 +60,7 @@ import org.ihtsdo.project.refset.partition.IsDescendantOfPartitioner;
 import org.ihtsdo.project.refset.partition.QuantityPartitioner;
 import org.ihtsdo.project.refset.partition.RefsetSplitter;
 import org.ihtsdo.tk.api.Precedence;
-import org.ihtsdo.tk.query.helper.SpecRefsetHelper;
+import org.ihtsdo.tk.query.helper.RefsetHelper;
 
 /**
  * The Class TestContextualizedDescriptions.
@@ -142,7 +142,7 @@ public class TestWorksetsAndWorklistsCRUD extends TestCase {
 					allowedTypes, config.getViewPositionSetReadOnly(), Precedence.TIME, config.getConflictResolutionStrategy());
 			
 			I_GetConceptData refset = tf.getConcept(RefsetAuxiliary.Concept.DESCRIPTION_TYPE_PURPOSE.getUids());
-                        SpecRefsetHelper helper = new SpecRefsetHelper(config.getViewCoordinate(), config.getEditCoordinate());
+                        RefsetHelper helper = new RefsetHelper(config.getViewCoordinate(), config.getEditCoordinate());
 			for (I_RelTuple rel : relationships) {
 				I_GetConceptData member = tf.getConcept(rel.getC1Id());
                                 helper.newConceptRefsetExtension(refset.getConceptNid(), member.getConceptNid(), member.getConceptNid());

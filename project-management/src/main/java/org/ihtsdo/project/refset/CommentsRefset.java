@@ -55,7 +55,7 @@ import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
 import org.ihtsdo.tk.api.changeset.ChangeSetGenerationThreadingPolicy;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
-import org.ihtsdo.tk.query.helper.SpecRefsetHelper;
+import org.ihtsdo.tk.query.helper.RefsetHelper;
 
 /**
  * The Class CommentsRefset.
@@ -327,7 +327,7 @@ public class CommentsRefset extends Refset {
         //refsetHelper.newRefsetExtension(this.refsetId, componentId, EConcept.REFSET_TYPES.CID_CID_STR, rfPropMap, config);
 		//        BdbTermFactory.createMember(UUID.randomUUID(), componentId, EConcept.REFSET_TYPES.CID_CID_STR, org.ihtsdo.concept.Concept.get(refsetId),
 		//                config, rfPropMap);
-                SpecRefsetHelper helper = new SpecRefsetHelper(config.getViewCoordinate(), config.getEditCoordinate());
+                RefsetHelper helper = new RefsetHelper(config.getViewCoordinate(), config.getEditCoordinate());
                 helper.newConceptConceptStringRefsetExtension(refsetId, componentId, commentType, commentSubType, comment);
 		termFactory.addUncommittedNoChecks(Terms.get().getConcept(refsetId));
         refsetConcept.commit(ChangeSetGenerationPolicy.INCREMENTAL, ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);

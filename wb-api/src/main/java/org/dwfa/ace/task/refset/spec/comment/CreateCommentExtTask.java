@@ -43,7 +43,7 @@ import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.query.RefsetSpec;
-import org.ihtsdo.tk.query.helper.SpecRefsetHelper;
+import org.ihtsdo.tk.query.helper.RefsetHelper;
 
 /**
  * Creates a comment extension on the refset currently in the refset spec panel,
@@ -114,7 +114,7 @@ public class CreateCommentExtTask extends AbstractTask {
                         	AceLog.getAppLog().info("commentsRefset is null");
                     }
                     if (commentsRefset != null && memberRefset != null) {
-                        SpecRefsetHelper specRefsetHelper = new SpecRefsetHelper(Terms.get().getActiveAceFrameConfig().getViewCoordinate(),
+                        RefsetHelper specRefsetHelper = new RefsetHelper(Terms.get().getActiveAceFrameConfig().getViewCoordinate(),
                                 Terms.get().getActiveAceFrameConfig().getEditCoordinate());
                         //                        specRefsetHelper.setAutocommitActive(true);
                         RefexChronicleBI newExt = specRefsetHelper.newStringRefsetExtension(commentsRefset.getConceptNid(),

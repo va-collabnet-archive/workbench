@@ -40,7 +40,7 @@ import org.dwfa.util.bean.Spec;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.NidBitSetBI;
 import org.ihtsdo.tk.api.NidBitSetItrBI;
-import org.ihtsdo.tk.query.helper.SpecRefsetHelper;
+import org.ihtsdo.tk.query.helper.RefsetHelper;
 
 /**
  * Adds a single concept as a member of the working refset
@@ -114,7 +114,7 @@ public class AddConceptChildrenToRefset extends AbstractTask {
             I_TermFactory termFactory = Terms.get();
             I_ShowActivity activity = termFactory.newActivityPanel(false, termFactory.getActiveAceFrameConfig(),
             "Adding children of concept " + member.getInitialText(), true);
-            SpecRefsetHelper helper = new SpecRefsetHelper(Terms.get().getActiveAceFrameConfig().getViewCoordinate(),
+            RefsetHelper helper = new RefsetHelper(Terms.get().getActiveAceFrameConfig().getViewCoordinate(),
                     Terms.get().getActiveAceFrameConfig().getEditCoordinate());
             while(itr.next()){
                 if(itr.nid() != member.getConceptNid()){

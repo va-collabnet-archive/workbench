@@ -123,7 +123,7 @@ import org.ihtsdo.tk.workflow.api.WfFilterBI;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.json.JettisonMappedXmlDriver;
-import org.ihtsdo.tk.query.helper.SpecRefsetHelper;
+import org.ihtsdo.tk.query.helper.RefsetHelper;
 
 /**
  * The Class TerminologyProjectDAO.
@@ -2540,7 +2540,7 @@ public class TerminologyProjectDAO {
 
 			if (!alreadyMember) {
 				if (refsetHelper == null) {
-					refsetHelper = new SpecRefsetHelper(config.getViewCoordinate(), config.getEditCoordinate());
+					refsetHelper = new RefsetHelper(config.getViewCoordinate(), config.getEditCoordinate());
 				}
                                 refsetHelper.newStringRefsetExtension(workSetConcept.getConceptNid(), newMemberConcept.getConceptNid(), "");
 				// WorkSet workset =
@@ -3482,7 +3482,7 @@ public class TerminologyProjectDAO {
 		// termFactory.addUncommittedNoChecks(newCommentsConcept);
 		// termFactory.addUncommittedNoChecks(newPromotionConcept);
 		// termFactory.commit();
-		SpecRefsetHelper helper = new SpecRefsetHelper(config.getViewCoordinate(), config.getEditCoordinate());
+		RefsetHelper helper = new RefsetHelper(config.getViewCoordinate(), config.getEditCoordinate());
                 helper.newStringRefsetExtension(workListRefset.getConceptNid(), newConcept.getConceptNid(), metadata);
 
 		for (I_ExtendByRef extension : termFactory.getRefsetExtensionMembers(workListRefset.getConceptNid())) {
@@ -3670,7 +3670,7 @@ public class TerminologyProjectDAO {
 
 		Partition newPartition = null;
 		ActivityUpdater updater = new ActivityUpdater(activity, "Creating partition");
-		refsetHelper = new SpecRefsetHelper(config.getViewCoordinate(), config.getEditCoordinate());
+		refsetHelper = new RefsetHelper(config.getViewCoordinate(), config.getEditCoordinate());
 		updater.startActivity();
 		try {
 			if (isConceptDuplicate(name + " (partition)")) {
@@ -3876,7 +3876,7 @@ public class TerminologyProjectDAO {
 				WorkList workList = getWorkList(workListConcept, config);
 				PromotionAndAssignmentRefset promotionRefset = workList.getPromotionRefset(config);
 				if (refsetHelper == null) {
-					refsetHelper = new SpecRefsetHelper(config.getViewCoordinate(), config.getEditCoordinate());
+					refsetHelper = new RefsetHelper(config.getViewCoordinate(), config.getEditCoordinate());
 				}
                                 refsetHelper.newStringRefsetExtension(workListConcept.getConceptNid(), newMemberConcept.getConceptNid(), "");
 				termFactory.addUncommittedNoChecks(workListConcept);
@@ -3926,7 +3926,7 @@ public class TerminologyProjectDAO {
 	/**
 	 * The refset helper.
 	 */
-	private static SpecRefsetHelper refsetHelper = null;
+	private static RefsetHelper refsetHelper = null;
 
 	/**
 	 * Adds the concept as partition member.
@@ -3966,7 +3966,7 @@ public class TerminologyProjectDAO {
 
 			if (!alreadyMember) {
                             if (refsetHelper == null) {
-					refsetHelper = new SpecRefsetHelper(config.getViewCoordinate(), config.getEditCoordinate());
+					refsetHelper = new RefsetHelper(config.getViewCoordinate(), config.getEditCoordinate());
 				}
                                 refsetHelper.newStringRefsetExtension(partitionConcept.getConceptNid(), newMemberConcept.getConceptNid(), "");
 			}
@@ -4998,7 +4998,7 @@ public class TerminologyProjectDAO {
 
 		ActivityUpdater updater = new ActivityUpdater(activity, "Synchronizing WorkSet");
 		updater.startActivity();
-		refsetHelper = new SpecRefsetHelper(config.getViewCoordinate(), config.getEditCoordinate());
+		refsetHelper = new RefsetHelper(config.getViewCoordinate(), config.getEditCoordinate());
 		initializeWorkSet(workSet, config, updater);
 		Terms.get().addUncommittedNoChecks(workSet.getConcept());
 		workSet.getConcept().commit(ChangeSetGenerationPolicy.INCREMENTAL, ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);

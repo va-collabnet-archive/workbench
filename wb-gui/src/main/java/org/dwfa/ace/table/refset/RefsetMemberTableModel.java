@@ -89,7 +89,7 @@ import org.dwfa.vodb.bind.ThinVersionHelper;
 import org.dwfa.vodb.types.IntList;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
-import org.ihtsdo.tk.query.helper.SpecRefsetHelper;
+import org.ihtsdo.tk.query.helper.RefsetHelper;
 
 public class RefsetMemberTableModel extends AbstractTableModel implements PropertyChangeListener, I_HoldRefsetData,
         ActionListener {
@@ -855,7 +855,7 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
                 case INTEGER_VALUE:
                     if (I_ExtendByRefPartCidInt.class.isAssignableFrom(tuple.getMutablePart().getClass())) {
                         int value = ((I_ExtendByRefPartCidInt) tuple.getMutablePart()).getIntValue();
-                        SpecRefsetHelper helper = new SpecRefsetHelper(host.getConfig().getViewCoordinate(),
+                        RefsetHelper helper = new RefsetHelper(host.getConfig().getViewCoordinate(),
                                 host.getConfig().getEditCoordinate());
                         if (helper.hasPurpose(tuple.getRefsetId(),
                                 Ts.get().getNidForUuids(RefsetAuxiliary.Concept.REFSET_PURPOSE_POSITION.getPrimoridalUid()))) {
@@ -911,7 +911,7 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
             I_HoldRefsetPreferences preferences = host.getConfig().getRefsetPreferencesForToggle(toggle);
             I_RefsetDefaults refsetDefaults = null;
             RefsetPropertyMap extProps = new RefsetPropertyMap();
-            SpecRefsetHelper helper = new SpecRefsetHelper(host.getConfig().getViewCoordinate(), host.getConfig().getEditCoordinate());
+            RefsetHelper helper = new RefsetHelper(host.getConfig().getViewCoordinate(), host.getConfig().getEditCoordinate());
             RefexChronicleBI extension = null;
 ;            switch (refsetType) {
                 case BOOLEAN:

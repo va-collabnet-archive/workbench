@@ -65,7 +65,7 @@ import org.ihtsdo.lucene.SearchResult;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
-import org.ihtsdo.tk.query.helper.SpecRefsetHelper;
+import org.ihtsdo.tk.query.helper.RefsetHelper;
 
 @BeanList(specs = { @Spec(directory = "tasks/ide/file", type = BeanType.TASK_BEAN) })
 public class UpdateDescriptionsBasedOnFileSpec extends AbstractTask {
@@ -123,7 +123,7 @@ public class UpdateDescriptionsBasedOnFileSpec extends AbstractTask {
             for (PathBI loopPath : config.getPromotionPathSetReadOnly()) {
             	config.addEditingPath(loopPath);
             }
-                        SpecRefsetHelper refsetHelper = new SpecRefsetHelper(config.getViewCoordinate(), config.getEditCoordinate());
+                        RefsetHelper refsetHelper = new RefsetHelper(config.getViewCoordinate(), config.getEditCoordinate());
 			JList conceptList = config.getBatchConceptList();
 			I_ModelTerminologyList model = (I_ModelTerminologyList) conceptList.getModel();
 			model.clear();

@@ -22,7 +22,7 @@ import org.ihtsdo.tk.api.NidBitSetBI;
 import org.ihtsdo.tk.api.ProcessUnfetchedConceptDataBI;
 
 /**
- *
+ * Processes one or more <code>Query</code> objects using the same parallel concept iterator.
  * @author aimeefurber
  */
 public class MultiQueryProcessor implements ProcessUnfetchedConceptDataBI {
@@ -30,6 +30,11 @@ public class MultiQueryProcessor implements ProcessUnfetchedConceptDataBI {
     NidBitSetBI possibleNids;
     
 
+    /**
+     * Creates a new <code>MultiQueryProcessor</code> based on the given <code>queries</code>
+     * @param queries one or more query to be processed
+     * @throws IOException
+     */
     public MultiQueryProcessor(RefsetComputer... queries) throws IOException {
         this.queries = queries;
         possibleNids = Ts.get().getEmptyNidSet();

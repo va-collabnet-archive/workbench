@@ -39,7 +39,7 @@ import org.ihtsdo.tk.query.persistance.PersistanceEngine;
 /**
  * The class ComputeFromSpec provides methods for computing and persisting a
  * refset from a specification. Use
- * <code>RefsetCompute</code> to compute results without persisting.
+ * <code>RefsetComputer</code> to compute results without persisting.
  *
  */
 public class ComputeFromSpec {

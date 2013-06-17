@@ -29,7 +29,7 @@ import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.tk.query.helper.SpecRefsetHelper;
+import org.ihtsdo.tk.query.helper.RefsetHelper;
 
 public class ConceptConceptExtTupleFileUtil {
 
@@ -151,7 +151,7 @@ public class ConceptConceptExtTupleFileUtil {
             }
 
             try {
-                SpecRefsetHelper refsetHelper = new SpecRefsetHelper(importConfig.getViewCoordinate(), importConfig.getEditCoordinate());
+                RefsetHelper refsetHelper = new RefsetHelper(importConfig.getViewCoordinate(), importConfig.getEditCoordinate());
                 refsetHelper.newConceptConceptRefsetExtension(termFactory.uuidToNative(refsetUuid), termFactory
                     .uuidToNative(componentUuid), termFactory.uuidToNative(c1Uuid), termFactory.uuidToNative(c2Uuid));
             } catch (Exception e) {

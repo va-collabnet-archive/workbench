@@ -64,7 +64,7 @@ import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.refex.type_string.RefexStringVersionBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
-import org.ihtsdo.tk.query.helper.SpecRefsetHelper;
+import org.ihtsdo.tk.query.helper.RefsetHelper;
 
 
 
@@ -180,7 +180,7 @@ public class IssueRepositoryDAO {
 			termFactory.addUncommitted(newConcept);
 			termFactory.addUncommitted(issueReposRefset);
 			termFactory.commit();
-                        SpecRefsetHelper refsetHelper = new SpecRefsetHelper(config.getViewCoordinate(), config.getEditCoordinate());
+                        RefsetHelper refsetHelper = new RefsetHelper(config.getViewCoordinate(), config.getEditCoordinate());
                         refsetHelper.newStringRefsetExtension(issueReposRefset.getConceptNid(), newConcept.getConceptNid(), metadata);
 
 			for (I_ExtendByRef extension : termFactory.getRefsetExtensionMembers(issueReposRefset.getConceptNid())) {
@@ -334,7 +334,7 @@ public static IssueRepository updateRepositoryMetadata(IssueRepository issueRepo
 		}
 
 		if (!foundPreviousExtension) {
-                        SpecRefsetHelper refsetHelper = new SpecRefsetHelper(config.getViewCoordinate(), config.getEditCoordinate());
+                        RefsetHelper refsetHelper = new RefsetHelper(config.getViewCoordinate(), config.getEditCoordinate());
                         refsetHelper.newStringRefsetExtension(issueReposRefset.getConceptNid(), issueRepoConcept.getConceptNid(), metadata);
 			termFactory.addUncommitted(issueRepoConcept);
 			termFactory.addUncommitted(issueReposRefset);
