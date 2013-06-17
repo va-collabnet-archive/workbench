@@ -62,6 +62,7 @@ import org.ihtsdo.helper.query.ConceptDefinedChangedQuery;
 import org.ihtsdo.helper.query.DescriptionChangedQuery;
 import org.ihtsdo.helper.query.Query;
 import org.ihtsdo.helper.query.QueryBuilderBI;
+import org.ihtsdo.helper.query.QueryResultBinder;
 import org.ihtsdo.helper.query.RelationshipInferredChangedQuery;
 import org.ihtsdo.helper.query.RelationshipStatedChangedQuery;
 import org.ihtsdo.helper.time.TimeHelper;
@@ -906,23 +907,22 @@ public class PromotionEditorFrame extends ComponentFrame implements PropertyChan
         Query q4 = new ConceptDefinedChangedQuery(vcTarget, vcSource).getQuery();
 
         //results
-        ArrayList<NidBitSetBI> results = builder.getResults(q1, q2, q3, q4);
-        for (int i = 0; i <= results.size(); i++) {
-            NidBitSetBI result = results.get(i);
-            System.out.println(result);
-            if (i == 0) {
-                descChange = result;
-                allChange.or(result);
-            } else if (i == 1) {
-                infChange = result;
-                allChange.or(result);
-            } else if (i == 2) {
-                statedChange = result;
-                allChange.or(result);
-            } else if (i == 3) {
+        ArrayList<QueryResultBinder> results = builder.getResults(q1, q2, q3, q4);
+        for (QueryResultBinder binder : results) {
+            Query query = binder.getQuery();
+            if(query.equals(q1)){
+                descChange = binder.getResults();
+                allChange.or(binder.getResults());
+            }else if(query.equals(q2)){
+                infChange = binder.getResults();
+                allChange.or(binder.getResults());
+            }else if(query.equals(q3)){
+                statedChange = binder.getResults();
+                allChange.or(binder.getResults());
+            }else if(query.equals(q4)){
                 //need to combine stated rel changes with concept defined change
-                statedChange.or(result);
-                allChange.or(result);
+                statedChange.or(binder.getResults());
+                allChange.or(binder.getResults());
             }
         }
 

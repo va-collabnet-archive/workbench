@@ -15,6 +15,7 @@
  */
 package org.ihtsdo.tk.refset;
 
+import org.ihtsdo.helper.query.QueryResultBinder;
 import java.io.IOException;
 import java.util.ArrayList;
 import org.ihtsdo.helper.query.Branch;
@@ -55,7 +56,7 @@ public class QueryToSpecBuilder implements QueryBuilderBI{
     }
  
     @Override
-    public ArrayList<NidBitSetBI> getResults(Query... queries) throws IOException, Exception{
+    public ArrayList<QueryResultBinder> getResults(Query... queries) throws IOException, Exception{
         RefsetComputer[] computers = new RefsetComputer[queries.length];
         int count = 0;
         for(Query query : queries){
@@ -68,9 +69,11 @@ public class QueryToSpecBuilder implements QueryBuilderBI{
         MultiQueryProcessor queryProcessor = new MultiQueryProcessor(computers);
         Ts.get().iterateConceptDataInParallel(queryProcessor);
         
-        ArrayList<NidBitSetBI> results = new ArrayList<>();
-        for(RefsetComputer computer : computers){
-            results.add(computer.getResultNids());
+        ArrayList<QueryResultBinder> results = new ArrayList<>();
+        for(int i = 0; i <= computers.length; i++){
+            RefsetComputer computer = computers[i];
+            QueryResultBinder binder = new QueryResultBinder(computer.getMemberNids(), queries[i]);
+            results.add(binder);
         }
         return results;
     }

@@ -36,6 +36,6 @@ public interface QueryBuilderBI {
      * @throws IOException signals that an I/O exception has occurred
      * @throws Exception indicates an exception has occurred
      */
-    public ArrayList<NidBitSetBI> getResults(Query... queries) throws IOException, Exception;
+    public ArrayList<QueryResultBinder> getResults(Query... queries) throws IOException, Exception;
     
 }
