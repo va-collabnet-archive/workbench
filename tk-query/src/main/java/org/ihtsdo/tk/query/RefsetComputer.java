@@ -42,32 +42,17 @@ public class RefsetComputer implements ProcessUnfetchedConceptDataBI {
             }
         }
     }
-//    private int refsetNid;
     private RefsetSpecQuery query;
-//    private SpecRefsetHelper memberRefsetHelper;
-//    private SpecMarkedParentRefsetHelper markedParentRefsetHelper;
-//    private ConceptChronicleBI refsetConcept;
-//    private ConceptChronicleBI markedParentRefsetConcept;
     private AtomicInteger processedCount = new AtomicInteger();
     private ConcurrentSkipListSet<Integer> resultNids = new ConcurrentSkipListSet<>();
-//    private AtomicInteger members = new AtomicInteger();
-//    private AtomicInteger newMembers = new AtomicInteger();
-//    private AtomicInteger retiredMembers = new AtomicInteger();
     private AtomicInteger processed = new AtomicInteger();
     private boolean canceled = false;
-    private long startTime = System.currentTimeMillis();
     private NidBitSetBI possibleCNids;
     private ComputeType computeType;
     private TerminologyStoreDI ts;
     private ViewCoordinate viewCoordinate;
-//    protected NidBitSetBI retiredRefsetRefCompNids;
-//    protected NidBitSetBI activeRefsetRefCompNids;
-//    protected NidBitSetBI activeMarkedParentRefCompNids;
-//    private boolean persist;
-    private int normalMemberNid;
     NidBitSetBI resultSet;
     private AtomicBoolean continueWorking = new AtomicBoolean(true);
-//    ConcurrentSkipListSet<Integer> newMarkedParents = new ConcurrentSkipListSet<>();
     
      public RefsetComputer(RefsetSpecQuery query, ViewCoordinate viewCoordinate,
             NidBitSetBI possibleIds, ComputeType computeType) throws Exception {
