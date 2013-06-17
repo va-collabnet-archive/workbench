@@ -423,6 +423,24 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
         if (eAttr != null) {
             if (c.getConAttrs() == null) {
                 setAttributesFromEConcept(c, eAttr);
+//Bad patch from Dan to enable refset indexing  https://csfe.aceworkspace.net/sf/go/artf228205?nav=1&_pagenum=1&returnUrlKey=1371093562968
+                for (RefexChronicleBI<?> annotation : c.getAnnotations()) {
+                    if (annotation instanceof RefsetMember){
+                        RefsetMember refsetMember = (RefsetMember)annotation;
+                        if (Ts.get().getConceptNidForNid(refsetMember.getRefsetId()) != Integer.MAX_VALUE) {
+                            Concept refsetConcept = (Concept) Ts.get().getConceptForNid(refsetMember.getRefsetId());
+                            if (refsetConcept.isAnnotationIndex()) {
+                                refsetConcept.getData().getMemberNids().add(refsetMember.getNid());
+                                indexedAnnotationConcepts.add(refsetConcept);
+                            }
+                        } else {
+                            // Not an error, it the indexed annotation concept does not exist, 
+                            // then it is from initial load, and the index will be created later. 
+                            //System.out.println("Nid to cNid == Integer.MAX_VALUE; " + refsetMember);
+                        }
+                    }
+                }
+//end of bad patch
             } else {
                 ConceptAttributes ca = c.getConAttrs();
                 ca.merge(new ConceptAttributes(eAttr, c), indexedAnnotationConcepts);
