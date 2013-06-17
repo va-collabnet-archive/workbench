@@ -57,7 +57,7 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
-import org.ihtsdo.tk.refset.RefsetSpec;
+import org.ihtsdo.tk.query.RefsetSpec;
 
 /**
  * This task prepares the Workflow Details Sheet to display the
