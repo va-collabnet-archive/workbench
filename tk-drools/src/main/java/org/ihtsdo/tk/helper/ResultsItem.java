@@ -1,6 +1,10 @@
 package org.ihtsdo.tk.helper;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
+
+import org.ihtsdo.testmodel.DrComponent;
 
 public class ResultsItem {
 	
@@ -8,6 +12,7 @@ public class ResultsItem {
 	private String message;
 	private String severity;
 	private String ruleUuid;
+	private Set<DrComponent> suspects;
 	
 	public enum Severity {
 		
@@ -35,11 +40,14 @@ public class ResultsItem {
 	
 	public ResultsItem() {
 		super();
+		this.suspects = new HashSet<DrComponent>();
 	}
+	
 	public ResultsItem(int errorCode, String message) {
 		super();
 		this.errorCode = errorCode;
 		this.message = message;
+		this.suspects = new HashSet<DrComponent>();
 	}
 	
 	public ResultsItem(int errorCode, String message, String severity, String ruleUuid) {
@@ -48,6 +56,7 @@ public class ResultsItem {
 		this.message = message;
 		this.severity=severity;
 		this.ruleUuid=ruleUuid;
+		this.suspects = new HashSet<DrComponent>();
 	}
 	public int getErrorCode() {
 		return errorCode;
@@ -72,6 +81,28 @@ public class ResultsItem {
 	}
 	public void setRuleUuid(String ruleUuid) {
 		this.ruleUuid = ruleUuid;
+	}
+
+	/**
+	 * @return the suspects
+	 */
+	public Set<DrComponent> getSuspects() {
+		return suspects;
+	}
+
+	/**
+	 * @param suspects the suspects to set
+	 */
+	public void setSuspects(Set<DrComponent> suspects) {
+		this.suspects = suspects;
+	}
+	
+	public void addSuspect(DrComponent suspect) {
+		suspects.add(suspect);
+	}
+	
+	public void removeSuspect(DrComponent suspect) {
+		suspects.remove(suspect);
 	}
 	
 }
