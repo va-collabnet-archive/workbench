@@ -826,6 +826,15 @@ NEXT_WHILE:
       roots.add(Taxonomies.REFSET_AUX.getLenient().getNid());
       roots.add(Taxonomies.WB_AUX.getLenient().getNid());
       roots.add(Taxonomies.SNOMED.getLenient().getNid());
+      
+      if (additionalRoots != null) {
+          if (!additionalRoots.isEmpty()) {
+             for (ConceptSpec root : additionalRoots) {
+                roots.add(root.getLenient().getNid());
+             }
+          }
+      }
+      
       activeConfig.setRoots(roots);
 
       // set up allowed statuses
