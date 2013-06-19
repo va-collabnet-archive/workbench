@@ -224,6 +224,11 @@ public class GenerateUsersExtended extends AbstractMojo {
    private ConceptSpec            defaultRelType;
    private ConceptSpec            defaultRelChar;
    private ConceptSpec            defaultRelRefinability;
+   private ArrayList<ConceptSpec> editStatusPopup;
+   private ArrayList<ConceptSpec> editDescTypesPopup;
+   private ArrayList<ConceptSpec> editRelCharacteristicsPopup;
+   private ArrayList<ConceptSpec> editRelRefinabiltysPopup;
+   private ArrayList<ConceptSpec> editRelTypesPopup;
    private ConceptSpec            module;
    private String                 visibleRefests;
    private String                 projectDevelopmentPathFsn = "Workbench Auxiliary";
@@ -793,8 +798,10 @@ NEXT_WHILE:
       activeConfig.setAdminPassword(adminPassword);
       activeConfig.setAdminUsername(adminUsername);
 
-      // status popup values
-      I_IntList statusPopupTypes = tf.newIntList();
+      // edit popup values
+/*
+ *       I_IntList statusPopupTypes = tf.newIntList();
+ 
 
       statusPopupTypes.add(SnomedMetadataRf1.CURRENT_RF1.getLenient().getNid());
       statusPopupTypes.add(
@@ -804,6 +811,57 @@ NEXT_WHILE:
       statusPopupTypes.add(
           SnomedMetadataRf2.INACTIVE_VALUE_RF2.getLenient().getNid());
       activeConfig.setEditStatusTypePopup(statusPopupTypes);
+*/
+      
+      if (editStatusPopup != null) {
+          I_IntList editStatusPopupList = tf.newIntList();
+          
+          for (ConceptSpec editStatusSpec : editStatusPopup) {
+        	  editStatusPopupList.add(editStatusSpec.getLenient().getConceptNid());
+           }
+
+          activeConfig.setEditStatusTypePopup(editStatusPopupList);
+      }
+      
+      if (editDescTypesPopup != null) {
+          I_IntList editDescTypesPopupList = tf.newIntList();
+          
+          for (ConceptSpec descTypeSpec : editDescTypesPopup) {
+        	  editDescTypesPopupList.add(descTypeSpec.getLenient().getConceptNid());
+           }
+
+          activeConfig.setEditDescTypePopup(editDescTypesPopupList);
+      }
+      
+      if (editRelCharacteristicsPopup != null) {
+    	  I_IntList editRelCharacteristicsPopupList = tf.newIntList();
+
+    	  for (ConceptSpec relCharSpec : editRelCharacteristicsPopup) {
+    		  editRelCharacteristicsPopupList.add(relCharSpec.getLenient().getConceptNid());
+    	  }
+
+    	  activeConfig.setEditRelCharacteristicPopup(editRelCharacteristicsPopupList);
+      }
+
+      if (editRelRefinabiltysPopup != null) {
+    	  I_IntList editRelRefinabiltysPopupList = tf.newIntList();
+
+    	  for (ConceptSpec relRefSpec : editRelRefinabiltysPopup) {
+    		  editRelRefinabiltysPopupList.add(relRefSpec.getLenient().getConceptNid());
+    	  }
+
+    	  activeConfig.setEditRelRefinabiltyPopup(editRelRefinabiltysPopupList);
+      }
+
+      if (editRelTypesPopup != null) {
+    	  I_IntList editRelTypesPopupList = tf.newIntList();
+
+    	  for (ConceptSpec relTypeSpec : editRelTypesPopup) {
+    		  editRelTypesPopupList.add(relTypeSpec.getLenient().getConceptNid());
+    	  }
+
+    	  activeConfig.setEditRelTypePopup(editRelTypesPopupList);
+      }
 
       // set up classifier
       activeConfig.setClassificationRoot(
@@ -1443,6 +1501,16 @@ NEXT_WHILE:
             getConceptSpecFromPrefs(configProps.getProperty("defaultRelType"));
          defaultRelRefinability = getConceptSpecFromPrefs(
             configProps.getProperty("defaultRelRefinability"));
+         editDescTypesPopup =
+                 getConceptSpecListFromPrefs(configProps.getProperty("editDescTypesPopup"));
+         editStatusPopup =
+                 getConceptSpecListFromPrefs(configProps.getProperty("editStatusPopup"));
+         editRelCharacteristicsPopup =
+                 getConceptSpecListFromPrefs(configProps.getProperty("editRelCharacteristicsPopup"));
+         editRelRefinabiltysPopup =
+                 getConceptSpecListFromPrefs(configProps.getProperty("editRelRefinabiltysPopup"));
+         editRelTypesPopup =
+                 getConceptSpecListFromPrefs(configProps.getProperty("editRelTypesPopup"));
          visibleRefests            = configProps.getProperty("visibleRefests");
          projectDevelopmentPathFsn =
             configProps.getProperty("projectDevelopmentPathFsn");
@@ -1628,8 +1696,10 @@ NEXT_WHILE:
                   NoSuchAlgorithmException, InvalidCAB, ContradictionException {
       I_ImplementTermFactory tf = (I_ImplementTermFactory) Terms.get();
 
-      // status popup values
+      // edit popup values
+/*
       I_IntList statusPopupTypes = tf.newIntList();
+
 
       statusPopupTypes.add(SnomedMetadataRf1.CURRENT_RF1.getLenient().getNid());
       statusPopupTypes.add(
@@ -1639,6 +1709,58 @@ NEXT_WHILE:
       statusPopupTypes.add(
           SnomedMetadataRf2.INACTIVE_VALUE_RF2.getLenient().getNid());
       userConfig.setEditStatusTypePopup(statusPopupTypes);
+*/
+      
+      if (editStatusPopup != null) {
+          I_IntList editStatusPopupList = tf.newIntList();
+          
+          for (ConceptSpec editStatusSpec : editStatusPopup) {
+        	  editStatusPopupList.add(editStatusSpec.getLenient().getConceptNid());
+           }
+
+          userConfig.setEditStatusTypePopup(editStatusPopupList);
+      }
+      
+      if (editDescTypesPopup != null) {
+          I_IntList editDescTypesPopupList = tf.newIntList();
+          
+          for (ConceptSpec descTypeSpec : editDescTypesPopup) {
+        	  editDescTypesPopupList.add(descTypeSpec.getLenient().getConceptNid());
+           }
+
+          userConfig.setEditDescTypePopup(editDescTypesPopupList);
+      }
+      
+      if (editRelCharacteristicsPopup != null) {
+    	  I_IntList editRelCharacteristicsPopupList = tf.newIntList();
+
+    	  for (ConceptSpec relCharSpec : editRelCharacteristicsPopup) {
+    		  editRelCharacteristicsPopupList.add(relCharSpec.getLenient().getConceptNid());
+    	  }
+
+    	  userConfig.setEditRelCharacteristicPopup(editRelCharacteristicsPopupList);
+      }
+
+      if (editRelRefinabiltysPopup != null) {
+    	  I_IntList editRelRefinabiltysPopupList = tf.newIntList();
+
+    	  for (ConceptSpec relRefSpec : editRelRefinabiltysPopup) {
+    		  editRelRefinabiltysPopupList.add(relRefSpec.getLenient().getConceptNid());
+    	  }
+
+    	  userConfig.setEditRelRefinabiltyPopup(editRelRefinabiltysPopupList);
+      }
+
+      if (editRelTypesPopup != null) {
+    	  I_IntList editRelTypesPopupList = tf.newIntList();
+
+    	  for (ConceptSpec relTypeSpec : editRelTypesPopup) {
+    		  editRelTypesPopupList.add(relTypeSpec.getLenient().getConceptNid());
+    	  }
+
+    	  userConfig.setEditRelTypePopup(editRelTypesPopupList);
+      }
+
 
       // set up classifier
       userConfig.setClassificationRoot(
@@ -1663,12 +1785,12 @@ NEXT_WHILE:
       roots.add(Taxonomies.SNOMED.getLenient().getNid());
 
       if (additionalRoots != null) {
-         if (!additionalRoots.isEmpty()) {
-            for (ConceptSpec root : additionalRoots) {
-               roots.add(root.getLenient().getNid());
-            }
-         }
-      }
+          if (!additionalRoots.isEmpty()) {
+             for (ConceptSpec root : additionalRoots) {
+                roots.add(root.getLenient().getNid());
+             }
+          }
+       }
 
       userConfig.setRoots(roots);
 
