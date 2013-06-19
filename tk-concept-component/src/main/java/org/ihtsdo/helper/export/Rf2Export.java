@@ -264,65 +264,65 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
     private void setup() throws FileNotFoundException, UnsupportedEncodingException, IOException, ContradictionException{
                 File conceptsFile = new File(directory,
                 "sct2_Concept_UUID_" + releaseType.suffix + "_"
-                + country.getFormatedCountryCode() + namespace + "_"
+                + country.getFormatedCountryCode().toUpperCase() + namespace + "_"
                 + TimeHelper.getShortFileDateFormat().format(effectiveDate) + ".txt");
         File descriptionsFile = new File(directory,
                 "sct2_Description_UUID_" + releaseType.suffix + "_"
                 + language.getFormatedLanguageCode() + "_"
-                + country.getFormatedCountryCode() + namespace + "_"
+                + country.getFormatedCountryCode().toUpperCase() + namespace + "_"
                 + TimeHelper.getShortFileDateFormat().format(effectiveDate) + ".txt");
         File relationshipsFile = new File(directory,
                 "sct2_Relationship_UUID_" + releaseType.suffix + "_"
-                + country.getFormatedCountryCode() + namespace + "_"
+                + country.getFormatedCountryCode().toUpperCase() + namespace + "_"
                 + TimeHelper.getShortFileDateFormat().format(effectiveDate) + ".txt");
         File relationshipsStatedFile = new File(directory,
                 "sct2_StatedRelationship_UUID_" + releaseType.suffix + "_"
-                + country.getFormatedCountryCode() + namespace + "_"
+                + country.getFormatedCountryCode().toUpperCase() + namespace + "_"
                 + TimeHelper.getShortFileDateFormat().format(effectiveDate) + ".txt");
         File privateIdentifiersFile = null;
         File identifiersFile = null;
         if (makePrivateIdFile) {
             privateIdentifiersFile = new File(directory,
                     "sct2_Identifier_Auxiliary_UUID_" + releaseType.suffix + "_"
-                    + country.getFormatedCountryCode() + namespace + "_"
+                    + country.getFormatedCountryCode().toUpperCase() + namespace + "_"
                     + TimeHelper.getShortFileDateFormat().format(effectiveDate) + ".txt");
             identifiersFile = new File(directory,
                     "sct2_Identifier_UUID_" + releaseType.suffix + "_"
-                    + country.getFormatedCountryCode() + namespace + "_"
+                    + country.getFormatedCountryCode().toUpperCase() + namespace + "_"
                     + TimeHelper.getShortFileDateFormat().format(effectiveDate) + ".txt");
         } else {
             identifiersFile = new File(directory,
                     "sct2_Identifier_UUID_" + releaseType.suffix + "_"
-                    + country.getFormatedCountryCode() + namespace + "_"
+                    + country.getFormatedCountryCode().toUpperCase() + namespace + "_"
                     + TimeHelper.getShortFileDateFormat().format(effectiveDate) + ".txt");
         }
         File associationFile = new File(directory,
                 "der2_cRefset_AssociationReference_UUID_" + releaseType.suffix + "-"
-                + LANG_CODE.EN.getFormatedLanguageCode() + namespace + "_"
+                + LANG_CODE.EN.getFormatedLanguageCode().toUpperCase() + namespace + "_"
                 + TimeHelper.getShortFileDateFormat().format(effectiveDate) + ".txt");
         File attributeValueFile = new File(directory,
                 "der2_cRefset_AttributeValue_UUID_" + releaseType.suffix + "-"
-                + LANG_CODE.EN.getFormatedLanguageCode() + namespace + "_"
+                + LANG_CODE.EN.getFormatedLanguageCode().toUpperCase() + namespace + "_"
                 + TimeHelper.getShortFileDateFormat().format(effectiveDate) + ".txt");
         File langRefsetsFile = new File(directory,
                 "der2_cRefset_Language_UUID_" + releaseType.suffix + "-"
-                + LANG_CODE.EN.getFormatedLanguageCode() + namespace + "_"
+                + LANG_CODE.EN.getFormatedLanguageCode().toUpperCase() + namespace + "_"
                 + TimeHelper.getShortFileDateFormat().format(effectiveDate) + ".txt");
         File otherLangRefsetsFile = new File(directory,
                 "der2_cRefset_Language_UUID_" + releaseType.suffix + "-"
-                + country.getFormatedCountryCode() + namespace + "_"
+                + country.getFormatedCountryCode().toUpperCase() + namespace + "_"
                 + TimeHelper.getShortFileDateFormat().format(effectiveDate) + ".txt");
         File modDependFile = new File(directory,
                 "der2_ssRefset_ModuleDependency_UUID_" + releaseType.suffix + "_"
-                + country.getFormatedCountryCode() + namespace + "_"
+                + country.getFormatedCountryCode().toUpperCase() + namespace + "_"
                 + TimeHelper.getShortFileDateFormat().format(effectiveDate) + ".txt");
         File descTypeFile = new File(directory,
                 "der2_ciRefset_DescriptionType_UUID_" + releaseType.suffix + "_"
-                + country.getFormatedCountryCode() + namespace + "_"
+                + country.getFormatedCountryCode().toUpperCase() + namespace + "_"
                 + TimeHelper.getShortFileDateFormat().format(effectiveDate) + ".txt");
         File refsetDescFile = new File(directory,
                 "der2_cciRefset_RefsetDescriptor_UUID_" + releaseType.suffix + "_"
-                + country.getFormatedCountryCode() + namespace + "_"
+                + country.getFormatedCountryCode().toUpperCase() + namespace + "_"
                 + TimeHelper.getShortFileDateFormat().format(effectiveDate) + ".txt");
 
         FileOutputStream conceptOs = new FileOutputStream(conceptsFile);
@@ -536,7 +536,11 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
         if (concept.getDescriptions() != null) {
             for (DescriptionChronicleBI d : concept.getDescriptions()) {
                 processDescription(d);
-//                processIdentifiers(d.getPrimUuid(), d.getPrimordialVersion().getStampNid());
+                if(sameCycleStampNids.contains(d.getPrimordialVersion().getStampNid())){
+                    processIdentifiers(d.getPrimUuid(), d.getPrimordialVersion().getStampNid(), effectiveDate.getTime());
+                }else{
+                    processIdentifiers(d.getPrimUuid(), d.getPrimordialVersion().getStampNid(), d.getPrimordialVersion().getTime());
+                }
                 if (d.getAnnotations() != null) {
                     for (RefexChronicleBI annot : d.getAnnotations()) {
                         int refexNid = annot.getRefexNid();
@@ -604,14 +608,22 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
         Collection<? extends ConceptVersionBI> childRefsetConcepts = refsetParentConcept.getRelationshipsIncomingSourceConceptsActiveIsa();
         for (ConceptVersionBI childRefset : childRefsetConcepts) {
             if (childRefset.getModuleNid() == Ts.get().getNidForUuids(UUID.fromString(module))) {
-                String refsetName = childRefset.getDescriptionPreferred().getText();
-                refsetName = refsetName.replace(" ", "-");
+                String refsetNameOld = childRefset.getDescriptionPreferred().getText();
+                String[] parts = refsetNameOld.split(" ");
+                String refsetName = "";
+                for(String part : parts){
+                    String first = part.substring(0, 1);
+                    String rest = part.substring(1);
+                    first = first.toUpperCase();
+                    part = first + rest;
+                    refsetName = refsetName + part;
+                }
                 if(!refsetName.toLowerCase().contains("simple-refset")){
                     refsetName = refsetName.concat("-simple-refset");
                 }
                 File simpleRefsetFile = new File(directory,
                         "der2_cRefset_" + refsetName + "_UUID_" + releaseType.suffix + "_"
-                        + language.getFormatedLanguageCode() + namespace + "_"
+                        + country.getFormatedCountryCode() + namespace + "_"
                         + TimeHelper.getShortFileDateFormat().format(effectiveDate) + ".txt");
                 FileOutputStream simpleRefsetOs = new FileOutputStream(simpleRefsetFile);
                 Writer simpleRefsetWriter = new BufferedWriter(new OutputStreamWriter(simpleRefsetOs, "UTF8"));
@@ -652,8 +664,11 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                                         break;
 
                                     case EFFECTIVE_TIME:
-                                        simpleRefsetWriter.write(effectiveDateString + field.seperator);
-
+                                        if (sameCycleStampNids.contains(refexVersion.getStampNid())) {
+                                            simpleRefsetWriter.write(effectiveDateString + field.seperator);
+                                        }else{
+                                            simpleRefsetWriter.write(TimeHelper.getShortFileDateFormat().format(refexVersion.getTime()) + field.seperator);
+                                        }
                                         break;
 
                                     case ACTIVE:
@@ -750,8 +765,11 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                                         break;
 
                                     case EFFECTIVE_TIME:
-                                        conNumRefsetWriter.write(effectiveDateString + field.seperator);
-
+                                        if (sameCycleStampNids.contains(nfVersion.getStampNid())) {
+                                            conNumRefsetWriter.write(nfVersion + field.seperator);
+                                        } else {
+                                            conNumRefsetWriter.write(TimeHelper.getShortFileDateFormat().format(nfVersion.getTime()) + field.seperator);
+                                        }
                                         break;
 
                                     case ACTIVE:
@@ -811,13 +829,20 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
             boolean write = true;
             if (sameCycleStampNids.contains(conceptAttributeChronicle.getPrimordialVersion().getStampNid())) {
                 ConceptAttributeVersionBI version = conceptAttributeChronicle.getVersion(viewCoordinateAllStatus);
-                if(!version.isActive(viewCoordinate)){
+                if(version == null || !version.isActive(viewCoordinate)){
                     write = false;
                 }
             }
             if (write) {
-//                processIdentifiers(conceptAttributeChronicle.getPrimUuid(),
-//                        conceptAttributeChronicle.getPrimordialVersion().getStampNid());
+                if(sameCycleStampNids.contains(conceptAttributeChronicle.getPrimordialVersion().getStampNid())){
+                    processIdentifiers(conceptAttributeChronicle.getPrimUuid(),
+                        conceptAttributeChronicle.getPrimordialVersion().getStampNid(),
+                        effectiveDate.getTime());
+                }else{
+                    processIdentifiers(conceptAttributeChronicle.getPrimUuid(),
+                        conceptAttributeChronicle.getPrimordialVersion().getStampNid(),
+                        conceptAttributeChronicle.getPrimordialVersion().getTime());
+                }
                 for (ConceptAttributeVersionBI car : versions) {
                     if (stampNids.contains(car.getStampNid())) {
                         for (Rf2File.ConceptsFileFields field : Rf2File.ConceptsFileFields.values()) {
@@ -834,8 +859,11 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                                     break;
 
                                 case EFFECTIVE_TIME:
-                                    conceptsWriter.write(effectiveDateString + field.seperator);
-
+                                    if (sameCycleStampNids.contains(car.getStampNid())) {
+                                        conceptsWriter.write(effectiveDateString + field.seperator);
+                                    }else{
+                                        conceptsWriter.write(TimeHelper.getShortFileDateFormat().format(car.getTime()) + field.seperator);
+                                    }
                                     break;
 
                                 case ID:
@@ -878,7 +906,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
             
             if (sameCycleStampNids.contains(descriptionChronicle.getPrimordialVersion().getStampNid())) {
                 DescriptionVersionBI version = descriptionChronicle.getVersion(viewCoordinateAllStatus);
-                if(!version.isActive(viewCoordinate)){
+                if(version == null || !version.isActive(viewCoordinate)){
                     write = false;
                 }
             }
@@ -894,8 +922,11 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                                     break;
 
                                 case EFFECTIVE_TIME:
-                                    descriptionsWriter.write(effectiveDateString + field.seperator);
-
+                                    if (sameCycleStampNids.contains(descr.getStampNid())) {
+                                        descriptionsWriter.write(effectiveDateString + field.seperator);
+                                    }else{
+                                        descriptionsWriter.write(TimeHelper.getShortFileDateFormat().format(descr.getTime()) + field.seperator);
+                                    }
                                     break;
 
                                 case ID:
@@ -988,10 +1019,17 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                         }
                     }
                 }
-//                if (inTaxonomy) { //only need to write once if a relationship was added
-//                    processIdentifiers(relationshipChronicle.getPrimUuid(),
-//                            relationshipChronicle.getPrimordialVersion().getStampNid());
-//                }
+                if (inTaxonomy) { //only need to write once if a relationship was added
+                    if(sameCycleStampNids.contains(relationshipChronicle.getPrimordialVersion().getStampNid())){
+                        processIdentifiers(relationshipChronicle.getPrimUuid(),
+                            relationshipChronicle.getPrimordialVersion().getStampNid(),
+                            effectiveDate.getTime());
+                    }else{
+                        processIdentifiers(relationshipChronicle.getPrimUuid(),
+                            relationshipChronicle.getPrimordialVersion().getStampNid(),
+                            relationshipChronicle.getPrimordialVersion().getTime());
+                    }
+                }
             }
         }
     }
@@ -1016,8 +1054,11 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                     break;
 
                 case EFFECTIVE_TIME:
-                    relationshipsWriter.write(effectiveDateString + field.seperator);
-
+                    if (sameCycleStampNids.contains(relationshipVersion.getStampNid())) {
+                        relationshipsWriter.write(effectiveDateString + field.seperator);
+                    }else{
+                        relationshipsWriter.write(TimeHelper.getShortFileDateFormat().format(relationshipVersion.getTime()) + field.seperator);
+                    }
                     break;
 
                 case ID:
@@ -1060,7 +1101,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                     break;
 
                 case MODIFIER_ID:
-                    relationshipsWriter.write(store.getUuidPrimordialForNid(relationshipVersion.getRefinabilityNid())
+                    relationshipsWriter.write(Snomed.SOME.getLenient().getPrimUuid()
                             + field.seperator);
 
                     break;
@@ -1087,8 +1128,11 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                     break;
 
                 case EFFECTIVE_TIME:
-                    relationshipsStatedWriter.write(effectiveDateString + field.seperator);
-
+                    if (sameCycleStampNids.contains(relationshipVersion.getStampNid())) {
+                        relationshipsStatedWriter.write(effectiveDateString + field.seperator);
+                    }else{
+                        relationshipsStatedWriter.write(TimeHelper.getShortFileDateFormat().format(relationshipVersion.getTime()) + field.seperator);
+                    }
                     break;
 
                 case ID:
@@ -1131,7 +1175,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                     break;
 
                 case MODIFIER_ID:
-                    relationshipsStatedWriter.write(store.getUuidPrimordialForNid(relationshipVersion.getRefinabilityNid())
+                    relationshipsStatedWriter.write(Snomed.SOME.getLenient().getPrimUuid()
                             + field.seperator);
 
                     break;
@@ -1150,22 +1194,25 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
             boolean write = true;
             if (sameCycleStampNids.contains(refexChronicle.getPrimordialVersion().getStampNid())) {
                 RefexVersionBI version = (RefexVersionBI) refexChronicle.getVersion(viewCoordinateAllStatus);
-                if(!version.isActive(viewCoordinate)){
+                if(version == null || !version.isActive(viewCoordinate)){
                     write = false;
                 }
             }
             if (write) {
                 for (RefexVersionBI refex : versions) {
                     if (stampNids.contains(refex.getStampNid())) {
-                        RefexNidVersionBI member = (RefexNidVersionBI) refexChronicle;
+                        RefexNidVersionBI member = (RefexNidVersionBI) refex;
                         for (Rf2File.AssociationRefsetFileFields field : Rf2File.AssociationRefsetFileFields.values()) {
                             switch (field) {
                                 case ID:
                                     associationWriter.write(member.getPrimUuid().toString() + field.seperator);
                                     break;
                                 case EFFECTIVE_TIME:
-                                    associationWriter.write(effectiveDateString + field.seperator);
-                                    break;
+                                    if (sameCycleStampNids.contains(member.getStampNid())) {
+                                        associationWriter.write(effectiveDateString + field.seperator);
+                                    }else{
+                                        associationWriter.write(TimeHelper.getShortFileDateFormat().format(member.getTime()) + field.seperator);
+                                    }                                    break;
                                 case ACTIVE:
                                     associationWriter.write(Ts.get().getUuidPrimordialForNid(member.getStatusNid())
                                             + field.seperator);
@@ -1212,14 +1259,18 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
             if (write) {
                 for (RefexVersionBI refex : versions) {
                     if (stampNids.contains(refex.getStampNid())) {
-                        RefexNidVersionBI member = (RefexNidVersionBI) refexChronicle;
+                        RefexNidVersionBI member = (RefexNidVersionBI) refex;
                         for (Rf2File.AttribValueRefsetFileFields field : Rf2File.AttribValueRefsetFileFields.values()) {
                             switch (field) {
                                 case ID:
                                     attributeValueWriter.write(member.getPrimUuid().toString() + field.seperator);
                                     break;
                                 case EFFECTIVE_TIME:
-                                    attributeValueWriter.write(effectiveDateString + field.seperator);
+                                    if (sameCycleStampNids.contains(refex.getStampNid())) {
+                                        attributeValueWriter.write(effectiveDateString + field.seperator);
+                                    }else{
+                                        attributeValueWriter.write(TimeHelper.getShortFileDateFormat().format(member.getTime()) + field.seperator);
+                                    }                                    
                                     break;
                                 case ACTIVE:
                                     attributeValueWriter.write(Ts.get().getUuidPrimordialForNid(member.getStatusNid())
@@ -1259,39 +1310,43 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
      * @throws IOException signals that an I/O exception has occurred
      * @see Rf2File.IdentifiersFileFields
      */
-    private void processIdentifiers(UUID primordialUuid) throws IOException {
-        for (Rf2File.IdentifiersFileFields field : Rf2File.IdentifiersFileFields.values()) {
+    private void processIdentifiers(UUID primordialUuid, int primordialStampNid, long time) throws IOException {
+        if (primordialUuid != null) {
+            if (stampNids.contains(primordialStampNid)) {
+                for (Rf2File.IdentifiersFileFields field : Rf2File.IdentifiersFileFields.values()) {
 
-            switch (field) {
-                case IDENTIFIER_SCHEME_ID:
-                    identifiersWriter.write(uuidIdScheme.getLenient().getPrimUuid() + field.seperator);
+                    switch (field) {
+                        case IDENTIFIER_SCHEME_ID:
+                            identifiersWriter.write(uuidIdScheme.getLenient().getPrimUuid() + field.seperator);
 
-                    break;
+                            break;
 
-                case ALTERNATE_IDENTIFIER:
-                    identifiersWriter.write(primordialUuid + field.seperator);
+                        case ALTERNATE_IDENTIFIER:
+                            identifiersWriter.write(primordialUuid + field.seperator);
 
-                    break;
+                            break;
 
-                case EFFECTIVE_TIME:
-                    identifiersWriter.write(effectiveDateString + field.seperator);
+                        case EFFECTIVE_TIME:
+                            identifiersWriter.write(TimeHelper.getShortFileDateFormat().format(time) + field.seperator);
 
-                    break;
+                            break;
 
-                case ACTIVE:
-                    identifiersWriter.write(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getPrimUuid() + field.seperator);
+                        case ACTIVE:
+                            identifiersWriter.write(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getPrimUuid() + field.seperator);
 
-                    break;
+                            break;
 
-                case MODULE_ID:
-                    identifiersWriter.write(module + field.seperator);
+                        case MODULE_ID:
+                            identifiersWriter.write(module + field.seperator);
 
-                    break;
+                            break;
 
-                case REFERENCED_COMPONENT_ID:
-                    identifiersWriter.write(primordialUuid + field.seperator);
+                        case REFERENCED_COMPONENT_ID:
+                            identifiersWriter.write(primordialUuid + field.seperator);
 
-                    break;
+                            break;
+                    }
+                }
             }
         }
     }
@@ -1345,6 +1400,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
      * @throws IOException signals that an I/O exception has occurred
      */
     private void processLang(RefexVersionBI refexVersion) throws IOException {
+        RefexNidVersionBI refexNidVersion = (RefexNidVersionBI) refexVersion;
         if (refexVersion != null) {
             for (Rf2File.LanguageRefsetFileFields field : Rf2File.LanguageRefsetFileFields.values()) {
                 switch (field) {
@@ -1354,8 +1410,11 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                         break;
 
                     case EFFECTIVE_TIME:
-                        langRefsetsWriter.write(effectiveDateString + field.seperator);
-
+                        if (sameCycleStampNids.contains(refexVersion.getStampNid())) {
+                            langRefsetsWriter.write(effectiveDateString + field.seperator);
+                        }else{
+                            langRefsetsWriter.write(TimeHelper.getShortFileDateFormat().format(refexVersion.getTime()) + field.seperator);
+                        }
                         break;
 
                     case ACTIVE:
@@ -1380,7 +1439,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                         break;
 
                     case ACCEPTABILITY:
-                        langRefsetsWriter.write(store.getComponent(refexVersion.getReferencedComponentNid()).getPrimUuid() + field.seperator);
+                        langRefsetsWriter.write(store.getComponent(refexNidVersion.getNid1()).getPrimUuid() + field.seperator);
 
                         break;
                 }
@@ -1398,6 +1457,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
      * @throws IOException signals that an I/O exception has occurred
      */
     private void processOtherLang(RefexVersionBI refexVersion) throws IOException {
+        RefexNidVersionBI refexNidVersion = (RefexNidVersionBI) refexVersion;
         if (refexVersion != null) {
             for (Rf2File.LanguageRefsetFileFields field : Rf2File.LanguageRefsetFileFields.values()) {
                 switch (field) {
@@ -1407,8 +1467,11 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                         break;
 
                     case EFFECTIVE_TIME:
-                        otherLangRefsetsWriter.write(effectiveDateString + field.seperator);
-
+                        if (sameCycleStampNids.contains(refexVersion.getStampNid())) {
+                            otherLangRefsetsWriter.write(effectiveDateString+ field.seperator);
+                        }else{
+                            otherLangRefsetsWriter.write(TimeHelper.getShortFileDateFormat().format(refexVersion.getTime()) + field.seperator);
+                        }
                         break;
 
                     case ACTIVE:
@@ -1433,7 +1496,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                         break;
 
                     case ACCEPTABILITY:
-                        otherLangRefsetsWriter.write(store.getComponent(refexVersion.getReferencedComponentNid()).getPrimUuid() + field.seperator);
+                        otherLangRefsetsWriter.write(store.getComponent(refexNidVersion.getNid1()).getPrimUuid() + field.seperator);
 
                         break;
                 }

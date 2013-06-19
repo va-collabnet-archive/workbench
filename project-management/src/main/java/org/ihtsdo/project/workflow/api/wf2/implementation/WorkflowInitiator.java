@@ -74,7 +74,6 @@ public class WorkflowInitiator implements WorkflowInitiatiorBI {
 						timeDiff = System.currentTimeMillis() - (Long) alreadySeen.get(workflowNid).get(possibleItr.nid());
 						System.out.println("Diff cache time: " + timeDiff);
 					}
-
 					alreadySeen.get(workflowNid).put(possibleItr.nid(), System.currentTimeMillis());
 					
 					if ( timeDiff == Long.MIN_VALUE || timeDiff >  3000) {

@@ -310,13 +310,11 @@ public class WorkSetDetailsPanel extends JPanel {
 			I_TermFactory termFactory = Terms.get();
 			ArrayList<WorkSetMember> result = new ArrayList<WorkSetMember>();
 			try {
+				List<WorkSetMember> members = TerminologyProjectDAO.getAllWorkSetMembers(workSet, config);
 				Collection<? extends I_ExtendByRef> membersExtensions = termFactory.getRefsetExtensionMembers(workSet.getId());
 				AceLog.getAppLog().log(Level.INFO, "Members: " + membersExtensions.size());
-				for (I_ExtendByRef extension : membersExtensions) {
-					I_ExtendByRefPart lastPart = TerminologyProjectDAO.getLastExtensionPart(extension);
-					if (TerminologyProjectDAO.isActive(lastPart.getStatusNid())) {
-						publish(TerminologyProjectDAO.getWorkSetMember(termFactory.getConcept(extension.getComponentNid()), workSet.getId(), config));
-					}
+				for (WorkSetMember member : members) {
+					publish(member);
 				}
 			} catch (Exception e) {
 				AceLog.getAppLog().alertAndLogException(e);
@@ -332,17 +330,19 @@ public class WorkSetDetailsPanel extends JPanel {
 		 */
 		protected void process(java.util.List<WorkSetMember> chunks) {
 			for (WorkSetMember member : chunks) {
-				if (tableModel.size() == 0) {
-					tableModel.addElement(member);
-				} else {
-					for (int i = 0; i < tableModel.size(); i++) {
-						if (tableModel.get(i).toString().compareTo(member.toString()) > 0) {
-							tableModel.add(i, member);
-							break;
-						}
-						if (i + 1 == tableModel.size()) {
-							tableModel.addElement(member);
-							break;
+				if (member != null) {
+					if (tableModel.size() == 0) {
+						tableModel.addElement(member);
+					} else {
+						for (int i = 0; i < tableModel.size(); i++) {
+							if (tableModel.get(i).toString().compareTo(member.toString()) > 0) {
+								tableModel.add(i, member);
+								break;
+							}
+							if (i + 1 == tableModel.size()) {
+								tableModel.addElement(member);
+								break;
+							}
 						}
 					}
 				}

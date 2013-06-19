@@ -760,7 +760,11 @@ public interface TerminologyStoreDI extends TerminologyDI {
         /**
          * The event occurred when a change was added as uncommitted.
          */
-        ADD_UNCOMMITTED;
+        ADD_UNCOMMITTED,
+        /**
+         * The event occurred after a sucessful commit.
+         */
+        POST_SUCESSFUL_COMMIT;
     }
 
     /**

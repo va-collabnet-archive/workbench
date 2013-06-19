@@ -5,9 +5,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.util.logging.Level;
 
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.MojoFailureException;
-import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.ihtsdo.workflow.refset.semTag.SemanticTagsRefsetWriter;
 

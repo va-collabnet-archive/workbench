@@ -256,7 +256,6 @@ public class PromotionAndAssignmentRefset extends PromotionRefset {
             newSpec.put(RefexProperty.CNID1, statusConceptId);
             newSpec.put(RefexProperty.CNID2, oldStatusCC.getNid2());
             RefexChronicleBI<?> newRefex = tc.constructIfNotCurrent(newSpec);
-            component.addAnnotation(newRefex);
             termFactory.addUncommittedNoChecks(component);
             /*I_ExtendByRef oldExtension = termFactory.getExtension(oldStatus.getNid());
              long lastVersion = Long.MIN_VALUE;
@@ -323,7 +322,6 @@ public class PromotionAndAssignmentRefset extends PromotionRefset {
             newSpec.put(RefexProperty.CNID1, statusConceptId);
             newSpec.put(RefexProperty.CNID2, defaultUserNid);
             RefexChronicleBI<?> newRefex = tc.construct(newSpec);
-            component.addAnnotation(newRefex);
             termFactory.addUncommittedNoChecks(component);
         }
 
@@ -358,7 +356,6 @@ public class PromotionAndAssignmentRefset extends PromotionRefset {
             newSpec.put(RefexProperty.CNID1, oldStatusCC.getNid1());
             newSpec.put(RefexProperty.CNID2, destinationUserConceptId);
             RefexChronicleBI<?> newRefex = tc.constructIfNotCurrent(newSpec);
-            component.addAnnotation(newRefex);
             termFactory.addUncommittedNoChecks(component);
             /*long lastVersion = Long.MIN_VALUE;
              I_ExtendByRef oldExtension = termFactory.getExtension(oldStatus.getNid());
@@ -413,7 +410,6 @@ public class PromotionAndAssignmentRefset extends PromotionRefset {
             newSpec.put(RefexProperty.CNID1, defaultStatusNid);
             newSpec.put(RefexProperty.CNID2, destinationUserConceptId);
             RefexChronicleBI<?> newRefex = tc.construct(newSpec);
-            component.addAnnotation(newRefex);
             termFactory.addUncommittedNoChecks(component);
         }
 
@@ -449,7 +445,6 @@ public class PromotionAndAssignmentRefset extends PromotionRefset {
             newSpec.put(RefexProperty.CNID1, statusConceptId);
             newSpec.put(RefexProperty.CNID2, destinationUserConceptId);
             RefexChronicleBI<?> newRefex = tc.constructIfNotCurrent(newSpec);
-            component.addAnnotation(newRefex);
             termFactory.addUncommittedNoChecks(component);
             /*long lastVersion = Long.MIN_VALUE;
              I_ExtendByRef oldExtension = termFactory.getExtension(oldStatus.getNid());
@@ -508,7 +503,6 @@ public class PromotionAndAssignmentRefset extends PromotionRefset {
             newSpec.put(RefexProperty.CNID1, statusConceptId);
             newSpec.put(RefexProperty.CNID2, destinationUserConceptId);
             RefexChronicleBI<?> newRefex = tc.construct(newSpec);
-            component.addAnnotation(newRefex);
             termFactory.addUncommittedNoChecks(component);
         }
 

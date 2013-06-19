@@ -24,6 +24,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.UUID;
+
 import org.dwfa.util.id.Type3UuidFactory;
 
 class Sct1_DesRecord implements Comparable<Object>, Serializable {

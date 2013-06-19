@@ -180,5 +180,7 @@ public class WfUser implements Serializable, WfUserBI, Comparable<WfUser> {
 	public int compareTo(WfUser o) {
 		return this.username.compareTo(o.getUsername());
 	}
+	
+	
 
 }

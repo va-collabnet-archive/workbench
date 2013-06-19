@@ -358,11 +358,11 @@ public class UuidToSctIdWriter {
                 attributeValueFileUuid = inputFile;
                 attributeValueReader = new BufferedReader(new InputStreamReader(new FileInputStream(inputFile), "UTF8"));
             }else if (inputFile.getName().startsWith("der2_cRefset_Language_UUID_" + this.releaseType.suffix)
-                    && inputFile.getName().contains(LANG_CODE.EN.getFormatedLanguageCode())) {
+                    && inputFile.getName().contains(LANG_CODE.EN.getFormatedLanguageCode().toUpperCase())) {
                 langRefsetsFileUuid = inputFile;
                 langRefsetsReader = new BufferedReader(new InputStreamReader(new FileInputStream(inputFile), "UTF8"));
             } else if (inputFile.getName().startsWith("der2_cRefset_Language_UUID_" + this.releaseType.suffix)
-                    && !inputFile.getName().contains(LANG_CODE.EN.getFormatedLanguageCode())) {
+                    && !inputFile.getName().contains(LANG_CODE.EN.getFormatedLanguageCode().toUpperCase())) {
                 otherLangRefsetsFileUuid = inputFile;
                 otherLangRefsetsReader = new BufferedReader(new InputStreamReader(new FileInputStream(inputFile), "UTF8"));
             } else if (inputFile.getName().startsWith("der2_ssRefset_ModuleDependency_UUID_" + this.releaseType.suffix)) {
@@ -392,10 +392,10 @@ public class UuidToSctIdWriter {
         }
         File statedRelFile = new File(terminology,
                 statedRelFileUuid.getName().replace("sct2_StatedRelationship_UUID_", "sct2_StatedRelationship_"));
-        File associationFile = new File(languageDir,
-                associationFileUuid.getName().replace("der2_cRefset_AssociationReference_UUID_", "der2_cRefset_Language_"));
-        File attributeValueFile = new File(languageDir,
-                attributeValueFileUuid.getName().replace("der2_cRefset_AttributeValue_UUID_", "der2_cRefset_Language_"));
+        File associationFile = new File(metadata,
+                associationFileUuid.getName().replace("der2_cRefset_AssociationReference_UUID_", "der2_cRefset_AssociationReference_"));
+        File attributeValueFile = new File(metadata,
+                attributeValueFileUuid.getName().replace("der2_cRefset_AttributeValue_UUID_", "der2_cRefset_AttributeValue_"));
         File langRefsetsFile = new File(languageDir,
                 langRefsetsFileUuid.getName().replace("der2_cRefset_Language_UUID_", "der2_cRefset_Language_"));
         File otherLangRefsetsFile = new File(languageDir,
@@ -1531,7 +1531,7 @@ public class UuidToSctIdWriter {
      */
     private void processSimpleRefsets() throws  IOException {
         for (File inputFile : uuidFiles) {
-            if (inputFile.getName().toLowerCase().contains("simple-refset")) {
+            if (inputFile.getName().toLowerCase().contains("SimpleRefset_UUID_" + this.releaseType.suffix)) {
                 BufferedReader simpleRefsetReader = new BufferedReader(new InputStreamReader(new FileInputStream(inputFile), "UTF8"));
                 File simpleRefsetFile = new File(content,
                         inputFile.getName().replace("UUID_", ""));

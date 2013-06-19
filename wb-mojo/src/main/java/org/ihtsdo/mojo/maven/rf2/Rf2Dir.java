@@ -17,7 +17,6 @@
 package org.ihtsdo.mojo.maven.rf2;
 
 import java.io.File;
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;

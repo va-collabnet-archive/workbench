@@ -405,12 +405,12 @@ public class BdbCommitManager {
         boolean passedRelease = false;
         boolean performCommit = true;
         WriteLock datacheckWriteLock = dataCheckLock.writeLock();
+        I_RepresentIdSet allUncommitted = new IdentifierSet();
         try {
             
             synchronized (uncommittedCNids) {
                 synchronized (uncommittedCNidsNoChecks) {
                     synchronized (uncommittedWfMemberIds) {
-                        I_RepresentIdSet allUncommitted = new IdentifierSet();
                         allUncommitted.or(uncommittedCNids);
                         allUncommitted.or(uncommittedCNidsNoChecks);
                         for (I_ExtendByRef ref : uncommittedWfMemberIds) {
@@ -606,6 +606,7 @@ public class BdbCommitManager {
         fireCommit();
 
         if (performCommit) {
+            GlobalPropertyChange.firePropertyChange(TerminologyStoreDI.CONCEPT_EVENT.POST_SUCESSFUL_COMMIT, null, allUncommitted);
             return true;
         }else{
             updateAlerts();
@@ -808,6 +809,7 @@ public class BdbCommitManager {
         fireCommit();
 
         if (performCommit) {
+            GlobalPropertyChange.firePropertyChange(TerminologyStoreDI.CONCEPT_EVENT.POST_SUCESSFUL_COMMIT, null, allUncommitted);
             return true;
         }else{
             updateAlerts();
@@ -1579,6 +1581,7 @@ public class BdbCommitManager {
 
         @Override
         protected Collection<AlertToDataConstraintFailure> doInBackground() throws Exception {
+            try {
             List<AlertToDataConstraintFailure> runnerAlerts = new ArrayList<AlertToDataConstraintFailure>();
 
             if (canceled) {
@@ -1643,24 +1646,21 @@ public class BdbCommitManager {
             }
 
             return runnerAlerts;
-        }
+            
+            } finally {
+                long remaining = latch.getCount();
 
-        @Override
-        protected void done() {
-            super.done();
-
-            long remaining = latch.getCount();
-
-            for (long i = 0; i < remaining; i++) {
+                for (long i = 0; i < remaining; i++) {
 
 //          System.out.println(">>>>>>>>>>>>> Latch cancel: " + latch.getCount());
-                latch.countDown();
-            }
+                    latch.countDown();
+                }
 
-            if (!canceled) {
-                runners.remove(c);
+                if (!canceled) {
+                    runners.remove(c);
+                }
+                dbCheckerPermit2.release();
             }
-            dbCheckerPermit2.release();
         }
 
         @Override

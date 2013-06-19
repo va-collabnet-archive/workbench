@@ -251,6 +251,7 @@ the specific language governing permissions and limitations under the License. -
         <module>wb-api</module>
         <module>tk-workflow-api</module>
         <module>id-generation-ws-client</module>
+        <!--  <module>id-generation-ws</module>  -->
         <module>id-generation-api</module>
         <module>wb-release-process</module>
         <module>wb-mojo</module>

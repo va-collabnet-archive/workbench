@@ -91,7 +91,7 @@ public class SetWorkflowListener extends AbstractTask {
 	public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker)
 	throws TaskFailedException {
 		try {
-			Ts.get().addPropertyChangeListener(CONCEPT_EVENT.POST_COMMIT, WorkflowHelper2.getWorkflowListener());
+			Ts.get().addPropertyChangeListener(CONCEPT_EVENT.POST_SUCESSFUL_COMMIT, WorkflowHelper2.getWorkflowListener());
 		} catch (Exception e) {
 			throw new TaskFailedException(e);
 		}

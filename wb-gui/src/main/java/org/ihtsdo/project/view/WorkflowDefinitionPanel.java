@@ -272,7 +272,7 @@ public class WorkflowDefinitionPanel extends JPanel {
 		ListModel<String> xlsModel = xlsFiles.getModel();
 		List<Integer> vector = new ArrayList<Integer>();
 		for (String excelFile : excelFiles) {
-			String[] split = excelFile.split("/");
+			String[] split = excelFile.split(File.separator);
 			String key = split[split.length - 1];
 			String replacedKey = key.replaceAll(".xls", "");
 			if (xlsHash.containsKey(replacedKey)) {
@@ -302,7 +302,7 @@ public class WorkflowDefinitionPanel extends JPanel {
 		ListModel<String> drlModel = drlFiles.getModel();
 		List<Integer> vectordrl = new ArrayList<Integer>();
 		for (String drlFile : rulesFiles) {
-			String[] split = drlFile.split("/");
+			String[] split = drlFile.split(File.separator);
 			String key = split[split.length - 1];
 			String replacedKey = key.replaceAll(".drl", "");
 			if (drlHash.containsKey(replacedKey)) {

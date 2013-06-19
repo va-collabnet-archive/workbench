@@ -562,7 +562,7 @@ public class BdbTermBuilder implements TerminologyBuilderBI {
         } else if (newC.isCanceled()) {
             a = newC.getConAttrs();
             for (int pathNid : ec.getEditPaths()) {
-                a.resetUncommitted(blueprint.getStatusNid(), ec.getAuthorNid(), pathNid, ec.getModuleNid());
+                a.resetUncommitted(blueprint.getStatusNid(), ec.getAuthorNid(), ec.getModuleNid(), pathNid);
             }
             a.nid = cNid;
             a.enclosingConceptNid = cNid;

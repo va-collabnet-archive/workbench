@@ -20,7 +20,6 @@ import org.dwfa.ace.api.ebr.I_ExtendByRefPartStr;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.workflow.refset.WorkflowRefset;
 import org.ihtsdo.workflow.refset.edcat.EditorCategoryRefsetReader;
 
 /**

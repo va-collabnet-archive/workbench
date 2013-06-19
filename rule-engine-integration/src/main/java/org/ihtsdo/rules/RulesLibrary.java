@@ -394,8 +394,10 @@ public class RulesLibrary {
 					// Nothing to do
 				}
 				AceLog.getAppLog().alertAndLogException(e);
+			} else {
+				System.out.println("Error in QA check on concept: " + concept.toString() + " for " + context.toString());
 			}
-			throw(e);
+			//throw(e);
 		}
 		long endTime = System.currentTimeMillis();
 		long elapsed = endTime - startTime;

@@ -18,7 +18,6 @@ package org.ihtsdo.mojo.mojo;
 
 import java.io.File;
 import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
 import org.apache.maven.plugin.AbstractMojo;
@@ -29,7 +28,6 @@ import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.id.Type5UuidFactory;
-import org.ihtsdo.mojo.maven.MojoUtil;
 
 /**
  * 

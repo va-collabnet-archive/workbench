@@ -106,7 +106,7 @@ public class StatusAtPositionBdb extends ComponentBdb {
     private void checkTimeAndAdd(long startTime, long endTime, IntSet specifiedSapNids, int sapNid) {
         long time = getTime(sapNid);
 
-        if ((time >= startTime) && (time <= endTime)) {
+        if ((time > startTime) && (time <= endTime)) {
             specifiedSapNids.add(sapNid);
         }
     }
@@ -375,7 +375,7 @@ public class StatusAtPositionBdb extends ComponentBdb {
 
     public int getSapNid(int statusNid, long time, int authorNid, int moduleNid, int pathNid) {
         if (time == Long.MAX_VALUE) {
-            UncommittedStatusForPath usp = new UncommittedStatusForPath(statusNid, authorNid, pathNid, moduleNid);
+            UncommittedStatusForPath usp = new UncommittedStatusForPath(statusNid, authorNid, moduleNid, pathNid);
 
             if (uncomittedStatusPathEntries.containsKey(usp)) {
                 return uncomittedStatusPathEntries.get(usp);

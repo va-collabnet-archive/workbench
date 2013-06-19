@@ -81,6 +81,8 @@ import org.ihtsdo.project.workflow.model.WfRole;
 import org.ihtsdo.project.workflow.model.WfUser;
 import org.ihtsdo.project.workflow.model.WorkflowDefinition;
 import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
+import org.ihtsdo.tk.api.changeset.ChangeSetGenerationThreadingPolicy;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
@@ -595,6 +597,9 @@ public class ConceptViewRenderer extends JLayeredPane {
 
 						if (nextDestination != null) {
 							WfInstance.updateDestination((WfInstance) wfInstance, nextDestination);
+						} else {
+							I_GetConceptData component = Terms.get().getConcept(((WfInstance) wfInstance).getComponentId());
+							component.commit(ChangeSetGenerationPolicy.INCREMENTAL, ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);
 						}
 
 						WorkflowStore ws = new WorkflowStore();
