@@ -16,6 +16,7 @@
 package org.ihtsdo.tk.query.persistance;
 
 import java.io.IOException;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -162,7 +163,7 @@ public class PersistanceEngine {
         }
 
         protected void process(int conceptNid, NidBitSetBI newMembers) throws Exception {
-            if (originalActiveMarkedParentRefCompNids.isMember(conceptNid) || newMembers.isMember(conceptNid)) {
+            if (originalActiveRefsetRefCompNids.isMember(conceptNid) || newMembers.isMember(conceptNid)) {
                 if (!originalActiveRefsetRefCompNids.isMember(conceptNid) && newMembers.isMember(conceptNid)) { //add
                     newMemberCount.incrementAndGet();
                     memberRefsetHelper.newRefsetExtension(refsetNid, conceptNid,
