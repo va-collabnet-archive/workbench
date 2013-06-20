@@ -216,6 +216,9 @@ public abstract class RF2AbstractImpl {
 			modmodMap.put("13b9d324-0913-4c7e-a4cd-c92f8d28e8bd","999000011000000103");
 			modmodMap.put("7049fbe6-220d-4580-a369-d1981d0753f8","999000011000000103");
 			modmodMap.put("ab30cbe7-92e5-4445-b489-9226a91d6506","999000011000000103");
+			modmodMap.put("f81df085-c0a7-4a05-8f55-01bbdd4371d5","999000011000001104");
+			modmodMap.put("c4a2e263-5203-4078-8b89-7c12d196fc9e","999000011000001104");
+			modmodMap.put("70473ab9-80dc-40a3-8943-0ce703486739","999000011000001104");
 
 			nspMap=new HashMap<String,String>();
 			nspMap.put("999000011000000103","1000000");
