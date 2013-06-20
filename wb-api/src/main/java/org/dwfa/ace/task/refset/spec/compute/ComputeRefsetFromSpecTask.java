@@ -172,7 +172,7 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
             }
 
             if (!DwfaEnv.isHeadless()) {
-                JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null), "Refset compute complete.", "",
+                JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null), "Refset compute complete. Refset: " + refset.toUserString(), "",
                         JOptionPane.INFORMATION_MESSAGE);
             }
             return Condition.ITEM_COMPLETE;

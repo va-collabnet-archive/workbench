@@ -247,8 +247,8 @@ public abstract class RefsetSpecStatement extends RefsetSpecComponent {
 
     protected boolean componentIsMemberOf(ComponentVersionBI component) throws IOException {
         int refexNid = ((ConceptChronicleBI) queryConstraint).getConceptNid();
-        Collection<? extends RefexChronicleBI<?>> annotations = component.getAnnotationMembersActive(viewCoordinate, refexNid);
-        if(annotations != null || !annotations.isEmpty()){
+        Collection<? extends RefexChronicleBI<?>> annotations = component.getRefexMembersActive(viewCoordinate, refexNid);
+        if(!annotations.isEmpty()){
             return true;
         }
         return false;
