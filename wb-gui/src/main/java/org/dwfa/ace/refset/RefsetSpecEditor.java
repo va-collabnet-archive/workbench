@@ -1188,13 +1188,15 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
 
         @Override
         public void propertyChange(PropertyChangeEvent evt) {
-            RowSorter<? extends TableModel> rowSorter = refsetSpecPanel.getRefsetTable().getRowSorter();
-            List<SortKey> emptyList = new ArrayList<SortKey>();
-            rowSorter.setSortKeys(emptyList);
-            updatePanel();
-            firePropertyChange(evt.getPropertyName(), evt.getOldValue(), evt.getNewValue());
+            if(refsetSpecPanel.getRefsetTable() != null){
+                RowSorter<? extends TableModel> rowSorter = refsetSpecPanel.getRefsetTable().getRowSorter();
+                List<SortKey> emptyList = new ArrayList<SortKey>();
+                rowSorter.setSortKeys(emptyList);
+                updatePanel();
+                firePropertyChange(evt.getPropertyName(), evt.getOldValue(), evt.getNewValue());
+            }
+            }
         }
-    }
 
     private class PluginListener implements ActionListener {
 

@@ -176,7 +176,9 @@ public class RefsetSpecPanel extends JPanel {
       bottomTabs.addChangeListener(new TabChangeListener());
       commentTableModel = setupCommentTable();
       setupRefsetMemberTable(commentTableModel);
-      editor.getLabel().setTermComponent(editor.getTermComponent());
+      I_AmTermComponent termComponent = editor.getTermComponent();
+      editor.getLabel().setTermComponent(null);
+      editor.getLabel().setTermComponent(termComponent);
       editor.addHistoryActionListener(new HistoryActionListener());
       editor.getLabel().addTermChangeListener(new PropertyChangeListener() {
 
