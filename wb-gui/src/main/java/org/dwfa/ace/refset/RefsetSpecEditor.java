@@ -937,47 +937,47 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
                 name = name.replace(" refset", "");
             }
             I_GetConceptData status =
-                    Terms.get().getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
+                   (I_GetConceptData) Ts.get().getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
             if (Ts.get().hasUuid(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getUuids()[0])) {
                 status = (I_GetConceptData) SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient();
             }
             I_GetConceptData refsetComputeType =
-                    Terms.get().getConcept(RefsetAuxiliary.Concept.CONCEPT_COMPUTE_TYPE.getUids());
+                    (I_GetConceptData) Ts.get().getConcept(RefsetAuxiliary.Concept.CONCEPT_COMPUTE_TYPE.getUids());
             I_GetConceptData fsnConcept =
-                    Terms.get().getConcept(
+                    (I_GetConceptData) Ts.get().getConcept(
                     ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids());
             I_GetConceptData ptConcept =
-                    Terms.get().getConcept(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids());
+                    (I_GetConceptData) Ts.get().getConcept(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids());
             I_GetConceptData isA =
-                    Terms.get().getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids());
+                    (I_GetConceptData) Ts.get().getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids());
             I_GetConceptData supportingRefset =
-                    Terms.get().getConcept(RefsetAuxiliary.Concept.SUPPORTING_REFSETS.getUids());
+                    (I_GetConceptData) Ts.get().getConcept(RefsetAuxiliary.Concept.SUPPORTING_REFSETS.getUids());
             I_GetConceptData markedParentRel =
-                    Terms.get().getConcept(RefsetAuxiliary.Concept.MARKED_PARENT_REFSET.getUids());
+                    (I_GetConceptData) Ts.get().getConcept(RefsetAuxiliary.Concept.MARKED_PARENT_REFSET.getUids());
             I_GetConceptData markedParentIsATypeRel =
-                    Terms.get().getConcept(RefsetAuxiliary.Concept.MARKED_PARENT_IS_A_TYPE.getUids());
+                    (I_GetConceptData) Ts.get().getConcept(RefsetAuxiliary.Concept.MARKED_PARENT_IS_A_TYPE.getUids());
             I_GetConceptData specifiesRefsetRel =
-                    Terms.get().getConcept(RefsetAuxiliary.Concept.SPECIFIES_REFSET.getUids());
+                    (I_GetConceptData) Ts.get().getConcept(RefsetAuxiliary.Concept.SPECIFIES_REFSET.getUids());
             I_GetConceptData commentsRel =
-                    Terms.get().getConcept(RefsetAuxiliary.Concept.COMMENTS_REL.getUids());
+                    (I_GetConceptData) Ts.get().getConcept(RefsetAuxiliary.Concept.COMMENTS_REL.getUids());
             I_GetConceptData editTimeRel =
-                    Terms.get().getConcept(RefsetAuxiliary.Concept.EDIT_TIME_REL.getUids());
+                    (I_GetConceptData) Ts.get().getConcept(RefsetAuxiliary.Concept.EDIT_TIME_REL.getUids());
             I_GetConceptData computeTimeRel =
-                    Terms.get().getConcept(RefsetAuxiliary.Concept.COMPUTE_TIME_REL.getUids());
+                    (I_GetConceptData) Ts.get().getConcept(RefsetAuxiliary.Concept.COMPUTE_TIME_REL.getUids());
             I_GetConceptData purposeRel =
-                    Terms.get().getConcept(RefsetAuxiliary.Concept.REFSET_PURPOSE_REL.getUids());
+                    (I_GetConceptData) Ts.get().getConcept(RefsetAuxiliary.Concept.REFSET_PURPOSE_REL.getUids());
             I_GetConceptData refsetComputeTypeRel =
-                    Terms.get().getConcept(RefsetAuxiliary.Concept.REFSET_COMPUTE_TYPE_REL.getUids());
+                    (I_GetConceptData) Ts.get().getConcept(RefsetAuxiliary.Concept.REFSET_COMPUTE_TYPE_REL.getUids());
             I_GetConceptData stringAnnotation =
-                    Terms.get().getConcept(RefsetAuxiliary.Concept.STRING_ANNOTATION_PURPOSE.getUids());
+                    (I_GetConceptData) Ts.get().getConcept(RefsetAuxiliary.Concept.STRING_ANNOTATION_PURPOSE.getUids());
             I_GetConceptData markedParentAnnotation =
-                    Terms.get().getConcept(RefsetAuxiliary.Concept.REFSET_PARENT_MEMBER_PURPOSE.getUids());
+                    (I_GetConceptData) Ts.get().getConcept(RefsetAuxiliary.Concept.REFSET_PARENT_MEMBER_PURPOSE.getUids());
             I_GetConceptData enumeratedAnnotation =
-                    Terms.get().getConcept(RefsetAuxiliary.Concept.ENUMERATED_ANNOTATION_PURPOSE.getUids());
+                    (I_GetConceptData) Ts.get().getConcept(RefsetAuxiliary.Concept.ENUMERATED_ANNOTATION_PURPOSE.getUids());
             I_GetConceptData specAnnotation =
-                    Terms.get().getConcept(RefsetAuxiliary.Concept.REFSET_SPECIFICATION.getUids());
+                    (I_GetConceptData) Ts.get().getConcept(RefsetAuxiliary.Concept.REFSET_SPECIFICATION.getUids());
             I_GetConceptData ancillaryDataAnnotation =
-                    Terms.get().getConcept(RefsetAuxiliary.Concept.ANCILLARY_DATA.getUids());
+                    (I_GetConceptData) Ts.get().getConcept(RefsetAuxiliary.Concept.ANCILLARY_DATA.getUids());
             // check that the name isn't null or empty etc
             if ((name == null) || name.trim().equals("")) {
                 throw new TaskFailedException("Refset name cannot be empty.");
@@ -1076,57 +1076,17 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
         return newConcept;
     }
 
-    public static void newDescription(I_GetConceptData concept, I_GetConceptData descriptionType,
+    private static void newDescription(I_GetConceptData concept, I_GetConceptData descriptionType,
             String description, I_ConfigAceFrame aceConfig, I_GetConceptData status)
             throws TerminologyException, Exception {
-        NidSetBI actives = Terms.get().getActiveAceFrameConfig().getViewCoordinate().getAllowedStatusNids();
-
-        if (descriptionType.getNid()
-                == ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.localize().getNid()) {
-            String filteredDescription = description;
-
-            filteredDescription = filteredDescription.trim();
-
-            // new removal using native lucene escaping
-            filteredDescription = QueryParser.escape(filteredDescription);
-
-            SearchResult result = Terms.get().doLuceneSearch(filteredDescription);
-
-            for (int i = 0; i < result.topDocs.totalHits; i++) {
-                Document doc = result.searcher.doc(result.topDocs.scoreDocs[i].doc);
-                int cnid = Integer.parseInt(doc.get("cnid"));
-                int dnid = Integer.parseInt(doc.get("dnid"));
-
-                if (cnid == concept.getConceptNid()) {
-                    continue;
-                }
-
-                try {
-                    I_DescriptionVersioned<?> potential_fsn = Terms.get().getDescription(dnid, cnid);
-                    if (potential_fsn != null && potential_fsn.getMutableParts() != null) {
-                        for (I_DescriptionPart part_search : potential_fsn.getMutableParts()) {
-                            if (actives.contains(part_search.getStatusNid())
-                                    && (part_search.getTypeNid()
-                                    == ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.localize().getNid()) && part_search.getText().equals(description)) {
-                                throw new TerminologyException("Concept already exists in database with FSN: "
-                                        + description);
-                            }
-                        }
-                    }
-                } catch (IOException ioe) {
-                    AceLog.getAppLog().warning("unique fsn check. Doc: \n" + doc + "\nex:\n" + ioe.toString());
-                }
-            }
-        }
 
         UUID descUuid = UUID.randomUUID();
 
         Terms.get().newDescription(descUuid, concept, "en", description, descriptionType,
                 Terms.get().getActiveAceFrameConfig(), status.getNid());
-        Terms.get().addUncommittedNoChecks(concept);
     }
 
-    public static void newRelationship(I_GetConceptData concept, I_GetConceptData relationshipType,
+    private static void newRelationship(I_GetConceptData concept, I_GetConceptData relationshipType,
             I_GetConceptData destination, I_ConfigAceFrame aceConfig)
             throws Exception {
         int statusId =
@@ -1141,7 +1101,6 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
         Terms.get().newRelationship(relUuid, concept, relationshipType, destination, charConcept,
                 refConcept, Terms.get().getConcept(statusId), group,
                 Terms.get().getActiveAceFrameConfig());
-        Terms.get().addUncommittedNoChecks(concept);
     }
     //~--- inner classes -------------------------------------------------------
 
