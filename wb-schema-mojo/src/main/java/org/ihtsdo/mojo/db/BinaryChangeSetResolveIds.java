@@ -338,16 +338,19 @@ public class BinaryChangeSetResolveIds {
                         
                         removeLegacyGBDialectExceptionsAnnotation(eConcept);
 
+                        if (eccsLogPreWriter != null) {
+                            eccsLogPreWriter.write("\n#_#_#_#_# ");
+                            eccsLogPreWriter.write("timeStampEccsL: ");
+                            eccsLogPreWriter.write(Long.toString(timeStampEccsL));
+                            eccsLogPreWriter.write("\n");
+                            eccsLogPreWriter.write(eConcept.toString());
+                            eccsLogPreWriter.write("\n");
+                        }
+
                         if (skipUuidSet != null
                                 && skipUuidSet.contains(eConcept.primordialUuid)) {
                             eccsLogExceptionsWriter.append("skipped UUID :: " + enclosingUuid.toString() + "\n");
                             continue;
-                        }
-
-                        if (eccsLogPreWriter != null) {
-                            eccsLogPreWriter.write("\n------- ");
-                            eccsLogPreWriter.write(eConcept.toString());
-                            eccsLogPreWriter.write("\n");
                         }
 
                     } catch (EOFException e) {
@@ -468,12 +471,9 @@ public class BinaryChangeSetResolveIds {
 //                    if (debugSet.contains(eConcept.getPrimordialUuid())) {
 //                        System.out.println(":!!!:DEBUG: BinaryChangeSetResolveIds .OUT. \n" + eConcept.toString());
 //                    }
-                    if (eccsLogPostWriter != null) {
-                        eccsLogPostWriter.write("\n------- ");
-                        eccsLogPostWriter.write(eConcept.toString());
-                        eccsLogPostWriter.write("\n");
-                    }
                     if (eccsPathExceptionFoundB) {
+                        eccsLogExceptionsWriter.append("### PATH EXCEPTION FOUND ###\n");
+                        eccsLogExceptionsWriter.append(eConcept.toString());
                         eccsLogExceptionsWriter.append("\n");
                     }
                     bcsList.add(new TkChangeSortable(timeStampEccsL, timeFirstEditL, eConcept));
@@ -491,6 +491,16 @@ public class BinaryChangeSetResolveIds {
                 for (TkChangeSortable tkcs : bcsList) {
                     out.writeLong(tkcs.timeStampEccsL);
                     tkcs.eConcept.writeExternal(out);
+                    if (eccsLogPostWriter != null) {
+                        eccsLogPostWriter.write("\n#_#_#_#_# ");
+                        eccsLogPostWriter.write("timeStampEccsL: ");
+                        eccsLogPostWriter.write(Long.toString(tkcs.timeStampEccsL));
+                        eccsLogPostWriter.write(" ---- timeFirstEditL: ");
+                        eccsLogPostWriter.write(Long.toString(tkcs.timeFirstEditL));
+                        eccsLogPostWriter.write("\n");
+                        eccsLogPostWriter.write(tkcs.eConcept.toString());
+                        eccsLogPostWriter.write("\n");
+                    }
                 }
                 out.flush();
             }
@@ -1138,14 +1148,23 @@ public class BinaryChangeSetResolveIds {
 
         @Override
         public int compareTo(TkChangeSortable o) {
-            if (this.timeFirstEditL < o.timeFirstEditL) {
+            if (this.timeStampEccsL < o.timeStampEccsL) {
                 return -1; // instance less than received
-            } else if (this.timeFirstEditL > o.timeFirstEditL) {
+            } else if (this.timeStampEccsL > o.timeStampEccsL) {
                 return 1; // instance greater than received
             } else {
                 return 0;
             }
         }
+//        public int compareTo(TkChangeSortable o) {
+//            if (this.timeFirstEditL < o.timeFirstEditL) {
+//                return -1; // instance less than received
+//            } else if (this.timeFirstEditL > o.timeFirstEditL) {
+//                return 1; // instance greater than received
+//            } else {
+//                return 0;
+//            }
+//        }
     }
     //################## :TODO: generalize these as parameters ##########################
     HashSet<UUID> pathsToNotChange;
