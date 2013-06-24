@@ -1,7 +1,5 @@
 package com.termmed.genid;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -156,7 +154,8 @@ public class GenIdHelper {
 					logger.info("lista decimal start: " + startDecimalLista);
 					int endDecimalLista = Integer.parseInt(last.split("-")[1], 16);
 					logger.info("lista decimal end: " + endDecimalLista);
-					if (lista != null && !lista.isEmpty() && startDecimalLista + pageLenght != endDecimalLista) {
+					//startDecimalLista + pageLenght != endDecimalLista
+					if (lista != null && !lista.isEmpty() && lista.size() != pageLenght) {
 						int resultNum = findFirstAvailableNumber(lista, digits, lenSuffix);
 						logger.info("First Avalable Number: " + resultNum);
 
@@ -230,8 +229,14 @@ public class GenIdHelper {
 						int actNum = Integer.parseInt(actSuffix, 16);
 						logger.info("Actual Number: " + actNum);
 						if (actNum - antNum >= 1) {
-
-							resultNum = antNum;
+							logger.info("Anterior Number: " + antNum);
+							if (antNum == lastNum) {
+								logger.info("LLego a fin de la lista");
+								antNum++;
+							} else {
+								logger.info("esta por el medio de la lista");
+								resultNum = antNum;
+							}
 							break;
 						}
 						antNum++;
@@ -240,7 +245,7 @@ public class GenIdHelper {
 			}
 		}
 		if (resultNum == 0) {
-			resultNum = antNum;
+			resultNum = antNum+1;
 		}
 		return resultNum;
 	}
