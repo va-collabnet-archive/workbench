@@ -63,7 +63,12 @@ import org.ihtsdo.tk.api.TerminologyBuilderBI;
 import org.ihtsdo.tk.api.blueprint.DescriptionCAB;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
+import org.ihtsdo.tk.api.description.DescriptionChronicleBI;
+import org.ihtsdo.tk.api.description.DescriptionVersionBI;
+import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
+import org.ihtsdo.tk.dto.concept.component.refex.TK_REFEX_TYPE;
 
 @BeanList(specs = { @Spec(directory = "tasks/ide/listview", type = BeanType.TASK_BEAN) })
 public class SearchReplaceTermsInList extends AbstractTask {
@@ -189,21 +194,18 @@ public class SearchReplaceTermsInList extends AbstractTask {
                 for (int i = 0; i < model.getSize(); i++) {
 
                     // Get the current concept
-                    I_GetConceptData child = model.getElementAt(i);
+                    ConceptChronicleBI child = model.getElementAt(i);
 
                     PositionSetReadOnly positionsToCheck = config.getViewPositionSetReadOnly();
-
                     // get latest descriptions
-                    List<? extends I_DescriptionTuple> descriptionTuples = child.getDescriptionTuples(config.getAllowedStatus(),
-                        (searchAll ? null : descriptionTypesToCheck), positionsToCheck, config.getPrecedence(), 
-                        config.getConflictResolutionStrategy());
+                    Collection<? extends DescriptionVersionBI> descriptionsActive = child.getVersion(config.getViewCoordinate()).getDescriptionsActive();
 
                     // For the current description of this concept
-                    for (I_DescriptionTuple description : descriptionTuples) {
+                    for (DescriptionVersionBI description : descriptionsActive) {
                     	if(!selectedLangCode.getFormatedLanguageCode().equals(description.getLang())){
                     		continue;
                     	}
-                        if (!processedDescriptions.contains(":" + description.getDescId() + ":")) {
+                        if (!processedDescriptions.contains(":" + description.getNid() + ":")) {
                             // If it contains the search string
                             if ((caseSensitive && description.getText().contains(searchString))
                                 || (!caseSensitive && description.getText().toUpperCase().contains(
@@ -225,7 +227,7 @@ public class SearchReplaceTermsInList extends AbstractTask {
                                 String finalDescHtml = description.getText().replaceAll(searchPrepend + searchString,
                                     "<font color='green'>" + replaceString + "</font>");
 
-                                String descType = termFactory.getConcept(description.getTypeId()).getInitialText();
+                                String descType = termFactory.getConcept(description.getTypeNid()).getInitialText();
 
                                 // Add to our list of descriptions that will
                                 // require change
@@ -240,13 +242,23 @@ public class SearchReplaceTermsInList extends AbstractTask {
                                     DescriptionCAB descriptionBlueprint = description.makeBlueprint(config.getViewCoordinate());
                                     descriptionBlueprint.setText(finalDesc);
                                     descriptionBlueprint.setComponentUuid(UUID.randomUUID());
+                                    descriptionBlueprint.getAnnotationBlueprints().clear();
                                     builder.construct(descriptionBlueprint);
+                                    
                                     for (RefexVersionBI refex : description.getRefexesActive(config.getViewCoordinate())) {
-                                        RefexCAB refexBlueprint = refex.makeBlueprint(config.getViewCoordinate());
-                                        refexBlueprint.setMemberUuid(refex.getPrimUuid());
-                                        refexBlueprint.setRetired();
-                                        builder.construct(refexBlueprint);
+                                        RefexCAB bpToAdd = refex.makeBlueprint(config.getViewCoordinate());
+                                        bpToAdd.setReferencedComponentUuid(descriptionBlueprint.getComponentUuid());
+                                        bpToAdd.setMemberUuid(UUID.randomUUID());
+                                        builder.construct(bpToAdd);
+                                        
+                                        RefexCAB bpToRetire = refex.makeBlueprint(config.getViewCoordinate());
+                                        bpToRetire.setMemberUuid(refex.getPrimUuid());
+                                        bpToRetire.setRetired();
+                                        builder.construct(bpToRetire);
                                     }
+                                    
+                                    
+                                    
                                 }catch(InvalidCAB e){
                                     throw new TaskFailedException(e);
                                 }
@@ -269,11 +281,10 @@ public class SearchReplaceTermsInList extends AbstractTask {
                                                 config.getEditCoordinate().getModuleNid(),
                                                 path.getConceptNid());
                                     }
-                                    description.getDescVersioned().addVersion(newRetiredPart);
-                                    termFactory.addUncommitted(child);
+                                    Ts.get().addUncommitted(child);
                                 }
                             }
-                            processedDescriptions += ":" + description.getDescId() + ":";
+                            processedDescriptions += ":" + description.getNid() + ":";
                         }
                     }
                 }
