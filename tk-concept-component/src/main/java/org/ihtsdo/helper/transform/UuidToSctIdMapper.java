@@ -172,20 +172,26 @@ public class UuidToSctIdMapper implements ProcessUnfetchedConceptDataBI {
      * @throws Exception indicates an exception has occurred
      */
     private void process(ConceptChronicleBI conceptChronicle) throws Exception {
+        Collection<IdBI> ids = null;
         ConceptAttributeChronicleBI conceptAttr = conceptChronicle.getConceptAttributes();
-        UUID conceptAttrUuid = conceptAttr.getPrimUuid();
-        Collection<IdBI> ids = (Collection<IdBI>) conceptAttr.getAdditionalIds();
-        if (ids != null) {
-            for (IdBI id : ids) {
-                if (id.getAuthorityNid() == TermAux.SCT_ID_AUTHORITY.getLenient().getNid()) {
-                    String sctId = id.getDenotation().toString();
-                    if (sctId.length() > 10 && namespace.equals(getNamespace(sctId))) {
-                        conceptsWriter.write(conceptAttrUuid.toString() + endOfLine); //TODO additional UUIDs?
-                        conceptsWriter.write(sctId + endOfLine); //TODO effective date?
+        if (conceptAttr == null) {
+            System.out.println("Null concept attributes: " + conceptChronicle.toLongString());
+        } else {
+            UUID conceptAttrUuid = conceptAttr.getPrimUuid();
+            ids = (Collection<IdBI>) conceptAttr.getAdditionalIds();
+            if (ids != null) {
+                for (IdBI id : ids) {
+                    if (id.getAuthorityNid() == TermAux.SCT_ID_AUTHORITY.getLenient().getNid()) {
+                        String sctId = id.getDenotation().toString();
+                        if (sctId.length() > 10 && namespace.equals(getNamespace(sctId))) {
+                            conceptsWriter.write(conceptAttrUuid.toString() + endOfLine); //TODO additional UUIDs?
+                            conceptsWriter.write(sctId + endOfLine); //TODO effective date?
+                        }
                     }
                 }
             }
         }
+        
         for (DescriptionChronicleBI description : conceptChronicle.getDescriptions()) {
             ids = (Collection<IdBI>) description.getAdditionalIds();
             if (ids != null) {
@@ -193,7 +199,7 @@ public class UuidToSctIdMapper implements ProcessUnfetchedConceptDataBI {
                     if (id.getAuthorityNid() == TermAux.SCT_ID_AUTHORITY.getLenient().getNid()) {
                         String sctId = id.getDenotation().toString();
                         if (sctId.length() > 10 && namespace.equals(getNamespace(sctId))) {
-                            descriptionsWriter.write(conceptAttrUuid.toString() + endOfLine); //TODO additional UUIDs?
+                            descriptionsWriter.write(description.getPrimUuid().toString() + endOfLine); //TODO additional UUIDs?
                             descriptionsWriter.write(sctId + endOfLine); //TODO effective date?
                         }
                     }
@@ -207,7 +213,7 @@ public class UuidToSctIdMapper implements ProcessUnfetchedConceptDataBI {
                     if (id.getAuthorityNid() == TermAux.SCT_ID_AUTHORITY.getLenient().getNid()) {
                         String sctId = id.getDenotation().toString();
                         if (sctId.length() > 10 && namespace.equals(getNamespace(sctId))) {
-                            relationshipsWriter.write(conceptAttrUuid.toString() + endOfLine); //TODO additional UUIDs?
+                            relationshipsWriter.write(relationship.getPrimUuid().toString() + endOfLine); //TODO additional UUIDs?
                             relationshipsWriter.write(sctId + endOfLine); //TODO effective date?
                         }
                     }
