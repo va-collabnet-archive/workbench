@@ -618,8 +618,8 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                     part = first + rest;
                     refsetName = refsetName + part;
                 }
-                if(!refsetName.toLowerCase().contains("simple-refset")){
-                    refsetName = refsetName.concat("-simple-refset");
+                if(!refsetName.toLowerCase().contains("SimpleRefset")){
+                    refsetName = refsetName.concat("SimpleRefset");
                 }
                 File simpleRefsetFile = new File(directory,
                         "der2_cRefset_" + refsetName + "_UUID_" + releaseType.suffix + "_"
@@ -716,10 +716,18 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
         Collection<? extends ConceptVersionBI> childRefsetConcepts = conNumRefsetParentConcept.getRelationshipsIncomingSourceConceptsActiveIsa();
         for (ConceptVersionBI childRefset : childRefsetConcepts) {
             if (childRefset.getModuleNid() == Ts.get().getNidForUuids(UUID.fromString(module))) {
-                String refsetName = childRefset.getDescriptionPreferred().getText();
-                refsetName = refsetName.replace(" ", "-");
-                if(!refsetName.toLowerCase().contains("concept-number-refset")){
-                    refsetName = refsetName.concat("-concept-number-refset");
+                String refsetNameOld = childRefset.getDescriptionPreferred().getText();
+                String[] parts = refsetNameOld.split(" ");
+                String refsetName = "";
+                for(String part : parts){
+                    String first = part.substring(0, 1);
+                    String rest = part.substring(1);
+                    first = first.toUpperCase();
+                    part = first + rest;
+                    refsetName = refsetName + part;
+                }
+                if(!refsetName.toLowerCase().contains("ConceptNumberRefset")){
+                    refsetName = refsetName.concat("ConceptNumberRefset");
                 }
                 File conNumRefsetFile = new File(directory,
                         "der2_ciRefset_" + refsetName + "_UUID_" + releaseType.suffix + "_"
@@ -766,7 +774,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
 
                                     case EFFECTIVE_TIME:
                                         if (sameCycleStampNids.contains(nfVersion.getStampNid())) {
-                                            conNumRefsetWriter.write(nfVersion + field.seperator);
+                                            conNumRefsetWriter.write(effectiveDateString + field.seperator);
                                         } else {
                                             conNumRefsetWriter.write(TimeHelper.getShortFileDateFormat().format(nfVersion.getTime()) + field.seperator);
                                         }

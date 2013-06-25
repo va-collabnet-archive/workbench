@@ -1531,7 +1531,7 @@ public class UuidToSctIdWriter {
      */
     private void processSimpleRefsets() throws  IOException {
         for (File inputFile : uuidFiles) {
-            if (inputFile.getName().toLowerCase().contains("simplerefset")) {
+            if (inputFile.getName().toLowerCase().contains("simplerefset_uuid_" + releaseType.toString().toLowerCase())) {
                 BufferedReader simpleRefsetReader = new BufferedReader(new InputStreamReader(new FileInputStream(inputFile), "UTF8"));
                 File simpleRefsetFile = new File(content,
                         inputFile.getName().replace("UUID_", ""));
@@ -1615,7 +1615,7 @@ public class UuidToSctIdWriter {
      */
     private void processConNumRefsets() throws  IOException {
         for (File inputFile : uuidFiles) {
-            if (inputFile.getName().toLowerCase().contains("concept-number-refset")) {
+            if (inputFile.getName().toLowerCase().contains("conceptnumberrefset_uuid_" + releaseType.toString().toLowerCase())) {
                 BufferedReader conNumRefsetReader = new BufferedReader(new InputStreamReader(new FileInputStream(inputFile), "UTF8"));
                 File conNumRefsetFile = new File(content,
                         inputFile.getName().replace("UUID_", ""));
