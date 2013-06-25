@@ -174,9 +174,7 @@ public class UuidToSctIdMapper implements ProcessUnfetchedConceptDataBI {
     private void process(ConceptChronicleBI conceptChronicle) throws Exception {
         Collection<IdBI> ids = null;
         ConceptAttributeChronicleBI conceptAttr = conceptChronicle.getConceptAttributes();
-        if (conceptAttr == null) {
-            System.out.println("Null concept attributes: " + conceptChronicle.toLongString());
-        } else {
+        if (conceptAttr != null) {
             UUID conceptAttrUuid = conceptAttr.getPrimUuid();
             ids = (Collection<IdBI>) conceptAttr.getAdditionalIds();
             if (ids != null) {
