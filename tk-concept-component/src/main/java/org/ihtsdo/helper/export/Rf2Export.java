@@ -268,7 +268,6 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                 + TimeHelper.getShortFileDateFormat().format(effectiveDate) + ".txt");
         File descriptionsFile = new File(directory,
                 "sct2_Description_UUID_" + releaseType.suffix + "_"
-                + language.getFormatedLanguageCode() + "_"
                 + country.getFormatedCountryCode().toUpperCase() + namespace + "_"
                 + TimeHelper.getShortFileDateFormat().format(effectiveDate) + ".txt");
         File relationshipsFile = new File(directory,
