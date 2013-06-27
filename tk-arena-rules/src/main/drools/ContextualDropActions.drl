@@ -134,8 +134,8 @@ rule "rule 4"
          not $refex: RefexFact(context == Context.DROP_TARGET)
    then
       actions.add(new RetireAction("retire", $dropObject, config));
-      actions.add(new CloneAction("clone", $dropObject, config));
-      actions.add(new CloneAndRetireAction("clone & retire", $dropObject, config));
+      actions.add(new CloneAction("clone", $dropObject, config, cvSettings));
+      actions.add(new CloneAndRetireAction("clone & retire", $dropObject, config, cvSettings));
 end
 
 rule "rule 4.2" 

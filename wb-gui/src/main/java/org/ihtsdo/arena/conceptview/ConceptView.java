@@ -94,6 +94,7 @@ public class ConceptView extends JPanel {
     private Object lastThingBeingDropped;
     private ConceptViewSettings settings;
     private CVChangeListener cvChangeListener = new CVChangeListener();
+    public boolean focus = true;
 
     protected void redoConceptViewLayout() throws IOException {
         if (concept != null) {

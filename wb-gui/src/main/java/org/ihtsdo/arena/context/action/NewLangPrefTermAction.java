@@ -6,6 +6,7 @@ import java.util.UUID;
 import javax.swing.AbstractAction;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.log.AceLog;
+import org.ihtsdo.arena.conceptview.ConceptViewSettings;
 import org.ihtsdo.lang.LANG_CODE;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ContradictionException;
@@ -32,12 +33,13 @@ public class NewLangPrefTermAction extends AbstractAction {
     DescriptionVersionBI desc;
 
     public NewLangPrefTermAction(String actionName, ConceptSpec refex, LANG_CODE lang,
-            DescFact desc, I_ConfigAceFrame config) {
+            DescFact desc, I_ConfigAceFrame config, ConceptViewSettings settings) {
         super(actionName);
         this.refex = refex;
         this.config = config;
         this.lang = lang;
         this.desc = desc.getComponent();
+        settings.getView().focus = true;
     }
 
     @Override
