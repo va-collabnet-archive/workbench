@@ -59,6 +59,7 @@ import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidCidCid;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartInt;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartStr;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
+import org.dwfa.ace.classifier.DiffReportTableModel;
 import org.dwfa.ace.classifier.DiffTableModel;
 import org.dwfa.ace.classifier.EquivTableModel;
 import org.dwfa.ace.list.*;
@@ -312,13 +313,17 @@ public class TerminologyTransferHandler extends TransferHandler {
                             JOptionPane.ERROR_MESSAGE);
                         return null;
                     }
-                } else if (DiffTableModel.class.isAssignableFrom(tableModel.getClass())) {
+                } else if (DiffReportTableModel.class.isAssignableFrom(tableModel.getClass())) {
 
                     AceLog.getAppLog().info("\r\n::: FOUND JTable type: " + tableModel.getClass().toString());
-                    DiffTableModel diffTableModel = (DiffTableModel) tableModel;
+                    DiffReportTableModel diffTableModel = (DiffReportTableModel) tableModel;
+                    // row
                     int selectedRow = termTable.getSelectedRow();
                     int modelRow = termTable.convertRowIndexToModel(selectedRow);
-                    int nid = diffTableModel.getNidAt(modelRow, 0);
+                    // column
+                    int selectedColumn = termTable.getSelectedColumn();
+                    int modelColumn = termTable.convertColumnIndexToModel(selectedColumn);
+                    int nid = diffTableModel.getNidAt(modelRow, modelColumn);
                     if (nid == Integer.MIN_VALUE)
                         return null;
                     return new ConceptTransferable(Terms.get().getConcept(nid));
