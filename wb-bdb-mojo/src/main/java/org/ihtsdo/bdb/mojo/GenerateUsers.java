@@ -625,6 +625,7 @@ NEXT_WHILE:
       activeConfig.setAdminUsername(adminUsername);
 
       // status popup values
+      /*
       I_IntList statusPopupTypes = tf.newIntList();
 
       statusPopupTypes.add(SnomedMetadataRf1.CURRENT_RF1.getLenient().getNid());
@@ -635,7 +636,8 @@ NEXT_WHILE:
       statusPopupTypes.add(
           SnomedMetadataRf2.INACTIVE_VALUE_RF2.getLenient().getNid());
       activeConfig.setEditStatusTypePopup(statusPopupTypes);
-
+       */
+      
       // set up classifier
       activeConfig.setClassificationRoot(
           tf.getConcept(Taxonomies.SNOMED.getLenient().getUUIDs()));
