@@ -21,10 +21,12 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.*;
 import javax.swing.table.TableColumn;
+import javax.swing.table.TableRowSorter;
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.*;
 import org.dwfa.ace.dnd.TerminologyTransferHandler;
@@ -103,7 +105,7 @@ public class DiffReportPanel extends JPanel {
             c.weighty = 1;
             c.gridx = 0;
             c.gridy += 1;
-            table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+            table.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
             JScrollPane jscrollpane = new JScrollPane(table);
             jscrollpane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
             jscrollpane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
@@ -134,10 +136,26 @@ public class DiffReportPanel extends JPanel {
         table.setDefaultRenderer(Object.class, renderer);
         table.setDefaultRenderer(String.class, renderer);
 
+        // sorter
+        TableRowSorter<DiffReportTableModel> sorter = new TableRowSorter<>();
+        sorter.setModel(theTableModel);
+        Comparator<SnoRelReport> comparatorIsAdded = new ComparatorIsAdded();
+        sorter.setComparator(0, comparatorIsAdded);
+        Comparator<SnoRelReport> comparatorC1 = new ComparatorC1();
+        sorter.setComparator(1, comparatorC1);
+        Comparator<SnoRelReport> comparatorType = new ComparatorType();
+        sorter.setComparator(2, comparatorType);
+        Comparator<SnoRelReport> comparatorC2 = new ComparatorC2();
+        sorter.setComparator(3, comparatorC2);
+        sorter.setSortable(4, false); // not sortable by group
+        table.setRowSorter(sorter);
+
         // set column widths
         // add drop column
         TableColumn tc = table.getColumnModel().getColumn(0);
-        tc.setPreferredWidth(32);
+        tc.setMinWidth(32);
+        tc.setPreferredWidth(64);
+        tc.setMaxWidth(128);
         // c1 source concept
         tc = table.getColumnModel().getColumn(1);
         tc.setPreferredWidth(200);
@@ -149,7 +167,9 @@ public class DiffReportPanel extends JPanel {
         tc.setPreferredWidth(200);
         // group
         tc = table.getColumnModel().getColumn(4);
-        tc.setPreferredWidth(60);
+        tc.setMinWidth(18);
+        tc.setPreferredWidth(48);
+        tc.setMaxWidth(64);
 
         int totalRowHeight = 18;
         table.setPreferredScrollableViewportSize(new Dimension(900, totalRowHeight));
@@ -197,5 +217,62 @@ public class DiffReportPanel extends JPanel {
         }
 
         return tableStrings;
+    }
+
+    private static class ComparatorC1 implements Comparator<SnoRelReport> {
+
+        public ComparatorC1() {
+        }
+
+        @Override
+        public int compare(SnoRelReport sr1, SnoRelReport sr2) {
+            String strings1 = sr1.snoRel.toStringC1();
+            String strings2 = sr2.snoRel.toStringC1();
+            return strings1.compareTo(strings2);
+        }
+    }
+
+    private static class ComparatorType implements Comparator<SnoRelReport> {
+
+        public ComparatorType() {
+        }
+
+        @Override
+        public int compare(SnoRelReport sr1, SnoRelReport sr2) {
+            String strings1 = sr1.snoRel.toStringType();
+            String strings2 = sr2.snoRel.toStringType();
+            return strings1.compareTo(strings2);
+        }
+    }
+
+    private static class ComparatorC2 implements Comparator<SnoRelReport> {
+
+        public ComparatorC2() {
+        }
+
+        @Override
+        public int compare(SnoRelReport sr1, SnoRelReport sr2) {
+            String strings1 = sr1.snoRel.toStringC2();
+            String strings2 = sr2.snoRel.toStringC2();
+            return strings1.compareTo(strings2);
+        }
+    }
+
+    private static class ComparatorIsAdded implements Comparator<SnoRelReport> {
+
+        public ComparatorIsAdded() {
+        }
+
+        @Override
+        public int compare(SnoRelReport sr1, SnoRelReport sr2) {
+            boolean boolean1 = sr1.isAdded;
+            boolean boolean2 = sr2.isAdded;
+            if (boolean1 == true && boolean2 == false) {
+                return 1;
+            } else if (boolean1 == false && boolean2 == true) {
+                return -1;
+            }
+            return 0;
+        }
     }
 }

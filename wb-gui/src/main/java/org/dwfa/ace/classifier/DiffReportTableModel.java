@@ -21,7 +21,7 @@ import javax.swing.table.AbstractTableModel;
 
 @SuppressWarnings("serial")
 public class DiffReportTableModel extends AbstractTableModel {
-    private String[] columnNames = {"+-", "source", "type", "destination", "group"};
+    private String[] columnNames = {" ", "source", "type", "destination", "group"};
 
     private Object[][] data;
     private ArrayList<SnoRelReport> srl;
