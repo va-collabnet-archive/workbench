@@ -54,9 +54,9 @@ public class DiffReportTableRenderer extends AceTableRenderer {
             SnoRelReport sr = (SnoRelReport) value;
             if (column == 0) {
                 if (sr.isAdded) {
-                    renderComponent.setText("<html><font face='Dialog' size='3' color='black'>+");
+                    renderComponent.setText("<html><font face='Dialog' size='3' color='black'>added");
                 } else {
-                    renderComponent.setText("<html><font face='Dialog' size='3' color='black'>-");
+                    renderComponent.setText("<html><font face='Dialog' size='3' color='black'>retired");
                 }
             } else if (column == 1) {
                 renderComponent.setText("<html><font face='Dialog' size='3' color='black'>"
@@ -77,9 +77,9 @@ public class DiffReportTableRenderer extends AceTableRenderer {
             SnoRelReport sr = (SnoRelReport) value;
             if (column == 0) {
                 if (sr.isAdded) {
-                    renderComponent.setText("<html><font face='Dialog' size='3' color='white'>+");
+                    renderComponent.setText("<html><font face='Dialog' size='3' color='white'>added");
                 } else {
-                    renderComponent.setText("<html><font face='Dialog' size='3' color='white'>-");
+                    renderComponent.setText("<html><font face='Dialog' size='3' color='white'>retired");
                 }
             } else if (column == 1) {
                 renderComponent.setText("<html><font face='Dialog' size='3' color='white'>"
