@@ -198,7 +198,7 @@ public class WfComponentProvider {
 			}
 
 			Set<I_GetConceptData> vaRoles = new HashSet<I_GetConceptData>();
-			vaRoles = ProjectPermissionsAPI.getDescendants(vaRoles, Terms.get().getConcept(UUID.fromString("dd6f9d69-5d0d-4c4a-b90c-40e76a231f80")));
+			vaRoles = ProjectPermissionsAPI.getDescendants(vaRoles, Terms.get().getConcept(UUID.fromString("7ce34831-6241-5120-a5bd-6b88e163f1bd")));
 
 			for (I_GetConceptData role : vaRoles) {
 				returnRoles.add(roleConceptToWfRole(role));
@@ -344,7 +344,7 @@ public class WfComponentProvider {
 			allStates.addAll(ProjectPermissionsAPI.getDescendants(allStates, Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_STATES.getUids())));
 
 			// VA
-			allStates.addAll(ProjectPermissionsAPI.getDescendants(allStates, Terms.get().getConcept(UUID.fromString("61224a5d-f045-4d0f-85f8-1ef9a7a95780"))));
+			allStates.addAll(ProjectPermissionsAPI.getDescendants(allStates, Terms.get().getConcept(UUID.fromString("c92b837f-bf5a-57d8-86ae-6c79acde8e12"))));
 			// JIF
 			allStates.addAll(ProjectPermissionsAPI.getDescendants(allStates, Terms.get().getConcept(UUID.fromString("56ccc98b-6c1f-5e05-beae-65d9ff12f0f3"))));
 			
