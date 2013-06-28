@@ -203,6 +203,13 @@ public class WfComponentProvider {
 			for (I_GetConceptData role : vaRoles) {
 				returnRoles.add(roleConceptToWfRole(role));
 			}
+
+			Set<I_GetConceptData> jifRoles = new HashSet<I_GetConceptData>();
+			jifRoles = ProjectPermissionsAPI.getDescendants(jifRoles, Terms.get().getConcept(UUID.fromString("c0670d51-e25a-5384-9d6c-9737025642cd")));
+
+			for (I_GetConceptData role : jifRoles) {
+				returnRoles.add(roleConceptToWfRole(role));
+			}
 		} catch (TerminologyException e) {
 			AceLog.getAppLog().alertAndLogException(e);
 		} catch (IOException e) {
@@ -333,9 +340,14 @@ public class WfComponentProvider {
 
 		try {
 			Set<I_GetConceptData> allStates = new HashSet<I_GetConceptData>();
-			allStates.addAll(ProjectPermissionsAPI.getDescendants(allStates, Terms.get().getConcept(UUID.fromString("61224a5d-f045-4d0f-85f8-1ef9a7a95780"))));
 			allStates.addAll(ProjectPermissionsAPI.getDescendants(allStates, Terms.get().getConcept(ArchitectonicAuxiliary.Concept.TRANSLATION_STATUS.getUids())));
 			allStates.addAll(ProjectPermissionsAPI.getDescendants(allStates, Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKFLOW_STATES.getUids())));
+
+			// VA
+			allStates.addAll(ProjectPermissionsAPI.getDescendants(allStates, Terms.get().getConcept(UUID.fromString("61224a5d-f045-4d0f-85f8-1ef9a7a95780"))));
+			// JIF
+			allStates.addAll(ProjectPermissionsAPI.getDescendants(allStates, Terms.get().getConcept(UUID.fromString("56ccc98b-6c1f-5e05-beae-65d9ff12f0f3"))));
+			
 			for (I_GetConceptData state : allStates) {
 				returnStates.add(statusConceptToWfState(state));
 			}
