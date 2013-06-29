@@ -22,6 +22,7 @@ import javax.swing.JTable;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.table.AceTableRenderer;
 
 public class DiffReportTableRenderer extends AceTableRenderer {
@@ -51,48 +52,28 @@ public class DiffReportTableRenderer extends AceTableRenderer {
                 renderComponent.setBackground(colorForRow(row));
                 renderComponent.setForeground(UIManager.getColor("Table.foreground"));
             }
-            SnoRelReport sr = (SnoRelReport) value;
             if (column == 0) {
-                if (sr.isAdded) {
-                    renderComponent.setText("<html><font face='Dialog' size='3' color='black'>added");
-                } else {
-                    renderComponent.setText("<html><font face='Dialog' size='3' color='black'>retired");
-                }
-            } else if (column == 1) {
-                renderComponent.setText("<html><font face='Dialog' size='3' color='black'>"
-                        + sr.snoRel.toStringC1());
-            } else if (column == 2) {
-                renderComponent.setText("<html><font face='Dialog' size='3' color='black'>"
-                        + sr.snoRel.toStringType());
-            } else if (column == 3) {
-                renderComponent.setText("<html><font face='Dialog' size='3' color='black'>"
-                        + sr.snoRel.toStringC2());
+                    renderComponent.setText("<html><font face='Dialog' size='3' color='black'>"
+                            + (String) value);
+            } else if (column == 1 || column == 2 || column == 3) {
+                I_GetConceptData cb = (I_GetConceptData) value;
+                renderComponent.setText("<html><font face='Dialog' size='3' color='black'>" + cb.toUserString());
             } else if (column == 4) {
                 renderComponent.setText("<html><font face='Dialog' size='3' color='black'>"
-                        + sr.snoRel.toStringGroup());
+                            + ((Integer) value).toString());
             }
         } else {
             renderComponent.setBackground(UIManager.getColor("Table.selectionBackground"));
             renderComponent.setForeground(UIManager.getColor("Table.selectionForeground"));
-            SnoRelReport sr = (SnoRelReport) value;
             if (column == 0) {
-                if (sr.isAdded) {
-                    renderComponent.setText("<html><font face='Dialog' size='3' color='white'>added");
-                } else {
-                    renderComponent.setText("<html><font face='Dialog' size='3' color='white'>retired");
-                }
-            } else if (column == 1) {
-                renderComponent.setText("<html><font face='Dialog' size='3' color='white'>"
-                        + sr.snoRel.toStringC1());
-            } else if (column == 2) {
-                renderComponent.setText("<html><font face='Dialog' size='3' color='white'>"
-                        + sr.snoRel.toStringType());
-            } else if (column == 3) {
-                renderComponent.setText("<html><font face='Dialog' size='3' color='white'>"
-                        + sr.snoRel.toStringC2());
+                    renderComponent.setText("<html><font face='Dialog' size='3' color='white'>"
+                            + (String) value);
+            } else if (column == 1 || column == 2 || column == 3) {
+                I_GetConceptData cb = (I_GetConceptData) value;
+                renderComponent.setText("<html><font face='Dialog' size='3' color='white'>" + cb.toUserString());
             } else if (column == 4) {
                 renderComponent.setText("<html><font face='Dialog' size='3' color='white'>"
-                        + sr.snoRel.toStringGroup());
+                            + ((Integer) value).toString());
             }
         }
 
