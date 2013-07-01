@@ -291,6 +291,7 @@ public class GenerateIncrementalRf2File extends AbstractMojo {
             }else{
                 throw new MojoExecutionException("No module specified.");
             }
+            moduleUuids.add(Snomed.UNSPECIFIED_MODULE.getLenient().getPrimUuid()); //classifier written on this module
 
             int viewPathNid;
             if (viewPathConceptSpec != null) {
