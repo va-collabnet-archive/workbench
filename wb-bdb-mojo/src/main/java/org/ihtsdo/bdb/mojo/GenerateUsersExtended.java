@@ -20,10 +20,31 @@ package org.ihtsdo.bdb.mojo;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import java.awt.Color;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Field;
+import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Properties;
+import java.util.Set;
+import java.util.UUID;
+import java.util.logging.Level;
+
+import javax.swing.JOptionPane;
+
 import org.apache.lucene.document.Document;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
-
 import org.dwfa.ace.api.I_ConfigAceDb;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionVersioned;
@@ -51,7 +72,6 @@ import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.id.Type5UuidFactory;
-
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.computer.ReferenceConcepts;
 import org.ihtsdo.lang.LANG_CODE;
@@ -88,6 +108,7 @@ import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationshipType;
 import org.ihtsdo.tk.spec.ConceptSpec;
 import org.ihtsdo.tk.spec.ValidationException;
 import org.ihtsdo.ttk.preferences.EnumBasedPreferences;
+import org.ihtsdo.ttk.queue.QueueAddress;
 import org.ihtsdo.ttk.queue.QueueList;
 import org.ihtsdo.ttk.queue.QueuePreferences;
 import org.ihtsdo.ttk.queue.QueueType;
@@ -95,33 +116,6 @@ import org.ihtsdo.ttk.queue.QueueType.Types;
 import org.ihtsdo.workflow.refset.edcat.EditorCategoryRefsetSearcher;
 import org.ihtsdo.workflow.refset.edcat.EditorCategoryRefsetWriter;
 import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
-
-//~--- JDK imports ------------------------------------------------------------
-
-import java.awt.Color;
-
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.io.UnsupportedEncodingException;
-
-import java.security.NoSuchAlgorithmException;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Properties;
-import java.util.Set;
-import java.util.UUID;
-import java.util.logging.Level;
-
-import javax.swing.JOptionPane;
-import org.ihtsdo.ttk.queue.QueueAddress;
 
 /**
  * Goal which generated the users for the application.
@@ -241,6 +235,7 @@ public class GenerateUsersExtended extends AbstractMojo {
    private I_ConfigAceFrame       userConfig;
    private I_ConfigAceFrame       defaultConfig;
    private String                 generateAdjCs = "false";
+   private HashMap<Integer, Color> colorMap = new HashMap<>(); 
    private ArrayList<ConceptSpec> cBooleanRefsets = new ArrayList<>();
    private ArrayList<ConceptSpec> cConceptRefsets = new ArrayList<>();
    private ArrayList<ConceptSpec> cConIntRefsets = new ArrayList<>();
@@ -260,7 +255,9 @@ public class GenerateUsersExtended extends AbstractMojo {
    private ArrayList<ConceptSpec> dConceptRefsetConTypes = new ArrayList<>();
    private ConceptSpec            refsetStatus;
    private ArrayList<ConceptSpec> additionalRoots = new ArrayList<>();
-
+   private ArrayList<ConceptSpec> orderedAdditionalTerminologyPaths = new ArrayList<>();
+   private ArrayList<String> orderedAdditionalTerminologyColors = new ArrayList<>();
+   
    private void addRelPermission(String userName, String typeUid,
                                  String typeName, String targetUid,
                                  String targetName)
@@ -529,12 +526,13 @@ public class GenerateUsersExtended extends AbstractMojo {
                          TermAux.WB_AUX_PATH.getLenient().getNid()));
                   tf.setActiveAceFrameConfig(defaultConfig);
 
+                  
+/* No longer necessary WF functionality from international edition's WF Framework                  
                   ViewCoordinate             vc     =
                      defaultConfig.getViewCoordinate();
-                  EditorCategoryRefsetWriter writer =
-                     new EditorCategoryRefsetWriter();
-                  BufferedReader wfReader =
-                     new BufferedReader(new FileReader(wfPermissionsFile));
+
+                  EditorCategoryRefsetWriter writer = new EditorCategoryRefsetWriter();
+                  BufferedReader wfReader = new BufferedReader(new FileReader(wfPermissionsFile));
 
                   WorkflowHelper.updateModelers(vc);
                   modelers = WorkflowHelper.getModelers();
@@ -601,7 +599,7 @@ NEXT_WHILE:
 
                      wfLine = wfReader.readLine();
                   }
-
+*/
                   getLog().info("Starting rels permissions creation");
 
                   if (relPermissionsFile.exists()) {
@@ -644,7 +642,7 @@ NEXT_WHILE:
       }
    }
 
-   private ConceptVersionBI identifyExistingEditorCategory(String[] columns,
+/*
            ViewCoordinate vc) {
       try {
          return searcher.searchForCategoryByModelerAndTag(
@@ -658,6 +656,7 @@ NEXT_WHILE:
 
       return null;
    }
+ */
 
    private void makeUserDevPaths(String username)
            throws NoSuchAlgorithmException, UnsupportedEncodingException,
@@ -1286,6 +1285,12 @@ NEXT_WHILE:
              ArchitectonicAuxiliary.Concept.SNOMED_CORE.getUids()), new Color(
              81, 23, 255));
 
+      for (Integer pathNid : colorMap.keySet()) {
+    	  Color pathColor = colorMap.get(pathNid);
+    	  
+    	  activeConfig.setColorForPath(pathNid, pathColor);
+      }
+      
       // set up toggles
       activeConfig.setSubversionToggleVisible(false);
       activeConfig.setTogglesInComponentPanelVisible(
@@ -1564,12 +1569,49 @@ NEXT_WHILE:
          if ("true".equals(configProps.getProperty("displayRf2"))) {
             displayRf2 = true;
          }
-
+         
          refsetStatus =
             getConceptSpecFromPrefs(configProps.getProperty("refsetStatus"));
          additionalRoots = getConceptSpecListFromPrefs(
-            configProps.getProperty("additionalRoots"));
+                 configProps.getProperty("additionalRoots"));
 
+		// Setup Colors
+		orderedAdditionalTerminologyColors = getStringListFromPrefs(configProps
+				.getProperty("orderedAdditionalTerminologyColors"));
+		orderedAdditionalTerminologyPaths = getConceptSpecListFromPrefs(configProps
+				.getProperty("orderedAdditionalTerminologyPaths"));
+
+		if (orderedAdditionalTerminologyPaths != null && !orderedAdditionalTerminologyPaths.isEmpty() && 
+			orderedAdditionalTerminologyColors != null && !orderedAdditionalTerminologyColors.isEmpty()) 
+		{
+			boolean noMorePaths = false;
+			ConceptSpec path = null;
+		
+			for (int i = 0; i < orderedAdditionalTerminologyColors.size() && !noMorePaths; i++) {
+				// Get Color
+				try
+				{
+					Color pathColor = mapStringToColor(orderedAdditionalTerminologyColors.get(i).toUpperCase());
+					
+					// Get associated Path
+					if (!(i < orderedAdditionalTerminologyPaths.size())) {
+						noMorePaths = true;
+					} else {
+						path = orderedAdditionalTerminologyPaths.get(i);
+	
+						// If path's uuid exists in DB, assign it taxColor
+						if (Ts.get().hasUuid(path.getUuids()[0])) {
+							colorMap.put(path.getLenient().getConceptNid(), pathColor);
+						} else {
+							AceLog.getAppLog().warning("Couldn't assign color for Path: " + path.getDescription());
+						}
+					}
+				} catch (Exception e) {
+					AceLog.getAppLog().warning("Couldn't discern color: " + orderedAdditionalTerminologyColors.get(i));
+				}
+			}
+		}
+ 	    
          if ("true".equals(configProps.getProperty("makeUserDevPath"))) {
             makeUserDevPath = true;
          }
@@ -1590,7 +1632,39 @@ NEXT_WHILE:
       }
    }
 
-   private String setupChangeSetsAndAddChangeSetGenerator(File userDir) {
+   private Color mapStringToColor(String color) {
+	if (color.equalsIgnoreCase("BLACK")) {
+		return Color.BLACK;
+	} else if (color.equalsIgnoreCase("BLUE")) {
+		return Color.BLUE;
+	} else if (color.equalsIgnoreCase("CYAN")) {
+		return Color.CYAN;
+	} else if (color.equalsIgnoreCase("DARK_GRAY")) {
+		return Color.DARK_GRAY;
+	} else if (color.equalsIgnoreCase("GRAY")) {
+		return Color.GRAY;
+	} else if (color.equalsIgnoreCase("GREEN")) {
+		return Color.GREEN;
+	} else if (color.equalsIgnoreCase("LIGHT_GRAY")) {
+		return Color.LIGHT_GRAY;
+	} else if (color.equalsIgnoreCase("MAGENTA")) {
+		return Color.MAGENTA;
+	} else if (color.equalsIgnoreCase("ORANGE")) {
+		return Color.ORANGE;
+	} else if (color.equalsIgnoreCase("PINK")) {
+		return Color.PINK;
+	} else if (color.equalsIgnoreCase("RED")) {
+		return Color.RED;
+	} else if (color.equalsIgnoreCase("WHITE")) {
+		return Color.WHITE;
+	} else if (color.equalsIgnoreCase("YELLOW")) {
+		return Color.YELLOW;
+	}
+	
+	return null;
+}
+
+private String setupChangeSetsAndAddChangeSetGenerator(File userDir) {
       File changeSetRoot = new File(userDir, "changesets");
 
       getLog().info("** Changeset root: " + changeSetRoot.getAbsolutePath());
@@ -2163,6 +2237,7 @@ NEXT_WHILE:
              ArchitectonicAuxiliary.Concept.SNOMED_CORE.getUids()), new Color(
              81, 23, 255));
 
+      
       // set up toggles
       userConfig.setSubversionToggleVisible(false);
       userConfig.setTogglesInComponentPanelVisible(
@@ -2343,6 +2418,23 @@ NEXT_WHILE:
       }
 
       return conceptSpecList;
+   }
+
+   private ArrayList<String> getStringListFromPrefs(
+           String configString) {
+      ArrayList<String> stringList = new ArrayList<String>();
+
+      if ((configString != null) &&!configString.equals("")) {
+         String[] strings = configString.split(";");
+
+         if (strings.length > 0) {
+            for (String s : strings) {
+            	stringList.add(s);
+            }
+         }
+      }
+
+      return stringList;
    }
 
    private void setActiveFrameConfig(File userProfile)
