@@ -2429,7 +2429,7 @@ private String setupChangeSetsAndAddChangeSetGenerator(File userDir) {
 
          if (strings.length > 0) {
             for (String s : strings) {
-            	stringList.add(s);
+            	stringList.add(s.trim());
             }
          }
       }
