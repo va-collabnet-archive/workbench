@@ -1400,7 +1400,11 @@ NEXT_WHILE:
                    t = I_HostConceptPlugins.TOGGLES.ATTRIBUTES;
                } else if (toggle.equals("desc")) {
                    t = I_HostConceptPlugins.TOGGLES.DESCRIPTIONS;
-               } else {
+               } else if (toggle.equals("destRel")) {
+                   t = I_HostConceptPlugins.TOGGLES.DEST_RELS;
+               } else if (toggle.equals("sourceRel")) {
+                   t = I_HostConceptPlugins.TOGGLES.SOURCE_RELS;
+               }else {
                    throw new MojoExecutionException(
                            "Can't handle value:  " + toggle
                            + " For preference: visibleRefsets.component");
@@ -2343,6 +2347,10 @@ private String setupChangeSetsAndAddChangeSetGenerator(File userDir) {
             t = I_HostConceptPlugins.TOGGLES.ATTRIBUTES;
          } else if (toggle.equals("desc")) {
             t = I_HostConceptPlugins.TOGGLES.DESCRIPTIONS;
+         } else if (toggle.equals("destRel")) {
+             t = I_HostConceptPlugins.TOGGLES.DEST_RELS;
+         } else if (toggle.equals("sourceRel")) {
+             t = I_HostConceptPlugins.TOGGLES.SOURCE_RELS;
          } else {
             throw new MojoExecutionException(
                 "Can't handle value:  " + toggle
