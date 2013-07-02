@@ -257,7 +257,7 @@ public class GenerateUsers extends AbstractMojo {
          tf.addUncommittedNoChecks(user);
       }
    }
-
+/*
    private void addWfRelIfDoesNotExist(String userUuidString)
            throws TerminologyException, IOException, InvalidCAB,
                   ContradictionException {
@@ -295,7 +295,7 @@ public class GenerateUsers extends AbstractMojo {
 
       Ts.get().addUncommitted(userConcept);
    }
-
+*/
    private ConceptChronicleBI createUser()
            throws TerminologyException, IOException,
                   UnsupportedEncodingException, NoSuchAlgorithmException,
@@ -322,7 +322,7 @@ public class GenerateUsers extends AbstractMojo {
 
       if (Ts.get().hasUuid(userUuid)) {
          setUserConcept(userUuid.toString());
-         addWfRelIfDoesNotExist(userUuid.toString());
+         // addWfRelIfDoesNotExist(userUuid.toString());
 
          return Ts.get().getConcept(userUuid);
       } else {
@@ -344,14 +344,14 @@ public class GenerateUsers extends AbstractMojo {
                                userConfig.getUsername() + ".inbox", false);
 
          // add workflow relationship
-         RelationshipCAB wfRelBp =
-            new RelationshipCAB(userConceptBp.getComponentUuid(),
-                                ArchitectonicAuxiliary.Concept
-                                   .WORKFLOW_EDITOR_STATUS
-                                   .getPrimoridalUid(), ArchitectonicAuxiliary
-                                   .Concept.WORKFLOW_ACTIVE_MODELER
-                                   .getPrimoridalUid(), 0,
-                                      TkRelationshipType.STATED_ROLE);
+//         RelationshipCAB wfRelBp =
+//            new RelationshipCAB(userConceptBp.getComponentUuid(),
+//                                ArchitectonicAuxiliary.Concept
+//                                   .WORKFLOW_EDITOR_STATUS
+//                                   .getPrimoridalUid(), ArchitectonicAuxiliary
+//                                   .Concept.WORKFLOW_ACTIVE_MODELER
+//                                   .getPrimoridalUid(), 0,
+//                                      TkRelationshipType.STATED_ROLE);
          ViewCoordinate vc    = userConfig.getViewCoordinate();
          EditCoordinate oldEc = userConfig.getEditCoordinate();
          EditCoordinate ec    = new EditCoordinate(oldEc.getAuthorNid(),
@@ -360,7 +360,7 @@ public class GenerateUsers extends AbstractMojo {
          TerminologyBuilderBI builder = Ts.get().getTerminologyBuilder(ec, vc);
 
          userConceptBp.addDescriptionCAB(inboxDescBp);
-         userConceptBp.setRelationshipCAB(wfRelBp);
+         //userConceptBp.setRelationshipCAB(wfRelBp);
 
          ConceptChronicleBI userConcept = builder.construct(userConceptBp);
 
@@ -411,7 +411,9 @@ public class GenerateUsers extends AbstractMojo {
          }
 
          // add users to wf permissions refset
-         I_TermFactory tf = Terms.get();
+/*
+          I_TermFactory tf = Terms.get();
+ 
 
          wfConfig = newProfile(null, null, null, null, null);
 
@@ -490,7 +492,7 @@ NEXT_WHILE:
 
             wfLine = wfReader.readLine();
          }
-
+*/
          getLog().info("Starting rels permissions creation");
 
          if (relPermissionsFile.exists()) {
@@ -553,6 +555,7 @@ NEXT_WHILE:
                                    comment);
    }
 
+   /*
    private ConceptVersionBI identifyExistingEditorCategory(String[] columns,
            ViewCoordinate vc) {
       try {
@@ -567,7 +570,7 @@ NEXT_WHILE:
 
       return null;
    }
-
+*/
    public I_ConfigAceFrame newProfile(String fullName, String username,
                                       String password, String adminUsername,
                                       String adminPassword)
@@ -1000,7 +1003,7 @@ NEXT_WHILE:
                   Ts.get().getConcept(UUID.fromString(userUuid));
 
                setUserConcept(userUuid);
-               addWfRelIfDoesNotExist(userUuid);
+               //addWfRelIfDoesNotExist(userUuid);
             }
 
             List<AlertToDataConstraintFailure> errorsAndWarnings =
