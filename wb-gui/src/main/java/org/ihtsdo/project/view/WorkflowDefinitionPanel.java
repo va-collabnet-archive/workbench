@@ -11,7 +11,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -19,6 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.regex.Pattern;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
@@ -41,17 +41,12 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
 
-import org.apache.tools.ant.types.resources.FileResource;
-import org.apache.xmlbeans.ResourceLoader;
-import org.apache.xmlbeans.impl.schema.FileResourceLoader;
 import org.ihtsdo.project.workflow.api.WfComponentProvider;
 import org.ihtsdo.project.workflow.api.WorkflowDefinitionManager;
 import org.ihtsdo.project.workflow.model.WfAction;
 import org.ihtsdo.project.workflow.model.WfRole;
 import org.ihtsdo.project.workflow.model.WfState;
 import org.ihtsdo.project.workflow.model.WorkflowDefinition;
-
-import com.googlecode.sardine.model.Collection;
 
 /**
  * @author Guillermo Reynoso
@@ -272,7 +267,8 @@ public class WorkflowDefinitionPanel extends JPanel {
 		ListModel<String> xlsModel = xlsFiles.getModel();
 		List<Integer> vector = new ArrayList<Integer>();
 		for (String excelFile : excelFiles) {
-			String[] split = excelFile.split(File.separator);
+			String splitRegex = Pattern.quote(System.getProperty("file.separator"));
+			String[] split = excelFile.split(splitRegex);
 			String key = split[split.length - 1];
 			String replacedKey = key.replaceAll(".xls", "");
 			if (xlsHash.containsKey(replacedKey)) {
@@ -302,7 +298,8 @@ public class WorkflowDefinitionPanel extends JPanel {
 		ListModel<String> drlModel = drlFiles.getModel();
 		List<Integer> vectordrl = new ArrayList<Integer>();
 		for (String drlFile : rulesFiles) {
-			String[] split = drlFile.split(File.separator);
+			String splitRegex = Pattern.quote(System.getProperty("file.separator"));
+			String[] split = drlFile.split(splitRegex);
 			String key = split[split.length - 1];
 			String replacedKey = key.replaceAll(".drl", "");
 			if (drlHash.containsKey(replacedKey)) {
