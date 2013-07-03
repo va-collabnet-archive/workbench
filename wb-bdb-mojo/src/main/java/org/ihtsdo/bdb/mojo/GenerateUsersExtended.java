@@ -1512,7 +1512,9 @@ public class GenerateUsersExtended extends AbstractMojo {
 			throw new MojoExecutionException(ex.getLocalizedMessage(), ex);
 		} finally {
 			try {
-				configReader.close();
+				if (configReader!=null){
+					configReader.close();
+				}
 			} catch (IOException ex) {
 				throw new MojoExecutionException(ex.getLocalizedMessage(), ex);
 			}
