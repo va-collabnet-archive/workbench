@@ -1428,6 +1428,7 @@ public class GenerateUsersExtended extends AbstractMojo {
 			configProps.load(configReader);
 			langSortPref         = configProps.getProperty("langSortPref");
 			langPrefOrder        = configProps.getProperty("langPrefOrder");
+			System.out.println("langPrefOrder=" + langPrefOrder);
 			statedInferredPolicy = configProps.getProperty("statedInferredPolicy");
 			defaultStatus        =
 					getConceptSpecFromPrefs(configProps.getProperty("defaultStatus"));
