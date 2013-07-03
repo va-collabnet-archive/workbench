@@ -172,18 +172,20 @@ public class Rf2RefexComputer implements ProcessUnfetchedConceptDataBI {
             ComponentVersionBI cav = cv.getConceptAttributes().getVersion(vcAllStatus);
             if (!cv.isActive() && cav != null) {
                 if (stampNids.contains(cav.getStampNid())) {
-                    RefexCAB refexBp = new RefexCAB(TK_REFEX_TYPE.CID,
-                            cv.getNid(),
-                            conceptInactiveRefexNid);
-                    refexBp.put(RefexCAB.RefexProperty.CNID1, getValueForRetirement(cv.getNid()));
-                    RefexChronicleBI<?> member = builder.construct(refexBp);
-                    conceptChronicle.addAnnotation(member);
-                    for (int stampNid : member.getAllStampNids()) {
-                        newStamps.add(stampNid);
+                    if(getValueForRetirement(cv.getNid()) != null){
+                        RefexCAB refexBp = new RefexCAB(TK_REFEX_TYPE.CID,
+                                cv.getNid(),
+                                conceptInactiveRefexNid);
+                        refexBp.put(RefexCAB.RefexProperty.CNID1, getValueForRetirement(cv.getNid()));
+                        RefexChronicleBI<?> member = builder.construct(refexBp);
+                        conceptChronicle.addAnnotation(member);
+                        for (int stampNid : member.getAllStampNids()) {
+                            newStamps.add(stampNid);
+                        }
+                        Ts.get().addUncommitted(Ts.get().getConcept(conceptInactiveRefexNid));
+                        Ts.get().commit(Ts.get().getConcept(conceptInactiveRefexNid));
+                        changed = true;
                     }
-                    Ts.get().addUncommitted(Ts.get().getConcept(conceptInactiveRefexNid));
-                    Ts.get().commit(Ts.get().getConcept(conceptInactiveRefexNid));
-                    changed = true;
                 }
 
             }
