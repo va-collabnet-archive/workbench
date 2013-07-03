@@ -300,8 +300,8 @@ public class GenerateUsers extends AbstractMojo {
            throws TerminologyException, IOException,
                   UnsupportedEncodingException, NoSuchAlgorithmException,
                   MojoExecutionException, InvalidCAB, ContradictionException {
-      AceLog.getAppLog().info("Create new path for user: "
-                              + userConfig.getDbConfig().getFullName());
+//      AceLog.getAppLog().info("Create new path for user: "
+//                              + userConfig.getDbConfig().getFullName());
 
       if ((userConfig.getDbConfig().getFullName() == null)
               || (userConfig.getDbConfig().getFullName().length() == 0)) {

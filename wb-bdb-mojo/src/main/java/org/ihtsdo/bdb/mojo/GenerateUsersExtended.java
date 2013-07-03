@@ -366,8 +366,8 @@ public class GenerateUsersExtended extends AbstractMojo {
                   MojoExecutionException, InvalidCAB, ContradictionException {
       I_ConfigAceDb dbConfig = userConfig.getDbConfig();
 
-      AceLog.getAppLog().info("Create new path for user: "
-                              + dbConfig.getFullName());
+//      AceLog.getAppLog().info("Create new path for user: "
+//                              + dbConfig.getFullName());
 
       if ((dbConfig.getFullName() == null)
               || (dbConfig.getFullName().length() == 0)) {
@@ -1591,27 +1591,29 @@ NEXT_WHILE:
 			boolean noMorePaths = false;
 			ConceptSpec path = null;
 		
+			if (orderedAdditionalTerminologyPaths.size() > orderedAdditionalTerminologyColors.size()) {
+				AceLog.getAppLog().warning("Have more Paths than Colors.  Not all Paths will not receive color coding");
+			}
+			
 			for (int i = 0; i < orderedAdditionalTerminologyColors.size() && !noMorePaths; i++) {
-				// Get Color
-				try
-				{
-					Color pathColor = mapStringToColor(orderedAdditionalTerminologyColors.get(i).toUpperCase());
-					
-					// Get associated Path
+				Color pathColor = mapStringToColor(orderedAdditionalTerminologyColors.get(i).toUpperCase());
+				
+				if (pathColor != null) {
 					if (!(i < orderedAdditionalTerminologyPaths.size())) {
 						noMorePaths = true;
+						AceLog.getAppLog().warning("Have more Colors than Paths");
 					} else {
 						path = orderedAdditionalTerminologyPaths.get(i);
 	
-						// If path's uuid exists in DB, assign it taxColor
+						// If path's uuid exists in DB, assign it pathColor
 						if (Ts.get().hasUuid(path.getUuids()[0])) {
 							colorMap.put(path.getLenient().getConceptNid(), pathColor);
 						} else {
 							AceLog.getAppLog().warning("Couldn't assign color for Path: " + path.getDescription());
 						}
 					}
-				} catch (Exception e) {
-					AceLog.getAppLog().warning("Couldn't discern color: " + orderedAdditionalTerminologyColors.get(i));
+				} else {
+					AceLog.getAppLog().warning("Couldn't match color: " + orderedAdditionalTerminologyColors.get(i));
 				}
 			}
 		}
