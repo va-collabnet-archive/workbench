@@ -823,7 +823,9 @@ public class WfInboxPanel extends JPanel {
 						inboxTreePanel1.itemUserAndStateChanged(oldWfInstance, newWfInstance);
 					} else {
 						try {
-							tagManager.sendToOutbox(TagManager.getTagWorklistConceptUuids(newWfInstance));
+							if(!newWfInstance.isCompleted()){
+								tagManager.sendToOutbox(TagManager.getTagWorklistConceptUuids(newWfInstance));
+							}
 							EventMediator.getInstance().fireEvent(new ItemDestinationChangedEvent(newWfInstance));
 							inboxTreePanel1.itemStateChanged(oldWfInstance, newWfInstance);
 						} catch (IOException e) {
@@ -856,7 +858,9 @@ public class WfInboxPanel extends JPanel {
 					break;
 				case OUTBOX:
 					try {
-						tagManager.sendToOutbox(TagManager.getTagWorklistConceptUuids((WfInstance) currentRow[InboxColumn.values().length]));
+						if(!newWfInstance.isCompleted()){
+							tagManager.sendToOutbox(TagManager.getTagWorklistConceptUuids((WfInstance) currentRow[InboxColumn.values().length]));
+						}
 						EventMediator.getInstance().fireEvent(new ItemSentToSpecialFolderEvent(newWfInstance, oldWfInstance));
 						int currentItemViewIndex = 0;
 						try {
@@ -895,7 +899,9 @@ public class WfInboxPanel extends JPanel {
 			}
 		} else if (type.equals(ActionType.SEND_TO_OUTBOX_LAUNCHED)) {
 			try {
-				tagManager.sendToOutbox(TagManager.getTagWorklistConceptUuids((WfInstance) currentRow[InboxColumn.values().length]));
+				if(!newWfInstance.isCompleted()){
+					tagManager.sendToOutbox(TagManager.getTagWorklistConceptUuids((WfInstance) currentRow[InboxColumn.values().length]));
+				}
 				EventMediator.getInstance().fireEvent(new ItemSentToSpecialFolderEvent(oldWfInstance, oldWfInstance));
 				int currentItemViewIndex = 0;
 				try {
