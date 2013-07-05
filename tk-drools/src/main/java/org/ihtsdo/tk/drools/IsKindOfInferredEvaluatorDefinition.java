@@ -32,7 +32,6 @@ import org.drools.spi.FieldValue;
 import org.drools.spi.InternalReadAccessor;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ContradictionException;
-import org.ihtsdo.tk.api.RelAssertionType;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
@@ -40,10 +39,11 @@ import org.ihtsdo.tk.drools.facts.ConceptFact;
 import org.ihtsdo.tk.drools.facts.DescFact;
 import org.ihtsdo.tk.spec.ConceptSpec;
 import org.ihtsdo.tk.spec.ValidationException;
+
 /**
- * Only includes stated view.
+ * Includes stated and inferred views.
  */
-public class IsKindOfEvaluatorDefinition implements EvaluatorDefinition {
+public class IsKindOfInferredEvaluatorDefinition implements EvaluatorDefinition {
 
     public static class IsKindOfEvaluator extends BaseEvaluator {
 
@@ -79,8 +79,8 @@ public class IsKindOfEvaluatorDefinition implements EvaluatorDefinition {
 
         public IsKindOfEvaluator(final ValueType type, final boolean isNegated) {
             super(type, isNegated
-                    ? IsKindOfEvaluatorDefinition.NOT_IS_KIND_OF
-                    : IsKindOfEvaluatorDefinition.IS_KIND_OF);
+                    ? IsKindOfInferredEvaluatorDefinition.NOT_IS_KIND_OF
+                    : IsKindOfInferredEvaluatorDefinition.IS_KIND_OF);
         }
 
         @Override
@@ -114,8 +114,6 @@ public class IsKindOfEvaluatorDefinition implements EvaluatorDefinition {
                     throw new UnsupportedOperationException("Can't convert: " + value1);
                 }
                 ViewCoordinate coordinate = possibleKind.getViewCoordinate();
-                coordinate.setRelationshipAssertionType(RelAssertionType.STATED);
-                possibleKind = possibleKind.getVersion(coordinate);
                 ConceptVersionBI parentKind = null;
 
                 if (ConceptVersionBI.class.isAssignableFrom(value2.getClass())) {
