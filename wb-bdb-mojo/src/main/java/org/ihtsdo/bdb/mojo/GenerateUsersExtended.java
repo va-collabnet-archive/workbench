@@ -511,13 +511,14 @@ public class GenerateUsersExtended extends AbstractMojo {
                   userLine = userReader.readLine();
                }
 
+               defaultConfig = newProfile(null, null, null, null, null);
+               Terms.get().setActiveAceFrameConfig(defaultConfig);
+
                // add users to wf permissions refset
 /* No longer necessary WF functionality from international edition's WF Framework
-                 I_TermFactory tf = Terms.get();
               
 
 //               if (createdUsers) {
-                  defaultConfig = newProfile(null, null, null, null, null);
 
                   Set<PathBI> editingPathSet =
                      defaultConfig.getEditingPathSet();
@@ -526,7 +527,6 @@ public class GenerateUsersExtended extends AbstractMojo {
                   editingPathSet.add(
                       Ts.get().getPath(
                          TermAux.WB_AUX_PATH.getLenient().getNid()));
-                  tf.setActiveAceFrameConfig(defaultConfig);
                   
                   ViewCoordinate             vc     =
                      defaultConfig.getViewCoordinate();

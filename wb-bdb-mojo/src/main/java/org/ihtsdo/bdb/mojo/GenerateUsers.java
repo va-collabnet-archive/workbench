@@ -411,12 +411,11 @@ public class GenerateUsers extends AbstractMojo {
          }
 
          // add users to wf permissions refset
-/*
-          I_TermFactory tf = Terms.get();
- 
-
+         I_TermFactory tf = Terms.get();
          wfConfig = newProfile(null, null, null, null, null);
+         tf.setActiveAceFrameConfig(wfConfig);
 
+        /*
          Set<PathBI> editingPathSet = wfConfig.getEditingPathSet();
 
          editingPathSet.clear();
