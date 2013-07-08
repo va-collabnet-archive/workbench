@@ -54,178 +54,160 @@ public class RF2RelationshipImpl extends RF2AbstractImpl implements I_ProcessCon
 			String destinationId = "";
 			String relTypeId = "";
 			String active = "";
-			String moduleId=I_Constants.CORE_MODULE_ID;
+			String moduleId="";
 			String characteristicTypeId = "";
 			String modifierId = I_Constants.SOMEMODIFIER; 
 			int relationshipStatusId=0;
 			String updateWbSctId = "false";
-			
+
 			if(!getConfig().isUpdateWbSctId().equals(null)){
 				updateWbSctId = getConfig().isUpdateWbSctId();
 			}
-			
+
 			List<? extends I_RelTuple> relationships = sourceConcept.getSourceRelTuples(allStatuses, null, 
 					currenAceConfig.getViewPositionSetReadOnly(), 
 					Precedence.PATH, currenAceConfig.getConflictResolutionStrategy());
-	
+
 			for (I_RelTuple rel : relationships) {
-				characteristicTypeId="";
-								
-				I_Identify charId = tf.getId(rel.getCharacteristicId());
-				List<? extends I_IdPart> idParts = charId.getVisibleIds(currenAceConfig.getViewPositionSetReadOnly(), 
-						snomedIntId);
-				if (idParts != null) {
-					Object denotation = getLastCurrentVisibleId(idParts, currenAceConfig.getViewPositionSetReadOnly(), 
-							RelAssertionType.INFERRED_THEN_STATED);
-					if (denotation instanceof Long) {
-						Long c = (Long) denotation;
-						if (c != null)  characteristicTypeId = c.toString();
+
+				if (isComponentToPublish( rel.getMutablePart())){
+					characteristicTypeId="";
+
+					I_Identify charId = tf.getId(rel.getCharacteristicId());
+					List<? extends I_IdPart> idParts = charId.getVisibleIds(currenAceConfig.getViewPositionSetReadOnly(), 
+							snomedIntId);
+					if (idParts != null) {
+						Object denotation = getLastCurrentVisibleId(idParts, currenAceConfig.getViewPositionSetReadOnly(), 
+								RelAssertionType.INFERRED_THEN_STATED);
+						if (denotation instanceof Long) {
+							Long c = (Long) denotation;
+							if (c != null)  characteristicTypeId = c.toString();
+						}
 					}
-				}
-				
-				if (characteristicTypeId.equals(I_Constants.INFERRED) || characteristicTypeId.equals(I_Constants.ADDITIONALRELATION)){
-					destinationId = "";
-					I_Identify id = tf.getId(rel.getC2Id());
-					if (id != null) {
-						idParts = id.getVisibleIds(currenAceConfig.getViewPositionSetReadOnly(), 
-								snomedIntId);
-						if (idParts != null) {
-							Object denotation = getLastCurrentVisibleId(idParts, currenAceConfig.getViewPositionSetReadOnly(), 
-									RelAssertionType.INFERRED_THEN_STATED);
-							if (denotation instanceof Long) {
-								Long c = (Long) denotation;
-								if (c != null)  destinationId = c.toString();
+
+					if (characteristicTypeId.equals(I_Constants.INFERRED) || characteristicTypeId.equals(I_Constants.ADDITIONALRELATION)){
+						destinationId = "";
+						I_Identify id = tf.getId(rel.getC2Id());
+						if (id != null) {
+							idParts = id.getVisibleIds(currenAceConfig.getViewPositionSetReadOnly(), 
+									snomedIntId);
+							if (idParts != null) {
+								Object denotation = getLastCurrentVisibleId(idParts, currenAceConfig.getViewPositionSetReadOnly(), 
+										RelAssertionType.INFERRED_THEN_STATED);
+								if (denotation instanceof Long) {
+									Long c = (Long) denotation;
+									if (c != null)  destinationId = c.toString();
+								}
 							}
 						}
-					}
 
-					relTypeId = "";
+						relTypeId = "";
 
-					id = tf.getId(rel.getTypeNid());
-					if (id != null) {
-						idParts = tf.getId(rel.getTypeNid()).getVisibleIds(currenAceConfig.getViewPositionSetReadOnly(), 
-								snomedIntId);
-						if (idParts != null) {
-							Object denotation = getLastCurrentVisibleId(idParts, currenAceConfig.getViewPositionSetReadOnly(), 
-									RelAssertionType.INFERRED_THEN_STATED);
-							if (denotation instanceof Long) {
-								Long c = (Long) denotation;
-								if (c != null)  relTypeId = c.toString();
+						id = tf.getId(rel.getTypeNid());
+						if (id != null) {
+							idParts = tf.getId(rel.getTypeNid()).getVisibleIds(currenAceConfig.getViewPositionSetReadOnly(), 
+									snomedIntId);
+							if (idParts != null) {
+								Object denotation = getLastCurrentVisibleId(idParts, currenAceConfig.getViewPositionSetReadOnly(), 
+										RelAssertionType.INFERRED_THEN_STATED);
+								if (denotation instanceof Long) {
+									Long c = (Long) denotation;
+									if (c != null)  relTypeId = c.toString();
+								}
 							}
 						}
-					}
 
-					if (relTypeId.equals(I_Constants.ISA)) {
-						if (destinationId.equals(I_Constants.DUPLICATE_CONCEPT) || destinationId.equals(I_Constants.AMBIGUOUS_CONCEPT) ||
-								destinationId.equals(I_Constants.OUTDATED_CONCEPT) || destinationId.equals(I_Constants.ERRONEOUS_CONCEPT ) ||
-								destinationId.equals(I_Constants.LIMITED_CONCEPT) || destinationId.equals(I_Constants.REASON_NOT_STATED_CONCEPT) ||
-								destinationId.equals(I_Constants.MOVED_ELSEWHERE_CONCEPT)){
-							continue;
-						}
-					} 
+						if (relTypeId.equals(I_Constants.ISA)) {
+							if (destinationId.equals(I_Constants.DUPLICATE_CONCEPT) || destinationId.equals(I_Constants.AMBIGUOUS_CONCEPT) ||
+									destinationId.equals(I_Constants.OUTDATED_CONCEPT) || destinationId.equals(I_Constants.ERRONEOUS_CONCEPT ) ||
+									destinationId.equals(I_Constants.LIMITED_CONCEPT) || destinationId.equals(I_Constants.REASON_NOT_STATED_CONCEPT) ||
+									destinationId.equals(I_Constants.MOVED_ELSEWHERE_CONCEPT)){
+								continue;
+							}
+						} 
 
-					relationshipId = "";
+						relationshipId = "";
 
-					id = tf.getId(rel.getNid());
-					if (id != null) {
-						idParts = tf.getId(rel.getNid()).getVisibleIds(currenAceConfig.getViewPositionSetReadOnly(), 
-								snomedIntId);
-						if (idParts != null) {
-							Object denotation = getLastCurrentVisibleId(idParts, currenAceConfig.getViewPositionSetReadOnly(), 
-									RelAssertionType.INFERRED_THEN_STATED);
-							if (denotation instanceof Long) {
-								Long c = (Long) denotation;
-								if (c != null)  relationshipId = c.toString();
+						id = tf.getId(rel.getNid());
+						if (id != null) {
+							idParts = tf.getId(rel.getNid()).getVisibleIds(currenAceConfig.getViewPositionSetReadOnly(), 
+									snomedIntId);
+							if (idParts != null) {
+								Object denotation = getLastCurrentVisibleId(idParts, currenAceConfig.getViewPositionSetReadOnly(), 
+										RelAssertionType.INFERRED_THEN_STATED);
+								if (denotation instanceof Long) {
+									Long c = (Long) denotation;
+									if (c != null)  relationshipId = c.toString();
+								}
 							}
 						}
-					}
-					
-					relationshipStatusId = rel.getStatusNid();
-					if (relationshipStatusId == activeNid) {               
-						active = "1";
-						moduleId = getConceptMetaModuleID(sourceConcept,releaseDate);
-				     } else if (relationshipStatusId == inactiveNid) {               
-					      active = "0";
-					      moduleId=I_Constants.CORE_MODULE_ID;
-//					      Long lastActiveDate=getLatestActivePart(rel.getFixedPart().getMutableParts());
-//						      
-//					      if (lastActiveDate!=null){
-//					      moduleId = getConceptMetaModuleID(sourceConcept,
-//					        getDateFormat().format(new Date(lastActiveDate)));
-//					      }else{
-//					       moduleId = getConceptMetaModuleID(sourceConcept,
-//					         getDateFormat().format(new Date(rel.getTime())));
-//					      }
-				     }
-					
-					/*relationshipStatusId = rel.getStatusNid();
-					if (relationshipStatusId == activeNid) { 														
-						active = "1";
-						moduleId = computeModuleId(sourceConcept);
-					} else if (relationshipStatusId == inactiveNid) { 														
-						active = "0";
-						moduleId = computeModuleId(sourceConcept);
-					}*/
-					
-					if(moduleId.equals(I_Constants.META_MODULE_ID)){		
-						//logger.info("==Meta Concept==" + sourceId + " & Name : " + sourceConcept.getInitialText());
-						incrementMetaDataCount();
-					}
-					
-					
-					effectiveTime = getDateFormat().format(new Date(rel.getTime()));
-					
-					int relationshipGroup = rel.getGroup();
 
-					if (sourceId==null || sourceId.equals("")){
-						sourceId=sourceConcept.getUids().iterator().next().toString();
-					}
-				
-					if (relTypeId==null || relTypeId.equals("")){
-						relTypeId=tf.getUids(rel.getTypeNid()).iterator().next().toString();
-					}
-					
-					if (destinationId==null || destinationId.equals("")){
-						Collection<UUID> Uids=tf.getUids(rel.getC2Id());
-						if (Uids==null  ){
-							continue;
+						relationshipStatusId = rel.getStatusNid();
+						if (relationshipStatusId == activeNid) {               
+							active = "1";
+							//						moduleId = getConceptMetaModuleID(sourceConcept,releaseDate);
+						} else if (relationshipStatusId == inactiveNid) {               
+							active = "0";
+							//					      moduleId=I_Constants.CORE_MODULE_ID;
 						}
-						destinationId=Uids.iterator().next().toString();
-						if (destinationId.equals(nullUuid)){
-							continue;
+
+						int intModuleId=rel.getModuleNid();
+						moduleId=getModuleSCTIDForStampNid(intModuleId);
+
+						effectiveTime = getDateFormat().format(new Date(rel.getTime()));
+
+						int relationshipGroup = rel.getGroup();
+
+						if (sourceId==null || sourceId.equals("")){
+							sourceId=sourceConcept.getUids().iterator().next().toString();
 						}
-					}
-					
-					
-					if ((relationshipId==null || relationshipId.equals("")) && active.equals("1")){
-						relationshipId=rel.getUUIDs().iterator().next().toString();						
-						//This won't work in editing environment because relationshipgroup changes with respect to classifier 
-						//relationshipId = Type5UuidFactory.get(sourceId + destinationId + relTypeId + relationshipGroup).toString();	// sourceId + destinationId + typeId + relationshipGroup
-					}
-					
-					String authorName = tf.getConcept(rel.getAuthorNid()).getInitialText();
-					if (relationshipId==null || relationshipId.equals("")){
-						logger.info("Unplublished Retired Relationship: " + rel.getUUIDs().iterator().next().toString());
-					}else if(getConfig().getRf2Format().equals("false") ){	
-						writeRF2TypeLine(relationshipId, effectiveTime, active, moduleId, sourceId, destinationId, relationshipGroup, relTypeId,
-							characteristicTypeId, modifierId, authorName);
-					}else{
-						writeRF2TypeLine(relationshipId, effectiveTime, active, moduleId, sourceId, destinationId, relationshipGroup, relTypeId,
-							characteristicTypeId, modifierId);	
+
+						if (relTypeId==null || relTypeId.equals("")){
+							relTypeId=tf.getUids(rel.getTypeNid()).iterator().next().toString();
+						}
+
+						if (destinationId==null || destinationId.equals("")){
+							Collection<UUID> Uids=tf.getUids(rel.getC2Id());
+							if (Uids==null  ){
+								continue;
+							}
+							destinationId=Uids.iterator().next().toString();
+							if (destinationId.equals(nullUuid)){
+								continue;
+							}
+						}
+
+
+						if ((relationshipId==null || relationshipId.equals("")) && active.equals("1")){
+							relationshipId=rel.getUUIDs().iterator().next().toString();						
+							//This won't work in editing environment because relationshipgroup changes with respect to classifier 
+							//relationshipId = Type5UuidFactory.get(sourceId + destinationId + relTypeId + relationshipGroup).toString();	// sourceId + destinationId + typeId + relationshipGroup
+						}
+
+						String authorName = tf.getConcept(rel.getAuthorNid()).getInitialText();
+						if (relationshipId==null || relationshipId.equals("")){
+							logger.info("Unplublished Retired Relationship: " + rel.getUUIDs().iterator().next().toString());
+						}else if(getConfig().getRf2Format().equals("false") ){	
+							writeRF2TypeLine(relationshipId, effectiveTime, active, moduleId, sourceId, destinationId, relationshipGroup, relTypeId,
+									characteristicTypeId, modifierId, authorName);
+						}else{
+							writeRF2TypeLine(relationshipId, effectiveTime, active, moduleId, sourceId, destinationId, relationshipGroup, relTypeId,
+									characteristicTypeId, modifierId);	
+						}
 					}
 				}
 			}
-		
-	}catch (NullPointerException ne) {
-		logger.error("NullPointerException: " + ne.getMessage());
-		logger.error(" NullPointerException " + sourceId);
-	} catch (IOException e) {
-		logger.error("IOExceptions: " + e.getMessage());
-		logger.error("IOExceptions: " + sourceId);
-	} catch (Exception e) {
-		logger.error("Exceptions in exportInfRelationship: " + e.getMessage());
-		logger.error("Exceptions in exportInfRelationship: " +sourceId);
-	}
+
+		}catch (NullPointerException ne) {
+			logger.error("NullPointerException: " + ne.getMessage());
+			logger.error(" NullPointerException " + sourceId);
+		} catch (IOException e) {
+			logger.error("IOExceptions: " + e.getMessage());
+			logger.error("IOExceptions: " + sourceId);
+		} catch (Exception e) {
+			logger.error("Exceptions in exportInfRelationship: " + e.getMessage());
+			logger.error("Exceptions in exportInfRelationship: " +sourceId);
+		}
 
 	}
 	public static void writeRF2TypeLine(String relationshipId, String effectiveTime, String active, String moduleId, String sourceId, String destinationId, int relationshipGroup, String relTypeId,
@@ -234,7 +216,7 @@ public class RF2RelationshipImpl extends RF2AbstractImpl implements I_ProcessCon
 				+ "\t" + characteristicTypeId + "\t" + modifierId);
 		WriteUtil.write(getConfig(), "\r\n");
 	}
-	
+
 	public static void writeRF2TypeLine(String relationshipId, String effectiveTime, String active, String moduleId, String sourceId, String destinationId, int relationshipGroup, String relTypeId,
 			String characteristicTypeId, String modifierId, String authorName) throws IOException {
 		WriteUtil.write(getConfig(), relationshipId + "\t" + effectiveTime + "\t" + active + "\t" + moduleId + "\t" + sourceId + "\t" + destinationId + "\t" + relationshipGroup + "\t" + relTypeId

@@ -13,7 +13,6 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
-import org.ihtsdo.rf2.constant.I_Constants;
 import org.ihtsdo.rf2.impl.RF2AbstractImpl;
 import org.ihtsdo.rf2.model.Refset;
 import org.ihtsdo.rf2.util.Config;
@@ -63,12 +62,12 @@ public class RF2DescriptionReferencesImpl extends RF2AbstractImpl implements I_P
 		String effectiveTime = "";
 		UUID uuid = null;
 		String targetComponent = "";
-		
+
 		try {
 			String refsetId = getRefset().getId();
 			//int refsetTermAuxId = getNid(getRefset().getTermAuxUID());
 			int refsetNid = getNid(getRefset().getUID());		
-			String moduleId = I_Constants.CORE_MODULE_ID;
+			String moduleId = "";
 			List<? extends I_DescriptionTuple> descriptions = concept.getDescriptionTuples(allStatuses, 
 					allDescTypes, currenAceConfig.getViewPositionSetReadOnly(), 
 					Precedence.PATH, currenAceConfig.getConflictResolutionStrategy());
@@ -106,38 +105,42 @@ public class RF2DescriptionReferencesImpl extends RF2AbstractImpl implements I_P
 									}
 								}else{
 
-									extensionStatusId = extensionPart.getStatusNid();
-									descriptionid = getDescriptionId(description.getDescId(), ExportUtil.getSnomedCorePathNid());
-									if (extensionStatusId == activeNid) { 														
-										active = "1";
-									} else if (extensionStatusId == inactiveNid) { 														
-										active = "0";								
-									} else {
-										System.out.println("unknown extensionStatusId =====>" + extensionStatusId);
-										logger.error("unknown extensionStatusId =====>" + extensionStatusId);
-										//System.exit(0);
-									}
-									
-									if (logger.isDebugEnabled()) {
-										logger.debug("extensionStatusId :" + extensionStatusId + "active : " + active);
-									}
+									if (isComponentToPublish( extensionPart)){
+										extensionStatusId = extensionPart.getStatusNid();
+										descriptionid = getDescriptionId(description.getDescId(), ExportUtil.getSnomedCorePathNid());
+										if (extensionStatusId == activeNid) { 														
+											active = "1";
+										} else if (extensionStatusId == inactiveNid) { 														
+											active = "0";								
+										} else {
+											System.out.println("unknown extensionStatusId =====>" + extensionStatusId);
+											logger.error("unknown extensionStatusId =====>" + extensionStatusId);
+											//System.exit(0);
+										}
 
-									int targetComponentNid = extensionPart.getC1id();
-									targetComponent = getSctId(targetComponentNid, getSnomedCorePathNid());
-									uuid = extensionPart.getPrimUuid();
-									Date effectiveDate = new Date(extensionPart.getTime());
-									effectiveTime = getDateFormat().format(effectiveDate);
-									
+										if (logger.isDebugEnabled()) {
+											logger.debug("extensionStatusId :" + extensionStatusId + "active : " + active);
+										}
 
-									if (descriptionid==null || descriptionid.equals("")){
-										descriptionid=description.getUUIDs().iterator().next().toString();
-									}
-									if (targetComponent==null || targetComponent.equals("")){
-										targetComponent=Terms.get().getUids(targetComponentNid).iterator().next().toString();
-									}
+										int targetComponentNid = extensionPart.getC1id();
+										targetComponent = getSctId(targetComponentNid, getSnomedCorePathNid());
+										uuid = extensionPart.getPrimUuid();
+										Date effectiveDate = new Date(extensionPart.getTime());
+										effectiveTime = getDateFormat().format(effectiveDate);
 
-									writeRF2TypeLine(uuid, effectiveTime, active, moduleId, refsetId, descriptionid, targetComponent);
-									break;
+
+										if (descriptionid==null || descriptionid.equals("")){
+											descriptionid=description.getUUIDs().iterator().next().toString();
+										}
+										if (targetComponent==null || targetComponent.equals("")){
+											targetComponent=Terms.get().getUids(targetComponentNid).iterator().next().toString();
+										}
+										int intModuleId=description.getModuleNid();
+										moduleId=getModuleSCTIDForStampNid(intModuleId);
+
+										writeRF2TypeLine(uuid, effectiveTime, active, moduleId, refsetId, descriptionid, targetComponent);
+										break;
+									}
 								}
 							}
 
@@ -168,7 +171,7 @@ public class RF2DescriptionReferencesImpl extends RF2AbstractImpl implements I_P
 		return logger;
 	}
 
-	
+
 	public static void setLogger(Logger logger) {
 		RF2DescriptionReferencesImpl.logger = logger;
 	}

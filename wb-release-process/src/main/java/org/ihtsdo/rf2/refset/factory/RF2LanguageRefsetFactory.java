@@ -32,11 +32,11 @@ public class RF2LanguageRefsetFactory extends RF2AbstractFactory {
 
 		try {
 			int refsetId=Terms.get().getConcept(UUID.fromString("bca0a686-3516-3daf-8fcf-fe396d13cfad")).getNid();
-			RF2LanguageImpl languageUSIterator = new RF2LanguageImpl(getConfig(),refsetId,I_Constants.US_LANG_REFSET_ID,I_Constants.CORE_MODULE_ID);
+			RF2LanguageImpl languageUSIterator = new RF2LanguageImpl(getConfig(),refsetId,I_Constants.US_LANG_REFSET_ID);
 			Terms.get().iterateConcepts(languageUSIterator);
 			
 			refsetId=Terms.get().getConcept(UUID.fromString("eb9a5e42-3cba-356d-b623-3ed472e20b30")).getNid();
-			RF2LanguageImpl languageGBIterator = new RF2LanguageImpl(getConfig(),refsetId,I_Constants.GB_LANG_REFSET_ID,I_Constants.CORE_MODULE_ID);
+			RF2LanguageImpl languageGBIterator = new RF2LanguageImpl(getConfig(),refsetId,I_Constants.GB_LANG_REFSET_ID);
 			Terms.get().iterateConcepts(languageGBIterator);
 
 			closeExportFileWriter();

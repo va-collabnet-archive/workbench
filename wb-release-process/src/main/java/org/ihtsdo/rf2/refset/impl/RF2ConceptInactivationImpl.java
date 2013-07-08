@@ -17,7 +17,6 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.id.Type5UuidFactory;
 import org.ihtsdo.rf2.constant.I_Constants;
 import org.ihtsdo.rf2.impl.RF2AbstractImpl;
-import org.ihtsdo.rf2.refset.dao.RefsetConceptDAO;
 import org.ihtsdo.rf2.util.Config;
 import org.ihtsdo.rf2.util.WriteUtil;
 import org.ihtsdo.tk.api.Precedence;
@@ -142,7 +141,7 @@ public class RF2ConceptInactivationImpl extends RF2AbstractImpl implements I_Pro
 
 			int conceptInactivationRefsetNid = getNid(I_Constants.CONCEPT_INACTIVATION_REFSET_UID);
 			String refsetId = getSctId(conceptInactivationRefsetNid, getSnomedCorePathNid());
-			String moduleId = I_Constants.CORE_MODULE_ID;
+			String moduleId = "";
 			UUID uuid = Type5UuidFactory.get(refsetId + referencedComponentId);
 			Date PREVIOUSRELEASEDATE = getDateFormat().parse(I_Constants.inactivation_policy_change);
 
@@ -153,24 +152,31 @@ public class RF2ConceptInactivationImpl extends RF2AbstractImpl implements I_Pro
 
 			if (conceptAttributes.size() > 0) {
 				for (int i = 0; i < conceptAttributes.size(); i++) {
+
 					I_ConceptAttributeTuple<?> i_ConceptAttributeTuple = (I_ConceptAttributeTuple<?>) conceptAttributes.get(i);
-					conceptStatus = getConceptInactivationStatusType(i_ConceptAttributeTuple.getStatusNid());
-					Date et = new Date(getTermFactory().convertToThickVersion(i_ConceptAttributeTuple.getVersion()));
-					effectiveTime = getDateFormat().format(et);
 
-					if (conceptStatus.equals("0")){
-						valueId="XXX";
-					} else {
-						valueId= getConceptInactivationRelationshipValueId(concept); 
-					}
+					if (isComponentToPublish( i_ConceptAttributeTuple.getMutablePart())){
+						conceptStatus = getConceptInactivationStatusType(i_ConceptAttributeTuple.getStatusNid());
+						Date et = new Date(getTermFactory().convertToThickVersion(i_ConceptAttributeTuple.getVersion()));
+						effectiveTime = getDateFormat().format(et);
 
-					if (valueId!=null){
-
-						if (!valueId.equals("XXX")) {
-							WriteRF2TypeLine(uuid, effectiveTime, "1", moduleId, refsetId, referencedComponentId, valueId);
+						if (conceptStatus.equals("0")){
+							valueId="XXX";
 						} else {
-							WriteRF2TypeLine(uuid, effectiveTime, "0", moduleId, refsetId, referencedComponentId, "");
-							recordCounter++;
+							valueId= getConceptInactivationRelationshipValueId(concept); 
+						}
+
+						if (valueId!=null){
+
+							int intModuleId=i_ConceptAttributeTuple.getModuleNid();
+							moduleId=getModuleSCTIDForStampNid(intModuleId);
+
+							if (!valueId.equals("XXX")) {
+								WriteRF2TypeLine(uuid, effectiveTime, "1", moduleId, refsetId, referencedComponentId, valueId);
+							} else {
+								WriteRF2TypeLine(uuid, effectiveTime, "0", moduleId, refsetId, referencedComponentId, "");
+								recordCounter++;
+							}
 						}
 					}
 				}

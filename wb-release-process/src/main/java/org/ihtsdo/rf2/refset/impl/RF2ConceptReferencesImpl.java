@@ -11,9 +11,7 @@ import org.dwfa.ace.api.I_ProcessConcepts;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
-import org.dwfa.ace.api.ebr.I_ExtendByRefPartInt;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
-import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.ihtsdo.rf2.constant.I_Constants;
 import org.ihtsdo.rf2.impl.RF2AbstractImpl;
 import org.ihtsdo.rf2.model.Refset;
@@ -68,7 +66,7 @@ public class RF2ConceptReferencesImpl extends RF2AbstractImpl implements I_Proce
 			String moduleId = I_Constants.CORE_MODULE_ID;
 			//int refsetTermAuxId = getNid(getRefset().getTermAuxUID());
 			int refsetNid = getNid(getRefset().getUID());
-			
+
 			List<? extends I_ExtendByRef> extensions = tf.getAllExtensionsForComponent(concept.getNid(), true);
 
 			if (!extensions.isEmpty()) {
@@ -91,31 +89,37 @@ public class RF2ConceptReferencesImpl extends RF2AbstractImpl implements I_Proce
 									logger.debug("Refset extension part not found!");
 								}
 							}else{
-								
-								int extensionStatusId = extensionPart.getStatusNid();
-								if (extensionStatusId == activeNid) { 														
-									active = "1";
-								} else if (extensionStatusId == inactiveNid) { 														
-									active = "0";								
-								} else {
-									System.out.println("unknown extensionStatusId =====>" + extensionStatusId);
-									logger.error("unknown extensionStatusId =====>" + extensionStatusId);
-									//System.exit(0);
-								}
-								
-								int targetComponentNid = extensionPart.getC1id();
-								targetComponent = getSctId(targetComponentNid, getSnomedCorePathNid());
-								uuid = extensionPart.getPrimUuid();
-								Date effectiveDate = new Date(extensionPart.getTime());
-								effectiveTime = getDateFormat().format(effectiveDate);
 
-								if (referencedComponentId==null || referencedComponentId.equals("")){
-									referencedComponentId=concept.getUids().iterator().next().toString();
+								if (isComponentToPublish( extensionPart)){
+
+									int extensionStatusId = extensionPart.getStatusNid();
+									if (extensionStatusId == activeNid) { 														
+										active = "1";
+									} else if (extensionStatusId == inactiveNid) { 														
+										active = "0";								
+									} else {
+										System.out.println("unknown extensionStatusId =====>" + extensionStatusId);
+										logger.error("unknown extensionStatusId =====>" + extensionStatusId);
+										//System.exit(0);
+									}
+
+									int targetComponentNid = extensionPart.getC1id();
+									targetComponent = getSctId(targetComponentNid, getSnomedCorePathNid());
+									uuid = extensionPart.getPrimUuid();
+									Date effectiveDate = new Date(extensionPart.getTime());
+									effectiveTime = getDateFormat().format(effectiveDate);
+
+									if (referencedComponentId==null || referencedComponentId.equals("")){
+										referencedComponentId=concept.getUids().iterator().next().toString();
+									}
+									if (targetComponent==null || targetComponent.equals("")){
+										targetComponent=Terms.get().getUids(targetComponentNid).iterator().next().toString();
+									}
+
+									int intModuleId=extensionPart.getModuleNid();
+									moduleId=getModuleSCTIDForStampNid(intModuleId);
+									writeRF2TypeLine(uuid, effectiveTime, active, moduleId, refsetId, referencedComponentId, targetComponent);
 								}
-								if (targetComponent==null || targetComponent.equals("")){
-									targetComponent=Terms.get().getUids(targetComponentNid).iterator().next().toString();
-								}
-								writeRF2TypeLine(uuid, effectiveTime, active, moduleId, refsetId, referencedComponentId, targetComponent);
 							}
 						}
 					}

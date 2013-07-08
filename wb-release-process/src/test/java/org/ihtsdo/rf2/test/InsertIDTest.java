@@ -37,6 +37,7 @@ import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.rf2.constant.I_Constants;
 import org.ihtsdo.rf2.core.dao.ConceptDAO;
 import org.ihtsdo.rf2.core.dao.DescriptionDAO;
+import org.ihtsdo.rf2.util.Config;
 import org.ihtsdo.rf2.util.Database;
 import org.ihtsdo.rf2.util.ExportUtil;
 
@@ -114,7 +115,8 @@ public class InsertIDTest extends TestCase {
 			db.setLocation("E:\\Workbench_Bundle\\UAT\\UAT-2011-30-10\\berkeley-db");
 			
 			ExportUtil.createTermFactory(db);
-			ExportUtil.init();
+			Config config=new Config();
+			ExportUtil.init(config);
 			// ExportUtil.InitializeFileName();
 			_termfactory = ExportUtil.getTermFactory();
 			ExportUtil.createAceConfig();

@@ -63,7 +63,7 @@ public class RF2RefinabilityImpl extends RF2AbstractImpl implements I_ProcessCon
 
 			// UUID uuid = UUID.randomUUID();
 			//String moduleId = getMetaModuleID(concept);
-			String moduleId = I_Constants.CORE_MODULE_ID;
+			String moduleId = "";
 			Collection<? extends I_RelVersioned> rels = concept.getSourceRels();
 			if (!rels.isEmpty()) {
 				for (I_RelVersioned<?> rel : rels) {
@@ -75,78 +75,83 @@ public class RF2RefinabilityImpl extends RF2AbstractImpl implements I_ProcessCon
 							String priorQualifier = "0";
 							int firstRowInserted = 0;
 							for (I_RelPart relVer : relVers) {
-								// int relPathId = relVer.getPathNid();
-								// if (relPathId == getSnomedCorePathNid() || relPathId == getSnomedInferredPathNid()) {
-								referencedComponentId = getSctId(rel.getRelId(), relVer.getPathNid());
-								UUID uuid = Type5UuidFactory.get(refsetId + referencedComponentId);
-								String characteristicType = getCharacteristicType(relVer.getCharacteristicId());
 
-								characteristicTypeId = getCharacteristicTypeId(characteristicType);
+								if (isComponentToPublish( relVer)){
+									// int relPathId = relVer.getPathNid();
+									// if (relPathId == getSnomedCorePathNid() || relPathId == getSnomedInferredPathNid()) {
+									referencedComponentId = getSctId(rel.getRelId(), relVer.getPathNid());
+									UUID uuid = Type5UuidFactory.get(refsetId + referencedComponentId);
+									String characteristicType = getCharacteristicType(relVer.getCharacteristicId());
 
-								refinability = getRefinabilityType(relVer.getRefinabilityId());
-								valueId = getRefinabilityValueId(Integer.parseInt(refinability));
-								status = getRefinabilityStatusType(relVer.getStatusNid());
+									characteristicTypeId = getCharacteristicTypeId(characteristicType);
 
-								if (status.equals("0")) {
-									active = "1";
-								} else {
-									active = "0";
-								}
-								Date date = new Date(getTermFactory().convertToThickVersion(relVer.getVersion()));
-								effectiveTime = getDateFormat().format(date);
-								relTypeId = getSctId(relVer.getTypeNid(), getSnomedCorePathNid());
-								if (relTypeId.equals(I_Constants.MAY_BE) || relTypeId.equals(I_Constants.WAS_A) || relTypeId.equals(I_Constants.SAME_AS) || relTypeId.equals(I_Constants.REPLACED_BY)
-										|| relTypeId.equals(I_Constants.MOVED_FROM) || relTypeId.equals(I_Constants.MOVED_TO)) {
-									characteristicTypeId = I_Constants.HISTORICAL;
-								}
+									refinability = getRefinabilityType(relVer.getRefinabilityId());
+									valueId = getRefinabilityValueId(Integer.parseInt(refinability));
+									status = getRefinabilityStatusType(relVer.getStatusNid());
 
-								// We need to capture relationshipid's state only when they are qualifier
-								// Do not output Hisorical or any other relationships
-								if (getConfig().getRf2Format().equals("true") && firstRowInserted == 0 && characteristicTypeId.equalsIgnoreCase(I_Constants.QUALIFYRELATION)) {
-									insertRefsetRow(uuid, effectiveTime, active, moduleId, refsetId, referencedComponentId, valueId);
-									priorValueId = valueId;
-									priorQualifier = "1";
-									priorActive = active;
-									firstRowInserted = 1;
-								} else if (getConfig().getRf2Format().equals("true") && firstRowInserted == 1) {
-									if (priorActive.equals("1") && active.equals("0") && priorQualifier.equals("1") && characteristicTypeId.equalsIgnoreCase(I_Constants.QUALIFYRELATION)
-											&& valueId == priorValueId) {
-										// Inactivation row
-										insertRefsetRow(uuid, effectiveTime, active, moduleId, refsetId, referencedComponentId, priorValueId);
-										priorActive = active;
-									} else if (priorActive.equals("1") && active.equals("1") && priorQualifier.equals("1") && !characteristicTypeId.equalsIgnoreCase(I_Constants.QUALIFYRELATION)) {
-										// Inactivation row
-										priorQualifier = "0";
-										priorActive = "0";
-										insertRefsetRow(uuid, effectiveTime, priorActive, moduleId, refsetId, referencedComponentId, priorValueId);
-									} else if (priorActive.equals("1") && active.equals("1") && priorQualifier.equals("1") && characteristicTypeId.equalsIgnoreCase(I_Constants.QUALIFYRELATION)
-											&& valueId != priorValueId) {
-										// Insert new row
-										insertRefsetRow(uuid, effectiveTime, active, moduleId, refsetId, referencedComponentId, valueId);
-										priorValueId = valueId;
-										priorQualifier = "1";
-									} else if (priorActive.equals("0") && active.equals("1") && priorQualifier.equals("0") && characteristicTypeId.equalsIgnoreCase(I_Constants.QUALIFYRELATION)) {
-										// Insert new row
-										insertRefsetRow(uuid, effectiveTime, active, moduleId, refsetId, referencedComponentId, valueId);
-										priorValueId = valueId;
-										priorQualifier = "1";
-										priorActive = active;
-									} else if (priorActive.equals("0") && active.equals("1") && priorQualifier.equals("1") && characteristicTypeId.equalsIgnoreCase(I_Constants.QUALIFYRELATION)) {
-										// Insert new row
-										insertRefsetRow(uuid, effectiveTime, active, moduleId, refsetId, referencedComponentId, valueId);
-										priorValueId = valueId;
-										priorActive = active;
-										priorQualifier = "1";
-									} else if (priorActive.equals("1") && active.equals("0")) {
-										// Inactivation row
-										insertRefsetRow(uuid, effectiveTime, active, moduleId, refsetId, referencedComponentId, valueId);
-										priorValueId = valueId;
-										priorActive = active;
-									} else if (priorActive.equals("1") && active.equals("0") && priorQualifier.equals("1") && characteristicTypeId.equalsIgnoreCase(I_Constants.QUALIFYRELATION)
-											&& valueId != priorValueId) {
-										logger.error("<====================Illegal State========================>");
+									if (status.equals("0")) {
+										active = "1";
+									} else {
+										active = "0";
 									}
-									// if( active != priorActive || valueId != priorValueId ){ }
+									Date date = new Date(getTermFactory().convertToThickVersion(relVer.getVersion()));
+									effectiveTime = getDateFormat().format(date);
+									relTypeId = getSctId(relVer.getTypeNid(), getSnomedCorePathNid());
+									if (relTypeId.equals(I_Constants.MAY_BE) || relTypeId.equals(I_Constants.WAS_A) || relTypeId.equals(I_Constants.SAME_AS) || relTypeId.equals(I_Constants.REPLACED_BY)
+											|| relTypeId.equals(I_Constants.MOVED_FROM) || relTypeId.equals(I_Constants.MOVED_TO)) {
+										characteristicTypeId = I_Constants.HISTORICAL;
+									}
+
+									int intModuleId=relVer.getModuleNid();
+									moduleId=getModuleSCTIDForStampNid(intModuleId);
+									// We need to capture relationshipid's state only when they are qualifier
+									// Do not output Hisorical or any other relationships
+									if (getConfig().getRf2Format().equals("true") && firstRowInserted == 0 && characteristicTypeId.equalsIgnoreCase(I_Constants.QUALIFYRELATION)) {
+										insertRefsetRow(uuid, effectiveTime, active, moduleId, refsetId, referencedComponentId, valueId);
+										priorValueId = valueId;
+										priorQualifier = "1";
+										priorActive = active;
+										firstRowInserted = 1;
+									} else if (getConfig().getRf2Format().equals("true") && firstRowInserted == 1) {
+										if (priorActive.equals("1") && active.equals("0") && priorQualifier.equals("1") && characteristicTypeId.equalsIgnoreCase(I_Constants.QUALIFYRELATION)
+												&& valueId == priorValueId) {
+											// Inactivation row
+											insertRefsetRow(uuid, effectiveTime, active, moduleId, refsetId, referencedComponentId, priorValueId);
+											priorActive = active;
+										} else if (priorActive.equals("1") && active.equals("1") && priorQualifier.equals("1") && !characteristicTypeId.equalsIgnoreCase(I_Constants.QUALIFYRELATION)) {
+											// Inactivation row
+											priorQualifier = "0";
+											priorActive = "0";
+											insertRefsetRow(uuid, effectiveTime, priorActive, moduleId, refsetId, referencedComponentId, priorValueId);
+										} else if (priorActive.equals("1") && active.equals("1") && priorQualifier.equals("1") && characteristicTypeId.equalsIgnoreCase(I_Constants.QUALIFYRELATION)
+												&& valueId != priorValueId) {
+											// Insert new row
+											insertRefsetRow(uuid, effectiveTime, active, moduleId, refsetId, referencedComponentId, valueId);
+											priorValueId = valueId;
+											priorQualifier = "1";
+										} else if (priorActive.equals("0") && active.equals("1") && priorQualifier.equals("0") && characteristicTypeId.equalsIgnoreCase(I_Constants.QUALIFYRELATION)) {
+											// Insert new row
+											insertRefsetRow(uuid, effectiveTime, active, moduleId, refsetId, referencedComponentId, valueId);
+											priorValueId = valueId;
+											priorQualifier = "1";
+											priorActive = active;
+										} else if (priorActive.equals("0") && active.equals("1") && priorQualifier.equals("1") && characteristicTypeId.equalsIgnoreCase(I_Constants.QUALIFYRELATION)) {
+											// Insert new row
+											insertRefsetRow(uuid, effectiveTime, active, moduleId, refsetId, referencedComponentId, valueId);
+											priorValueId = valueId;
+											priorActive = active;
+											priorQualifier = "1";
+										} else if (priorActive.equals("1") && active.equals("0")) {
+											// Inactivation row
+											insertRefsetRow(uuid, effectiveTime, active, moduleId, refsetId, referencedComponentId, valueId);
+											priorValueId = valueId;
+											priorActive = active;
+										} else if (priorActive.equals("1") && active.equals("0") && priorQualifier.equals("1") && characteristicTypeId.equalsIgnoreCase(I_Constants.QUALIFYRELATION)
+												&& valueId != priorValueId) {
+											logger.error("<====================Illegal State========================>");
+										}
+										// if( active != priorActive || valueId != priorValueId ){ }
+									}
 								}
 							}
 						}

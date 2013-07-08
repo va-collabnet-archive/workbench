@@ -12,6 +12,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -34,8 +35,6 @@ import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
-import org.ihtsdo.tk.api.cs.ChangeSetPolicy;
-import org.ihtsdo.tk.api.cs.ChangeSetWriterThreading;
 import org.dwfa.ace.commitlog.CommitLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
@@ -49,12 +48,17 @@ import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
 import org.ihtsdo.tk.api.changeset.ChangeSetGeneratorBI;
+import org.ihtsdo.tk.api.cs.ChangeSetPolicy;
+import org.ihtsdo.tk.api.cs.ChangeSetWriterThreading;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 import org.ihtsdo.tk.spec.ConceptSpec;
 
 //import org.ihtsdo.tk.api.Precedence;
 
 public class ExportUtil {
+
+
+	private static final String META_MODULEID_PARENT = null;
 
 	// store the handle for the log files
 	private static I_ConfigAceFrame aceConfig;
@@ -75,7 +79,9 @@ public class ExportUtil {
 	private static Set<I_GetConceptData> inactiveConceptList;
 	private static boolean inActiveRelationshipState = false;
 	private static HashSet<ModuleIDDAO> metaHierDAO;
+	private static HashMap<Integer,String> allModuleMapNidSCTId;
 
+	private static Set<I_GetConceptData> moduleIdDescendants = new HashSet<I_GetConceptData>();
 
 	public static int activeId; 
 	public static int inactId; 
@@ -116,7 +122,7 @@ public class ExportUtil {
 		}
 	}
 
-	public static void init() {
+	public static void init(Config config) {
 		// create ace framework
 		//createAceConfig();
 
@@ -124,54 +130,57 @@ public class ExportUtil {
 		//metaConceptList = initMetaHierarchyIsAList(); // 127;
 
 		inactiveConceptList = getInactiveDecendentList();
-		InitializeModuleID();		
+		InitializeModuleID(config);		
 	}
 
-
-
-	//Temporary solution for module id...
-	public static void InitializeModuleID() {
-		InputStream is =ExportUtil.class.getResourceAsStream("/fileconfig.properties"); 
-
-		try { 
-			// Load properties file for FileNames 
-			Properties propsFileName = new Properties();
-			propsFileName.load(is); 
-			String metaHierarchy = propsFileName.getProperty("metaHierarchy"); 			 
-			metaHierDAO = new HashSet<ModuleIDDAO>();
-			BufferedReader in = null;
-			InputStream isData = ExportUtil.class.getResourceAsStream(metaHierarchy);
-			InputStreamReader isR = new InputStreamReader(isData);
-			try {
-				in = new BufferedReader(isR);
-				String str;
-				while ((str = in.readLine()) != null) {
-					str = str.trim();
-					String[] part= str.split("\t");
-					ModuleIDDAO ModuleIDDAO = new ModuleIDDAO(part[0] , part[1], part[2]);
-					metaHierDAO.add(ModuleIDDAO);
-				}
-			} catch (FileNotFoundException e1) {
-				logger.error(e1.getMessage());
-			} catch (IOException e1) {
-				logger.error(e1.getMessage());
-			} catch (Exception e) {
-				logger.error(" Exceptions in getHier : " + e.getMessage());
-			} finally {
-				if (in != null)
-					try {
-						in.close();
-					} catch (IOException e) {		 				
-						e.printStackTrace();
-					}
+	public static void InitializeModuleID(Config config) {
+		try{
+			if (allModuleMapNidSCTId!=null && allModuleMapNidSCTId.size()>0){
+				return;
 			}
+			HashMap<UUID, String> allModuleIds=new HashMap<UUID, String>();
+			I_GetConceptData metaModuleIdParent = getTermFactory().getConcept(UUID.fromString(META_MODULEID_PARENT));
+			Set <I_GetConceptData>moduleIdDescendants=new HashSet<I_GetConceptData>();
+			moduleIdDescendants = getDescendantsLocal(moduleIdDescendants, metaModuleIdParent );
+
+			for (I_GetConceptData loopConcept : moduleIdDescendants) {
+				allModuleIds.put(loopConcept.getPrimUuid(),"");
+			}	
+			CompleteMapSCTIDtoModule(config, allModuleIds);
 		} catch (FileNotFoundException e){ 
 			logger.error(e.getMessage()); 
 		} catch (IOException e) { 
 			logger.error(e.getMessage()); 
+		} catch (TerminologyException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 
+
+	private static void CompleteMapSCTIDtoModule(Config config,HashMap<UUID, String> allModuleIds) {
+		List<String>moduleFilter=config.getModuleFilter();
+		boolean filter=true;
+		if (moduleFilter==null || moduleFilter.size()==0){
+			filter= false;
+		}
+
+		for (UUID uuid:allModuleIds.keySet()){
+			String moduleSCTId=getSCTId(config, uuid);
+			try {
+				if (!filter){
+					allModuleMapNidSCTId.put(getTermFactory().uuidToNative(uuid), moduleSCTId);
+				}else if ( moduleFilter.contains(moduleSCTId)){
+					allModuleMapNidSCTId.put(getTermFactory().uuidToNative(uuid), moduleSCTId);
+				}
+			} catch (TerminologyException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+
+		}
+	}
 
 	public static String getParentSnomedId(I_GetConceptData concept) throws Exception{		
 		Set<I_GetConceptData> parents = new HashSet<I_GetConceptData>();
@@ -221,15 +230,15 @@ public class ExportUtil {
 
 			ChangeSetWriterHandler.addWriter(newDbProfile.getUsername() + ".commitLog.xls",
 					new CommitLog(new File(newDbProfile.getChangeSetRoot(),
-					"commitLog.xls"), new File(newDbProfile.getChangeSetRoot(),
-							"." + "commitLog.xls")));	
+							"commitLog.xls"), new File(newDbProfile.getChangeSetRoot(),
+									"." + "commitLog.xls")));	
 
 			flag = i_Identify.addLongId(Long.parseLong(wsSctId), ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.localize().getNid(),
-                    statusNid,
-                    effectiveDate,
-                    aceConfig.getEditCoordinate().getAuthorNid(),
-                    aceConfig.getEditCoordinate().getModuleNid(),
-                    pathNid);
+					statusNid,
+					effectiveDate,
+					aceConfig.getEditCoordinate().getAuthorNid(),
+					aceConfig.getEditCoordinate().getModuleNid(),
+					pathNid);
 			I_GetConceptData commitedConcept = getTermFactory().getConceptForNid(componentNid);
 
 			getTermFactory().addUncommitted(commitedConcept);
@@ -284,8 +293,8 @@ public class ExportUtil {
 
 		ChangeSetWriterHandler.addWriter(newDbProfile.getUsername() + ".commitLog.xls",
 				new CommitLog(new File(newDbProfile.getChangeSetRoot(),
-				"commitLog.xls"), new File(newDbProfile.getChangeSetRoot(),
-						"." + "commitLog.xls")));	
+						"commitLog.xls"), new File(newDbProfile.getChangeSetRoot(),
+								"." + "commitLog.xls")));	
 
 		Ts.get().addChangeSetGenerator(tempKey, generator);
 	}
@@ -298,11 +307,11 @@ public class ExportUtil {
 		try {	
 			I_Identify i_Identify = getTermFactory().getId(componentNid);
 			flag = i_Identify.addStringId(wsSnomedId, ArchitectonicAuxiliary.Concept.SNOMED_RT_ID.localize().getNid(),
-                    statusNid,
-                    Long.MAX_VALUE,
-                    aceConfig.getEditCoordinate().getAuthorNid(),
-                    aceConfig.getEditCoordinate().getModuleNid(),
-                    pathNid);
+					statusNid,
+					Long.MAX_VALUE,
+					aceConfig.getEditCoordinate().getAuthorNid(),
+					aceConfig.getEditCoordinate().getModuleNid(),
+					pathNid);
 			I_GetConceptData commitedConcept = getTermFactory().getConcept(componentNid);
 
 			getTermFactory().addUncommitted(commitedConcept);
@@ -328,10 +337,10 @@ public class ExportUtil {
 			}
 
 			flag = i_Identify.addStringId(wsCtv3Id, ArchitectonicAuxiliary.Concept.CTV3_ID.localize().getNid(), statusNid,
-                    Long.MAX_VALUE,
-                    aceConfig.getEditCoordinate().getAuthorNid(),
-                    aceConfig.getEditCoordinate().getModuleNid(),
-                    pathNid);
+					Long.MAX_VALUE,
+					aceConfig.getEditCoordinate().getAuthorNid(),
+					aceConfig.getEditCoordinate().getModuleNid(),
+					pathNid);
 			I_GetConceptData commitedConcept = getTermFactory().getConcept(componentNid);
 
 			getTermFactory().addUncommitted(commitedConcept);
@@ -360,11 +369,11 @@ public class ExportUtil {
 
 			flag = i_Identify.addStringId(wsSnomedId, ArchitectonicAuxiliary.Concept.SNOMED_RT_ID.localize().getNid(),
 					statusNid,
-                                            effectiveDate,
-                                            aceConfig.getEditCoordinate().getAuthorNid(),
-                                            aceConfig.getEditCoordinate().getModuleNid(),
-                                            pathNid);
-			
+					effectiveDate,
+					aceConfig.getEditCoordinate().getAuthorNid(),
+					aceConfig.getEditCoordinate().getModuleNid(),
+					pathNid);
+
 			I_GetConceptData commitedConcept = getTermFactory().getConcept(componentNid);
 			//getTermFactory().addUncommitted(commitedConcept);
 			//getTermFactory().commit();
@@ -391,10 +400,10 @@ public class ExportUtil {
 
 			flag = i_Identify.addStringId(wsCtv3Id, ArchitectonicAuxiliary.Concept.CTV3_ID.localize().getNid(),
 					statusNid,
-                                            effectiveDate,
-                                            aceConfig.getEditCoordinate().getAuthorNid(),
-                                            aceConfig.getEditCoordinate().getModuleNid(),
-                                            pathNid);
+					effectiveDate,
+					aceConfig.getEditCoordinate().getAuthorNid(),
+					aceConfig.getEditCoordinate().getModuleNid(),
+					pathNid);
 
 			I_GetConceptData commitedConcept = getTermFactory().getConcept(componentNid);
 			//getTermFactory().addUncommitted(commitedConcept);
@@ -460,7 +469,7 @@ public class ExportUtil {
 	}*/
 
 	public static Long getLatestActivePart(List<I_RelPart> parts)
-	throws Exception {
+			throws Exception {
 		long latestVersion = Integer.MIN_VALUE;
 		for (I_RelPart rel : parts) {
 			if (rel.getTime() > latestVersion && rel.getStatusNid()==getNid("d12702ee-c37f-385f-a070-61d56d4d0f1f")) {
@@ -611,11 +620,9 @@ public class ExportUtil {
 			I_TermFactory termFactory = Terms.get();
 			I_ConfigAceFrame config = termFactory.getActiveAceFrameConfig();
 			I_IntSet allowedDestRelTypes =  termFactory.newIntSet();
-			Collection<UUID> uids = new ArrayList<UUID>();
-			UUID uuid = UUID.fromString(I_Constants.IS_A_UID);
-			uids.add(uuid);
-			allowedDestRelTypes.add(getTermFactory().uuidToNative(uids));
 			allowedDestRelTypes.add(termFactory.uuidToNative(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()));
+			allowedDestRelTypes.add(termFactory.uuidToNative(UUID.fromString("c93a30b9-ba77-3adb-a9b8-4589c9f8fb25")));
+
 			Set<I_GetConceptData> childrenSet = new HashSet<I_GetConceptData>();
 			childrenSet.addAll(concept.getDestRelOrigins(config.getAllowedStatus(), allowedDestRelTypes, 
 					config.getViewPositionSetReadOnly(), config.getPrecedence(), config.getConflictResolutionStrategy()));
@@ -774,7 +781,7 @@ public class ExportUtil {
 				String effectivetime = moduleIdDAO.getEffectiveTime();
 				//need to sort effectivetime issue
 				if(snomedIntegerId.equals(conceptid) //&& effectivetime.equals(effectivetime)
-				){
+						){
 					moduleId = I_Constants.META_MODULE_ID;
 					break;
 				}
@@ -1635,7 +1642,7 @@ public class ExportUtil {
 				partitionId = config.getPartitionId();
 				releaseId	= config.getReleaseId();
 				executionId = config.getExecutionId();
-				sctModuleId = config.getModuleId();
+				sctModuleId = "12345";
 				return getSCTId(config,uuid, Integer.parseInt(namespaceId) , partitionId, releaseId, executionId, sctModuleId);
 			}	
 		} catch (Exception cE) {
@@ -1767,7 +1774,7 @@ public class ExportUtil {
 	// get the relationshipId for the given UUID using Specific namespace and partition values
 	public static String getRelationshipId(Config config, UUID uuid) {
 		IdAssignmentImpl idGen = getIdGeneratorClient( config);
-		
+
 		long relationshipId = 0L;
 		String partitionId = "";
 		String sctModuleId = "Relationship Component";
@@ -1803,11 +1810,11 @@ public class ExportUtil {
 			I_Identify i_Identify = getTermFactory().getId(componentNid);	
 			I_GetConceptData commitedConcept = getTermFactory().getConceptForNid(componentNid);
 			flag = i_Identify.addLongId(Long.parseLong(wsSctId), ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.localize().getNid(),
-                    statusNid,
-                    Long.MAX_VALUE,
-                    aceConfig.getEditCoordinate().getAuthorNid(),
-                    aceConfig.getEditCoordinate().getModuleNid(),
-                    pathNid);
+					statusNid,
+					Long.MAX_VALUE,
+					aceConfig.getEditCoordinate().getAuthorNid(),
+					aceConfig.getEditCoordinate().getModuleNid(),
+					pathNid);
 			getTermFactory().addUncommitted(commitedConcept);
 
 		} catch (Exception ex) {
@@ -2141,6 +2148,10 @@ public class ExportUtil {
 		}
 
 		return characteristicTypeId;
+	}
+
+	public static String getModuleSCTIDForStampNid(int moduleNid) {
+		return allModuleMapNidSCTId.get(moduleNid);
 	}
 
 }

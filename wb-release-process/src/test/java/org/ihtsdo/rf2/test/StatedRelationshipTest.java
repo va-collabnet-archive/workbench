@@ -98,7 +98,7 @@ public class StatedRelationshipTest extends TestCase {
 	public void testCreateChangeset(){
 		try {	
 				System.out.println("===============StatedRelationshipTest  Started============");
-				ExportUtil.init();
+				
 				Config config = null;
 			
 			    config = JAXBUtil.getConfig("/org/ihtsdo/rf2/config/statedrelationship.xml");
@@ -115,7 +115,6 @@ public class StatedRelationshipTest extends TestCase {
 				config.setNamespaceId("0");
 				config.setPartitionId("00");
 				config.setExecutionId("Daily Build Test");
-				config.setModuleId("Core Component Test");
 				config.setReleaseId("20120131");
 				config.setComponentType("Concept Test");			
 				config.setUsername("termmed");
@@ -126,7 +125,7 @@ public class StatedRelationshipTest extends TestCase {
 				config.setChangesetUserName("jmirza");
 				config.setChangesetUserConcept("f7495b58-6630-3499-a44e-2052b5fcf06c");
 				config.setChangesetRoot("E:/Workbench_Bundle/Prod/Test/profiles/jmirza");
-				
+				ExportUtil.init(config);
 				RF2StatedRelationshipImpl iterator = new RF2StatedRelationshipImpl(config);
 
 				ExportUtil.getTermFactory().iterateConcepts(iterator);

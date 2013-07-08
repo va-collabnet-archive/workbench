@@ -65,8 +65,10 @@ public class RF2HistoricalRelationshipImpl extends RF2AbstractImpl implements I_
 					Precedence.PATH, currenAceConfig.getConflictResolutionStrategy());
 
 			for (I_RelTuple rel : relationships) {
-				characteristicTypeId="-1";
-				/*I_Identify charId = tf.getId(rel.getCharacteristicId());
+
+				if (isComponentToPublish( rel.getMutablePart())){
+					characteristicTypeId="-1";
+					/*I_Identify charId = tf.getId(rel.getCharacteristicId());
 				List<? extends I_IdPart> idParts = charId.getVisibleIds(currenAceConfig.getViewPositionSetReadOnly(), 
 						snomedIntId);
 				if (idParts != null) {
@@ -77,8 +79,8 @@ public class RF2HistoricalRelationshipImpl extends RF2AbstractImpl implements I_
 						if (c != null)  characteristicTypeId = c.toString();
 					}
 				}*/
-				
-				//if (characteristicTypeId.equals(I_Constants.INFERRED) || characteristicTypeId.equals(I_Constants.ADDITIONALRELATION) || characteristicTypeId.equals(I_Constants.STATED) ){
+
+					//if (characteristicTypeId.equals(I_Constants.INFERRED) || characteristicTypeId.equals(I_Constants.ADDITIONALRELATION) || characteristicTypeId.equals(I_Constants.STATED) ){
 					destinationId = "";
 					I_Identify id = tf.getId(rel.getC2Id());
 					if (id != null) {
@@ -109,49 +111,45 @@ public class RF2HistoricalRelationshipImpl extends RF2AbstractImpl implements I_
 							}
 						}
 					}
-					
+
 					if (!(relTypeId==null || relTypeId.equals(""))){
 						if (relTypeId.equals(I_Constants.MAY_BE) || relTypeId.equals(I_Constants.WAS_A) || relTypeId.equals(I_Constants.SAME_AS) || relTypeId.equals(I_Constants.REPLACED_BY)
 								|| relTypeId.equals(I_Constants.MOVED_FROM) || relTypeId.equals(I_Constants.MOVED_TO)) {
-	
-						relationshipId = "";
-	
-						id = tf.getId(rel.getNid());
-						if (id != null) {
-							idParts = tf.getId(rel.getNid()).getVisibleIds(currenAceConfig.getViewPositionSetReadOnly(), 
-									snomedIntId);
-							if (idParts != null) {
-								Object denotation = getLastCurrentVisibleId(idParts, currenAceConfig.getViewPositionSetReadOnly(), 
-										RelAssertionType.STATED);
-								if (denotation instanceof Long) {
-									Long c = (Long) denotation;
-									if (c != null)  relationshipId = c.toString();
+
+							relationshipId = "";
+
+							id = tf.getId(rel.getNid());
+							if (id != null) {
+								idParts = tf.getId(rel.getNid()).getVisibleIds(currenAceConfig.getViewPositionSetReadOnly(), 
+										snomedIntId);
+								if (idParts != null) {
+									Object denotation = getLastCurrentVisibleId(idParts, currenAceConfig.getViewPositionSetReadOnly(), 
+											RelAssertionType.STATED);
+									if (denotation instanceof Long) {
+										Long c = (Long) denotation;
+										if (c != null)  relationshipId = c.toString();
+									}
 								}
 							}
-						}
-						
-						relationshipStatusId = rel.getStatusNid();
-						if (relationshipStatusId == activeNid) { 														
-							active = "1";
-							moduleId = computeModuleId(sourceConcept);
-						} else if (relationshipStatusId == inactiveNid) { 														
-							active = "0";
-							moduleId = computeModuleId(sourceConcept);
-						}
-						
-						if(moduleId.equals(I_Constants.META_MODULE_ID)){		
-							logger.info("==Meta Concept==" + sourceId + " & Name : " + sourceConcept.getInitialText());
-							incrementMetaDataCount();
-						}
 
-						effectiveTime = getDateFormat().format(new Date(rel.getTime()));
-	
-						int relationshipGroup = rel.getGroup();
+							relationshipStatusId = rel.getStatusNid();
+							if (relationshipStatusId == activeNid) { 														
+								active = "1";
+							} else if (relationshipStatusId == inactiveNid) { 														
+								active = "0";
+							}
 
-						/*if (sourceId==null || sourceId.equals("")){
+							int intModuleId=rel.getModuleNid();
+							moduleId=getModuleSCTIDForStampNid(intModuleId);
+
+							effectiveTime = getDateFormat().format(new Date(rel.getTime()));
+
+							int relationshipGroup = rel.getGroup();
+
+							/*if (sourceId==null || sourceId.equals("")){
 							sourceId=sourceConcept.getUids().iterator().next().toString();
 						}
-				
+
 						if (relTypeId==null || relTypeId.equals("")){
 							relTypeId=tf.getUids(rel.getTypeNid()).iterator().next().toString();
 						}
@@ -165,23 +163,24 @@ public class RF2HistoricalRelationshipImpl extends RF2AbstractImpl implements I_
 								continue;
 							}
 						}
-						
+
 						if ((relationshipId==null || relationshipId.equals("")) && active.equals("1")){
 							relationshipId=rel.getUUIDs().iterator().next().toString();
 						}*/
-					
-						if (relationshipId==null || relationshipId.equals("")){
-							logger.info("Unplublished Retired Stated Relationship: " + rel.getUUIDs().iterator().next().toString());
-						}else if (!((destinationId==null || destinationId.equals("") || destinationId.equals("0"))
-							&& (sourceId==null || sourceId.equals("") || sourceId.equals("0"))
-							&& (relTypeId==null || relTypeId.equals("") || relTypeId.equals("0")))){
+
+							if (relationshipId==null || relationshipId.equals("")){
+								logger.info("Unplublished Retired Stated Relationship: " + rel.getUUIDs().iterator().next().toString());
+							}else if (!((destinationId==null || destinationId.equals("") || destinationId.equals("0"))
+									&& (sourceId==null || sourceId.equals("") || sourceId.equals("0"))
+									&& (relTypeId==null || relTypeId.equals("") || relTypeId.equals("0")))){
 								String reluuidStr =rel.getUUIDs().iterator().next().toString();
 								writeRF2TypeLine(reluuidStr , relationshipId, effectiveTime, active, moduleId, sourceId, destinationId, relationshipGroup, relTypeId,
-									characteristicTypeId, modifierId);
+										characteristicTypeId, modifierId);
 							}
 						}
 					}
 				}
+			}
 			//}
 		} catch (IOException e) {
 			logger.error("======failing for the sourceId=====" + sourceId);
@@ -200,13 +199,13 @@ public class RF2HistoricalRelationshipImpl extends RF2AbstractImpl implements I_
 				+ "\t" + characteristicTypeId + "\t" + modifierId);
 		WriteUtil.write(getConfig(), "\r\n");
 	}
-	
-	
+
+
 	public static void writeRF2TypeLine(String uuid , String relationshipId, String effectiveTime, String active, String moduleId, String sourceId, String destinationId, int relationshipGroup, String relTypeId,
 			String characteristicTypeId, String modifierId) throws IOException {
 		WriteUtil.write(getConfig(), uuid + "\t" + relationshipId + "\t" + effectiveTime + "\t" + active + "\t" + moduleId + "\t" + sourceId + "\t" + destinationId + "\t" + relationshipGroup + "\t" + relTypeId
 				+ "\t" + characteristicTypeId + "\t" + modifierId);
 		WriteUtil.write(getConfig(), "\r\n");
 	}
-	
+
 }

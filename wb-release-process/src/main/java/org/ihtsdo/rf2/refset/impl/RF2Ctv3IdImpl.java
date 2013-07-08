@@ -1,9 +1,11 @@
 package org.ihtsdo.rf2.refset.impl;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.UUID;
 
 import org.apache.log4j.Logger;
+import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_ProcessConcepts;
 import org.dwfa.tapi.TerminologyException;
@@ -12,6 +14,7 @@ import org.ihtsdo.rf2.constant.I_Constants;
 import org.ihtsdo.rf2.impl.RF2AbstractImpl;
 import org.ihtsdo.rf2.util.Config;
 import org.ihtsdo.rf2.util.WriteUtil;
+import org.ihtsdo.tk.api.Precedence;
 
 /**
  * Title: RF2Ctv3IdImpl Description: Iterating over all the concept in workbench and fetching all the components required by RF2 Ctv3Id Refset File Copyright: Copyright (c) 2010 Company: IHTSDO
@@ -40,7 +43,7 @@ public class RF2Ctv3IdImpl extends RF2AbstractImpl implements I_ProcessConcepts 
 
 		try{
 			String refsetId = I_Constants.CTV3_REFSET_ID;
-			String moduleId = I_Constants.CORE_MODULE_ID;
+			String moduleId = "";
 
 			String mapTarget_Core = getCtv3Id(concept, getSnomedCorePathNid());
 			String mapTarget_Aux = getCtv3Id(concept, getNid("2faa9260-8fb2-11db-b606-0800200c9a66")); //Workbench Auxillary path
@@ -64,15 +67,28 @@ public class RF2Ctv3IdImpl extends RF2AbstractImpl implements I_ProcessConcepts 
 					mapTarget = getCTV3ID(getConfig(), UUID.fromString(referencedComponentId));
 				}else{
 					mapTarget = getCTV3ID(getConfig(), concept.getUids().iterator().next());
-					
+
 				}
 				if (wsConceptId!=null && !wsConceptId.equals("")){
 					referencedComponentId=wsConceptId;
 				}
 			}
 
-			UUID uuid = Type5UuidFactory.get(refsetId + referencedComponentId + mapTarget);
-			writeRF2TypeLine(uuid, getConfig().getReleaseDate(), I_Constants.SIMPLE_MAP_REFSET_ACTIVE, moduleId, refsetId, referencedComponentId, mapTarget);
+			List<? extends I_ConceptAttributeTuple> conceptAttributes = concept.getConceptAttributeTuples(
+					allStatuses, 
+					currenAceConfig.getViewPositionSetReadOnly(), 
+					Precedence.PATH, currenAceConfig.getConflictResolutionStrategy());
+
+			if (conceptAttributes != null && !conceptAttributes.isEmpty()) {
+				I_ConceptAttributeTuple attributes = conceptAttributes.iterator().next();
+
+				if (isComponentToPublish( attributes.getMutablePart())){
+					int intModuleId=attributes.getModuleNid();
+					moduleId=getModuleSCTIDForStampNid(intModuleId);
+					UUID uuid = Type5UuidFactory.get(refsetId + referencedComponentId + mapTarget);
+					writeRF2TypeLine(uuid, getConfig().getReleaseDate(), I_Constants.SIMPLE_MAP_REFSET_ACTIVE, moduleId, refsetId, referencedComponentId, mapTarget);
+				}
+			}
 		} catch (TerminologyException e) {
 			logger.error("TerminologyException: " + e.getMessage());
 			e.printStackTrace();

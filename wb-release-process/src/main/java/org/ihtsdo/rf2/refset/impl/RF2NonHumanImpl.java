@@ -55,7 +55,7 @@ public class RF2NonHumanImpl extends RF2AbstractImpl implements I_ProcessConcept
 		int extensionStatusId = 0;
 		try {
 			String refsetId = I_Constants.NON_HUMAN_REFSET_ID;
-			String moduleId = I_Constants.CORE_MODULE_ID;
+			String moduleId = "";
 			int refsetTermAuxId = getNid(I_Constants.NON_HUMAN_REFSET_UID_TERM_AUX);		
 			List<? extends I_ExtendByRef> extensions = tf.getAllExtensionsForComponent(concept.getNid(), true);
 			if (!extensions.isEmpty()) {
@@ -78,46 +78,51 @@ public class RF2NonHumanImpl extends RF2AbstractImpl implements I_ProcessConcept
 								}
 							}else{							
 
-								extensionStatusId = extensionPart.getStatusNid();
-								if (extensionStatusId == activeNid) { 														
-									active = "1";
-									List<? extends I_ConceptAttributeTuple> conceptAttributes = concept.getConceptAttributeTuples(
-											allStatuses, 
-											currenAceConfig.getViewPositionSetReadOnly(), 
-											Precedence.PATH, currenAceConfig.getConflictResolutionStrategy());
+								if (isComponentToPublish( extensionPart)){
+									extensionStatusId = extensionPart.getStatusNid();
+									if (extensionStatusId == activeNid) { 														
+										active = "1";
+										List<? extends I_ConceptAttributeTuple> conceptAttributes = concept.getConceptAttributeTuples(
+												allStatuses, 
+												currenAceConfig.getViewPositionSetReadOnly(), 
+												Precedence.PATH, currenAceConfig.getConflictResolutionStrategy());
 
-									if (conceptAttributes != null && !conceptAttributes.isEmpty()) {
-										I_ConceptAttributeTuple attributes = conceptAttributes.iterator().next();
-										
-										String conceptStatus = getStatusType(attributes.getStatusNid());
-										if (conceptStatus.equals("0")) {
-											active = "1";
-										} else if (getConfig().getReleaseDate().compareTo(I_Constants.limited_policy_change)<0 && conceptStatus.equals("6")) {
-											active = "1";
-										} else {
-											active = "0";
+										if (conceptAttributes != null && !conceptAttributes.isEmpty()) {
+											I_ConceptAttributeTuple attributes = conceptAttributes.iterator().next();
+
+											String conceptStatus = getStatusType(attributes.getStatusNid());
+											if (conceptStatus.equals("0")) {
+												active = "1";
+											} else if (getConfig().getReleaseDate().compareTo(I_Constants.limited_policy_change)<0 && conceptStatus.equals("6")) {
+												active = "1";
+											} else {
+												active = "0";
+											}
 										}
+									} else if (extensionStatusId == inactiveNid) { 														
+										active = "0";								
+									} else {
+										System.out.println("unknown extensionStatusId =====>" + extensionStatusId);
+										logger.error("unknown extensionStatusId =====>" + extensionStatusId);
+										System.exit(0);
 									}
-								} else if (extensionStatusId == inactiveNid) { 														
-									active = "0";								
-								} else {
-									System.out.println("unknown extensionStatusId =====>" + extensionStatusId);
-									logger.error("unknown extensionStatusId =====>" + extensionStatusId);
-									System.exit(0);
+
+									if ((conceptid==null || conceptid.equals("")) && active.equals("1")){
+										conceptid=concept.getUids().iterator().next().toString();
+									}
+
+									if (conceptid==null || conceptid.equals("")){
+										logger.error("Unplublished Retired Concept of Non-Human : " + concept.getUUIDs().iterator().next().toString());
+									}else {
+										refsetuuid = Type5UuidFactory.get(refsetId + conceptid);
+
+										int intModuleId=extensionPart.getModuleNid();
+										moduleId=getModuleSCTIDForStampNid(intModuleId);
+
+										effectiveTime = getDateFormat().format(new Date(extensionPart.getTime()));
+										writeRF2TypeLine(refsetuuid, effectiveTime, active, moduleId, refsetId, conceptid);
+									}
 								}
-								
-								if ((conceptid==null || conceptid.equals("")) && active.equals("1")){
-									conceptid=concept.getUids().iterator().next().toString();
-								}
-								
-								if (conceptid==null || conceptid.equals("")){
-									logger.error("Unplublished Retired Concept of Non-Human : " + concept.getUUIDs().iterator().next().toString());
-								}else {
-									refsetuuid = Type5UuidFactory.get(refsetId + conceptid);
-									effectiveTime = getDateFormat().format(new Date(extensionPart.getTime()));
-									writeRF2TypeLine(refsetuuid, effectiveTime, active, moduleId, refsetId, conceptid);
-								}
-								
 							}							
 						}
 					}
