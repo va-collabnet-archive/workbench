@@ -52,50 +52,57 @@ public class RF2DescriptionInactivationImpl extends RF2AbstractImpl implements I
 
 			int descInactivationRefsetNid = getNid(I_Constants.DESCRIPTION_INACTIVATION_REFSET_UID);
 			String refsetId = getSctId(descInactivationRefsetNid, getSnomedCorePathNid());
-			String moduleId = I_Constants.CORE_MODULE_ID;
+			String moduleId = "";
 			List<? extends I_DescriptionTuple> descriptions = concept.getDescriptionTuples(allStatuses, 
 					allDescTypes, currenAceConfig.getViewPositionSetReadOnly(), 
 					Precedence.PATH, currenAceConfig.getConflictResolutionStrategy());
 
 			for (I_DescriptionTuple description: descriptions) {
-				String sDescType = getSnomedDescriptionType(description.getTypeNid());
-				Date descriptionEffectiveDate = new Date(getTermFactory().convertToThickVersion(description.getVersion()));
-				effectiveTime = getDateFormat().format(descriptionEffectiveDate);
 
-				if (!sDescType.equals("4") && !description.getLang().equals("es"))  { // Ignore text-defination & spanish description
-					String referencedComponentId = getDescriptionId(description.getDescId(), ExportUtil.getSnomedCorePathNid());
+				if (isComponentToPublish( description.getMutablePart())){
+					String sDescType = getSnomedDescriptionType(description.getTypeNid());
+					Date descriptionEffectiveDate = new Date(getTermFactory().convertToThickVersion(description.getVersion()));
+					effectiveTime = getDateFormat().format(descriptionEffectiveDate);
 
-					if (referencedComponentId==null || referencedComponentId.equals("")){
-						referencedComponentId=Terms.get().getUids(description.getDescId()).iterator().next().toString();
-					}
-					UUID uuid = Type5UuidFactory.get(refsetId + referencedComponentId);
+					if (!sDescType.equals("4") && !description.getLang().equals("es"))  { // Ignore text-defination & spanish description
+						String referencedComponentId = getDescriptionId(description.getDescId(), ExportUtil.getSnomedCorePathNid());
 
-					//20121207 patch to generate concept-non-current record for active descriptions in retired concept
-					if(description.getStatusNid()==activeNid){
-						valueId="XXX";
-						List<? extends I_ConceptAttributeTuple> conceptAttributes = concept.getConceptAttributeTuples(
-								allStatuses, 
-								currenAceConfig.getViewPositionSetReadOnly(), 
-								Precedence.PATH, currenAceConfig.getConflictResolutionStrategy());
-
-						if (conceptAttributes != null && !conceptAttributes.isEmpty()) {
-							I_ConceptAttributeTuple attributes = conceptAttributes.iterator().next();
-							
-							conceptStatus = getStatusType(attributes.getStatusNid());
-							if (!conceptStatus.equals("0") && !conceptStatus.equals("6") ) {
-								valueId=I_Constants.CONCEPT_NON_CURRENT;
-							}
+						if (referencedComponentId==null || referencedComponentId.equals("")){
+							referencedComponentId=Terms.get().getUids(description.getDescId()).iterator().next().toString();
 						}
-					}else{
-						valueId = getDescInactivationValueId(description.getStatusNid());
+						UUID uuid = Type5UuidFactory.get(refsetId + referencedComponentId);
+
+						//20121207 patch to generate concept-non-current record for active descriptions in retired concept
+						if(description.getStatusNid()==activeNid){
+							valueId="XXX";
+							List<? extends I_ConceptAttributeTuple> conceptAttributes = concept.getConceptAttributeTuples(
+									allStatuses, 
+									currenAceConfig.getViewPositionSetReadOnly(), 
+									Precedence.PATH, currenAceConfig.getConflictResolutionStrategy());
+
+							if (conceptAttributes != null && !conceptAttributes.isEmpty()) {
+								I_ConceptAttributeTuple attributes = conceptAttributes.iterator().next();
+
+								conceptStatus = getStatusType(attributes.getStatusNid());
+								if (!conceptStatus.equals("0") && !conceptStatus.equals("6") ) {
+									valueId=I_Constants.CONCEPT_NON_CURRENT;
+								}
+							}
+						}else{
+							valueId = getDescInactivationValueId(description.getStatusNid());
+						}
+
+						int intModuleId=description.getModuleNid();
+						moduleId=getModuleSCTIDForStampNid(intModuleId);
+
+						if ( !valueId.equals("XXX")) {
+							writeRF2TypeLine(uuid, effectiveTime, "1", moduleId, refsetId, referencedComponentId, valueId);
+
+						} else {
+							writeRF2TypeLine(uuid, effectiveTime, "0", moduleId, refsetId, referencedComponentId, "");
+
+						} 
 					}
-					if ( !valueId.equals("XXX")) {
-						writeRF2TypeLine(uuid, effectiveTime, "1", moduleId, refsetId, referencedComponentId, valueId);
-
-					} else {
-						writeRF2TypeLine(uuid, effectiveTime, "0", moduleId, refsetId, referencedComponentId, "");
-
-					} 
 				}
 			}
 		} catch (IOException e) {

@@ -17,7 +17,6 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.id.Type5UuidFactory;
 import org.ihtsdo.rf2.constant.I_Constants;
 import org.ihtsdo.rf2.impl.RF2AbstractImpl;
-import org.ihtsdo.rf2.refset.dao.RefsetConceptDAO;
 import org.ihtsdo.rf2.util.Config;
 import org.ihtsdo.rf2.util.WriteUtil;
 import org.ihtsdo.tk.api.Precedence;
@@ -57,15 +56,15 @@ public class RF2ConceptRetiredWithoutReasonImpl extends RF2AbstractImpl implemen
 				Precedence.PATH, currenAceConfig.getConflictResolutionStrategy());
 
 		for (I_RelTuple rel : relationships) {
-			
+
 			Date et = new Date(rel.getTime());
 			if (et.after(PREVIOUSRELEASEDATE) || et.equals(PREVIOUSRELEASEDATE)){
 				String characteristicTypeId="";
 				I_Identify charId = tf.getId(rel.getCharacteristicId());
-			
+
 				List<? extends I_IdPart> idParts = charId.getVisibleIds(currenAceConfig.getViewPositionSetReadOnly(), 
 						snomedIntId);
-				
+
 				if (idParts != null) {
 					Object denotation = getLastCurrentVisibleId(idParts, currenAceConfig.getViewPositionSetReadOnly(), 
 							RelAssertionType.INFERRED_THEN_STATED);
@@ -74,7 +73,7 @@ public class RF2ConceptRetiredWithoutReasonImpl extends RF2AbstractImpl implemen
 						if (c != null)  characteristicTypeId = c.toString();
 					}
 				}
-				
+
 				if (characteristicTypeId.equals(I_Constants.STATED) ){
 					String destinationId = "";
 					I_Identify id = tf.getId(rel.getC2Id());
@@ -117,11 +116,11 @@ public class RF2ConceptRetiredWithoutReasonImpl extends RF2AbstractImpl implemen
 				} 
 			}
 		}
-				
+
 		return valueId;
-		
+
 	}
-	
+
 	@Override
 	public void export(I_GetConceptData concept, String referencedComponentId) {
 		try {
@@ -132,7 +131,7 @@ public class RF2ConceptRetiredWithoutReasonImpl extends RF2AbstractImpl implemen
 
 			int conceptInactivationRefsetNid = getNid(I_Constants.CONCEPT_INACTIVATION_REFSET_UID);
 			String refsetId = getSctId(conceptInactivationRefsetNid, getSnomedCorePathNid());
-			String moduleId = I_Constants.CORE_MODULE_ID;
+			String moduleId = "";
 			UUID uuid = Type5UuidFactory.get(refsetId + referencedComponentId);
 			Date PREVIOUSRELEASEDATE = getDateFormat().parse(I_Constants.inactivation_policy_change);
 
@@ -140,28 +139,33 @@ public class RF2ConceptRetiredWithoutReasonImpl extends RF2AbstractImpl implemen
 					allStatuses, 
 					currenAceConfig.getViewPositionSetReadOnly(), 
 					Precedence.PATH, currenAceConfig.getConflictResolutionStrategy());
-			
+
 			if (conceptAttributes.size() > 0) {
 				for (int i = 0; i < conceptAttributes.size(); i++) {
 					I_ConceptAttributeTuple<?> i_ConceptAttributeTuple = (I_ConceptAttributeTuple<?>) conceptAttributes.get(i);
-					conceptStatus = getConceptInactivationStatusType(i_ConceptAttributeTuple.getStatusNid());
-					Date et = new Date(getTermFactory().convertToThickVersion(i_ConceptAttributeTuple.getVersion()));
-					effectiveTime = getDateFormat().format(et);
-					
-					//if(conceptStatus.equals("1") && (et.after(PREVIOUSRELEASEDATE) || et.equals(PREVIOUSRELEASEDATE))) {
-					
-					if(conceptStatus.equals("1")){
-						active = "1";
-						valueId = getConceptInactivationValueId(i_ConceptAttributeTuple.getStatusNid());
-					
-						if (valueId.equals("XXX")) {
-							//logger.info("====if====" + conceptStatus + "===referencedComponentId==" + referencedComponentId + "==et==" + et);
-							valueId= getConceptInactivationRelationshipValueId(concept);
+
+					if (isComponentToPublish( i_ConceptAttributeTuple.getMutablePart())){
+						conceptStatus = getConceptInactivationStatusType(i_ConceptAttributeTuple.getStatusNid());
+						Date et = new Date(getTermFactory().convertToThickVersion(i_ConceptAttributeTuple.getVersion()));
+						effectiveTime = getDateFormat().format(et);
+
+						//if(conceptStatus.equals("1") && (et.after(PREVIOUSRELEASEDATE) || et.equals(PREVIOUSRELEASEDATE))) {
+
+						if(conceptStatus.equals("1")){
+							active = "1";
+							valueId = getConceptInactivationValueId(i_ConceptAttributeTuple.getStatusNid());
+
+							int intModuleId=i_ConceptAttributeTuple.getModuleNid();
+							moduleId=getModuleSCTIDForStampNid(intModuleId);
+							if (valueId.equals("XXX")) {
+								//logger.info("====if====" + conceptStatus + "===referencedComponentId==" + referencedComponentId + "==et==" + et);
+								valueId= getConceptInactivationRelationshipValueId(concept);
+							}
+
+							if (!valueId.equals("XXX")) {
+								WriteRF2TypeLine(uuid, effectiveTime, active, moduleId, refsetId, referencedComponentId, valueId);
+							} 
 						}
-					
-						if (!valueId.equals("XXX")) {
-							WriteRF2TypeLine(uuid, effectiveTime, active, moduleId, refsetId, referencedComponentId, valueId);
-						} 
 					}
 				}
 			}

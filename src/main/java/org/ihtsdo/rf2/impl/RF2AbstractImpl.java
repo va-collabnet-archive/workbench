@@ -12,6 +12,7 @@ import java.util.UUID;
 import org.apache.log4j.Logger;
 import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseFactory;
+import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_ConfigAceFrame;
@@ -19,7 +20,6 @@ import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IdPart;
 import org.dwfa.ace.api.I_IntSet;
-import org.ihtsdo.tk.api.ContradictionManagerBI;
 import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
@@ -33,13 +33,15 @@ import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.rf2.constant.I_Constants;
 import org.ihtsdo.rf2.util.Config;
 import org.ihtsdo.rf2.util.ExportUtil;
+import org.ihtsdo.rf2.util.TestFilters;
 import org.ihtsdo.tk.api.ContradictionException;
+import org.ihtsdo.tk.api.ContradictionManagerBI;
 import org.ihtsdo.tk.api.NidSet;
 import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.PositionBI;
+import org.ihtsdo.tk.api.PositionSet;
 import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.RelAssertionType;
-import org.ihtsdo.tk.api.PositionSet;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 
 public abstract class RF2AbstractImpl {
@@ -140,7 +142,11 @@ public abstract class RF2AbstractImpl {
 		return kbase;
 	}
 
-
+	public String getModuleSCTIDForStampNid(int moduleNid){
+		
+		return ExportUtil.getModuleSCTIDForStampNid(moduleNid);
+		
+	}
 	public RF2AbstractImpl(Config config) {
 
 		RF2AbstractImpl.config = config;
@@ -238,7 +244,14 @@ public abstract class RF2AbstractImpl {
 	public I_TermFactory getTermFactory() {
 		return tf;
 	}
-
+	protected boolean isComponentToPublish(I_AmPart part){
+		boolean ret=true;
+		TestFilters testFilters=config.getTestFilters();
+		if (testFilters!=null){
+			return testFilters.testAll(part);
+		}
+		return ret;
+	}
 	/*
 	 * public static String getModuleID(String snomedIntegerId) { return ExportUtil.getModuleID(snomedIntegerId); }
 	 */

@@ -56,11 +56,11 @@ public class RF2ICDOMapImpl extends RF2AbstractImpl implements I_ProcessConcepts
 
 		try {
 			String refsetId = I_Constants.ICDO_REFSET_ID;
-			String moduleId = I_Constants.CORE_MODULE_ID;
+			String moduleId = "";
 			int refsetTermAuxNid = getNid(I_Constants.ICDO_REFSET_UID_TERM_AUX);
 			int refsetNid = getNid("5ef10e09-8f16-398e-99b5-55cff5bd820a");
 			List<? extends I_ExtendByRef> extensions = Terms.get().getAllExtensionsForComponent(concept.getNid(), true);
-	
+
 			if (!extensions.isEmpty()) {
 				for (I_ExtendByRef extension : extensions) {
 					if (extension.getRefsetId() == refsetTermAuxNid || (extension.getRefsetId() == refsetNid)) {
@@ -81,54 +81,60 @@ public class RF2ICDOMapImpl extends RF2AbstractImpl implements I_ProcessConcepts
 								}
 							}else{
 
-								if (extensionPart == null)
+								if (extensionPart == null){
 									throw new Exception("Refset extension part not found!");
+								}
 
-								int extensionStatusId = extensionPart.getStatusNid();
-								
-								if (extensionStatusId == activeNid) { // active													
-									active = "1";
-									List<? extends I_ConceptAttributeTuple> conceptAttributes = concept.getConceptAttributeTuples(
-											allStatuses, 
-											currenAceConfig.getViewPositionSetReadOnly(), 
-											Precedence.PATH, currenAceConfig.getConflictResolutionStrategy());
+								if (isComponentToPublish( extensionPart)){
+									int extensionStatusId = extensionPart.getStatusNid();
 
-									if (conceptAttributes != null && !conceptAttributes.isEmpty()) {
-										I_ConceptAttributeTuple attributes = conceptAttributes.iterator().next();
-										
-										String conceptStatus = getStatusType(attributes.getStatusNid());
-										if (conceptStatus.equals("0")) {
-											active = "1";
-										} else if (getConfig().getReleaseDate().compareTo(I_Constants.limited_policy_change)<0 && conceptStatus.equals("6")) {
-											active = "1";
-										} else {
-											active = "0";
+									if (extensionStatusId == activeNid) { // active													
+										active = "1";
+										List<? extends I_ConceptAttributeTuple> conceptAttributes = concept.getConceptAttributeTuples(
+												allStatuses, 
+												currenAceConfig.getViewPositionSetReadOnly(), 
+												Precedence.PATH, currenAceConfig.getConflictResolutionStrategy());
+
+										if (conceptAttributes != null && !conceptAttributes.isEmpty()) {
+											I_ConceptAttributeTuple attributes = conceptAttributes.iterator().next();
+
+											String conceptStatus = getStatusType(attributes.getStatusNid());
+											if (conceptStatus.equals("0")) {
+												active = "1";
+											} else if (getConfig().getReleaseDate().compareTo(I_Constants.limited_policy_change)<0 && conceptStatus.equals("6")) {
+												active = "1";
+											} else {
+												active = "0";
+											}
 										}
+									} else if (extensionStatusId == inactiveNid) { // inactive													
+										active = "0";								
+									} else {
+										logger.error("unknown extensionStatusId =====>" + extensionStatusId);
 									}
-								} else if (extensionStatusId == inactiveNid) { // inactive													
-									active = "0";								
-								} else {
-									logger.error("unknown extensionStatusId =====>" + extensionStatusId);
-								}
-								
-								
-								if ((referencedComponentId==null || referencedComponentId.equals("")) && active.equals("1")){
-									referencedComponentId=concept.getUids().iterator().next().toString();
-								}
-								if (referencedComponentId==null || referencedComponentId.equals("")){
-									logger.error("Unplublished Retired Concept of ICDO Map : " + concept.getUUIDs().iterator().next().toString());
-								}else{
-										
-								effectiveTime = getDateFormat().format(new Date(extensionPart.getTime()));
 
-								mapTarget = extensionPart.getStringValue();
-								if(mapTarget.contains(" ") || mapTarget.contains("[") || mapTarget.contains("]") ){
-									String test[] = mapTarget.split(" ");
-									mapTarget = test[0];								
-								}
-								refsetuuid = Type5UuidFactory.get(refsetId + referencedComponentId + mapTarget);
-								writeRF2TypeLine(refsetuuid, effectiveTime, active, moduleId, refsetId, referencedComponentId, mapTarget);
 
+									if ((referencedComponentId==null || referencedComponentId.equals("")) && active.equals("1")){
+										referencedComponentId=concept.getUids().iterator().next().toString();
+									}
+									if (referencedComponentId==null || referencedComponentId.equals("")){
+										logger.error("Unplublished Retired Concept of ICDO Map : " + concept.getUUIDs().iterator().next().toString());
+									}else{
+
+										effectiveTime = getDateFormat().format(new Date(extensionPart.getTime()));
+
+										mapTarget = extensionPart.getStringValue();
+										if(mapTarget.contains(" ") || mapTarget.contains("[") || mapTarget.contains("]") ){
+											String test[] = mapTarget.split(" ");
+											mapTarget = test[0];								
+										}
+
+										int intModuleId=extensionPart.getModuleNid();
+										moduleId=getModuleSCTIDForStampNid(intModuleId);
+										refsetuuid = Type5UuidFactory.get(refsetId + referencedComponentId + mapTarget);
+										writeRF2TypeLine(refsetuuid, effectiveTime, active, moduleId, refsetId, referencedComponentId, mapTarget);
+
+									}
 								}
 							}
 						}

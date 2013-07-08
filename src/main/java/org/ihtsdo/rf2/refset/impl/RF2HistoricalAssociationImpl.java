@@ -12,7 +12,6 @@ import org.dwfa.ace.api.I_IdPart;
 import org.dwfa.ace.api.I_Identify;
 import org.dwfa.ace.api.I_ProcessConcepts;
 import org.dwfa.ace.api.I_RelTuple;
-import org.dwfa.ace.api.Terms;
 import org.dwfa.util.id.Type5UuidFactory;
 import org.ihtsdo.rf2.constant.I_Constants;
 import org.ihtsdo.rf2.impl.RF2AbstractImpl;
@@ -48,86 +47,91 @@ public class RF2HistoricalAssociationImpl extends RF2AbstractImpl implements I_P
 
 	}
 
-	
+
 	@Override
 	public void export(I_GetConceptData concept, String referencedComponentId) throws IOException {
 		try {
-			
+
 			String effectiveTime = "";
 			String relTypeId = "";
 			String active = "";
 			String targetComponent = "";
-			String moduleId = I_Constants.CORE_MODULE_ID;
+			String moduleId = "";
 			int relationshipStatusId=0;
-			
+
 			List<? extends I_RelTuple> relationships = concept.getSourceRelTuples(allStatuses, null, 
 					currenAceConfig.getViewPositionSetReadOnly(), 
 					Precedence.PATH, currenAceConfig.getConflictResolutionStrategy());
 
 			for (I_RelTuple rel : relationships) {
-		
-				targetComponent = getSctId(rel.getC2Id(), getSnomedCorePathNid());
 
-				relTypeId = getSctId(rel.getTypeNid(), getSnomedCorePathNid());
+				if (isComponentToPublish( rel.getMutablePart())){
+					targetComponent = getSctId(rel.getC2Id(), getSnomedCorePathNid());
 
-				if (relTypeId==null || relTypeId.equals("")){
-					relTypeId=tf.getUids(rel.getTypeNid()).iterator().next().toString();
-				}
-				if (relTypeId.equals(I_Constants.MAY_BE) || relTypeId.equals(I_Constants.WAS_A) || relTypeId.equals(I_Constants.SAME_AS) || relTypeId.equals(I_Constants.REPLACED_BY)
-						|| relTypeId.equals(I_Constants.MOVED_FROM) || relTypeId.equals(I_Constants.MOVED_TO)) {
+					relTypeId = getSctId(rel.getTypeNid(), getSnomedCorePathNid());
 
-					relationshipStatusId = rel.getStatusNid();
-					if (relationshipStatusId == activeNid) { 														
-						active = "1";
-					} else if (relationshipStatusId == inactiveNid) { 														
-						active = "0";
+					if (relTypeId==null || relTypeId.equals("")){
+						relTypeId=tf.getUids(rel.getTypeNid()).iterator().next().toString();
 					}
-						
-					String relationshipId = "";
+					if (relTypeId.equals(I_Constants.MAY_BE) || relTypeId.equals(I_Constants.WAS_A) || relTypeId.equals(I_Constants.SAME_AS) || relTypeId.equals(I_Constants.REPLACED_BY)
+							|| relTypeId.equals(I_Constants.MOVED_FROM) || relTypeId.equals(I_Constants.MOVED_TO)) {
 
-					I_Identify id = tf.getId(rel.getNid());
-					if (id != null) {
-						List<? extends I_IdPart> idParts = tf.getId(rel.getNid()).getVisibleIds(currenAceConfig.getViewPositionSetReadOnly(), 
-								snomedIntId);
-						if (idParts != null) {
-							Object denotation = getLastCurrentVisibleId(idParts, currenAceConfig.getViewPositionSetReadOnly(), 
-									RelAssertionType.INFERRED_THEN_STATED);
-							if (denotation instanceof Long) {
-								Long c = (Long) denotation;
-								if (c != null)  relationshipId = c.toString();
+						relationshipStatusId = rel.getStatusNid();
+						if (relationshipStatusId == activeNid) { 														
+							active = "1";
+						} else if (relationshipStatusId == inactiveNid) { 														
+							active = "0";
+						}
+
+						String relationshipId = "";
+
+						I_Identify id = tf.getId(rel.getNid());
+						if (id != null) {
+							List<? extends I_IdPart> idParts = tf.getId(rel.getNid()).getVisibleIds(currenAceConfig.getViewPositionSetReadOnly(), 
+									snomedIntId);
+							if (idParts != null) {
+								Object denotation = getLastCurrentVisibleId(idParts, currenAceConfig.getViewPositionSetReadOnly(), 
+										RelAssertionType.INFERRED_THEN_STATED);
+								if (denotation instanceof Long) {
+									Long c = (Long) denotation;
+									if (c != null)  relationshipId = c.toString();
+								}
 							}
 						}
-					}
-					
-					if ((relationshipId==null || relationshipId.equals("")) && active.equals("1")){
-						relationshipId=rel.getUUIDs().iterator().next().toString();
-					}
-					
-					if (relationshipId==null || relationshipId.equals("")){
-						logger.error("Unplublished Retired Historical Relationship: " + rel.getUUIDs().iterator().next().toString());
-					}else{
 
-						effectiveTime = getDateFormat().format(new Date(rel.getTime()));
-	
-						String refsetId = getRefsetId(relTypeId);
-	
-						if (referencedComponentId==null || referencedComponentId.equals("")){
-							referencedComponentId=concept.getUids().iterator().next().toString();
+						if ((relationshipId==null || relationshipId.equals("")) && active.equals("1")){
+							relationshipId=rel.getUUIDs().iterator().next().toString();
 						}
-						if (targetComponent==null || targetComponent.equals("")){
-							Collection<UUID> Uids=tf.getUids(rel.getC2Id());
-							if (Uids==null  ){
-								continue;
+
+						if (relationshipId==null || relationshipId.equals("")){
+							logger.error("Unplublished Retired Historical Relationship: " + rel.getUUIDs().iterator().next().toString());
+						}else{
+
+							effectiveTime = getDateFormat().format(new Date(rel.getTime()));
+
+							String refsetId = getRefsetId(relTypeId);
+
+							if (referencedComponentId==null || referencedComponentId.equals("")){
+								referencedComponentId=concept.getUids().iterator().next().toString();
 							}
-							targetComponent=Uids.iterator().next().toString();
-							if (targetComponent.equals(nullUuid)){
-								continue;
+							if (targetComponent==null || targetComponent.equals("")){
+								Collection<UUID> Uids=tf.getUids(rel.getC2Id());
+								if (Uids==null  ){
+									continue;
+								}
+								targetComponent=Uids.iterator().next().toString();
+								if (targetComponent.equals(nullUuid)){
+									continue;
+								}
 							}
+
+							UUID uuid = Type5UuidFactory.get(refsetId + referencedComponentId + targetComponent);
+
+							int intModuleId=rel.getModuleNid();
+							moduleId=getModuleSCTIDForStampNid(intModuleId);
+
+							writeRF2TypeLine(uuid, effectiveTime, active, moduleId, refsetId, referencedComponentId, targetComponent);
 						}
-	
-						UUID uuid = Type5UuidFactory.get(refsetId + referencedComponentId + targetComponent);
-											
-						writeRF2TypeLine(uuid, effectiveTime, active, moduleId, refsetId, referencedComponentId, targetComponent);
 					}
 				}
 			}

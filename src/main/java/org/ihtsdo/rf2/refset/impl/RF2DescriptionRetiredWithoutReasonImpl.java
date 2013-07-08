@@ -1,23 +1,17 @@
 package org.ihtsdo.rf2.refset.impl;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
 import org.apache.log4j.Logger;
-import org.drools.runtime.StatefulKnowledgeSession;
-import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_DescriptionTuple;
-import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_ProcessConcepts;
-import org.dwfa.ace.api.Terms;
 import org.dwfa.util.id.Type5UuidFactory;
 import org.ihtsdo.rf2.constant.I_Constants;
 import org.ihtsdo.rf2.impl.RF2AbstractImpl;
-import org.ihtsdo.rf2.refset.dao.RefsetConceptDAO;
 import org.ihtsdo.rf2.util.Config;
 import org.ihtsdo.rf2.util.ExportUtil;
 import org.ihtsdo.rf2.util.WriteUtil;
@@ -55,31 +49,37 @@ public class RF2DescriptionRetiredWithoutReasonImpl extends RF2AbstractImpl impl
 
 			int descInactivationRefsetNid = getNid(I_Constants.DESCRIPTION_INACTIVATION_REFSET_UID);
 			String refsetId = getSctId(descInactivationRefsetNid, getSnomedCorePathNid());
-			String moduleId = I_Constants.CORE_MODULE_ID;
+			String moduleId = "";
 			List<? extends I_DescriptionTuple> descriptions = concept.getDescriptionTuples(allStatuses, 
 					allDescTypes, currenAceConfig.getViewPositionSetReadOnly(), 
 					Precedence.PATH, currenAceConfig.getConflictResolutionStrategy());
 			Date PREVIOUSRELEASEDATE = getDateFormat().parse(I_Constants.inactivation_policy_change);
 
 			for (I_DescriptionTuple description: descriptions) {
-				String sDescType = getSnomedDescriptionType(description.getTypeNid());
-				Date descriptionEffectiveDate = new Date(getTermFactory().convertToThickVersion(description.getVersion()));
-				effectiveTime = getDateFormat().format(descriptionEffectiveDate);
 
-				if(descriptionEffectiveDate.after(PREVIOUSRELEASEDATE) || descriptionEffectiveDate.equals(PREVIOUSRELEASEDATE)) {
-					//Inactive status
-					if ((description.getStatusNid()== -2147479489) && !sDescType.equals("4") && !description.getLang().equals("es"))  { // Ignore text-defination & spanish description
-						String referencedComponentId = getDescriptionId(description.getDescId(), ExportUtil.getSnomedCorePathNid());
-						//Only existing retired description needs to be in the list
-						if (referencedComponentId==null || referencedComponentId.equals("")){
-							//referencedComponentId=Terms.get().getUids(description.getDescId()).iterator().next().toString();
-						}else{
-							valueId = getDescInactivationValueId(description.getStatusNid());	
-							if (valueId.equals("XXX")) {
-								System.out.println("No Reason Stated for Description retirement " + concept.getInitialText());
-								UUID uuid = Type5UuidFactory.get(refsetId + referencedComponentId);
-								writeRF2TypeLine(uuid, effectiveTime, "1", moduleId, refsetId, referencedComponentId, valueId);
-							} 
+				if (isComponentToPublish( description.getMutablePart())){
+					String sDescType = getSnomedDescriptionType(description.getTypeNid());
+					Date descriptionEffectiveDate = new Date(getTermFactory().convertToThickVersion(description.getVersion()));
+					effectiveTime = getDateFormat().format(descriptionEffectiveDate);
+
+					if(descriptionEffectiveDate.after(PREVIOUSRELEASEDATE) || descriptionEffectiveDate.equals(PREVIOUSRELEASEDATE)) {
+						//Inactive status
+						if ((description.getStatusNid()== -2147479489) && !sDescType.equals("4") && !description.getLang().equals("es"))  { // Ignore text-defination & spanish description
+							String referencedComponentId = getDescriptionId(description.getDescId(), ExportUtil.getSnomedCorePathNid());
+							//Only existing retired description needs to be in the list
+							if (referencedComponentId==null || referencedComponentId.equals("")){
+								//referencedComponentId=Terms.get().getUids(description.getDescId()).iterator().next().toString();
+							}else{
+								valueId = getDescInactivationValueId(description.getStatusNid());	
+								if (valueId.equals("XXX")) {
+									int intModuleId=description.getModuleNid();
+									moduleId=getModuleSCTIDForStampNid(intModuleId);
+
+									System.out.println("No Reason Stated for Description retirement " + concept.getInitialText());
+									UUID uuid = Type5UuidFactory.get(refsetId + referencedComponentId);
+									writeRF2TypeLine(uuid, effectiveTime, "1", moduleId, refsetId, referencedComponentId, valueId);
+								} 
+							}
 						}
 					}
 				}

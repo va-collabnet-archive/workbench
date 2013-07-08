@@ -34,13 +34,10 @@ public class RF2LanguageImpl extends RF2AbstractImpl implements I_ProcessConcept
 
 	private String refsetSCTId;
 
-	private String moduleId;
-
-	public RF2LanguageImpl(Config config, int langRefsetId, String refsetSCTId, String moduleId) {
+	public RF2LanguageImpl(Config config, int langRefsetId, String refsetSCTId) {
 		super(config);
 		this.langRefsetId=langRefsetId;
 		this.refsetSCTId=refsetSCTId;
-		this.moduleId=moduleId;
 	}
 
 	/*
@@ -109,56 +106,60 @@ public class RF2LanguageImpl extends RF2AbstractImpl implements I_ProcessConcept
 							}
 						}else{
 
-							extensionStatusId = extensionPart.getStatusNid();
-							int acceptabilityNid = extensionPart.getC1id();
-							descriptionid = getDescriptionId(description.getDescId(), ExportUtil.getSnomedCorePathNid());
+							if (isComponentToPublish( extensionPart)){
+								extensionStatusId = extensionPart.getStatusNid();
+								int acceptabilityNid = extensionPart.getC1id();
+								descriptionid = getDescriptionId(description.getDescId(), ExportUtil.getSnomedCorePathNid());
 
-							String status = getStatusType(extensionStatusId);
-							if (status.equals("0")){ 
-								active = "1";
-							} else if (status.equals("1")) {
-								active = "0";
-							} else {
-								I_GetConceptData con=tf.getConcept(extensionStatusId);
-								logger.error("unknown extensionStatusId =====>" + extensionStatusId + "con : " + con.toString());
-							}
-							
-							String descriptionstatus = getStatusType(description.getStatusNid());
-							
-							if (!(descriptionstatus.equals("0") 
-									|| descriptionstatus.equals("6") 
-									|| descriptionstatus.equals("8"))){
-								if ((descriptionid==null || descriptionid.equals("")) && !active.equals("1")){
-									continue;
-								}else{
-//									Force member inactivation;
-									active="0";
+								String status = getStatusType(extensionStatusId);
+								if (status.equals("0")){ 
+									active = "1";
+								} else if (status.equals("1")) {
+									active = "0";
+								} else {
+									I_GetConceptData con=tf.getConcept(extensionStatusId);
+									logger.error("unknown extensionStatusId =====>" + extensionStatusId + "con : " + con.toString());
 								}
-								logger.error("Inactive description with active language refset member: " + description.getUUIDs().iterator().next().toString());
-								
-							}
-							
-							if (acceptabilityNid == preferredNid) { // preferred
-								acceptabilityId = I_Constants.PREFERRED;
-							} else if (acceptabilityNid == acceptableNid) { 
-								acceptabilityId = I_Constants.ACCEPTABLE;
-							} else {
-								logger.error("unknown acceptabilityId =====>" + acceptabilityNid + "conceptid  =====>" + conceptid + " descriptionid ===>" + descriptionid);
-							}
 
-							if ((descriptionid==null || descriptionid.equals("")) && active.equals("1")){
-								descriptionid=description.getUUIDs().iterator().next().toString();
-							}
-							
-							if (descriptionid==null || descriptionid.equals("")){
-								logger.error("Unplublished Retired Description of Lang Refset : " + description.getUUIDs().iterator().next().toString());
-							}else {
-								
-								refsetuuid = extensionPart.getPrimUuid(); 
-								
-								effectiveTime = getDateFormat().format(new Date(extensionPart.getTime()));
-	
-								writeRF2TypeLine(refsetuuid, effectiveTime, active, moduleId, refsetSCTId, descriptionid, acceptabilityId);
+								String descriptionstatus = getStatusType(description.getStatusNid());
+
+								if (!(descriptionstatus.equals("0") 
+										|| descriptionstatus.equals("6") 
+										|| descriptionstatus.equals("8"))){
+									if ((descriptionid==null || descriptionid.equals("")) && !active.equals("1")){
+										continue;
+									}else{
+										//									Force member inactivation;
+										active="0";
+									}
+									logger.error("Inactive description with active language refset member: " + description.getUUIDs().iterator().next().toString());
+
+								}
+
+								if (acceptabilityNid == preferredNid) { // preferred
+									acceptabilityId = I_Constants.PREFERRED;
+								} else if (acceptabilityNid == acceptableNid) { 
+									acceptabilityId = I_Constants.ACCEPTABLE;
+								} else {
+									logger.error("unknown acceptabilityId =====>" + acceptabilityNid + "conceptid  =====>" + conceptid + " descriptionid ===>" + descriptionid);
+								}
+
+								if ((descriptionid==null || descriptionid.equals("")) && active.equals("1")){
+									descriptionid=description.getUUIDs().iterator().next().toString();
+								}
+
+								if (descriptionid==null || descriptionid.equals("")){
+									logger.error("Unplublished Retired Description of Lang Refset : " + description.getUUIDs().iterator().next().toString());
+								}else {
+
+									refsetuuid = extensionPart.getPrimUuid(); 
+
+									int intModuleId=extensionPart.getModuleNid();
+									String moduleId=getModuleSCTIDForStampNid(intModuleId);
+									effectiveTime = getDateFormat().format(new Date(extensionPart.getTime()));
+
+									writeRF2TypeLine(refsetuuid, effectiveTime, active, moduleId, refsetSCTId, descriptionid, acceptabilityId);
+								}
 							}
 						}
 					} 

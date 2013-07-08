@@ -57,75 +57,74 @@ public class RF2DescriptionImpl extends RF2AbstractImpl implements I_ProcessConc
 			if(!getConfig().isUpdateWbSctId().equals(null)){
 				updateWbSctId = getConfig().isUpdateWbSctId();
 			}
-		
+
 			List<? extends I_DescriptionTuple> descriptions = concept.getDescriptionTuples(allStatuses, 
 					allDescTypes, currenAceConfig.getViewPositionSetReadOnly(), 
 					Precedence.PATH, currenAceConfig.getConflictResolutionStrategy());
-			
-			
+
+
 			for (I_DescriptionTuple description: descriptions) {
-				
-				String sDescType = getSnomedDescriptionType(description.getTypeNid());
-				typeId = getTypeId(sDescType);
 
-				Date descriptionEffectiveDate = new Date(getTermFactory().convertToThickVersion(description.getVersion()));
-				effectiveTime = getDateFormat().format(descriptionEffectiveDate);
+				if (isComponentToPublish( description.getMutablePart())){
+					String sDescType = getSnomedDescriptionType(description.getTypeNid());
+					typeId = getTypeId(sDescType);
 
-				if (!sDescType.equals("4") && !description.getLang().equals("es")) { 
-					//&& !effectiveTime.contains("1031") && !effectiveTime.contains("0430")) {
-					descriptionid = getDescriptionId(description.getDescId(), ExportUtil.getSnomedCorePathNid());
+					Date descriptionEffectiveDate = new Date(getTermFactory().convertToThickVersion(description.getVersion()));
+					effectiveTime = getDateFormat().format(descriptionEffectiveDate);
 
-					String term = description.getText();
-					if (term!=null ){
-						if (term.indexOf("\t")>-1){
-							term=term.replaceAll("\t", "");
+					if (!sDescType.equals("4") && !description.getLang().equals("es")) { 
+						//&& !effectiveTime.contains("1031") && !effectiveTime.contains("0430")) {
+						descriptionid = getDescriptionId(description.getDescId(), ExportUtil.getSnomedCorePathNid());
+
+						String term = description.getText();
+						if (term!=null ){
+							if (term.indexOf("\t")>-1){
+								term=term.replaceAll("\t", "");
+							}
+							if (term.indexOf("\r")>-1){
+								term=term.replaceAll("\r", "");
+							}
+							if (term.indexOf("\n")>-1){
+								term=term.replaceAll("\n", "");
+							}
+							term=StringEscapeUtils.unescapeHtml(term);
+
 						}
-						if (term.indexOf("\r")>-1){
-							term=term.replaceAll("\r", "");
-						}
-						if (term.indexOf("\n")>-1){
-							term=term.replaceAll("\n", "");
-						}
-						term=StringEscapeUtils.unescapeHtml(term);
-						
-					}
-					String descriptionstatus = getStatusType(description.getStatusNid());
-					
-					String authorName = tf.getConcept(description.getAuthorNid()).getInitialText();
-					
-					
-					if (descriptionstatus.equals("0") || descriptionstatus.equals("6") || descriptionstatus.equals("8"))
-						active = "1";
-					else
-						active = "0";
+						String descriptionstatus = getStatusType(description.getStatusNid());
 
-					if (description.isInitialCaseSignificant()) {
-						caseSignificanceId = I_Constants.SENSITIVE_CASE;
-					} else {
-						caseSignificanceId = I_Constants.INITIAL_INSENSITIVE;
-					}
-					
-					//moduleId = getConceptMetaModuleID(concept , getConfig().getReleaseDate());
-					moduleId = computeModuleId(concept);	
-					if(moduleId.equals(I_Constants.META_MODULE_ID)){			
-						//logger.info("==Meta Concept==" + conceptid + " & Name : " + concept.getInitialText());
-						incrementMetaDataCount();
-					}
-					
-					if (conceptid==null || conceptid.equals("") || conceptid.equals("0")){
-						conceptid=concept.getUids().iterator().next().toString();
-					}
-				
-					if ((descriptionid==null || descriptionid.equals("") || descriptionid.equals("0")) && active.equals("1")){
-						descriptionid=description.getUUIDs().iterator().next().toString();
-					}					
-					
-					if (descriptionid==null || descriptionid.equals("") || descriptionid.equals("0")){
-						logger.info("Unplublished Retired Description: " + description.getUUIDs().iterator().next().toString());
-					}else if(getConfig().getRf2Format().equals("false") ){
-						writeRF2TypeLine(descriptionid, effectiveTime, active, moduleId, conceptid, languageCode, typeId, term, caseSignificanceId, authorName);
-					}else{
-						writeRF2TypeLine(descriptionid, effectiveTime, active, moduleId, conceptid, languageCode, typeId, term, caseSignificanceId);
+						String authorName = tf.getConcept(description.getAuthorNid()).getInitialText();
+
+
+						if (descriptionstatus.equals("0") || descriptionstatus.equals("6") || descriptionstatus.equals("8"))
+							active = "1";
+						else
+							active = "0";
+
+						if (description.isInitialCaseSignificant()) {
+							caseSignificanceId = I_Constants.SENSITIVE_CASE;
+						} else {
+							caseSignificanceId = I_Constants.INITIAL_INSENSITIVE;
+						}
+
+
+						int intModuleId=description.getModuleNid();
+						moduleId=getModuleSCTIDForStampNid(intModuleId);
+
+						if (conceptid==null || conceptid.equals("") || conceptid.equals("0")){
+							conceptid=concept.getUids().iterator().next().toString();
+						}
+
+						if ((descriptionid==null || descriptionid.equals("") || descriptionid.equals("0")) && active.equals("1")){
+							descriptionid=description.getUUIDs().iterator().next().toString();
+						}					
+
+						if (descriptionid==null || descriptionid.equals("") || descriptionid.equals("0")){
+							logger.info("Unplublished Retired Description: " + description.getUUIDs().iterator().next().toString());
+						}else if(getConfig().getRf2Format().equals("false") ){
+							writeRF2TypeLine(descriptionid, effectiveTime, active, moduleId, conceptid, languageCode, typeId, term, caseSignificanceId, authorName);
+						}else{
+							writeRF2TypeLine(descriptionid, effectiveTime, active, moduleId, conceptid, languageCode, typeId, term, caseSignificanceId);
+						}
 					}
 				}
 			}
@@ -147,7 +146,7 @@ public class RF2DescriptionImpl extends RF2AbstractImpl implements I_ProcessConc
 				+ caseSignificanceId);
 		WriteUtil.write(getConfig(), "\r\n");
 	}
-	
+
 	public static void writeRF2TypeLine(String descriptionid, String effectiveTime, String active, String moduleId, String conceptid, String languageCode, String typeId, String term,
 			String caseSignificanceId, String authorName) throws IOException {
 		WriteUtil.write(getConfig(), descriptionid + "\t" + effectiveTime + "\t" + active + "\t" + moduleId + "\t" + conceptid + "\t" + languageCode + "\t" + typeId + "\t" + term + "\t"

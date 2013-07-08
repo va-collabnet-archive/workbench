@@ -67,10 +67,10 @@ public class Config {
 	private String namespaceId;
 	private String partitionId;
 	private String executionId;
-	private String moduleId;
 	private String releaseId;
 	private String componentType;
-	
+	private ArrayList<String> moduleFilter;
+	private TestFilters testFilters;
 	
 	public String getChangesetUserName() {
 		return changesetUserName;
@@ -328,14 +328,6 @@ public class Config {
 		this.executionId = executionId;
 	}
 
-	public String getModuleId() {
-		return moduleId;
-	}
-
-	public void setModuleId(String moduleId) {
-		this.moduleId = moduleId;
-	}
-
 	public String getReleaseId() {
 		return releaseId;
 	}
@@ -358,6 +350,22 @@ public class Config {
 
 	public void setPreviousIdNotReleasedFile(String previousIdNotReleasedFile) {
 		this.previousIdNotReleasedFile = previousIdNotReleasedFile;
+	}
+
+	public ArrayList<String> getModuleFilter() {
+		return moduleFilter;
+	}
+
+	public void setModuleFilter(ArrayList<String> moduleFilter) {
+		this.moduleFilter = moduleFilter;
+	}
+
+	public TestFilters getTestFilters() {
+		return testFilters;
+	}
+
+	public void setTestFilters(TestFilters testFilters) {
+		this.testFilters = testFilters;
 	}
 
 	

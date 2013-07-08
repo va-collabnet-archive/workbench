@@ -113,8 +113,6 @@ public class ProcessSingleDataExtraction {
 			// initialize the database
 			ExportUtil.createTermFactory(db);
 
-			// initialize ace framework and meta hierarchy
-			ExportUtil.init();
 
 			for (int i = 0; i < extractTypes.length; i++) {
 
@@ -126,6 +124,8 @@ public class ProcessSingleDataExtraction {
 
 					config = setCommandLineParams(config, args);
 
+					// initialize ace framework and meta hierarchy
+					ExportUtil.init(config);
 					RF2ConceptFactory factory = new RF2ConceptFactory(config);
 					factory.export();
 
@@ -137,6 +137,8 @@ public class ProcessSingleDataExtraction {
 
 					config = setCommandLineParams(config, args);
 
+					// initialize ace framework and meta hierarchy
+					ExportUtil.init(config);
 					RF2DescriptionFactory factory = new RF2DescriptionFactory(config);
 					factory.export();
 
@@ -148,6 +150,8 @@ public class ProcessSingleDataExtraction {
 
 					config = setCommandLineParams(config, args);
 
+					// initialize ace framework and meta hierarchy
+					ExportUtil.init(config);
 					RF2IdentifierFactory factory = new RF2IdentifierFactory(config);
 					factory.export();
 
@@ -159,6 +163,8 @@ public class ProcessSingleDataExtraction {
 
 					config = setCommandLineParams(config, args);
 
+					// initialize ace framework and meta hierarchy
+					ExportUtil.init(config);
 					RF2RelationshipFactory factory = new RF2RelationshipFactory(config);
 					factory.export();
 
@@ -170,6 +176,8 @@ public class ProcessSingleDataExtraction {
 
 					config = setCommandLineParams(config, args);
 
+					// initialize ace framework and meta hierarchy
+					ExportUtil.init(config);
 					RF2StatedRelationshipFactory factory = new RF2StatedRelationshipFactory(config);
 					factory.export();
 
@@ -181,6 +189,8 @@ public class ProcessSingleDataExtraction {
 
 					config = setCommandLineParams(config, args);
 
+					// initialize ace framework and meta hierarchy
+					ExportUtil.init(config);
 					RF2AttributeValueRefsetFactory factory = new RF2AttributeValueRefsetFactory(config);
 					factory.export();
 
@@ -192,6 +202,8 @@ public class ProcessSingleDataExtraction {
 
 					config = setCommandLineParams(config, args);
 
+					// initialize ace framework and meta hierarchy
+					ExportUtil.init(config);
 					RF2HistoricalAssociationRefsetFactory factory = new RF2HistoricalAssociationRefsetFactory(config);
 					factory.export();
 
@@ -203,6 +215,8 @@ public class ProcessSingleDataExtraction {
 
 					config = setCommandLineParams(config, args);
 
+					// initialize ace framework and meta hierarchy
+					ExportUtil.init(config);
 					RF2SimpleMapRefsetFactory factory = new RF2SimpleMapRefsetFactory(config);
 					factory.export();
 
@@ -214,6 +228,8 @@ public class ProcessSingleDataExtraction {
 
 					config = setCommandLineParams(config, args);
 
+					// initialize ace framework and meta hierarchy
+					ExportUtil.init(config);
 					RF2TextDefinitionFactory factory = new RF2TextDefinitionFactory(config);
 					factory.export();
 
@@ -225,6 +241,8 @@ public class ProcessSingleDataExtraction {
 
 					config = setCommandLineParams(config, args);
 
+					// initialize ace framework and meta hierarchy
+					ExportUtil.init(config);
 					RF2LanguageRefsetFactory factory = new RF2LanguageRefsetFactory(config);
 					factory.export();
 
@@ -236,6 +254,8 @@ public class ProcessSingleDataExtraction {
 
 					config = setCommandLineParams(config, args);
 
+					// initialize ace framework and meta hierarchy
+					ExportUtil.init(config);
 					RF2SimpleFullRefsetFactory factory = new RF2SimpleFullRefsetFactory(config);
 					factory.export();
 
