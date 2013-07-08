@@ -2,6 +2,7 @@ package org.ihtsdo.mojo.release.refset;
 
 import java.io.File;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -111,14 +112,6 @@ public class RF2SimpleMapExporterMojo extends AbstractMojo {
 	private String executionId;
 	
 	/**
-	 * moduleId
-	 * 
-	 * @parameter default-value="Core Concept Component"
-	 * 
-	 */
-	private String moduleId;
-	
-	/**
 	 * releaseId
 	 * 
 	 * @parameter default-value="20110131"
@@ -133,6 +126,14 @@ public class RF2SimpleMapExporterMojo extends AbstractMojo {
 	 * 
 	 */
 	private String componentType;
+
+	/**
+	 * moduleFilter
+	 * 
+	 * @parameter
+	 * 
+	 */
+	private ArrayList<String> moduleFilter;
 	
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		System.setProperty("java.awt.headless", "true");
@@ -153,6 +154,7 @@ public class RF2SimpleMapExporterMojo extends AbstractMojo {
 			config.setFlushCount(10000);
 			config.setInvokeDroolRules("false");
 			config.setFileExtension("txt");
+			config.setModuleFilter(moduleFilter);
 			
 
 			//Below Parameters are necessary for ID-Generation
@@ -160,7 +162,6 @@ public class RF2SimpleMapExporterMojo extends AbstractMojo {
 			config.setNamespaceId(namespaceId);
 			config.setPartitionId(partitionId);
 			config.setExecutionId(executionId);
-			config.setModuleId(moduleId);
 			config.setReleaseId(releaseId);
 			config.setComponentType(componentType);			
 			config.setUsername(username);
@@ -168,7 +169,7 @@ public class RF2SimpleMapExporterMojo extends AbstractMojo {
 			config.setEndPoint(endpointURL);
 			
 			// initialize ace framwork and meta hierarchy
-			ExportUtil.init();
+			ExportUtil.init(config);
 			//Exports snomedid , ctv3id and icdo map
 			RF2SimpleMapRefsetFactory factory = new RF2SimpleMapRefsetFactory(config);
 			factory.export();

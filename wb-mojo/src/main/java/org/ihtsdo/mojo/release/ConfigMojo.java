@@ -125,14 +125,6 @@ public class ConfigMojo extends AbstractMojo {
 	/**
 	 * moduleId
 	 * 
-	 * @parameter default-value="Core Component"
-	 * 
-	 */
-	private String moduleId;
-	
-	/**
-	 * moduleId
-	 * 
 	 * @parameter default-value="20110131"
 	 * 
 	 */
@@ -207,7 +199,6 @@ public class ConfigMojo extends AbstractMojo {
 		config.setNamespaceId(namespaceId);
 		config.setPartitionId(partitionId);
 		config.setExecutionId(executionId);
-		config.setModuleId(moduleId);
 		config.setReleaseId(releaseId);
 		config.setComponentType(componentType);
 		

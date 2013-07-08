@@ -2,6 +2,7 @@ package org.ihtsdo.mojo.release.refset;
 
 import java.io.File;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -44,6 +45,14 @@ public class RF2SIMPLEFULLExporterMojo extends AbstractMojo {
 	 * @required
 	 */
 	private String exportFolder;
+
+	/**
+	 * moduleFilter
+	 * 
+	 * @parameter
+	 * 
+	 */
+	private ArrayList<String> moduleFilter;
 	
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		System.setProperty("java.awt.headless", "true");
@@ -64,9 +73,10 @@ public class RF2SIMPLEFULLExporterMojo extends AbstractMojo {
 			config.setFlushCount(10000);
 			config.setInvokeDroolRules("false");
 			config.setFileExtension("txt");
+			config.setModuleFilter(moduleFilter);
 			
 			// initialize ace framwork and meta hierarchy
-			ExportUtil.init();
+			ExportUtil.init(config);
 			
 			//Exports VTM , VMP and Non-Human
 			RF2SimpleFullRefsetFactory factory = new RF2SimpleFullRefsetFactory(config);

@@ -1,6 +1,7 @@
 package org.ihtsdo.mojo.release.core;
 
 import java.io.File;
+import java.util.ArrayList;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -43,6 +44,14 @@ public class RF2IdentifierExporterMojo extends AbstractMojo {
 	 */
 	private String exportFolder;
 
+	/**
+	 * moduleFilter
+	 * 
+	 * @parameter
+	 * 
+	 */
+	private ArrayList<String> moduleFilter;
+	
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		try {
 			Config config = JAXBUtil.getConfig("/org/ihtsdo/rf2/config/identifier.xml");
@@ -59,9 +68,10 @@ public class RF2IdentifierExporterMojo extends AbstractMojo {
 			config.setFlushCount(10000);
 			config.setInvokeDroolRules("false");
 			config.setFileExtension("txt");
+			config.setModuleFilter(moduleFilter);
 
 			// initialize meta hierarchy
-			ExportUtil.init();
+			ExportUtil.init(config);
 
 
 			RF2IdentifierFactory factory = new RF2IdentifierFactory(config);

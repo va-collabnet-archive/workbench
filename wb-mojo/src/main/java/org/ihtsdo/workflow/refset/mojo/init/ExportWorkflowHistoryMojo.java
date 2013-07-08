@@ -116,14 +116,6 @@ public class ExportWorkflowHistoryMojo extends AbstractMojo {
 	private String executionId;
 	
 	/**
-	 * moduleId
-	 * 
-	 * @parameter default-value="Core Concept Component"
-	 * 
-	 */
-	private String moduleId;
-	
-	/**
 	 * releaseId
 	 * 
 	 * @parameter default-value="20110131"
@@ -156,7 +148,6 @@ public class ExportWorkflowHistoryMojo extends AbstractMojo {
 			config.setNamespaceId(namespaceId);
 			config.setPartitionId(partitionId);
 			config.setExecutionId(executionId);
-			config.setModuleId(moduleId);
 			config.setReleaseId(releaseId);
 			config.setComponentType(componentType);			
 			config.setUsername(username);
@@ -164,7 +155,7 @@ public class ExportWorkflowHistoryMojo extends AbstractMojo {
 			config.setEndPoint(endpointURL);
 			
 			// initialize meta hierarchy
-			ExportUtil.init();
+			ExportUtil.init(config);
 
 			RF2WorkflowHistoryFactory factory = new RF2WorkflowHistoryFactory(config);
 			factory.export();

@@ -2,6 +2,7 @@ package org.ihtsdo.mojo.release.compatibilitypkg;
 
 import java.io.File;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -12,6 +13,8 @@ import org.ihtsdo.rf2.compatibilitypkg.factory.RF2HistoricalAssociationIdentFact
 import org.ihtsdo.rf2.util.Config;
 import org.ihtsdo.rf2.util.ExportUtil;
 import org.ihtsdo.rf2.util.JAXBUtil;
+import org.ihtsdo.rf2.util.ModuleFilter;
+import org.ihtsdo.rf2.util.TestFilters;
 
 /**
  * @author Ale
@@ -53,6 +56,14 @@ public class RF2AssociationIdentExporterMojo extends AbstractMojo {
 	 * @optional
 	 */
 	private String wbAssociationId_SCTIDMapFactory;
+
+	/**
+	 * moduleFilter
+	 * 
+	 * @parameter
+	 * 
+	 */
+	private ArrayList<String> moduleFilter;
 	
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		System.setProperty("java.awt.headless", "true");
@@ -73,9 +84,13 @@ public class RF2AssociationIdentExporterMojo extends AbstractMojo {
 			config.setFlushCount(10000);
 			config.setInvokeDroolRules("false");
 			config.setFileExtension("txt");
-
+			config.setModuleFilter(moduleFilter);
+			TestFilters testFilters= new TestFilters();
+			ModuleFilter filter=new ModuleFilter(); 
+			testFilters.addFilter(filter);
+			config.setTestFilters(testFilters);
 			// initialize ace framwork and meta hierarchy
-			ExportUtil.init();
+			ExportUtil.init(config);
 			if (wbAssociationId_SCTIDMapFactory!=null){
 				RF2AssociationId_SCTIDMapFactory factory=new RF2AssociationId_SCTIDMapFactory(config);
 				factory.export();

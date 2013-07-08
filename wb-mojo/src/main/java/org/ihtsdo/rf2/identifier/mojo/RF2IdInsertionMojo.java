@@ -116,14 +116,6 @@ public class RF2IdInsertionMojo extends AbstractMojo {
 	private String executionId;
 	
 	/**
-	 * moduleId
-	 * 
-	 * @parameter default-value="Core Concept Component"
-	 * 
-	 */
-	private String moduleId;
-	
-	/**
 	 * releaseId
 	 * 
 	 * @parameter default-value="20110131"
@@ -195,7 +187,6 @@ public class RF2IdInsertionMojo extends AbstractMojo {
 			config.setNamespaceId(namespaceId);
 			config.setPartitionId(partitionId);
 			config.setExecutionId(executionId);
-			config.setModuleId(moduleId);
 			config.setReleaseId(releaseId);
 			config.setComponentType(componentType);			
 			config.setUsername(username);
@@ -209,7 +200,7 @@ public class RF2IdInsertionMojo extends AbstractMojo {
 			
 			
 			// initialize meta hierarchy
-			ExportUtil.init();
+			ExportUtil.init(config);
 
 			RF2IdInsertionFactory factory = new RF2IdInsertionFactory(config);
 			factory.export();

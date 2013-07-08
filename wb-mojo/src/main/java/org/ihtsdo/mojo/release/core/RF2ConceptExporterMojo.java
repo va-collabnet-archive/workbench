@@ -1,6 +1,7 @@
 package org.ihtsdo.mojo.release.core;
 
 import java.io.File;
+import java.util.ArrayList;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -116,14 +117,6 @@ public class RF2ConceptExporterMojo extends AbstractMojo {
 	private String executionId;
 	
 	/**
-	 * moduleId
-	 * 
-	 * @parameter default-value="Core Concept Component"
-	 * 
-	 */
-	private String moduleId;
-	
-	/**
 	 * releaseId
 	 * 
 	 * @parameter default-value="20110131"
@@ -138,6 +131,14 @@ public class RF2ConceptExporterMojo extends AbstractMojo {
 	 * 
 	 */
 	private String componentType;
+
+	/**
+	 * moduleFilter
+	 * 
+	 * @parameter
+	 * 
+	 */
+	private ArrayList<String> moduleFilter;
 
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		try {
@@ -160,7 +161,7 @@ public class RF2ConceptExporterMojo extends AbstractMojo {
 			config.setFlushCount(10000);
 			config.setInvokeDroolRules("false");
 			config.setFileExtension("txt");
-
+			config.setModuleFilter(moduleFilter);
 			
 			
 			//Below Parameters are necessary for ID-Generation
@@ -168,7 +169,6 @@ public class RF2ConceptExporterMojo extends AbstractMojo {
 			config.setNamespaceId(namespaceId);
 			config.setPartitionId(partitionId);
 			config.setExecutionId(executionId);
-			config.setModuleId(moduleId);
 			config.setReleaseId(releaseId);
 			config.setComponentType(componentType);			
 			config.setUsername(username);
@@ -176,7 +176,7 @@ public class RF2ConceptExporterMojo extends AbstractMojo {
 			config.setEndPoint(endpointURL);
 			
 			// initialize meta hierarchy
-			ExportUtil.init();
+			ExportUtil.init(config);
 
 			RF2ConceptFactory factory = new RF2ConceptFactory(config);
 			factory.export();

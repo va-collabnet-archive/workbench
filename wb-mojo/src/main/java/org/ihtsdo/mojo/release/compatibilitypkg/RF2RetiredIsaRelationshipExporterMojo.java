@@ -1,6 +1,7 @@
 package org.ihtsdo.mojo.release.compatibilitypkg;
 
 import java.io.File;
+import java.util.ArrayList;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -51,6 +52,14 @@ public class RF2RetiredIsaRelationshipExporterMojo extends AbstractMojo {
 	 * @required
 	 */
 	private String rF2Format;
+
+	/**
+	 * moduleFilter
+	 * 
+	 * @parameter
+	 * 
+	 */
+	private ArrayList<String> moduleFilter;
 	
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		try {
@@ -71,9 +80,10 @@ public class RF2RetiredIsaRelationshipExporterMojo extends AbstractMojo {
 			config.setFlushCount(10000);
 			config.setInvokeDroolRules("false");
 			config.setFileExtension("txt");
+			config.setModuleFilter(moduleFilter);
 
 			// initialize meta hierarchy
-			ExportUtil.init();
+			ExportUtil.init(config);
 
 
 			RF2RetiredIsaRelationshipFactory factory = new RF2RetiredIsaRelationshipFactory(config);

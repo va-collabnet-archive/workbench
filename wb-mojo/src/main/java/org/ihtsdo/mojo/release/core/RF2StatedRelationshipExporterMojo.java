@@ -2,6 +2,7 @@ package org.ihtsdo.mojo.release.core;
 
 import java.io.File;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -92,14 +93,6 @@ public class RF2StatedRelationshipExporterMojo extends AbstractMojo {
 	/**
 	 * moduleId
 	 * 
-	 * @parameter default-value="Core Component"
-	 * 
-	 */
-	private String moduleId;
-	
-	/**
-	 * moduleId
-	 * 
 	 * @parameter default-value="20110131"
 	 * 
 	 */
@@ -138,6 +131,14 @@ public class RF2StatedRelationshipExporterMojo extends AbstractMojo {
 	 */
 	private String password;
 
+	/**
+	 * moduleFilter
+	 * 
+	 * @parameter
+	 * 
+	 */
+	private ArrayList<String> moduleFilter;
+	
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		System.setProperty("java.awt.headless", "true");
 		try {
@@ -164,13 +165,13 @@ public class RF2StatedRelationshipExporterMojo extends AbstractMojo {
 			config.setFlushCount(10000);
 			config.setInvokeDroolRules("false");
 			config.setFileExtension("txt");
+			config.setModuleFilter(moduleFilter);
 				
 			//Below Parameters are necessary for ID-Generation
 			config.setUpdateWbSctId(updateWbSctId);
 			config.setNamespaceId(namespaceId);
 			config.setPartitionId(partitionId);
 			config.setExecutionId(executionId);
-			config.setModuleId(moduleId);
 			config.setReleaseId(releaseId);
 			config.setComponentType(componentType);			
 			config.setUsername(username);
@@ -178,7 +179,7 @@ public class RF2StatedRelationshipExporterMojo extends AbstractMojo {
 			config.setEndPoint(endpointURL);
 		
 			// initialize ace framwork and meta hierarchy
-			ExportUtil.init();
+			ExportUtil.init(config);
 
 			RF2StatedRelationshipFactory factory = new RF2StatedRelationshipFactory(config);
 			factory.export();

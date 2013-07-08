@@ -2,6 +2,7 @@ package org.ihtsdo.mojo.release.compatibilitypkg;
 
 import java.io.File;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -53,6 +54,14 @@ public class RF2RetiredIsaStatedRelationshipExporterMojo extends AbstractMojo {
 	 */
 	private String rF2Format;
 
+	/**
+	 * moduleFilter
+	 * 
+	 * @parameter
+	 * 
+	 */
+	private ArrayList<String> moduleFilter;
+	
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		System.setProperty("java.awt.headless", "true");
 		try {
@@ -84,9 +93,10 @@ public class RF2RetiredIsaStatedRelationshipExporterMojo extends AbstractMojo {
 			config.setFlushCount(10000);
 			config.setInvokeDroolRules("false");
 			config.setFileExtension("txt");
+			config.setModuleFilter(moduleFilter);
 
 			// initialize ace framwork and meta hierarchy
-			ExportUtil.init();
+			ExportUtil.init(config);
 
 			RF2RetiredIsaStatedRelationshipFactory factory = new RF2RetiredIsaStatedRelationshipFactory(config);
 			factory.export();

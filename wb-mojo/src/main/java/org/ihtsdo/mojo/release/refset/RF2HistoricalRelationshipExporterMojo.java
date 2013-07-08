@@ -1,6 +1,7 @@
 package org.ihtsdo.mojo.release.refset;
 
 import java.io.File;
+import java.util.ArrayList;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -91,14 +92,6 @@ public class RF2HistoricalRelationshipExporterMojo extends AbstractMojo {
 	/**
 	 * moduleId
 	 * 
-	 * @parameter default-value="Core Component"
-	 * 
-	 */
-	private String moduleId;
-	
-	/**
-	 * moduleId
-	 * 
 	 * @parameter default-value="20110131"
 	 * 
 	 */
@@ -162,6 +155,14 @@ public class RF2HistoricalRelationshipExporterMojo extends AbstractMojo {
 	 * 
 	 */
 	private String changesetRoot;
+
+	/**
+	 * moduleFilter
+	 * 
+	 * @parameter
+	 * 
+	 */
+	private ArrayList<String> moduleFilter;
 	
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		try {
@@ -175,13 +176,13 @@ public class RF2HistoricalRelationshipExporterMojo extends AbstractMojo {
 			
 			config.setInvokeDroolRules("false");
 			config.setFileExtension("txt");
+			config.setModuleFilter(moduleFilter);
 			
 			//Below Parameters are necessary for ID-Generation
 			config.setUpdateWbSctId(updateWbSctId);
 			config.setNamespaceId(namespaceId);
 			config.setPartitionId(partitionId);
 			config.setExecutionId(executionId);
-			config.setModuleId(moduleId);
 			config.setReleaseId(releaseId);
 			config.setComponentType(componentType);			
 			config.setUsername(username);
@@ -194,7 +195,7 @@ public class RF2HistoricalRelationshipExporterMojo extends AbstractMojo {
 			config.setChangesetRoot(changesetRoot);
 			
 			// initialize meta hierarchy
-			ExportUtil.init();
+			ExportUtil.init(config);
 
 
 			RF2HistoricalAssociationRelationshipRefsetFactory factory = new RF2HistoricalAssociationRelationshipRefsetFactory(config);
