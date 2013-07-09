@@ -213,9 +213,11 @@ public abstract class ConceptDataManager implements I_ManageConceptData {
        //add annotation nids
        Set<Integer> annotNids = new HashSet<>();
        ConceptAttributes ca = getConceptAttributes();
-       if (ca.annotations != null) {
-           for (RefsetMember rm : ca.annotations) {
-               annotNids.add(rm.nid);
+       if (ca != null) {
+           if (ca.annotations != null) {
+               for (RefsetMember rm : ca.annotations) {
+                   annotNids.add(rm.nid);
+               }
            }
        }
        AddDescriptionSet descriptions = getDescriptions();

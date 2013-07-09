@@ -525,38 +525,47 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
      * @throws Exception indicates an exception has occurred
      */
     private void process(ConceptChronicleBI concept) throws Exception {
-        ConceptAttributeChronicleBI ca = concept.getConceptAttributes();
-        processConceptAttribute(ca);
-        for (RefexChronicleBI annot : ca.getAnnotations()) {
-            if (associationRefexNids.contains(annot.getRefexNid())) {
-                processAssociationRefset(annot);
-            } else if (attribValueRefexNids.contains(annot.getRefexNid())) {
-                processAttributeValueRefset(annot);
+        boolean write = true;
+        if(sameCycleStampNids.contains(concept.getConceptAttributes().getPrimordialVersion().getStampNid())){
+            if(!concept.getVersion(viewCoordinate).isActive(viewCoordinate)){
+                //concept was created and retired in same cycle, don't write any part
+                write = false;
             }
         }
+        if (write) {
+            ConceptAttributeChronicleBI ca = concept.getConceptAttributes();
+            processConceptAttribute(ca);
+            for (RefexChronicleBI annot : ca.getAnnotations()) {
+                if (associationRefexNids.contains(annot.getRefexNid())) {
+                    processAssociationRefset(annot);
+                } else if (attribValueRefexNids.contains(annot.getRefexNid())) {
+                    processAttributeValueRefset(annot);
+                }
+            }
 
-        if (concept.getDescriptions() != null) {
-            for (DescriptionChronicleBI d : concept.getDescriptions()) {
-                processDescription(d);
-                if (d.getAnnotations() != null) {
-                    for (RefexChronicleBI annot : d.getAnnotations()) {
-                        int refexNid = annot.getRefexNid();
-                        if(possibleLangRefexNids.contains(annot.getRefexNid())){
-                            langRefexNids.add(annot.getRefexNid());
-                            processLangRefsets(annot);
-                        }else if(associationRefexNids.contains(annot.getRefexNid())){
-                            processAssociationRefset(annot);
-                        }else if(attribValueRefexNids.contains(annot.getRefexNid())){
-                            processAttributeValueRefset(annot);
+            if (concept.getDescriptions() != null) {
+                for (DescriptionChronicleBI d : concept.getDescriptions()) {
+                    processDescription(d);
+                    if (d.getAnnotations() != null) {
+                        for (RefexChronicleBI annot : d.getAnnotations()) {
+                            int refexNid = annot.getRefexNid();
+                            if (possibleLangRefexNids.contains(annot.getRefexNid())) {
+                                langRefexNids.add(annot.getRefexNid());
+                                processLangRefsets(annot);
+                            } else if (associationRefexNids.contains(annot.getRefexNid())) {
+                                processAssociationRefset(annot);
+                            } else if (attribValueRefexNids.contains(annot.getRefexNid())) {
+                                processAttributeValueRefset(annot);
+                            }
                         }
                     }
                 }
             }
-        }
 
-        if (concept.getRelationshipsOutgoing() != null) {
-            for (RelationshipChronicleBI r : concept.getRelationshipsOutgoing()) {
-                processRelationship(r);
+            if (concept.getRelationshipsOutgoing() != null) {
+                for (RelationshipChronicleBI r : concept.getRelationshipsOutgoing()) {
+                    processRelationship(r);
+                }
             }
         }
     }
@@ -651,7 +660,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                 boolean write = true;
                     for (RefexVersionBI refexVersion : versions) {
                         RefexChronicleBI chronicle = (RefexChronicleBI) refexVersion.getChronicle();
-                        if (sameCycleStampNids.contains(chronicle.getPrimordialVersion().getStampNid())) {
+                        if (sameCycleStampNids.contains(refexVersion.getStampNid())) {
                             RefexVersionBI version = (RefexVersionBI) chronicle.getVersion(viewCoordinateAllStatus);
                             if (!version.isActive(viewCoordinate)) {
                                 write = false;
@@ -767,7 +776,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                     for (RefexVersionBI refexVersion : versions) {
                         RefexNidFloatVersionBI nfVersion = (RefexNidFloatVersionBI) refexVersion;
                         RefexChronicleBI chronicle = (RefexChronicleBI) nfVersion.getChronicle();
-                        if (sameCycleStampNids.contains(chronicle.getPrimordialVersion().getStampNid())) {
+                        if (sameCycleStampNids.contains(refexVersion.getStampNid())) {
                             RefexVersionBI version = (RefexVersionBI) chronicle.getVersion(viewCoordinateAllStatus);
                             if (!version.isActive(viewCoordinate)) {
                                 write = false;
@@ -951,7 +960,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                     if (stampNids.contains(descr.getStampNid())) {
                         if (writeIds) {
                             writeIds = false;
-                            if (sameCycleStampNids.contains(descriptionChronicle.getPrimordialVersion().getStampNid())) {
+                            if (sameCycleStampNids.contains(descr.getStampNid())) {
                                 processIdentifiers(descriptionChronicle.getPrimUuid(), descr.getStampNid(), effectiveDate.getTime());
                             } else {
                                 processIdentifiers(descriptionChronicle.getPrimUuid(), descr.getStampNid(), descriptionChronicle.getPrimordialVersion().getTime());
@@ -1061,7 +1070,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                             if (inTaxonomy) {
                                 if (writeIds) {
                                     writeIds = false;
-                                    if (sameCycleStampNids.contains(relationshipChronicle.getPrimordialVersion().getStampNid())) {
+                                    if (sameCycleStampNids.contains(rv.getStampNid())) {
                                         processIdentifiers(relationshipChronicle.getPrimUuid(),
                                                 rv.getStampNid(),
                                                 effectiveDate.getTime());
@@ -1252,15 +1261,14 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                 versions.add((RefexVersionBI) refexChronicle.getVersion(viewCoordinateAllStatus));
             }
             boolean write = true;
-            if (sameCycleStampNids.contains(refexChronicle.getPrimordialVersion().getStampNid())) {
-                RefexVersionBI version = (RefexVersionBI) refexChronicle.getVersion(viewCoordinateAllStatus);
-                if(version == null || !version.isActive(viewCoordinate)){
-                    write = false;
-                }
-            }
-            if (write) {
                 for (RefexVersionBI refex : versions) {
-                    if (stampNids.contains(refex.getStampNid())) {
+                    if (sameCycleStampNids.contains(refex.getStampNid())) {
+                        RefexVersionBI version = (RefexVersionBI) refexChronicle.getVersion(viewCoordinateAllStatus);
+                        if (version == null || !version.isActive(viewCoordinate)) {
+                            write = false;
+                        }
+                    }
+                    if (stampNids.contains(refex.getStampNid()) && write) {
                         RefexNidVersionBI member = (RefexNidVersionBI) refex;
                         for (Rf2File.AssociationRefsetFileFields field : Rf2File.AssociationRefsetFileFields.values()) {
                             switch (field) {
@@ -1297,7 +1305,6 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                         }
                     }
                 }
-            }
         }
     }
 
@@ -1317,15 +1324,15 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                 versions.add((RefexVersionBI) refexChronicle.getVersion(viewCoordinateAllStatus));
             }
             boolean write = true;
-            if (sameCycleStampNids.contains(refexChronicle.getPrimordialVersion().getStampNid())) {
-                RefexVersionBI version = (RefexVersionBI) refexChronicle.getVersion(viewCoordinateAllStatus);
-                if (!version.isActive(viewCoordinate)) {
-                    write = false;
-                }
-            }
-            if (write) {
+            
                 for (RefexVersionBI refex : versions) {
-                    if (stampNids.contains(refex.getStampNid())) {
+                    if (sameCycleStampNids.contains(refex.getStampNid())) {
+                        RefexVersionBI version = (RefexVersionBI) refexChronicle.getVersion(viewCoordinateAllStatus);
+                        if (!version.isActive(viewCoordinate)) {
+                            write = false;
+                        }
+                    }
+                    if (stampNids.contains(refex.getStampNid()) && write) {
                         RefexNidVersionBI member = (RefexNidVersionBI) refex;
                         for (Rf2File.AttribValueRefsetFileFields field : Rf2File.AttribValueRefsetFileFields.values()) {
                             switch (field) {
@@ -1360,7 +1367,6 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                         }
                     }
                 }
-            }
         }
     }
 
@@ -1445,7 +1451,13 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                 boolean write = true;
                 for (RefexVersionBI rv : versions) {
                     if (!rv.isActive(viewCoordinate)) {
-                        if (sameCycleStampNids.contains(rv.getPrimordialVersion().getStampNid())) {
+                        if (sameCycleStampNids.contains(rv.getStampNid())) {
+                            write = false;
+                        }
+                    }
+                    if(rv.isActive(viewCoordinate)){ //CHANGE FOR DK, source data incorrect, retired descriptions should also have retired lang refsets
+                        ComponentVersionBI rc = Ts.get().getComponentVersion(viewCoordinate, rv.getReferencedComponentNid());
+                        if(rc == null || !rc.isActive(viewCoordinate)){
                             write = false;
                         }
                     }
