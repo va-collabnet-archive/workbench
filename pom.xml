@@ -30,7 +30,7 @@ the specific language governing permissions and limitations under the License. -
     <scm>
         <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/branches/trek-no-jini-termmed-backend-branch-april-2013</connection>
         <developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/branches/trek-no-jini-termmed-backend-branch-april-2013</developerConnection>
-        <url>https://csfe.aceworkspace.net/integration/viewvc/viewvc.cgi/branches/trek-no-jini-termmed-backend-branch-april-2013</url>
+        <url>https://csfe.aceworkspace.net/svn/repos/workbench/branches/trek-no-jini-termmed-backend-branch-april-2013</url>
     </scm>
     <properties>
         <branch>no-jini</branch>
