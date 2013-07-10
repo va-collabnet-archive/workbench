@@ -58,7 +58,7 @@ import org.ihtsdo.tk.spec.ConceptSpec;
 public class ExportUtil {
 
 
-	private static final String META_MODULEID_PARENT = null;
+	private static final String META_MODULEID_PARENT = "40d1c869-b509-32f8-b735-836eac577a67";
 
 	// store the handle for the log files
 	private static I_ConfigAceFrame aceConfig;
