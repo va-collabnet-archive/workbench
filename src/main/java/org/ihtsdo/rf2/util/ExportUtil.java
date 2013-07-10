@@ -138,6 +138,7 @@ public class ExportUtil {
 			if (allModuleMapNidSCTId!=null && allModuleMapNidSCTId.size()>0){
 				return;
 			}
+			allModuleMapNidSCTId=new HashMap<Integer, String>();
 			HashMap<UUID, String> allModuleIds=new HashMap<UUID, String>();
 			I_GetConceptData metaModuleIdParent = getTermFactory().getConcept(UUID.fromString(META_MODULEID_PARENT));
 			Set <I_GetConceptData>moduleIdDescendants=new HashSet<I_GetConceptData>();
