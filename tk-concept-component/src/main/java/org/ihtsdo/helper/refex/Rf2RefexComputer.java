@@ -168,23 +168,27 @@ public class Rf2RefexComputer implements ProcessUnfetchedConceptDataBI {
             }
         }
         ConceptVersionBI cv = conceptChronicle.getVersion(viewCoordinate);
-        ComponentVersionBI cav = cv.getConceptAttributes().getVersion(vcAllStatus);
-        if (!cv.isActive() && cav != null) {
-            if(stampNids.contains(cav.getStampNid())){
-                RefexCAB refexBp = new RefexCAB(TK_REFEX_TYPE.CID,
-                    cv.getNid(),
-                    conceptInactiveRefexNid);
-                refexBp.put(RefexCAB.RefexProperty.CNID1, getValueForRetirement(cv.getNid()));
-                RefexChronicleBI<?> member = builder.construct(refexBp);
-                conceptChronicle.addAnnotation(member);
-                for(int stampNid : member.getAllStampNids()){
+        if (cv.getConceptAttributes() != null) {
+            ComponentVersionBI cav = cv.getConceptAttributes().getVersion(vcAllStatus);
+            if (!cv.isActive() && cav != null) {
+                if (stampNids.contains(cav.getStampNid())) {
+                    if(getValueForRetirement(cv.getNid()) != null){
+                        RefexCAB refexBp = new RefexCAB(TK_REFEX_TYPE.CID,
+                                cv.getNid(),
+                                conceptInactiveRefexNid);
+                        refexBp.put(RefexCAB.RefexProperty.CNID1, getValueForRetirement(cv.getNid()));
+                        RefexChronicleBI<?> member = builder.construct(refexBp);
+                        conceptChronicle.addAnnotation(member);
+                        for (int stampNid : member.getAllStampNids()) {
                             newStamps.add(stampNid);
+                        }
+                        Ts.get().addUncommitted(Ts.get().getConcept(conceptInactiveRefexNid));
+                        Ts.get().commit(Ts.get().getConcept(conceptInactiveRefexNid));
+                        changed = true;
+                    }
                 }
-                Ts.get().addUncommitted(Ts.get().getConcept(conceptInactiveRefexNid));
-                Ts.get().commit(Ts.get().getConcept(conceptInactiveRefexNid));
-                changed = true;
+
             }
-            
         }
         for (DescriptionVersionBI desc : latestDescs) {
             if (stampNids.contains(desc.getStampNid())) {

@@ -190,7 +190,7 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
             return Condition.ITEM_CANCELED;
         }
     }
-
+    
     private void computeNestedRefsets(I_ConfigAceFrame configFrame,boolean showActivityPanel, RefsetSpecQuery query)
             throws TerminologyException, IOException, Exception {
         // compute any nested refsets (e.g. if this spec uses

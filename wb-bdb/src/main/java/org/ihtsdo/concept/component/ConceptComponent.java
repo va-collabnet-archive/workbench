@@ -235,6 +235,19 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         if (another.annotations != null) {
             if (this.annotations == null) {
                 this.annotations = another.annotations;
+                for (RefsetMember refsetMember : this.annotations) {
+                    if (Ts.get().getConceptNidForNid(refsetMember.getRefsetId()) != Integer.MAX_VALUE) {
+                        Concept refsetConcept = (Concept) Ts.get().getConceptForNid(refsetMember.getRefsetId()); 
+                        if (refsetConcept.isAnnotationIndex()) {
+                            refsetConcept.getData().getMemberNids().add(refsetMember.getNid());
+                            indexedAnnotationConcepts.add(refsetConcept);
+                        }
+                    } else {
+                        // Not an error, it the indexed annotation concept does not exist, 
+                        // then it is from initial load, and the index will be created later. 
+                        //System.out.println("Nid to cNid == Integer.MAX_VALUE; " + refsetMember);
+                    }
+                }
             } else {
                 HashMap<Integer, RefsetMember<?, ?>> anotherAnnotationMap = new HashMap<Integer, RefsetMember<?, ?>>();
 
@@ -259,7 +272,13 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
 
                 for (RefsetMember refsetMember : anotherAnnotationMap.values()) {
                     if (Ts.get().getConceptNidForNid(refsetMember.getRefsetId()) != Integer.MAX_VALUE) {
-                        Concept refsetConcept = (Concept) Ts.get().getConceptForNid(refsetMember.getRefsetId());
+                        Concept refsetConcept = (Concept) Ts.get().getConceptForNid(refsetMember.getRefsetId()); 
+                        if (refsetConcept.getPrimUuid().equals(UUID.fromString("704ceee7-6d19-392f-a0e6-e28dfd444801"))){ //concentration
+                            System.out.println("DEBUG");
+                        }
+                        if(refsetConcept.getPrimUuid().equals(UUID.fromString("f1bc3ad3-960f-3035-b570-cf9f7b64fe9b"))){ //panodil
+                            System.out.println("DEBUG");
+                        }
                         if (refsetConcept.isAnnotationIndex()) {
                             refsetConcept.getData().getMemberNids().add(refsetMember.getNid());
                             indexedAnnotationConcepts.add(refsetConcept);
