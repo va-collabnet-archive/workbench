@@ -159,7 +159,7 @@ public class RF2RelationshipImpl extends RF2AbstractImpl implements I_ProcessCon
 						
 						if (!tmpHash.containsKey(intModuleId)){
 							tmpHash.put(intModuleId, moduleId);
-							System.out.println("intModule=" + String.valueOf(intModuleId) + " -SCTID=" + moduleId);
+							logger.info("intModule=" + String.valueOf(intModuleId) + " -SCTID=" + moduleId);
 						}
 						effectiveTime = getDateFormat().format(new Date(rel.getTime()));
 
