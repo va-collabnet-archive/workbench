@@ -56,6 +56,7 @@ import org.ihtsdo.tk.api.PositionSet;
 import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.RelAssertionType;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
@@ -252,7 +253,18 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 		if (parentConcept ==  null || subtypeConcept == null) {
 			result = false;
 		} else {
-			result = subtypeConcept.isKindOf(parentConcept);
+			// OLD IMPLEMENTATION -- result = subtypeConcept.isKindOf(parentConcept);
+			ViewCoordinate testViewCoordinate = new ViewCoordinate(config.getViewCoordinate());
+
+			Set<PositionBI> viewPositions =  new HashSet<PositionBI>();
+			for (PathBI loopPath : config.getEditingPathSet()) {
+				PositionBI pos = Terms.get().newPosition(loopPath, Long.MAX_VALUE);
+				viewPositions.add(pos);
+			}
+			PositionSet mockViewSet = new PositionSet(viewPositions);
+			testViewCoordinate.setPositionSet(mockViewSet);
+			testViewCoordinate.setRelationshipAssertionType(RelAssertionType.STATED);
+			result =  Ts.get().isChildOf(subtypeConceptNid, parentConceptNid, testViewCoordinate);
 		}
 		return result;
 	}
@@ -284,7 +296,7 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 					int dnid = Integer.parseInt(doc.get("dnid"));
 					if (cnid != conceptNid) {
 						I_DescriptionVersioned<?> potential_match = Terms.get().getDescription(dnid, cnid);
-						
+
 						int pfdn = Integer.MAX_VALUE;
 
 						try {
