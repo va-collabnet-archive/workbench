@@ -230,26 +230,26 @@ public class UuidToIntHashMap extends AbstractUuidToIntHashMap {
 	 *         such key is present.
 	 */
 	public int get(long[] key) {
-		try {
-			r.lock();
-		int i = indexOfKey(key);
-		if (i < 0)
+            r.lock();
+            try {
+                    int i = indexOfKey(key);
+                    if (i < 0)
 			return Integer.MAX_VALUE; // not contained
 		return values[i];
-		} finally {
-			r.unlock();
-		}
+            } finally {
+		r.unlock();
+            }
 	}
 	public int get(UUID key) {
-		try {
-			r.lock();
+            r.lock();
+            try {
 		int i = indexOfKey(key);
 		if (i < 0)
 			return Integer.MAX_VALUE; // not contained
 		return values[i];
-		} finally {
-			r.unlock();
-		}
+            } finally {
+		r.unlock();
+            }
 	}
 
 	/**
@@ -485,19 +485,18 @@ public class UuidToIntHashMap extends AbstractUuidToIntHashMap {
 	 *         the new value has now replaced the formerly associated value.
 	 */
 	public boolean put(long[] key, int value) {
-			w.lock();
+		w.lock();
+                try {
 		int i = indexOfInsertion(key);
 		if (i < 0) { // already contained
 			i = -i - 1;
 			this.values[i] = value;
-			w.unlock();
 			return false;
 		}
 		if (this.distinct > this.highWaterMark) {
 			int newCapacity = chooseGrowCapacity(this.distinct + 1,
 					this.minLoadFactor, this.maxLoadFactor);
 			rehash(newCapacity);
-			w.unlock();
 			return put(key, value);
 		}
 
@@ -515,9 +514,12 @@ public class UuidToIntHashMap extends AbstractUuidToIntHashMap {
 					this.minLoadFactor, this.maxLoadFactor);
 			rehash(newCapacity);
 		}
-		w.unlock();
+		
 
 		return true;
+                } finally {
+                    w.unlock();
+                }
 	}
 
 	/**
