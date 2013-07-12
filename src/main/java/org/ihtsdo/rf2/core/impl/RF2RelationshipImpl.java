@@ -31,7 +31,6 @@ public class RF2RelationshipImpl extends RF2AbstractImpl implements I_ProcessCon
 
 	private static Logger logger = Logger.getLogger(RF2RelationshipImpl.class);
 	private String releaseDate;
-	private HashMap<Integer, String> tmpHash;
 
 	public RF2RelationshipImpl(Config config) {
 		super(config);
@@ -47,7 +46,6 @@ public class RF2RelationshipImpl extends RF2AbstractImpl implements I_ProcessCon
 	public void processConcept(I_GetConceptData concept) throws Exception {
 
 		process(concept);
-		tmpHash=new HashMap<Integer,String>();
 	}
 
 	public void export(I_GetConceptData sourceConcept, String sourceId) throws IOException {
@@ -157,9 +155,8 @@ public class RF2RelationshipImpl extends RF2AbstractImpl implements I_ProcessCon
 						int intModuleId=rel.getModuleNid();
 						moduleId=getModuleSCTIDForStampNid(intModuleId);
 						
-						if (!tmpHash.containsKey(intModuleId)){
-							tmpHash.put(intModuleId, moduleId);
-							logger.info("intModule=" + String.valueOf(intModuleId) + " -SCTID=" + moduleId);
+						if (moduleId==null){
+							logger.info("intModuleId=" + intModuleId + " has not module SCTID");
 						}
 						effectiveTime = getDateFormat().format(new Date(rel.getTime()));
 
