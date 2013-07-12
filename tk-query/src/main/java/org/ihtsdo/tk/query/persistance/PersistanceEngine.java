@@ -32,6 +32,7 @@ import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.cs.ChangeSetPolicy;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
+import org.ihtsdo.tk.query.RefsetSpec;
 import org.ihtsdo.tk.query.helper.MarkedParentRefsetHelper;
 import org.ihtsdo.tk.query.helper.RefsetHelper;
 
@@ -135,6 +136,13 @@ public class PersistanceEngine {
         Ts.get().addUncommitted(refsetConcept);
         Ts.get().addUncommitted(markedParentRefsetConcept);
         if (commit) {
+            RefsetSpec helper = new RefsetSpec(refsetConcept, true, viewCoordinate);
+            if(helper.getComputeConcept().isUncommitted()){
+                Ts.get().commit(helper.getComputeConcept(), csPolicy);
+            }
+            if(helper.getEditConcept().isUncommitted()){
+                Ts.get().commit(helper.getEditConcept(), csPolicy);
+            }
             Ts.get().commit(refsetConcept, csPolicy);
             Ts.get().commit(markedParentRefsetConcept, csPolicy);
         }

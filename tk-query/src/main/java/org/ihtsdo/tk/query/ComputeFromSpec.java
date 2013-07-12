@@ -105,8 +105,9 @@ public class ComputeFromSpec {
             logger.log(Level.INFO, ">>>>>>>>>> Search space (concept count): " + possibleIds.cardinality());
             refsetComputer = new RefsetComputer(query, viewCoordinate, possibleIds, computeType);
             long startTime = System.currentTimeMillis();
-            ts.iterateConceptDataInParallel(refsetComputer);
             logger.log(Level.INFO, ">>>>>>>>> Iterating concepts in parallel.");
+            ts.iterateConceptDataInParallel(refsetComputer);
+            
 
             if (!refsetComputer.continueWork()) {
                 throw new ComputationCanceled("Computation cancelled");

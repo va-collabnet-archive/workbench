@@ -36,8 +36,12 @@ import org.ihtsdo.helper.transform.UuidToSctIdWriter;
 import org.ihtsdo.lang.LANG_CODE;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.*;
+import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.api.cs.ChangeSetPolicy;
 import org.ihtsdo.tk.binding.snomed.Snomed;
+import org.ihtsdo.tk.binding.snomed.TermAux;
+import org.ihtsdo.tk.query.helper.release.ReleaseSpecComputer;
 import org.ihtsdo.tk.spec.ConceptSpec;
 
 /**
@@ -359,7 +363,7 @@ public class GenerateIncrementalRf2File extends AbstractMojo {
             getLog().info("Criterion matches " + stampsToWrite.size() + " sapNids: " + stampsToWrite);
             if (makeInitialMappingFiles) {
                 UuidToSctIdMapper mapper = new UuidToSctIdMapper(Ts.get().getAllConceptNids(), namespace, output);
-                Ts.get().iterateConceptDataInSequence(mapper);
+                Ts.get().iterateConceptDataInSequence(mapper); //why sequence?
                 mapper.close();
             }
             UuidSnomedMapHandler handler = new UuidSnomedMapHandler(output, output);
@@ -367,6 +371,13 @@ public class GenerateIncrementalRf2File extends AbstractMojo {
             Integer refsetParentConceptNid = 0;
             if (refsetParentConceptSpec != null) {
                 refsetParentConceptNid = Ts.get().getNidForUuids(UUID.fromString(refsetParentConceptSpec.getUuid()));
+                vc.getPositionSet().getViewPathNidSet();
+                EditCoordinate ec = new EditCoordinate(TermAux.USER.getLenient().getConceptNid(),
+                        Ts.get().getNidForUuids(UUID.fromString(moduleConcepts[0].getUuid())),
+                        viewPathNid);
+                ReleaseSpecComputer refsetSpecComputer = new ReleaseSpecComputer(ec,
+                        vc, ChangeSetPolicy.OFF, refsetParentConceptNid);
+                refsetSpecComputer.process();
             }
             Integer conNumRefsetParentConceptNid = null;
             if (conceptNumberRefsetParentConceptSpec != null) {
