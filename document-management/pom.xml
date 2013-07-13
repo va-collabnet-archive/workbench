@@ -3,7 +3,7 @@
 	<parent>
             <groupId>org.ihtsdo</groupId>
             <artifactId>wb-mmb</artifactId>
-            <version>2.33-trek-no-jini-backend-SNAPSHOT</version>
+            <version><version>2.33-trek-no-jini-open-release</version></version>
         </parent>
 	<artifactId>document-management</artifactId>
 	<packaging>jar</packaging>
