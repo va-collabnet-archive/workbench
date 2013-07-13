@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>org.ihtsdo</groupId>
 		<artifactId>wb-mmb</artifactId>
-		<version><version>2.33-trek-no-jini-open-release</version></version>
+		<version>2.33-trek-no-jini-open-release</version>
 	</parent>
 	<artifactId>wb-schema-mojo</artifactId>
 	<packaging>maven-plugin</packaging>
