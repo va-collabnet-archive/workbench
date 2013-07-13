@@ -81,6 +81,7 @@ public abstract class ArenaComponentSettings implements Serializable,
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
+        // dataversion == 1
         out.writeBoolean(visible);
         out.writeObject(bounds);
         out.writeObject(alternateBounds);
@@ -90,13 +91,15 @@ public abstract class ArenaComponentSettings implements Serializable,
     private void readObject(ObjectInputStream in) throws IOException,
             ClassNotFoundException {
         int objDataVersion = in.readInt();
-        if (objDataVersion == dataVersion) {
+        if (objDataVersion >= 1) {
+            // dataversion == 1
             visible = in.readBoolean();
             bounds = (mxRectangle) in.readObject();
             alternateBounds = (mxRectangle) in.readObject();
             fontSize = in.readFloat();
-            //
-        } else {
+        }
+                
+        if (objDataVersion > dataVersion) {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
 

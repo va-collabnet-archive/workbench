@@ -150,6 +150,12 @@ public class CollapsePanel extends JPanel {
 
     public CollapsePanel(String labelStr, ConceptViewSettings settings,
             CollapsePanelPrefs prefs, PanelSection sectionType, JButton menuButton) {
+        this(labelStr, settings, prefs, sectionType, menuButton, null);
+    }
+
+    public CollapsePanel(String labelStr, ConceptViewSettings settings,
+            CollapsePanelPrefs prefs, PanelSection sectionType,
+            JButton menuButton, ArrayList<JLabel> modulePathIconList) {
         super();
         this.prefs = prefs;
         this.sectionType = sectionType;
@@ -197,6 +203,13 @@ public class CollapsePanel extends JPanel {
         JPanel toolBar2 = new JPanel();
         toolBar2.setLayout(new FlowLayout(FlowLayout.LEFT, 1, 2));
         toolBar2.setOpaque(false);
+        
+        if (modulePathIconList != null) {
+            for (JLabel modulePathIcon : modulePathIconList) {
+                toolBar2.add(modulePathIcon);
+            }
+        }
+        
         if (menuButton != null) {
             toolBar2.add(menuButton);
         } else if (!noMenuSections.contains(sectionType)) {

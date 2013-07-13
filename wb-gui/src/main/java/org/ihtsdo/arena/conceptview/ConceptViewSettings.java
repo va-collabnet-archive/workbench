@@ -35,7 +35,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
 
-import org.dwfa.ace.ACE;
 import org.dwfa.ace.TermComponentLabel.LabelText;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
@@ -48,7 +47,6 @@ import org.ihtsdo.arena.promotion.PromotionConfig;
 import org.ihtsdo.taxonomy.TaxonomyHelper;
 import org.ihtsdo.taxonomy.TaxonomyMouseListener;
 import org.ihtsdo.taxonomy.TaxonomyTree;
-import org.ihtsdo.taxonomy.path.PathExpander;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.RelAssertionType;
@@ -90,9 +88,11 @@ public class ConceptViewSettings extends ArenaComponentSettings {
 	private DescType c1Refex = DescType.FULLY_SPECIFIED;
 	// dataversion = 4
 	private RelAssertionType relAssertionType = RelAssertionType.STATED;
-        // dataversion = 5
-        private boolean forPromotion = false;
-	// /
+    // dataversion = 5
+    private boolean forPromotion = false;
+    // dataVersion = 6;
+    private ModulePathIconState modulePathIconPreference = ModulePathIconState.SHOW_MODULE_PATH;
+    // transient
 	private transient ConceptChangedListener conceptChangedListener;
 	private transient JToggleButton navButton;
 	private transient ConceptNavigator navigator;
@@ -352,11 +352,17 @@ public class ConceptViewSettings extends ArenaComponentSettings {
 			} else {
 				relAssertionType = RelAssertionType.STATED;
 			}
-                        if (dataVersion >= 5) {
+            if (dataVersion >= 5) {
 				forPromotion = (boolean) in.readObject();
 			} else {
 				forPromotion = false;
 			}
+            if (dataVersion >= 6) {
+                modulePathIconPreference = (ModulePathIconState) in.readObject();
+            } else {
+                modulePathIconPreference = ModulePathIconState.SHOW_MODULE_PATH;
+            }
+
 		} else {
 			throw new IOException("Can't handle dataversion: " + objDataVersion);
 		}
@@ -367,6 +373,9 @@ public class ConceptViewSettings extends ArenaComponentSettings {
 
 	@Override
 	protected void setupSubtypes() {
+        JPanel pathModuleIconTogglePanel = newPathModuleIconTogglePanel();
+        this.getPrefRoot().add(new PreferencesNode("module, path", pathModuleIconTogglePanel));
+        
 		this.getPrefRoot().add(newDescTypeNode(DescPreference.DESC_TYPE));
 		this.getPrefRoot().add(newDescTypeNode(DescPreference.REL_TYPE));
 		this.getPrefRoot().add(newDescTypeNode(DescPreference.REL_TARGET));
@@ -414,7 +423,9 @@ public class ConceptViewSettings extends ArenaComponentSettings {
 		out.writeObject(c3Refex);
 		out.writeObject(refexName);
 		out.writeObject(relAssertionType);
-                out.writeBoolean(forPromotion);
+        out.writeBoolean(forPromotion);
+        // dataversion == 6
+        out.writeObject(modulePathIconPreference);
 	}
 
 	// ~--- get methods
@@ -941,4 +952,69 @@ public class ConceptViewSettings extends ArenaComponentSettings {
 			}
 		}
 	};
+    
+        public enum ModulePathIconState {
+
+        NOT_SHOWN("icons not shown"),
+        SHOW_ONLY_MODULE("show module icons"),
+        SHOW_ONLY_PATH("show path icons"),
+        SHOW_MODULE_PATH("show module & path icons");
+		String displayName;
+
+		// ~--- constructors
+		// -----------------------------------------------------
+		private ModulePathIconState(String displayName) {
+			this.displayName = displayName;
+		}
+
+		// ~--- methods
+		// ----------------------------------------------------------
+		@Override
+		public String toString() {
+			return displayName;
+		}
+    }
+
+    private JPanel newPathModuleIconTogglePanel() {
+        JComboBox iconStateCombo = new JComboBox(ModulePathIconState.values());
+        iconStateCombo.setSelectedItem(modulePathIconPreference);
+
+        iconStateCombo.addActionListener(new IconStateComboListener(modulePathIconPreference));
+        
+        JPanel pathModuleIconTogglePanel = new JPanel(new GridLayout(1, 1));
+        pathModuleIconTogglePanel.add(iconStateCombo);
+
+        return pathModuleIconTogglePanel;
+    }
+
+    public ModulePathIconState getModulePathIconPreference() {
+        return modulePathIconPreference;
+    }
+
+    public void setModulePathIconPreference(ModulePathIconState modulePathIconPreference) {
+        this.modulePathIconPreference = modulePathIconPreference;
+    }
+
+    private class IconStateComboListener implements ActionListener {
+
+        ModulePathIconState listenerModulePathIconPreference;
+
+        public IconStateComboListener(ModulePathIconState modulePathIconPreference) {
+            this.listenerModulePathIconPreference = modulePathIconPreference;
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            try {
+                JComboBox descTypeCombo = (JComboBox) e.getSource();
+                modulePathIconPreference = (ModulePathIconState) descTypeCombo.getSelectedItem();
+
+                getView().resetLastLayoutSequence();
+                getView().layoutConcept(getConcept());
+            } catch (IOException ex) {
+				AceLog.getAppLog().alertAndLogException(ex);
+            }
+        }
+    }
+
 }
