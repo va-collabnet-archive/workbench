@@ -26,7 +26,6 @@ import org.dwfa.cement.PrimordialId;
 
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.ComponentBdb;
-import org.ihtsdo.tk.api.ComponentBI;
 
 //~--- JDK imports ------------------------------------------------------------
 
@@ -35,6 +34,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.ReentrantLock;
 import org.ihtsdo.db.uuidmap.UuidToIntHashMap;
 
 /**
@@ -47,6 +47,7 @@ public class UuidToNidMapBdb extends ComponentBdb {
    //~--- fields --------------------------------------------------------------
 
    private IdSequence    idSequence;
+   private ReentrantLock generateLock = new ReentrantLock();
    
     UuidToIntHashMap readOnlyMap;
     ConcurrentHashMap<UUID,Integer> mutableMap;
@@ -74,6 +75,8 @@ public class UuidToNidMapBdb extends ComponentBdb {
 
 
    private int generate(UUID key) {
+        generateLock.lock();
+        try {
          int nid = getNoGen(key);
 
          // if can't find, then generate new...
@@ -88,6 +91,9 @@ public class UuidToNidMapBdb extends ComponentBdb {
          }
 
          return nid;
+        } finally {
+            generateLock.unlock();
+        }
    }
 
    @Override
