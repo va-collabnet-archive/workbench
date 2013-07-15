@@ -42,6 +42,6 @@ public class WbDescType {
      * Represents the description type: synonym.
      */
     public static ConceptSpec SYNONYM =
-            new ConceptSpec("synonym",
+            new ConceptSpec("synonym RF1",
             UUID.fromString("d6fad981-7df6-3388-94d8-238cc0465a79"));
 }

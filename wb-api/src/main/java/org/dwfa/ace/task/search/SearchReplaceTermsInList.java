@@ -69,6 +69,8 @@ import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.dto.concept.component.refex.TK_REFEX_TYPE;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
+
 
 @BeanList(specs = { @Spec(directory = "tasks/ide/listview", type = BeanType.TASK_BEAN) })
 public class SearchReplaceTermsInList extends AbstractTask {
@@ -168,12 +170,14 @@ public class SearchReplaceTermsInList extends AbstractTask {
             I_IntSet descriptionTypesToCheck = termFactory.newIntSet();
             if (searchFsn) {
                 descriptionTypesToCheck.add(FSN_UUID.getConceptNid());
+                descriptionTypesToCheck.add(SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getLenient().getNid());
             }
             if (searchPft) {
                 descriptionTypesToCheck.add(PFT_UUID.getConceptNid());
             }
             if (searchSynonym) {
                 descriptionTypesToCheck.add(SYNONYM_UUID.getConceptNid());
+                descriptionTypesToCheck.add(SnomedMetadataRf2.SYNONYM_RF2.getLenient().getNid());
             }
 
             JList conceptList = config.getBatchConceptList();
