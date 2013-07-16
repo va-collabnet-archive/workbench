@@ -61,7 +61,7 @@ public class VodbSetEditModule extends AbstractMojo {
 			I_TermFactory tf = Terms.get();
 
 			I_GetConceptData moduleConcept=editModule.getVerifiedConcept();
-			
+			System.out.println("Edit Module=" + moduleConcept.toString());
 			activeConfig.setModuleNid(moduleConcept.getNid());
 		} catch (TerminologyException e) {
 			throw new MojoExecutionException(e.getLocalizedMessage(), e);
