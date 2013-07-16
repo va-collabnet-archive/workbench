@@ -858,7 +858,10 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                     }
                 }
             } else {
-                versions.add(conceptAttributeChronicle.getVersion(viewCoordinateAllStatusTime));//CHANGE FOR DK, before merge back use viewCoordinateAllStatus
+                ConceptAttributeVersionBI version = conceptAttributeChronicle.getVersion(viewCoordinateAllStatusTime);//CHANGE FOR DK, before merge back use viewCoordinateAllStatus
+                if(version != null){
+                    versions.add(version);
+                }
             }
             boolean write = true;
             boolean writeIds = true;
@@ -944,7 +947,10 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                     }
                 }
             } else {
-                versions.add(descriptionChronicle.getVersion(viewCoordinateAllStatus));
+                DescriptionVersionBI version = descriptionChronicle.getVersion(viewCoordinateAllStatus);
+                if(version != null){
+                    versions.add(version);
+                }
             }
             boolean write = true;
             boolean writeIds = true;
@@ -1046,7 +1052,10 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                     }
                 }
             } else {
-                versions.add(relationshipChronicle.getVersion(viewCoordinateAllStatus));
+                RelationshipVersionBI version = relationshipChronicle.getVersion(viewCoordinateAllStatus);
+                if(version != null){
+                    versions.add(version);
+                }
             }
             boolean write = true;
 
@@ -1258,7 +1267,10 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                     }
                 }
             } else {
-                versions.add((RefexVersionBI) refexChronicle.getVersion(viewCoordinateAllStatus));
+                RefexVersionBI version = (RefexVersionBI) refexChronicle.getVersion(viewCoordinateAllStatus);
+                if(version != null){
+                    versions.add(version);
+                }
             }
             boolean write = true;
                 for (RefexVersionBI refex : versions) {
@@ -1321,7 +1333,10 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                     }
                 }
             } else {
-                versions.add((RefexVersionBI) refexChronicle.getVersion(viewCoordinateAllStatus));
+                RefexVersionBI version = (RefexVersionBI) refexChronicle.getVersion(viewCoordinateAllStatus);
+                if(version != null){
+                    versions.add(version);
+                }
             }
             boolean write = true;
             
@@ -1446,7 +1461,10 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                         }
                     }
                 } else {
-                    versions.add((RefexVersionBI) refexChronicle.getVersion(viewCoordinateAllStatus));
+                    RefexVersionBI version = (RefexVersionBI) refexChronicle.getVersion(viewCoordinateAllStatus);
+                    if (version != null) {
+                        versions.add(version);
+                    }
                 }
                 boolean write = true;
                 for (RefexVersionBI rv : versions) {
