@@ -331,10 +331,7 @@ public class GenerateIncrementalRf2File extends AbstractMojo {
             for(UUID uuid : moduleUuids){
                 moduleIds.add(Ts.get().getNidForUuids(uuid));
             }
-            stampsToWrite = Bdb.getSapDb().getSpecifiedSapNids(null,
-                    TimeHelper.getTimeFromString(startDate, TimeHelper.getFileDateFormat()),
-                    TimeHelper.getTimeFromString(endDate, TimeHelper.getFileDateFormat()),
-                    null, moduleIds, pathIds);
+            
             File refsetCs = new File(output.getParentFile(), "changesets");
             refsetCs.mkdir();
             if (makeRf2Refsets) {
@@ -349,6 +346,12 @@ public class GenerateIncrementalRf2File extends AbstractMojo {
                     stampsToWrite.add(stamp);
                 }
             }
+            
+            stampsToWrite = Bdb.getSapDb().getSpecifiedSapNids(null,
+                    TimeHelper.getTimeFromString(startDate, TimeHelper.getFileDateFormat()),
+                    TimeHelper.getTimeFromString(endDate, TimeHelper.getFileDateFormat()),
+                    null, moduleIds, pathIds);
+            
 
             IntSet sapsToRemove = new IntSet();
             if (previousReleaseDate != null) {
