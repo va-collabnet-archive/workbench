@@ -506,11 +506,16 @@ NEXT_WHILE:
                getLog().info("Looking at lines...");
 
                while (relPermissionLine != null) {
-                  String[] parts = relPermissionLine.split("\t");
-
-                  addRelPermission(parts[0], parts[1], parts[2], parts[3],
-                                   parts[4]);
-                  relPermissionLine = br.readLine();
+               		if (relPermissionLine.trim().length() == 0) {
+                        relPermissionLine = br.readLine();
+               			continue;
+               		}
+                  
+               		String[] parts = relPermissionLine.split("\t");
+               		addRelPermission(parts[0].trim(), parts[1].trim(), parts[2].trim(),
+                                   parts[3].trim(), parts[4].trim());
+                  
+               		relPermissionLine = br.readLine();
                }
             } catch (Exception ex) {
                throw new TaskFailedException(ex);
