@@ -256,13 +256,13 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 			// OLD IMPLEMENTATION -- result = subtypeConcept.isKindOf(parentConcept);
 			ViewCoordinate testViewCoordinate = new ViewCoordinate(config.getViewCoordinate());
 
-			Set<PositionBI> viewPositions =  new HashSet<PositionBI>();
-			for (PathBI loopPath : config.getEditingPathSet()) {
-				PositionBI pos = Terms.get().newPosition(loopPath, Long.MAX_VALUE);
-				viewPositions.add(pos);
-			}
-			PositionSet mockViewSet = new PositionSet(viewPositions);
-			testViewCoordinate.setPositionSet(mockViewSet);
+//			Set<PositionBI> viewPositions =  new HashSet<PositionBI>();
+//			for (PathBI loopPath : config.getEditingPathSet()) {
+//				PositionBI pos = Terms.get().newPosition(loopPath, Long.MAX_VALUE);
+//				viewPositions.add(pos);
+//			}
+//			PositionSet mockViewSet = new PositionSet(viewPositions);
+//			testViewCoordinate.setPositionSet(mockViewSet);
 			testViewCoordinate.setRelationshipAssertionType(RelAssertionType.STATED);
 			result =  Ts.get().isChildOf(subtypeConceptNid, parentConceptNid, testViewCoordinate);
 		}
