@@ -88,10 +88,12 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.UUID;
@@ -120,8 +122,10 @@ import javax.swing.table.TableModel;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 import org.ihtsdo.tk.api.NidSetBI;
+import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.binding.snomed.TermAux;
 import org.ihtsdo.tk.query.RefsetSpec;
 
 public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeListener {
@@ -931,6 +935,10 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
                 return false;
             }
             I_ConfigAceFrame aceConfig = Terms.get().getActiveAceFrameConfig();
+            Set<PathBI> originalPathSet = new HashSet<>();
+            originalPathSet.addAll(aceConfig.getEditingPathSet());
+            aceConfig.getEditingPathSet().clear();
+            aceConfig.addEditingPath(Ts.get().getPath(TermAux.WB_AUX_PATH.getLenient().getConceptNid()));
             String name = Ts.get().getConceptVersion(aceConfig.getViewCoordinate(),
                     memberRefset.getConceptNid()).getDescriptionPreferred().getText();
             if (name.endsWith(" refset")) {
@@ -1048,6 +1056,8 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
                 JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
                         "Refset wizard cannot be completed. " + ex.getMessage(), "",
                         JOptionPane.ERROR_MESSAGE);
+                aceConfig.getEditingPathSet().clear();
+                aceConfig.getEditingPathSet().addAll(originalPathSet);
                 return false;
             }
             I_IntSet availableIsATypes = aceConfig.getDestRelTypes();
@@ -1057,6 +1067,8 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
             }
             Terms.get().addUncommittedNoChecks(memberRefset);
             Ts.get().commit(memberRefset);
+            aceConfig.getEditingPathSet().clear();
+            aceConfig.getEditingPathSet().addAll(originalPathSet);
         } catch (Exception exception) {
             AceLog.getAppLog().alertAndLogException(exception);
         }

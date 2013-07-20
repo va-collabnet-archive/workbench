@@ -41,7 +41,7 @@ import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.cs.ChangeSetPolicy;
 import org.ihtsdo.tk.binding.snomed.Snomed;
 import org.ihtsdo.tk.binding.snomed.TermAux;
-import org.ihtsdo.tk.query.helper.release.ReleaseSpecComputer;
+import org.ihtsdo.tk.query.helper.release.ReleaseSpecProcessor;
 import org.ihtsdo.tk.spec.ConceptSpec;
 
 /**
@@ -335,12 +335,22 @@ public class GenerateIncrementalRf2File extends AbstractMojo {
             for(UUID uuid : moduleUuids){
                 moduleIds.add(Ts.get().getNidForUuids(uuid));
             }
-            stampsToWrite = Bdb.getSapDb().getSpecifiedSapNids(null,
-                    TimeHelper.getTimeFromString(startDate, TimeHelper.getFileDateFormat()),
-                    TimeHelper.getTimeFromString(endDate, TimeHelper.getFileDateFormat()),
-                    null, moduleIds, pathIds);
             File refsetCs = new File(output.getParentFile(), "changesets");
             refsetCs.mkdir();
+//          compute spec refsets
+            Integer refsetParentConceptNid = null;
+            if (refsetParentConceptSpec != null) {
+                refsetParentConceptNid = Ts.get().getNidForUuids(UUID.fromString(refsetParentConceptSpec.getUuid()));
+                vc.getPositionSet().getViewPathNidSet();
+                EditCoordinate ec = new EditCoordinate(TermAux.USER.getLenient().getConceptNid(),
+                        Ts.get().getNidForUuids(UUID.fromString(moduleConcepts[0].getUuid())),
+                        viewPathNid);
+                ReleaseSpecProcessor refsetSpecComputer = new ReleaseSpecProcessor(ec,
+                        vc, ChangeSetPolicy.OFF, refsetParentConceptNid);
+                refsetSpecComputer.process();
+                refsetSpecComputer.writeRefsetSpecMetadata(refsetCs);
+            }
+//          write RF2 specific metadata refsets  
             if (makeRf2Refsets) {
                 Rf2RefexComputer rf2RefexComputer = new Rf2RefexComputer(vc, Ts.get().getMetadataEditCoordinate(),
                         refsetCs, stampsToWrite.getAsSet());
@@ -353,6 +363,12 @@ public class GenerateIncrementalRf2File extends AbstractMojo {
                     stampsToWrite.add(stamp);
                 }
             }
+//          get stamps after refset computations
+            stampsToWrite = Bdb.getSapDb().getSpecifiedSapNids(null,
+                    TimeHelper.getTimeFromString(startDate, TimeHelper.getFileDateFormat()),
+                    TimeHelper.getTimeFromString(endDate, TimeHelper.getFileDateFormat()),
+                    null, moduleIds, pathIds);
+            
 
             IntSet sapsToRemove = new IntSet();
             if (previousReleaseDate != null) {
@@ -369,17 +385,7 @@ public class GenerateIncrementalRf2File extends AbstractMojo {
             }
             UuidSnomedMapHandler handler = new UuidSnomedMapHandler(output, output);
             handler.setNamespace(namespace);
-            Integer refsetParentConceptNid = 0;
-            if (refsetParentConceptSpec != null) {
-                refsetParentConceptNid = Ts.get().getNidForUuids(UUID.fromString(refsetParentConceptSpec.getUuid()));
-                vc.getPositionSet().getViewPathNidSet();
-                EditCoordinate ec = new EditCoordinate(TermAux.USER.getLenient().getConceptNid(),
-                        Ts.get().getNidForUuids(UUID.fromString(moduleConcepts[0].getUuid())),
-                        viewPathNid);
-                ReleaseSpecComputer refsetSpecComputer = new ReleaseSpecComputer(ec,
-                        vc, ChangeSetPolicy.OFF, refsetParentConceptNid);
-                refsetSpecComputer.process();
-            }
+            
             Integer conNumRefsetParentConceptNid = null;
             if (conceptNumberRefsetParentConceptSpec != null) {
                 conNumRefsetParentConceptNid = Ts.get().getNidForUuids(UUID.fromString(conceptNumberRefsetParentConceptSpec.getUuid()));
