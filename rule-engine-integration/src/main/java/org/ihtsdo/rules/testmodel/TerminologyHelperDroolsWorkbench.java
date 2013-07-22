@@ -260,7 +260,7 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 			ViewCoordinate testViewCoordinate = new ViewCoordinate(config.getViewCoordinate());
 
 			testViewCoordinate.setRelationshipAssertionType(RelAssertionType.STATED);
-			result =  Ts.get().isChildOf(subtypeConceptNid, parentConceptNid, testViewCoordinate);
+			result =  Ts.get().isKindOf(subtypeConceptNid, parentConceptNid, testViewCoordinate);
 		}
 		return result;
 	}
