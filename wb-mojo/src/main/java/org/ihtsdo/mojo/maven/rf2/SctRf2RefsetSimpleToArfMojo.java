@@ -81,7 +81,11 @@ public class SctRf2RefsetSimpleToArfMojo extends AbstractMojo implements Seriali
     private ConceptDescriptor pathConcept = new ConceptDescriptor("8c230474-9f11-30ce-9cad-185a96fd03a2","SNOMED Core");
     
     String uuidSourceSnomedLongStr;
-    String uuidPathStr;
+    /**
+     * Path to import concepts on. Defaults to SNOMED Core.
+     * @parameter default-value="8c230474-9f11-30ce-9cad-185a96fd03a2"
+     */
+    private String pathUuid;
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
@@ -125,9 +129,9 @@ public class SctRf2RefsetSimpleToArfMojo extends AbstractMojo implements Seriali
             BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(
                     outDir + "concept_simple_rf2.refset"), "UTF-8"));
             getLog().info("::: SIMPLE REFSET FILE: " + outDir + "concept_simple_rf2.refset");
-            filesIn = Rf2File.getFiles(wDir, targetSubDir, inputDir, "der2_Refset_Simple", ".txt");
+            filesIn = Rf2File.getFiles(wDir, targetSubDir, inputDir, "der2_cRefset", ".txt");
             for (Rf2File rf2File : filesIn) {
-                Rf2_RefsetSimpleRecord[] members = Rf2_RefsetSimpleRecord.parseRefset(rf2File);
+                Rf2_RefsetSimpleRecord[] members = Rf2_RefsetSimpleRecord.parseRefset(rf2File, pathUuid);
                 for (Rf2_RefsetSimpleRecord m : members) {
                 	m.setPath(pathStr);
                     m.writeArf(bw);

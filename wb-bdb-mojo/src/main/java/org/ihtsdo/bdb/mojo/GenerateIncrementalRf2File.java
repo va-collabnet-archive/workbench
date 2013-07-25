@@ -335,8 +335,8 @@ public class GenerateIncrementalRf2File extends AbstractMojo {
             for(UUID uuid : moduleUuids){
                 moduleIds.add(Ts.get().getNidForUuids(uuid));
             }
-            File refsetCs = new File(output.getParentFile(), "changesets");
-            refsetCs.mkdir();
+            File metaDir = new File(output.getParentFile(), "refset-econcept");
+            metaDir.mkdir();
 //          compute spec refsets
             Integer refsetParentConceptNid = null;
             if (refsetParentConceptSpec != null) {
@@ -348,8 +348,10 @@ public class GenerateIncrementalRf2File extends AbstractMojo {
                 ReleaseSpecProcessor refsetSpecComputer = new ReleaseSpecProcessor(ec,
                         vc, ChangeSetPolicy.OFF, refsetParentConceptNid);
                 refsetSpecComputer.process();
-                refsetSpecComputer.writeRefsetSpecMetadata(refsetCs);
+                refsetSpecComputer.writeRefsetSpecMetadata(metaDir);
             }
+            File refsetCs = new File(output.getParentFile(), "changesets");
+            refsetCs.mkdir();
 //          write RF2 specific metadata refsets  
             if (makeRf2Refsets) {
                 Rf2RefexComputer rf2RefexComputer = new Rf2RefexComputer(vc, Ts.get().getMetadataEditCoordinate(),

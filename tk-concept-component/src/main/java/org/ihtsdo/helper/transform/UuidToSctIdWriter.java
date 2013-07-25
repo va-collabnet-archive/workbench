@@ -88,8 +88,7 @@ public class UuidToSctIdWriter {
     private COUNTRY_CODE countryCode;
     private Date effectiveDate;
     private File content;
-    private ConceptSpec uuidIdScheme = new ConceptSpec("SNOMED CT universally unique identifier (core metadata concept)",
-            UUID.fromString("680f3f6c-7a2a-365d-b527-8c9a96dd1a94"));
+    private String uuidIdScheme = "900000000000002006";
     private ViewCoordinate vc;
     private ArrayList<Long> idFileList = new ArrayList<>();
     private HashSet<Long> idFileSet = new HashSet<>();
@@ -939,9 +938,7 @@ private void processIdentifiers(String line, Writer writer) throws IOException {
 
                 switch (field) {
                     case IDENTIFIER_SCHEME_ID:
-                        String schemeId = parts[Rf2File.IdentifiersFileFields.IDENTIFIER_SCHEME_ID.ordinal()];
-                        String schemeSctId = handler.getWithGeneration(UUID.fromString(schemeId), SctIdGenerator.TYPE.CONCEPT).toString();
-                        writer.write(schemeSctId + field.seperator);
+                        writer.write(uuidIdScheme + field.seperator);
 
                         break;
 

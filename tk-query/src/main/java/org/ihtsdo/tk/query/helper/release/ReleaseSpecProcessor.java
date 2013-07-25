@@ -21,25 +21,21 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.tk.Ts;
-import org.ihtsdo.tk.api.ConceptFetcherBI;
 import org.ihtsdo.tk.api.ContradictionException;
-import org.ihtsdo.tk.api.NidBitSetBI;
-import org.ihtsdo.tk.api.ProcessUnfetchedConceptDataBI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.cs.ChangeSetPolicy;
-import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
-import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 import org.ihtsdo.tk.binding.snomed.TermAux;
 import org.ihtsdo.tk.dto.concept.TkConcept;
+import org.ihtsdo.tk.dto.concept.component.refex.TkRefexAbstractMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_member.TkRefexMember;
 import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationship;
 import org.ihtsdo.tk.query.ComputeFromSpec;
 import org.ihtsdo.tk.query.RefsetComputer;
@@ -92,8 +88,7 @@ public class ReleaseSpecProcessor {
     }
     
     public void writeRefsetSpecMetadata(File outputDirectory) throws IOException, TerminologyException, ContradictionException{
-        String fileName = Ts.get().getConceptForNid(editCoordinate.getAuthorNid()).toUserString() + "#refsetMetadata#"
-                + UUID.randomUUID().toString() + ".eccs";
+        String fileName = "refsetMetadata.jbin";
         File eConceptsFile = new File(outputDirectory, fileName);
         eConceptsFile.getParentFile().mkdirs();
         BufferedOutputStream eConceptsBos = new BufferedOutputStream(new FileOutputStream(eConceptsFile));
@@ -115,7 +110,9 @@ public class ReleaseSpecProcessor {
                 
                 for(ConceptChronicleBI c : metadataConcepts){
                     TkConcept eC = new TkConcept(c);
-                    eConceptDOS.writeLong(System.currentTimeMillis());
+                    for(TkRefexAbstractMember r: eC.getRefsetMembers()){
+                        r.setPathUuid(TermAux.WB_AUX_PATH.getLenient().getPrimUuid());
+                    }
                     eC.writeExternal(eConceptDOS);
                 }
 //              write supporting metadata relationships on refset concept
@@ -130,7 +127,6 @@ public class ReleaseSpecProcessor {
                     }
                 }
                 refsetEConcept.setRelationships(relsToKeep);
-                eConceptDOS.writeLong(System.currentTimeMillis());
                 refsetEConcept.writeExternal(eConceptDOS);
             }
         }

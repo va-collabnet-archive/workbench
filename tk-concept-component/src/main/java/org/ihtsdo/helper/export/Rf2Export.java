@@ -942,6 +942,9 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                 //if not previously released or latest version remove
                 DescriptionVersionBI latest = descriptionChronicle.getVersion(viewCoordinateAllStatus);
                 for(DescriptionVersionBI d : descriptionChronicle.getVersions()){
+                    if(latest == null){
+                        System.out.println("DEBUG");
+                    }
                     if(!sameCycleStampNids.contains(d.getStampNid()) || d.getStampNid() == latest.getStampNid()){
                         versions.add(d);
                     }
