@@ -18,8 +18,10 @@ package org.dwfa.ace.file;
 
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.util.List;
 
 import org.dwfa.tapi.TerminologyException;
@@ -50,7 +52,7 @@ public class GenericFileWriter<T> {
      * @throws IOException
      */
     public void open(File outputFile, boolean append) throws IOException {
-        writer = new BufferedWriter(new FileWriter(outputFile, append));
+       writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outputFile, append), "UTF-8"));
     }
 
     /**
