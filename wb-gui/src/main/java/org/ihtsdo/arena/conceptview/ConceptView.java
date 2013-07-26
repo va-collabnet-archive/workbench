@@ -395,6 +395,7 @@ public class ConceptView extends JPanel {
                 globals.put("actions", actions);
                 globals.put("vc", config.getViewCoordinate());
                 globals.put("config", config);
+                globals.put("cvSettings", getSettings());
 
                 View viewType;
 
