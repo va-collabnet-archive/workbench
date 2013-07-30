@@ -190,7 +190,8 @@ public class DragPanelExtension extends DragPanelComponentVersion<RefexVersionBI
       }
 
       if (RefexNidVersionBI.class.isAssignableFrom(getRefexV().getClass())) {
-         int                cnid = ((RefexNidVersionBI) getRefexV()).getNid1();
+          RefexNidVersionBI refex = (RefexNidVersionBI) getRefexV();
+         int                cnid = refex.getNid1();
          TermComponentLabel ext  = getLabel(cnid, canDrop, getSettings().getC1Refex());
 
          ext.setFrozen(canDrop);
@@ -200,7 +201,7 @@ public class DragPanelExtension extends DragPanelComponentVersion<RefexVersionBI
          gbc.gridx++;
          classFound = true;
          ext.addPropertyChangeListener("termComponent",
-              new PropertyChangeManagerRefex<RefexNidAnalogBI>((RefexNidAnalogBI) getRefexV()) {
+              new PropertyChangeManagerRefex<RefexNidAnalogBI>((RefexNidAnalogBI)refex) {
          @Override
          protected void changeProperty(I_GetConceptData newValue) {
             try {
