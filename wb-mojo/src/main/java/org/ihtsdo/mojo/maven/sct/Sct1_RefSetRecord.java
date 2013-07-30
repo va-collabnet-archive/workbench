@@ -14,7 +14,7 @@ public class Sct1_RefSetRecord implements Comparable<Sct1_RefSetRecord>, Seriali
 
     enum ValueType {
 
-        BOOLEAN, CONCEPT, INTEGER, STRING
+        BOOLEAN, CONCEPT, INTEGER, STRING, C_FLOAT
     };
     private static final long serialVersionUID = 1L;
     long conUuidMsb; // ENVELOP CONCEPTID (eConcept to which this concept belongs)
@@ -30,6 +30,7 @@ public class Sct1_RefSetRecord implements Comparable<Sct1_RefSetRecord>, Seriali
     long valueConUuidMsb;
     long valueConUuidLsb;
     int valueInt;
+    float valueFloat;
     String valueString;
     ValueType valueType;
     int status; // CONCEPTSTATUS
@@ -57,6 +58,7 @@ public class Sct1_RefSetRecord implements Comparable<Sct1_RefSetRecord>, Seriali
         this.valueConUuidMsb = Long.MAX_VALUE;
         this.valueConUuidLsb = Long.MAX_VALUE;
         this.valueInt = Integer.MAX_VALUE;
+        this.valueFloat = Float.MAX_VALUE;
         this.valueString = null;
         this.valueType = ValueType.BOOLEAN; // BOOLEAN
 
@@ -86,6 +88,7 @@ public class Sct1_RefSetRecord implements Comparable<Sct1_RefSetRecord>, Seriali
         this.valueConUuidMsb = vConcept.getMostSignificantBits();
         this.valueConUuidLsb = vConcept.getLeastSignificantBits();
         this.valueInt = Integer.MAX_VALUE;
+        this.valueFloat = Float.MAX_VALUE;
         this.valueString = null;
         this.valueType = ValueType.CONCEPT; // CONCEPT
 
@@ -115,8 +118,39 @@ public class Sct1_RefSetRecord implements Comparable<Sct1_RefSetRecord>, Seriali
         this.valueConUuidMsb = Long.MAX_VALUE;
         this.valueConUuidLsb = Long.MAX_VALUE;
         this.valueInt = vInteger;
+        this.valueFloat = Float.MAX_VALUE;
         this.valueString = null;
         this.valueType = ValueType.INTEGER; // INTEGER
+
+        this.status = status;
+        this.revTime = zRevTime;
+        this.pathIdx = zPathIdx;
+        this.authorIdx = zAuthIdx;
+        this.moduleIdx = zModuleIdx;
+    }
+    
+    // FLOAT
+    public Sct1_RefSetRecord(UUID refsetUuid, UUID memberUuid, UUID componentUuid, int status,
+            long zRevTime, int zPathIdx, int zAuthIdx, int zModuleIdx, UUID vConcept,
+            float vFloat) {
+        super();
+        this.conUuidMsb = Long.MAX_VALUE;
+        this.conUuidLsb = Long.MAX_VALUE;
+        this.referencedComponentUuidMsb = componentUuid.getMostSignificantBits();
+        this.referencedComponentUuidLsb = componentUuid.getLeastSignificantBits();
+        this.componentType = ComponentType.UNKNOWN;
+        this.refsetUuidMsb = refsetUuid.getMostSignificantBits();
+        this.refsetUuidLsb = refsetUuid.getLeastSignificantBits();
+        this.refsetMemberUuidMsb = memberUuid.getMostSignificantBits();
+        this.refsetMemberUuidLsb = memberUuid.getLeastSignificantBits();
+
+        this.valueBoolean = false;
+        this.valueConUuidMsb = vConcept.getMostSignificantBits();
+        this.valueConUuidLsb = vConcept.getLeastSignificantBits();
+        this.valueInt = Integer.MAX_VALUE;
+        this.valueFloat = vFloat;
+        this.valueString = null;
+        this.valueType = ValueType.C_FLOAT; // FLOAT
 
         this.status = status;
         this.revTime = zRevTime;
@@ -144,6 +178,7 @@ public class Sct1_RefSetRecord implements Comparable<Sct1_RefSetRecord>, Seriali
         this.valueConUuidMsb = Long.MAX_VALUE;
         this.valueConUuidLsb = Long.MAX_VALUE;
         this.valueInt = Integer.MAX_VALUE;
+        this.valueFloat = Float.MAX_VALUE;
         this.valueString = vString;
         this.valueType = ValueType.STRING; // STRING
 
@@ -240,6 +275,8 @@ public class Sct1_RefSetRecord implements Comparable<Sct1_RefSetRecord>, Seriali
             sb.append("\r\n::: value boolean ").append(this.valueBoolean);
         } else if (this.valueType == Sct1_RefSetRecord.ValueType.INTEGER) {
             sb.append("\r\n::: value integer ").append(this.valueInt);
+        } else if (this.valueType == Sct1_RefSetRecord.ValueType.C_FLOAT) {
+            sb.append("\r\n::: value float ").append(this.valueFloat);
         } else if (this.valueType == Sct1_RefSetRecord.ValueType.CONCEPT) {
             sb.append("\r\n::: value concept ");
             sb.append(new UUID(this.valueConUuidMsb, this.valueConUuidLsb));

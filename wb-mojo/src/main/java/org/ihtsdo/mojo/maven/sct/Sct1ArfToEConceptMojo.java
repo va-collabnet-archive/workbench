@@ -61,6 +61,8 @@ import org.ihtsdo.etypes.EIdentifierLong;
 import org.ihtsdo.etypes.EIdentifierString;
 import org.ihtsdo.etypes.ERefsetBooleanMember;
 import org.ihtsdo.etypes.ERefsetBooleanRevision;
+import org.ihtsdo.etypes.ERefsetCidFloatMember;
+import org.ihtsdo.etypes.ERefsetCidFloatRevision;
 import org.ihtsdo.etypes.ERefsetCidMember;
 import org.ihtsdo.etypes.ERefsetCidRevision;
 import org.ihtsdo.etypes.ERefsetIntMember;
@@ -80,6 +82,7 @@ import org.ihtsdo.tk.dto.concept.component.refex.type_boolean.TkRefexBooleanRevi
 import org.ihtsdo.tk.dto.concept.component.refex.type_int.TkRefexIntRevision;
 import org.ihtsdo.tk.dto.concept.component.refex.type_string.TkRefsetStrRevision;
 import org.ihtsdo.tk.dto.concept.component.refex.type_uuid.TkRefexUuidRevision;
+import org.ihtsdo.tk.dto.concept.component.refex.type_uuid_float.TkRefexUuidFloatRevision;
 import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationship;
 import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationshipRevision;
 
@@ -195,6 +198,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
     private int countRefsetMaster;
     private int statRsBoolFromArf;
     private int statRsIntFromArf;
+    private int statRsFloatFromArf;
     private int statRsConFromArf;
     private int statRsStrFromArf;
     private static final int IS_LESS = -1;
@@ -917,6 +921,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
         countRefsetMaster = 0;
         statRsBoolFromArf = 0;
         statRsIntFromArf = 0;
+        statRsFloatFromArf = 0;
         statRsConFromArf = 0;
         statRsStrFromArf = 0;
 
@@ -1237,6 +1242,13 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
             processArfRsIntFiles(wDir, listOfRsIntDirs, oosRefSet);
             listOfRsIntDirs = null;
             System.gc();
+            
+            // PROCESS REFSET FLOAT FILES
+            List<List<ARFFile>> listOfRsFloatDirs = getArfFiles(wDir, subDir, arfDirs, "float",
+                    ".refset");
+            processArfRsFloatFiles(wDir, listOfRsFloatDirs, oosRefSet);
+            listOfRsFloatDirs = null;
+            System.gc();
 
             // PROCESS REFSET STRING FILES
             List<List<ARFFile>> listOfRsStrDirs = getArfFiles(wDir, subDir, arfDirs, "string",
@@ -1247,7 +1259,8 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
 
             getLog().info(
                     "\r\nstatRsBoolFromArf= " + statRsBoolFromArf + "\r\nstatRsIntFromArf= "
-                    + statRsIntFromArf + "\r\nstatRsConFromArf= " + statRsConFromArf
+                    + statRsIntFromArf + "\r\nstatRsFloatFromArf= "
+                    + statRsFloatFromArf+ "\r\nstatRsConFromArf= " + statRsConFromArf
                     + "\r\nstatRsStrFromArf= " + statRsStrFromArf);
 
         } catch (MojoFailureException e1) {
@@ -1741,6 +1754,72 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
                     vInt);
 
             statRsIntFromArf++;
+            oos.writeUnshared(tmpRsRec);
+        }
+
+        br.close();
+    }
+    private void processArfRsFloatFiles(String wDir, List<List<ARFFile>> listOfDirs,
+            ObjectOutputStream oos)
+            throws IOException, MojoFailureException {
+        for (List<ARFFile> laf : listOfDirs) {
+            for (ARFFile f : laf) {
+                parseArfRsFloatFile(f.file, oos);
+            }
+        }
+    }
+
+    private void parseArfRsFloatFile(File f, ObjectOutputStream oos) throws IOException, MojoFailureException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(f),
+                "UTF-8"));
+
+        int REFSEST_UUID = 0;
+        int MEMBER_UUID = 1;
+        int STATUS_UUID = 2;
+        int REFERENCED_COMPONENT_UUID = 3;
+        int EFFECTIVE_DATE = 4; // yyyy-MM-dd HH:mm:ss
+        int PATH_UUID = 5;
+        int CONCEPT_VALUE = 6;
+        int EXT_VALUE = 7;
+        int AUTHOR_UUID = 8; // Author UUID
+        int MODULE_UUID = 9; // Module UUID
+
+        while (br.ready()) {
+            String[] line = br.readLine().split(TAB_CHARACTER);
+
+            // REFSEST_UUID = 0;
+            UUID uuidRefset = UUID.fromString(line[REFSEST_UUID]);
+            // MEMBER_UUID = 1;
+            UUID uuidMember = UUID.fromString(line[MEMBER_UUID]);
+            // STATUS_UUID = 2;
+            int status = lookupZStatusUuidIdx(line[STATUS_UUID]);
+            // REFERENCED_COMPONENT_UUID = 3;
+            UUID uuidComponent = UUID.fromString(line[REFERENCED_COMPONENT_UUID]);
+            // EFFECTIVE_DATE = 4; // yyyy-MM-dd HH:mm:ss
+            long revTime = convertDateStrToTime(line[EFFECTIVE_DATE]);
+            // PATH_UUID = 5;
+            int pathIdx = lookupZPathIdx(line[PATH_UUID]);
+            // CONCEPT_VALUE = 6
+            UUID vConcept = UUID.fromString(line[CONCEPT_VALUE]);
+            // CONCEPT_EXT_VALUE_UUID = 7;
+            float vFloat = Float.valueOf(line[EXT_VALUE]);
+            // AUTHOR_UUID = 8;
+            int authorIdx = -1;
+            if (line.length > AUTHOR_UUID) {
+                authorIdx = lookupZAuthorIdx(line[AUTHOR_UUID]);
+            }
+            // MODULE_UUID = 9;
+            int moduleIdx = -1;
+            if (line.length > MODULE_UUID) {
+                moduleIdx = lookupZModuleIdx(line[MODULE_UUID]);
+            }
+
+            Sct1_RefSetRecord tmpRsRec = new Sct1_RefSetRecord(uuidRefset, uuidMember,
+                    uuidComponent, status,
+                    revTime, pathIdx, authorIdx, moduleIdx,
+                    vConcept, vFloat);
+
+            statRsFloatFromArf++;
             oos.writeUnshared(tmpRsRec);
         }
 
@@ -4125,7 +4204,100 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
 
                     // :NYI: tmp.setAdditionalIdComponents(additionalIdComponents);
                     listErm.add(tmp);
-                } else {
+                } else if (r.valueType == Sct1_RefSetRecord.ValueType.C_FLOAT) {
+                    ERefsetCidFloatMember tmp = new ERefsetCidFloatMember();
+                    tmp.setRefsetUuid(new UUID(r.refsetUuidMsb, r.refsetUuidLsb));
+                    tmp.setPrimordialComponentUuid(new UUID(r.refsetMemberUuidMsb,
+                            r.refsetMemberUuidLsb));
+                    tmp.setComponentUuid(new UUID(r.referencedComponentUuidMsb,
+                            r.referencedComponentUuidLsb));
+                    tmp.setStatusUuid(zStatusUuidArray[r.status]);
+                    tmp.setTime(r.revTime);
+                    tmp.setPathUuid(zPathArray[r.pathIdx]);
+                    tmp.setUuid1(new UUID(r.valueConUuidMsb, r.valueConUuidLsb));
+                    tmp.setFloat1(r.valueFloat);
+                    if (r.authorIdx != -1) {
+                        tmp.setAuthorUuid(zAuthorUuidArray[r.authorIdx]);
+                    } else {
+                        tmp.setAuthorUuid(uuidUser);
+                    }
+                    if (r.moduleIdx == MODULE_DEFAULT_IDX) {
+                        tmp.setModuleUuid(uuidModule);
+                    } else {
+                        tmp.setModuleUuid(zModuleArray[r.moduleIdx]);
+                    }
+
+                    if (rsmIdx < rsmMax) { // CHECK REVISIONS
+                        lastRefsetMemberUuidMsb = r.refsetMemberUuidMsb;
+                        lastRefsetMemberUuidLsb = r.refsetMemberUuidLsb;
+                        r = rsByRsList.get(rsmIdx++);
+                        if (r.refsetMemberUuidMsb == lastRefsetMemberUuidMsb
+                                && r.refsetMemberUuidLsb == lastRefsetMemberUuidLsb) {
+                            // FIRST REVISION
+                            List<TkRefexUuidFloatRevision> revisionList = new ArrayList<>();
+                            ERefsetCidFloatRevision revision = new ERefsetCidFloatRevision();
+                            revision.setUuid1(new UUID(r.valueConUuidMsb, r.valueConUuidLsb));
+                            revision.setFloat1(r.valueFloat);
+                            revision.setStatusUuid(zStatusUuidArray[r.status]);
+                            revision.setPathUuid(zPathArray[r.pathIdx]);
+                            revision.setTime(r.revTime);
+                            if (r.authorIdx != -1) {
+                                revision.setAuthorUuid(zAuthorUuidArray[r.authorIdx]);
+                            } else {
+                                revision.setAuthorUuid(uuidUser);
+                            }
+                            if (r.moduleIdx == MODULE_DEFAULT_IDX) {
+                                revision.setModuleUuid(uuidModule);
+                            } else {
+                                revision.setModuleUuid(zModuleArray[r.moduleIdx]);
+                            }
+                            revisionList.add(revision);
+
+                            boolean checkForMoreVersions = true;
+                            do {
+                                // SET UP NEXT MEMBER
+                                if (rsmIdx < rsmMax) {
+                                    lastRefsetMemberUuidMsb = r.refsetMemberUuidMsb;
+                                    lastRefsetMemberUuidLsb = r.refsetMemberUuidLsb;
+                                    r = rsByRsList.get(rsmIdx++);
+                                    if (r.refsetMemberUuidMsb == lastRefsetMemberUuidMsb
+                                            && r.refsetMemberUuidLsb == lastRefsetMemberUuidLsb) {
+                                        revision = new ERefsetCidFloatRevision();
+                                        revision.setUuid1(new UUID(r.valueConUuidMsb, r.valueConUuidLsb));
+                                        revision.setFloat1(r.valueFloat);
+                                        revision.setStatusUuid(zStatusUuidArray[r.status]);
+                                        revision.setPathUuid(zPathArray[r.pathIdx]);
+                                        revision.setTime(r.revTime);
+                                        if (r.authorIdx != -1) {
+                                            revision.setAuthorUuid(zAuthorUuidArray[r.authorIdx]);
+                                        } else {
+                                            revision.setAuthorUuid(uuidUser);
+                                        }
+                                        if (r.moduleIdx == MODULE_DEFAULT_IDX) {
+                                            revision.setModuleUuid(uuidModule);
+                                        } else {
+                                            revision.setModuleUuid(zModuleArray[r.moduleIdx]);
+                                        }
+                                        revisionList.add(revision);
+                                    } else {
+                                        checkForMoreVersions = false;
+                                    }
+                                } else {
+                                    checkForMoreVersions = false;
+                                    hasMembersToProcess = false;
+                                }
+
+                            } while (checkForMoreVersions);
+
+                            tmp.setRevisions(revisionList); // ADD REVISIONS
+                        }
+                    } else {
+                        hasMembersToProcess = false;
+                    }
+
+                    // :NYI: tmp.setAdditionalIdComponents(additionalIdComponents);
+                    listErm.add(tmp);
+                }else {
                     throw new UnsupportedOperationException("Cannot handle case");
                 }
 
