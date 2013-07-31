@@ -78,6 +78,7 @@ import org.dwfa.ace.search.DescSearchResultsTablePopupListener;
 import org.dwfa.ace.search.I_MakeCriterionPanel;
 import org.dwfa.ace.search.QueryBean;
 import org.dwfa.ace.table.JTableWithDragImage;
+import org.dwfa.ace.task.RegenerateWorkflowIndex;
 import org.dwfa.ace.task.search.I_TestSearchResults;
 import org.dwfa.ace.tree.ExpandPathToNodeStateListener;
 import org.dwfa.ace.tree.JTreeWithDragImage;
@@ -660,7 +661,9 @@ public class WorkflowHistorySearchPanel extends JPanel implements I_MakeCriterio
     }
 
     private void startSearch() {
-        if (updateExtraCriterion()) {
+        if (RegenerateWorkflowIndex.indexGenerating.get()) {
+            JOptionPane.showMessageDialog(null, "Please wait until workflow index has regenerated.", "Please wait.", JOptionPane.OK_OPTION);
+        }else if (updateExtraCriterion()) {
 		    setShowProgress(true);
 		    ACE.threadPool.execute(new SearchWfHxWorker(this, model, config, this.workflowInProgress.isSelected(), this.workflowCompleted.isSelected()));
         }

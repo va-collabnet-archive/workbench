@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.Collection;
+import java.util.concurrent.atomic.AtomicBoolean;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.bpa.process.Condition;
@@ -37,6 +38,7 @@ public class RegenerateWorkflowIndex extends AbstractTask{
     // Serialization Properties
     private static final long serialVersionUID = 1;
     private static final int dataVersion = 1;
+    public static AtomicBoolean indexGenerating = new AtomicBoolean(false);
     
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
@@ -65,6 +67,7 @@ public class RegenerateWorkflowIndex extends AbstractTask{
                         @Override
                         public void run() {
                             try {
+                                indexGenerating.getAndSet(true);
                                 System.out.println("*** Starting workflow history lucene index regeneration.");
                                 File wfLuceneDirectory = new File("workflow/lucene");
                                 if (wfLuceneDirectory.exists()) {
@@ -75,6 +78,7 @@ public class RegenerateWorkflowIndex extends AbstractTask{
                                 }
                                 I_ConfigAceFrame config = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
                                 Ts.get().regenerateWfHxLuceneIndex(config.getViewCoordinate());
+                                indexGenerating.getAndSet(false);
                                 System.out.println("*** Finished workflow history lucene index regeneration.");
                             } catch (IOException ex) {
                                 AceLog.getAppLog().alertAndLogException(ex);
