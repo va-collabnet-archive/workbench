@@ -847,11 +847,14 @@ public class BdbCommitManager {
 
                         aceInstance.getDataCheckListScroller();
                         aceInstance.getUncommittedListModel().clear();
-                        
-                        for (Collection<AlertToDataConstraintFailure> alerts : dataCheckMap.values()) {
-                            aceInstance.getUncommittedListModel().addAll(alerts);
+                        if(uncommittedCNids.cardinality() > 0){
+                            for (I_GetConceptData key : dataCheckMap.keySet()) {
+                                if(key.isUncommitted()){
+                                    aceInstance.getUncommittedListModel().addAll(dataCheckMap.get(key));
+                                }
+                            }
                         }
-
+                        
                         if (aceInstance.getUncommittedListModel().size() > 0) {
                             for (int i = 0; i < aceInstance.getLeftTabs().getTabCount(); i++) {
                                 if (aceInstance.getLeftTabs().getTitleAt(i).equals(ACE.DATA_CHECK_TAB_LABEL)) {
