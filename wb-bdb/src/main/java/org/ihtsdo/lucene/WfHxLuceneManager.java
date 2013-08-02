@@ -32,7 +32,7 @@ public class WfHxLuceneManager extends LuceneManager {
 
 	private static HashSet<WorkflowHistoryJavaBean> beansToAdd;
 
-	public static void writeToLuceneNoLock(Collection<WorkflowHistoryJavaBean> beans, Map<UUID, WorkflowLuceneSearchResult> lastBeanInWfMap, ViewCoordinate viewCoord) throws IOException, TerminologyException {
+	public static int writeToLuceneNoLock(Collection<WorkflowHistoryJavaBean> beans, Map<UUID, WorkflowLuceneSearchResult> lastBeanInWfMap, ViewCoordinate viewCoord) throws IOException, TerminologyException {
 		int recordsImported = 0;
 		Set<UUID> processedIds = new HashSet<UUID>();
         WorkflowHistoryRefsetSearcher searcher = new WorkflowHistoryRefsetSearcher();
@@ -105,6 +105,7 @@ public class WfHxLuceneManager extends LuceneManager {
 
 		wfHxSearcher = null;
 		beans.clear();
+                return recordsImported;
     }
 
 	public static SearchResult searchAllWorkflowCriterion(List<I_TestSearchResults> checkList, boolean wfInProgress, boolean completedWf) throws Exception {
@@ -143,12 +144,14 @@ public class WfHxLuceneManager extends LuceneManager {
 		beansToAdd.add(latestWorkflow);
 	}
 
-	public static void writeUnwrittenWorkflows() throws IOException, TerminologyException {
+	public static int writeUnwrittenWorkflows() throws IOException, TerminologyException {
 		init(LuceneSearchType.WORKFLOW_HISTORY);
 
 	    if (LuceneManager.indexExists(LuceneSearchType.WORKFLOW_HISTORY) != false) {
-		writeToLuceneNoLock(beansToAdd, null, null);
+		int records = writeToLuceneNoLock(beansToAdd, null, null);
 		beansToAdd.clear();
+                return records;
 	    }
+            return 0;
 	} 
 }

@@ -45,6 +45,8 @@ public abstract class ChangeSetImporter implements ActionListener {
 
     private boolean continueImport = true;
     private static boolean commitAfterImport = false;
+    private static int conceptCount = 0;
+    private static int wfConceptCount = 0;
 
     @Override
     public void actionPerformed(ActionEvent arg0) {
@@ -60,6 +62,8 @@ public abstract class ChangeSetImporter implements ActionListener {
     public void importAllChangeSets(Logger logger, String validators, String rootDirStr, boolean validateChangeSets,
             String suffix, String prefix) throws TaskFailedException {
         try {
+            conceptCount = 0;
+            wfConceptCount = 0;
             long start = System.currentTimeMillis();
             I_TermFactory tf = Terms.get();
             I_ShowActivity activity = tf.newActivityPanel(true, tf.getActiveAceFrameConfig(),
@@ -142,7 +146,7 @@ public abstract class ChangeSetImporter implements ActionListener {
     }
 
     private void createWfHxLuceneIndex(I_ShowActivity activity, List<File> changeSetFiles, 
-            Set<ConceptChronicleBI> indexedAnnotations) throws IOException, ClassNotFoundException {
+            Set<ConceptChronicleBI> indexedAnnotations) throws IOException, ClassNotFoundException, Exception {
         if (changeSetFiles.isEmpty()) {
             if (AceLog.getEditLog().isLoggable(Level.INFO)) {
                 AceLog.getEditLog().info("Workflow history lucene index already updated with all changes");
@@ -174,11 +178,16 @@ public abstract class ChangeSetImporter implements ActionListener {
             }
 
             // Send first change set file again to signify that done importing, and time to process Lucene Index
+            // reset wf concept count due to second procesessing
+            wfConceptCount = 0;
             if (firstFile != null) {
                 TreeSet<I_ReadChangeSet> finalizeWfHxLuceneIndexReaderSet = getSortedReaderSet();
                 finalizeWfHxLuceneIndexReaderSet.add(firstFile);
 
                 readNext(finalizeWfHxLuceneIndexReaderSet, indexedAnnotations);
+            }
+                if(conceptCount != wfConceptCount){
+                    Ts.get().regenerateWfHxLuceneIndex(Terms.get().getActiveAceFrameConfig().getViewCoordinate());
             }
 
             if (AceLog.getEditLog().isLoggable(Level.INFO)) {
@@ -272,6 +281,11 @@ public abstract class ChangeSetImporter implements ActionListener {
                     + " readers left)\n");
             }
             // don't add back since it is complete.
+            if(first.isForWorkflow()){
+                wfConceptCount = wfConceptCount + first.getConceptCount();
+            }else{
+                conceptCount = conceptCount + first.getConceptCount();
+            }
         } else {
             if (AceLog.getEditLog().isLoggable(Level.FINE)) {
                 if (first.getChangeSetFile() != null) {

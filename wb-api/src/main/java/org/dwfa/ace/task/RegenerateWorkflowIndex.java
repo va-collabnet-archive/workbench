@@ -67,7 +67,8 @@ public class RegenerateWorkflowIndex extends AbstractTask{
                         @Override
                         public void run() {
                             try {
-                                indexGenerating.getAndSet(true);
+                                if(indexGenerating.get() == false){
+                                    indexGenerating.getAndSet(true);
                                 System.out.println("*** Starting workflow history lucene index regeneration.");
                                 File wfLuceneDirectory = new File("workflow/lucene");
                                 if (wfLuceneDirectory.exists()) {
@@ -80,6 +81,7 @@ public class RegenerateWorkflowIndex extends AbstractTask{
                                 Ts.get().regenerateWfHxLuceneIndex(config.getViewCoordinate());
                                 indexGenerating.getAndSet(false);
                                 System.out.println("*** Finished workflow history lucene index regeneration.");
+                                }
                             } catch (IOException ex) {
                                 AceLog.getAppLog().alertAndLogException(ex);
                             } catch (Exception ex) {

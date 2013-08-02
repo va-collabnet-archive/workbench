@@ -126,7 +126,7 @@ public class WfRefsetChangeSetReader implements I_ReadChangeSet {
             importWfRefsetMembers(annotationIndexes);
 
             // Update the WfHx Refset based on wfMembersToCommit as well
-            updateWfHxLuceneIndex();
+            conceptCount = updateWfHxLuceneIndex();
 
             // Clear for future imports
             unresolvedAnnotations.clear();
@@ -191,18 +191,22 @@ public class WfRefsetChangeSetReader implements I_ReadChangeSet {
 
     }
 
-    private void updateWfHxLuceneIndex() {
+    private int updateWfHxLuceneIndex() {
         if (wfMembersToCommit.size() > 0) {
             try {
                 Runnable luceneWriter = WfHxLuceneWriterAccessor.addWfHxLuceneMembersFromEConcept(wfMembersToCommit);
-
+                        
                 if (luceneWriter != null) {
                     luceneWriter.run();
+//                   wait until done to get count
+                    return WfHxLuceneWriterAccessor.importCount;
+                    
                 }
             } catch (InterruptedException e) {
                 AceLog.getAppLog().log(Level.WARNING, "Failed to generate WfHx Lucene Index on Change Set Import");
             }
         }
+        return 0;
     }
 
     private void importWfRefsetMembers(Set<ConceptChronicleBI> annotationIndexes) {
@@ -448,5 +452,15 @@ public class WfRefsetChangeSetReader implements I_ReadChangeSet {
         //retSet.add(new WfPostLastReleaseFilter("releaseDateFilter.txt"));
 
         return retSet;
+    }
+    
+    @Override
+    public int getConceptCount() {
+        return conceptCount;
+    }
+    
+    @Override
+    public boolean isForWorkflow(){
+        return true;
     }
 }
