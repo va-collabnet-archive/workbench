@@ -187,7 +187,9 @@ public abstract class ChangeSetImporter implements ActionListener {
                 readNext(finalizeWfHxLuceneIndexReaderSet, indexedAnnotations);
             }
                 if(conceptCount != wfConceptCount){
-                    Ts.get().regenerateWfHxLuceneIndex(Terms.get().getActiveAceFrameConfig().getViewCoordinate());
+                    if(Terms.get().getActiveAceFrameConfig() != null){
+                        Ts.get().regenerateWfHxLuceneIndex(Terms.get().getActiveAceFrameConfig().getViewCoordinate());
+                    }
             }
 
             if (AceLog.getEditLog().isLoggable(Level.INFO)) {
