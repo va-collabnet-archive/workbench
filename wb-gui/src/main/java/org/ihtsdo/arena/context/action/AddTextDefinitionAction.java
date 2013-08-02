@@ -43,36 +43,35 @@ public class AddTextDefinitionAction extends AbstractAction {
         try {
             TerminologyBuilderBI builder = Ts.get().getTerminologyBuilder(config.getEditCoordinate(),
                     config.getViewCoordinate());
-            DescriptionCAB descBp = new DescriptionCAB(desc.getConceptNid(), 
-                    SnomedMetadataRf2.DEFINITION_RF2.getLenient().getConceptNid(),
-                    LANG_CODE.getLangCode(desc.getLang()),
-                    "Clone of " + desc.getText(),
-                    true);
-            descBp.setComponentUuidNoRecompute(UUID.randomUUID());
-            DescriptionChronicleBI dc = builder.construct(descBp);
-            RefexCAB refexBp = null;
-            for(RefexVersionBI refex : desc.getAnnotationsActive(config.getViewCoordinate())){
-                if(refex.getRefexNid() == SnomedMetadataRfx.getGB_DIALECT_REFEX_NID()){
-                    refexBp = new RefexCAB(TK_REFEX_TYPE.CID,
-                    dc.getNid(), 
-                    SnomedMetadataRfx.getGB_DIALECT_REFEX_NID());
-                    refexBp.put(RefexProperty.CNID1, SnomedMetadataRfx.getDESC_PREFERRED_NID());
-                    RefexChronicleBI<?> newRefex = builder.construct(refexBp);
-                }else if(refex.getRefexNid() == SnomedMetadataRfx.getUS_DIALECT_REFEX_NID()){
-                    refexBp = new RefexCAB(TK_REFEX_TYPE.CID,
-                    dc.getNid(), 
-                    SnomedMetadataRfx.getUS_DIALECT_REFEX_NID());
-                    refexBp.put(RefexProperty.CNID1, SnomedMetadataRfx.getDESC_PREFERRED_NID());
-                    RefexChronicleBI<?> newRefex = builder.construct(refexBp);
+            if (desc.getLang().equals(LANG_CODE.EN.getFormatedLanguageCode())) { // need to add additional languages here when supported
+                DescriptionCAB descBp = new DescriptionCAB(desc.getConceptNid(),
+                        SnomedMetadataRf2.DEFINITION_RF2.getLenient().getConceptNid(),
+                        LANG_CODE.getLangCode(desc.getLang()),
+                        "Clone of " + desc.getText(),
+                        true);
+                descBp.setComponentUuidNoRecompute(UUID.randomUUID());
+                DescriptionChronicleBI dc = builder.construct(descBp);
+                RefexCAB refexBp = null;
+                for (RefexVersionBI refex : desc.getAnnotationsActive(config.getViewCoordinate())) {
+                    if (refex.getRefexNid() == SnomedMetadataRfx.getGB_DIALECT_REFEX_NID()) {
+                        refexBp = new RefexCAB(TK_REFEX_TYPE.CID,
+                                dc.getNid(),
+                                SnomedMetadataRfx.getGB_DIALECT_REFEX_NID());
+                        refexBp.put(RefexProperty.CNID1, SnomedMetadataRfx.getDESC_PREFERRED_NID());
+                        RefexChronicleBI<?> newRefex = builder.construct(refexBp);
+                    } else if (refex.getRefexNid() == SnomedMetadataRfx.getUS_DIALECT_REFEX_NID()) {
+                        refexBp = new RefexCAB(TK_REFEX_TYPE.CID,
+                                dc.getNid(),
+                                SnomedMetadataRfx.getUS_DIALECT_REFEX_NID());
+                        refexBp.put(RefexProperty.CNID1, SnomedMetadataRfx.getDESC_PREFERRED_NID());
+                        RefexChronicleBI<?> newRefex = builder.construct(refexBp);
+                    }
                 }
-            }
-            if(refexBp == null){
+                ConceptVersionBI cv = Ts.get().getConceptVersion(config.getViewCoordinate(), desc.getConceptNid());
+                Ts.get().addUncommitted(cv);
+            }else{
                 throw new UnsupportedDialectOrLanguage("Language refset not supported. Currently supporting EN-US and EN-GB ");
             }
-            
-            ConceptVersionBI cv = Ts.get().getConceptVersion(config.getViewCoordinate(), desc.getConceptNid());
-            Ts.get().addUncommitted(cv);
-
         } catch (IOException e1) {
             AceLog.getAppLog().alertAndLogException(e1);
         } catch (InvalidCAB e1) {
