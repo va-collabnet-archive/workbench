@@ -17,6 +17,7 @@ import org.dwfa.ace.api.Terms;
 import org.ihtsdo.tk.api.cs.ChangeSetPolicy;
 import org.ihtsdo.tk.api.cs.ChangeSetWriterThreading;
 import org.dwfa.ace.log.AceLog;
+import static org.dwfa.ace.task.RegenerateWorkflowIndex.indexGenerating;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.SNOMED;
 import org.dwfa.tapi.PathNotExistsException;
@@ -855,16 +856,21 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
     
     @Override
     public boolean regenerateWfHxLuceneIndex(ViewCoordinate viewCoordinate) throws Exception{
-        if (LuceneManager.indexExists(LuceneManager.LuceneSearchType.WORKFLOW_HISTORY) == false) {
+        if(indexGenerating.get() == false){
+            indexGenerating.getAndSet(true);
+            if (LuceneManager.indexExists(LuceneManager.LuceneSearchType.WORKFLOW_HISTORY) == false) {
                 File wfLuceneDirectory = new File("workflow/lucene");
 
                 LuceneManager.setLuceneRootDir(wfLuceneDirectory, LuceneManager.LuceneSearchType.WORKFLOW_HISTORY);
                 if (LuceneManager.indexExists(LuceneManager.LuceneSearchType.WORKFLOW_HISTORY) == false) {
                     WfHxIndexGenerator.setSourceInputFile(null);
                     LuceneManager.createLuceneIndex(LuceneManager.LuceneSearchType.WORKFLOW_HISTORY, viewCoordinate);
+                    indexGenerating.getAndSet(false);
                     return true;
                 }
+            }
         }
+        
         return false;
     }
     
