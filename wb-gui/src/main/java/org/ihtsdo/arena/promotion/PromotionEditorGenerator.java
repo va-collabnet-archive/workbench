@@ -178,8 +178,13 @@ public class PromotionEditorGenerator implements I_InitComponentMenus{
                         @Override
                         public void run() {
                             try {
+                                PositionBI targetPos = Ts.get().newPosition(targetPath,
+                                        TimeHelper.getTimeFromString("latest", TimeHelper.getFileDateFormat()));
+                                I_ConfigAceFrame targetConfig = new PromotionSourceConfig(newFrame, newFrameConfig, targetPos);
+                                targetConfig.getEditingPathSet().clear();
+                                targetConfig.getEditingPathSet().add(targetPath);
                                 SnorocketExTask classifier = new SnorocketExTask();
-                                classifier.runClassifier(newFrameConfig);
+                                classifier.runClassifier(targetConfig);
                                 classifier.commitClassification();
                                 
                                 PositionBI sourcePos = Ts.get().newPosition(sourcePath,
