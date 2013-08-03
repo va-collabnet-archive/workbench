@@ -116,7 +116,7 @@ public class ExportAnnotatedBeans extends AbstractMojo implements ExceptionListe
     /**
      * @parameter
      */
-    private String[] forbiddenRoots = { "org.dwfa.cement", "org.dwfa.tapi", "org.dwfa.bpa.util" };
+    private String[] forbiddenRoots = { "org.dwfa.cement", "org.dwfa.tapi", "org.dwfa.bpa.util", "org.ihtsdo.lucene" };
 
     /**
      * @parameter

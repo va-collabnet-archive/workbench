@@ -29,7 +29,7 @@ import javax.swing.JLabel;
 import javax.swing.JTextField;
 
 import org.apache.lucene.document.Document;
-import org.apache.lucene.queryParser.QueryParser;
+import org.apache.lucene.queryparser.classic.QueryParser;
 import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_IntSet;

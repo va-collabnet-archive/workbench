@@ -21,7 +21,6 @@ package org.dwfa.ace.api;
 
 //~--- non-JDK imports --------------------------------------------------------
 
-import org.apache.lucene.queryParser.ParseException;
 
 import org.drools.KnowledgeBase;
 
@@ -31,10 +30,8 @@ import org.dwfa.ace.api.cs.I_ReadChangeSet;
 import org.dwfa.ace.api.cs.I_WriteChangeSet;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
-import org.dwfa.ace.refset.spec.I_HelpSpecRefset;
 import org.dwfa.ace.task.commit.AlertToDataConstraintFailure;
 import org.dwfa.ace.task.search.I_TestSearchResults;
-import org.dwfa.bpa.process.Condition;
 import org.dwfa.tapi.AllowDataCheckSuppression;
 import org.dwfa.tapi.I_ConceptualizeLocally;
 import org.dwfa.tapi.SuppressDataChecks;
@@ -50,6 +47,7 @@ import org.ihtsdo.tk.api.changeset.ChangeSetGeneratorBI;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.ParseException;
 
 import java.util.Collection;
 import java.util.HashMap;

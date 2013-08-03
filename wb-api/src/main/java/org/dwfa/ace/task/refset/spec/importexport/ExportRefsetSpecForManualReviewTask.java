@@ -22,11 +22,11 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.text.ParseException;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
-import org.apache.lucene.queryParser.ParseException;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_DescriptionVersioned;
@@ -41,7 +41,6 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
-import org.dwfa.ace.refset.spec.I_HelpSpecRefset;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.ace.task.WorkerAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
@@ -61,7 +60,6 @@ import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.query.RefsetSpec;
-import org.ihtsdo.tk.query.helper.RefsetHelper;
 
 /**
  * Exports the refset currently in the refset spec panel to the specified file,

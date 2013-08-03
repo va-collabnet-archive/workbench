@@ -36,8 +36,7 @@ import javax.swing.SwingWorker;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import org.apache.lucene.document.Document;
-import org.apache.lucene.queryParser.ParseException;
-import org.apache.lucene.queryParser.QueryParser;
+import org.apache.lucene.queryparser.classic.QueryParser;
 
 import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_ConfigAceFrame;
@@ -1130,9 +1129,9 @@ public class RedoConcept extends PreviousNextOrCancel {
                     AceLog.getAppLog().alertAndLogException(ex);
                 } catch (TerminologyException ex) {
                     AceLog.getAppLog().alertAndLogException(ex);
-                } catch (ParseException ex) {
-                    AceLog.getAppLog().alertAndLogException(ex);
-                }
+                } catch (java.text.ParseException ex) {
+                    Logger.getLogger(RedoConcept.class.getName()).log(Level.SEVERE, null, ex);
+                } 
             }
         }
     }

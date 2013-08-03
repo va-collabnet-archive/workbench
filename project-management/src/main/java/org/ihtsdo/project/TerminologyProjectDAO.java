@@ -41,8 +41,6 @@ import javax.swing.JOptionPane;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.lucene.document.Document;
-import org.apache.lucene.queryParser.ParseException;
-import org.apache.lucene.queryParser.QueryParser;
 import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionPart;
@@ -124,6 +122,8 @@ import org.ihtsdo.tk.workflow.api.WfFilterBI;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.json.JettisonMappedXmlDriver;
+import java.util.logging.Logger;
+import org.apache.lucene.queryparser.classic.QueryParser;
 import org.ihtsdo.tk.query.helper.RefsetHelper;
 
 /**
@@ -3633,6 +3633,7 @@ public class TerminologyProjectDAO {
 			I_ConfigAceFrame config = tf.getActiveAceFrameConfig();
 			String escapedDescription = QueryParser.escape(description);
 			SearchResult results = tf.doLuceneSearch(escapedDescription);
+                    
 			for (int i = 0; i < results.topDocs.scoreDocs.length; i++) {
 				try {
 					Document doc = results.searcher.doc(results.topDocs.scoreDocs[i].doc);
@@ -3651,11 +3652,11 @@ public class TerminologyProjectDAO {
 			}
 		} catch (IOException e) {
 			AceLog.getAppLog().alertAndLogException(e);
-		} catch (ParseException e) {
-			AceLog.getAppLog().alertAndLogException(e);
 		} catch (TerminologyException e) {
 			AceLog.getAppLog().alertAndLogException(e);
-		}
+		} catch (java.text.ParseException ex) {
+                        Logger.getLogger(TerminologyProjectDAO.class.getName()).log(Level.SEVERE, null, ex);
+                    }
 		return result;
 	}
 

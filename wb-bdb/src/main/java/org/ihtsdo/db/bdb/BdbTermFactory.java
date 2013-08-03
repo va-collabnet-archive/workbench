@@ -26,10 +26,8 @@ import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
 import javax.swing.TransferHandler;
 
-import org.apache.lucene.analysis.WhitespaceAnalyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
-import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.Query;
 import org.drools.KnowledgeBase;
 import org.dwfa.ace.ACE;
@@ -52,7 +50,6 @@ import org.dwfa.ace.api.I_ImageVersioned;
 import org.dwfa.ace.api.I_ImplementTermFactory;
 import org.dwfa.ace.api.I_IntList;
 import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_ProcessConcepts;
 import org.dwfa.ace.api.I_ProcessDescriptions;
 import org.dwfa.ace.api.I_ProcessExtByRef;
@@ -153,6 +150,10 @@ import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.dto.concept.component.TkRevision;
 
 import com.sleepycat.je.DatabaseException;
+import java.util.logging.Logger;
+import org.apache.lucene.analysis.core.WhitespaceAnalyzer;
+import org.apache.lucene.queryparser.classic.QueryParser;
+import org.apache.lucene.util.Version;
 import org.ihtsdo.db.change.ChangeNotifier;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
@@ -415,11 +416,15 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
 
     @Override
     public SearchResult doLuceneSearch(String query)
-            throws IOException, org.apache.lucene.queryParser.ParseException {
-        Query q = new QueryParser(LuceneManager.version, "desc",
-                new StandardAnalyzer(LuceneManager.version)).parse(query);
+            throws IOException, ParseException {
+        try {
+            Query q = new QueryParser(LuceneManager.version, "desc",
+                    new StandardAnalyzer(LuceneManager.version)).parse(query);
 
-        return LuceneManager.search(q, LuceneSearchType.DESCRIPTION);
+            return LuceneManager.search(q, LuceneSearchType.DESCRIPTION);
+        } catch (org.apache.lucene.queryparser.classic.ParseException ex) {
+            throw new IOException(ex);
+        }
     }
 
     @Override
@@ -1071,7 +1076,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     @Override
     public void searchConcepts(I_TrackContinuation tracker, I_RepresentIdSet matches, CountDownLatch latch,
             List<I_TestSearchResults> checkList, I_ConfigAceFrame config)
-            throws DatabaseException, IOException, org.apache.lucene.queryParser.ParseException {
+            throws DatabaseException, IOException, ParseException {
         ConceptSearcher searcher = new ConceptSearcher(latch, tracker, checkList, config, matches);
 
         try {
@@ -1118,7 +1123,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
                 stringUpdater.setProgressInfo("Starting WhitespaceAnalyzer lucene query...");
                 AceLog.getAppLog().info(
                         "StandardAnalyzer query returned no results. Now trying WhitespaceAnalyzer query");
-                q = new QueryParser(LuceneManager.version, "desc", new WhitespaceAnalyzer()).parse(query);
+                q = new QueryParser(LuceneManager.version, "desc", new WhitespaceAnalyzer(Version.LUCENE_43)).parse(query);
                 result = LuceneManager.search(q, LuceneSearchType.DESCRIPTION);
             }
 
@@ -1256,7 +1261,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
             Set<String> conceptList = new HashSet<String>();            
             for (int i = 0; i < result.topDocs.totalHits; i++) {
                 Document doc = result.searcher.doc(result.topDocs.scoreDocs[i].doc);
-                conceptList.add(doc.getFieldable("conceptId").stringValue());
+                conceptList.add(doc.getField("conceptId").stringValue());
             }
 
             wfHxUpdater.setHits(conceptList.size());
@@ -1593,21 +1598,25 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
 
     @Override
     public Set<I_GetConceptData> getConcept(String conceptIdStr)
-            throws TerminologyException, org.apache.lucene.queryParser.ParseException, IOException {
-        Set<I_GetConceptData> matchingConcepts = new HashSet<I_GetConceptData>();
-        Query q =
-                new QueryParser(LuceneManager.version, "desc",
-                new StandardAnalyzer(LuceneManager.version)).parse(conceptIdStr);
-        SearchResult result = LuceneManager.search(q, LuceneSearchType.DESCRIPTION);
+            throws TerminologyException, IOException {
+        try {
+            Set<I_GetConceptData> matchingConcepts = new HashSet<I_GetConceptData>();
+            Query q =
+                    new QueryParser(LuceneManager.version, "desc",
+                    new StandardAnalyzer(LuceneManager.version)).parse(conceptIdStr);
+            SearchResult result = LuceneManager.search(q, LuceneSearchType.DESCRIPTION);
 
-        for (int i = 0; i < result.topDocs.totalHits; i++) {
-            Document doc = result.searcher.doc(result.topDocs.scoreDocs[i].doc);
-            int cnid = Integer.parseInt(doc.get("cnid"));
+            for (int i = 0; i < result.topDocs.totalHits; i++) {
+                Document doc = result.searcher.doc(result.topDocs.scoreDocs[i].doc);
+                int cnid = Integer.parseInt(doc.get("cnid"));
 
-            matchingConcepts.add(Concept.get(cnid));
+                matchingConcepts.add(Concept.get(cnid));
+            }
+
+            return matchingConcepts;
+        } catch (org.apache.lucene.queryparser.classic.ParseException ex) {
+            throw new IOException(ex);
         }
-
-        return matchingConcepts;
     }
     
     @Override
@@ -1627,8 +1636,8 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
 
                 matchingConcepts.add(Concept.get(cnid));
             }
-        } catch (org.apache.lucene.queryParser.ParseException ex) {
-            throw new ParseException(q.toString(), 0);
+        } catch (org.apache.lucene.queryparser.classic.ParseException ex) {
+            Logger.getLogger(BdbTermFactory.class.getName()).log(Level.SEVERE, null, ex);
         }
         
         return matchingConcepts;
@@ -1641,7 +1650,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
 
     @Override
     public I_GetConceptData getConcept(String conceptId, int sourceId)
-            throws TerminologyException, org.apache.lucene.queryParser.ParseException, IOException {
+            throws TerminologyException, ParseException, IOException {
         throw new UnsupportedOperationException();
     }
 

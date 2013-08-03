@@ -66,7 +66,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
@@ -77,6 +76,7 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
+import org.apache.lucene.index.IndexNotFoundException;
 import org.ihtsdo.arena.conceptview.ConceptTemplates;
 import org.ihtsdo.tk.api.conceptattribute.ConceptAttributeVersionBI;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
@@ -1743,6 +1743,8 @@ public class BdbCommitManager {
                 }
 
                 LuceneManager.writeToLucene(toIndex, LuceneSearchType.DESCRIPTION);
+            } catch (IndexNotFoundException e) {
+                AceLog.getAppLog().warning("Index not yet created: " + e.getLocalizedMessage());
             } catch (Exception e) {
                 AceLog.getAppLog().alertAndLogException(e);
             }

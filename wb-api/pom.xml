@@ -87,6 +87,11 @@
             <version>${org.apache.lucene.version}</version>
         </dependency>
         <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-queryparser</artifactId>
+            <version>${org.apache.lucene.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.tmatesoft.svnkit</groupId>
             <artifactId>svnkit-javahl</artifactId>
         </dependency>

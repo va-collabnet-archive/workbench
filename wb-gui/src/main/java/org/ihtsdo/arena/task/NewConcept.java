@@ -15,6 +15,7 @@ import java.awt.event.ItemListener;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationTargetException;
+import java.text.ParseException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
@@ -35,8 +36,7 @@ import javax.swing.SwingWorker;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import org.apache.lucene.document.Document;
-import org.apache.lucene.queryParser.ParseException;
-import org.apache.lucene.queryParser.QueryParser;
+import org.apache.lucene.queryparser.classic.QueryParser;
 
 import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_ConfigAceFrame;
@@ -1148,7 +1148,7 @@ public class NewConcept extends PreviousNextOrCancel {
                 } catch (TerminologyException ex) {
                     AceLog.getAppLog().alertAndLogException(ex);
                 } catch (ParseException ex) {
-                    AceLog.getAppLog().alertAndLogException(ex);
+                   AceLog.getAppLog().alertAndLogException(ex);
                 }
             }
         }

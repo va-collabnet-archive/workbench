@@ -39,6 +39,16 @@
             <artifactId>commons-lang3</artifactId>
         </dependency>
         <dependency>
+            <artifactId>lucene-analyzers-common</artifactId>
+            <groupId>org.apache.lucene</groupId>
+            <version>${org.apache.lucene.version}</version>
+        </dependency>
+        <dependency>
+            <artifactId>lucene-queryparser</artifactId>
+            <groupId>org.apache.lucene</groupId>
+            <version>${org.apache.lucene.version}</version>
+        </dependency>
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <type>jar</type>

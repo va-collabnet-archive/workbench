@@ -28,13 +28,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 
 import org.apache.axis.encoding.Base64;
 import org.apache.lucene.document.Document;
-import org.apache.lucene.queryParser.ParseException;
 import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_ConfigAceDb;
 import org.dwfa.ace.api.I_ConfigAceFrame;
@@ -43,9 +44,7 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HelpRefsets;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_TermFactory;
-import org.dwfa.ace.api.RefsetPropertyMap;
 import org.dwfa.ace.api.Terms;
-import org.dwfa.ace.api.RefsetPropertyMap.REFSET_PROPERTY;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartStr;
@@ -53,11 +52,9 @@ import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 import org.ihtsdo.issue.IssueRepoRegistration;
 import org.ihtsdo.issue.issuerepository.IssueRepository;
 import org.ihtsdo.lucene.SearchResult;
-import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.Precedence;
@@ -626,11 +623,11 @@ private static boolean isConceptDuplicate(String descriptionText) {
 		}
 	} catch (IOException e) {
 		e.printStackTrace();
-	} catch (ParseException e) {
-		e.printStackTrace();
 	} catch (TerminologyException e) {
 		e.printStackTrace();
-	}
+	}   catch (java.text.ParseException ex) {
+                Logger.getLogger(IssueRepositoryDAO.class.getName()).log(Level.SEVERE, null, ex);
+            }
 	return result;
 }
 

@@ -13,15 +13,11 @@
 package org.dwfa.ace.refset;
 
 //~--- non-JDK imports --------------------------------------------------------
-import org.apache.lucene.document.Document;
-import org.apache.lucene.queryParser.QueryParser;
 
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.TermComponentLabel;
 import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_ConfigAceFrame;
-import org.dwfa.ace.api.I_DescriptionPart;
-import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.api.I_IntSet;
@@ -51,7 +47,6 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.LogWithAlerts;
 
 import org.ihtsdo.etypes.EConcept;
-import org.ihtsdo.lucene.SearchResult;
 import org.ihtsdo.taxonomy.TaxonomyHelper;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
@@ -121,7 +116,6 @@ import javax.swing.event.TreeSelectionListener;
 import javax.swing.table.TableModel;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
-import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;

@@ -10,7 +10,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
-import org.apache.lucene.queryParser.QueryParser;
+import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.Query;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.Terms;
@@ -653,7 +653,7 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
                 scoredResults.add(scr);
             }
             return scoredResults;
-        } catch (org.apache.lucene.queryParser.ParseException ex) {
+        } catch (ParseException ex) {
             throw new ParseException(query, 0);
         }
     }
@@ -675,7 +675,7 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
 
                 matchingConcepts.add(Concept.get(cnid));
             }
-        } catch (org.apache.lucene.queryParser.ParseException ex) {
+        } catch (org.apache.lucene.queryparser.classic.ParseException ex) {
             throw new ParseException(q.toString(), 0);
         }
         
