@@ -340,7 +340,7 @@ public class ConceptSpec implements SpecBI {
         boolean found = false;
         for (DescriptionChronicleBI desc : conceptChronicle.getDescriptions()) {
             for (DescriptionVersionBI descv : desc.getVersions()) {
-                if (descv.getText().equals(description)) {
+                if (descv.getText().compareToIgnoreCase(description) == 0) {
                     found = true;
                     break;
                 }

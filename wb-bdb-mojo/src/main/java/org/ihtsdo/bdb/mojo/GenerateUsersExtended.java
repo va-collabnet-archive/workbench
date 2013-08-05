@@ -165,6 +165,13 @@ public class GenerateUsersExtended extends AbstractMojo {
     * @parameter expression="${project.build.directory}/users/users.txt"
     */
    private File usersFile;
+   
+   /**
+    * recreateUserProfiles will delete and replace exiting '*.wb' user profiles
+    * 
+    * @parameter expression=false
+    */
+   private Boolean recreateUserProfiles;
 
    /**
     *
@@ -220,6 +227,10 @@ public class GenerateUsersExtended extends AbstractMojo {
    private File                   userConfigFile;
    private String                 langSortPref = "rf2";
    private String                 langPrefOrder;
+   private String                 longLabelDescPreferenceString;
+   private String                 shortLabelDescPreferenceString;
+   private String                 treeDescPreferenceString;
+   private String                 tableDescPreferenceString;
    private String                 statedInferredPolicy = "is";
    private ConceptSpec            defaultStatus;
    private ConceptSpec            defaultDescType;
@@ -1132,58 +1143,100 @@ NEXT_WHILE:
       }
 
       // set up label display prefs
-      I_IntList treeDescPrefList = activeConfig.getTreeDescPreferenceList();
+      I_IntList treeDescPreferenceList = activeConfig.getTreeDescPreferenceList();
 
-      treeDescPrefList.add(SnomedMetadataRf2.SYNONYM_RF2.getLenient().getNid());
-      treeDescPrefList.add(
+      treeDescPreferenceList.add(SnomedMetadataRf2.SYNONYM_RF2.getLenient().getNid());
+      treeDescPreferenceList.add(
           SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getLenient().getNid());
-      treeDescPrefList
+      treeDescPreferenceList
          .add(SnomedMetadataRf1.PREFERRED_TERM_DESCRIPTION_TYPE_RF1.getLenient()
             .getNid());
-      treeDescPrefList
+      treeDescPreferenceList
          .add(SnomedMetadataRf1.FULLY_SPECIFIED_DESCRIPTION_TYPE.getLenient()
             .getNid());
+       // override defaults if non-empty string is present
+       if (treeDescPreferenceString != null) {
+           String[] treeDescPreferenceArray = treeDescPreferenceString.split(";");
+           if (treeDescPreferenceArray.length > 0) {
+               treeDescPreferenceList.clear();
+               for (String labelPref : treeDescPreferenceArray) {
+                   ConceptSpec label = getConceptSpecFromPrefs(labelPref.trim());
+                   treeDescPreferenceList.add(label.getLenient().getNid());
+               }
+           }
+       }
 
-      I_IntList shortLabelDescPrefList =
-         activeConfig.getShortLabelDescPreferenceList();
+       I_IntList shortLabelDescPreferenceList =
+               activeConfig.getShortLabelDescPreferenceList();
+       shortLabelDescPreferenceList.add(
+               SnomedMetadataRf2.SYNONYM_RF2.getLenient().getNid());
+       shortLabelDescPreferenceList.add(
+               SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getLenient().getNid());
+       shortLabelDescPreferenceList
+               .add(SnomedMetadataRf1.PREFERRED_TERM_DESCRIPTION_TYPE_RF1.getLenient()
+               .getNid());
+       shortLabelDescPreferenceList
+               .add(SnomedMetadataRf1.FULLY_SPECIFIED_DESCRIPTION_TYPE.getLenient()
+               .getNid());
+       // override defaults if non-empty string is present
+       if (shortLabelDescPreferenceString != null) {
+           String[] shortLabelDescPreferenceArray = shortLabelDescPreferenceString.split(";");
+           if (shortLabelDescPreferenceArray.length > 0) {
+               shortLabelDescPreferenceList.clear();
+               for (String labelPref : shortLabelDescPreferenceArray) {
+                   ConceptSpec label = getConceptSpecFromPrefs(labelPref.trim());
+                   shortLabelDescPreferenceList.add(label.getLenient().getNid());
+               }
+           }
+       }
 
-      shortLabelDescPrefList.add(
+       I_IntList longLabelDescPreferenceList =
+               activeConfig.getLongLabelDescPreferenceList();
+       longLabelDescPreferenceList.add(
+               SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getLenient().getNid());
+       longLabelDescPreferenceList.add(
+               SnomedMetadataRf2.SYNONYM_RF2.getLenient().getNid());
+       longLabelDescPreferenceList
+               .add(SnomedMetadataRf1.FULLY_SPECIFIED_DESCRIPTION_TYPE.getLenient()
+               .getNid());
+       longLabelDescPreferenceList
+               .add(SnomedMetadataRf1.PREFERRED_TERM_DESCRIPTION_TYPE_RF1.getLenient()
+               .getNid());
+       // override defaults if non-empty string is present
+       if (longLabelDescPreferenceString != null) {
+           String[] longLabelDescPreferenceArray = longLabelDescPreferenceString.split(";");
+           if (longLabelDescPreferenceArray.length > 0) {
+               longLabelDescPreferenceList.clear();
+               for (String labelPref : longLabelDescPreferenceArray) {
+                   ConceptSpec label = getConceptSpecFromPrefs(labelPref.trim());
+                   longLabelDescPreferenceList.add(label.getLenient().getNid());
+               }
+           }
+       }
+
+      I_IntList tableDescPreferenceList = activeConfig.getTableDescPreferenceList();
+
+      tableDescPreferenceList
+         .add(SnomedMetadataRf1.PREFERRED_TERM_DESCRIPTION_TYPE_RF1.getLenient()
+            .getNid());
+      tableDescPreferenceList
+         .add(SnomedMetadataRf1.FULLY_SPECIFIED_DESCRIPTION_TYPE.getLenient()
+            .getNid());
+      tableDescPreferenceList.add(
           SnomedMetadataRf2.SYNONYM_RF2.getLenient().getNid());
-      shortLabelDescPrefList.add(
+      tableDescPreferenceList.add(
           SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getLenient().getNid());
-      shortLabelDescPrefList
-         .add(SnomedMetadataRf1.PREFERRED_TERM_DESCRIPTION_TYPE_RF1.getLenient()
-            .getNid());
-      shortLabelDescPrefList
-         .add(SnomedMetadataRf1.FULLY_SPECIFIED_DESCRIPTION_TYPE.getLenient()
-            .getNid());
-
-      I_IntList longLabelDescPrefList =
-         activeConfig.getLongLabelDescPreferenceList();
-
-      longLabelDescPrefList.add(
-          SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getLenient().getNid());
-      longLabelDescPrefList.add(
-          SnomedMetadataRf2.SYNONYM_RF2.getLenient().getNid());
-      longLabelDescPrefList
-         .add(SnomedMetadataRf1.FULLY_SPECIFIED_DESCRIPTION_TYPE.getLenient()
-            .getNid());
-      longLabelDescPrefList
-         .add(SnomedMetadataRf1.PREFERRED_TERM_DESCRIPTION_TYPE_RF1.getLenient()
-            .getNid());
-
-      I_IntList tableDescPrefList = activeConfig.getTableDescPreferenceList();
-
-      tableDescPrefList
-         .add(SnomedMetadataRf1.PREFERRED_TERM_DESCRIPTION_TYPE_RF1.getLenient()
-            .getNid());
-      tableDescPrefList
-         .add(SnomedMetadataRf1.FULLY_SPECIFIED_DESCRIPTION_TYPE.getLenient()
-            .getNid());
-      tableDescPrefList.add(
-          SnomedMetadataRf2.SYNONYM_RF2.getLenient().getNid());
-      tableDescPrefList.add(
-          SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getLenient().getNid());
+       // override defaults if non-empty string is present
+       if (tableDescPreferenceString != null) {
+           String[] tableDescPreferenceArray = tableDescPreferenceString.split(";");
+           if (tableDescPreferenceArray.length > 0) {
+               tableDescPreferenceList.clear();
+               for (String labelPref : tableDescPreferenceArray) {
+                   ConceptSpec label = getConceptSpecFromPrefs(labelPref.trim());
+                   tableDescPreferenceList.add(label.getLenient().getNid());
+               }
+           }
+       }
 
       // set up paths
           PathBI viewPath =
@@ -1432,6 +1485,10 @@ NEXT_WHILE:
          configProps.load(configReader);
          langSortPref         = configProps.getProperty("langSortPref");
          langPrefOrder        = configProps.getProperty("langPrefOrder");
+         longLabelDescPreferenceString  = configProps.getProperty("longLabelDescPreferenceString");
+         shortLabelDescPreferenceString  = configProps.getProperty("shortLabelDescPreferenceString");
+         treeDescPreferenceString  = configProps.getProperty("treeDescPreferenceString");
+         tableDescPreferenceString  = configProps.getProperty("tableDescPreferenceString");
          statedInferredPolicy = configProps.getProperty("statedInferredPolicy");
          defaultStatus        =
             getConceptSpecFromPrefs(configProps.getProperty("defaultStatus"));
@@ -1566,7 +1623,13 @@ NEXT_WHILE:
                                  PROFILE_ROOT + File.separator + username);
          File userProfile = new File(userDir, username + ".wb");
 
-         create = !userProfile.exists();
+         create = false;
+         if (!userProfile.exists()) {
+             create = true;
+         } else if (userProfile.exists() && recreateUserProfiles) {
+             userProfile.delete();
+             create = true;
+         }
 
          if (create) {
             createdUsers = true;
@@ -1926,77 +1989,77 @@ NEXT_WHILE:
       }
 
       // set up label display prefs
-      I_IntList treeDescPrefList       = userConfig.getTreeDescPreferenceList();
-      I_IntList shortLabelDescPrefList =
+      I_IntList treeDescPreferenceList       = userConfig.getTreeDescPreferenceList();
+      I_IntList shortLabelDescPreferenceList =
          userConfig.getShortLabelDescPreferenceList();
-      I_IntList longLabelDescPrefList =
+      I_IntList longLabelDescPreferenceList =
          userConfig.getLongLabelDescPreferenceList();
-      I_IntList tableDescPrefList = userConfig.getTableDescPreferenceList();
+      I_IntList tableDescPreferenceList = userConfig.getTableDescPreferenceList();
 
       if (displayRf2) {
-         treeDescPrefList.add(
+         treeDescPreferenceList.add(
              SnomedMetadataRf2.SYNONYM_RF2.getLenient().getNid());
-         treeDescPrefList.add(
+         treeDescPreferenceList.add(
              SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getLenient().getNid());
-         treeDescPrefList
+         treeDescPreferenceList
             .add(SnomedMetadataRf1.PREFERRED_TERM_DESCRIPTION_TYPE_RF1
                .getLenient().getNid());
-         treeDescPrefList
+         treeDescPreferenceList
             .add(SnomedMetadataRf1.FULLY_SPECIFIED_DESCRIPTION_TYPE.getLenient()
                .getNid());
-         shortLabelDescPrefList.add(
+         shortLabelDescPreferenceList.add(
              SnomedMetadataRf2.SYNONYM_RF2.getLenient().getNid());
-         shortLabelDescPrefList.add(
+         shortLabelDescPreferenceList.add(
              SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getLenient().getNid());
-         shortLabelDescPrefList
+         shortLabelDescPreferenceList
             .add(SnomedMetadataRf1.PREFERRED_TERM_DESCRIPTION_TYPE_RF1
                .getLenient().getNid());
-         shortLabelDescPrefList
+         shortLabelDescPreferenceList
             .add(SnomedMetadataRf1.FULLY_SPECIFIED_DESCRIPTION_TYPE.getLenient()
                .getNid());
-         longLabelDescPrefList.add(
+         longLabelDescPreferenceList.add(
              SnomedMetadataRf2.SYNONYM_RF2.getLenient().getNid());
-         longLabelDescPrefList.add(
+         longLabelDescPreferenceList.add(
              SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getLenient().getNid());
-         longLabelDescPrefList
+         longLabelDescPreferenceList
             .add(SnomedMetadataRf1.FULLY_SPECIFIED_DESCRIPTION_TYPE.getLenient()
                .getNid());
-         longLabelDescPrefList
+         longLabelDescPreferenceList
             .add(SnomedMetadataRf1.PREFERRED_TERM_DESCRIPTION_TYPE_RF1
                .getLenient().getNid());
-         tableDescPrefList.add(
+         tableDescPreferenceList.add(
              SnomedMetadataRf2.SYNONYM_RF2.getLenient().getNid());
-         tableDescPrefList.add(
+         tableDescPreferenceList.add(
              SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getLenient().getNid());
-         tableDescPrefList
+         tableDescPreferenceList
             .add(SnomedMetadataRf1.PREFERRED_TERM_DESCRIPTION_TYPE_RF1
                .getLenient().getNid());
-         tableDescPrefList
+         tableDescPreferenceList
             .add(SnomedMetadataRf1.FULLY_SPECIFIED_DESCRIPTION_TYPE.getLenient()
                .getNid());
       } else {
-         treeDescPrefList
+         treeDescPreferenceList
             .add(SnomedMetadataRf1.PREFERRED_TERM_DESCRIPTION_TYPE_RF1
                .getLenient().getNid());
-         treeDescPrefList
+         treeDescPreferenceList
             .add(SnomedMetadataRf1.FULLY_SPECIFIED_DESCRIPTION_TYPE.getLenient()
                .getNid());
-         shortLabelDescPrefList
+         shortLabelDescPreferenceList
             .add(SnomedMetadataRf1.PREFERRED_TERM_DESCRIPTION_TYPE_RF1
                .getLenient().getNid());
-         shortLabelDescPrefList
+         shortLabelDescPreferenceList
             .add(SnomedMetadataRf1.FULLY_SPECIFIED_DESCRIPTION_TYPE.getLenient()
                .getNid());
-         longLabelDescPrefList
+         longLabelDescPreferenceList
             .add(SnomedMetadataRf1.FULLY_SPECIFIED_DESCRIPTION_TYPE.getLenient()
                .getNid());
-         longLabelDescPrefList
+         longLabelDescPreferenceList
             .add(SnomedMetadataRf1.PREFERRED_TERM_DESCRIPTION_TYPE_RF1
                .getLenient().getNid());
-         tableDescPrefList
+         tableDescPreferenceList
             .add(SnomedMetadataRf1.PREFERRED_TERM_DESCRIPTION_TYPE_RF1
                .getLenient().getNid());
-         tableDescPrefList
+         tableDescPreferenceList
             .add(SnomedMetadataRf1.FULLY_SPECIFIED_DESCRIPTION_TYPE.getLenient()
                .getNid());
       }
@@ -2095,6 +2158,7 @@ NEXT_WHILE:
                                           + " for preference: langSortPref");
       }
 
+      /* languagePreferenceList */
       I_IntList languagePreferenceList = userConfig.getLanguagePreferenceList();
 
       languagePreferenceList.clear();
@@ -2106,6 +2170,59 @@ NEXT_WHILE:
 
          languagePreferenceList.add(lang.getLenient().getNid());
       }
+      
+       // :!!!:MEC:BEGIN: label sort order
+       /* Long label preference order -- file string overrides coded defaults */
+       if (longLabelDescPreferenceString != null) {
+           longLabelDescPreferenceList = userConfig.getLongLabelDescPreferenceList();
+           String[] longLabelDescPreferenceArray = longLabelDescPreferenceString.split(";");
+           if (longLabelDescPreferenceArray.length > 0) {
+               longLabelDescPreferenceList.clear();
+               for (String labelPref : longLabelDescPreferenceArray) {
+                   ConceptSpec label = getConceptSpecFromPrefs(labelPref.trim());
+                   longLabelDescPreferenceList.add(label.getLenient().getNid());
+               }
+           }
+       }
+
+       /* Short label preference order -- file string overrides coded defaults */
+       if (shortLabelDescPreferenceString != null) {
+           shortLabelDescPreferenceList = userConfig.getShortLabelDescPreferenceList();
+           String[] shortLabelDescPreferenceArray = shortLabelDescPreferenceString.split(";");
+           if (shortLabelDescPreferenceArray.length > 0) {
+               shortLabelDescPreferenceList.clear();
+               for (String labelPref : shortLabelDescPreferenceArray) {
+                   ConceptSpec label = getConceptSpecFromPrefs(labelPref.trim());
+                   shortLabelDescPreferenceList.add(label.getLenient().getNid());
+               }
+           }
+       }
+                  
+       /* Tree preference order -- file string overrides coded defaults */
+       if (treeDescPreferenceString != null) {
+           treeDescPreferenceList = userConfig.getTreeDescPreferenceList();
+           String[] treeDescPreferenceArray = treeDescPreferenceString.split(";");
+           if (treeDescPreferenceArray.length > 0) {
+               treeDescPreferenceList.clear();
+               for (String labelPref : treeDescPreferenceArray) {
+                   ConceptSpec label = getConceptSpecFromPrefs(labelPref.trim());
+                   treeDescPreferenceList.add(label.getLenient().getNid());
+               }
+           }
+       }
+
+       /* Table preference order -- file string overrides coded defaults */
+       if (tableDescPreferenceString != null) {
+           tableDescPreferenceList = userConfig.getTableDescPreferenceList();
+           String[] tableDescPreferenceArray = tableDescPreferenceString.split(";");
+           if (tableDescPreferenceArray.length > 0) {
+               tableDescPreferenceList.clear();
+               for (String labelPref : tableDescPreferenceArray) {
+                   ConceptSpec label = getConceptSpecFromPrefs(labelPref.trim());
+                   tableDescPreferenceList.add(label.getLenient().getNid());
+               }
+           }
+       }
 
       /*
        * statedInferredPolicy preference options: stated (s), inferred (i),
