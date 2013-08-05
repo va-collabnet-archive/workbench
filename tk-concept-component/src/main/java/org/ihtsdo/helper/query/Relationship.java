@@ -78,7 +78,7 @@ public class Relationship implements Branch{
      * @param v2 the <code>ViewCoordinate<code> representing the second position
      * @return returns a branch representing the specified query
      */
-    public static Relationship changed(Boolean trueStatement,
+    public static Relationship changedStatus(Boolean trueStatement,
             ViewCoordinate v1, ViewCoordinate v2) {
         Relationship r = new Relationship();
         r.v1 = v1;
@@ -97,7 +97,7 @@ public class Relationship implements Branch{
      * @param clauses one or more clauses to further filter the query
      * @return returns a branch representing the specified query
      */
-    public static Relationship changed(Boolean trueStatement,
+    public static Relationship changedStatus(Boolean trueStatement,
             ViewCoordinate v1, ViewCoordinate v2,
             Clause... clauses) {
         Relationship r = new Relationship();
@@ -105,6 +105,44 @@ public class Relationship implements Branch{
         r.v2 = v2;
         r.trueStatement = trueStatement;
         r.token = TOKENS.CHANGED_RELATIONSHIP_STATUS;
+        r.clauses = clauses;
+        return r;
+    }
+    
+    
+    /**
+     * Created a query branch asking for relationships that have changed role groups.
+     * @param trueStatement set to <code>false</code> if using negation, <code>true</code> otherwise
+     * @param v1 the <code>ViewCoordinate<code> representing the first position
+     * @param v2 the <code>ViewCoordinate<code> representing the second position
+     * @return returns a branch representing the specified query
+     */
+    public static Relationship changedGroup(Boolean trueStatement,
+            ViewCoordinate v1, ViewCoordinate v2) {
+        Relationship r = new Relationship();
+        r.v1 = v1;
+        r.v2 = v2;
+        r.trueStatement = trueStatement;
+        r.token = TOKENS.CHANGED_REL_GROUP;
+        return r;
+    }
+    
+    /**
+     * Created a query branch asking for relationships that have changed role groups.
+     * @param trueStatement set to <code>false</code> if using negation, <code>true</code> otherwise
+     * @param v1 the <code>ViewCoordinate<code> representing the first position
+     * @param v2 the <code>ViewCoordinate<code> representing the second position
+     * @param clauses one or more clauses to further filter the query
+     * @return returns a branch representing the specified query
+     */
+    public static Relationship changedGroup(Boolean trueStatement,
+            ViewCoordinate v1, ViewCoordinate v2,
+            Clause... clauses) {
+        Relationship r = new Relationship();
+        r.v1 = v1;
+        r.v2 = v2;
+        r.trueStatement = trueStatement;
+        r.token = TOKENS.CHANGED_REL_GROUP;
         r.clauses = clauses;
         return r;
     }

@@ -63,7 +63,7 @@ public class DragPanelConceptAttributes extends DragPanelComponentVersion<Concep
             return;
         }
         
-        if (!ArenaEditor.diffColor.isEmpty()){
+        if (!ArenaEditor.diffColor.isEmpty() && viewLayout.getSettings().isForPromotion()){
             if(ArenaEditor.diffColor.containsKey(getThingToDrag().getNid())){
                 Color color = ArenaEditor.diffColor.get(getThingToDrag().getNid());
                 if(getThingToDrag().isDefined()){

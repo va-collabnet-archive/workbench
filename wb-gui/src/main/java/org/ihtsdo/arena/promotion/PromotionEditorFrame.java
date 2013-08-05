@@ -301,8 +301,8 @@ public class PromotionEditorFrame extends ComponentFrame implements PropertyChan
         SnoRocketTabPanel classifierPanel = new SnoRocketTabPanel(mergeConfig);
         conceptTabsPane.add("classifier", classifierPanel);
         mergeArena = new Arena(mergeConfig, new File("arena/1-up.mxe"), false, true);
-        sourceArena = new Arena(sourceConfig, new File("arena/1-up.mxe"), false);
-        targetArena = new Arena(targetConfig, new File("arena/1-up.mxe"), false);
+        sourceArena = new Arena(sourceConfig, new File("arena/1-up.mxe"), false, true);
+        targetArena = new Arena(targetConfig, new File("arena/1-up.mxe"), false, true);
 
         JPanel arenaHolder = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
@@ -906,8 +906,8 @@ public class PromotionEditorFrame extends ComponentFrame implements PropertyChan
         Query q4 = new ConceptDefinedChangedQuery(vcTarget, vcSource).getQuery();
 
         //results
-        ArrayList<NidBitSetBI> results = builder.getResults(q1, q2, q3, q4);
-//TODO: do this better            
+        ArrayList<NidBitSetBI> results = builder.getResults(q1, q2, q3, q4);        
+           
         int count = 0;
         for (NidBitSetBI result : results) {
             System.out.println(result);

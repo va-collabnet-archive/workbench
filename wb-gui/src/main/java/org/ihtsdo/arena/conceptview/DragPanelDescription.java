@@ -70,7 +70,7 @@ public class DragPanelDescription extends DragPanelComponentVersion<DescriptionA
     private void layoutDescription() throws TerminologyException, IOException {
         boolean canDrop = false;
 
-        if (!ArenaEditor.diffColor.isEmpty()){
+        if (!ArenaEditor.diffColor.isEmpty() && viewLayout.getSettings().isForPromotion()){
             if(ArenaEditor.diffColor.containsKey(getThingToDrag().getNid())){
                 Color color = ArenaEditor.diffColor.get(getThingToDrag().getNid());
                 setBackground(color);

@@ -81,7 +81,7 @@ public class DragPanelExtension extends DragPanelComponentVersion<RefexVersionBI
       TerminologyStoreDI ts      = Ts.get();
       RefexVersionBI<?>  refexV  = getRefexV();
       
-      if (!ArenaEditor.diffColor.isEmpty()){
+      if (!ArenaEditor.diffColor.isEmpty() && viewLayout.getSettings().isForPromotion()){
             if(ArenaEditor.diffColor.containsKey(getThingToDrag().getNid())){
                 Color color = ArenaEditor.diffColor.get(getThingToDrag().getNid());
                     setBackground(color);
