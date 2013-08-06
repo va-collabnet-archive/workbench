@@ -61,6 +61,7 @@ import javax.swing.JSpinner;
 import javax.swing.JSplitPane;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
+import javax.swing.JTree;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.RowSorter;
@@ -75,6 +76,7 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableRowSorter;
+import javax.swing.tree.TreePath;
 
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.TermComponentLabel;
@@ -101,7 +103,15 @@ import org.dwfa.ace.task.search.I_TestSearchResults;
 import org.dwfa.ace.tree.ExpandPathToNodeStateListener;
 import org.dwfa.ace.tree.JTreeWithDragImage;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.concurrent.future.FutureHelper;
+import org.ihtsdo.taxonomy.TaxonomyTree;
+import org.ihtsdo.taxonomy.model.NodePath;
+import org.ihtsdo.taxonomy.model.TaxonomyModel;
+import org.ihtsdo.taxonomy.nodes.RootNode;
+import org.ihtsdo.taxonomy.nodes.TaxonomyNode;
+import org.ihtsdo.taxonomy.path.PathExpander;
 import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.util.swing.GuiUtil;
 
 public class SearchPanel extends JPanel implements I_MakeCriterionPanel, I_HostConceptPlugins {
@@ -429,13 +439,18 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel, I_HostC
                         l.setTermComponent(cb);
                     }
                     if (linkType == LINK_TYPE.TREE_LINK) {
-                        try {
-                            new ExpandPathToNodeStateListener((JTreeWithDragImage) config.getTreeInTaxonomyPanel(), config,
-                                    cb);
-                            config.setHierarchySelection(cb);
-                        } catch (IOException e1) {
-                            AceLog.getAppLog().alertAndLogException(e1);
+                        TaxonomyModel model = (TaxonomyModel) ace.getTree().getModel();
+                        RootNode root = model.getRoot();
+                        for (Long childNodeId : root.children) {
+                            TaxonomyNode childNode = model.getNodeStore().get(childNodeId);
+                            TreePath path = NodePath.getTreePath(model, childNode);
+                            ace.getTree().collapsePath(path);
                         }
+
+                        PathExpander epl = new PathExpander(ace.getTree(), config,
+                                (ConceptChronicleBI) termComponent);
+                        config.setHierarchySelection((I_GetConceptData) termComponent);
+                        FutureHelper.addFuture(ace.threadPool.submit(epl));
                     }
                     setTermComponent(cb);
                 }
@@ -595,9 +610,11 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel, I_HostC
     private int lastSelectedRow = -1;
     private LineagePlugin lineagePlugin = new LineagePlugin(true, 0);
     private JScrollPane lineageScrollPane;
+    private ACE ace;
 
     public SearchPanel(I_ConfigAceFrame config, ACE ace) throws TerminologyException, IOException {
         super(new GridBagLayout());
+        this.ace = ace;
         this.config = config;
         this.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "search");
         this.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "search");
