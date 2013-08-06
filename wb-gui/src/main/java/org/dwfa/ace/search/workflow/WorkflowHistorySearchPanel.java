@@ -661,7 +661,7 @@ public class WorkflowHistorySearchPanel extends JPanel implements I_MakeCriterio
     }
 
     private void startSearch() {
-        if (RegenerateWorkflowIndex.indexGenerating.get()) {
+        if (RegenerateWorkflowIndex.indexGenerating.get() == true) {
             JOptionPane.showMessageDialog(null, "Please wait until workflow index has regenerated.", "Please wait.", JOptionPane.OK_OPTION);
         }else if (updateExtraCriterion()) {
 		    setShowProgress(true);

@@ -188,6 +188,7 @@ public abstract class ChangeSetImporter implements ActionListener {
             }
                 if(conceptCount != wfConceptCount){
                     if(Terms.get().getActiveAceFrameConfig() != null){
+                        AceLog.getEditLog().info("*** Workflow history lucene index not updated properly. Regenerating index. ***");
                         Ts.get().regenerateWfHxLuceneIndex(Terms.get().getActiveAceFrameConfig().getViewCoordinate());
                     }
             }

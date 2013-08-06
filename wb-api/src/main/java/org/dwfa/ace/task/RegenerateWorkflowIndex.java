@@ -70,13 +70,6 @@ public class RegenerateWorkflowIndex extends AbstractTask{
                                 if(indexGenerating.get() == false){
                                     indexGenerating.getAndSet(true);
                                 System.out.println("*** Starting workflow history lucene index regeneration.");
-                                File wfLuceneDirectory = new File("workflow/lucene");
-                                if (wfLuceneDirectory.exists()) {
-                                    for (File wfFile : wfLuceneDirectory.listFiles()) {
-                                        wfFile.delete();
-                                    }
-                                    wfLuceneDirectory.delete();
-                                }
                                 I_ConfigAceFrame config = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
                                 Ts.get().regenerateWfHxLuceneIndex(config.getViewCoordinate());
                                 indexGenerating.getAndSet(false);
