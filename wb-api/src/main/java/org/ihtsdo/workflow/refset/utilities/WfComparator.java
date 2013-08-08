@@ -46,18 +46,6 @@ public class WfComparator
 	private class WfHxEarliestFirstTimeComparer implements Comparator<WorkflowHistoryJavaBean> {
 		@Override
 		public int compare(WorkflowHistoryJavaBean o1, WorkflowHistoryJavaBean o2) {
-                    if(o1 == null){
-                        System.out.println("DEBUG 1");
-                    }
-                    if(o1.getWorkflowTime() == null){
-                        System.out.println("DEBUG 2");
-                    }
-                    if(o2 == null){
-                        System.out.println("DEBUG 3");
-                    }
-                    if(o2.getWorkflowTime() == null){
-                        System.out.println("DEBUG 4");
-                    }
 			return o1.getWorkflowTime().compareTo(o2.getWorkflowTime());
 		}
 	}
