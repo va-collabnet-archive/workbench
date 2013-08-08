@@ -27,8 +27,8 @@ import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 public class WfHxLuceneManager extends LuceneManager {
 	public final static int matchLimit = 10000000;
     static final String wfLuceneFileSuffix = "lucene";
-	public static File wfHxLuceneDirFile = new File("target" + File.separatorChar + "workflow" + File.separatorChar + "lucene");
-	protected static File runningLuceneDirFile = new File("workflow" + File.separatorChar + "lucene");
+	public static File wfHxLuceneDirFile = new File("target/workflow/lucene");
+	protected static File runningLuceneDirFile = new File("workflow/lucene");
 
 	private static HashSet<WorkflowHistoryJavaBean> beansToAdd;
 
@@ -96,7 +96,7 @@ public class WfHxLuceneManager extends LuceneManager {
 			AceLog.getAppLog().warning("Failed on bean: " + currentBean);
         }
 
-		AceLog.getAppLog().log(Level.INFO, "Have written " + recordsImported + " workflow history lucene records");
+		AceLog.getAppLog().log(Level.INFO, "Have written " + recordsImported + " workflow history lucene records to " + wfHxWriter.getDirectory());
 		wfHxWriter.commit();
 
 		if (wfHxSearcher != null) {
