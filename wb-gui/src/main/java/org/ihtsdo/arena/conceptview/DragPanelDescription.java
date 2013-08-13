@@ -35,6 +35,7 @@ import javax.swing.JLabel;
 import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
 import javax.swing.TransferHandler;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.ihtsdo.arena.editor.ArenaEditor;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
@@ -167,7 +168,7 @@ public class DragPanelDescription extends DragPanelComponentVersion<DescriptionA
         textPane.setEditable(canDrop);
         textPane.setOpaque(false);
         textPane.setFont(textPane.getFont().deriveFont(getSettings().getFontSize()));
-        textPane.setText(getDesc().getText());
+        textPane.setText(StringEscapeUtils.escapeHtml(getDesc().getText()));
         if(canDrop && viewLayout.cView.focus){
             textPane.selectAll();
         }
