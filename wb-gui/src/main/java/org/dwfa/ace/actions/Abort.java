@@ -19,15 +19,22 @@ package org.dwfa.ace.actions;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+import org.dwfa.ace.CollectionEditorContainer;
 
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
 
 public class Abort implements ActionListener {
+    CollectionEditorContainer container;
+
+    public Abort(CollectionEditorContainer container) {
+        this.container = container;
+    }
 
     public void actionPerformed(ActionEvent e) {
         try {
+            container.StopBatchEdits();
             Terms.get().cancel();
             Terms.get().getActiveAceFrameConfig().refreshRefsetTab();
         } catch (IOException e1) {

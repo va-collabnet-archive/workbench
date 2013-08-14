@@ -144,6 +144,8 @@ public final class BatchActionEditorPanel extends javax.swing.JPanel {
     private List<RelationshipVersionBI> existingRoles;
     private List<ComponentVersionBI> parentLinkages;
     private Map<Integer, Class> existingRefsetTypes;
+    private BatchActionProcessor bap;
+    private BatchActionSwingWorker basw;
 
     public List<RelationshipVersionBI> getExistingParents() {
         return existingParents;
@@ -441,8 +443,8 @@ public final class BatchActionEditorPanel extends javax.swing.JPanel {
                 return;
             }
 
-            BatchActionProcessor bap = new BatchActionProcessor(concepts, tasks, ec, vc);
-            BatchActionSwingWorker basw = new BatchActionSwingWorker();
+            bap = new BatchActionProcessor(concepts, tasks, ec, vc);
+            basw = new BatchActionSwingWorker();
             basw.setBap(bap);
             basw.execute();
 
@@ -458,7 +460,14 @@ public final class BatchActionEditorPanel extends javax.swing.JPanel {
             Logger.getLogger(BatchActionEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_actionExecuteAllTasks
-
+    
+    public boolean stop(){
+        if(bap != null){
+            bap.setContinueWorkB(false);
+            basw.cancel(true);
+        }
+        return false;
+    }
     private void actionAddAnotherTask(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_actionAddAnotherTask
         actionAddAnotherTask();
     }//GEN-LAST:event_actionAddAnotherTask

@@ -2277,7 +2277,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         c.gridx++;
         cancelButton = new JButton("cancel");
         cancelButton.setEnabled(false);
-        cancelButton.addActionListener(new Abort());
+        cancelButton.addActionListener(new Abort(conceptListEditor));
         bottomPanel.add(cancelButton, c);
         cancelButton.setVisible(editMode);
         c.gridx++;
