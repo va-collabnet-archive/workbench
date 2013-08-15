@@ -299,7 +299,7 @@ public abstract class LuceneManager {
             DirectoryReader newMutableSearcher =
                     DirectoryReader.openIfChanged(mutableReader, writer, true);
             if (newMutableSearcher != null) {
-                mutableReader.close();
+//                mutableReader.close();
                 mutableReader = newMutableSearcher;
             }
             mr = new TtkMultiReader(readOnlyReader, mutableReader);
@@ -309,7 +309,7 @@ public abstract class LuceneManager {
             DirectoryReader newMutableSearcher =
                     DirectoryReader.openIfChanged(mutableReader, writer, true);
             if (newMutableSearcher != null) {
-                mutableReader.close();
+//                mutableReader.close();
                 mutableReader = newMutableSearcher;
             }
             searcher = new IndexSearcher(mutableReader);
