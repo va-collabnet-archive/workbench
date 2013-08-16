@@ -1,10 +1,12 @@
 package org.ihtsdo.mojo.release.refset;
 
 import java.io.File;
+import java.util.ArrayList;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.ihtsdo.rf2.identifier.mojo.RefSetParam;
 import org.ihtsdo.rf2.postexport.RF2ArtifactPostExportAbst.FILE_TYPE;
 import org.ihtsdo.rf2.postexport.RF2ArtifactPostExportImpl;
 import org.ihtsdo.rf2.util.Config;
@@ -67,6 +69,8 @@ public class RF2LanguagePostMojo extends AbstractMojo {
 	 */
 	private String outputFolder;
 
+	
+	
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		try {
 			Config config = JAXBUtil.getConfig("/org/ihtsdo/rf2/config/languageRefset.xml");
@@ -80,7 +84,7 @@ public class RF2LanguagePostMojo extends AbstractMojo {
 			RF2ArtifactPostExportImpl pExp=new RF2ArtifactPostExportImpl(FILE_TYPE.RF2_LANGUAGE_REFSET , new File( rf2FullFolder),
 					langFileName, new File(outputFolder), targetDirectory,
 					 previousReleaseDate, releaseDate);
-			pExp.postProcess();
+			pExp.process();
 			
 		} catch (Exception e) {
 			e.printStackTrace();

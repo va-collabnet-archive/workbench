@@ -94,7 +94,7 @@ public class RF2TextDefinitionPostMojo extends AbstractMojo {
 			RF2ArtifactPostExportImpl pExp=new RF2ArtifactPostExportImpl(FILE_TYPE.RF2_TEXTDEFINITION, new File( rf2FullFolder),
 					txtDefFileName, new File(outputFolder), targetDirectory,
 					 previousReleaseDate, releaseDate);
-			pExp.postProcess();
+			pExp.process();
 			
 		} catch (Exception e) {
 			e.printStackTrace();

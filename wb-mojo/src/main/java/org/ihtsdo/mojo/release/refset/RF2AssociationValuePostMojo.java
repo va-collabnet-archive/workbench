@@ -80,7 +80,7 @@ public class RF2AssociationValuePostMojo extends AbstractMojo {
 			RF2ArtifactPostExportImpl pExp=new RF2ArtifactPostExportImpl(FILE_TYPE.RF2_ASSOCIATION , new File( rf2FullFolder),
 					associationFileName, new File(outputFolder), targetDirectory,
 					 previousReleaseDate, releaseDate);
-			pExp.postProcess();
+			pExp.process();
 			
 		} catch (Exception e) {
 			e.printStackTrace();

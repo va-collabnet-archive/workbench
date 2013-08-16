@@ -81,7 +81,7 @@ public class RF2SimpleFullPostMojo extends AbstractMojo {
 			RF2ArtifactPostExportImpl pExp=new RF2ArtifactPostExportImpl(FILE_TYPE.RF2_SIMPLE, new File( rf2FullFolder),
 					simpleFileName, new File(outputFolder), targetDirectory,
 					 previousReleaseDate, releaseDate);
-			pExp.postProcess();
+			pExp.process();
 			
 		} catch (Exception e) {
 			e.printStackTrace();

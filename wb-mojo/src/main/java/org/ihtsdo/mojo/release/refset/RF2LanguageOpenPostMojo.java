@@ -1,23 +1,25 @@
-package org.ihtsdo.mojo.release.core;
+package org.ihtsdo.mojo.release.refset;
 
 import java.io.File;
+import java.util.ArrayList;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.ihtsdo.rf2.identifier.mojo.RefSetParam;
 import org.ihtsdo.rf2.postexport.RF2ArtifactPostExportAbst.FILE_TYPE;
 import org.ihtsdo.rf2.postexport.RF2ArtifactPostExportImpl;
 import org.ihtsdo.rf2.util.Config;
 import org.ihtsdo.rf2.util.JAXBUtil;
 
 /**
- * @author Alo
+ * @author Alejandro Rodriguez
  * 
- * @goal post-process-relationship
+ * @goal post-process-language-refset-open
  * @requiresDependencyResolution compile
  */
 
-public class RF2RelationshipPostMojo extends AbstractMojo {
+public class RF2LanguageOpenPostMojo extends AbstractMojo {
 
 	/**
 	 * Location of the build directory.
@@ -66,33 +68,43 @@ public class RF2RelationshipPostMojo extends AbstractMojo {
 	 * @required
 	 */
 	private String outputFolder;
-	
+
 	/**
-	 * Location of the rF2Format.
+	 * Refset Files
 	 * 
 	 * @parameter
 	 * @required
 	 */
-	private String rF2Format;
-
+	private ArrayList<RefSetParam> refsetData;
+	
+	/**
+	 * Namespace for file names of release. 
+	 * 
+	 * @parameter
+	 * @required
+	 */
+	private String namespace;
+	
+	/**
+	 * Language Code for file names of release
+	 * 
+	 * @parameter expression="en"
+	 * @required
+	 */
+	private String languageCode;
+	
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		try {
-			Config config;
-			
-			if(rF2Format.equals("true"))
-			 config = JAXBUtil.getConfig("/org/ihtsdo/rf2/config/relationship.xml");
-			else
-			 config = JAXBUtil.getConfig("/org/ihtsdo/rf2/config/relationshipqa.xml");
-			
+			Config config = JAXBUtil.getConfig("/org/ihtsdo/rf2/config/languageRefset.xml");
+
 			// set all the values passed via mojo
 			config.setOutputFolderName(exportFolder);
 			config.setFileExtension("txt");
-			File relationshipFileName = new File(exportFolder, 
-					config.getExportFileName() + releaseDate + "." + config.getFileExtension());
 			
-			RF2ArtifactPostExportImpl pExp=new RF2ArtifactPostExportImpl(FILE_TYPE.RF2_RELATIONSHIP, new File( rf2FullFolder),
-					relationshipFileName, new File(outputFolder), targetDirectory,
-					 previousReleaseDate, releaseDate);
+			RF2ArtifactPostExportImpl pExp=new RF2ArtifactPostExportImpl(FILE_TYPE.RF2_LANGUAGE_REFSET , new File( rf2FullFolder),
+					new File(outputFolder), targetDirectory,
+					 previousReleaseDate, releaseDate,refsetData,config.getFileExtension(),languageCode,namespace);
+		
 			pExp.process();
 			
 		} catch (Exception e) {

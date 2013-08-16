@@ -11,7 +11,7 @@ import org.ihtsdo.rf2.util.Config;
 import org.ihtsdo.rf2.util.JAXBUtil;
 
 /**
- * @author Alo
+ * @author Alejandro Rodriguez
  * 
  * @goal post-process-simple-map-refset
  * @requiresDependencyResolution compile
@@ -80,7 +80,7 @@ public class RF2SimpleMapPostMojo extends AbstractMojo {
 			RF2ArtifactPostExportImpl pExp=new RF2ArtifactPostExportImpl(FILE_TYPE.RF2_SIMPLE_MAP, new File( rf2FullFolder),
 					simpleMapFileName, new File(outputFolder), targetDirectory,
 					 previousReleaseDate, releaseDate);
-			pExp.postProcess();
+			pExp.process();
 			
 		} catch (Exception e) {
 			e.printStackTrace();

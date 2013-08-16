@@ -80,7 +80,7 @@ public class RF2AssociationIdentPostMojo extends AbstractMojo {
 			RF2ArtifactPostExportImpl pExp=new RF2ArtifactPostExportImpl(FILE_TYPE.RF2_COMPATIBILITY_IDENTIFIER , new File( rf2CompatibiliyPkgFolder),
 					associationFileName, new File(outputFolder), targetDirectory,
 					 previousReleaseDate, releaseDate);
-			pExp.postProcess();
+			pExp.process();
 			
 		} catch (Exception e) {
 			e.printStackTrace();

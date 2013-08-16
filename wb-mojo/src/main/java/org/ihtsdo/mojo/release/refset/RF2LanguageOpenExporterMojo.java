@@ -8,19 +8,20 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.ihtsdo.mojo.maven.MojoUtil;
-import org.ihtsdo.rf2.refset.factory.RF2RetiredWithoutReasonRefsetFactory;
+import org.ihtsdo.rf2.identifier.mojo.RefSetParam;
+import org.ihtsdo.rf2.refset.factory.RF2LanguageOpenRefsetFactory;
 import org.ihtsdo.rf2.util.Config;
 import org.ihtsdo.rf2.util.ExportUtil;
 import org.ihtsdo.rf2.util.JAXBUtil;
 
 /**
- * @author Varsha Parekh
+ * @author Alejandro Rodriguez
  * 
- * @goal export-retired-without-reason
+ * @goal export-language-refset-open
  * @requiresDependencyResolution compile
  */
 
-public class RF2RetiredWithoutReasonExporterMojo extends AbstractMojo {
+public class RF2LanguageOpenExporterMojo extends AbstractMojo {
 
 	/**
 	 * Location of the build directory.
@@ -54,6 +55,14 @@ public class RF2RetiredWithoutReasonExporterMojo extends AbstractMojo {
 	 */
 	private ArrayList<String> moduleFilter;
 	
+	/**
+	 * Refset Files
+	 * 
+	 * @parameter
+	 * @required
+	 */
+	private ArrayList<RefSetParam> refsetData;
+	
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		System.setProperty("java.awt.headless", "true");
 		try {
@@ -65,7 +74,8 @@ public class RF2RetiredWithoutReasonExporterMojo extends AbstractMojo {
 				throw new MojoExecutionException(e.getLocalizedMessage(), e);
 			}
 
-			Config config = JAXBUtil.getConfig("/org/ihtsdo/rf2/config/attributeValueRefset.xml");
+			Config config = JAXBUtil.getConfig("/org/ihtsdo/rf2/config/languageRefset.xml");
+
 
 			// set all the values passed via mojo
 			config.setOutputFolderName(exportFolder);
@@ -74,13 +84,15 @@ public class RF2RetiredWithoutReasonExporterMojo extends AbstractMojo {
 			config.setInvokeDroolRules("false");
 			config.setFileExtension("txt");
 			config.setModuleFilter(moduleFilter);
+			config.setRefsetData(refsetData);
 
 			// initialize ace framwork and meta hierarchy
 			ExportUtil.init(config);
 
-			RF2RetiredWithoutReasonRefsetFactory factory = new RF2RetiredWithoutReasonRefsetFactory(config);
+			RF2LanguageOpenRefsetFactory factory = new RF2LanguageOpenRefsetFactory(config);
 			factory.export();
-
+			
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 			e.getMessage();

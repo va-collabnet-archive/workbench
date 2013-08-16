@@ -94,7 +94,7 @@ public class RF2RetiredIsaStatedRelationshipPostMojo extends AbstractMojo {
 			RF2ArtifactPostExportImpl pExp=new RF2ArtifactPostExportImpl(FILE_TYPE.RF2_STATED_ISA_RETIRED, new File( rf2CompatibiliyPkgFolder),
 					relationshipFileName, new File(outputFolder), targetDirectory,
 					 previousReleaseDate, releaseDate);
-			pExp.postProcess();
+			pExp.process();
 			
 		} catch (Exception e) {
 			e.printStackTrace();

@@ -13,11 +13,11 @@ import org.ihtsdo.rf2.util.JAXBUtil;
 /**
  * @author Alo
  * 
- * @goal post-process-relationship
+ * @goal post-process-concept-open
  * @requiresDependencyResolution compile
  */
 
-public class RF2RelationshipPostMojo extends AbstractMojo {
+public class RF2ConceptOpenPostMojo extends AbstractMojo {
 
 	/**
 	 * Location of the build directory.
@@ -75,24 +75,34 @@ public class RF2RelationshipPostMojo extends AbstractMojo {
 	 */
 	private String rF2Format;
 
+	/**
+	 * Namespace for file names of release. 
+	 * 
+	 * @parameter
+	 * @required
+	 */
+	private String namespace;
+	
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		try {
+			
 			Config config;
 			
 			if(rF2Format.equals("true"))
-			 config = JAXBUtil.getConfig("/org/ihtsdo/rf2/config/relationship.xml");
+			 config = JAXBUtil.getConfig("/org/ihtsdo/rf2/config/concept.xml");
 			else
-			 config = JAXBUtil.getConfig("/org/ihtsdo/rf2/config/relationshipqa.xml");
+			 config = JAXBUtil.getConfig("/org/ihtsdo/rf2/config/conceptqa.xml");
 			
+
 			// set all the values passed via mojo
 			config.setOutputFolderName(exportFolder);
 			config.setFileExtension("txt");
-			File relationshipFileName = new File(exportFolder, 
+			File conceptsFileName = new File(exportFolder, 
 					config.getExportFileName() + releaseDate + "." + config.getFileExtension());
 			
-			RF2ArtifactPostExportImpl pExp=new RF2ArtifactPostExportImpl(FILE_TYPE.RF2_RELATIONSHIP, new File( rf2FullFolder),
-					relationshipFileName, new File(outputFolder), targetDirectory,
-					 previousReleaseDate, releaseDate);
+			RF2ArtifactPostExportImpl pExp=new RF2ArtifactPostExportImpl(FILE_TYPE.RF2_CONCEPT, new File( rf2FullFolder),
+					 conceptsFileName, new File(outputFolder), targetDirectory,
+					 previousReleaseDate, releaseDate, config.getFileExtension(),"",namespace);
 			pExp.process();
 			
 		} catch (Exception e) {

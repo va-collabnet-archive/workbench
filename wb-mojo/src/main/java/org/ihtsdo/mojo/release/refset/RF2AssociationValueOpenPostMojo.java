@@ -1,4 +1,4 @@
-package org.ihtsdo.mojo.release.core;
+package org.ihtsdo.mojo.release.refset;
 
 import java.io.File;
 
@@ -11,13 +11,13 @@ import org.ihtsdo.rf2.util.Config;
 import org.ihtsdo.rf2.util.JAXBUtil;
 
 /**
- * @author Alo
+ * @author Alejandro Rodriguez
  * 
- * @goal post-process-relationship
+ * @goal post-process-association-references-open
  * @requiresDependencyResolution compile
  */
 
-public class RF2RelationshipPostMojo extends AbstractMojo {
+public class RF2AssociationValueOpenPostMojo extends AbstractMojo {
 
 	/**
 	 * Location of the build directory.
@@ -28,7 +28,6 @@ public class RF2RelationshipPostMojo extends AbstractMojo {
 	private File targetDirectory;
 	
 	/**
-	 * release date. 20100731
 	 * 
 	 * @parameter
 	 * @required
@@ -36,7 +35,6 @@ public class RF2RelationshipPostMojo extends AbstractMojo {
 	private String releaseDate;
 	
 	/**
-	 * previuous release date. 20100731
 	 * 
 	 * @parameter
 	 * @required
@@ -68,31 +66,26 @@ public class RF2RelationshipPostMojo extends AbstractMojo {
 	private String outputFolder;
 	
 	/**
-	 * Location of the rF2Format.
+	 * Namespace for file names of release. 
 	 * 
 	 * @parameter
 	 * @required
 	 */
-	private String rF2Format;
-
+	private String namespace;
+	
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		try {
-			Config config;
-			
-			if(rF2Format.equals("true"))
-			 config = JAXBUtil.getConfig("/org/ihtsdo/rf2/config/relationship.xml");
-			else
-			 config = JAXBUtil.getConfig("/org/ihtsdo/rf2/config/relationshipqa.xml");
-			
+			Config config = JAXBUtil.getConfig("/org/ihtsdo/rf2/config/historicalAssociationRefset.xml");
+
 			// set all the values passed via mojo
 			config.setOutputFolderName(exportFolder);
 			config.setFileExtension("txt");
-			File relationshipFileName = new File(exportFolder, 
+			File associationFileName = new File(exportFolder, 
 					config.getExportFileName() + releaseDate + "." + config.getFileExtension());
 			
-			RF2ArtifactPostExportImpl pExp=new RF2ArtifactPostExportImpl(FILE_TYPE.RF2_RELATIONSHIP, new File( rf2FullFolder),
-					relationshipFileName, new File(outputFolder), targetDirectory,
-					 previousReleaseDate, releaseDate);
+			RF2ArtifactPostExportImpl pExp=new RF2ArtifactPostExportImpl(FILE_TYPE.RF2_ASSOCIATION , new File( rf2FullFolder),
+					associationFileName, new File(outputFolder), targetDirectory,
+					 previousReleaseDate, releaseDate, config.getFileExtension(),"",namespace);
 			pExp.process();
 			
 		} catch (Exception e) {

@@ -11,13 +11,13 @@ import org.ihtsdo.rf2.util.Config;
 import org.ihtsdo.rf2.util.JAXBUtil;
 
 /**
- * @author Alo
+ * @author Alejandro Rodriguez
  * 
- * @goal post-process-relationship
+ * @goal post-process-relationship-open
  * @requiresDependencyResolution compile
  */
 
-public class RF2RelationshipPostMojo extends AbstractMojo {
+public class RF2RelationshipOpenPostMojo extends AbstractMojo {
 
 	/**
 	 * Location of the build directory.
@@ -75,6 +75,14 @@ public class RF2RelationshipPostMojo extends AbstractMojo {
 	 */
 	private String rF2Format;
 
+	/**
+	 * Namespace for file names of release. 
+	 * 
+	 * @parameter
+	 * @required
+	 */
+	private String namespace;
+
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		try {
 			Config config;
@@ -92,7 +100,7 @@ public class RF2RelationshipPostMojo extends AbstractMojo {
 			
 			RF2ArtifactPostExportImpl pExp=new RF2ArtifactPostExportImpl(FILE_TYPE.RF2_RELATIONSHIP, new File( rf2FullFolder),
 					relationshipFileName, new File(outputFolder), targetDirectory,
-					 previousReleaseDate, releaseDate);
+					 previousReleaseDate, releaseDate, config.getFileExtension(),"",namespace);
 			pExp.process();
 			
 		} catch (Exception e) {

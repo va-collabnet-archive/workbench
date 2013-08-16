@@ -1,4 +1,4 @@
-package org.ihtsdo.mojo.release.core;
+package org.ihtsdo.mojo.release.derivative;
 
 import java.io.File;
 
@@ -11,13 +11,13 @@ import org.ihtsdo.rf2.util.Config;
 import org.ihtsdo.rf2.util.JAXBUtil;
 
 /**
- * @author Alo
+ * @author Alejandro Rodriguez
  * 
- * @goal post-process-relationship
+ * @goal post-process-text-definition-open
  * @requiresDependencyResolution compile
  */
 
-public class RF2RelationshipPostMojo extends AbstractMojo {
+public class RF2TextDefinitionOpenPostMojo extends AbstractMojo {
 
 	/**
 	 * Location of the build directory.
@@ -75,24 +75,41 @@ public class RF2RelationshipPostMojo extends AbstractMojo {
 	 */
 	private String rF2Format;
 
+	/**
+	 * Namespace for file names of release. 
+	 * 
+	 * @parameter
+	 * @required
+	 */
+	private String namespace;
+
+	/**
+	 * Language Code for file names of release
+	 * 
+	 * @parameter expression="en"
+	 * @required
+	 */
+	private String languageCode;
+	
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		try {
 			Config config;
 			
 			if(rF2Format.equals("true"))
-			 config = JAXBUtil.getConfig("/org/ihtsdo/rf2/config/relationship.xml");
+			 config = JAXBUtil.getConfig("/org/ihtsdo/rf2/config/textDef.xml");
 			else
-			 config = JAXBUtil.getConfig("/org/ihtsdo/rf2/config/relationshipqa.xml");
+			 config = JAXBUtil.getConfig("/org/ihtsdo/rf2/config/textDefqa.xml");
+			
 			
 			// set all the values passed via mojo
 			config.setOutputFolderName(exportFolder);
 			config.setFileExtension("txt");
-			File relationshipFileName = new File(exportFolder, 
+			File txtDefFileName = new File(exportFolder, 
 					config.getExportFileName() + releaseDate + "." + config.getFileExtension());
 			
-			RF2ArtifactPostExportImpl pExp=new RF2ArtifactPostExportImpl(FILE_TYPE.RF2_RELATIONSHIP, new File( rf2FullFolder),
-					relationshipFileName, new File(outputFolder), targetDirectory,
-					 previousReleaseDate, releaseDate);
+			RF2ArtifactPostExportImpl pExp=new RF2ArtifactPostExportImpl(FILE_TYPE.RF2_TEXTDEFINITION, new File( rf2FullFolder),
+					txtDefFileName, new File(outputFolder), targetDirectory,
+					 previousReleaseDate, releaseDate, config.getFileExtension(),languageCode,namespace);
 			pExp.process();
 			
 		} catch (Exception e) {

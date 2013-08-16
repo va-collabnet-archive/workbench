@@ -1,4 +1,4 @@
-package org.ihtsdo.mojo.release.core;
+package org.ihtsdo.mojo.release.compatibilitypkg;
 
 import java.io.File;
 
@@ -11,13 +11,13 @@ import org.ihtsdo.rf2.util.Config;
 import org.ihtsdo.rf2.util.JAXBUtil;
 
 /**
- * @author Alo
+ * @author Ale
  * 
- * @goal post-process-relationship
+ * @goal post-process-association-identifier-open
  * @requiresDependencyResolution compile
  */
 
-public class RF2RelationshipPostMojo extends AbstractMojo {
+public class RF2AssociationIdentOpenPostMojo extends AbstractMojo {
 
 	/**
 	 * Location of the build directory.
@@ -57,7 +57,7 @@ public class RF2RelationshipPostMojo extends AbstractMojo {
 	 * @parameter
 	 * @required
 	 */
-	private String rf2FullFolder;
+	private String rf2CompatibiliyPkgFolder;
 	
 	/**
 	 * Location of the outputFolder. (output in this mojo)
@@ -66,33 +66,28 @@ public class RF2RelationshipPostMojo extends AbstractMojo {
 	 * @required
 	 */
 	private String outputFolder;
-	
+
 	/**
-	 * Location of the rF2Format.
+	 * Namespace for file names of release. 
 	 * 
 	 * @parameter
 	 * @required
 	 */
-	private String rF2Format;
-
+	private String namespace;
+	
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		try {
-			Config config;
-			
-			if(rF2Format.equals("true"))
-			 config = JAXBUtil.getConfig("/org/ihtsdo/rf2/config/relationship.xml");
-			else
-			 config = JAXBUtil.getConfig("/org/ihtsdo/rf2/config/relationshipqa.xml");
-			
+			Config config = JAXBUtil.getConfig("/org/ihtsdo/rf2/config/historicalAssociationIdentifier.xml");
+
 			// set all the values passed via mojo
 			config.setOutputFolderName(exportFolder);
 			config.setFileExtension("txt");
-			File relationshipFileName = new File(exportFolder, 
+			File associationFileName = new File(exportFolder, 
 					config.getExportFileName() + releaseDate + "." + config.getFileExtension());
 			
-			RF2ArtifactPostExportImpl pExp=new RF2ArtifactPostExportImpl(FILE_TYPE.RF2_RELATIONSHIP, new File( rf2FullFolder),
-					relationshipFileName, new File(outputFolder), targetDirectory,
-					 previousReleaseDate, releaseDate);
+			RF2ArtifactPostExportImpl pExp=new RF2ArtifactPostExportImpl(FILE_TYPE.RF2_COMPATIBILITY_IDENTIFIER , new File( rf2CompatibiliyPkgFolder),
+					associationFileName, new File(outputFolder), targetDirectory,
+					 previousReleaseDate, releaseDate,config.getFileExtension(),"",namespace);
 			pExp.process();
 			
 		} catch (Exception e) {
@@ -134,12 +129,12 @@ public class RF2RelationshipPostMojo extends AbstractMojo {
 		this.previousReleaseDate = previousReleaseDate;
 	}
 
-	public String getRf2FullFolder() {
-		return rf2FullFolder;
+	public String getRf2CompatibiliyPkgFolder() {
+		return rf2CompatibiliyPkgFolder;
 	}
 
-	public void setRf2FullFolder(String rf2FullFolder) {
-		this.rf2FullFolder = rf2FullFolder;
+	public void setRf2CompatibiliyPkgFolder(String rf2CompatibiliyPkgFolder) {
+		this.rf2CompatibiliyPkgFolder = rf2CompatibiliyPkgFolder;
 	}
 
 	public String getOutputFolder() {
