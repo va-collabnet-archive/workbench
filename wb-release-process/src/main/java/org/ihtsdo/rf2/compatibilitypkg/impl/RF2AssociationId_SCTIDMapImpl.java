@@ -56,7 +56,7 @@ public class RF2AssociationId_SCTIDMapImpl extends RF2AbstractImpl implements I_
 			for (I_RelTuple rel : relationships) {
 
 				if (isComponentToPublish( rel.getMutablePart())){
-					relTypeId = getSctId(rel.getTypeNid(), getSnomedCorePathNid());
+					relTypeId = getSctId(rel.getTypeNid());
 
 					if (relTypeId!=null && (relTypeId.equals(I_Constants.MAY_BE) || relTypeId.equals(I_Constants.WAS_A) || relTypeId.equals(I_Constants.SAME_AS) || relTypeId.equals(I_Constants.REPLACED_BY)
 							|| relTypeId.equals(I_Constants.MOVED_FROM) || relTypeId.equals(I_Constants.MOVED_TO))) {
@@ -79,7 +79,7 @@ public class RF2AssociationId_SCTIDMapImpl extends RF2AbstractImpl implements I_
 
 						if (relationshipId==null || relationshipId.equals("")){
 
-							targetComponent = getSctId(rel.getC2Id(), getSnomedCorePathNid());
+							targetComponent = getSctId(rel.getC2Id());
 
 
 							if (targetComponent==null || targetComponent.equals("")){

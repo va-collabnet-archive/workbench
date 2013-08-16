@@ -43,14 +43,11 @@ public class RF2SnomedIdImpl extends RF2AbstractImpl implements I_ProcessConcept
 		try{
 			String refsetId = I_Constants.SNOMED_REFSET_ID;
 			String moduleId = "";
-			String mapTarget_Core = getSnomedId(concept, getSnomedCorePathNid());
-			String mapTarget_Aux = getSnomedId(concept, getNid("2faa9260-8fb2-11db-b606-0800200c9a66")); //Workbench Auxillary path
+			String mapTarget_Core = getSnomedId(concept);
 			String mapTarget="";
 
 			if(!(mapTarget_Core.equals("") && mapTarget_Core.equals(null))){
 				mapTarget = mapTarget_Core;
-			}else if(!(mapTarget_Aux.equals("") && mapTarget_Aux.equals(null))){
-				mapTarget = mapTarget_Aux;
 			}
 			if (referencedComponentId==null || referencedComponentId.equals("")){
 				referencedComponentId=concept.getUids().iterator().next().toString();

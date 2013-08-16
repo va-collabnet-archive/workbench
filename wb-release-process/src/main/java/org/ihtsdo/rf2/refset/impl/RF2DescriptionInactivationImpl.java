@@ -51,7 +51,7 @@ public class RF2DescriptionInactivationImpl extends RF2AbstractImpl implements I
 			String conceptStatus="";
 
 			int descInactivationRefsetNid = getNid(I_Constants.DESCRIPTION_INACTIVATION_REFSET_UID);
-			String refsetId = getSctId(descInactivationRefsetNid, getSnomedCorePathNid());
+			String refsetId = getSctId(descInactivationRefsetNid);
 			String moduleId = "";
 			List<? extends I_DescriptionTuple> descriptions = concept.getDescriptionTuples(allStatuses, 
 					allDescTypes, currenAceConfig.getViewPositionSetReadOnly(), 

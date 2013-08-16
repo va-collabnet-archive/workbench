@@ -104,7 +104,7 @@ public class RF2ConceptReferencesImpl extends RF2AbstractImpl implements I_Proce
 									}
 
 									int targetComponentNid = extensionPart.getC1id();
-									targetComponent = getSctId(targetComponentNid, getSnomedCorePathNid());
+									targetComponent = getSctId(targetComponentNid);
 									uuid = extensionPart.getPrimUuid();
 									Date effectiveDate = new Date(extensionPart.getTime());
 									effectiveTime = getDateFormat().format(effectiveDate);

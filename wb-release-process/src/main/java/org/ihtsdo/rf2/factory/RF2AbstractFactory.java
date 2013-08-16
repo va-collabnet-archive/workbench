@@ -26,6 +26,9 @@ public abstract class RF2AbstractFactory {
 		setBufferedWriter();
 	}
 
+	public RF2AbstractFactory() {
+		
+	}
 	public abstract void export() throws IOException, Exception;
 
 	private static void writeHeader() throws IOException {
@@ -80,5 +83,9 @@ public abstract class RF2AbstractFactory {
 
 	public static Config getConfig() {
 		return config;
+	}
+
+	public static void setConfig(Config recConfig) {
+		RF2AbstractFactory.config=recConfig;
 	}
 }

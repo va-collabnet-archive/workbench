@@ -16,7 +16,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Properties;
 import java.util.Set;
 import java.util.UUID;
 
@@ -67,10 +66,7 @@ public class ExportUtil {
 	private static Logger logger = Logger.getLogger(ExportUtil.class.getName());
 	private static int userAuthorNid;
 
-	private static UUID paths[] = null;
 	private static HashSet<String> metaHier;
-
-	private static Set<I_GetConceptData> metaConceptList;
 
 	public static String TIMEFORMAT = I_Constants.TimeFormat;
 	public static SimpleDateFormat DATEFORMAT = new SimpleDateFormat(TIMEFORMAT);
@@ -80,8 +76,6 @@ public class ExportUtil {
 	private static boolean inActiveRelationshipState = false;
 	private static HashSet<ModuleIDDAO> metaHierDAO;
 	private static HashMap<Integer,String> allModuleMapNidSCTId;
-
-	private static Set<I_GetConceptData> moduleIdDescendants = new HashSet<I_GetConceptData>();
 
 	public static int activeId; 
 	public static int inactId; 
@@ -96,6 +90,12 @@ public class ExportUtil {
 	public static int movId ;
 	public static int pendId ;
 	public static int inappropriateId ;
+
+	private static int arcAuxSnomedIntegerNid;
+
+	private static int arcAuxSnomedRTNid;
+
+	private static int arcAuxCtv3Nid;
 	static{
 		try {
 
@@ -105,7 +105,9 @@ public class ExportUtil {
 			retId = ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid();
 			dupId = getTermFactory().uuidToNative(SnomedMetadataRfx.getSTATUS_DUPLICATE().getLenient().getUUIDs().get(0));
 			curId =ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid();
-
+			arcAuxSnomedIntegerNid = ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.localize().getNid();
+			arcAuxSnomedRTNid = ArchitectonicAuxiliary.Concept.SNOMED_RT_ID.localize().getNid();
+			arcAuxCtv3Nid = ArchitectonicAuxiliary.Concept.CTV3_ID.localize().getNid();
 			outdatedId = getTermFactory().uuidToNative(SnomedMetadataRfx.getSTATUS_OUTDATED().getLenient().getUUIDs().get(0));
 			ambiguousId =getTermFactory().uuidToNative(SnomedMetadataRfx.getSTATUS_AMBIGUOUS().getLenient().getUUIDs().get(0));
 			errId = getTermFactory().uuidToNative(SnomedMetadataRfx.getSTATUS_ERRONEOUS().getLenient().getUUIDs().get(0));
@@ -114,21 +116,14 @@ public class ExportUtil {
 			pendId = getTermFactory().uuidToNative(UUID.fromString("9906317a-f50f-30f6-8b59-a751ae1cdeb9"));
 			inappropriateId = getTermFactory().uuidToNative(UUID.fromString("bcb2ccda-d62a-3fc8-b158-10ad673823b6"));
 		} catch (TerminologyException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 
 	public static void init(Config config) {
-		// create ace framework
-		//createAceConfig();
-
-		// create the meta hierarchy
-		//metaConceptList = initMetaHierarchyIsAList(); // 127;
-
+		
 		inactiveConceptList = getInactiveDecendentList();
 		InitializeModuleID(config);		
 	}
@@ -185,22 +180,18 @@ public class ExportUtil {
 
 	public static String getParentSnomedId(I_GetConceptData concept) throws Exception{		
 		Set<I_GetConceptData> parents = new HashSet<I_GetConceptData>();
-		parents = getParentLocal(parents, concept); // check size		
+		parents = getParentLocal(parents, concept); 
 		String parentSnomedId="";
 		boolean findParentSnomedId = true;
 
 		for (I_GetConceptData loopConcept : parents) {
 			if(findParentSnomedId){
-				parentSnomedId = getSnomedId(loopConcept, getSnomedCorePathNid());
+				parentSnomedId = getSnomedId(loopConcept);
 				if(!parentSnomedId.isEmpty()){
 					findParentSnomedId = false;
 				}
 			}
 		}
-
-		/*	if(findParentSnomedId){
-			parentSnomedId="R-10000"; //Default Value
-		}*/	
 
 		return parentSnomedId;
 	}
@@ -484,7 +475,7 @@ public class ExportUtil {
 	}
 
 	public static String getConceptMetaModuleID(I_GetConceptData snomedConcept , String conEffectiveTime) throws IOException, TerminologyException {
-		String snomedIntegerId = getConceptId(snomedConcept, getSnomedCorePathNid());
+		String snomedIntegerId = getConceptId(snomedConcept);
 		moduleId = I_Constants.CORE_MODULE_ID; 
 		if (snomedIntegerId!=null){
 			if (metaHierDAO.isEmpty()) { 
@@ -600,7 +591,7 @@ public class ExportUtil {
 
 			while (iter.hasNext()) {
 				I_GetConceptData concept = (I_GetConceptData) iter.next();
-				String conceptId = getConceptId(concept, getSnomedCorePathNid());		    	
+				String conceptId = getConceptId(concept);		    	
 			}
 
 		} catch (StackOverflowError e) {
@@ -662,7 +653,7 @@ public class ExportUtil {
 
 			for (I_GetConceptData loopConcept : parentSet) {
 				if(findParentSnomedId){
-					parentSnomedId = getSnomedId(loopConcept, getSnomedCorePathNid());	
+					parentSnomedId = getSnomedId(loopConcept);	
 					if(!parentSnomedId.isEmpty()){
 						parent.addAll(parentSet);
 						findParentSnomedId = false;
@@ -771,7 +762,7 @@ public class ExportUtil {
 
 
 	public static String getMetaModuleID(I_GetConceptData snomedConcept) throws IOException, TerminologyException {
-		String snomedIntegerId = getConceptId(snomedConcept, getSnomedCorePathNid());
+		String snomedIntegerId = getConceptId(snomedConcept);
 		if (metaHierDAO.isEmpty()) { 
 			logger.error("Meta Hierarchy DAO Set is empty"); 
 		} else {  
@@ -1313,7 +1304,7 @@ public class ExportUtil {
 
 
 
-	public static String getSnomedId(I_GetConceptData concept, int snomedCorePathNid) throws IOException, TerminologyException {
+	public static String getSnomedId(I_GetConceptData concept) throws IOException, TerminologyException {
 		String snomedId = "";
 		I_Identify i_Identify = concept.getIdentifier();
 		List<? extends I_IdVersion> i_IdentifyList = i_Identify.getIdVersions();
@@ -1322,22 +1313,20 @@ public class ExportUtil {
 				I_IdVersion i_IdVersion = (I_IdVersion) i_IdentifyList.get(i);
 				Object denotion = (Object) i_IdVersion.getDenotation(); // Actual value for identifier
 				int snomedRTNid = i_IdVersion.getAuthorityNid();
-				int arcAuxSnomedRTNid = ArchitectonicAuxiliary.Concept.SNOMED_RT_ID.localize().getNid();
-				int pathNid = i_IdVersion.getPathNid();
-				if (pathNid == snomedCorePathNid && snomedRTNid == arcAuxSnomedRTNid) {
+				
+				if ( snomedRTNid == arcAuxSnomedRTNid) {
 					snomedId = (String) denotion;
-				}else if (snomedId.equals("") && snomedRTNid == arcAuxSnomedRTNid) {
-					snomedId = (String) denotion;
+					return snomedId.toString();
 				}
 			}
 		}
 
-		return snomedId.toString();
+		return null;
 	}
 
 
 
-	public static String getCtv3Id(I_GetConceptData concept, int snomedCorePathNid) throws IOException, TerminologyException {
+	public static String getCtv3Id(I_GetConceptData concept) throws IOException, TerminologyException {
 		String ctv3Id = ""; // ConceptId
 		I_Identify i_Identify = concept.getIdentifier();
 		List<?> i_IdentifyList = i_Identify.getIdVersions();
@@ -1347,17 +1336,14 @@ public class ExportUtil {
 				Object denotion = (Object) i_IdVersion.getDenotation();
 				// Actual value for identifier
 				int ctv3Nid = i_IdVersion.getAuthorityNid();
-				int arcAuxCtv3Nid = ArchitectonicAuxiliary.Concept.CTV3_ID.localize().getNid();
-				int pathNid = i_IdVersion.getPathNid();
-				if (pathNid == snomedCorePathNid && ctv3Nid == arcAuxCtv3Nid) {
+				
+				if (ctv3Nid == arcAuxCtv3Nid){
 					ctv3Id = (String) denotion;
-					// logger.error("=======ctv3id value=======" + ctv3Id);
-				}else if (ctv3Id.equals("") && ctv3Nid == arcAuxCtv3Nid){
-					ctv3Id = (String) denotion;
+					return ctv3Id.toString();
 				}
 			}
 		}
-		return ctv3Id.toString();
+		return null;
 	}
 
 
@@ -1563,7 +1549,7 @@ public class ExportUtil {
 		return snomedPathFlag;
 	}
 
-	public static String getSctId(int nid, int pathNid) throws IOException, TerminologyException {
+	public static String getSctId(int nid) throws IOException, TerminologyException {
 		Long sctId = null;
 		I_Identify identify = getTermFactory().getId(nid);
 		if (identify==null) return null;
@@ -1573,28 +1559,17 @@ public class ExportUtil {
 				I_IdVersion i_IdVersion = (I_IdVersion) i_IdentifyList.get(i);
 				Object denotion = (Object) i_IdVersion.getDenotation();
 				int snomedIntegerNid = i_IdVersion.getAuthorityNid();
-				int arcAuxSnomedIntegerNid = ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.localize().getNid();
-				int sctNid = i_IdVersion.getPathNid();
-				if (sctNid == pathNid && snomedIntegerNid == arcAuxSnomedIntegerNid) {
+				if (  snomedIntegerNid == arcAuxSnomedIntegerNid) {
 					sctId = (Long) denotion;
-				} else if (sctNid == getSnomedInferredPathNid() && snomedIntegerNid == arcAuxSnomedIntegerNid) { // -2147480867
-					sctId = (Long) denotion; // Inferred Path
-				} else if (sctNid == getSnomedStatedPathNid() && snomedIntegerNid == arcAuxSnomedIntegerNid) { // -2147480865
-					sctId = (Long) denotion; // Stated Path
-				} else if (sctId==null && snomedIntegerNid == arcAuxSnomedIntegerNid) { // -2147480865
-					sctId = (Long) denotion; 
+					return sctId.toString();
 				}
 			}
 		}
-		if (sctId == null)
-			return null;
-		return sctId.toString();
+		return null;
 	}
 
 	public static String getRelationshipIdVersion(Object denotion, int snomedAuthorityNid) throws IOException, TerminologyException {
 		Long sctId = null;
-
-		int arcAuxSnomedIntegerNid = ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.localize().getNid();
 
 		if (snomedAuthorityNid == arcAuxSnomedIntegerNid) {
 			sctId = (Long) denotion;
@@ -1652,7 +1627,7 @@ public class ExportUtil {
 		return null;
 	}
 
-	public static String getConceptId(I_GetConceptData concept, int snomedCorePathNid) throws IOException, TerminologyException {
+	public static String getConceptId(I_GetConceptData concept) throws IOException, TerminologyException {
 		Long conceptId = null; // ConceptId
 		I_Identify i_Identify = concept.getIdentifier();
 		List<? extends I_IdVersion> i_IdentifyList = i_Identify.getIdVersions();
@@ -1661,36 +1636,23 @@ public class ExportUtil {
 				I_IdVersion i_IdVersion = (I_IdVersion) i_IdentifyList.get(i);
 				Object denotion = (Object) i_IdVersion.getDenotation();
 				int snomedIntegerNid = i_IdVersion.getAuthorityNid();
-				int arcAuxSnomedIntegerNid = ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.localize().getNid();
-				int pathNid = i_IdVersion.getPathNid();
-				if (pathNid == snomedCorePathNid && snomedIntegerNid == arcAuxSnomedIntegerNid) {
+				
+				
+				if ( snomedIntegerNid == arcAuxSnomedIntegerNid) {
 					try {
 						conceptId = (Long) denotion;
+						return conceptId.toString();
 					} catch (java.lang.ClassCastException e) {
-						// e.printStackTrace();
+						 e.printStackTrace();
 						// This is all the subset which gets imported and subsetoriginalid becomes conceptid (not need to extracted)
-						// System.out.println("ClassCastException ===>" + concept.getInitialText());
+						 System.out.println("ClassCastException ===>" + concept.getInitialText());
 					}
-				}else if(conceptId==null && snomedIntegerNid == arcAuxSnomedIntegerNid){
-					try {
-						conceptId = (Long) denotion;
-					} catch (java.lang.ClassCastException e) {
-						// e.printStackTrace();
-						// This is all the subset which gets imported and subsetoriginalid becomes conceptid (not need to extracted)
-						// System.out.println("ClassCastException ===>" + concept.getInitialText());
-					}	
 				}
 			}
 		}
 
-		/*	
-	   if(conceptId.toString().equals("0")){
-			System.out.println("==conceptId==" + conceptId.toString());
-		}*/
+		return null;
 
-		if (conceptId==null) return null;
-
-		return conceptId.toString();
 	}
 
 
@@ -1865,9 +1827,9 @@ public class ExportUtil {
 		return snomedDescType;
 	}
 
-	public static String getDescriptionId(int descriptionNid, int snomedCorePathNid) throws IOException, TerminologyException {
+	public static String getDescriptionId(int descriptionNid) throws IOException, TerminologyException {
 
-		Long descriptionId = null; //If description is new then descriptionid doesn't exist in workbench so use dummy value.
+		Long descriptionId = null; 
 		I_Identify desc_Identify = getTermFactory().getId(descriptionNid);
 		List<? extends I_IdVersion> i_IdentifyList = desc_Identify.getIdVersions();
 		if (i_IdentifyList.size() > 0) {
@@ -1875,21 +1837,14 @@ public class ExportUtil {
 				I_IdVersion i_IdVersion = (I_IdVersion) i_IdentifyList.get(i);
 				Object denotion = (Object) i_IdVersion.getDenotation();
 				int snomedIntegerNid = i_IdVersion.getAuthorityNid();
-				int arcAuxSnomedIntegerNid = ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.localize().getNid();
-				int pathNid = i_IdVersion.getPathNid();
-				if (pathNid == snomedCorePathNid && snomedIntegerNid == arcAuxSnomedIntegerNid) {
+				if (snomedIntegerNid == arcAuxSnomedIntegerNid) {
 					descriptionId = (Long) denotion;
-				}else if (descriptionId==null && snomedIntegerNid == arcAuxSnomedIntegerNid){
-					descriptionId = (Long) denotion;
+					return descriptionId.toString();
 				}
 			}
 		}
-		/*if(descriptionId.toString().equals("0")){
-			System.out.println("==descriptionId==" + descriptionId.toString());
-		}*/
-		if (descriptionId==null)return null;
-
-		return descriptionId.toString();
+		return null;
+		
 	}
 
 	public static String getCharacteristicType(int type) throws IOException, TerminologyException {

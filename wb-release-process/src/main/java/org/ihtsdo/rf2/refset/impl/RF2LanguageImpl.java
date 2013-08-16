@@ -22,7 +22,7 @@ import org.ihtsdo.tk.api.Precedence;
 /**
  * Title: RF2LanguageImpl Description: Iterating over all the concept in workbench and fetching all the components required by RF2 Language File Copyright: Copyright (c) 2010 Company: IHTSDO
  * 
- * @author Varsha Parekh
+ * @author Alejandro Rodriguez
  * @version 1.0
  */
 
@@ -37,6 +37,15 @@ public class RF2LanguageImpl extends RF2AbstractImpl implements I_ProcessConcept
 	public RF2LanguageImpl(Config config, int langRefsetId, String refsetSCTId) {
 		super(config);
 		this.langRefsetId=langRefsetId;
+
+		if (refsetSCTId==null || refsetSCTId.equals("")){
+			try {
+				refsetSCTId=getSCTId(getConfig(), UUID.fromString(getConfig().getRefsetUuid()));
+			} catch (Exception e) {
+				e.printStackTrace();
+				System.exit(0);
+			}
+		}
 		this.refsetSCTId=refsetSCTId;
 	}
 
@@ -119,6 +128,7 @@ public class RF2LanguageImpl extends RF2AbstractImpl implements I_ProcessConcept
 								} else {
 									I_GetConceptData con=tf.getConcept(extensionStatusId);
 									logger.error("unknown extensionStatusId =====>" + extensionStatusId + "con : " + con.toString());
+									System.exit(0);
 								}
 
 								String descriptionstatus = getStatusType(description.getStatusNid());

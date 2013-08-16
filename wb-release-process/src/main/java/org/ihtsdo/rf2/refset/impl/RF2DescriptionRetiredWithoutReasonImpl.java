@@ -48,7 +48,7 @@ public class RF2DescriptionRetiredWithoutReasonImpl extends RF2AbstractImpl impl
 			String valueId = "";
 
 			int descInactivationRefsetNid = getNid(I_Constants.DESCRIPTION_INACTIVATION_REFSET_UID);
-			String refsetId = getSctId(descInactivationRefsetNid, getSnomedCorePathNid());
+			String refsetId = getSctId(descInactivationRefsetNid);
 			String moduleId = "";
 			List<? extends I_DescriptionTuple> descriptions = concept.getDescriptionTuples(allStatuses, 
 					allDescTypes, currenAceConfig.getViewPositionSetReadOnly(), 

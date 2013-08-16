@@ -2,7 +2,10 @@ package org.ihtsdo.rf2.postexport;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashSet;
+
+import org.ihtsdo.rf2.identifier.mojo.RefSetParam;
 
 
 public class RF2ArtifactPostExportImpl extends RF2ArtifactPostExportAbst{
@@ -29,11 +32,44 @@ public class RF2ArtifactPostExportImpl extends RF2ArtifactPostExportAbst{
 	private File fullFinalFile;
 
 	private File sortTmpfolderSortedTmp;
+
+	private ArrayList<RefSetParam> refsetData;
+	
+
+	public RF2ArtifactPostExportImpl(FILE_TYPE fType, File rf2FullFolder,
+			File rf2OutputFolder, File buildDirectory,
+			String previousReleaseDate, String releaseDate,
+			ArrayList<RefSetParam> refsetData,String fileExtension,
+			String languageCode,String namespace) throws IOException {
+		this( fType,  rf2FullFolder,
+				 null,  rf2OutputFolder,  buildDirectory,
+				 previousReleaseDate,  releaseDate);
+		this.fileExtension="." + fileExtension;
+		this.refsetData=refsetData;
+		this.langCode=languageCode;
+		this.namespace=namespace;
+	}
+
+	public RF2ArtifactPostExportImpl(FILE_TYPE fType, File rf2FullFolder,
+			File rf2Exported,File rf2OutputFolder, File buildDirectory,
+			String previousReleaseDate, String releaseDate,
+			String fileExtension,
+			String languageCode,String namespace) throws IOException {
+		this( fType,  rf2FullFolder,
+				rf2Exported,  rf2OutputFolder,  buildDirectory,
+				 previousReleaseDate,  releaseDate);
+		this.fileExtension="." + fileExtension;
+		this.langCode=languageCode;
+		this.namespace=namespace;
+	}
 	
 	public RF2ArtifactPostExportImpl(FILE_TYPE fType, File rf2FullFolder,
 			File rf2Exported, File rf2OutputFolder, File buildDirectory,
 			String previousReleaseDate, String releaseDate) throws IOException {
 		super();
+		this.fileExtension=".txt";
+		this.langCode="en";
+		this.namespace="INT";
 		this.fType = fType;
 //		this.rf2FullFolder = new File(rf2FullFolder.getAbsolutePath() + "/org/ihtsdo/rf2");
 		this.rf2FullFolder = new File(rf2FullFolder.getAbsolutePath() );
@@ -89,26 +125,38 @@ public class RF2ArtifactPostExportImpl extends RF2ArtifactPostExportAbst{
 		}else{
 			//TODO empty folder needed?
 		}
+	}
+	public void process() throws Exception{
+		File previousFile=null;
+		File sortedExportedfile=null;
+		if (refsetData!=null){
+			for (RefSetParam refsetParam:refsetData){
+				sortedExportedfile=new File(sortedfolderTmp,"exp_" + refsetParam.refsetFileName + releaseDate + "." + fileExtension);
+
+				fullFinalFile=new File(rf2FullOutputFolder.getAbsolutePath(),  refsetParam.refsetFileName + "Full" + langCode + "_" + namespace + "_" + releaseDate + fileExtension);
+				deltaFinalFile=new File(rf2FullOutputFolder.getAbsolutePath(),  refsetParam.refsetFileName + "Delta" + langCode + "_" + namespace + "_" + releaseDate + fileExtension);
+				snapshotFinalFile=new File(rf2FullOutputFolder.getAbsolutePath(),  refsetParam.refsetFileName + "Snapshot" + langCode + "_" + namespace + "_" + releaseDate + fileExtension);
+				
+				postProcess( previousFile, sortedExportedfile);
+			}
+			return;
+		}
 		fullFinalFile=getFullOutputFile(rf2FullOutputFolder.getAbsolutePath(), fType,releaseDate);
 		deltaFinalFile=getDeltaOutputFile(rf2DeltaOutputFolder.getAbsolutePath(), fType,releaseDate, previousReleaseDate);
 		snapshotFinalFile=getSnapshotOutputFile(rf2SnapshotOutputFolder.getAbsolutePath(), fType,releaseDate);
+		previousFile=getPreviousFile(rf2FullFolder.getAbsolutePath(),fType);
+		sortedExportedfile=new File(sortedfolderTmp,"exp_" + rf2Exported.getName());
+		postProcess( previousFile, sortedExportedfile);
 	}
-	public void postProcess() throws Exception{
-		File previousFile=getPreviousFile(rf2FullFolder.getAbsolutePath(),fType);
+	
+	private void postProcess(File previousFile,File sortedExportedfile) throws Exception{
 		File sortedPreviousfile=new File(sortedfolderTmp,"pre_" + previousFile.getName());
-//		File filterPreviousfile=new File(sortedfolderTmp,"ftr_" + previousFile.getName());
-//		
-//		ValueAnalyzer vAnl=new ValueAnalyzer(ValueAnalyzer.OPERATOR.LOWER, releaseDate);
-//		CommonUtils.FilterFile(previousFile, filterPreviousfile, 1, vAnl);
 		
 		FileSorter fsc=new FileSorter(previousFile, sortedPreviousfile, sortTmpfolderSortedTmp, fType.getColumnIndexes());
 		fsc.execute();
 		fsc=null;
 		System.gc();
 		
-//		filterPreviousfile.delete();
-		
-		File sortedExportedfile=new File(sortedfolderTmp,"exp_" + rf2Exported.getName());
 		fsc=new FileSorter(rf2Exported, sortedExportedfile, sortTmpfolderSortedTmp, fType.getColumnIndexes());
 		fsc.execute();
 		fsc=null;

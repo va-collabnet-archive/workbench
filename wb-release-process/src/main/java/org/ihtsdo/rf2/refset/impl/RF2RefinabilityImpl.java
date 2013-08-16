@@ -59,7 +59,7 @@ public class RF2RefinabilityImpl extends RF2AbstractImpl implements I_ProcessCon
 			String valueId = "";
 
 			int refinabilityRefsetNid = getNid(I_Constants.REFINIBILITY_REFSET_UID);
-			String refsetId = getSctId(refinabilityRefsetNid, getSnomedCorePathNid());
+			String refsetId = getSctId(refinabilityRefsetNid);
 
 			// UUID uuid = UUID.randomUUID();
 			//String moduleId = getMetaModuleID(concept);
@@ -79,7 +79,7 @@ public class RF2RefinabilityImpl extends RF2AbstractImpl implements I_ProcessCon
 								if (isComponentToPublish( relVer)){
 									// int relPathId = relVer.getPathNid();
 									// if (relPathId == getSnomedCorePathNid() || relPathId == getSnomedInferredPathNid()) {
-									referencedComponentId = getSctId(rel.getRelId(), relVer.getPathNid());
+									referencedComponentId = getSctId(rel.getRelId());
 									UUID uuid = Type5UuidFactory.get(refsetId + referencedComponentId);
 									String characteristicType = getCharacteristicType(relVer.getCharacteristicId());
 
@@ -96,7 +96,7 @@ public class RF2RefinabilityImpl extends RF2AbstractImpl implements I_ProcessCon
 									}
 									Date date = new Date(getTermFactory().convertToThickVersion(relVer.getVersion()));
 									effectiveTime = getDateFormat().format(date);
-									relTypeId = getSctId(relVer.getTypeNid(), getSnomedCorePathNid());
+									relTypeId = getSctId(relVer.getTypeNid());
 									if (relTypeId.equals(I_Constants.MAY_BE) || relTypeId.equals(I_Constants.WAS_A) || relTypeId.equals(I_Constants.SAME_AS) || relTypeId.equals(I_Constants.REPLACED_BY)
 											|| relTypeId.equals(I_Constants.MOVED_FROM) || relTypeId.equals(I_Constants.MOVED_TO)) {
 										characteristicTypeId = I_Constants.HISTORICAL;

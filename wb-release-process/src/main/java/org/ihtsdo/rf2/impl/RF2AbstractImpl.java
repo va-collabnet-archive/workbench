@@ -268,15 +268,9 @@ public abstract class RF2AbstractImpl {
 		return ExportUtil.getLatestActivePart(parts);
 	}
 	
-
 	public String getRefinabilityStatusType(int status) throws TerminologyException, IOException {
 		return ExportUtil.getRefinabilityStatusType(status);
 	}
-	
-	public boolean insertSctId(int componentNid  ,Config config, String wbSctId, int pathNid, int statusNid, long effectiveDate) throws Exception {
-		return ExportUtil.insertSctId(componentNid , getConfig(), wbSctId , pathNid , statusNid , effectiveDate);
-	}
-	
 	
 	public boolean insertSnomedId(int componentNid  ,Config config, String wbSctId, int pathNid, int statusNid, long effectiveDate) throws Exception {
 		return ExportUtil.insertSnomedId(componentNid , getConfig(), wbSctId , pathNid , statusNid , effectiveDate);
@@ -326,12 +320,12 @@ public abstract class RF2AbstractImpl {
 		return ExportUtil.getStatusType(status);
 	}
 
-	public String getSnomedId(I_GetConceptData concept, int snomedCorePathNid) throws IOException, TerminologyException {
-		return ExportUtil.getSnomedId(concept, snomedCorePathNid);
+	public String getSnomedId(I_GetConceptData concept) throws IOException, TerminologyException {
+		return ExportUtil.getSnomedId(concept);
 	}
 
-	public String getCtv3Id(I_GetConceptData concept, int snomedCorePathNid) throws IOException, TerminologyException {
-		return ExportUtil.getCtv3Id(concept, snomedCorePathNid);
+	public String getCtv3Id(I_GetConceptData concept) throws IOException, TerminologyException {
+		return ExportUtil.getCtv3Id(concept);
 	}
 
 	public String getRelationshipIdVersion(Object denotion, int snomedAuthorityNid) throws IOException, TerminologyException {
@@ -357,8 +351,6 @@ public abstract class RF2AbstractImpl {
 	public  Set<I_GetConceptData>  getParentLocal(Set<I_GetConceptData> parents, I_GetConceptData concept) throws Exception {
 		return ExportUtil.getParentLocal(parents ,concept);
 	}
-	
-	
 
 	public int getNid(String struuid) throws TerminologyException, IOException {
 		return ExportUtil.getNid(struuid);
@@ -403,8 +395,8 @@ public abstract class RF2AbstractImpl {
 	}
 
 
-	public String getSctId(int nid, int pathNid) throws IOException, TerminologyException {
-		return ExportUtil.getSctId(nid, pathNid);
+	public String getSctId(int nid) throws IOException, TerminologyException {
+		return ExportUtil.getSctId(nid);
 	}
 
 	// get the id for the given UUID
@@ -417,8 +409,8 @@ public abstract class RF2AbstractImpl {
 		return ExportUtil.getConceptId(config, uuid);
 	}
 	
-	public String getConceptId(I_GetConceptData concept, int snomedCorePathNid) throws IOException, TerminologyException {
-		return ExportUtil.getConceptId(concept, snomedCorePathNid);
+	public String getConceptId(I_GetConceptData concept) throws IOException, TerminologyException {
+		return ExportUtil.getConceptId(concept);
 	}
 
 	public String getPartitionId(String sctId) {
@@ -430,7 +422,7 @@ public abstract class RF2AbstractImpl {
 	}
 
 	public String getDescriptionId(int descriptionNid, int snomedCorePathNid) throws IOException, TerminologyException {
-		return ExportUtil.getDescriptionId(descriptionNid, snomedCorePathNid);
+		return ExportUtil.getDescriptionId(descriptionNid);
 	}
 	
 	

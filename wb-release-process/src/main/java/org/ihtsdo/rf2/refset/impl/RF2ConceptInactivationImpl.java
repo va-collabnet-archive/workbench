@@ -140,7 +140,7 @@ public class RF2ConceptInactivationImpl extends RF2AbstractImpl implements I_Pro
 			String active = "";
 
 			int conceptInactivationRefsetNid = getNid(I_Constants.CONCEPT_INACTIVATION_REFSET_UID);
-			String refsetId = getSctId(conceptInactivationRefsetNid, getSnomedCorePathNid());
+			String refsetId = getSctId(conceptInactivationRefsetNid);
 			String moduleId = "";
 			UUID uuid = Type5UuidFactory.get(refsetId + referencedComponentId);
 			Date PREVIOUSRELEASEDATE = getDateFormat().parse(I_Constants.inactivation_policy_change);

@@ -205,7 +205,7 @@ public class RF2ICDOTargetsImpl extends AbstractTask {
 			RF2ArtifactPostExportImpl pExp=new RF2ArtifactPostExportImpl(FILE_TYPE.RF2_ICDO_TARGETS, new File( rf2FullFolder),
 					ouputFile, new File(outputFolder), targetDirectory,
 					previousReleaseDate, releaseDate);
-			pExp.postProcess();
+			pExp.process();
 
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();

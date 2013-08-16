@@ -130,7 +130,7 @@ public class RF2ConceptRetiredWithoutReasonImpl extends RF2AbstractImpl implemen
 			String active = "";
 
 			int conceptInactivationRefsetNid = getNid(I_Constants.CONCEPT_INACTIVATION_REFSET_UID);
-			String refsetId = getSctId(conceptInactivationRefsetNid, getSnomedCorePathNid());
+			String refsetId = getSctId(conceptInactivationRefsetNid);
 			String moduleId = "";
 			UUID uuid = Type5UuidFactory.get(refsetId + referencedComponentId);
 			Date PREVIOUSRELEASEDATE = getDateFormat().parse(I_Constants.inactivation_policy_change);

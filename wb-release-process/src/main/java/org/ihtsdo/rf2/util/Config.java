@@ -10,6 +10,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
 import org.ihtsdo.rf2.identifier.mojo.RF2IdentifierFile;
+import org.ihtsdo.rf2.identifier.mojo.RefSetParam;
 
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -111,6 +112,9 @@ public class Config {
 
 	@XmlTransient
 	private int flushCount;
+	private String refsetUuid;
+	private String refsetSCTId;
+	private ArrayList<RefSetParam> refsetData;
 
 	public String getExportFileName() {
 		return exportFileName;
@@ -368,6 +372,30 @@ public class Config {
 		this.testFilters = testFilters;
 	}
 
+	public String getRefsetUuid() {
+		return refsetUuid;
+	}
+
+	public void setRefsetUuid(String refsetUuid) {
+		this.refsetUuid = refsetUuid;
+	}
+
+	public String getRefsetSCTID() {
+		return refsetSCTId;
+	}
+
+	public void setRefsetSCTID(String refsetSCTId) {
+		this.refsetSCTId = refsetSCTId;
+	}
+
+	public void setRefsetData(ArrayList<RefSetParam> refsetData) {
+		this.refsetData=refsetData;
+		
+	}
+
+	public ArrayList<RefSetParam> getRefsetData() {
+		return refsetData;
+	}
 	
 	
 }

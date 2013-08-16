@@ -66,9 +66,9 @@ public class RF2HistoricalAssociationImpl extends RF2AbstractImpl implements I_P
 			for (I_RelTuple rel : relationships) {
 
 				if (isComponentToPublish( rel.getMutablePart())){
-					targetComponent = getSctId(rel.getC2Id(), getSnomedCorePathNid());
+					targetComponent = getSctId(rel.getC2Id());
 
-					relTypeId = getSctId(rel.getTypeNid(), getSnomedCorePathNid());
+					relTypeId = getSctId(rel.getTypeNid());
 
 					if (relTypeId==null || relTypeId.equals("")){
 						relTypeId=tf.getUids(rel.getTypeNid()).iterator().next().toString();
