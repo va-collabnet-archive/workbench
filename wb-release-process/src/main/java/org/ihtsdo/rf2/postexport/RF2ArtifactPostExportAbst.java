@@ -213,6 +213,32 @@ public abstract class RF2ArtifactPostExportAbst {
 	public String getTmpTmpSort() {
 		return tmpTmpSort;
 	}
+
+	protected File getPreviousFileByCustomName(File rf2FullFolder,
+			String refsetFileName) {
+		File retFile=null;
+		File[] fileList = rf2FullFolder.listFiles();
+		for (File file : fileList) {
+			if (file.isDirectory()) {
+				retFile= getPreviousFileByCustomName(file,refsetFileName);
+			} else {
+				if(!file.isHidden() ){
+					String tmpName=file.getName().toLowerCase();
+							
+					if( tmpName.endsWith(fileExtension.toLowerCase())){
+						if (tmpName.contains(refsetFileName)){
+							retFile=file;
+						}
+						
+					}
+				}
+			}
+			if (retFile!=null){
+				return retFile;
+			}
+		}
+		return null;
+	}
 }
 
 

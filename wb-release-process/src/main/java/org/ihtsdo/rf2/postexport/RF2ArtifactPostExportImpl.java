@@ -136,7 +136,7 @@ public class RF2ArtifactPostExportImpl extends RF2ArtifactPostExportAbst{
 				fullFinalFile=new File(rf2FullOutputFolder.getAbsolutePath(),  refsetParam.refsetFileName + "Full" + langCode + "_" + namespace + "_" + releaseDate + fileExtension);
 				deltaFinalFile=new File(rf2FullOutputFolder.getAbsolutePath(),  refsetParam.refsetFileName + "Delta" + langCode + "_" + namespace + "_" + releaseDate + fileExtension);
 				snapshotFinalFile=new File(rf2FullOutputFolder.getAbsolutePath(),  refsetParam.refsetFileName + "Snapshot" + langCode + "_" + namespace + "_" + releaseDate + fileExtension);
-				
+				previousFile=getPreviousFileByCustomName(rf2FullFolder,refsetParam.refsetFileName.toLowerCase());
 				postProcess( previousFile, sortedExportedfile);
 			}
 			return;
@@ -149,6 +149,7 @@ public class RF2ArtifactPostExportImpl extends RF2ArtifactPostExportAbst{
 		postProcess( previousFile, sortedExportedfile);
 	}
 	
+
 	private void postProcess(File previousFile,File sortedExportedfile) throws Exception{
 		File sortedPreviousfile=new File(sortedfolderTmp,"pre_" + previousFile.getName());
 		

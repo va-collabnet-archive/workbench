@@ -36,22 +36,37 @@ public class RF2LanguageOpenRefsetFactory extends RF2AbstractFactory {
 
 		try {
 			List<RefSetParam> refsets=getConfig().getRefsetData();
-			
-			for (RefSetParam refsetData:refsets){
-				
-				getConfig().setExportFileName(refsetData.refsetFileName);
-				getConfig().setRefsetUuid(refsetData.refsetUuid);
-				getConfig().setRefsetSCTID(refsetData.refsetSCTId);
 
+			for (RefSetParam refsetData:refsets){
+
+				getConfig().setExportFileName(refsetData.refsetFileName);
 				setBufferedWriter();
-				
-				logger.info("Started Language Refset Export for [" + refsetData.refsetUuid + "]...");
-				int refsetNid=Terms.get().getConcept(UUID.fromString(refsetData.refsetUuid)).getNid();
-				
-				RF2LanguageImpl refsetImpl=new RF2LanguageImpl(getConfig(),refsetNid,refsetData.refsetSCTId);
-				Terms.get().iterateConcepts(refsetImpl);
-				logger.info("Finished Language Refset Export for [" + refsetData.refsetUuid + "].");
-				
+				if (refsetData.refsetParam!=null && refsetData.refsetParam.size()>0){
+
+					for (RefSetParam refsetData2:refsetData.refsetParam){
+
+						getConfig().setRefsetUuid(refsetData2.refsetUuid);
+						getConfig().setRefsetSCTID(refsetData2.refsetSCTId);
+
+						logger.info("Started Language Refset Export for [" + refsetData2.refsetUuid + "]...");
+						int refsetNid=Terms.get().getConcept(UUID.fromString(refsetData2.refsetUuid)).getNid();
+
+						RF2LanguageImpl refsetImpl=new RF2LanguageImpl(getConfig(),refsetNid,refsetData2.refsetSCTId);
+						Terms.get().iterateConcepts(refsetImpl);
+						logger.info("Finished Language Refset Export for [" + refsetData2.refsetUuid + "].");
+					}
+				}else{
+					getConfig().setRefsetUuid(refsetData.refsetUuid);
+					getConfig().setRefsetSCTID(refsetData.refsetSCTId);
+
+					logger.info("Started Language Refset Export for [" + refsetData.refsetUuid + "]...");
+					int refsetNid=Terms.get().getConcept(UUID.fromString(refsetData.refsetUuid)).getNid();
+
+					RF2LanguageImpl refsetImpl=new RF2LanguageImpl(getConfig(),refsetNid,refsetData.refsetSCTId);
+					Terms.get().iterateConcepts(refsetImpl);
+					logger.info("Finished Language Refset Export for [" + refsetData.refsetUuid + "].");
+
+				}
 				closeExportFileWriter();
 			}
 

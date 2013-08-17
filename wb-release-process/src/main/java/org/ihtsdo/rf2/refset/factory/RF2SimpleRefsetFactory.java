@@ -33,20 +33,33 @@ public class RF2SimpleRefsetFactory extends RF2AbstractFactory {
 
 		try {
 			List<RefSetParam> refsets=getConfig().getRefsetData();
-			
-			for (RefSetParam refsetData:refsets){
-				
-				getConfig().setExportFileName(refsetData.refsetFileName);
-				getConfig().setRefsetUuid(refsetData.refsetUuid);
-				getConfig().setRefsetSCTID(refsetData.refsetSCTId);
 
+			for (RefSetParam refsetData:refsets){
+
+				getConfig().setExportFileName(refsetData.refsetFileName);
 				setBufferedWriter();
-				
-				logger.info("Started Simple Refset Export for [" + refsetData.refsetUuid + "]...");
-				RF2SimpleRefsetImpl refsetImpl=new RF2SimpleRefsetImpl(getConfig());
-				Terms.get().iterateConcepts(refsetImpl);
-				logger.info("Finished Simple Refset Export for [" + refsetData.refsetUuid + "].");
-				
+				if (refsetData.refsetParam!=null && refsetData.refsetParam.size()>0){
+
+					for (RefSetParam refsetData2:refsetData.refsetParam){
+						getConfig().setRefsetUuid(refsetData2.refsetUuid);
+						getConfig().setRefsetSCTID(refsetData2.refsetSCTId);
+
+						logger.info("Started Simple Refset Export for [" + refsetData2.refsetUuid + "]...");
+						RF2SimpleRefsetImpl refsetImpl=new RF2SimpleRefsetImpl(getConfig());
+						Terms.get().iterateConcepts(refsetImpl);
+						logger.info("Finished Simple Refset Export for [" + refsetData2.refsetUuid + "].");
+					}
+				}else{
+
+					getConfig().setRefsetUuid(refsetData.refsetUuid);
+					getConfig().setRefsetSCTID(refsetData.refsetSCTId);
+
+					logger.info("Started Simple Refset Export for [" + refsetData.refsetUuid + "]...");
+					RF2SimpleRefsetImpl refsetImpl=new RF2SimpleRefsetImpl(getConfig());
+					Terms.get().iterateConcepts(refsetImpl);
+					logger.info("Finished Simple Refset Export for [" + refsetData.refsetUuid + "].");
+				}
+
 				closeExportFileWriter();
 			}
 
@@ -55,6 +68,6 @@ public class RF2SimpleRefsetFactory extends RF2AbstractFactory {
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 		}
-		
+
 	}
 }
