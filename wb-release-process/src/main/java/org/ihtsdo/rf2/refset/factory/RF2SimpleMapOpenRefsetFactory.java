@@ -48,10 +48,10 @@ public class RF2SimpleMapOpenRefsetFactory extends RF2AbstractFactory {
 						getConfig().setRefsetSCTID(refsetData2.refsetSCTId);
 
 						logger.info("Started Simple Map Refset Export for [" + refsetData2.refsetUuid + "]...");
-						if (refsetData2.refsetSCTId.toLowerCase().equals(I_Constants.SNOMED_REFSET_ID)){
+						if (refsetData2.refsetSCTId.equals(I_Constants.SNOMED_REFSET_ID)){
 							RF2SnomedIdImpl snomedIdIterator = new RF2SnomedIdImpl(getConfig());
 							Terms.get().iterateConcepts(snomedIdIterator);
-						}else if (refsetData2.refsetSCTId.toLowerCase().equals(I_Constants.CTV3_REFSET_ID)){
+						}else if (refsetData2.refsetSCTId.equals(I_Constants.CTV3_REFSET_ID)){
 							RF2Ctv3IdImpl ctv3IdIterator = new RF2Ctv3IdImpl(getConfig());
 							Terms.get().iterateConcepts(ctv3IdIterator);
 						}else{
@@ -65,10 +65,10 @@ public class RF2SimpleMapOpenRefsetFactory extends RF2AbstractFactory {
 					getConfig().setRefsetSCTID(refsetData.refsetSCTId);
 
 					logger.info("Started Simple Map Refset Export for [" + refsetData.refsetUuid + "]...");
-					if (refsetData.refsetSCTId.toLowerCase().equals(I_Constants.SNOMED_REFSET_ID)){
+					if (refsetData.refsetSCTId.equals(I_Constants.SNOMED_REFSET_ID)){
 						RF2SnomedIdImpl snomedIdIterator = new RF2SnomedIdImpl(getConfig());
 						Terms.get().iterateConcepts(snomedIdIterator);
-					}else if (refsetData.refsetSCTId.toLowerCase().equals(I_Constants.CTV3_REFSET_ID)){
+					}else if (refsetData.refsetSCTId.equals(I_Constants.CTV3_REFSET_ID)){
 						RF2Ctv3IdImpl ctv3IdIterator = new RF2Ctv3IdImpl(getConfig());
 						Terms.get().iterateConcepts(ctv3IdIterator);
 					}else{
