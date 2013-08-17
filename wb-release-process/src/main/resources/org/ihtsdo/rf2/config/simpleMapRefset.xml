@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <config>
-	<exportFileName>der2_sRefset_SimpleMapFull_INT_</exportFileName>
-	<droolsDrlFile>org/ihtsdo/rf2/drools/NONEReleaseRules.drl</droolsDrlFile>
+	<exportFileName>der2_sRefset_SimpleMap</exportFileName>
 	<column>
 		<name>id</name>
 		<description></description>

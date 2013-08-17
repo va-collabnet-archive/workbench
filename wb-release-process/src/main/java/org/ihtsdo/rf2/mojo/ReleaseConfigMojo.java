@@ -35,27 +35,11 @@ public class ReleaseConfigMojo extends AbstractMojo {
 	private String rF2Format;
 
 	/**
-	 * invokeDroolsRules
-	 * 
-	 * @parameter default-value="true"
-	 */
-	private String invokeDroolsRules;
-
-	/**
-	 * incrementalRelease
-	 * 
-	 * @parameter default-value="false"
-	 */
-	private String incrementalRelease;
-
-	/**
 	 * fileExtension
 	 * 
 	 * @parameter default-value="txt"
 	 */
 	private String fileExtension;
-	
-	
 
 	/**
 	 * flushCount
@@ -113,13 +97,6 @@ public class ReleaseConfigMojo extends AbstractMojo {
 	 */	
 	private ArrayList<RF2IdentifierFile> rf2Files;
 	
-	/**
-	 * Workbench sctid update flag
-	 * 
-	 * @parameter default-value="false"
-	 * 
-	 */	
-	private String updateWbSctId;
 
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
@@ -138,15 +115,12 @@ public class ReleaseConfigMojo extends AbstractMojo {
 
 		// defaults set in the mojo declaratons, overrriden from POM
 		config.setRf2Format(rF2Format);
-		config.setInvokeDroolRules(invokeDroolsRules);
-		config.setIncrementalRelease(incrementalRelease);
 		config.setFileExtension(fileExtension);
 		config.setFlushCount(flushCount);
 		
 		// set these for isgeneration
 		config.setReleaseFolder(releaseFolder);
 		config.setDestinationFolder(destinationFolder);
-		config.setUpdateWbSctId(updateWbSctId);		
 		config.setRf2Files(rf2Files);		
 	}
 

@@ -52,11 +52,7 @@ public class RF2DescriptionImpl extends RF2AbstractImpl implements I_ProcessConc
 		String caseSignificanceId = "";
 		String typeId = "";
 		String languageCode = "en";
-		String updateWbSctId = "false";
 		try {
-			if(!getConfig().isUpdateWbSctId().equals(null)){
-				updateWbSctId = getConfig().isUpdateWbSctId();
-			}
 
 			List<? extends I_DescriptionTuple> descriptions = concept.getDescriptionTuples(allStatuses, 
 					allDescTypes, currenAceConfig.getViewPositionSetReadOnly(), 

@@ -117,8 +117,6 @@ public class RF2IdListGeneratorImpl extends RF2IDImpl {
 			logger.info("Creating dirs does not existent." );
 		}
 
-		String updateWbSctId = getConfig().isUpdateWbSctId();
-
 		//check configuration contains files
 
 		if ( getConfig().getRf2Files().size() == 0 ){
@@ -138,7 +136,6 @@ public class RF2IdListGeneratorImpl extends RF2IDImpl {
 			File file = new File( getConfig().getRf2Files().get(f).fileName);
 			File sctIdFile = new File(getConfig().getRf2Files().get(f).sctIdFileName);
 			sctIdFile.getParentFile().mkdirs();
-			int effectiveTimeOrdinal = getConfig().getRf2Files().get(f).key.effectiveTimeOrdinal;
 			ArrayList<String> Key = getConfig().getRf2Files().get(f).key.keyOrdinals;
 
 			String namespaceId = getConfig().getRf2Files().get(f).sctidparam.namespaceId;
@@ -257,7 +254,6 @@ public class RF2IdListGeneratorImpl extends RF2IDImpl {
 								String partitionId = getConfig().getRf2Files().get(f).sctidparam.partitionId;
 								String releaseId =  getConfig().getRf2Files().get(f).sctidparam.releaseId;
 								String executionId = getConfig().getRf2Files().get(f).sctidparam.executionId;
-								String moduleId = getConfig().getRf2Files().get(f).sctidparam.moduleId;			
 
 								res=getSCTIdList(getConfig(),list,Integer.parseInt(namespaceId), partitionId, releaseId, executionId,"1");
 

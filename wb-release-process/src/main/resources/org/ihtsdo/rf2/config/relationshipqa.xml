@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <config>
-	<exportFileName>sct2_Relationship_Full_INT_</exportFileName>
-	<droolsDrlFile>org/ihtsdo/rf2/drools/RelationshipReleaseRules.drl</droolsDrlFile>
+	<exportFileName>sct2_Relationship_</exportFileName>
 	<column>
 		<name>id</name>
 		<description></description>

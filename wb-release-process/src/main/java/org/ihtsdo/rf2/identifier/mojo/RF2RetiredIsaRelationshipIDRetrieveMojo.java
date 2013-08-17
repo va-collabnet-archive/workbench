@@ -8,9 +8,9 @@ import org.ihtsdo.rf2.identifier.impl.RF2RelsIDRetrieveImpl;
 import org.ihtsdo.rf2.mojo.ReleaseConfigMojo;
 import org.ihtsdo.rf2.postexport.AuxiliaryFilesRetrieve;
 import org.ihtsdo.rf2.postexport.FileSorter;
+import org.ihtsdo.rf2.postexport.RF2ArtifactPostExportAbst.FILE_TYPE;
 import org.ihtsdo.rf2.postexport.RF2FileRetrieve;
 import org.ihtsdo.rf2.postexport.SnapshotGeneratorMultiColumn;
-import org.ihtsdo.rf2.postexport.RF2ArtifactPostExportAbst.FILE_TYPE;
 
 
 
@@ -62,14 +62,6 @@ public class RF2RetiredIsaRelationshipIDRetrieveMojo extends ReleaseConfigMojo {
 	 */
 	private String rf2FullFolder;
 	
-	/**
-	 * Location of the outputFolder. (output in this mojo)
-	 * 
-	 * @parameter
-	 * @required
-	 */
-	private String outputFolder;
-	
 	private String tmpPostExport="tmppostexport";	
 	private String tmpSort="tmpsort";
 	private String tmpTmpSort="tmp";
@@ -90,14 +82,10 @@ public class RF2RetiredIsaRelationshipIDRetrieveMojo extends ReleaseConfigMojo {
 			File folderTmp=new File(targetDirectory.getAbsolutePath() + "/" + getTmpPostExport() );
 			if (!folderTmp.exists()){
 				folderTmp.mkdir();
-			}else{
-				//TODO empty folder needed?
 			}
 			File sortedfolderTmp=new File(folderTmp.getAbsolutePath() + "/" + getTmpSort());
 			if (!sortedfolderTmp.exists()){
 				sortedfolderTmp.mkdir();
-			}else{
-				//TODO empty folder needed?
 			}
 
 		//	Config config = JAXBUtil.getConfig("/org/ihtsdo/rf2/config/relationship.xml");
@@ -107,8 +95,6 @@ public class RF2RetiredIsaRelationshipIDRetrieveMojo extends ReleaseConfigMojo {
 			File sortTmpfolderSortedTmp=new File(sortedfolderTmp.getAbsolutePath() + "/" + getTmpTmpSort());
 			if (!sortTmpfolderSortedTmp.exists()){
 				sortTmpfolderSortedTmp.mkdir();
-			}else{
-				//TODO empty folder needed?getTmpTmpSort
 			}
 
 			File sortedPreviousfile=new File(sortedfolderTmp,"pre_" + previousRelationshipFullFile.getName());
@@ -130,8 +116,6 @@ public class RF2RetiredIsaRelationshipIDRetrieveMojo extends ReleaseConfigMojo {
 			File snapshotfolderTmp=new File(folderTmp.getAbsolutePath() + "/" + getTmpSnapShot() );
 			if (!snapshotfolderTmp.exists()){
 				snapshotfolderTmp.mkdir();
-			}else{
-				//TODO empty folder needed?
 			}
 			File snapshotSortedPreviousfile=new File(snapshotfolderTmp,"pre_" + previousRelationshipFullFile.getName());
 			SnapshotGeneratorMultiColumn sg=new SnapshotGeneratorMultiColumn(sortedPreviousfile, previousReleaseDate, FILE_TYPE.RF2_RELATIONSHIP.getSnapshotIndex(), 1, snapshotSortedPreviousfile, null, null);
@@ -160,16 +144,6 @@ public class RF2RetiredIsaRelationshipIDRetrieveMojo extends ReleaseConfigMojo {
 			fsc=null;
 			System.gc();
 
-
-//			File rf2SnapshotOutputFolder=new File(outputFolder + "/" + getSnapshotOutputFolder() );
-//			if (!rf2SnapshotOutputFolder.exists()){
-//				rf2SnapshotOutputFolder.mkdir();
-//			}else{
-//				//TODO empty folder needed?
-//			}
-//			File rf2FullOutputFolder=new File(outputFolder+ "/" + getFullOutputFolder() );
-//			File rf2OutputRelationships=getSnapshotOutputFile(rf2SnapshotOutputFolder.getAbsolutePath(),  FILE_TYPE.RF2_RELATIONSHIP,releaseDate);
-//			File rf2OutputRelationships=getFullOutputFile( rf2FullOutputFolder.getAbsolutePath(), FILE_TYPE.RF2_RELATIONSHIP,releaseDate);
 			File rf2OutputRelationshipsReassign=new File(exportedRelationshipFile.getParentFile().getAbsolutePath(),"outputRF2RetIsaRelationshipReassigned.txt");
 			File outputUUIDsToAssign=new File(exportedRelationshipFile.getParentFile().getAbsolutePath(),"outputRetIsaUUIDsToAssign.txt");
 			File outputDifferences=new File(exportedRelationshipFile.getParentFile().getAbsolutePath(),"outputRetIsaDifferences.txt");
@@ -193,21 +167,6 @@ public class RF2RetiredIsaRelationshipIDRetrieveMojo extends ReleaseConfigMojo {
 
 	}
 
-	private FILE_TYPE getRelFileType(String relFileType) {
-		if (relFileType.equalsIgnoreCase(FILE_TYPE.RF2_RELATIONSHIP.name())){
-			return FILE_TYPE.RF2_RELATIONSHIP;
-		}
-		if (relFileType.equalsIgnoreCase(FILE_TYPE.RF2_STATED_RELATIONSHIP.name())){
-			return FILE_TYPE.RF2_STATED_RELATIONSHIP;
-		}
-		if (relFileType.equalsIgnoreCase(FILE_TYPE.RF2_ISA_RETIRED.name())){
-			return FILE_TYPE.RF2_ISA_RETIRED;
-		}
-		if (relFileType.equalsIgnoreCase(FILE_TYPE.RF2_STATED_ISA_RETIRED.name())){
-			return FILE_TYPE.RF2_STATED_ISA_RETIRED;
-		}
-		return null;
-	}
 
 	public File getSnapshotOutputFile(String parentFolder,FILE_TYPE fType,String date){
 		String retFile=fType.getFileName();

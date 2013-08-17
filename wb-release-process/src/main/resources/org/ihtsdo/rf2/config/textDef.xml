@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <config>
-	<exportFileName>sct2_TextDefinition_Full-en_INT_</exportFileName>
-	<droolsDrlFile>org/ihtsdo/rf2/drools/NONEReleaseRules.drl</droolsDrlFile>
+	<exportFileName>sct2_TextDefinition_</exportFileName>
 	<description/>
 	<column>
 		<name>id</name>

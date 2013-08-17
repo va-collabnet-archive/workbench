@@ -62,15 +62,6 @@ public class RF2IDListCreatorMojo extends ReleaseConfigMojo {
 	 */
 	private File targetDirectory;
 	
-	/**
-	 * Files
-	 * 
-	 * @parameter
-	 * @required
-	 */
-	private String updateWbSctId;
-	
-	
 	// for accessing the web service
 	/**
 	 * Files
@@ -102,26 +93,20 @@ public class RF2IDListCreatorMojo extends ReleaseConfigMojo {
 		Config config = JAXBUtil.getConfig("/org/ihtsdo/rf2/config/idGenerator.xml");
 		// set all the values passed via mojo
 		config.setOutputFolderName(exportFolder);
-//		DateFormat df = new SimpleDateFormat("yyyy.MM.dd hh:mm:ss");
-//		Date time = df.parse(releaseDate);
-//		DateFormat releaseFormat = new SimpleDateFormat("yyyyMMdd");
-//		String releaseDateString = releaseFormat.format(time);
 		config.setReleaseDate(releaseDate);		
 		config.setFlushCount(10000);
-		config.setInvokeDroolRules("false");
 		config.setFileExtension("txt");
 		config.setUsername(username);
 		config.setPassword(password);
 		config.setEndPoint(endpointURL);
 		config.setDestinationFolder(destinationFolder);
 		config.setRf2Files(rf2Files);
-		config.setUpdateWbSctId(updateWbSctId);
 		
 		getLog().info("Running the RF2 File ID Creation with the following ");
 		getLog().info("Destination Folder :" + destinationFolder);
 		
 		// Initialize meta hierarchy
-		//ExportUtil.init();
+//		ExportUtil.init(config);
 
 		RF2IdListGeneratorFactory factory = new RF2IdListGeneratorFactory(config);
 		factory.export();		

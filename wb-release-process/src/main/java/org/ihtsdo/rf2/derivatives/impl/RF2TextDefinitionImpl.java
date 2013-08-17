@@ -53,12 +53,7 @@ public class RF2TextDefinitionImpl extends RF2AbstractImpl implements I_ProcessC
 		String caseSignificanceId = "";
 		String typeId = "";
 		String moduleId="";
-		String updateWbSctId = "false";
 		try {
-			
-			if(!getConfig().isUpdateWbSctId().equals(null)){
-				updateWbSctId = getConfig().isUpdateWbSctId();
-			}
 			
 			List<? extends I_DescriptionTuple> descriptions = concept.getDescriptionTuples(allStatuses, 
 					textDefinTypes, currenAceConfig.getViewPositionSetReadOnly(), 
@@ -101,7 +96,6 @@ public class RF2TextDefinitionImpl extends RF2AbstractImpl implements I_ProcessC
 						active = "0";
 					
 					moduleId = computeModuleId(concept);	
-					//moduleId = getConceptMetaModuleID(concept , effectiveTime);
 					if(moduleId.equals(I_Constants.META_MODULE_ID)){		
 						logger.info("==Meta Concept==" + conceptid + " & Name : " + concept.getInitialText());
 						incrementMetaDataCount();

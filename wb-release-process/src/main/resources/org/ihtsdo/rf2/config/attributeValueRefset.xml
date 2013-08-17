@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <config>
-	<exportFileName>der2_cRefset_AttributeValueFull_INT_</exportFileName>	
-	<droolsDrlFile>org/ihtsdo/rf2/drools/NONEReleaseRules.drl</droolsDrlFile>
+	<exportFileName>der2_cRefset_AttributeValue</exportFileName>	
 	<column>
 		<name>id</name>
 		<description></description>

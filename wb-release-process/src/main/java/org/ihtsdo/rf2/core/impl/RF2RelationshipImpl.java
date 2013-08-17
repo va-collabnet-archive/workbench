@@ -3,7 +3,6 @@ package org.ihtsdo.rf2.core.impl;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
@@ -30,11 +29,9 @@ import org.ihtsdo.tk.api.RelAssertionType;
 public class RF2RelationshipImpl extends RF2AbstractImpl implements I_ProcessConcepts {
 
 	private static Logger logger = Logger.getLogger(RF2RelationshipImpl.class);
-	private String releaseDate;
 
 	public RF2RelationshipImpl(Config config) {
 		super(config);
-		releaseDate=config.getReleaseDate();
 	}
 
 	/*
@@ -59,11 +56,6 @@ public class RF2RelationshipImpl extends RF2AbstractImpl implements I_ProcessCon
 			String characteristicTypeId = "";
 			String modifierId = I_Constants.SOMEMODIFIER; 
 			int relationshipStatusId=0;
-			String updateWbSctId = "false";
-
-			if(!getConfig().isUpdateWbSctId().equals(null)){
-				updateWbSctId = getConfig().isUpdateWbSctId();
-			}
 
 			List<? extends I_RelTuple> relationships = sourceConcept.getSourceRelTuples(allStatuses, null, 
 					currenAceConfig.getViewPositionSetReadOnly(), 

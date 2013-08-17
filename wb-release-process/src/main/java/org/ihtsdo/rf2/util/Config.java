@@ -2,7 +2,6 @@ package org.ihtsdo.rf2.util;
 
 import java.io.BufferedWriter;
 import java.util.ArrayList;
-import java.util.Date;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -18,36 +17,17 @@ public class Config {
 
 	// from jsxb marshalling
 	private String exportFileName;
-	private String droolsDrlFile;
 	private ArrayList<Column> column;
 
 	// internal
 	@XmlTransient
-	private String database;
-	@XmlTransient
-	private String description;
-	@XmlTransient
 	private String releaseDate;
 	@XmlTransient
 	private String previousReleaseDate;
-	
-
-	@XmlTransient
-	private String fileExtension;
 	@XmlTransient
 	private String outputFolderName;
 	@XmlTransient
 	private String rf2Format;
-	@XmlTransient
-	private String incrementalRelease;
-	@XmlTransient
-	private String invokeDroolRules;
-	@XmlTransient
-	private Date fromReleaseDate;
-	@XmlTransient
-	private Date toReleaseDate;
-
-	
 	// for accessing the web service
 	@XmlTransient
 	private String endPoint;
@@ -55,14 +35,10 @@ public class Config {
 	private String username;
 	@XmlTransient
 	private String password;
-	
-	// for idgenerator
 	private String releaseFolder;
 	private String destinationFolder;
 	private String previousIdNotReleasedFile;
 	private ArrayList<RF2IdentifierFile> rf2Files;
-	private String updateWbSctId;
-	
 	
 	//Below Parameters are necessary for ID-Generation
 	private String namespaceId;
@@ -70,43 +46,11 @@ public class Config {
 	private String executionId;
 	private String releaseId;
 	private String componentType;
+	
+	
 	private ArrayList<String> moduleFilter;
 	private TestFilters testFilters;
 	
-	public String getChangesetUserName() {
-		return changesetUserName;
-	}
-
-	public void setChangesetUserName(String changesetUserName) {
-		this.changesetUserName = changesetUserName;
-	}
-
-	public String getChangesetUserConcept() {
-		return changesetUserConcept;
-	}
-
-	public void setChangesetUserConcept(String changesetUserConcept) {
-		this.changesetUserConcept = changesetUserConcept;
-	}
-
-	public String getChangesetRoot() {
-		return changesetRoot;
-	}
-
-	public void setChangesetRoot(String changesetRoot) {
-		this.changesetRoot = changesetRoot;
-	}
-
-	public String getUpdateWbSctId() {
-		return updateWbSctId;
-	}
-
-	// for id insertion
-	private String changesetUserName;
-	private String changesetUserConcept;
-	private String changesetRoot;
-	
-
 	@XmlTransient
 	private BufferedWriter bw;
 
@@ -115,6 +59,7 @@ public class Config {
 	private String refsetUuid;
 	private String refsetSCTId;
 	private ArrayList<RefSetParam> refsetData;
+	private String fileExtension;
 
 	public String getExportFileName() {
 		return exportFileName;
@@ -124,36 +69,12 @@ public class Config {
 		this.exportFileName = exportFileName;
 	}
 
-	public String getDroolsDrlFile() {
-		return droolsDrlFile;
-	}
-
-	public void setDroolsDrlFile(String droolsDrlFile) {
-		this.droolsDrlFile = droolsDrlFile;
-	}
-
 	public ArrayList<Column> getColumn() {
 		return column;
 	}
 
 	public void setColumn(ArrayList<Column> column) {
 		this.column = column;
-	}
-
-	public String getDatabase() {
-		return database;
-	}
-
-	public void setDatabase(String database) {
-		this.database = database;
-	}
-
-	public String getDescription() {
-		return description;
-	}
-
-	public void setDescription(String description) {
-		this.description = description;
 	}
 
 	public String getReleaseDate() {
@@ -196,38 +117,6 @@ public class Config {
 		this.rf2Format = rf2Format;
 	}
 
-	public String getIncrementalRelease() {
-		return incrementalRelease;
-	}
-
-	public void setIncrementalRelease(String incrementalRelease) {
-		this.incrementalRelease = incrementalRelease;
-	}
-
-	public String getInvokeDroolRules() {
-		return invokeDroolRules;
-	}
-
-	public void setInvokeDroolRules(String invokeDroolRules) {
-		this.invokeDroolRules = invokeDroolRules;
-	}
-
-	public Date getFromReleaseDate() {
-		return fromReleaseDate;
-	}
-
-	public void setFromReleaseDate(Date fromReleaseDate) {
-		this.fromReleaseDate = fromReleaseDate;
-	}
-
-	public Date getToReleaseDate() {
-		return toReleaseDate;
-	}
-
-	public void setToReleaseDate(Date toReleaseDate) {
-		this.toReleaseDate = toReleaseDate;
-	}
-
 	public BufferedWriter getBw() {
 		return bw;
 	}
@@ -246,8 +135,6 @@ public class Config {
 
 	public void setDefaults() {
 		this.setRf2Format("false");
-		this.setInvokeDroolRules("false");
-		this.setIncrementalRelease("false");
 		this.setFileExtension("txt");
 		this.setFlushCount(100000);
 	}
@@ -300,14 +187,6 @@ public class Config {
 		this.rf2Files = rf2Files;
 	}
 	
-	public String isUpdateWbSctId() {
-		return updateWbSctId;
-	}
-
-	public void setUpdateWbSctId(String updateWbSctId) {
-		this.updateWbSctId = updateWbSctId;
-	}
-
 	public String getNamespaceId() {
 		return namespaceId;
 	}
