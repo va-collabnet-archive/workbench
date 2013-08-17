@@ -30,7 +30,7 @@ public class RF2SimpleOpenPostMojo extends AbstractMojo {
 	private File targetDirectory;
 	
 	/**
-	 * release date. 20100731
+	 * release date.
 	 * 
 	 * @parameter
 	 * @required
@@ -38,7 +38,7 @@ public class RF2SimpleOpenPostMojo extends AbstractMojo {
 	private String releaseDate;
 	
 	/**
-	 * previuous release date. 20100731
+	 * previuous release date.
 	 * 
 	 * @parameter
 	 * @required

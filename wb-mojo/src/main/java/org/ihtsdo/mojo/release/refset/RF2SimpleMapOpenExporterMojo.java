@@ -72,26 +72,13 @@ public class RF2SimpleMapOpenExporterMojo extends AbstractMojo {
 	 */
 	private String password;
 	
-	
-	
-	//Below Parameters are necessary for ID-Generation
-
-	/**
-	 * updateWbSctId
-	 * 
-	 * @parameter default-value="false"
-	 * 
-	 */
-	private String updateWbSctId;
-	
-	
 	// for accessing the web service
 	
 	
 	/**
 	 * namespaceId
 	 * 
-	 * @parameter default-value="0"
+	 * @parameter 
 	 * 
 	 */
 	private String namespaceId;
@@ -99,7 +86,7 @@ public class RF2SimpleMapOpenExporterMojo extends AbstractMojo {
 	/**
 	 * partitionId
 	 * 
-	 * @parameter default-value="00"
+	 * @parameter 
 	 * 
 	 */
 	private String partitionId;
@@ -107,7 +94,7 @@ public class RF2SimpleMapOpenExporterMojo extends AbstractMojo {
 	/**
 	 * executionId
 	 * 
-	 * @parameter default-value="Daily-build"
+	 * @parameter 
 	 * 
 	 */
 	private String executionId;
@@ -115,19 +102,11 @@ public class RF2SimpleMapOpenExporterMojo extends AbstractMojo {
 	/**
 	 * releaseId
 	 * 
-	 * @parameter default-value="20110131"
+	 * @parameter 
 	 * 
 	 */
 	private String releaseId;
 	
-	/**
-	 * componentType
-	 * 
-	 * @parameter default-value="Concept"
-	 * 
-	 */
-	private String componentType;
-
 	/**
 	 * moduleFilter
 	 * 
