@@ -58,21 +58,13 @@ public class RF2IdentifierExporterMojo extends AbstractMojo {
 
 			// set all the values passed via mojo
 			config.setOutputFolderName(exportFolder);
-
-//			DateFormat df = new SimpleDateFormat("yyyy.MM.dd hh:mm:ss");
-//			Date time = df.parse(releaseDate);
-//			DateFormat releaseFormat = new SimpleDateFormat("yyyyMMdd");
-//			String releaseDateString = releaseFormat.format(time);
 			config.setReleaseDate(releaseDate);
-			
 			config.setFlushCount(10000);
-			config.setInvokeDroolRules("false");
 			config.setFileExtension("txt");
 			config.setModuleFilter(moduleFilter);
 
 			// initialize meta hierarchy
 			ExportUtil.init(config);
-
 
 			RF2IdentifierFactory factory = new RF2IdentifierFactory(config);
 			factory.export();

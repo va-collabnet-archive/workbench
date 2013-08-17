@@ -67,12 +67,10 @@ public class RF2LanguageExporterMojo extends AbstractMojo {
 
 			Config config = JAXBUtil.getConfig("/org/ihtsdo/rf2/config/languageRefset.xml");
 
-
 			// set all the values passed via mojo
 			config.setOutputFolderName(exportFolder);
 			config.setReleaseDate(releaseDate);
 			config.setFlushCount(10000);
-			config.setInvokeDroolRules("false");
 			config.setFileExtension("txt");
 			config.setModuleFilter(moduleFilter);
 

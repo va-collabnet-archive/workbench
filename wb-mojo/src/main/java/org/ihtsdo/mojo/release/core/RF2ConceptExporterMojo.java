@@ -51,21 +51,7 @@ public class RF2ConceptExporterMojo extends AbstractMojo {
 	 * @required
 	 */
 	private String rF2Format;
-	
-	
-	
-	
 	//Below Parameters are necessary for ID-Generation
-
-	/**
-	 * updateWbSctId
-	 * 
-	 * @parameter default-value="false"
-	 * 
-	 */
-	private String updateWbSctId;
-	
-	
 	// for accessing the web service
 	/**
 	 * endpointURL
@@ -95,7 +81,7 @@ public class RF2ConceptExporterMojo extends AbstractMojo {
 	/**
 	 * namespaceId
 	 * 
-	 * @parameter default-value="0"
+	 * @parameter 
 	 * 
 	 */
 	private String namespaceId;
@@ -103,7 +89,7 @@ public class RF2ConceptExporterMojo extends AbstractMojo {
 	/**
 	 * partitionId
 	 * 
-	 * @parameter default-value="00"
+	 * @parameter 
 	 * 
 	 */
 	private String partitionId;
@@ -111,7 +97,7 @@ public class RF2ConceptExporterMojo extends AbstractMojo {
 	/**
 	 * executionId
 	 * 
-	 * @parameter default-value="Daily-build"
+	 * @parameter
 	 * 
 	 */
 	private String executionId;
@@ -119,18 +105,10 @@ public class RF2ConceptExporterMojo extends AbstractMojo {
 	/**
 	 * releaseId
 	 * 
-	 * @parameter default-value="20110131"
+	 * @parameter 
 	 * 
 	 */
 	private String releaseId;
-	
-	/**
-	 * componentType
-	 * 
-	 * @parameter default-value="Concept"
-	 * 
-	 */
-	private String componentType;
 
 	/**
 	 * moduleFilter
@@ -152,25 +130,18 @@ public class RF2ConceptExporterMojo extends AbstractMojo {
 			// set all the values passed via mojo
 			config.setOutputFolderName(exportFolder);
 			
-//			DateFormat df = new SimpleDateFormat("yyyy.MM.dd hh:mm:ss");
-//			Date time = df.parse(releaseDate);
-//			DateFormat releaseFormat = new SimpleDateFormat("yyyyMMdd");
-//			String releaseDateString = releaseFormat.format(time);
 			config.setReleaseDate(releaseDate);
 			config.setRf2Format(rF2Format);
 			config.setFlushCount(10000);
-			config.setInvokeDroolRules("false");
 			config.setFileExtension("txt");
 			config.setModuleFilter(moduleFilter);
 			
 			
 			//Below Parameters are necessary for ID-Generation
-			config.setUpdateWbSctId(updateWbSctId);
 			config.setNamespaceId(namespaceId);
 			config.setPartitionId(partitionId);
 			config.setExecutionId(executionId);
 			config.setReleaseId(releaseId);
-			config.setComponentType(componentType);			
 			config.setUsername(username);
 			config.setPassword(password);
 			config.setEndPoint(endpointURL);

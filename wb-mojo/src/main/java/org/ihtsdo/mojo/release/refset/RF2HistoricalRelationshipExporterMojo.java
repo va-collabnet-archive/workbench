@@ -53,18 +53,6 @@ public class RF2HistoricalRelationshipExporterMojo extends AbstractMojo {
 	 */
 	private String rF2Format;
 	
-	
-	//Below Parameters are necessary for ID-Generation
-
-	/**
-	 * namespaceId
-	 * 
-	 * @parameter default-value="false"
-	 * 
-	 */
-	private String updateWbSctId;
-	
-	
 	/**
 	 * namespaceId
 	 * 
@@ -129,32 +117,6 @@ public class RF2HistoricalRelationshipExporterMojo extends AbstractMojo {
 	 * 
 	 */
 	private String password;
-	
-	/**
-	 * changesetUserName
-	 * 
-	 * @parameter default-value="testvp"
-	 * 
-	 */
-	private String changesetUserName;
-	
-	
-	/**
-	 * changesetUserConcept
-	 * 
-	 * @parameter default-value="f7495b58-6630-3499-a44e-2052b5fcf06c"
-	 * 
-	 */
-	private String changesetUserConcept;
-	
-	
-	/**
-	 * changesetRoot
-	 * 
-	 * @parameter default-value="E:/Workbench_Bundle/Prod/SyncPRODNov06/profiles/testvp"
-	 * 
-	 */
-	private String changesetRoot;
 
 	/**
 	 * moduleFilter
@@ -174,12 +136,10 @@ public class RF2HistoricalRelationshipExporterMojo extends AbstractMojo {
 			config.setRf2Format(rF2Format);
 			config.setFlushCount(10000);
 			
-			config.setInvokeDroolRules("false");
 			config.setFileExtension("txt");
 			config.setModuleFilter(moduleFilter);
 			
 			//Below Parameters are necessary for ID-Generation
-			config.setUpdateWbSctId(updateWbSctId);
 			config.setNamespaceId(namespaceId);
 			config.setPartitionId(partitionId);
 			config.setExecutionId(executionId);
@@ -188,15 +148,9 @@ public class RF2HistoricalRelationshipExporterMojo extends AbstractMojo {
 			config.setUsername(username);
 			config.setPassword(password);
 			config.setEndPoint(endpointURL);
-		
-			//Below Parameters are required for ID-Insertion
-			config.setChangesetUserName(changesetUserName);
-			config.setChangesetUserConcept(changesetUserConcept);
-			config.setChangesetRoot(changesetRoot);
-			
+
 			// initialize meta hierarchy
 			ExportUtil.init(config);
-
 
 			RF2HistoricalAssociationRelationshipRefsetFactory factory = new RF2HistoricalAssociationRelationshipRefsetFactory(config);
 			factory.export();

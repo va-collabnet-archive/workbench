@@ -63,13 +63,11 @@ public class RF2HistoricalRelationshipExporterMojo extends AbstractMojo {
 			config.setReleaseDate(releaseDate);
 			
 			config.setFlushCount(10000);
-			config.setInvokeDroolRules("false");
 			config.setFileExtension("txt");
 			config.setModuleFilter(moduleFilter);
 
 			// initialize meta hierarchy
 			ExportUtil.init(config);
-
 
 			RF2HistoricalRelationshipFactory factory = new RF2HistoricalRelationshipFactory(config);
 			factory.export();

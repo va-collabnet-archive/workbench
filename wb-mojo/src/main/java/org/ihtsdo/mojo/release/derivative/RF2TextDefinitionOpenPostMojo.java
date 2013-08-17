@@ -28,7 +28,7 @@ public class RF2TextDefinitionOpenPostMojo extends AbstractMojo {
 	private File targetDirectory;
 	
 	/**
-	 * release date. 20100731
+	 * release date. 
 	 * 
 	 * @parameter
 	 * @required
@@ -36,7 +36,7 @@ public class RF2TextDefinitionOpenPostMojo extends AbstractMojo {
 	private String releaseDate;
 	
 	/**
-	 * previuous release date. 20100731
+	 * previous release date. 
 	 * 
 	 * @parameter
 	 * @required
@@ -86,7 +86,7 @@ public class RF2TextDefinitionOpenPostMojo extends AbstractMojo {
 	/**
 	 * Language Code for file names of release
 	 * 
-	 * @parameter expression="en"
+	 * @parameter 
 	 * @required
 	 */
 	private String languageCode;

@@ -59,15 +59,6 @@ public class RF2DescriptionExporterMojo extends AbstractMojo {
 	/**
 	 * namespaceId
 	 * 
-	 * @parameter default-value="false"
-	 * 
-	 */
-	private String updateWbSctId;
-	
-	
-	/**
-	 * namespaceId
-	 * 
 	 * @parameter default-value="0"
 	 * 
 	 */
@@ -159,12 +150,10 @@ public class RF2DescriptionExporterMojo extends AbstractMojo {
 			config.setReleaseDate(releaseDate);
 			config.setRf2Format(rF2Format);
 			config.setFlushCount(10000);
-			config.setInvokeDroolRules("false");
 			config.setFileExtension("txt");
 			config.setModuleFilter(moduleFilter);
 
 			//Below Parameters are necessary for ID-Generation
-			config.setUpdateWbSctId(updateWbSctId);
 			config.setNamespaceId(namespaceId);
 			config.setPartitionId(partitionId);
 			config.setExecutionId(executionId);

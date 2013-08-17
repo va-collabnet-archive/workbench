@@ -84,14 +84,9 @@ public class RF2RetiredIsaStatedRelationshipExporterMojo extends AbstractMojo {
 			// set all the values passed via mojo
 			config.setOutputFolderName(exportFolder);
 
-//			DateFormat df = new SimpleDateFormat("yyyy.MM.dd hh:mm:ss");
-//			Date time = df.parse(releaseDate);
-//			DateFormat releaseFormat = new SimpleDateFormat("yyyyMMdd");
-//			String releaseDateString = releaseFormat.format(time);
 			config.setReleaseDate(releaseDate);
 			config.setRf2Format(rF2Format);
 			config.setFlushCount(10000);
-			config.setInvokeDroolRules("false");
 			config.setFileExtension("txt");
 			config.setModuleFilter(moduleFilter);
 

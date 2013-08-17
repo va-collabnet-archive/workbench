@@ -71,19 +71,6 @@ public class RF2SimpleMapExporterMojo extends AbstractMojo {
 	 */
 	private String password;
 	
-	
-	
-	//Below Parameters are necessary for ID-Generation
-
-	/**
-	 * updateWbSctId
-	 * 
-	 * @parameter default-value="false"
-	 * 
-	 */
-	private String updateWbSctId;
-	
-	
 	// for accessing the web service
 	
 	
@@ -152,13 +139,11 @@ public class RF2SimpleMapExporterMojo extends AbstractMojo {
 			config.setOutputFolderName(exportFolder);
 			config.setReleaseDate(releaseDate);
 			config.setFlushCount(10000);
-			config.setInvokeDroolRules("false");
 			config.setFileExtension("txt");
 			config.setModuleFilter(moduleFilter);
 			
 
 			//Below Parameters are necessary for ID-Generation
-			config.setUpdateWbSctId(updateWbSctId);
 			config.setNamespaceId(namespaceId);
 			config.setPartitionId(partitionId);
 			config.setExecutionId(executionId);

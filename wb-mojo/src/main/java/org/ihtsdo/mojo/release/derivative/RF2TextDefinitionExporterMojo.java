@@ -54,17 +54,6 @@ public class RF2TextDefinitionExporterMojo extends AbstractMojo {
 	 */
 	private String rF2Format;
 	
-	//Below Parameters are necessary for ID-Generation
-
-	/**
-	 * updateWbSctId
-	 * 
-	 * @parameter default-value="false"
-	 * 
-	 */
-	private String updateWbSctId;
-	
-	
 	// for accessing the web service
 	/**
 	 * endpointURL
@@ -91,12 +80,10 @@ public class RF2TextDefinitionExporterMojo extends AbstractMojo {
 	private String password;
 	
 	
-	
-	
 	/**
 	 * namespaceId
 	 * 
-	 * @parameter default-value="0"
+	 * @parameter 
 	 * 
 	 */
 	private String namespaceId;
@@ -104,7 +91,7 @@ public class RF2TextDefinitionExporterMojo extends AbstractMojo {
 	/**
 	 * partitionId
 	 * 
-	 * @parameter default-value="00"
+	 * @parameter 
 	 * 
 	 */
 	private String partitionId;
@@ -112,7 +99,7 @@ public class RF2TextDefinitionExporterMojo extends AbstractMojo {
 	/**
 	 * executionId
 	 * 
-	 * @parameter default-value="Daily-build"
+	 * @parameter
 	 * 
 	 */
 	private String executionId;
@@ -120,7 +107,7 @@ public class RF2TextDefinitionExporterMojo extends AbstractMojo {
 	/**
 	 * releaseId
 	 * 
-	 * @parameter default-value="20110131"
+	 * @parameter 
 	 * 
 	 */
 	private String releaseId;
@@ -128,7 +115,7 @@ public class RF2TextDefinitionExporterMojo extends AbstractMojo {
 	/**
 	 * componentType
 	 * 
-	 * @parameter default-value="Concept"
+	 * @parameter 
 	 * 
 	 */
 	private String componentType;
@@ -164,13 +151,11 @@ public class RF2TextDefinitionExporterMojo extends AbstractMojo {
 			config.setOutputFolderName(exportFolder);
 			config.setReleaseDate(releaseDate);
 			config.setFlushCount(10000);
-			config.setInvokeDroolRules("false");
 			config.setFileExtension("txt");
 			config.setModuleFilter(moduleFilter);
 			config.setRf2Format(rF2Format);
 			
 			//Below Parameters are necessary for ID-Generation
-			config.setUpdateWbSctId(updateWbSctId);
 			config.setNamespaceId(namespaceId);
 			config.setPartitionId(partitionId);
 			config.setExecutionId(executionId);

@@ -82,7 +82,6 @@ public class RF2SimpleOpenExporterMojo extends AbstractMojo {
 			config.setOutputFolderName(exportFolder);
 			config.setReleaseDate(releaseDate);
 			config.setFlushCount(10000);
-			config.setInvokeDroolRules("false");
 			config.setFileExtension("txt");
 			config.setModuleFilter(moduleFilter);
 			config.setRefsetData(refsetData);

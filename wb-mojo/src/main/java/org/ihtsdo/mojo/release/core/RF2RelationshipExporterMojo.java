@@ -154,12 +154,10 @@ public class RF2RelationshipExporterMojo extends AbstractMojo {
 			config.setReleaseDate(releaseDate);
 			config.setRf2Format(rF2Format);
 			config.setFlushCount(10000);
-			config.setInvokeDroolRules("false");
 			config.setFileExtension("txt");
 			config.setModuleFilter(moduleFilter);
 			
 			//Below Parameters are necessary for ID-Generation
-			config.setUpdateWbSctId(updateWbSctId);
 			config.setNamespaceId(namespaceId);
 			config.setPartitionId(partitionId);
 			config.setExecutionId(executionId);
@@ -171,7 +169,6 @@ public class RF2RelationshipExporterMojo extends AbstractMojo {
 		
 			// initialize meta hierarchy
 			ExportUtil.init(config);
-
 
 			RF2RelationshipFactory factory = new RF2RelationshipFactory(config);
 			factory.export();

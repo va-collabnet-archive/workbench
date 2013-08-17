@@ -71,7 +71,6 @@ public class RF2AttributeValueExporterMojo extends AbstractMojo {
 			config.setOutputFolderName(exportFolder);
 			config.setReleaseDate(releaseDate);
 			config.setFlushCount(10000);
-			config.setInvokeDroolRules("false");
 			config.setFileExtension("txt");
 			config.setModuleFilter(moduleFilter);
 

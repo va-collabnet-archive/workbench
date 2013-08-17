@@ -70,15 +70,12 @@ public class RF2RetiredIsaRelationshipExporterMojo extends AbstractMojo {
 			else
 			 config = JAXBUtil.getConfig("/org/ihtsdo/rf2/config/retiredisarelationshipqa.xml");
 		
-			
-
 			// set all the values passed via mojo
 			config.setOutputFolderName(exportFolder);
 
 			config.setReleaseDate(releaseDate);
 			config.setRf2Format(rF2Format);
 			config.setFlushCount(10000);
-			config.setInvokeDroolRules("false");
 			config.setFileExtension("txt");
 			config.setModuleFilter(moduleFilter);
 
