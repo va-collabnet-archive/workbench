@@ -88,7 +88,7 @@ public class RF2LanguageOpenPostMojo extends AbstractMojo {
 	/**
 	 * Language Code for file names of release
 	 * 
-	 * @parameter expression="en"
+	 * @parameter 
 	 * @required
 	 */
 	private String languageCode;

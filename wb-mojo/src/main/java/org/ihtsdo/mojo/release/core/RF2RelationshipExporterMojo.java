@@ -68,7 +68,7 @@ public class RF2RelationshipExporterMojo extends AbstractMojo {
 	/**
 	 * namespaceId
 	 * 
-	 * @parameter default-value="0"
+	 * @parameter 
 	 * 
 	 */
 	private String namespaceId;
@@ -76,7 +76,7 @@ public class RF2RelationshipExporterMojo extends AbstractMojo {
 	/**
 	 * partitionId
 	 * 
-	 * @parameter default-value="00"
+	 * @parameter 
 	 * 
 	 */
 	private String partitionId;
@@ -84,7 +84,7 @@ public class RF2RelationshipExporterMojo extends AbstractMojo {
 	/**
 	 * executionId
 	 * 
-	 * @parameter default-value="Daily-build"
+	 * @parameter 
 	 * 
 	 */
 	private String executionId;
@@ -92,7 +92,7 @@ public class RF2RelationshipExporterMojo extends AbstractMojo {
 	/**
 	 * moduleId
 	 * 
-	 * @parameter default-value="20110131"
+	 * @parameter 
 	 * 
 	 */
 	private String releaseId;
@@ -100,7 +100,7 @@ public class RF2RelationshipExporterMojo extends AbstractMojo {
 	/**
 	 * componentType
 	 * 
-	 * @parameter default-value="Concept"
+	 * @parameter 
 	 * 
 	 */
 	private String componentType;
