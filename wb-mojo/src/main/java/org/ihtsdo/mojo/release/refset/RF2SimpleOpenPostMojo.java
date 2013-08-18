@@ -97,7 +97,7 @@ public class RF2SimpleOpenPostMojo extends AbstractMojo {
 			
 			RF2ArtifactPostExportImpl pExp=new RF2ArtifactPostExportImpl(FILE_TYPE.RF2_SIMPLE, new File( rf2FullFolder),
 					new File(outputFolder), targetDirectory,
-					 previousReleaseDate, releaseDate,refsetData,config.getFileExtension(),"",namespace);
+					 previousReleaseDate, releaseDate,refsetData,config.getFileExtension(),"",namespace,exportFolder);
 			
 			pExp.process();
 			

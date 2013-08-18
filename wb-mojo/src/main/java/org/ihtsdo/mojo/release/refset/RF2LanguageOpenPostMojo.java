@@ -103,7 +103,7 @@ public class RF2LanguageOpenPostMojo extends AbstractMojo {
 			
 			RF2ArtifactPostExportImpl pExp=new RF2ArtifactPostExportImpl(FILE_TYPE.RF2_LANGUAGE_REFSET , new File( rf2FullFolder),
 					new File(outputFolder), targetDirectory,
-					 previousReleaseDate, releaseDate,refsetData,config.getFileExtension(),languageCode,namespace);
+					 previousReleaseDate, releaseDate,refsetData,config.getFileExtension(),languageCode,namespace,exportFolder);
 		
 			pExp.process();
 			
