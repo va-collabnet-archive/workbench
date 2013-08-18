@@ -225,7 +225,7 @@ public class ExportUtil {
 			for (I_GetConceptData loopConcept : parentSet) {
 				if(findParentSnomedId){
 					parentSnomedId = getSnomedId(loopConcept);	
-					if(!parentSnomedId.isEmpty()){
+					if(parentSnomedId!=null){
 						parent.addAll(parentSet);
 						findParentSnomedId = false;
 					}
