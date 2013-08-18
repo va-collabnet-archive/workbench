@@ -34,16 +34,19 @@ public class RF2ArtifactPostExportImpl extends RF2ArtifactPostExportAbst{
 	private File sortTmpfolderSortedTmp;
 
 	private ArrayList<RefSetParam> refsetData;
+
+	private String exportFolder;
 	
 
 	public RF2ArtifactPostExportImpl(FILE_TYPE fType, File rf2FullFolder,
 			File rf2OutputFolder, File buildDirectory,
 			String previousReleaseDate, String releaseDate,
 			ArrayList<RefSetParam> refsetData,String fileExtension,
-			String languageCode,String namespace) throws IOException {
+			String languageCode,String namespace,String exportFolder) throws IOException {
 		this( fType,  rf2FullFolder,
 				 null,  rf2OutputFolder,  buildDirectory,
 				 previousReleaseDate,  releaseDate);
+		this.exportFolder=exportFolder;
 		this.fileExtension="." + fileExtension;
 		this.refsetData=refsetData;
 		this.langCode=languageCode;
@@ -131,6 +134,7 @@ public class RF2ArtifactPostExportImpl extends RF2ArtifactPostExportAbst{
 		File sortedExportedfile=null;
 		if (refsetData!=null){
 			for (RefSetParam refsetParam:refsetData){
+				rf2Exported=new File(exportFolder, refsetParam.refsetFileName + releaseDate + "." + fileExtension);
 				sortedExportedfile=new File(sortedfolderTmp,"exp_" + refsetParam.refsetFileName + releaseDate + "." + fileExtension);
 
 				fullFinalFile=new File(rf2FullOutputFolder.getAbsolutePath(),  refsetParam.refsetFileName + "Full" + langCode + "_" + namespace + "_" + releaseDate + fileExtension);
