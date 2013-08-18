@@ -151,18 +151,15 @@ public class ExportUtil {
 		Set<I_GetConceptData> parents = new HashSet<I_GetConceptData>();
 		parents = getParentLocal(parents, concept); 
 		String parentSnomedId="";
-		boolean findParentSnomedId = true;
 
 		for (I_GetConceptData loopConcept : parents) {
-			if(findParentSnomedId){
-				parentSnomedId = getSnomedId(loopConcept);
-				if(!parentSnomedId.isEmpty()){
-					findParentSnomedId = false;
-				}
+			parentSnomedId = getSnomedId(loopConcept);
+			if(parentSnomedId!=null){
+				return parentSnomedId;
 			}
 		}
 
-		return parentSnomedId;
+		return "";
 	}
 
 

@@ -46,7 +46,7 @@ public class RF2SnomedIdImpl extends RF2AbstractImpl implements I_ProcessConcept
 			String mapTarget_Core = getSnomedId(concept);
 			String mapTarget="";
 
-			if(!(mapTarget_Core.equals("") && mapTarget_Core.equals(null))){
+			if(mapTarget_Core!=null && !mapTarget_Core.equals("")){
 				mapTarget = mapTarget_Core;
 			}
 			if (referencedComponentId==null || referencedComponentId.equals("")){

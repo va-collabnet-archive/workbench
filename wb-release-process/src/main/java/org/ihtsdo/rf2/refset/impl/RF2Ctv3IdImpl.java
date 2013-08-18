@@ -48,7 +48,7 @@ public class RF2Ctv3IdImpl extends RF2AbstractImpl implements I_ProcessConcepts 
 			String mapTarget_Core = getCtv3Id(concept);
 			String mapTarget="";
 
-			if(!(mapTarget_Core.equals("") && mapTarget_Core.equals(null))){
+			if(mapTarget_Core!=null && !mapTarget_Core.equals("")){
 				mapTarget = mapTarget_Core;
 			}
 
