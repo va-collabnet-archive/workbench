@@ -131,7 +131,12 @@ public class ExportUtil {
 		}
 
 		for (UUID uuid:allModuleIds.keySet()){
-			String moduleSCTId=getSCTId(config, uuid);
+			String part="00";
+			if (config.getNamespaceId()!="0"){
+				part="10";
+			}
+			
+			String moduleSCTId=getSCTId(config,uuid, Integer.parseInt(config.getNamespaceId()) , part, config.getReleaseId(),config.getExecutionId(), "");
 			try {
 				if (!filter){
 					allModuleMapNidSCTId.put(getTermFactory().uuidToNative(uuid), moduleSCTId);
