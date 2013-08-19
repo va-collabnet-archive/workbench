@@ -47,6 +47,30 @@ public class RF2LanguageOpenExporterMojo extends AbstractMojo {
 	 */
 	private String exportFolder;
 
+	// for accessing the web service
+	/**
+	 * endpointURL
+	 * 
+	 * @parameter
+	 * 
+	 */
+	private String endpointURL;
+	
+	/**
+	 * username
+	 * 
+	 * @parameter
+	 * 
+	 */
+	private String username;
+	
+	/**
+	 * password
+	 * 
+	 * @parameter
+	 * 
+	 */
+	private String password;
 	/**
 	 * moduleFilter
 	 * 
@@ -85,9 +109,12 @@ public class RF2LanguageOpenExporterMojo extends AbstractMojo {
 			config.setModuleFilter(moduleFilter);
 			config.setRefsetData(refsetData);
 
+			config.setUsername(username);
+			config.setPassword(password);
+			config.setEndPoint(endpointURL);
+
 			// initialize ace framwork and meta hierarchy
 			ExportUtil.init(config);
-
 			RF2LanguageOpenRefsetFactory factory = new RF2LanguageOpenRefsetFactory(config);
 			factory.export();
 			

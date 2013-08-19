@@ -45,7 +45,31 @@ public class RF2RetiredIsaStatedRelationshipExporterMojo extends AbstractMojo {
 	 * @required
 	 */
 	private String exportFolder;
+
+	// for accessing the web service
+	/**
+	 * endpointURL
+	 * 
+	 * @parameter
+	 * 
+	 */
+	private String endpointURL;
 	
+	/**
+	 * username
+	 * 
+	 * @parameter
+	 * 
+	 */
+	private String username;
+	
+	/**
+	 * password
+	 * 
+	 * @parameter
+	 * 
+	 */
+	private String password;
 	/**
 	 * Location of the rF2Format.
 	 * 
@@ -87,7 +111,10 @@ public class RF2RetiredIsaStatedRelationshipExporterMojo extends AbstractMojo {
 			config.setReleaseDate(releaseDate);
 			config.setRf2Format(rF2Format);
 			config.setFlushCount(10000);
-			config.setFileExtension("txt");
+			config.setFileExtension("txt");	
+			config.setUsername(username);
+			config.setPassword(password);
+			config.setEndPoint(endpointURL);
 			config.setModuleFilter(moduleFilter);
 
 			// initialize ace framwork and meta hierarchy

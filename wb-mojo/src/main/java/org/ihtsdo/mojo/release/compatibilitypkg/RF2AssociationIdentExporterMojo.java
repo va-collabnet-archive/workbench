@@ -49,6 +49,30 @@ public class RF2AssociationIdentExporterMojo extends AbstractMojo {
 	 */
 	private String exportFolder;
 
+	// for accessing the web service
+	/**
+	 * endpointURL
+	 * 
+	 * @parameter
+	 * 
+	 */
+	private String endpointURL;
+	
+	/**
+	 * username
+	 * 
+	 * @parameter
+	 * 
+	 */
+	private String username;
+	
+	/**
+	 * password
+	 * 
+	 * @parameter
+	 * 
+	 */
+	private String password;
 	/**
 	 * Location of the wbAssociationId_SCTIDMapFactory.
 	 * 
@@ -83,7 +107,10 @@ public class RF2AssociationIdentExporterMojo extends AbstractMojo {
 			config.setReleaseDate(releaseDate);
 			config.setFlushCount(10000);
 			config.setFileExtension("txt");
-			config.setModuleFilter(moduleFilter);
+			config.setModuleFilter(moduleFilter);	
+			config.setUsername(username);
+			config.setPassword(password);
+			config.setEndPoint(endpointURL);
 			TestFilters testFilters= new TestFilters();
 			ModuleFilter filter=new ModuleFilter(); 
 			testFilters.addFilter(filter);

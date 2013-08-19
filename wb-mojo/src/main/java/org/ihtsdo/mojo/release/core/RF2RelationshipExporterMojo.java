@@ -55,15 +55,6 @@ public class RF2RelationshipExporterMojo extends AbstractMojo {
 	
 	
 	//Below Parameters are necessary for ID-Generation
-
-	/**
-	 * namespaceId
-	 * 
-	 * @parameter default-value="false"
-	 * 
-	 */
-	private String updateWbSctId;
-	
 	
 	/**
 	 * namespaceId
