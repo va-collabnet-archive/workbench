@@ -121,6 +121,7 @@ public class RF2RelationshipIdListGeneratorImpl extends RF2IDImpl {
 		File sortedSnapPreviousfile=new File(getConfig().getPreviousIdNotReleasedFile());
 		if (!sortedSnapPreviousfile.exists()){
 			try {
+				sortedSnapPreviousfile.getParentFile().mkdirs();
 				sortedSnapPreviousfile.createNewFile();
 			} catch (IOException e) {
 				logger.error("Exception	" +e);
