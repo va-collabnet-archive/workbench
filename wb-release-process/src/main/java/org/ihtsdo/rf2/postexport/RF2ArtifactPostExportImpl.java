@@ -138,15 +138,15 @@ public class RF2ArtifactPostExportImpl extends RF2ArtifactPostExportAbst{
 				sortedExportedfile=new File(sortedfolderTmp,"exp_" + refsetParam.refsetFileName + releaseDate + "." + fileExtension);
 
 				fullFinalFile=new File(rf2FullOutputFolder.getAbsolutePath(),  refsetParam.refsetFileName + "Full" + langCode + "_" + namespace + "_" + releaseDate + fileExtension);
-				deltaFinalFile=new File(rf2FullOutputFolder.getAbsolutePath(),  refsetParam.refsetFileName + "Delta" + langCode + "_" + namespace + "_" + releaseDate + fileExtension);
-				snapshotFinalFile=new File(rf2FullOutputFolder.getAbsolutePath(),  refsetParam.refsetFileName + "Snapshot" + langCode + "_" + namespace + "_" + releaseDate + fileExtension);
+				deltaFinalFile=new File(rf2DeltaOutputFolder.getAbsolutePath(),  refsetParam.refsetFileName + "Delta" + langCode + "_" + namespace + "_" + releaseDate + fileExtension);
+				snapshotFinalFile=new File(rf2SnapshotOutputFolder.getAbsolutePath(),  refsetParam.refsetFileName + "Snapshot" + langCode + "_" + namespace + "_" + releaseDate + fileExtension);
 				previousFile=getPreviousFileByCustomName(rf2FullFolder,refsetParam.refsetFileName.toLowerCase());
 				postProcess( previousFile, sortedExportedfile);
 			}
 			return;
 		}
 		fullFinalFile=getFullOutputFile(rf2FullOutputFolder.getAbsolutePath(), fType,releaseDate);
-		deltaFinalFile=getDeltaOutputFile(rf2DeltaOutputFolder.getAbsolutePath(), fType,releaseDate, previousReleaseDate);
+		deltaFinalFile=getDeltaOutputFile(rf2DeltaOutputFolder.getAbsolutePath(), fType,releaseDate);
 		snapshotFinalFile=getSnapshotOutputFile(rf2SnapshotOutputFolder.getAbsolutePath(), fType,releaseDate);
 		previousFile=getPreviousFile(rf2FullFolder.getAbsolutePath(),fType);
 		sortedExportedfile=new File(sortedfolderTmp,"exp_" + rf2Exported.getName());
