@@ -9,7 +9,10 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.ihtsdo.rf2.qa.factory.RF2QAFactory;
 import org.ihtsdo.rf2.util.Config;
 import org.ihtsdo.rf2.util.ExportUtil;
+import org.ihtsdo.rf2.util.FilterConfig;
+import org.ihtsdo.rf2.util.I_amFilter;
 import org.ihtsdo.rf2.util.JAXBUtil;
+import org.ihtsdo.rf2.util.TestFilters;
 
 /**
  * @author Varsha Parekh
@@ -119,12 +122,12 @@ public class RF2ReleaseQAMojo extends AbstractMojo {
 	private String componentType;
 
 	/**
-	 * moduleFilter
+	 * Filter configurations
 	 * 
 	 * @parameter
 	 * 
 	 */
-	private ArrayList<String> moduleFilter;
+	private ArrayList<FilterConfig> filterConfigs;
 	
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		try {
@@ -146,8 +149,20 @@ public class RF2ReleaseQAMojo extends AbstractMojo {
 			config.setRf2Format(rF2Format);
 			config.setFlushCount(10000);
 			config.setFileExtension("txt");
-			config.setModuleFilter(moduleFilter);
-			
+
+			if (filterConfigs!=null){
+				TestFilters testFilters= new TestFilters();
+
+				for (FilterConfig filterConfig:filterConfigs){
+					Class test=Class.forName(filterConfig.className);
+					I_amFilter filter= (I_amFilter) test.newInstance();
+					if (filterConfig.valuesToMatch!=null){
+						filter.setValuesToMatch(filterConfig.valuesToMatch);
+					}
+					testFilters.addFilter(filter);
+				}
+				config.setTestFilters(testFilters);
+			}			
 			//Below Parameters are necessary for ID-Generation
 			config.setNamespaceId(namespaceId);
 			config.setPartitionId(partitionId);

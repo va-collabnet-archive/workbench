@@ -12,6 +12,8 @@ import org.ihtsdo.rf2.compatibilitypkg.factory.RF2AssociationId_SCTIDMapFactory;
 import org.ihtsdo.rf2.compatibilitypkg.factory.RF2HistoricalAssociationIdentFactory;
 import org.ihtsdo.rf2.util.Config;
 import org.ihtsdo.rf2.util.ExportUtil;
+import org.ihtsdo.rf2.util.FilterConfig;
+import org.ihtsdo.rf2.util.I_amFilter;
 import org.ihtsdo.rf2.util.JAXBUtil;
 import org.ihtsdo.rf2.util.ModuleFilter;
 import org.ihtsdo.rf2.util.TestFilters;
@@ -57,7 +59,7 @@ public class RF2AssociationIdentExporterMojo extends AbstractMojo {
 	 * 
 	 */
 	private String endpointURL;
-	
+
 	/**
 	 * username
 	 * 
@@ -65,7 +67,7 @@ public class RF2AssociationIdentExporterMojo extends AbstractMojo {
 	 * 
 	 */
 	private String username;
-	
+
 	/**
 	 * password
 	 * 
@@ -82,13 +84,13 @@ public class RF2AssociationIdentExporterMojo extends AbstractMojo {
 	private String wbAssociationId_SCTIDMapFactory;
 
 	/**
-	 * moduleFilter
+	 * Filter configurations
 	 * 
 	 * @parameter
 	 * 
 	 */
-	private ArrayList<String> moduleFilter;
-	
+	private ArrayList<FilterConfig> filterConfigs;
+
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		System.setProperty("java.awt.headless", "true");
 		try {
@@ -99,7 +101,7 @@ public class RF2AssociationIdentExporterMojo extends AbstractMojo {
 			} catch (NoSuchAlgorithmException e) {
 				throw new MojoExecutionException(e.getLocalizedMessage(), e);
 			}
-			
+
 			Config config = JAXBUtil.getConfig("/org/ihtsdo/rf2/config/historicalAssociationIdentifier.xml");
 
 			// set all the values passed via mojo
@@ -107,14 +109,23 @@ public class RF2AssociationIdentExporterMojo extends AbstractMojo {
 			config.setReleaseDate(releaseDate);
 			config.setFlushCount(10000);
 			config.setFileExtension("txt");
-			config.setModuleFilter(moduleFilter);	
 			config.setUsername(username);
 			config.setPassword(password);
 			config.setEndPoint(endpointURL);
-			TestFilters testFilters= new TestFilters();
-			ModuleFilter filter=new ModuleFilter(); 
-			testFilters.addFilter(filter);
-			config.setTestFilters(testFilters);
+			//				Class test=Class.forName("org.ihtsdo.rf2.util.ModuleFilter");
+			if (filterConfigs!=null){
+				TestFilters testFilters= new TestFilters();
+
+				for (FilterConfig filterConfig:filterConfigs){
+					Class test=Class.forName(filterConfig.className);
+					I_amFilter filter= (I_amFilter) test.newInstance();
+					if (filterConfig.valuesToMatch!=null){
+						filter.setValuesToMatch(filterConfig.valuesToMatch);
+					}
+					testFilters.addFilter(filter);
+				}
+				config.setTestFilters(testFilters);
+			}
 			// initialize ace framwork and meta hierarchy
 			ExportUtil.init(config);
 			if (wbAssociationId_SCTIDMapFactory!=null){

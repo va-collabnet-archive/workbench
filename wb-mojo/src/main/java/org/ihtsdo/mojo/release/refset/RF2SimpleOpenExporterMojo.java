@@ -12,7 +12,10 @@ import org.ihtsdo.rf2.identifier.mojo.RefSetParam;
 import org.ihtsdo.rf2.refset.factory.RF2SimpleRefsetFactory;
 import org.ihtsdo.rf2.util.Config;
 import org.ihtsdo.rf2.util.ExportUtil;
+import org.ihtsdo.rf2.util.FilterConfig;
+import org.ihtsdo.rf2.util.I_amFilter;
 import org.ihtsdo.rf2.util.JAXBUtil;
+import org.ihtsdo.rf2.util.TestFilters;
 
 /**
  * @author Alejandro Rodriguez
@@ -71,13 +74,14 @@ public class RF2SimpleOpenExporterMojo extends AbstractMojo {
 	 * 
 	 */
 	private String password;
+
 	/**
-	 * moduleFilter
+	 * Filter configurations
 	 * 
 	 * @parameter
 	 * 
 	 */
-	private ArrayList<String> moduleFilter;
+	private ArrayList<FilterConfig> filterConfigs;
 
 	/**
 	 * Refset Files
@@ -107,9 +111,21 @@ public class RF2SimpleOpenExporterMojo extends AbstractMojo {
 			config.setReleaseDate(releaseDate);
 			config.setFlushCount(10000);
 			config.setFileExtension("txt");
-			config.setModuleFilter(moduleFilter);
 			config.setRefsetData(refsetData);
 
+			if (filterConfigs!=null){
+				TestFilters testFilters= new TestFilters();
+
+				for (FilterConfig filterConfig:filterConfigs){
+					Class test=Class.forName(filterConfig.className);
+					I_amFilter filter= (I_amFilter) test.newInstance();
+					if (filterConfig.valuesToMatch!=null){
+						filter.setValuesToMatch(filterConfig.valuesToMatch);
+					}
+					testFilters.addFilter(filter);
+				}
+				config.setTestFilters(testFilters);
+			}
 			config.setUsername(username);
 			config.setPassword(password);
 			config.setEndPoint(endpointURL);
