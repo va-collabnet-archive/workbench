@@ -184,18 +184,22 @@ public class DiffReportPanel extends JPanel {
             try {
                 JList conceptList = config.getBatchConceptList();
                 I_ModelTerminologyList conceptListModel = (I_ModelTerminologyList) conceptList.getModel();
+                // conceptListModel.clear();
 
-                ArrayList<SnoRel> added = SnoQuery.getIsaAdded();
-                Collections.sort(added);
+                ArrayList<SnoRel> conceptsToBeAdded = new ArrayList<SnoRel>(SnoQuery.getIsaAdded());
+                conceptsToBeAdded.addAll(SnoQuery.getIsaDropped());
+                conceptsToBeAdded.addAll(SnoQuery.getRoleAdded());
+                conceptsToBeAdded.addAll(SnoQuery.getRoleDropped());
+                Collections.sort(conceptsToBeAdded);
 
-                for (int i = 0; i < added.size(); i++) {
-                    if (i < added.size() - 1) {
-                        if (added.get(i).c1Id != added.get(i + 1).c1Id) {
-                            I_GetConceptData cb = Terms.get().getConcept(added.get(i).c1Id);
+                for (int i = 0; i < conceptsToBeAdded.size(); i++) {
+                    if (i < conceptsToBeAdded.size() - 1) {
+                        if (conceptsToBeAdded.get(i).c1Id != conceptsToBeAdded.get(i + 1).c1Id) {
+                            I_GetConceptData cb = Terms.get().getConcept(conceptsToBeAdded.get(i).c1Id);
                             conceptListModel.addElement(cb);
                         }
                     } else {
-                        I_GetConceptData cb = Terms.get().getConcept(added.get(i).c1Id);
+                        I_GetConceptData cb = Terms.get().getConcept(conceptsToBeAdded.get(i).c1Id);
                         conceptListModel.addElement(cb);
                     }
                 }
