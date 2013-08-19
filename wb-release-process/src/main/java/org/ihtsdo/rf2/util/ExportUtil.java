@@ -94,7 +94,7 @@ public class ExportUtil {
 	}
 
 	public static void init(Config config) {
-		
+
 		InitializeModuleID(config);		
 	}
 
@@ -124,25 +124,16 @@ public class ExportUtil {
 
 
 	private static void CompleteMapSCTIDtoModule(Config config,HashMap<UUID, String> allModuleIds) {
-		List<String>moduleFilter=config.getModuleFilter();
-		boolean filter=true;
-		if (moduleFilter==null || moduleFilter.size()==0){
-			filter= false;
-		}
 
+		String part="00";
+		if (config.getNamespaceId()!="0"){
+			part="10";
+		}
 		for (UUID uuid:allModuleIds.keySet()){
-			String part="00";
-			if (config.getNamespaceId()!="0"){
-				part="10";
-			}
-			
+
 			String moduleSCTId=getSCTId(config,uuid, Integer.parseInt(config.getNamespaceId()) , part, config.getReleaseId(),config.getExecutionId(), "");
 			try {
-				if (!filter){
-					allModuleMapNidSCTId.put(getTermFactory().uuidToNative(uuid), moduleSCTId);
-				}else if ( moduleFilter.contains(moduleSCTId)){
-					allModuleMapNidSCTId.put(getTermFactory().uuidToNative(uuid), moduleSCTId);
-				}
+				allModuleMapNidSCTId.put(getTermFactory().uuidToNative(uuid), moduleSCTId);
 			} catch (TerminologyException e) {
 				e.printStackTrace();
 			} catch (IOException e) {
@@ -410,7 +401,7 @@ public class ExportUtil {
 
 	public static String getConceptInactivationValueId(int status) throws TerminologyException, IOException {
 		String valueId = "XXX";
-		
+
 		int pendId_Term_Aux = ArchitectonicAuxiliary.Concept.PENDING_MOVE.localize().getNid();
 		int dupId_Term_Aux = ArchitectonicAuxiliary.Concept.DUPLICATE.localize().getNid();
 		int outdatedId_Term_Aux = ArchitectonicAuxiliary.Concept.OUTDATED.localize().getNid();
@@ -706,7 +697,7 @@ public class ExportUtil {
 				I_IdVersion i_IdVersion = (I_IdVersion) i_IdentifyList.get(i);
 				Object denotion = (Object) i_IdVersion.getDenotation(); // Actual value for identifier
 				int snomedRTNid = i_IdVersion.getAuthorityNid();
-				
+
 				if ( snomedRTNid == arcAuxSnomedRTNid) {
 					snomedId = (String) denotion;
 					return snomedId.toString();
@@ -729,7 +720,7 @@ public class ExportUtil {
 				Object denotion = (Object) i_IdVersion.getDenotation();
 				// Actual value for identifier
 				int ctv3Nid = i_IdVersion.getAuthorityNid();
-				
+
 				if (ctv3Nid == arcAuxCtv3Nid){
 					ctv3Id = (String) denotion;
 					return ctv3Id.toString();
@@ -946,16 +937,16 @@ public class ExportUtil {
 				I_IdVersion i_IdVersion = (I_IdVersion) i_IdentifyList.get(i);
 				Object denotion = (Object) i_IdVersion.getDenotation();
 				int snomedIntegerNid = i_IdVersion.getAuthorityNid();
-				
-				
+
+
 				if ( snomedIntegerNid == arcAuxSnomedIntegerNid) {
 					try {
 						conceptId = (Long) denotion;
 						return conceptId.toString();
 					} catch (java.lang.ClassCastException e) {
-						 e.printStackTrace();
+						e.printStackTrace();
 						// This is all the subset which gets imported and subsetoriginalid becomes conceptid (not need to extracted)
-						 System.out.println("ClassCastException ===>" + concept.getInitialText());
+						System.out.println("ClassCastException ===>" + concept.getInitialText());
 					}
 				}
 			}
@@ -1154,7 +1145,7 @@ public class ExportUtil {
 			}
 		}
 		return null;
-		
+
 	}
 
 	public static String getCharacteristicType(int type) throws IOException, TerminologyException {
