@@ -134,8 +134,8 @@ public class RF2ArtifactPostExportImpl extends RF2ArtifactPostExportAbst{
 		File sortedExportedfile=null;
 		if (refsetData!=null){
 			for (RefSetParam refsetParam:refsetData){
-				rf2Exported=new File(exportFolder, refsetParam.refsetFileName + releaseDate + "." + fileExtension);
-				sortedExportedfile=new File(sortedfolderTmp,"exp_" + refsetParam.refsetFileName + releaseDate + "." + fileExtension);
+				rf2Exported=new File(exportFolder, refsetParam.refsetFileName + releaseDate + fileExtension);
+				sortedExportedfile=new File(sortedfolderTmp,"exp_" + refsetParam.refsetFileName + releaseDate + fileExtension);
 
 				fullFinalFile=new File(rf2FullOutputFolder.getAbsolutePath(),  refsetParam.refsetFileName + "Full" + langCode + "_" + namespace + "_" + releaseDate + fileExtension);
 				deltaFinalFile=new File(rf2DeltaOutputFolder.getAbsolutePath(),  refsetParam.refsetFileName + "Delta" + langCode + "_" + namespace + "_" + releaseDate + fileExtension);
