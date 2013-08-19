@@ -858,8 +858,8 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
     public boolean regenerateWfHxLuceneIndex(ViewCoordinate viewCoordinate) throws Exception {
         if (indexGenerating.get() == false) {
             indexGenerating.getAndSet(true);
+            File wfLuceneDirectory = new File("workflow/lucene");
             if (LuceneManager.indexExists(LuceneManager.LuceneSearchType.WORKFLOW_HISTORY) == true) {
-                File wfLuceneDirectory = new File("workflow/lucene");
                 if (wfLuceneDirectory.exists()) {
                     for (File wfFile : wfLuceneDirectory.listFiles()) {
                         wfFile.delete();
@@ -867,6 +867,7 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
                     wfLuceneDirectory.delete();
                 }
             }
+            LuceneManager.setLuceneRootDir(wfLuceneDirectory, LuceneManager.LuceneSearchType.WORKFLOW_HISTORY);
             WfHxIndexGenerator.setSourceInputFile(null);
             LuceneManager.createLuceneIndex(LuceneManager.LuceneSearchType.WORKFLOW_HISTORY, viewCoordinate);
             indexGenerating.getAndSet(false);
