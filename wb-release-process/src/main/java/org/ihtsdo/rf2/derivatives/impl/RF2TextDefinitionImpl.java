@@ -63,7 +63,7 @@ public class RF2TextDefinitionImpl extends RF2AbstractImpl implements I_ProcessC
 				String sDescType = getSnomedDescriptionType(description.getTypeNid());
 				typeId = getTypeId(sDescType);
 
-				if (sDescType.equals("4")) {
+				if (sDescType.equals("4") && isComponentToPublish( description.getMutablePart())){
 					descriptionid = getDescriptionId(description.getDescId(), ExportUtil.getSnomedCorePathNid());
 					typeId = I_Constants.DEFINITION;
 					String languageCode = description.getLang(); // This should be always "en"
