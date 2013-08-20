@@ -19,6 +19,7 @@ public class ModuleFilter implements I_amFilter {
 
 	@Override
 	public void setValuesToMatch(List<Object> values) {
+		valuesToMatch=new HashSet<Integer>();
 		for(Object value:values){
 			try {
 				valuesToMatch.add((Integer) Terms.get().uuidToNative(UUID.fromString(value.toString())));
