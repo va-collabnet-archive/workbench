@@ -18,6 +18,9 @@ public class TestFilters {
 	}
 	
 	public void addFilter(I_amFilter filter){
+		if (filters==null){
+			filters=new ArrayList<I_amFilter>();
+		}
 		filters.add(filter);
 	}
 }
