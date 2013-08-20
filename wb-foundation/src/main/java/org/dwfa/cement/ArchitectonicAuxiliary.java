@@ -217,6 +217,15 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
 	        		  new I_ConceptualizeUniversally[] { USER }),
     		  GENERIC_USER(new String[] {"Generic User", "generic-user"}, null,
                       new I_ConceptualizeUniversally[] { IHTSDO }),
+                  YONG_SHENG_GAO(new String[] {"Yong Sheng Gao", "ysgao"}, null,
+	        		  new I_ConceptualizeUniversally[] { USER }),
+                  MARIA_BRAITHWAITE(new String[] {"Maria Braithwaite", "mbraithwaite"}, null,
+	        		  new I_ConceptualizeUniversally[] { USER }),
+                  MONICA_HARRY(new String[] {"Monica Harry", "mharry"}, null,
+	        		  new I_ConceptualizeUniversally[] { USER }),
+                  KEITH_CAMPBELL(new String[] {"Keith Campbell", "kcampbell"}, null,
+	        		  new I_ConceptualizeUniversally[] { USER }),
+                  
 
         TUPLE_TYPE("tuple type",
                     new I_ConceptualizeUniversally[] { ARCHITECTONIC_ROOT_CONCEPT }),

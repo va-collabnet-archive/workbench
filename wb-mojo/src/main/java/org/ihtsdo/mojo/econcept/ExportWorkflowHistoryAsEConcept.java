@@ -262,7 +262,10 @@ public class ExportWorkflowHistoryAsEConcept extends AbstractMojo {
 	{
 		try 
 		{
-			UUID modeler = lookupModeler(row[WorkflowHelper.modelerPosition]);
+		if(row[WorkflowHelper.conceptIdPosition].equals("043429e4-9ce6-4584-9873-759b8608f4f0")){
+                   System.out.println("DEBUG");
+                }	
+                    UUID modeler = lookupModeler(row[WorkflowHelper.modelerPosition]);
 			UUID action = lookupAction(row[WorkflowHelper.actionPosition]);
 			UUID state = lookupState(row[WorkflowHelper.statePosition]);
 
@@ -432,6 +435,14 @@ public class ExportWorkflowHistoryAsEConcept extends AbstractMojo {
     		return ArchitectonicAuxiliary.Concept.JANE_HOWARTH.getPrimoridalUid();
     	}else if (modeler.equalsIgnoreCase("pamos")) {
     		return ArchitectonicAuxiliary.Concept.PAUL_AMOS.getPrimoridalUid();
+    	}else if (modeler.equalsIgnoreCase("ysgao")) {
+    		return ArchitectonicAuxiliary.Concept.YONG_SHENG_GAO.getPrimoridalUid();
+    	}else if (modeler.equalsIgnoreCase("mbraithwaite")) {
+    		return ArchitectonicAuxiliary.Concept.MARIA_BRAITHWAITE.getPrimoridalUid();
+    	}else if (modeler.equalsIgnoreCase("mharry")) {
+    		return ArchitectonicAuxiliary.Concept.MONICA_HARRY.getPrimoridalUid();
+    	}else if (modeler.equalsIgnoreCase("kcampbell")) {
+    		return ArchitectonicAuxiliary.Concept.KEITH_CAMPBELL.getPrimoridalUid();
     	}
     	
     	return null;
