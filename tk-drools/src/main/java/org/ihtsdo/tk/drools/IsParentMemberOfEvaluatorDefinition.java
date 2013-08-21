@@ -23,16 +23,17 @@ import java.util.Collection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.drools.base.BaseEvaluator;
-import org.drools.base.ValueType;
-import org.drools.base.evaluators.EvaluatorDefinition;
-import org.drools.base.evaluators.Operator;
-import org.drools.common.InternalWorkingMemory;
-import org.drools.rule.VariableRestriction.ObjectVariableContextEntry;
-import org.drools.rule.VariableRestriction.VariableContextEntry;
-import org.drools.spi.Evaluator;
-import org.drools.spi.FieldValue;
-import org.drools.spi.InternalReadAccessor;
+import org.drools.core.base.BaseEvaluator;
+import org.drools.core.base.ValueType;
+import org.drools.core.base.evaluators.EvaluatorDefinition;
+import org.drools.core.base.evaluators.Operator;
+import org.drools.core.common.InternalFactHandle;
+import org.drools.core.common.InternalWorkingMemory;
+import org.drools.core.rule.VariableRestriction.ObjectVariableContextEntry;
+import org.drools.core.rule.VariableRestriction.VariableContextEntry;
+import org.drools.core.spi.Evaluator;
+import org.drools.core.spi.FieldValue;
+import org.drools.core.spi.InternalReadAccessor;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
@@ -81,14 +82,14 @@ public class IsParentMemberOfEvaluatorDefinition implements EvaluatorDefinition 
 
         @Override
         public boolean evaluate(InternalWorkingMemory workingMemory,
-                InternalReadAccessor extractor, Object object, FieldValue value) {
+                InternalReadAccessor extractor, InternalFactHandle object, FieldValue value) {
             return testMemberOf(object, value.getValue());
         }
 
         @Override
         public boolean evaluate(InternalWorkingMemory workingMemory,
-                InternalReadAccessor leftExtractor, Object left,
-                InternalReadAccessor rightExtractor, Object right) {
+                InternalReadAccessor leftExtractor, InternalFactHandle left,
+                InternalReadAccessor rightExtractor, InternalFactHandle right) {
             final Object value1 = leftExtractor.getValue(workingMemory, left);
             final Object value2 = rightExtractor.getValue(workingMemory, right);
 
@@ -177,13 +178,13 @@ public class IsParentMemberOfEvaluatorDefinition implements EvaluatorDefinition 
 
         @Override
         public boolean evaluateCachedLeft(InternalWorkingMemory workingMemory,
-                VariableContextEntry context, Object right) {
+                VariableContextEntry context, InternalFactHandle right) {
             return testMemberOf(((ObjectVariableContextEntry) context).left, right);
         }
 
         @Override
         public boolean evaluateCachedRight(InternalWorkingMemory workingMemory,
-                VariableContextEntry context, Object left) {
+                VariableContextEntry context, InternalFactHandle left) {
             return testMemberOf(left, ((ObjectVariableContextEntry) context).right);
         }
 
