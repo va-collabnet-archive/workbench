@@ -130,6 +130,14 @@ public class RF2DescriptionExporterMojo extends AbstractMojo {
 	private String password;
 
 	/**
+	 * Language Code for file names of release
+	 * 
+	 * @parameter 
+	 * 
+	 */
+	private String languageCode;
+	
+	/**
 	 * Filter configurations
 	 * 
 	 * @parameter
@@ -177,6 +185,7 @@ public class RF2DescriptionExporterMojo extends AbstractMojo {
 			config.setUsername(username);
 			config.setPassword(password);
 			config.setEndPoint(endpointURL);
+			config.setLanguageCode(languageCode);
 			
 			// initialize meta hierarchy
 			ExportUtil.init(config);

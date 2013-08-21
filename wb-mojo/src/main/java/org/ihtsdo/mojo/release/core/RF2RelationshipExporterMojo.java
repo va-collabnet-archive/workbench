@@ -13,6 +13,7 @@ import org.ihtsdo.rf2.util.FilterConfig;
 import org.ihtsdo.rf2.util.I_amFilter;
 import org.ihtsdo.rf2.util.JAXBUtil;
 import org.ihtsdo.rf2.util.TestFilters;
+import org.ihtsdo.tk.binding.snomed.Snomed;
 
 /**
  * @author Varsha Parekh
@@ -132,6 +133,14 @@ public class RF2RelationshipExporterMojo extends AbstractMojo {
 	 */
 	private ArrayList<FilterConfig> filterConfigs;
 	
+	/**
+	 * Default Module for inferred relationships where the classifier add UNSPECIFED_MODULE
+	 * 
+	 * @parameter
+	 * 
+	 */
+	private String defaultModule;
+	
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		try {
 			Config config;
@@ -157,6 +166,9 @@ public class RF2RelationshipExporterMojo extends AbstractMojo {
 					Class test=Class.forName(filterConfig.className);
 					I_amFilter filter= (I_amFilter) test.newInstance();
 					if (filterConfig.valuesToMatch!=null){
+						if (filterConfig.className.equals("org.ihtsdo.rf2.util.ModuleFilter")){
+							filterConfig.valuesToMatch.add(Snomed.UNSPECIFIED_MODULE.getLenient().getPrimUuid().toString());
+						}
 						filter.setValuesToMatch(filterConfig.valuesToMatch);
 					}
 					testFilters.addFilter(filter);
@@ -172,6 +184,7 @@ public class RF2RelationshipExporterMojo extends AbstractMojo {
 			config.setUsername(username);
 			config.setPassword(password);
 			config.setEndPoint(endpointURL);
+			config.setDefaultModule(defaultModule);
 		
 			// initialize meta hierarchy
 			ExportUtil.init(config);
