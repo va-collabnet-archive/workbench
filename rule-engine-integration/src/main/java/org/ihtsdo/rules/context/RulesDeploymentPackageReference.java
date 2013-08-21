@@ -24,11 +24,11 @@ import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
-import org.drools.KnowledgeBase;
-import org.drools.definition.KnowledgePackage;
-import org.drools.definition.rule.Rule;
 import org.dwfa.ace.log.AceLog;
 import org.ihtsdo.rules.RulesLibrary;
+import org.kie.api.definition.rule.Rule;
+import org.kie.internal.KnowledgeBase;
+import org.kie.internal.definition.KnowledgePackage;
 
 /**
  * The Class RulesDeploymentPackageReference.

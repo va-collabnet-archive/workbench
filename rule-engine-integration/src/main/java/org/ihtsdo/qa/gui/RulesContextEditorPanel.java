@@ -52,7 +52,6 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
-import org.drools.definition.rule.Rule;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
@@ -64,6 +63,7 @@ import org.ihtsdo.qa.gui.viewers.ui.TestFrame;
 import org.ihtsdo.rules.context.RulesContextHelper;
 import org.ihtsdo.rules.context.RulesDeploymentPackageReference;
 import org.ihtsdo.rules.context.RulesDeploymentPackageReferenceHelper;
+import org.kie.api.definition.rule.Rule;
 
 /**
  * The Class RulesContextEditorPanel.

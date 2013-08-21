@@ -36,25 +36,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import javax.swing.JOptionPane;
-
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.XMLConfiguration;
-import org.drools.KnowledgeBase;
-import org.drools.KnowledgeBaseFactory;
-import org.drools.SystemEventListener;
-import org.drools.agent.KnowledgeAgent;
-import org.drools.agent.KnowledgeAgentConfiguration;
-import org.drools.agent.KnowledgeAgentFactory;
-import org.drools.builder.KnowledgeBuilder;
-import org.drools.builder.KnowledgeBuilderFactory;
-import org.drools.builder.ResourceType;
-import org.drools.definition.KnowledgePackage;
-import org.drools.definition.rule.Rule;
-import org.drools.io.Resource;
-import org.drools.io.ResourceFactory;
-import org.drools.runtime.StatefulKnowledgeSession;
-import org.drools.runtime.rule.FactHandle;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_DescriptionVersioned;
@@ -79,7 +62,6 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.ComputationCanceled;
 import org.dwfa.tapi.TerminologyException;
-import org.dwfa.util.LogWithAlerts;
 import org.dwfa.util.id.Type3UuidFactory;
 import org.ihtsdo.helper.time.TimeHelper;
 import org.ihtsdo.rules.context.RulesContextHelper;
@@ -104,11 +86,24 @@ import org.ihtsdo.tk.spec.ConceptSpec;
 import org.ihtsdo.tk.spec.DescriptionSpec;
 import org.ihtsdo.tk.spec.RelationshipSpec;
 import org.ihtsdo.tk.spec.SpecFactory;
-import org.mvel2.ast.IsDef;
+import org.kie.api.definition.rule.Rule;
+import org.kie.api.io.Resource;
+import org.kie.api.io.ResourceType;
+import org.kie.api.runtime.rule.FactHandle;
+import org.kie.internal.KnowledgeBase;
+import org.kie.internal.KnowledgeBaseFactory;
+import org.kie.internal.SystemEventListener;
+import org.kie.internal.agent.KnowledgeAgent;
+import org.kie.internal.agent.KnowledgeAgentConfiguration;
+import org.kie.internal.agent.KnowledgeAgentFactory;
+import org.kie.internal.builder.KnowledgeBuilder;
+import org.kie.internal.builder.KnowledgeBuilderFactory;
+import org.kie.internal.definition.KnowledgePackage;
+import org.kie.internal.io.ResourceFactory;
+import org.kie.internal.runtime.StatefulKnowledgeSession;
 
 import com.googlecode.sardine.Sardine;
 import com.googlecode.sardine.SardineFactory;
-import org.ihtsdo.tk.api.ConceptFetcherSimple;
 
 /**
  * The Class RulesLibrary.
@@ -468,7 +463,7 @@ public class RulesLibrary {
 			for (Rule rule : kpackg.getRules()) {
 				// AceLog.getAppLog().info("**** " + rule.getName());
 				boolean excluded = false;
-				String ruleUid = rule.getMetaAttribute("UID");
+				String ruleUid = (String) rule.getMetaData().get("UID");
 				if (ruleUid != null) {
 					if (agenda.getExcludedRules().containsKey(UUID.fromString(ruleUid))) {
 						excluded = true;
@@ -578,7 +573,7 @@ public class RulesLibrary {
 			for (Rule rule : kpackg.getRules()) {
 				AceLog.getAppLog().info("**** " + rule.getName());
 				if (rule.getName().trim().equals("Check for double spaces")) {
-					AceLog.getAppLog().info("****** " + rule.getMetaAttribute("UID"));
+					AceLog.getAppLog().info("****** " + ((String) rule.getMetaData().get("UID")));
 					// kbase.removeRule(kpackg.getName(), rule.getName());
 				}
 			}

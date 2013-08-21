@@ -27,7 +27,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.List;
 
-import org.drools.util.codec.Base64;
+import org.drools.core.util.codec.Base64;
 import org.dwfa.ace.log.AceLog;
 
 import com.googlecode.sardine.DavResource;
