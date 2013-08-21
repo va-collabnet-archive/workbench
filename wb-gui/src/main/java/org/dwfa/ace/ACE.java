@@ -2465,6 +2465,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
          */
         conceptTabs.setMinimumSize(new Dimension(0, 0));
         c2Panel.setMinimumSize(new Dimension(0, 0));
+        conceptTabs.setSelectedIndex(conceptTabs.indexOfComponent(arena));
         termTreeConceptSplit.setRightComponent(conceptTabs);
         leftTabs.addTab(taxonomyTabLabel, termTree);
 
