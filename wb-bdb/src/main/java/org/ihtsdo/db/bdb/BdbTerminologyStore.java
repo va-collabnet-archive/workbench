@@ -34,6 +34,7 @@ import org.ihtsdo.helper.query.QueryBuilderBI;
 import org.ihtsdo.lucene.LuceneManager;
 import org.ihtsdo.lucene.SearchResult;
 import org.ihtsdo.lucene.WfHxIndexGenerator;
+import org.ihtsdo.lucene.WfHxLuceneManager;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.*;
 import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
@@ -858,16 +859,16 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
     public boolean regenerateWfHxLuceneIndex(ViewCoordinate viewCoordinate) throws Exception {
         if (indexGenerating.get() == false) {
             indexGenerating.getAndSet(true);
-            File wfLuceneDirectory = new File("workflow/lucene");
+            String wfDirPath = WfHxLuceneManager.wfHxLuceneDirFile.getAbsolutePath();
             if (LuceneManager.indexExists(LuceneManager.LuceneSearchType.WORKFLOW_HISTORY) == true) {
-                if (wfLuceneDirectory.exists()) {
-                    for (File wfFile : wfLuceneDirectory.listFiles()) {
+                if (WfHxLuceneManager.wfHxLuceneDirFile.exists()) {
+                    for (File wfFile : WfHxLuceneManager.wfHxLuceneDirFile.listFiles()) {
                         wfFile.delete();
                     }
-                    wfLuceneDirectory.delete();
+                    WfHxLuceneManager.wfHxLuceneDirFile.delete();
                 }
             }
-            LuceneManager.setLuceneRootDir(wfLuceneDirectory, LuceneManager.LuceneSearchType.WORKFLOW_HISTORY);
+            LuceneManager.setLuceneRootDir(WfHxLuceneManager.wfHxLuceneDirFile, LuceneManager.LuceneSearchType.WORKFLOW_HISTORY);
             WfHxIndexGenerator.setSourceInputFile(null);
             LuceneManager.createLuceneIndex(LuceneManager.LuceneSearchType.WORKFLOW_HISTORY, viewCoordinate);
             indexGenerating.getAndSet(false);
