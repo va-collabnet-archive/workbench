@@ -23,7 +23,7 @@ package org.dwfa.ace.api;
 
 import org.apache.lucene.queryParser.ParseException;
 
-import org.drools.KnowledgeBase;
+import org.kie.internal.KnowledgeBase;
 
 import org.ihtsdo.tk.api.cs.ChangeSetPolicy;
 import org.ihtsdo.tk.api.cs.ChangeSetWriterThreading;

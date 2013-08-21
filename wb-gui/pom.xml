@@ -47,13 +47,13 @@
         </dependency>
         <dependency>
             <groupId>org.drools</groupId>
-            <artifactId>knowledge-api</artifactId>
+            <artifactId>kie-api</artifactId>
             <type>jar</type>
             <optional>false</optional>
         </dependency>
         <dependency>
             <groupId>org.drools</groupId>
-            <artifactId>knowledge-internal-api</artifactId>
+            <artifactId>kie-internal</artifactId>
             <type>jar</type>
             <optional>false</optional>
         </dependency>

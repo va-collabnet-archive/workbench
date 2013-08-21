@@ -98,11 +98,11 @@
         </dependency>
         <dependency>
             <groupId>org.drools</groupId>
-            <artifactId>knowledge-api</artifactId>
+            <artifactId>kie-api</artifactId>
         </dependency>
         <dependency>
             <groupId>org.drools</groupId>
-            <artifactId>knowledge-internal-api</artifactId>
+            <artifactId>kie-internal</artifactId>
         </dependency>
         <dependency>
             <groupId>org.jbpm</groupId>
