@@ -51,9 +51,11 @@ public class RF2DescriptionImpl extends RF2AbstractImpl implements I_ProcessConc
 		String active = "";
 		String caseSignificanceId = "";
 		String typeId = "";
-		String languageCode = "en";
+		String languageCode = getConfig().getLanguageCode();
 		try {
-
+			if (languageCode==null){
+				languageCode="en";
+			}
 			List<? extends I_DescriptionTuple> descriptions = concept.getDescriptionTuples(allStatuses, 
 					allDescTypes, currenAceConfig.getViewPositionSetReadOnly(), 
 					Precedence.PATH, currenAceConfig.getConflictResolutionStrategy());
@@ -68,8 +70,7 @@ public class RF2DescriptionImpl extends RF2AbstractImpl implements I_ProcessConc
 					Date descriptionEffectiveDate = new Date(getTermFactory().convertToThickVersion(description.getVersion()));
 					effectiveTime = getDateFormat().format(descriptionEffectiveDate);
 
-					if (!sDescType.equals("4") && !description.getLang().equals("es")) { 
-						//&& !effectiveTime.contains("1031") && !effectiveTime.contains("0430")) {
+					if (!sDescType.equals("4") && description.getLang().equals(languageCode) ) { 
 						descriptionid = getDescriptionId(description.getDescId(), ExportUtil.getSnomedCorePathNid());
 
 						String term = description.getText();

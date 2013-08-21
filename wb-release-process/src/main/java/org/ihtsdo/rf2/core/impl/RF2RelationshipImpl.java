@@ -56,7 +56,8 @@ public class RF2RelationshipImpl extends RF2AbstractImpl implements I_ProcessCon
 			String characteristicTypeId = "";
 			String modifierId = I_Constants.SOMEMODIFIER; 
 			int relationshipStatusId=0;
-
+			String defaultModule=getConfig().getDefaultModule();
+			
 			List<? extends I_RelTuple> relationships = sourceConcept.getSourceRelTuples(allStatuses, null, 
 					currenAceConfig.getViewPositionSetReadOnly(), 
 					Precedence.PATH, currenAceConfig.getConflictResolutionStrategy());
@@ -148,7 +149,8 @@ public class RF2RelationshipImpl extends RF2AbstractImpl implements I_ProcessCon
 						moduleId=getModuleSCTIDForStampNid(intModuleId);
 						
 						if (moduleId==null){
-							logger.info("intModuleId=" + intModuleId + " has not module SCTID");
+							logger.info("intModuleId=" + intModuleId + " replaced by default Module: " + defaultModule);
+							moduleId=defaultModule;
 						}
 						effectiveTime = getDateFormat().format(new Date(rel.getTime()));
 

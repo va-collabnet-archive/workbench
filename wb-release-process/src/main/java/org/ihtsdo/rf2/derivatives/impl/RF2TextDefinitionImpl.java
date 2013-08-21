@@ -53,8 +53,12 @@ public class RF2TextDefinitionImpl extends RF2AbstractImpl implements I_ProcessC
 		String caseSignificanceId = "";
 		String typeId = "";
 		String moduleId="";
+
+		String languageCode = getConfig().getLanguageCode();
 		try {
-			
+			if (languageCode==null){
+				languageCode="en";
+			}
 			List<? extends I_DescriptionTuple> descriptions = concept.getDescriptionTuples(allStatuses, 
 					textDefinTypes, currenAceConfig.getViewPositionSetReadOnly(), 
 					Precedence.PATH, currenAceConfig.getConflictResolutionStrategy());
@@ -63,10 +67,11 @@ public class RF2TextDefinitionImpl extends RF2AbstractImpl implements I_ProcessC
 				String sDescType = getSnomedDescriptionType(description.getTypeNid());
 				typeId = getTypeId(sDescType);
 
-				if (sDescType.equals("4") && isComponentToPublish( description.getMutablePart())){
+				if (sDescType.equals("4") 
+						&& description.getLang().equals(languageCode) 
+						&& isComponentToPublish( description.getMutablePart())){
 					descriptionid = getDescriptionId(description.getDescId(), ExportUtil.getSnomedCorePathNid());
 					typeId = I_Constants.DEFINITION;
-					String languageCode = description.getLang(); // This should be always "en"
 					String term = description.getText();
 					if (term!=null ){
 						if (term.indexOf("\t")>-1){

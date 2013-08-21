@@ -49,7 +49,7 @@ public class RF2ArtifactPostExportImpl extends RF2ArtifactPostExportAbst{
 		this.exportFolder=exportFolder;
 		this.fileExtension="." + fileExtension;
 		this.refsetData=refsetData;
-		this.langCode=languageCode;
+		this.langCode="-" + languageCode;
 		this.namespace=namespace;
 	}
 
@@ -62,7 +62,7 @@ public class RF2ArtifactPostExportImpl extends RF2ArtifactPostExportAbst{
 				rf2Exported,  rf2OutputFolder,  buildDirectory,
 				 previousReleaseDate,  releaseDate);
 		this.fileExtension="." + fileExtension;
-		this.langCode=languageCode;
+		this.langCode="-" + languageCode;
 		this.namespace=namespace;
 	}
 	
@@ -71,7 +71,7 @@ public class RF2ArtifactPostExportImpl extends RF2ArtifactPostExportAbst{
 			String previousReleaseDate, String releaseDate) throws IOException {
 		super();
 		this.fileExtension=".txt";
-		this.langCode="en";
+		this.langCode="-en";
 		this.namespace="INT";
 		this.fType = fType;
 //		this.rf2FullFolder = new File(rf2FullFolder.getAbsolutePath() + "/org/ihtsdo/rf2");

@@ -58,6 +58,8 @@ public class Config {
 	private String refsetSCTId;
 	private ArrayList<RefSetParam> refsetData;
 	private String fileExtension;
+	private String languageCode;
+	private String defaultModule;
 
 	public String getExportFileName() {
 		return exportFileName;
@@ -264,6 +266,22 @@ public class Config {
 
 	public ArrayList<RefSetParam> getRefsetData() {
 		return refsetData;
+	}
+
+	public void setLanguageCode(String languageCode) {
+		this.languageCode=languageCode;
+	}
+
+	public String getLanguageCode() {
+		return languageCode;
+	}
+
+	public String getDefaultModule() {
+		return defaultModule;
+	}
+
+	public void setDefaultModule(String defaultModule) {
+		this.defaultModule = defaultModule;
 	}
 	
 	
