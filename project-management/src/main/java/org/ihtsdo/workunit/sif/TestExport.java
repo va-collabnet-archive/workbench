@@ -43,7 +43,7 @@ import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.db.bdb.BdbTermFactory;
+//import org.ihtsdo.db.bdb.BdbTermFactory;
 import org.ihtsdo.project.model.I_TerminologyProject;
 import org.ihtsdo.project.workflow.api.WorkflowInterpreter;
 import org.ihtsdo.project.workflow.api.wf2.implementation.WorkflowStore;
@@ -433,15 +433,15 @@ public class TestExport extends TestCase {
 			config.setLanguageSortPref(I_ConfigAceFrame.LANGUAGE_SORT_PREF.LANG_REFEX);
 			config.getLanguagePreferenceList().clear();
 
-			BdbTermFactory tfb = (BdbTermFactory) tf;
-			I_ConfigAceDb newDbProfile = tfb.newAceDbConfig();
-			newDbProfile.setUsername("username");
-			newDbProfile.setUserConcept(tf.getConcept(UUID.fromString("f7495b58-6630-3499-a44e-2052b5fcf06c")));
-			newDbProfile.setClassifierChangesChangeSetPolicy(ChangeSetPolicy.OFF);
-			newDbProfile.setRefsetChangesChangeSetPolicy(ChangeSetPolicy.OFF);
-			newDbProfile.setUserChangesChangeSetPolicy(ChangeSetPolicy.INCREMENTAL);
-			newDbProfile.setChangeSetWriterThreading(ChangeSetWriterThreading.SINGLE_THREAD);
-			config.setDbConfig(newDbProfile);
+			//BdbTermFactory tfb = (BdbTermFactory) tf;
+//			I_ConfigAceDb newDbProfile = tfb.newAceDbConfig();
+//			newDbProfile.setUsername("username");
+//			newDbProfile.setUserConcept(tf.getConcept(UUID.fromString("f7495b58-6630-3499-a44e-2052b5fcf06c")));
+//			newDbProfile.setClassifierChangesChangeSetPolicy(ChangeSetPolicy.OFF);
+//			newDbProfile.setRefsetChangesChangeSetPolicy(ChangeSetPolicy.OFF);
+//			newDbProfile.setUserChangesChangeSetPolicy(ChangeSetPolicy.INCREMENTAL);
+//			newDbProfile.setChangeSetWriterThreading(ChangeSetWriterThreading.SINGLE_THREAD);
+//			config.setDbConfig(newDbProfile);
 
 
 		} catch (TerminologyException e) {

@@ -71,17 +71,17 @@
                 <groupId>org.ihtsdo</groupId>
                 <artifactId>wb-gui</artifactId>
                 <version>${project.version}</version>
-        </dependency> -->
+        </dependency> 
         <dependency>
                 <groupId>org.ihtsdo</groupId>
                 <artifactId>wb-bdb</artifactId>
                 <version>${project.version}</version>
-        </dependency>
+        </dependency>-->
         <dependency>
             <groupId>org.ihtsdo</groupId>
             <artifactId>issue-management</artifactId>
             <version>${project.version}</version>
-        </dependency>
+        </dependency> 
         <dependency>
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
