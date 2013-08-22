@@ -66,7 +66,7 @@ import com.google.gson.Gson;
 /**
  * The Class TestTerminologyProjectDAOForWorkSetsCRUD.
  */
-public class TestExport extends TestCase {
+public class TestExport2 extends TestCase {
 
 	/** The vodb directory. */
 	File vodbDirectory;
@@ -162,7 +162,7 @@ public class TestExport extends TestCase {
 		unit.setInstructions("This is a Translation Work Unit, please translate the concept following the IHTSDO Translation guidelines. Do not trasnlate the FSN, only a preferred synonym is needed. Acceptable synonyms are allowed, but not required.");
 		Map<String,URL> linksList = new HashMap<String,URL>();
 		linksList.put("IHTSDO Site", URI.create("http://www.ihtso.org").toURL());
-		linksList.put("Real Academia Española", URI.create("http://www.rae.es/rae.html").toURL());
+		linksList.put("Real Academia Espanola", URI.create("http://www.rae.es/rae.html").toURL());
 		unit.setLinks(linksList);
 
 		WuFocusConcept contextSample = new WuFocusConcept();
