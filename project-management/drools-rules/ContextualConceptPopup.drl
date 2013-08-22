@@ -1,0 +1,38 @@
+#created on: Aug 15, 2010
+package org.ihtsdo.arena.drools
+
+#list any import classes here.
+import java.util.Collection;
+
+import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.api.description.DescriptionVersionBI;
+
+import org.ihtsdo.arena.context.action.CopyDescAction;
+import org.ihtsdo.arena.context.action.MoveDescAction;
+
+import org.ihtsdo.tk.spec.DescriptionSpec;
+
+import org.ihtsdo.tk.binding.snomed.Snomed;
+import org.ihtsdo.tk.binding.snomed.SnomedConstraints;
+import org.ihtsdo.tk.binding.snomed.SnomedRelationshipType;
+import org.ihtsdo.tk.binding.snomed.SnomedRelationshipSpec;
+import org.ihtsdo.tk.binding.snomed.Taxonomies;
+import org.ihtsdo.tk.binding.snomed.WbDescType;
+
+
+
+#declare any global variables here
+
+global Collection actions;
+global ViewCoordinate vc;
+
+rule "add simple actions"
+	
+	when
+		$c : ConceptVersionBI();
+	then 
+		actions.add(new CopyDescAction("Copy to Concept"));
+		actions.add(new MoveDescAction("Move to Concept"));
+end
+

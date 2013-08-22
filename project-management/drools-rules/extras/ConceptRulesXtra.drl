@@ -1,0 +1,30 @@
+#created on: Jul 31, 2010
+package org.ihtsdo.arena.drools
+
+#list any import classes here.
+import org.ihtsdo.concept.Concept;
+import org.dwfa.ace.api.PathSetReadOnly;
+import org.dwfa.ace.api.PositionSetReadOnly;
+import org.ihtsdo.tk.api.Precedence;
+import org.dwfa.ace.api.I_ManageContradiction;
+import org.dwfa.ace.api.I_IntSet;
+
+#declare any global variables here.
+global PathSetReadOnly editPaths;
+global PositionSetReadOnly viewPositions;
+global Precedence precedence; 
+global I_ManageContradiction contradictionMgr;
+global I_IntSet allowedStatus;
+global I_IntSet allowedDescTypes;
+global I_IntSet allowedSrcRelTypes;
+global I_IntSet allowedMediaTypes;
+ 
+#list any project specific rules for this file here
+
+rule "sample"
+	
+	when
+		$c : Concept();
+	then 
+   		System.out.println("concept rules sample");	
+end

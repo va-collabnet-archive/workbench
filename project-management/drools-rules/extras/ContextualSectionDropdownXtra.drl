@@ -1,0 +1,29 @@
+#created on: Sep 1, 2010
+package org.ihtsdo.arena.drools
+
+#list any import classes here.
+import java.util.Collection;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.drools.facts.ConceptFact;
+import org.ihtsdo.tk.drools.facts.Context;
+import org.ihtsdo.tk.drools.facts.ViewFact;
+import org.ihtsdo.tk.drools.facts.View;
+import org.ihtsdo.arena.context.action.BpActionFactoryNoPanel;
+
+#declare any global variables here
+
+global Collection conceptActions;
+global Collection descriptionActions;
+global Collection relActions;
+global BpActionFactoryNoPanel actionFactory;
+global ViewCoordinate vc;
+
+#list any project specific rules for this file here
+
+rule "add if not in refset: Non-Human refset"
+	when
+                ViewFact(view == View.STATED)
+ 		$c: ConceptFact(context == Context.FOCUS_CONCEPT)
+	then 
+                System.out.println("contextual selection dropdown rules sample");
+end

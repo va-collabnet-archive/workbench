@@ -1,0 +1,21 @@
+package org.ihtsdo.arena.drools
+
+#list any import classes here.
+import java.util.Collection;
+import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+
+#declare any global variables here.
+global Collection actions;
+global ViewCoordinate vc;
+
+#list any project specific rules for this file here
+
+rule "sample"
+	
+	when
+		$c : ConceptVersionBI();
+	then 
+		System.out.println("contextual concept popup rules sample");
+end
+
