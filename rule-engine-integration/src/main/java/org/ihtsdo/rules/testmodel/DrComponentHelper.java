@@ -505,7 +505,7 @@ public class DrComponentHelper {
 			extension.setComponentUuid(tf.nidToUuid(annotation.getReferencedComponentNid()).toString());
 			extension.setRefsetUuid(tf.nidToUuid(annotation.getRefexNid()).toString());
 			extension.setPrimordialUuid(annotation.getPrimUuid().toString());
-			extension.setStatusUuid(tf.nidToUuid(annotation.getStampNid()).toString());
+			extension.setStatusUuid(tf.nidToUuid(annotation.getStatusNid()).toString());
 			extension.setTime(annotation.getTime());
 			extension.setAuthorUuid(tf.nidToUuid(annotation.getAuthorNid()).toString());
 			extension.setModuleId(tf.nidToUuid(annotation.getModuleNid()).toString());
