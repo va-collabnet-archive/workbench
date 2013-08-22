@@ -129,7 +129,7 @@ public class DrComponentHelper {
 				concept.setPrimordialUuid(attributeTuple.getPrimUuid().toString());
 				concept.setStatusUuid(tf.nidToUuid(attributeTuple.getStatusNid()).toString());
 				concept.setTime(attributeTuple.getTime());
-				concept.setExtensionId(tf.nidToUuid(attributeTuple.getModuleNid()).toString());
+				concept.setModuleId(tf.nidToUuid(attributeTuple.getModuleNid()).toString());
 				concept.setFactContextName(factContextName);
 			}
 
@@ -164,7 +164,7 @@ public class DrComponentHelper {
 				loopDescription.setLang(descriptionVersion.getLang());
 				loopDescription.setText(descriptionVersion.getText());
 				loopDescription.setTime(descriptionVersion.getTime());
-				loopDescription.setExtensionId(tf.nidToUuid(descriptionVersion.getModuleNid()).toString());
+				loopDescription.setModuleId(tf.nidToUuid(descriptionVersion.getModuleNid()).toString());
 				loopDescription.setStatusUuid(tf.nidToUuid(descriptionVersion.getStatusNid()).toString());
 				loopDescription.setPathUuid(tf.nidToUuid(descriptionVersion.getPathNid()).toString());
 				loopDescription.setPrimordialUuid(descriptionVersion.getPrimUuid().toString());
@@ -181,7 +181,7 @@ public class DrComponentHelper {
 					drId.setPathUuid(tf.nidToUuid(id.getPathNid()).toString());
 					drId.setStatusUuid(tf.nidToUuid(id.getStatusNid()).toString());
 					drId.setTime(id.getTime());
-					drId.setExtensionId(tf.nidToUuid(id.getModuleNid()).toString());
+					drId.setModuleId(tf.nidToUuid(id.getModuleNid()).toString());
 					loopDescription.getIdentifiers().add(drId);
 				}
 
@@ -200,7 +200,7 @@ public class DrComponentHelper {
 								langDescription.setLang(descriptionVersion.getLang());
 								langDescription.setText(descriptionVersion.getText());
 								langDescription.setTime(descriptionVersion.getTime());
-								langDescription.setExtensionId(tf.nidToUuid(descriptionVersion.getModuleNid()).toString());
+								langDescription.setModuleId(tf.nidToUuid(descriptionVersion.getModuleNid()).toString());
 								langDescription.setStatusUuid(tf.nidToUuid(descriptionVersion.getStatusNid()).toString());
 								langDescription.setPathUuid(tf.nidToUuid(descriptionVersion.getPathNid()).toString());
 								langDescription.setPrimordialUuid(descriptionVersion.getPrimUuid().toString());
@@ -214,7 +214,7 @@ public class DrComponentHelper {
 									drId.setPathUuid(tf.nidToUuid(id.getPathNid()).toString());
 									drId.setStatusUuid(tf.nidToUuid(id.getStatusNid()).toString());
 									drId.setTime(id.getTime());
-									drId.setExtensionId(tf.nidToUuid(id.getModuleNid()).toString());
+									drId.setModuleId(tf.nidToUuid(id.getModuleNid()).toString());
 									langDescription.getIdentifiers().add(drId);
 								}
 
@@ -261,7 +261,7 @@ public class DrComponentHelper {
 						loopRel.setRelGroup(relTuple.getGroup());
 						loopRel.setStatusUuid(tf.nidToUuid(relTuple.getStatusNid()).toString());
 						loopRel.setTime(relTuple.getTime());
-						loopRel.setExtensionId(tf.nidToUuid(relTuple.getModuleNid()).toString());
+						loopRel.setModuleId(tf.nidToUuid(relTuple.getModuleNid()).toString());
 						loopRel.setTypeUuid(tf.nidToUuid(relTuple.getTypeNid()).toString());
 						loopRel.setFactContextName(factContextName);
 						loopRel.setPublished(!getSnomedIntId(relTuple.getNid()).equals("0"));
@@ -273,7 +273,7 @@ public class DrComponentHelper {
 							drId.setPathUuid(tf.nidToUuid(id.getPathNid()).toString());
 							drId.setStatusUuid(tf.nidToUuid(id.getStatusNid()).toString());
 							drId.setTime(id.getTime());
-							drId.setExtensionId(tf.nidToUuid(id.getModuleNid()).toString());
+							drId.setModuleId(tf.nidToUuid(id.getModuleNid()).toString());
 							loopRel.getIdentifiers().add(drId);
 						}
 						addAnnotationsToComponent(loopRel, relTuple, mockVc, factContextName);
@@ -295,7 +295,7 @@ public class DrComponentHelper {
 						loopRel.setRelGroup(relTuple.getGroup());
 						loopRel.setStatusUuid(tf.nidToUuid(relTuple.getStatusNid()).toString());
 						loopRel.setTime(relTuple.getTime());
-						loopRel.setExtensionId(tf.nidToUuid(relTuple.getModuleNid()).toString());
+						loopRel.setModuleId(tf.nidToUuid(relTuple.getModuleNid()).toString());
 						loopRel.setTypeUuid(tf.nidToUuid(relTuple.getTypeNid()).toString());
 						loopRel.setFactContextName(factContextName);
 						loopRel.setPublished(!getSnomedIntId(relTuple.getNid()).equals("0"));
@@ -307,7 +307,7 @@ public class DrComponentHelper {
 							drId.setPathUuid(tf.nidToUuid(id.getPathNid()).toString());
 							drId.setStatusUuid(tf.nidToUuid(id.getStatusNid()).toString());
 							drId.setTime(id.getTime());
-							drId.setExtensionId(tf.nidToUuid(id.getModuleNid()).toString());
+							drId.setModuleId(tf.nidToUuid(id.getModuleNid()).toString());
 							loopRel.getIdentifiers().add(drId);
 						}
 						addAnnotationsToComponent(loopRel, relTuple, mockVc, factContextName);
@@ -347,7 +347,7 @@ public class DrComponentHelper {
 				loopRel.setRelGroup(relTuple.getGroup());
 				loopRel.setStatusUuid(tf.nidToUuid(relTuple.getStatusNid()).toString());
 				loopRel.setTime(relTuple.getTime());
-				loopRel.setExtensionId(tf.nidToUuid(relTuple.getModuleNid()).toString());
+				loopRel.setModuleId(tf.nidToUuid(relTuple.getModuleNid()).toString());
 				loopRel.setTypeUuid(tf.nidToUuid(relTuple.getTypeNid()).toString());
 				loopRel.setFactContextName(factContextName);
 				loopRel.setPublished(!getSnomedIntId(relTuple.getNid()).equals("0"));
@@ -359,7 +359,7 @@ public class DrComponentHelper {
 					drId.setPathUuid(tf.nidToUuid(id.getPathNid()).toString());
 					drId.setStatusUuid(tf.nidToUuid(id.getStatusNid()).toString());
 					drId.setTime(id.getTime());
-					drId.setExtensionId(tf.nidToUuid(id.getModuleNid()).toString());
+					drId.setModuleId(tf.nidToUuid(id.getModuleNid()).toString());
 					loopRel.getIdentifiers().add(drId);
 				}
 
@@ -420,7 +420,7 @@ public class DrComponentHelper {
 				drId.setPathUuid(tf.nidToUuid(id.getPathNid()).toString());
 				drId.setStatusUuid(tf.nidToUuid(id.getStatusNid()).toString());
 				drId.setTime(id.getTime());
-				drId.setExtensionId(tf.nidToUuid(id.getModuleNid()).toString());
+				drId.setModuleId(tf.nidToUuid(id.getModuleNid()).toString());
 				concept.getIdentifiers().add(drId);
 			}
 			addAnnotationsToComponent(concept, conceptBi.getConceptAttributesActive(), mockVc, factContextName);
@@ -508,7 +508,7 @@ public class DrComponentHelper {
 			extension.setStatusUuid(tf.nidToUuid(annotation.getStampNid()).toString());
 			extension.setTime(annotation.getTime());
 			extension.setAuthorUuid(tf.nidToUuid(annotation.getAuthorNid()).toString());
-			extension.setExtensionId(tf.nidToUuid(annotation.getModuleNid()).toString());
+			extension.setModuleId(tf.nidToUuid(annotation.getModuleNid()).toString());
 			extension.setFactContextName(factContextName);                
 			if (annotation instanceof RefexNidVersionBI) {
 				RefexNidVersionBI annotationTyped = (RefexNidVersionBI) annotation;
