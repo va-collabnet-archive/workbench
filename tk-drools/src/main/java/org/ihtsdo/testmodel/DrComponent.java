@@ -19,7 +19,7 @@ public abstract class DrComponent {
 	// Inferred properties
 	private boolean published = false;
 	private boolean extensionComponent = false;
-	private String extensionId = "";
+	private String moduleId = "";
 	private boolean active = false;
 
 	@Override
@@ -111,12 +111,12 @@ public abstract class DrComponent {
 		this.extensionComponent = extensionComponent;
 	}
 
-	public String getExtensionId() {
-		return extensionId;
+	public String getModuleId() {
+		return moduleId;
 	}
 
-	public void setExtensionId(String extensionId) {
-		this.extensionId = extensionId;
+	public void setModuleId(String moduleId) {
+		this.moduleId = moduleId;
 	}
 
 	public boolean isActive() {
