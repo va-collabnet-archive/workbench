@@ -20,12 +20,9 @@ import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
-
-import org.drools.core.WorkingMemory;
-import org.drools.core.spi.Activation;
-import org.kie.api.runtime.rule.ConsequenceExceptionHandler;
-import org.kie.api.runtime.rule.Match;
-import org.kie.api.runtime.rule.Session;
+import org.drools.runtime.rule.Activation;
+import org.drools.runtime.rule.ConsequenceExceptionHandler;
+import org.drools.runtime.rule.WorkingMemory;
 
 /**
  *
@@ -47,15 +44,10 @@ public class DroolsExceptionHandler
         // nothing to do. 
     }
 
-//    @Override
-//    public void handleException(Activation actvtn, 
-//                            WorkingMemory wm, Exception ex) {
-//        throw new DroolsException( ex, wm, actvtn);
-//    }
-
-	@Override
-	public void handleException(Match arg0, Session arg1, Exception ex) {
-		//TODO: Implement
-	}
+    @Override
+    public void handleException(Activation actvtn, 
+                            WorkingMemory wm, Exception ex) {
+        throw new DroolsException( ex, wm, actvtn);
+    }
 
 }

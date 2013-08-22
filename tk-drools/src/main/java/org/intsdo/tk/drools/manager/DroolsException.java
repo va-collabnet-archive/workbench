@@ -17,11 +17,10 @@ package org.intsdo.tk.drools.manager;
 
 import java.io.PrintStream;
 import java.util.Collection;
-
-import org.drools.core.FactHandle;
-import org.drools.core.WorkingMemory;
-import org.drools.core.rule.Rule;
-import org.drools.core.spi.Activation;
+import org.drools.FactHandle;
+import org.drools.runtime.rule.Activation;
+import org.drools.runtime.rule.WorkingMemory;
+import org.drools.definition.rule.Rule;
 
 /**
  * Based on example at: 

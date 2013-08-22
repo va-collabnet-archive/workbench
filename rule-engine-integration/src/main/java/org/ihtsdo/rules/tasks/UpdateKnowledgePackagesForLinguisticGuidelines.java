@@ -22,6 +22,9 @@ import java.net.MalformedURLException;
 import java.util.Collection;
 import java.util.HashMap;
 
+import org.drools.builder.ResourceType;
+import org.drools.io.Resource;
+import org.drools.io.ResourceFactory;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.task.WorkerAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
@@ -33,9 +36,6 @@ import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 import org.ihtsdo.rules.RulesLibrary;
-import org.kie.api.io.Resource;
-import org.kie.api.io.ResourceType;
-import org.kie.internal.io.ResourceFactory;
 
 /**
  * The Class UpdateKnowledgePackages.

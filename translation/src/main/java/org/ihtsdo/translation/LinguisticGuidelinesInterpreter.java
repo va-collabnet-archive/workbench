@@ -1,24 +1,30 @@
 package org.ihtsdo.translation;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 
+import org.drools.KnowledgeBase;
+import org.drools.KnowledgeBaseFactory;
+import org.drools.builder.DecisionTableConfiguration;
+import org.drools.builder.DecisionTableInputType;
+import org.drools.builder.KnowledgeBuilder;
+import org.drools.builder.KnowledgeBuilderFactory;
+import org.drools.builder.ResourceType;
+import org.drools.io.Resource;
+import org.drools.io.ResourceFactory;
+import org.drools.io.impl.InputStreamResource;
+import org.drools.io.impl.ReaderInputStream;
+import org.drools.logger.KnowledgeRuntimeLoggerFactory;
+import org.drools.runtime.StatelessKnowledgeSession;
+import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.log.AceLog;
 import org.ihtsdo.project.I_ContextualizeDescription;
 import org.ihtsdo.project.workflow.api.SimpleKindOfComputer;
-import org.kie.api.io.Resource;
-import org.kie.api.io.ResourceType;
-import org.kie.internal.KnowledgeBase;
-import org.kie.internal.KnowledgeBaseFactory;
-import org.kie.internal.builder.DecisionTableConfiguration;
-import org.kie.internal.builder.DecisionTableInputType;
-import org.kie.internal.builder.KnowledgeBuilder;
-import org.kie.internal.builder.KnowledgeBuilderFactory;
-import org.kie.internal.io.ResourceFactory;
-import org.kie.internal.logger.KnowledgeRuntimeLoggerFactory;
-import org.kie.internal.runtime.StatelessKnowledgeSession;
 
 /**
  * The Class WorkflowInterpreter.

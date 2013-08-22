@@ -27,11 +27,11 @@
         </dependency>
         <dependency>
             <groupId>org.drools</groupId>
-            <artifactId>kie-api</artifactId>
+            <artifactId>knowledge-api</artifactId>
         </dependency>
         <dependency>
             <groupId>org.drools</groupId>
-            <artifactId>kie-internal</artifactId>
+            <artifactId>knowledge-internal-api</artifactId>
         </dependency>
         <dependency>
             <groupId>org.drools</groupId>

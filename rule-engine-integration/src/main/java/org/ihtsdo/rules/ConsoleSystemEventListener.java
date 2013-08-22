@@ -16,8 +16,8 @@
  */
 package org.ihtsdo.rules;
 
+import org.drools.SystemEventListener;
 import org.dwfa.ace.log.AceLog;
-import org.kie.internal.SystemEventListener;
 
 /**
  * The listener interface for receiving consoleSystemEvent events.

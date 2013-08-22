@@ -25,6 +25,7 @@ import java.util.Collection;
 
 import javax.swing.JPanel;
 
+import org.drools.KnowledgeBase;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.task.WorkerAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
@@ -37,7 +38,6 @@ import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 import org.ihtsdo.rules.RulesBrowserPanel;
 import org.ihtsdo.rules.RulesLibrary;
-import org.kie.internal.KnowledgeBase;
 
 /**
  * The Class UpdateKnowledgePackages.

@@ -29,6 +29,7 @@ import java.util.UUID;
 
 import junit.framework.TestCase;
 
+import org.drools.definition.rule.Rule;
 import org.dwfa.ace.api.DatabaseSetupConfig;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
@@ -46,7 +47,6 @@ import org.ihtsdo.rules.context.RulesDeploymentPackageReference;
 import org.ihtsdo.rules.context.RulesDeploymentPackageReferenceHelper;
 import org.ihtsdo.rules.testmodel.ResultsCollectorWorkBench;
 import org.ihtsdo.tk.api.Precedence;
-import org.kie.api.definition.rule.Rule;
 
 /**
  * The Class TestContexts.
@@ -128,7 +128,7 @@ public class TestContexts extends TestCase {
 		assertEquals(4, rules.size());
 
 		for (Rule loopRule : rules) {
-			String ruleUid = (String) loopRule.getMetaData().get("UID");
+			String ruleUid = loopRule.getMetaAttribute("UID");
 			assertNull(contextHelper.getRoleInContext(ruleUid, context1));
 		}
 		
@@ -206,7 +206,7 @@ public class TestContexts extends TestCase {
 		assertEquals(includeClause, contextHelper.getRoleInContext("7feea960-9c23-11df-981c-0800200c9a66", context3));
 
 		for (Rule loopRule : rules) {
-			String ruleUid = (String) loopRule.getMetaData().get("UID");
+			String ruleUid = loopRule.getMetaAttribute("UID");
 			if (ruleUid.equals("f7bd3b50-9c1e-11df-981c-0800200c9a66")) {
 				assertTrue(true);
 				contextHelper.setRoleInContext(ruleUid, context1, includeClause);
@@ -218,7 +218,7 @@ public class TestContexts extends TestCase {
 		}
 		
 		for (Rule loopRule : rules) {
-			String ruleUid = (String) loopRule.getMetaData().get("UID");
+			String ruleUid = loopRule.getMetaAttribute("UID");
 			if (ruleUid.equals("f7bd3b50-9c1e-11df-981c-0800200c9a66")) {
 				assertEquals(includeClause.getConceptNid(), contextHelper.getRoleInContext(ruleUid, context1).getConceptNid());
 			} else {

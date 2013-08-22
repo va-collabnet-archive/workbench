@@ -39,10 +39,6 @@ public class WfComment implements WfCommentBI {
 	private String comment;
 	private SimpleDateFormat formatter;
 
-	public WfComment() {
-		super();
-	}
-	
 	public WfComment(Comment commentStructure) {
 
 		this.formatter = new SimpleDateFormat();
@@ -110,33 +106,5 @@ public class WfComment implements WfCommentBI {
 	@Override
 	public String toString() {
 		return comment + " - author: " + author + " - " + TimeHelper.formatDate(date);
-	}
-
-	/**
-	 * @param role the role to set
-	 */
-	public void setRole(String role) {
-		this.role = role;
-	}
-
-	/**
-	 * @param author the author to set
-	 */
-	public void setAuthor(WfUser author) {
-		this.author = author;
-	}
-
-	/**
-	 * @param date the date to set
-	 */
-	public void setDate(Long date) {
-		this.date = date;
-	}
-
-	/**
-	 * @param comment the comment to set
-	 */
-	public void setComment(String comment) {
-		this.comment = comment;
 	}
 }

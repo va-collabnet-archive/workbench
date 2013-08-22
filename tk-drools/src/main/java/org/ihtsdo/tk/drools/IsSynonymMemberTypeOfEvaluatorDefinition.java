@@ -21,25 +21,24 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.util.Collection;
 
-import org.drools.core.base.BaseEvaluator;
-import org.drools.core.base.ValueType;
-import org.drools.core.base.evaluators.EvaluatorDefinition;
-import org.drools.core.base.evaluators.Operator;
-import org.drools.core.common.InternalFactHandle;
-import org.drools.core.common.InternalWorkingMemory;
-import org.drools.core.rule.VariableRestriction.ObjectVariableContextEntry;
-import org.drools.core.rule.VariableRestriction.VariableContextEntry;
-import org.drools.core.spi.Evaluator;
-import org.drools.core.spi.FieldValue;
-import org.drools.core.spi.InternalReadAccessor;
+import org.drools.base.BaseEvaluator;
+import org.drools.base.ValueType;
+import org.drools.base.evaluators.EvaluatorDefinition;
+import org.drools.base.evaluators.Operator;
+import org.drools.common.InternalWorkingMemory;
+import org.drools.rule.VariableRestriction.ObjectVariableContextEntry;
+import org.drools.rule.VariableRestriction.VariableContextEntry;
+import org.drools.spi.Evaluator;
+import org.drools.spi.FieldValue;
+import org.drools.spi.InternalReadAccessor;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.refex.type_nid.RefexNidVersionBI;
-import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
-import org.ihtsdo.tk.drools.facts.DescFact;
 import org.ihtsdo.tk.spec.ConceptSpec;
+import org.ihtsdo.tk.drools.facts.DescFact;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 
 public class IsSynonymMemberTypeOfEvaluatorDefinition implements EvaluatorDefinition {
 
@@ -82,14 +81,14 @@ public class IsSynonymMemberTypeOfEvaluatorDefinition implements EvaluatorDefini
 
         @Override
         public boolean evaluate(InternalWorkingMemory workingMemory,
-                InternalReadAccessor extractor, InternalFactHandle object, FieldValue value) {
+                InternalReadAccessor extractor, Object object, FieldValue value) {
             return testMemberTypeOf(object, value.getValue());
         }
 
         @Override
         public boolean evaluate(InternalWorkingMemory workingMemory,
-                InternalReadAccessor leftExtractor, InternalFactHandle left,
-                InternalReadAccessor rightExtractor, InternalFactHandle right) {
+                InternalReadAccessor leftExtractor, Object left,
+                InternalReadAccessor rightExtractor, Object right) {
             final Object value1 = leftExtractor.getValue(workingMemory, left);
             final Object value2 = rightExtractor.getValue(workingMemory, right);
 
@@ -158,13 +157,13 @@ public class IsSynonymMemberTypeOfEvaluatorDefinition implements EvaluatorDefini
 
         @Override
         public boolean evaluateCachedLeft(InternalWorkingMemory workingMemory,
-                VariableContextEntry context, InternalFactHandle right) {
+                VariableContextEntry context, Object right) {
             return testMemberTypeOf(((ObjectVariableContextEntry) context).left, right);
         }
 
         @Override
         public boolean evaluateCachedRight(InternalWorkingMemory workingMemory,
-                VariableContextEntry context, InternalFactHandle left) {
+                VariableContextEntry context, Object left) {
             return testMemberTypeOf(left, ((ObjectVariableContextEntry) context).right);
         }
 

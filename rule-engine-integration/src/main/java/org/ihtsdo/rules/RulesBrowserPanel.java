@@ -33,12 +33,12 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
+import org.drools.KnowledgeBase;
+import org.drools.definition.KnowledgePackage;
+import org.drools.definition.rule.Rule;
 import org.dwfa.ace.api.I_ConfigAceDb;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.log.AceLog;
-import org.kie.api.definition.rule.Rule;
-import org.kie.internal.KnowledgeBase;
-import org.kie.internal.definition.KnowledgePackage;
 
 /**
  * The Class RulesBrowserPanel.
@@ -98,7 +98,7 @@ public class RulesBrowserPanel extends JPanel {
 				//AceLog.getAppLog().info("**** " + rule.getName());
 				boolean excluded = false;
 				//String ruleUid = (String) rule.getMetaData().get("UID");
-				String ruleUid = (String) rule.getMetaData().get("UID");
+				String ruleUid = (String) rule.getMetaAttribute("UID");
 				if (ruleUid != null) {
 					if (agenda.getExcludedRules().containsKey(UUID.fromString(ruleUid))) {
 						excluded = true;

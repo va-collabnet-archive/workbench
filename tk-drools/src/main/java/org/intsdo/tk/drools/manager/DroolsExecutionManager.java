@@ -30,8 +30,26 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Semaphore;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+import org.drools.KnowledgeBase;
+import org.drools.KnowledgeBaseConfiguration;
+import org.drools.KnowledgeBaseFactory;
+import org.drools.builder.KnowledgeBuilder;
+import org.drools.builder.KnowledgeBuilderConfiguration;
+import org.drools.builder.KnowledgeBuilderFactory;
+import org.drools.builder.ResourceType;
+import org.drools.builder.conf.EvaluatorOption;
+import org.drools.conf.ConsequenceExceptionHandlerOption;
+import org.drools.definition.KnowledgePackage;
+import org.drools.io.Resource;
+import org.drools.io.ResourceFactory;
+import org.drools.logger.KnowledgeRuntimeLogger;
+import org.drools.logger.KnowledgeRuntimeLoggerFactory;
+import org.drools.runtime.StatefulKnowledgeSession;
+import org.drools.runtime.rule.ConsequenceExceptionHandler;
 import org.ihtsdo.tk.drools.IsGbMemberTypeOfEvaluatorDefinition;
 import org.ihtsdo.tk.drools.IsKindOfEvaluatorDefinition;
 import org.ihtsdo.tk.drools.IsMemberOfEvaluatorDefinition;
@@ -41,22 +59,6 @@ import org.ihtsdo.tk.drools.IsParentMemberOfEvaluatorDefinition;
 import org.ihtsdo.tk.drools.IsSynonymMemberTypeOfEvaluatorDefinition;
 import org.ihtsdo.tk.drools.IsUsMemberTypeOfEvaluatorDefinition;
 import org.ihtsdo.tk.drools.SatisfiesConstraintEvaluatorDefinition;
-import org.kie.api.KieBaseConfiguration;
-import org.kie.api.io.Resource;
-import org.kie.api.io.ResourceType;
-import org.kie.api.runtime.rule.ConsequenceExceptionHandler;
-import org.kie.internal.KnowledgeBase;
-import org.kie.internal.KnowledgeBaseFactory;
-import org.kie.internal.builder.KnowledgeBuilder;
-import org.kie.internal.builder.KnowledgeBuilderConfiguration;
-import org.kie.internal.builder.KnowledgeBuilderFactory;
-import org.kie.internal.builder.conf.EvaluatorOption;
-import org.kie.internal.conf.ConsequenceExceptionHandlerOption;
-import org.kie.internal.definition.KnowledgePackage;
-import org.kie.internal.io.ResourceFactory;
-import org.kie.internal.logger.KnowledgeRuntimeLogger;
-import org.kie.internal.logger.KnowledgeRuntimeLoggerFactory;
-import org.kie.internal.runtime.StatefulKnowledgeSession;
 
 /**
  *
@@ -67,7 +69,7 @@ public class DroolsExecutionManager {
     private KnowledgeBase kbase;
     private final Set<File> kbFiles;
     private final File drlPkgFile;
-    private final KieBaseConfiguration kBaseConfig;
+    private final KnowledgeBaseConfiguration kBaseConfig;
     public static String drools_dialect_java_compiler;
 
     public static enum ExtraEvaluators {

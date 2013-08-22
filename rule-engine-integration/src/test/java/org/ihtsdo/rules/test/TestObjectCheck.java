@@ -24,6 +24,9 @@ import java.util.UUID;
 
 import junit.framework.TestCase;
 
+import org.drools.builder.ResourceType;
+import org.drools.io.Resource;
+import org.drools.io.ResourceFactory;
 import org.dwfa.ace.api.DatabaseSetupConfig;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
@@ -32,9 +35,6 @@ import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.log.AceLog;
 import org.ihtsdo.rules.RulesLibrary;
 import org.ihtsdo.rules.testmodel.ResultsCollectorWorkBench;
-import org.kie.api.io.Resource;
-import org.kie.api.io.ResourceType;
-import org.kie.internal.io.ResourceFactory;
 
 /**
  * The Class DomainModelTestCheck.

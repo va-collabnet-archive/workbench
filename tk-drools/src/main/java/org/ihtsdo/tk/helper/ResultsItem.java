@@ -23,16 +23,6 @@ public class ResultsItem {
 		private final UUID severityUuid;
 		private final String name;
 		
-		public static Severity getSeverityByUuid(UUID uuid) {
-			if (uuid.equals(ERROR.getSeverityUuid())) {
-				return ERROR;
-			} if (uuid.equals(WARNING.getSeverityUuid())) {
-				return WARNING;
-			} if (uuid.equals(NOTIFICATION.getSeverityUuid())) {
-				return NOTIFICATION;
-			} else return null;
-		}
-		
 		Severity(UUID severityUuid, String name) {
 			this.severityUuid = severityUuid;
 			this.name = name;
