@@ -57,6 +57,7 @@ import org.ihtsdo.tk.api.refex.type_long.RefexLongVersionBI;
 import org.ihtsdo.tk.api.refex.type_nid.RefexNidVersionBI;
 import org.ihtsdo.tk.api.refex.type_string.RefexStringVersionBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
+import org.ihtsdo.tk.binding.snomed.TermAux;
 import org.ihtsdo.util.swing.GuiUtil;
 
 /**
@@ -183,12 +184,14 @@ public final class BatchActionEditorPanel extends javax.swing.JPanel {
         try {
             // parentLinkages from preference settings
             I_IntSet parentLinkageTypes = ace.aceFrameConfig.getDestRelTypes();
+            parentLinkageTypes.remove(TermAux.IS_A.getLenient().getConceptNid());
             int[] types = parentLinkageTypes.getSetValues();
             for (int typeNid : types) {
                 ComponentVersionBI cvbi = ts.getComponentVersion(vc, typeNid);
                 parentLinkages.add(cvbi);
             }
-
+            
+            
             for (int i = 0; i < termList.getSize(); i++) {
                 I_GetConceptData cb = (I_GetConceptData) termList.getElementAt(i);
                 if (!cb.isCanceled()) {
