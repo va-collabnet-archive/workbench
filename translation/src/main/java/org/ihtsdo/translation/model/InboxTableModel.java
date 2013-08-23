@@ -53,6 +53,8 @@ import org.ihtsdo.project.view.tag.TagManager;
 import org.ihtsdo.project.view.tag.WfTagFilter;
 import org.ihtsdo.project.workflow.api.WfComponentProvider;
 import org.ihtsdo.project.workflow.model.WfInstance;
+import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 import org.ihtsdo.tk.workflow.api.WfFilterBI;
 import org.ihtsdo.translation.LanguageUtil;
@@ -608,10 +610,10 @@ public class InboxTableModel extends DefaultTableModel {
 		String defaultDescription = "";
 		TranslationProject translationProject = null;
 		I_TerminologyProject projectConcept = null;
-		I_GetConceptData concept = null;
+		ConceptChronicleBI concept = null;
 		try {
-			concept = Terms.get().getConcept(wfInstance.getComponentId());
-			defaultDescription = concept.toString();
+			concept = Ts.get().getConcept(wfInstance.getComponentId());
+			defaultDescription = concept.getPrimordialVersion().getDescriptionPreferred().getText();
 			List<I_GetConceptData> langRefsets = null;
 			List<ContextualizedDescription> descriptions = new ArrayList<ContextualizedDescription>();
 			projectConcept = TerminologyProjectDAO.getProjectForWorklist(wfInstance.getWorkList(), config);
