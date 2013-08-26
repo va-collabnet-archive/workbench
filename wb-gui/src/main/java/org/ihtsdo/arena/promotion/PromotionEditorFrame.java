@@ -626,6 +626,9 @@ public class PromotionEditorFrame extends ComponentFrame implements PropertyChan
                             Ts.get().commit(mergePathConcept);
                             PromotionTerminologyTableModel model = (PromotionTerminologyTableModel) promotionConceptTable.getModel();
                             model.fireTableDataChanged();
+                            SnorocketExTask classifierTarget = new SnorocketExTask();
+                            classifierTarget.runClassifier(origConfig);
+                            classifierTarget.commitClassification();
                             promoteDone = true;
                         } catch (IOException ex) {
                             Logger.getLogger(PromotionEditorFrame.class.getName()).log(Level.SEVERE, null, ex);
@@ -693,6 +696,9 @@ public class PromotionEditorFrame extends ComponentFrame implements PropertyChan
                             Ts.get().commit(mergePathConcept);
                             PromotionTerminologyTableModel model = (PromotionTerminologyTableModel) promotionConceptTable.getModel();
                             model.fireTableDataChanged();
+                            SnorocketExTask classifierTarget = new SnorocketExTask();
+                            classifierTarget.runClassifier(origConfig);
+                            classifierTarget.commitClassification();
                             promoteDone = true;
                         } catch (IOException ex) {
                             Logger.getLogger(PromotionEditorFrame.class.getName()).log(Level.SEVERE, null, ex);
@@ -760,6 +766,9 @@ public class PromotionEditorFrame extends ComponentFrame implements PropertyChan
 
                             PromotionTerminologyTableModel model = (PromotionTerminologyTableModel) promotionConceptTable.getModel();
                             model.fireTableDataChanged();
+                            SnorocketExTask classifierTarget = new SnorocketExTask();
+                            classifierTarget.runClassifier(origConfig);
+                            classifierTarget.commitClassification();
                             promoteDone = true;
                         } catch (IOException ex) {
                             Logger.getLogger(PromotionEditorFrame.class.getName()).log(Level.SEVERE, null, ex);
@@ -827,6 +836,9 @@ public class PromotionEditorFrame extends ComponentFrame implements PropertyChan
 
                             PromotionTerminologyTableModel model = (PromotionTerminologyTableModel) promotionConceptTable.getModel();
                             model.fireTableDataChanged();
+                            SnorocketExTask classifierTarget = new SnorocketExTask();
+                            classifierTarget.runClassifier(origConfig);
+                            classifierTarget.commitClassification();
                             promoteDone = true;
                         } catch (IOException ex) {
                             Logger.getLogger(PromotionEditorFrame.class.getName()).log(Level.SEVERE, null, ex);
