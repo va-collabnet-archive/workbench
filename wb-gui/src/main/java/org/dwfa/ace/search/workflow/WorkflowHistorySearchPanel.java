@@ -30,7 +30,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FilenameFilter;
-import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
@@ -79,10 +78,8 @@ import org.dwfa.ace.search.DescSearchResultsTablePopupListener;
 import org.dwfa.ace.search.I_MakeCriterionPanel;
 import org.dwfa.ace.search.QueryBean;
 import org.dwfa.ace.table.JTableWithDragImage;
-import org.dwfa.ace.task.RegenerateWorkflowIndex;
+import org.dwfa.ace.task.cs.ChangeSetImporter;
 import org.dwfa.ace.task.search.I_TestSearchResults;
-import org.dwfa.ace.tree.ExpandPathToNodeStateListener;
-import org.dwfa.ace.tree.JTreeWithDragImage;
 import org.ihtsdo.ace.table.WorkflowHistoryTableModel;
 import org.ihtsdo.ace.table.WorkflowHistoryTableModel.WORKFLOW_FIELD;
 import org.ihtsdo.ace.table.WorkflowHistoryTableModel.WorkflowStringWithConceptTuple;
@@ -676,7 +673,7 @@ public class WorkflowHistorySearchPanel extends JPanel implements I_MakeCriterio
     }
 
     private void startSearch() {
-        if (RegenerateWorkflowIndex.indexGenerating.get() == true) {
+        if (ChangeSetImporter.indexGenerating.get() == true) {
             JOptionPane.showMessageDialog(null, "Please wait until workflow index has regenerated.", "Please wait.", JOptionPane.OK_OPTION);
         }else if (updateExtraCriterion()) {
 		    setShowProgress(true);

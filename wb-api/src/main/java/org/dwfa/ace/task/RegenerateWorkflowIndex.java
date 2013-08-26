@@ -15,13 +15,12 @@
  */
 package org.dwfa.ace.task;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.Collection;
-import java.util.concurrent.atomic.AtomicBoolean;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.log.AceLog;
+import org.dwfa.ace.task.cs.ChangeSetImporter;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
@@ -37,9 +36,7 @@ import org.ihtsdo.tk.Ts;
 public class RegenerateWorkflowIndex extends AbstractTask{
     // Serialization Properties
     private static final long serialVersionUID = 1;
-    private static final int dataVersion = 1;
-    public static AtomicBoolean indexGenerating = new AtomicBoolean(false);
-    
+    private static final int dataVersion = 1;      
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
     }
@@ -67,12 +64,12 @@ public class RegenerateWorkflowIndex extends AbstractTask{
                         @Override
                         public void run() {
                             try {
-                                if(indexGenerating.get() == false){
-                                    indexGenerating.getAndSet(true);
+                                if(ChangeSetImporter.indexGenerating.get() == false){
+                                    ChangeSetImporter.indexGenerating.getAndSet(true);
                                 System.out.println("*** Starting workflow history lucene index regeneration.");
                                 I_ConfigAceFrame config = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
                                 Ts.get().regenerateWfHxLuceneIndex(config.getViewCoordinate());
-                                indexGenerating.getAndSet(false);
+                                ChangeSetImporter.indexGenerating.getAndSet(false);
                                 System.out.println("*** Finished workflow history lucene index regeneration.");
                                 }
                             } catch (IOException ex) {

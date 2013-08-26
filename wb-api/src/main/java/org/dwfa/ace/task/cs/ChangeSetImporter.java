@@ -26,8 +26,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.SwingUtilities;
 
 import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.I_TermFactory;
@@ -47,6 +49,7 @@ public abstract class ChangeSetImporter implements ActionListener {
     private static boolean commitAfterImport = false;
     private static int conceptCount = 0;
     private static int wfConceptCount = 0;
+    public static AtomicBoolean indexGenerating = new AtomicBoolean(false);
 
     @Override
     public void actionPerformed(ActionEvent arg0) {
@@ -188,8 +191,30 @@ public abstract class ChangeSetImporter implements ActionListener {
             }
                 if(conceptCount != wfConceptCount){
                     if(Terms.get().getActiveAceFrameConfig() != null){
-                        AceLog.getEditLog().info("*** Workflow history lucene index not updated properly. Regenerating index. ***");
-                        Ts.get().regenerateWfHxLuceneIndex(Terms.get().getActiveAceFrameConfig().getViewCoordinate());
+                        if (SwingUtilities.isEventDispatchThread()) {
+                            new Thread(
+                                    new Runnable() {
+                                @Override
+                                public void run() {
+                                    try {
+                                        if (indexGenerating.get() == false) {
+                                            indexGenerating.getAndSet(true);
+                                            System.out.println("*** Starting workflow history lucene index regeneration.");
+                                            Ts.get().regenerateWfHxLuceneIndex(Terms.get().getActiveAceFrameConfig().getViewCoordinate());
+                                            indexGenerating.getAndSet(false);
+                                            System.out.println("*** Finished workflow history lucene index regeneration.");
+                                        }
+                                    } catch (IOException ex) {
+                                        AceLog.getAppLog().alertAndLogException(ex);
+                                    } catch (Exception ex) {
+                                        AceLog.getAppLog().alertAndLogException(ex);
+                                    }
+                                }
+                            }).start();
+                        } else {
+                            AceLog.getEditLog().info("*** Workflow history lucene index not updated properly. Regenerating index. ***");
+                            Ts.get().regenerateWfHxLuceneIndex(Terms.get().getActiveAceFrameConfig().getViewCoordinate());
+                        }
                     }
             }
 

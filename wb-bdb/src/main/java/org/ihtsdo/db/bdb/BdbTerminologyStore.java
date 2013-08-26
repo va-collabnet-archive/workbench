@@ -17,7 +17,7 @@ import org.dwfa.ace.api.Terms;
 import org.ihtsdo.tk.api.cs.ChangeSetPolicy;
 import org.ihtsdo.tk.api.cs.ChangeSetWriterThreading;
 import org.dwfa.ace.log.AceLog;
-import static org.dwfa.ace.task.RegenerateWorkflowIndex.indexGenerating;
+import static org.dwfa.ace.task.cs.ChangeSetImporter.indexGenerating;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.SNOMED;
 import org.dwfa.tapi.PathNotExistsException;
