@@ -261,10 +261,7 @@ public class ExportWorkflowHistoryAsEConcept extends AbstractMojo {
 	private String toXml(String[] row, long effectiveTimestamp) throws IOException, TerminologyException
 	{
 		try 
-		{
-		if(row[WorkflowHelper.conceptIdPosition].equals("043429e4-9ce6-4584-9873-759b8608f4f0")){
-                   System.out.println("DEBUG");
-                }	
+		{	
                     UUID modeler = lookupModeler(row[WorkflowHelper.modelerPosition]);
 			UUID action = lookupAction(row[WorkflowHelper.actionPosition]);
 			UUID state = lookupState(row[WorkflowHelper.statePosition]);
