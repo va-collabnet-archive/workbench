@@ -96,7 +96,7 @@ public class ImportAllChangeSets extends AbstractTask {
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         try {
             Terms.get().suspendChangeSetWriters();
-            importAllChangeSets(worker.getLogger());
+            importAllChangeSets(worker.getLogger(), false);
             I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
             
             I_AmTermComponent termComponent1 = config.getConceptViewer(1).getTermComponent();
@@ -121,8 +121,8 @@ public class ImportAllChangeSets extends AbstractTask {
         }
     }
 
-    public void importAllChangeSets(Logger log) throws TaskFailedException {
-        ChangeSetImporter csi = new ChangeSetImporter() {
+    public void importAllChangeSets(Logger log, boolean fromMojo) throws TaskFailedException {
+        ChangeSetImporter csi = new ChangeSetImporter(fromMojo) {
             @Override
             public I_ReadChangeSet getChangeSetReader(File csf) {
                 try {

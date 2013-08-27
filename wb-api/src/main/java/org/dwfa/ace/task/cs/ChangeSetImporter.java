@@ -50,7 +50,17 @@ public abstract class ChangeSetImporter implements ActionListener {
     private static int conceptCount = 0;
     private static int wfConceptCount = 0;
     public static AtomicBoolean indexGenerating = new AtomicBoolean(false);
+    private boolean fromMojo;
 
+    
+    public ChangeSetImporter() {
+        this.fromMojo = false;
+    }
+    
+    public ChangeSetImporter(boolean fromMojo) {
+        this.fromMojo = fromMojo;
+    }
+    
     @Override
     public void actionPerformed(ActionEvent arg0) {
         continueImport = false;
@@ -191,21 +201,27 @@ public abstract class ChangeSetImporter implements ActionListener {
             }
                 if(conceptCount != wfConceptCount){
                     if (Terms.get().getActiveAceFrameConfig() != null) {
-                        new Thread(
-                                new Runnable() {
-                            @Override
-                            public void run() {
-                                try {
+                        if (fromMojo) {
+                            System.out.println("*** Starting workflow history lucene index regeneration.");
+                            Ts.get().regenerateWfHxLuceneIndex(Terms.get().getActiveAceFrameConfig().getViewCoordinate());
+                            System.out.println("*** Finished workflow history lucene index regeneration.");
+                        } else {
+                            new Thread(
+                                    new Runnable() {
+                                @Override
+                                public void run() {
+                                    try {
                                         System.out.println("*** Starting workflow history lucene index regeneration on background thread.");
                                         Ts.get().regenerateWfHxLuceneIndex(Terms.get().getActiveAceFrameConfig().getViewCoordinate());
                                         System.out.println("*** Finished workflow history lucene index regeneration.");
-                                } catch (IOException ex) {
-                                    AceLog.getAppLog().alertAndLogException(ex);
-                                } catch (Exception ex) {
-                                    AceLog.getAppLog().alertAndLogException(ex);
+                                    } catch (IOException ex) {
+                                        AceLog.getAppLog().alertAndLogException(ex);
+                                    } catch (Exception ex) {
+                                        AceLog.getAppLog().alertAndLogException(ex);
+                                    }
                                 }
-                            }
-                        }).start();
+                            }).start();
+                        }
                     }
             }
 
