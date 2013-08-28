@@ -613,7 +613,7 @@ public class InboxTableModel extends DefaultTableModel {
 		ConceptChronicleBI concept = null;
 		try {
 			concept = Ts.get().getConcept(wfInstance.getComponentId());
-			defaultDescription = concept.getPrimordialVersion().getDescriptionPreferred().getText();
+			defaultDescription = concept.getVersion(config.getViewCoordinate()).getDescriptionPreferred().getText();
 			List<I_GetConceptData> langRefsets = null;
 			List<ContextualizedDescription> descriptions = new ArrayList<ContextualizedDescription>();
 			projectConcept = TerminologyProjectDAO.getProjectForWorklist(wfInstance.getWorkList(), config);
