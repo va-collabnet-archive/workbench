@@ -49,7 +49,11 @@ public class RF2ArtifactPostExportImpl extends RF2ArtifactPostExportAbst{
 		this.exportFolder=exportFolder;
 		this.fileExtension="." + fileExtension;
 		this.refsetData=refsetData;
-		this.langCode="-" + languageCode;
+		if (languageCode!=null && !languageCode.equals("")){
+			this.langCode="-" + languageCode;
+		}else{
+			this.langCode="";
+		}
 		this.namespace=namespace;
 	}
 
@@ -62,7 +66,11 @@ public class RF2ArtifactPostExportImpl extends RF2ArtifactPostExportAbst{
 				rf2Exported,  rf2OutputFolder,  buildDirectory,
 				 previousReleaseDate,  releaseDate);
 		this.fileExtension="." + fileExtension;
-		this.langCode="-" + languageCode;
+		if (languageCode!=null && !languageCode.equals("")){
+			this.langCode="-" + languageCode;
+		}else{
+			this.langCode="";
+		}
 		this.namespace=namespace;
 	}
 	
