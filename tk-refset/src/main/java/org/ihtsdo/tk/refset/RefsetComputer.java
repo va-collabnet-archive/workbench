@@ -120,8 +120,10 @@ public class RefsetComputer implements ProcessUnfetchedConceptDataBI {
                     Collection<? extends DescriptionChronicleBI> descriptions = concept.getDescriptions();
                     for (DescriptionChronicleBI desc : descriptions) {
                         DescriptionVersionBI descVersioned = desc.getVersion(viewCoordinate.getViewCoordinateWithAllStatusValues());
-                        executeComponent(descVersioned, cNid,
+                        if(descVersioned != null){
+                            executeComponent(descVersioned, cNid,
                                 descVersioned.getNid(), activities);
+                        }
                     }
                     break;
                 case RELATIONSHP:

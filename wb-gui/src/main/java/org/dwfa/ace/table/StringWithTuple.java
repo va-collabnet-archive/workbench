@@ -16,6 +16,8 @@
  */
 package org.dwfa.ace.table;
 
+import org.apache.commons.lang.StringEscapeUtils;
+
 public abstract class StringWithTuple<T extends I_CellTextWithTuple<T>> implements I_CellTextWithTuple<T> {
 
     private String cellText;
@@ -35,6 +37,11 @@ public abstract class StringWithTuple<T extends I_CellTextWithTuple<T>> implemen
                 text = text.substring(5);
             }
             text = "<html><em style=\"color:red\">" + text + "</em>";
+        }
+        if(text.startsWith("<html>")){
+            text = StringEscapeUtils.escapeHtml(text);
+        }else{
+            text = "<html>"+ StringEscapeUtils.escapeHtml(text);
         }
         return text;
     }

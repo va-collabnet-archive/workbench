@@ -57,6 +57,7 @@ import org.ihtsdo.tk.api.refex.type_long.RefexLongVersionBI;
 import org.ihtsdo.tk.api.refex.type_nid.RefexNidVersionBI;
 import org.ihtsdo.tk.api.refex.type_string.RefexStringVersionBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
+import org.ihtsdo.tk.binding.snomed.TermAux;
 import org.ihtsdo.util.swing.GuiUtil;
 
 /**
@@ -144,6 +145,8 @@ public final class BatchActionEditorPanel extends javax.swing.JPanel {
     private List<RelationshipVersionBI> existingRoles;
     private List<ComponentVersionBI> parentLinkages;
     private Map<Integer, Class> existingRefsetTypes;
+    private BatchActionProcessor bap;
+    private BatchActionSwingWorker basw;
 
     public List<RelationshipVersionBI> getExistingParents() {
         return existingParents;
@@ -181,12 +184,14 @@ public final class BatchActionEditorPanel extends javax.swing.JPanel {
         try {
             // parentLinkages from preference settings
             I_IntSet parentLinkageTypes = ace.aceFrameConfig.getDestRelTypes();
+            parentLinkageTypes.remove(TermAux.IS_A.getLenient().getConceptNid());
             int[] types = parentLinkageTypes.getSetValues();
             for (int typeNid : types) {
                 ComponentVersionBI cvbi = ts.getComponentVersion(vc, typeNid);
                 parentLinkages.add(cvbi);
             }
-
+            
+            
             for (int i = 0; i < termList.getSize(); i++) {
                 I_GetConceptData cb = (I_GetConceptData) termList.getElementAt(i);
                 if (!cb.isCanceled()) {
@@ -441,8 +446,8 @@ public final class BatchActionEditorPanel extends javax.swing.JPanel {
                 return;
             }
 
-            BatchActionProcessor bap = new BatchActionProcessor(concepts, tasks, ec, vc);
-            BatchActionSwingWorker basw = new BatchActionSwingWorker();
+            bap = new BatchActionProcessor(concepts, tasks, ec, vc);
+            basw = new BatchActionSwingWorker();
             basw.setBap(bap);
             basw.execute();
 
@@ -458,7 +463,14 @@ public final class BatchActionEditorPanel extends javax.swing.JPanel {
             Logger.getLogger(BatchActionEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_actionExecuteAllTasks
-
+    
+    public boolean stop(){
+        if(bap != null){
+            bap.setContinueWorkB(false);
+            basw.cancel(true);
+        }
+        return false;
+    }
     private void actionAddAnotherTask(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_actionAddAnotherTask
         actionAddAnotherTask();
     }//GEN-LAST:event_actionAddAnotherTask

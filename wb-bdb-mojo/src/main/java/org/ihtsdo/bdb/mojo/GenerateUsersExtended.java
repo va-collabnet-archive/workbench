@@ -35,6 +35,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 import java.util.UUID;
@@ -235,7 +236,6 @@ public class GenerateUsersExtended extends AbstractMojo {
    private I_ConfigAceFrame       userConfig;
    private I_ConfigAceFrame       defaultConfig;
    private String                 generateAdjCs = "false";
-   private HashMap<Integer, Color> colorMap = new HashMap<>(); 
    private ArrayList<ConceptSpec> cBooleanRefsets = new ArrayList<>();
    private ArrayList<ConceptSpec> cConceptRefsets = new ArrayList<>();
    private ArrayList<ConceptSpec> cConIntRefsets = new ArrayList<>();
@@ -255,9 +255,9 @@ public class GenerateUsersExtended extends AbstractMojo {
    private ArrayList<ConceptSpec> dConceptRefsetConTypes = new ArrayList<>();
    private ConceptSpec            refsetStatus;
    private ArrayList<ConceptSpec> additionalRoots = new ArrayList<>();
-   private ArrayList<ConceptSpec> orderedAdditionalTerminologyPaths = new ArrayList<>();
-   private ArrayList<String> orderedAdditionalTerminologyColors = new ArrayList<>();
-   
+   private HashMap<UUID, Color> pathColors = new HashMap<>();
+   private String pathColorProp;
+
    private void addRelPermission(String userName, String typeUid,
                                  String typeName, String targetUid,
                                  String targetName)
@@ -647,7 +647,7 @@ NEXT_WHILE:
       }
    }
 
-/*
+/*    private ConceptVersionBI identifyExistingEditorCategory(String[] columns,
            ViewCoordinate vc) {
       try {
          return searcher.searchForCategoryByModelerAndTag(
@@ -741,8 +741,10 @@ NEXT_WHILE:
          }
 
          userConfig.addEditingPath(editPath);
-         userConfig.setColorForPath(editPath.getConceptNid(),
-                                    new Color(128, 128, 128));
+          for (Entry<UUID, Color> entry : pathColors.entrySet()) {
+              userConfig.setColorForPath(Ts.get().getNidForUuids(entry.getKey()),
+                      entry.getValue());
+          }
       }
    }
 
@@ -1264,11 +1266,6 @@ NEXT_WHILE:
                Type5UuidFactory.PATH_ID_FROM_FS_DESC,
                this.projectDevelopmentPathFsn));
          activeConfig.addEditingPath(editPath);
-
-         if (editPath.getConceptNid() != viewPath.getConceptNid()) {
-            activeConfig.setColorForPath(editPath.getConceptNid(),
-                                         new Color(128, 128, 128));
-         }
       }
 
       if (this.projectDevelopmentAdjPathFsn != null) {
@@ -1280,22 +1277,11 @@ NEXT_WHILE:
          activeConfig.addPromotionPath(adjPath);
       }
 
-      activeConfig.setColorForPath(viewPath.getConceptNid(),
-                                   new Color(255, 84, 27));
-      activeConfig.setColorForPath(
-          ReferenceConcepts.TERM_AUXILIARY_PATH.getNid(),
-          new Color(25, 178, 63));
-      activeConfig.setColorForPath(
-          Ts.get().getNidForUuids(
-             ArchitectonicAuxiliary.Concept.SNOMED_CORE.getUids()), new Color(
-             81, 23, 255));
-
-      for (Integer pathNid : colorMap.keySet()) {
-    	  Color pathColor = colorMap.get(pathNid);
-    	  
-    	  activeConfig.setColorForPath(pathNid, pathColor);
+      for(Entry<UUID,Color> entry : pathColors.entrySet()){
+          activeConfig.setColorForPath(Ts.get().getNidForUuids(entry.getKey()),
+                                         entry.getValue());
       }
-      
+              
       // set up toggles
       activeConfig.setSubversionToggleVisible(false);
       activeConfig.setTogglesInComponentPanelVisible(
@@ -1578,51 +1564,12 @@ NEXT_WHILE:
          if ("true".equals(configProps.getProperty("displayRf2"))) {
             displayRf2 = true;
          }
-         
+
          refsetStatus =
             getConceptSpecFromPrefs(configProps.getProperty("refsetStatus"));
          additionalRoots = getConceptSpecListFromPrefs(
-                 configProps.getProperty("additionalRoots"));
+            configProps.getProperty("additionalRoots"));
 
-		// Setup Colors
-		orderedAdditionalTerminologyColors = getStringListFromPrefs(configProps
-				.getProperty("orderedAdditionalTerminologyColors"));
-		orderedAdditionalTerminologyPaths = getConceptSpecListFromPrefs(configProps
-				.getProperty("orderedAdditionalTerminologyPaths"));
-
-		if (orderedAdditionalTerminologyPaths != null && !orderedAdditionalTerminologyPaths.isEmpty() && 
-			orderedAdditionalTerminologyColors != null && !orderedAdditionalTerminologyColors.isEmpty()) 
-		{
-			boolean noMorePaths = false;
-			ConceptSpec path = null;
-		
-			if (orderedAdditionalTerminologyPaths.size() > orderedAdditionalTerminologyColors.size()) {
-				AceLog.getAppLog().warning("Have more Paths than Colors.  Not all Paths will not receive color coding");
-			}
-			
-			for (int i = 0; i < orderedAdditionalTerminologyColors.size() && !noMorePaths; i++) {
-				Color pathColor = mapStringToColor(orderedAdditionalTerminologyColors.get(i).toUpperCase());
-				
-				if (pathColor != null) {
-					if (!(i < orderedAdditionalTerminologyPaths.size())) {
-						noMorePaths = true;
-						AceLog.getAppLog().warning("Have more Colors than Paths");
-					} else {
-						path = orderedAdditionalTerminologyPaths.get(i);
-	
-						// If path's uuid exists in DB, assign it pathColor
-						if (Ts.get().hasUuid(path.getUuids()[0])) {
-							colorMap.put(path.getLenient().getConceptNid(), pathColor);
-						} else {
-							AceLog.getAppLog().warning("Couldn't assign color for Path: " + path.getDescription());
-						}
-					}
-				} else {
-					AceLog.getAppLog().warning("Couldn't match color: " + orderedAdditionalTerminologyColors.get(i));
-				}
-			}
-		}
- 	    
          if ("true".equals(configProps.getProperty("makeUserDevPath"))) {
             makeUserDevPath = true;
          }
@@ -1630,11 +1577,15 @@ NEXT_WHILE:
          module        =
             getConceptSpecFromPrefs(configProps.getProperty("module"));
          generateAdjCs = configProps.getProperty("generateAdjCs");
+         pathColorProp = configProps.getProperty("pathColors");
+         processPathColors();
       } catch (FileNotFoundException ex) {
          throw new MojoExecutionException(ex.getLocalizedMessage(), ex);
       } catch (IOException ex) {
          throw new MojoExecutionException(ex.getLocalizedMessage(), ex);
-      } finally {
+      } catch (NoSuchAlgorithmException ex) {
+           throw new MojoExecutionException(ex.getLocalizedMessage(), ex);
+       } finally {
          try {
             configReader.close();
          } catch (IOException ex) {
@@ -1642,40 +1593,27 @@ NEXT_WHILE:
          }
       }
    }
+   
+   private void processPathColors() throws MojoExecutionException, NoSuchAlgorithmException, UnsupportedEncodingException, ValidationException, IOException{
+       String[] pathColorProps = pathColorProp.split(";");
+       for(String pathColor : pathColorProps){
+           String[] parts = pathColor.split(",");
+           String fsn = parts[0].trim();
+           UUID pathUuid = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, fsn);
+           if(fsn.equals(TermAux.SNOMED_CORE_PATH.getDescription())){
+               pathUuid = TermAux.SNOMED_CORE_PATH.getLenient().getPrimUuid();
+           }
+           if(fsn.equals(TermAux.WB_AUX_PATH.getDescription())){
+               pathUuid = TermAux.WB_AUX_PATH.getLenient().getPrimUuid();
+           }
+           int r = Integer.parseInt(parts[1].replace("Color(", "").trim());
+           int g = Integer.parseInt(parts[2].trim());
+           int b = Integer.parseInt(parts[3].replace(")", "").trim());
+           pathColors.put(pathUuid, new Color(r,g,b));
+       }
+   }
 
-   private Color mapStringToColor(String color) {
-	if (color.equalsIgnoreCase("BLACK")) {
-		return Color.BLACK;
-	} else if (color.equalsIgnoreCase("BLUE")) {
-		return Color.BLUE;
-	} else if (color.equalsIgnoreCase("CYAN")) {
-		return Color.CYAN;
-	} else if (color.equalsIgnoreCase("DARK_GRAY")) {
-		return Color.DARK_GRAY;
-	} else if (color.equalsIgnoreCase("GRAY")) {
-		return Color.GRAY;
-	} else if (color.equalsIgnoreCase("GREEN")) {
-		return Color.GREEN;
-	} else if (color.equalsIgnoreCase("LIGHT_GRAY")) {
-		return Color.LIGHT_GRAY;
-	} else if (color.equalsIgnoreCase("MAGENTA")) {
-		return Color.MAGENTA;
-	} else if (color.equalsIgnoreCase("ORANGE")) {
-		return Color.ORANGE;
-	} else if (color.equalsIgnoreCase("PINK")) {
-		return Color.PINK;
-	} else if (color.equalsIgnoreCase("RED")) {
-		return Color.RED;
-	} else if (color.equalsIgnoreCase("WHITE")) {
-		return Color.WHITE;
-	} else if (color.equalsIgnoreCase("YELLOW")) {
-		return Color.YELLOW;
-	}
-	
-	return null;
-}
-
-private String setupChangeSetsAndAddChangeSetGenerator(File userDir) {
+   private String setupChangeSetsAndAddChangeSetGenerator(File userDir) {
       File changeSetRoot = new File(userDir, "changesets");
 
       getLog().info("** Changeset root: " + changeSetRoot.getAbsolutePath());
@@ -1784,7 +1722,6 @@ private String setupChangeSetsAndAddChangeSetGenerator(File userDir) {
       // edit popup values
 /*
       I_IntList statusPopupTypes = tf.newIntList();
-
 
       statusPopupTypes.add(SnomedMetadataRf1.CURRENT_RF1.getLenient().getNid());
       statusPopupTypes.add(
@@ -2238,17 +2175,11 @@ private String setupChangeSetsAndAddChangeSetGenerator(File userDir) {
          userConfig.addPromotionPath(adjPath);
       }
 
-      userConfig.setColorForPath(viewPath.getConceptNid(),
-                                 new Color(255, 84, 27));
-      userConfig.setColorForPath(
-          ReferenceConcepts.TERM_AUXILIARY_PATH.getNid(),
-          new Color(25, 178, 63));
-      userConfig.setColorForPath(
-          Ts.get().getNidForUuids(
-             ArchitectonicAuxiliary.Concept.SNOMED_CORE.getUids()), new Color(
-             81, 23, 255));
+      for(Entry<UUID,Color> entry : pathColors.entrySet()){
+          userConfig.setColorForPath(Ts.get().getNidForUuids(entry.getKey()),
+                                         entry.getValue());
+      }
 
-      
       // set up toggles
       userConfig.setSubversionToggleVisible(false);
       userConfig.setTogglesInComponentPanelVisible(
