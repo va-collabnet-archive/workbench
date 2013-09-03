@@ -412,6 +412,8 @@ public class LoadBdbMulti extends AbstractMojo {
             }
          }
 
+         getLog().info("Generating new concepts.");
+         generateNewConcepts();
          getLog().info("finished load, adding paths.");
 
          if (initialPaths != null) {
@@ -515,8 +517,6 @@ public class LoadBdbMulti extends AbstractMojo {
          loadVariants();
          getLog().info("Loading case sensitive words.");
          loadCaseSensitiveWords();
-         getLog().info("Generating new concepts.");
-         generateNewConcepts();
          getLog().info("Starting db sync.");
          Bdb.sync();
          getLog().info("Finished db sync, starting generate lucene index.");
