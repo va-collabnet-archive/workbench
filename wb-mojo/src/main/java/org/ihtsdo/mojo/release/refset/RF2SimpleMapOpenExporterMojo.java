@@ -109,6 +109,14 @@ public class RF2SimpleMapOpenExporterMojo extends AbstractMojo {
 	 * 
 	 */
 	private String releaseId;
+	
+	/**
+	 * componentType
+	 * 
+	 * @parameter 
+	 * 
+	 */
+	private String componentType;
 
 	/**
 	 * Filter configurations

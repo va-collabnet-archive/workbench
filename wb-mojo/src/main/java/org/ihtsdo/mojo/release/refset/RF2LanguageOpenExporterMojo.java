@@ -76,11 +76,51 @@ public class RF2LanguageOpenExporterMojo extends AbstractMojo {
 	private String password;
 
 	/**
+	 * namespaceId
+	 * 
+	 * @parameter 
+	 * 
+	 */
+	private String namespaceId;
+	
+	/**
+	 * partitionId
+	 * 
+	 * @parameter 
+	 * 
+	 */
+	private String partitionId;
+	
+	/**
+	 * executionId
+	 * 
+	 * @parameter 
+	 * 
+	 */
+	private String executionId;
+	
+	/**
+	 * moduleId
+	 * 
+	 * @parameter 
+	 * 
+	 */
+	private String releaseId;
+	
+	/**
+	 * componentType
+	 * 
+	 * @parameter 
+	 * 
+	 */
+	private String componentType;
+	/**
 	 * Filter configurations
 	 * 
 	 * @parameter
 	 * 
 	 */
+	
 	private ArrayList<FilterConfig> filterConfigs;
 	
 	/**
@@ -125,6 +165,11 @@ public class RF2LanguageOpenExporterMojo extends AbstractMojo {
 				}
 				config.setTestFilters(testFilters);
 			}
+			config.setNamespaceId(namespaceId);
+			config.setPartitionId(partitionId);
+			config.setExecutionId(executionId);
+			config.setReleaseId(releaseId);
+			config.setComponentType(componentType);			
 			config.setUsername(username);
 			config.setPassword(password);
 			config.setEndPoint(endpointURL);
