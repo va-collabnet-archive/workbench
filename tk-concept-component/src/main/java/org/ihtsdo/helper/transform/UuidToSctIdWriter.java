@@ -940,7 +940,11 @@ private void processIdentifiers(String line, Writer writer) throws IOException {
                 switch (field) {
                     case IDENTIFIER_SCHEME_ID:
                         String schemeId = parts[Rf2File.IdentifiersFileFields.IDENTIFIER_SCHEME_ID.ordinal()];
-                        String schemeSctId = handler.getWithGeneration(UUID.fromString(schemeId), SctIdGenerator.TYPE.CONCEPT).toString();
+                        String schemeSctId = getExistingSctId(schemeId);
+                        if (schemeSctId == null) {
+                            schemeSctId = handler.getWithGeneration(UUID.fromString(schemeId), SctIdGenerator.TYPE.CONCEPT).toString();
+                            this.uuidToSctMap.put(UUID.fromString(schemeId), schemeSctId);
+                        }
                         writer.write(schemeSctId + field.seperator);
 
                         break;
