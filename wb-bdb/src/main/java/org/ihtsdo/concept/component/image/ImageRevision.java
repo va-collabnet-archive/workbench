@@ -118,7 +118,7 @@ public class ImageRevision extends Revision<ImageRevision, Image>
 
       ImageRevision newR;
 
-      newR = new ImageRevision(this.primordialComponent, statusNid, time, authorNid,
+      newR = new ImageRevision(this, statusNid, time, authorNid,
               moduleNid, pathNid,this.primordialComponent);
       this.primordialComponent.addRevision(newR);
 
