@@ -123,6 +123,8 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
     private List<DragPanelDescription> activeDescriptionPanels;
     private List<DragPanelRel> activeInferredRelPanels;
     private List<DragPanelRel> activeShortNormRelPanels = new ArrayList<>();
+    private List<DragPanelRel> activeLongNormRelPanels = new ArrayList<>();
+    private HashSet<RelationshipVersionBI> dupRelsToKeep;
     private List<DragPanelRel> activeStatedRelPanels;
     private ConceptView cView;
     private I_ConfigAceFrame config;
@@ -149,7 +151,8 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
     private Set<Integer> stamps;
     private ConceptViewSettings settings;
     private Collection<RelationshipGroupVersionBI> statedRelGroups = new ArrayList<>();
-    private Collection<RelationshipGroupVersionBI> shortNormRelGroups = new ArrayList<>();
+    private Collection<RelationshipGroupVersionBI> shortNormRelGroups = new HashSet<>();
+    private Collection<RelationshipGroupVersionBI> longNormRelGroups = new ArrayList<>();
     private List<? extends I_RelTuple> statedRels;
     private JPanel conceptPanel;
     private Set<Integer> sapsForConflict = new HashSet<>();
@@ -734,7 +737,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
                         
                         if (!roleRels.isEmpty()) {
                             shortNormRelGroups = new ArrayList<>();
-                            HashSet<RelationshipVersionBI> roleRelsToDisplay = findRoleRelsToDisplay(roleRels, filteredParentRels);
+                            HashSet<RelationshipVersionBI> roleRelsToDisplay = findShortNormRoleRelsToDisplay(roleRels, filteredParentRels);
                             for (RelationshipVersionBI rel : roleRelsToDisplay) {
                                 if(rel.getGroup() == 0){
                                     DragPanelRel dragPanel = getRelComponent(rel, cpe, true);
@@ -760,11 +763,89 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
                                     }
                                 }
                             }
-                        }
+                                        }
                         
                         for(RelationshipVersionBI rel : filteredParentRels){
                             DragPanelRel dragPanel = getRelComponent(rel, cpe, true);
                             activeShortNormRelPanels.add(dragPanel);
+                        }
+                        
+                    }
+                    
+                   if(settings.getRelAssertionType().equals(RelAssertionType.LONG_NORMAL_FORM)){
+                        HashSet<Integer> parentNids = new HashSet<>();
+                        HashSet<RelationshipVersionBI> allPrimitiveParentRels = new HashSet<>();
+                        allPrimitiveParentRels = findProximalPrimitve(inferredRels);
+                        HashSet<RelationshipVersionBI> noDupsParentRels = new HashSet<>();
+                        for(RelationshipVersionBI r : allPrimitiveParentRels){
+                            if(!parentNids.contains(r.getTargetNid())){
+                                parentNids.add(r.getTargetNid());
+                                noDupsParentRels.add(r);
+                            }
+                        }
+                        
+                        HashSet<RelationshipVersionBI> filteredParentRels = new HashSet<>(noDupsParentRels);
+                        for(RelationshipVersionBI childRel : noDupsParentRels){
+                            int childNid = childRel.getTargetNid();
+                            for(RelationshipVersionBI parentRel : noDupsParentRels){
+                                int parentNid = parentRel.getTargetNid();
+                                if(Ts.get().isKindOf(childNid, parentNid, coordinate) &&
+                                        childNid != parentNid){
+                                    filteredParentRels.remove(parentRel);
+                                }
+                            }
+                        }
+                        Collection<? extends RelationshipVersionBI> rels = cv.getRelationshipsOutgoingActive();
+                        HashSet<RelationshipVersionBI> roleRels = new HashSet<>();
+                        for(RelationshipVersionBI r : rels){
+                            if(r.getTypeNid() != Snomed.IS_A.getLenient().getNid() 
+                                    && r.getCharacteristicNid() == SnomedMetadataRf2.STATED_RELATIONSHIP_RF2.getLenient().getNid()){
+                                roleRels.add(r);
+                            }
+                        }
+                        if (!roleRels.isEmpty()) {
+                            longNormRelGroups = new ArrayList<>();
+                            HashSet<RelationshipVersionBI> roleRelsToDisplay = findLongNormRoleRelsToDisplay(roleRels);
+                            for (RelationshipVersionBI rel : roleRelsToDisplay) {
+                                if(rel.getGroup() == 0){
+                                    DragPanelRel dragPanel = getRelComponent(rel, cpe, true);
+                                    activeLongNormRelPanels.add(dragPanel);
+                                }else{
+                                    int group = rel.getGroup();
+                                    boolean add = true;
+                                    for (RelationshipGroupVersionBI rg : longNormRelGroups) {
+                                        if (rg.getRelationshipGroupNumber() == group) {
+                                            add = false;
+                                        }
+                                    }
+                                    if (add) {
+                                        for (RelationshipGroupVersionBI relGroup : cv.getRelationshipGroups()) {
+                                            if (relGroup.getRelationshipGroupNumber() == group) {
+                                                if (relGroup.getRelationshipsActive().iterator().next().getCharacteristicNid()
+                                                        == SnomedMetadataRf2.INFERRED_RELATIONSHIP_RF2.getLenient().getNid()) {
+                                                    longNormRelGroups.add(relGroup);
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                           for (RelationshipVersionBI rel : roleRels) {
+//                               for()
+                               if (rel.getGroup() == 0) {
+                                   DragPanelRel dragPanel = getRelComponent(rel, cpe, true);
+                                   if(dupRelsToKeep.contains(rel)){
+                                        dragPanel.setInheritedDuplicate();
+                                    }
+                                   activeLongNormRelPanels.add(dragPanel);
+                               }
+                           }
+                       }
+                        
+                        for(RelationshipVersionBI rel : filteredParentRels){
+                            DragPanelRel dragPanel = getRelComponent(rel, cpe, true);
+                            activeLongNormRelPanels.add(dragPanel);
                         }
                         
                     }
@@ -777,6 +858,28 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
                     
                     if (settings.getRelAssertionType().equals(RelAssertionType.SHORT_NORMAL_FORM)) {
                         for (DragPanelRel rc : activeShortNormRelPanels) {
+                            if (stop) {
+                                return;
+                            }
+
+                            if (!cprAdded) {
+                                conceptPanel.add(cpr, gbc);
+                                gbc.gridy++;
+                                cprAdded = true;
+                            }
+
+                            setShowConflicts(rc.getComponentVersion(), rc);
+                            seperatorComponents.add(rc);
+                            cpr.addToggleComponent(rc);
+                            conceptPanel.add(rc, gbc);
+                            gbc.gridy++;
+                            cpr.setAlertCount(cpr.alertCount += rc.getAlertSubpanelCount());
+                            cpr.setRefexCount(cpr.refexCount += rc.getRefexSubpanelCount());
+                            cpr.setHistoryCount(cpr.historyCount += rc.getHistorySubpanelCount());
+                            cpr.setTemplateCount(cpr.templateCount += rc.getTemplateSubpanelCount());
+                        }
+                    } else if (settings.getRelAssertionType().equals(RelAssertionType.LONG_NORMAL_FORM)) {
+                        for (DragPanelRel rc : activeLongNormRelPanels) {
                             if (stop) {
                                 return;
                             }
@@ -902,7 +1005,14 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
                             }
 
                             addRelGroups(shortNormRelGroups, cprAdded, cpr, gbc);
-                        } else {
+                        } else if (settings.getRelAssertionType().equals(RelAssertionType.LONG_NORMAL_FORM)) {
+                            if (stop) {
+                                return;
+                            }
+
+                            addRelGroups(longNormRelGroups, cprAdded, cpr, gbc);
+                            addRelGroups(statedRelGroups, cprAdded, cpr, gbc);
+                        }else {
                             if (settings.showStated()) {
                                 if (stop) {
                                     return;
@@ -1041,7 +1151,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
         return parentRels;
     }
     
-    private HashSet<RelationshipVersionBI> findRoleRelsToDisplay(HashSet<RelationshipVersionBI> roleRels, HashSet<RelationshipVersionBI> proximalParents) throws IOException, ContradictionException, NoSuchAlgorithmException{
+    private HashSet<RelationshipVersionBI> findShortNormRoleRelsToDisplay(HashSet<RelationshipVersionBI> roleRels, HashSet<RelationshipVersionBI> proximalParents) throws IOException, ContradictionException, NoSuchAlgorithmException{
          HashSet<RelationshipVersionBI> relsToKeep = new HashSet<>();
         HashSet<UUID> parentRelHashes = new HashSet<>();
         //find parents
@@ -1126,6 +1236,105 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
                 }
             }
         }
+                
+        
+        return relsToKeep;
+    }
+    
+        private HashSet<RelationshipVersionBI> findLongNormRoleRelsToDisplay(HashSet<RelationshipVersionBI> roleRels) throws IOException, ContradictionException, NoSuchAlgorithmException{
+        HashSet<RelationshipVersionBI> relsToKeep = new HashSet<>();
+        dupRelsToKeep = new HashSet<>();
+        HashSet<UUID> childRelHashes = new HashSet<>();
+        HashMap<UUID, RelationshipVersionBI> relToHashMap = new HashMap<>();
+        HashMap<UUID, HashSet<RelationshipVersionBI>> relGroupToHashMap = new HashMap<>();
+        
+         //make hashes for role rels
+        for (RelationshipVersionBI rel : roleRels) {
+            if (rel.getGroup() == 0) {
+                UUID hash = Type5UuidFactory.get(Ts.get().getUuidPrimordialForNid(rel.getSourceNid()).toString()
+                        + Ts.get().getUuidPrimordialForNid(rel.getTypeNid()).toString()
+                        + Ts.get().getUuidPrimordialForNid(rel.getTargetNid()).toString());
+                childRelHashes.add(hash);
+                relToHashMap.put(hash, rel);
+            } else {
+                int group = rel.getGroup();
+                ArrayList<String> hashes = new ArrayList<>();
+                
+                String hash = null;
+                HashSet<RelationshipVersionBI> relGroup = new HashSet<>();
+                for (RelationshipVersionBI r : roleRels) {
+                    if (r.getGroup() == group && r.getCharacteristicNid() == rel.getCharacteristicNid()) {
+                        hash = Ts.get().getUuidPrimordialForNid(r.getSourceNid()).toString()
+                                + Ts.get().getUuidPrimordialForNid(r.getTypeNid()).toString()
+                                + Ts.get().getUuidPrimordialForNid(r.getTargetNid()).toString();
+                        hashes.add(hash);
+                        relGroup.add(r);
+                    }
+                }
+                Collections.sort(hashes);
+                String groupString = null;
+                for (String s : hashes) {
+                    groupString = groupString + s;
+                }
+                UUID groupHash = Type5UuidFactory.get(groupString);
+                childRelHashes.add(groupHash);
+                relGroupToHashMap.put(groupHash, relGroup);
+            }
+        }
+        
+        //find parents
+        HashSet<RelationshipVersionBI> roleRelsParent = new HashSet<>();
+        for (RelationshipVersionBI p : inferredRels) { 
+//            ConceptVersionBI parent = Ts.get().getConceptVersion(coordinate, p.getTargetNid());
+//            Collection<? extends RelationshipVersionBI> rels = parent.getRelationshipsOutgoingActive();
+//            HashSet<RelationshipVersionBI> roleRelsParent = new HashSet<>();
+//            for (RelationshipVersionBI r : rels) {
+                if (p.getTypeNid() != Snomed.IS_A.getLenient().getNid()) {
+                    roleRelsParent.add(p);
+                }
+//            }
+        }
+            if (!roleRelsParent.isEmpty()) {
+                for (RelationshipVersionBI rel : roleRelsParent) {
+                    if (rel.getGroup() == 0) {
+                        UUID hash = Type5UuidFactory.get(Ts.get().getUuidPrimordialForNid(rel.getSourceNid()).toString()
+                                + Ts.get().getUuidPrimordialForNid(rel.getTypeNid()).toString()
+                                + Ts.get().getUuidPrimordialForNid(rel.getTargetNid()).toString());
+                        if(!childRelHashes.contains(hash)){
+                            relsToKeep.add(rel);
+                        }else{
+                            dupRelsToKeep.add(relToHashMap.get(hash));
+                        }
+                    } else {
+                        int group = rel.getGroup();
+                        ArrayList<String> hashes = new ArrayList<>();
+                        String hash = null;
+                        HashSet<RelationshipVersionBI> relGroup = new HashSet<>();
+                        for (RelationshipVersionBI r : roleRelsParent) {
+                            if (r.getGroup() == group && r.getCharacteristicNid() == rel.getCharacteristicNid()) {
+                                 hash = Ts.get().getUuidPrimordialForNid(r.getSourceNid()).toString()
+                                        + Ts.get().getUuidPrimordialForNid(r.getTypeNid()).toString()
+                                        + Ts.get().getUuidPrimordialForNid(r.getTargetNid()).toString();
+                                hashes.add(hash);
+                                relGroup.add(r);
+                            }
+                        }
+                        Collections.sort(hashes);
+                        String groupString = null;
+                        for (String s : hashes) {
+                            groupString = groupString + s;
+                        }
+                        UUID groupHash = Type5UuidFactory.get(groupString);
+                        if(!childRelHashes.contains(groupHash)){
+                            relsToKeep.addAll(relGroup);
+                        }else{
+                            dupRelsToKeep.addAll(relGroupToHashMap.get(groupHash));
+                        }
+                    }
+                }
+            }
+        
+        
                 
         
         return relsToKeep;
@@ -1484,7 +1693,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
     
     public DragPanelRel getRelComponent(RelationshipVersionBI r, CollapsePanel parentCollapsePanel,
             boolean inferred)
-            throws TerminologyException, IOException {
+            throws TerminologyException, IOException, ContradictionException {
         DragPanelRel relPanel = new DragPanelRel(new GridBagLayout(), this, parentCollapsePanel, r, inferred);
         
         addToPositionPanelMap(relPanel);
@@ -1504,7 +1713,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
         
         relGroupLabel.setBackground(Color.GREEN);
         relGroupLabel.setOpaque(true);
-        relGroupPanel.setDropPopupInset(relGroupLabel.getPreferredSize().width);
+//        relGroupPanel.setDropPopupInset(relGroupLabel.getPreferredSize().width);
         
         GridBagConstraints gbc = new GridBagConstraints();
         
@@ -1543,6 +1752,11 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
             activeRelIds.add(rv.getNid());
             
             DragPanelRel dpr = getRelComponent(rv, parentCollapsePanel, rv.isInferred());
+            if (settings.getRelAssertionType().equals(RelAssertionType.LONG_NORMAL_FORM)) {
+                if (dupRelsToKeep.contains(rv)) {
+                    dpr.setInheritedDuplicate();
+                }                
+            }
             setShowConflicts(rv, dpr);
             
             cprg.addToggleComponent(dpr);
@@ -1892,7 +2106,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
                         rc = getRelComponent(r, cp, inferred);
                         panels.add(rc);
                     }
-                } catch (TerminologyException | IOException ex) {
+                } catch (TerminologyException | IOException | ContradictionException ex) {
                     AceLog.getAppLog().alertAndLogException(ex);
                 }
             }

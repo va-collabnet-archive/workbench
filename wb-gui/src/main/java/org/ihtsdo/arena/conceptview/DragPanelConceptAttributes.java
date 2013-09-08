@@ -14,6 +14,7 @@ import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 //~--- JDK imports ------------------------------------------------------------
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.LayoutManager;
@@ -91,6 +92,8 @@ public class DragPanelConceptAttributes extends DragPanelComponentVersion<Concep
         }
 
         attrLabel.setOpaque(true);
+        attrLabel.setMinimumSize(new Dimension(20, 28));
+        attrLabel.setPreferredSize(new Dimension(20, 28));
         setDropPopupInset(attrLabel.getPreferredSize().width);
 
         GridBagConstraints gbc = new GridBagConstraints();

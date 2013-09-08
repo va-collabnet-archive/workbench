@@ -20,6 +20,7 @@ import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 //~--- JDK imports ------------------------------------------------------------
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.LayoutManager;
@@ -102,6 +103,8 @@ public class DragPanelExtension extends DragPanelComponentVersion<RefexVersionBI
       extensionLabel = getJLabel(" ");
       extensionLabel.setBackground(Color.RED);
       extensionLabel.setOpaque(true);
+      extensionLabel.setMinimumSize(new Dimension(20, 28));
+      extensionLabel.setPreferredSize(new Dimension(20, 28));
       setDropPopupInset(extensionLabel.getPreferredSize().width);
 
       GridBagConstraints gbc = new GridBagConstraints();

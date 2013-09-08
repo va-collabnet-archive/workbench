@@ -481,7 +481,7 @@ public class ArchitectonicAuxiliary implements I_AddToMemoryTermServer {
                  FULLY_SPECIFIED_DESCRIPTION_TYPE(PrimordialId.FULLY_SPECIFIED_DESCRIPTION_TYPE_ID,
                                                         new String[] {"fully specified name (description type)", "fully specified name"}, null,
                                                         new I_ConceptualizeUniversally[] { DESCRIPTION_TYPE }),
-                  SYNONYM_DESCRIPTION_TYPE(new String[] {"synonym (description type)", "synonym"}, null,
+                  SYNONYM_DESCRIPTION_TYPE(new String[] {"synonym RF1 (description type)", "synonym RF1"}, null,
                           new I_ConceptualizeUniversally[] { DESCRIPTION_TYPE }),
                   TEXT_DEFINITION_TYPE("text definition (description type)",
                                   new I_ConceptualizeUniversally[] { DESCRIPTION_TYPE }),

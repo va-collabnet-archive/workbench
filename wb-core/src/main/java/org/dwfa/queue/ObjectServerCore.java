@@ -368,6 +368,20 @@ public abstract class ObjectServerCore<T extends I_DescribeObject> implements Ac
         }
 
     }
+    
+    public void delete(EntryID entryID, Transaction t) throws NoMatchingEntryException{
+            File[] files = this.directory.listFiles(new MatchEntryID(entryID));
+            if (files == null) {
+                throw new NoMatchingEntryException("No matching files for entryID: " + entryID);
+            }
+            if (files.length != 1) {
+                throw new NoMatchingEntryException("Found " + files.length + " matching files for entryID: " + entryID);
+            }
+
+            File originalProcessFile = files[0];
+            originalProcessFile.delete();
+
+    }
 
     /**
      * @see org.dwfa.bpa.process.I_QueueProcesses#write(org.dwfa.bpa.process.I_EncodeBusinessProcess,

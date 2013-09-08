@@ -40,7 +40,7 @@ public class SnomedMetadataRf1 {
      * Represents the SNOMED RF1 concept: synonym.
      */
     public static ConceptSpec SYNOMYM_DESCRIPTION_TYPE_RF1 =
-            new ConceptSpec("synonym (description type)",
+            new ConceptSpec("synonym RF1 (description type)",
             UUID.fromString("d6fad981-7df6-3388-94d8-238cc0465a79"));
     /**
      * Represents the SNOMED RF1 concept: preferred term.
