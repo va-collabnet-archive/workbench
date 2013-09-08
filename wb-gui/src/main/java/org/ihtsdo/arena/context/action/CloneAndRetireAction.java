@@ -17,7 +17,6 @@ import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.arena.conceptview.ConceptViewSettings;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.ContradictionException;
@@ -48,12 +47,10 @@ public class CloneAndRetireAction extends AbstractAction {
     ComponentVersionBI component;
     I_ConfigAceFrame config;
 
-    public CloneAndRetireAction(String actionName, ComponentFact<ComponentVersionBI> fact,
-            I_ConfigAceFrame config, ConceptViewSettings settings) {
+    public CloneAndRetireAction(String actionName, ComponentFact<ComponentVersionBI> fact, I_ConfigAceFrame config) {
         super(actionName);
         this.component = fact.getComponent();
         this.config = config;
-        settings.getView().focus = true;
     }
 
     @Override

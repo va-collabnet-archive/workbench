@@ -302,10 +302,6 @@ public class SnoTable {
                int tmpCountDupl = 0;
 
                for (I_RelPart rp : rel.getMutableParts()) {
-                   // batch edit needs check relative to the existing DAG
-                   if (rp.isUncommitted()) {
-                       continue;
-                   }
                   if (isStatedUser && (rp.getAuthorNid() == snorocketAuthorNid)) {
                      continue;       // filter stated vs. inferred
                   } else if (!isStatedUser && (rp.getAuthorNid() != snorocketAuthorNid)) {

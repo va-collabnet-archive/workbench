@@ -35,8 +35,7 @@ public class RelationshipInferredChangedQuery {
         v1 = v1.getViewCoordinateWithAllStatusValues();
         v2 = v2.getViewCoordinateWithAllStatusValues();
         query = Query.or(Relationship.added(true, v1, v2, Clause.and(WithRelationship.characteristic(true, Subsumption.IS, SnomedMetadataRf2.INFERRED_RELATIONSHIP_RF2))),
-                 Relationship.changedStatus(true, v1, v2, Clause.and(WithRelationship.characteristic(true, Subsumption.IS, SnomedMetadataRf2.INFERRED_RELATIONSHIP_RF2))),
-                 Relationship.changedGroup(true, v1, v2, Clause.and(WithRelationship.characteristic(true, Subsumption.IS, SnomedMetadataRf2.INFERRED_RELATIONSHIP_RF2))));
+                 Relationship.changed(true, v1, v2, Clause.and(WithRelationship.characteristic(true, Subsumption.IS, SnomedMetadataRf2.INFERRED_RELATIONSHIP_RF2))));
     }
     
     /**

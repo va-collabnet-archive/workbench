@@ -81,11 +81,14 @@ import javax.swing.Timer;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import org.dwfa.cement.RefsetAuxiliary;
+import org.dwfa.swing.SwingTask;
 import org.dwfa.util.id.Type5UuidFactory;
 import org.ihtsdo.helper.bdb.MultiEditorContradictionCase;
 import org.ihtsdo.helper.bdb.MultiEditorContradictionDetector;
+import org.ihtsdo.lang.LANG_CODE;
 import org.ihtsdo.tk.api.*;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
+import org.ihtsdo.tk.api.conceptattribute.ConceptAttributeVersionBI;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.api.refex.type_nid.RefexNidVersionBI;
 import org.ihtsdo.tk.binding.snomed.RefsetAux;
@@ -121,7 +124,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
     private List<DragPanelRel> activeInferredRelPanels;
     private List<DragPanelRel> activeShortNormRelPanels = new ArrayList<>();
     private List<DragPanelRel> activeStatedRelPanels;
-    protected ConceptView cView;
+    private ConceptView cView;
     private I_ConfigAceFrame config;
     private ViewCoordinate coordinate;
     private CollapsePanel cpd;
@@ -661,10 +664,6 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
                         cpd.setRefexCount(cpd.refexCount += dc.getRefexSubpanelCount());
                         cpd.setHistoryCount(cpd.historyCount += dc.getHistorySubpanelCount());
                         cpd.setTemplateCount(cpd.templateCount += dc.getTemplateSubpanelCount());
-                        if(dc.getThingToDrag().isUncommitted() && cView.focus){
-                                dc.getTextPane().requestFocusInWindow();
-                                cView.focus = false;
-                        }
                     }
                     
                     boolean descHistoryIsShown = cpd.isShown(DragPanelComponentVersion.SubPanelTypes.HISTORY);

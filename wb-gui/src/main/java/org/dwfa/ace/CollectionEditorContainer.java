@@ -494,9 +494,4 @@ public CollectionEditorContainer(TerminologyTable table, ACE ace)
     public ConceptPanel getConceptPanel() {
         return conceptPanel;
     }
-    
-    public boolean StopBatchEdits(){
-        batchActionPanelMain.stop();
-        return false;
-    }
 }

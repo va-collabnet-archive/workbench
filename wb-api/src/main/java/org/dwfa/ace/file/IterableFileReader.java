@@ -18,10 +18,8 @@ package org.dwfa.ace.file;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.Iterator;
 
 /**
@@ -129,7 +127,7 @@ public abstract class IterableFileReader<T> implements Iterable<T> {
 
         protected FileReaderIterator(File sourceFile) throws IOException {
             setSize(sourceFile);
-            reader = new BufferedReader(new InputStreamReader(new FileInputStream(sourceFile),"UTF-8"));
+            reader = new BufferedReader(new FileReader(sourceFile));
 
             if (hasHeader) {
                 headerLine = reader.readLine();

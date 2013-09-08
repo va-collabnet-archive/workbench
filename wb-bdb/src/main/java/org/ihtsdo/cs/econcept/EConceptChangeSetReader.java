@@ -306,14 +306,4 @@ public class EConceptChangeSetReader implements I_ReadChangeSet {
 	public boolean isContentMerged() {
 		return fileContentMerged;
 	}
-        
-        @Override
-        public int getConceptCount(){
-            return conceptCount;
-        }
-        
-    @Override
-    public boolean isForWorkflow() {
-        return false;
-    }
 }

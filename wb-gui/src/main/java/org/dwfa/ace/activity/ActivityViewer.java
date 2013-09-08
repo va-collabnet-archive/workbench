@@ -337,17 +337,17 @@ public class ActivityViewer implements ActionListener {
                 }
                 if (a1Percent != a2Percent) {
                     if (a1Percent < a2Percent) {
-                        return 1;
+                        return -1;
                     }
-                    return -1;
+                    return 1;
                 }
             }
             if (a1.getStartTime() < a2.getStartTime()) {
                 return 1;
             }
-                return -1;
-            }
+            return -1;
         }
+    }
 
     public static void addActivity(final I_ShowActivity activity) throws Exception {
         if (DwfaEnv.isHeadless() == false) {

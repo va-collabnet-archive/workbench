@@ -17,7 +17,6 @@ import org.dwfa.ace.api.Terms;
 import org.ihtsdo.tk.api.cs.ChangeSetPolicy;
 import org.ihtsdo.tk.api.cs.ChangeSetWriterThreading;
 import org.dwfa.ace.log.AceLog;
-import static org.dwfa.ace.task.cs.ChangeSetImporter.indexGenerating;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.SNOMED;
 import org.dwfa.tapi.PathNotExistsException;
@@ -34,7 +33,6 @@ import org.ihtsdo.helper.query.QueryBuilderBI;
 import org.ihtsdo.lucene.LuceneManager;
 import org.ihtsdo.lucene.SearchResult;
 import org.ihtsdo.lucene.WfHxIndexGenerator;
-import org.ihtsdo.lucene.WfHxLuceneManager;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.*;
 import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
@@ -856,23 +854,16 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
     }
     
     @Override
-    public boolean regenerateWfHxLuceneIndex(ViewCoordinate viewCoordinate) throws Exception {
-        if (indexGenerating.get() == false) {
-            indexGenerating.getAndSet(true);
-            String wfDirPath = WfHxLuceneManager.wfHxLuceneDirFile.getAbsolutePath();
-            if (LuceneManager.indexExists(LuceneManager.LuceneSearchType.WORKFLOW_HISTORY) == true) {
-                if (WfHxLuceneManager.wfHxLuceneDirFile.exists()) {
-                    for (File wfFile : WfHxLuceneManager.wfHxLuceneDirFile.listFiles()) {
-                        wfFile.delete();
-                    }
-                    WfHxLuceneManager.wfHxLuceneDirFile.delete();
+    public boolean regenerateWfHxLuceneIndex(ViewCoordinate viewCoordinate) throws Exception{
+        if (LuceneManager.indexExists(LuceneManager.LuceneSearchType.WORKFLOW_HISTORY) == false) {
+                File wfLuceneDirectory = new File("workflow/lucene");
+
+                LuceneManager.setLuceneRootDir(wfLuceneDirectory, LuceneManager.LuceneSearchType.WORKFLOW_HISTORY);
+                if (LuceneManager.indexExists(LuceneManager.LuceneSearchType.WORKFLOW_HISTORY) == false) {
+                    WfHxIndexGenerator.setSourceInputFile(null);
+                    LuceneManager.createLuceneIndex(LuceneManager.LuceneSearchType.WORKFLOW_HISTORY, viewCoordinate);
+                    return true;
                 }
-            }
-            LuceneManager.setLuceneRootDir(WfHxLuceneManager.wfHxLuceneDirFile, LuceneManager.LuceneSearchType.WORKFLOW_HISTORY);
-            WfHxIndexGenerator.setSourceInputFile(null);
-            LuceneManager.createLuceneIndex(LuceneManager.LuceneSearchType.WORKFLOW_HISTORY, viewCoordinate);
-            indexGenerating.getAndSet(false);
-            return true;
         }
         return false;
     }

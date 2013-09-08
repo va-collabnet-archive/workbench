@@ -341,7 +341,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
 
 
         RefsetComputer computer;
-        Ts.get().suspendChangeNotifications();
+            Ts.get().suspendChangeNotifications();
 
         try {
             I_RepresentIdSet possibleIds;
@@ -363,55 +363,55 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
             possibleIds.or(getIdSetFromIntCollection(currentMembersList));
             AceLog.getAppLog().info(">>>>>>>>>> Search space (concept count): " + possibleIds.cardinality());
             computer = new RefsetComputer(refsetNid, query, frameConfig, possibleIds, activities);
+           
 
+                if (possibleIds.cardinality() > 500) {
+                    AceLog.getAppLog().info(">>>>>>>>> Iterating concepts in parallel.");
+                    Bdb.getConceptDb().iterateConceptDataInParallel(computer);
+                } else {
+                    AceLog.getAppLog().info(">>>>>>>>> Iterating concepts in sequence.");
 
-            if (possibleIds.cardinality() > 500) {
-                AceLog.getAppLog().info(">>>>>>>>> Iterating concepts in parallel.");
-                Bdb.getConceptDb().iterateConceptDataInParallel(computer);
-            } else {
-                AceLog.getAppLog().info(">>>>>>>>> Iterating concepts in sequence.");
+                    NidBitSetItrBI possibleItr = possibleIds.iterator();
+                    ConceptFetcher fetcher = new ConceptFetcher();
 
-                NidBitSetItrBI possibleItr = possibleIds.iterator();
-                ConceptFetcher fetcher = new ConceptFetcher();
-
-                while (possibleItr.next()) {
-                    fetcher.setConcept(Concept.get(possibleItr.nid()));
-                    computer.processUnfetchedConceptData(possibleItr.nid(), fetcher);
-                }
-            }
-
-            if (!computer.continueWork()) {
-                throw new ComputationCanceled("Computation cancelled");
-            }
-
-            AceLog.getAppLog().info(">>>>>>>>> Finished computing spec - adding uncommitted.");
-            specHelper.setLastComputeTime(System.currentTimeMillis());
-            computer.addUncommitted();
-
-            if (frameConfig.getDbConfig().getRefsetChangesChangeSetPolicy() == null) {
-                frameConfig.getDbConfig().setRefsetChangesChangeSetPolicy(ChangeSetPolicy.OFF);
-                frameConfig.getDbConfig().setChangeSetWriterThreading(ChangeSetWriterThreading.SINGLE_THREAD);
-            }
-
-            if (!computer.continueWork()) {
-                throw new ComputationCanceled("Computation cancelled");
-            }
-
-            AceLog.getAppLog().info(">>>>>>>>> Finished computing spec - committing.");
-            BdbCommitManager.commit(frameConfig.getDbConfig().getRefsetChangesChangeSetPolicy(),
-                    frameConfig.getDbConfig().getChangeSetWriterThreading());
-
-            if (!computer.continueWork()) {
-                for (I_ShowActivity a : activities) {
-                    a.cancel();
-                    a.setProgressInfoLower("Cancelled.");
+                    while (possibleItr.next()) {
+                        fetcher.setConcept(Concept.get(possibleItr.nid()));
+                        computer.processUnfetchedConceptData(possibleItr.nid(), fetcher);
+                    }
                 }
 
-                return Condition.ITEM_CANCELED;
-            } else {
-                return Condition.ITEM_COMPLETE;
-            }
+                if (!computer.continueWork()) {
+                    throw new ComputationCanceled("Computation cancelled");
+                }
 
+                AceLog.getAppLog().info(">>>>>>>>> Finished computing spec - adding uncommitted.");
+                specHelper.setLastComputeTime(System.currentTimeMillis());
+                computer.addUncommitted();
+
+                if (frameConfig.getDbConfig().getRefsetChangesChangeSetPolicy() == null) {
+                    frameConfig.getDbConfig().setRefsetChangesChangeSetPolicy(ChangeSetPolicy.OFF);
+                    frameConfig.getDbConfig().setChangeSetWriterThreading(ChangeSetWriterThreading.SINGLE_THREAD);
+                }
+
+                if (!computer.continueWork()) {
+                    throw new ComputationCanceled("Computation cancelled");
+                }
+
+                AceLog.getAppLog().info(">>>>>>>>> Finished computing spec - committing.");
+                BdbCommitManager.commit(frameConfig.getDbConfig().getRefsetChangesChangeSetPolicy(),
+                        frameConfig.getDbConfig().getChangeSetWriterThreading());
+
+                if (!computer.continueWork()) {
+                    for (I_ShowActivity a : activities) {
+                        a.cancel();
+                        a.setProgressInfoLower("Cancelled.");
+                    }
+
+                    return Condition.ITEM_CANCELED;
+                } else {
+                    return Condition.ITEM_COMPLETE;
+                }
+            
         } catch (ComputationCanceled e) {
             for (I_ShowActivity a : activities) {
                 a.cancel();
@@ -780,7 +780,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
                     a.revisions = new RevisionSet(a.primordialSapNid);
                 }
 
-                a.revisions.add((ConceptAttributesRevision) a.makeAnalog(statusNid,
+                a.revisions.add((ConceptAttributesRevision) a.makeAnalog(statusNid, 
                         time,
                         aceFrameConfig.getEditCoordinate().getAuthorNid(),
                         aceFrameConfig.getEditCoordinate().getModuleNid(),
@@ -1104,7 +1104,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
 
         for (PathBI p : aceFrameConfig.getEditingPathSet()) {
             if (r.primordialSapNid == Integer.MIN_VALUE) {
-                r.primordialSapNid = Bdb.getSapDb().getSapNid(statusNid, effectiveDate,
+                r.primordialSapNid = Bdb.getSapDb().getSapNid(statusNid,effectiveDate,
                         getUserNid(aceFrameConfig), aceFrameConfig.getEditCoordinate().getModuleNid(),
                         p.getConceptNid());
             } else {
@@ -1127,9 +1127,8 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     }
 
     /**
-     * newRelationshipNoCheck for use with classifier write-back to classifier
-     * output path.<br> <br> This call does not check the write-back path as
-     * path checking is done as part of the classifier setup.
+     * newRelationshipNoCheck for use with classifier write-back to classifier output path.<br> <br> This call
+     * does not check the write-back path as path checking is done as part of the classifier setup.
      */
     @Override
     public Relationship newRelationshipNoCheck(UUID newRelUid, I_GetConceptData concept, int relTypeNid,
@@ -1151,8 +1150,8 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         r.setRefinabilityId(relRefinabilityNid);
         r.setCharacteristicId(relCharacteristicNid);
         r.setGroup(group);
-        r.primordialSapNid = Bdb.getSapDb().getSapNid(relStatusNid, effectiveDate,
-                getActiveAceFrameConfig().getDbConfig().getUserConcept().getConceptNid(),
+        r.primordialSapNid = Bdb.getSapDb().getSapNid(relStatusNid,effectiveDate,
+                getActiveAceFrameConfig().getDbConfig().getUserConcept().getConceptNid(), 
                 getActiveAceFrameConfig().getEditCoordinate().getModuleNid(), pathNid);
         c.getSourceRels().add(r);
         c.modified();
@@ -1181,8 +1180,8 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         r.setCharacteristicId(relCharacteristicNid);
         r.setGroup(group);
         r.primordialSapNid = Bdb.getSapDb().getSapNid(relStatusNid, effectiveDate,
-                authorNid,
-                getActiveAceFrameConfig().getEditCoordinate().getModuleNid(),
+                authorNid, 
+                getActiveAceFrameConfig().getEditCoordinate().getModuleNid(), 
                 pathNid);
         c.getSourceRels().add(r);
         c.modified();
@@ -1190,8 +1189,9 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         return r;
     }
 
-    @Override
-    public I_ReadChangeSet newWfHxLuceneChangeSetReader(File changeSetFile) throws IOException {
+
+   @Override
+   public I_ReadChangeSet newWfHxLuceneChangeSetReader(File changeSetFile) throws IOException {
         WfRefsetChangeSetReader wfcr = new WfRefsetChangeSetReader();
         wfcr.setChangeSetFile(changeSetFile);
         return wfcr;
@@ -1424,10 +1424,6 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         Map<Document, Float> returnResults = new HashMap<Document, Float>();
         LuceneWfHxProgressUpdator wfHxUpdater = (LuceneWfHxProgressUpdator) updater;
         CountDownLatch hitLatch;
-        File wfHxLucene = new File(System.getProperty("user.dir") + "/workflow/lucene");
-        if (WfHxLuceneManager.wfHxLuceneDirFile != wfHxLucene) {
-            WfHxLuceneManager.wfHxLuceneDirFile = wfHxLucene;
-        }
 
         try {
             if (LuceneManager.indexExists(LuceneSearchType.WORKFLOW_HISTORY) == false) {
@@ -1451,9 +1447,9 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
             wfHxUpdater.setProgressInfo("Query complete in "
                     + Long.toString(System.currentTimeMillis() - startTime) + " ms. Hits: "
                     + returnResults.size());
-
-            // Get count of unique concepts
-            Set<String> conceptList = new HashSet<String>();
+            
+			// Get count of unique concepts
+            Set<String> conceptList = new HashSet<String>();            
             for (int i = 0; i < result.topDocs.totalHits; i++) {
                 Document doc = result.searcher.doc(result.topDocs.scoreDocs[i].doc);
                 conceptList.add(doc.getFieldable("conceptId").stringValue());
@@ -1464,7 +1460,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
             System.out.println("Total results to process: " + conceptList.size());
             hitLatch = new CountDownLatch(conceptList.size());
 
-            // Get map of concept to latest version of results for concept
+			// Get map of concept to latest version of results for concept
             Map<String, WfHxCheckAndProcessLuceneMatch> duplicateMatchesSet = new HashMap<String, WfHxCheckAndProcessLuceneMatch>();
             for (int i = 0; i < result.topDocs.totalHits; i++) {
                 float score = result.topDocs.scoreDocs[i].score;
@@ -1472,26 +1468,26 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
 
                 WfHxCheckAndProcessLuceneMatch match = new WfHxCheckAndProcessLuceneMatch(hitLatch, wfHxUpdater, doc, score,
                         matches, checkList, config);
-
+                
                 if (!duplicateMatchesSet.containsKey(match.getConcept())) {
-                    duplicateMatchesSet.put(match.getConcept(), match);
+                	duplicateMatchesSet.put(match.getConcept(), match);
                 } else {
-                    WfHxCheckAndProcessLuceneMatch dupMatch = duplicateMatchesSet.get(match.getConcept());
-
-                    // Don't add if dupMatch is later than match
-                    if (dupMatch.getTimestamp() < match.getTimestamp()) {
-                        duplicateMatchesSet.remove(match.getConcept());
-                        duplicateMatchesSet.put(match.getConcept(), match);
-                    }
+                	WfHxCheckAndProcessLuceneMatch dupMatch = duplicateMatchesSet.get(match.getConcept());
+                	
+                	// Don't add if dupMatch is later than match
+                	if (dupMatch.getTimestamp() < match.getTimestamp()) {
+                    	duplicateMatchesSet.remove(match.getConcept());
+                    	duplicateMatchesSet.put(match.getConcept(), match);
+                	} 
                 }
             }
-
-            // Sort concepts by timestamp            
+            
+			// Sort concepts by timestamp            
             TreeSet<WfHxCheckAndProcessLuceneMatch> sortedMatches = new TreeSet<WfHxCheckAndProcessLuceneMatch>(new WfSearchResultsComparator());
             for (WfHxCheckAndProcessLuceneMatch match : duplicateMatchesSet.values()) {
-                sortedMatches.add(match);
+            	sortedMatches.add(match);
             }
-
+            
 
             for (WfHxCheckAndProcessLuceneMatch match : sortedMatches) {
                 if (AceLog.getAppLog().isLoggable(Level.FINE)) {
@@ -1523,16 +1519,16 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         }
     }
 
-    private class WfSearchResultsComparator implements Comparator<WfHxCheckAndProcessLuceneMatch> {
-
-        public int compare(WfHxCheckAndProcessLuceneMatch a, WfHxCheckAndProcessLuceneMatch b) {
-            if (a.getTimestamp() > b.getTimestamp()) {
-                return 1;
-            } else {
-                return -1;
-            }
-        }
-    }
+	private class WfSearchResultsComparator implements Comparator<WfHxCheckAndProcessLuceneMatch> { 
+		public int compare(WfHxCheckAndProcessLuceneMatch a, WfHxCheckAndProcessLuceneMatch b) {
+			if (a.getTimestamp() > b.getTimestamp()) {
+				return 1;
+			} else {
+				return -1;
+			}
+		}
+	}
+	
 
     @Override
     public void setup(Object envHome, boolean readOnly, Long cacheSize) throws IOException {
@@ -1809,7 +1805,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
 
         return matchingConcepts;
     }
-
+    
     @Override
     public Set<ConceptChronicleBI> getConceptChronicle(String conceptIdStr)
             throws ParseException, IOException {
@@ -1830,7 +1826,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         } catch (org.apache.lucene.queryParser.ParseException ex) {
             throw new ParseException(q.toString(), 0);
         }
-
+        
         return matchingConcepts;
     }
 

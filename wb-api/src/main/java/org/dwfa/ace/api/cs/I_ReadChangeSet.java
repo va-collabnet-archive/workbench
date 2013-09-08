@@ -79,13 +79,6 @@ public interface I_ReadChangeSet extends Serializable {
      * @param counter
      */
     public void setCounter(I_Count counter);
-    
-    /**
-     * Gets the number of imported concepts.
-     */
-    public int getConceptCount();
-    
-    public boolean isForWorkflow();
 
     /**
      * 

@@ -117,7 +117,7 @@ public class NodeUpdator extends SwingWorker<Object, PublishRecord> implements P
             for (Long nodeId : nodeIds) {
                TaxonomyNode currentNode = model.getNodeStore().nodeMap.get(nodeId);
 
-               if (currentNode != null && cNid != Integer.MAX_VALUE) {
+               if (currentNode != null) {
                   if (!nodesToChange.containsKey(cNid)) {
                      nodesToChange.put(cNid, new ConcurrentSkipListSet<UpdateNodeBI>());
                   }

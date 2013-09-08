@@ -61,7 +61,6 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.ihtsdo.concept.component.refsetmember.str.StrMember;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 
 /**
@@ -318,16 +317,16 @@ public class BdbPathManager implements I_Manage<PathBI> {
    @SuppressWarnings("unchecked")
    private Path getFromDisk(int cNid) throws IOException {
       try {
-          for (RefsetMember extPart : getPathRefsetConcept().getExtensions()) {
-              if (!StrMember.class.isAssignableFrom(extPart.getClass())) {
-                  CidMember conceptExtension = (CidMember) extPart;
-                  int pathId = conceptExtension.getC1Nid();
-                  if (pathId == cNid) {
-                      pathMap.put(pathId, new Path(pathId, getPathOriginsFromDb(pathId)));
-                      return pathMap.get(cNid);
-                  }
-              }
-          }
+         for (RefsetMember extPart : getPathRefsetConcept().getExtensions()) {
+            CidMember conceptExtension = (CidMember) extPart;
+            int       pathId           = conceptExtension.getC1Nid();
+
+            if (pathId == cNid) {
+               pathMap.put(pathId, new Path(pathId, getPathOriginsFromDb(pathId)));
+
+               return pathMap.get(cNid);
+            }
+         }
       } catch (Exception e) {
          throw new IOException("Unable to retrieve all paths.", e);
       }

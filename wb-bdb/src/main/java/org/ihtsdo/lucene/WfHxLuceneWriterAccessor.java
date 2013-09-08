@@ -19,7 +19,6 @@ import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
  */
 public  class WfHxLuceneWriterAccessor {
    	private static Semaphore luceneWriterPermit = new Semaphore(1);
-        public static int importCount = 0;
 
    	public static WfHxLuceneWriter addWfHxLuceneMembersFromExtensions(Set<I_ExtendByRef> extensions) throws InterruptedException {
     	Set<UUID> wfIdsSeen = new HashSet<UUID>();
@@ -41,7 +40,7 @@ public  class WfHxLuceneWriterAccessor {
 					}
 				}
 			}
-                        importCount = 0;
+
 			return new WfHxLuceneWriter(beansToAddToWf);
 		} catch (Exception writerExc) {
     		AceLog.getAppLog().log(Level.WARNING, "Failed to write following beans to Wf Lucene with error: + " + writerExc.getMessage());
@@ -71,7 +70,7 @@ public  class WfHxLuceneWriterAccessor {
 					} 
 	    		}
             }
-                        importCount = 0;
+
 			return new WfHxLuceneWriter(beansToAddToWf);
 		} catch (Exception e) {
     		AceLog.getAppLog().log(Level.WARNING, "Workflow History Refset Not Available: " + e.getMessage());
@@ -85,11 +84,10 @@ public  class WfHxLuceneWriterAccessor {
    	private static class WfHxLuceneWriter implements Runnable 
    	{
    		private static Set<WorkflowHistoryJavaBean> wfExtensionsToUpdate = new HashSet<WorkflowHistoryJavaBean>();
-                
+   		
    		private WfHxLuceneWriter(Set<WorkflowHistoryJavaBean> allBeans) {
    			wfExtensionsToUpdate.addAll(allBeans);
    		}
-                
 
    		@Override
    		public void run() {
@@ -100,7 +98,7 @@ public  class WfHxLuceneWriterAccessor {
    					WfHxLuceneManager.addToLuceneNoWrite(bean);
    				}
    				
-                                importCount = WfHxLuceneManager.writeUnwrittenWorkflows();
+   				WfHxLuceneManager.writeUnwrittenWorkflows();
    			} catch (Exception e) {
    				AceLog.getAppLog().log(Level.WARNING, "Failed in adding following workflow row:" + wfExtensionsToUpdate.toString());
    			}

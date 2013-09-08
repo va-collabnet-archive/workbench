@@ -41,7 +41,6 @@ import org.ihtsdo.arena.context.action.UngroupRelGroupAction;
 import org.ihtsdo.arena.context.action.UpdateDescFromSpecAction;
 import org.ihtsdo.arena.context.action.ReplaceAction;
 import org.ihtsdo.arena.context.action.MakeAcceptableAction;
-import org.ihtsdo.arena.context.action.MakePreferredAutoAction;
 import org.ihtsdo.arena.context.action.MakeNotAcceptableAction;
 import org.ihtsdo.arena.context.action.MakePreferredAction;
 import org.ihtsdo.arena.context.action.GroupRelsAction;
@@ -134,8 +133,8 @@ rule "rule 4"
          not $refex: RefexFact(context == Context.DROP_TARGET)
    then
       actions.add(new RetireAction("retire", $dropObject, config));
-      actions.add(new CloneAction("clone", $dropObject, config, cvSettings));
-      actions.add(new CloneAndRetireAction("clone & retire", $dropObject, config, cvSettings));
+      actions.add(new CloneAction("clone", $dropObject, config));
+      actions.add(new CloneAndRetireAction("clone & retire", $dropObject, config));
 end
 
 rule "rule 4.2" 
@@ -417,43 +416,6 @@ rule "rule 15"
 		$dropObject : DescFact(context == Context.DROP_OBJECT, component == $dropTarget.component);				   								   
 	then
 		actions.add(new MakeAcceptableAction("GB Acceptable", $dropTarget, LANG_CODE.EN_GB, config));
-end
-
-rule "rule 15.1" 
-#make preferred, set old preferred term to acceptible -- EN
-	when
-                ViewFact(getView() == View.STATED)
-		$dropTarget: DescFact(this isGbMemberTypeOf SnomedMetadataRfx.getDESC_ACCEPTABLE(),
-                                      this isUsMemberTypeOf SnomedMetadataRfx.getDESC_ACCEPTABLE(),
-				      context == Context.DROP_TARGET)
-		$dropObject : DescFact(context == Context.DROP_OBJECT, component == $dropTarget.component);				   								   
-	then
-		actions.add(new MakePreferredAutoAction("make preferred", $dropTarget, LANG_CODE.EN, config));
-end
-
-
-rule "rule 15.2" 
-#make preferred, set old preferred term to acceptible -- US
-	when
-                ViewFact(getView() == View.STATED)
-		$dropTarget: DescFact(this not isGbMemberTypeOf SnomedMetadataRfx.getDESC_ACCEPTABLE(),
-                                      this isUsMemberTypeOf SnomedMetadataRfx.getDESC_ACCEPTABLE(),
-							  context == Context.DROP_TARGET)
-		$dropObject : DescFact(context == Context.DROP_OBJECT, component == $dropTarget.component);				   								   
-	then
-		actions.add(new MakePreferredAutoAction("make preferred", $dropTarget, LANG_CODE.EN_US, config));
-end
-
-rule "rule 15.3" 
-#make preferred, set old preferred term to acceptible -- GB
-	when
-                ViewFact(getView() == View.STATED)
-		$dropTarget: DescFact(this isGbMemberTypeOf SnomedMetadataRfx.getDESC_ACCEPTABLE(),
-                                      this not isUsMemberTypeOf SnomedMetadataRfx.getDESC_ACCEPTABLE(),
-							  context == Context.DROP_TARGET)
-		$dropObject : DescFact(context == Context.DROP_OBJECT, component == $dropTarget.component);				   								   
-	then
-		actions.add(new MakePreferredAutoAction("make preferred", $dropTarget, LANG_CODE.EN_GB, config));
 end
 
 rule "rule 16.1" 

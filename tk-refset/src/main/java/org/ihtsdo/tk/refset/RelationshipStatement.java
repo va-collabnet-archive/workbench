@@ -30,7 +30,6 @@ import org.dwfa.util.id.Type5UuidFactory;
 import org.ihtsdo.helper.time.TimeHelper;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ComponentChronicleBI;
-import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.NidBitSetBI;
 import org.ihtsdo.tk.api.NidSet;
@@ -847,28 +846,12 @@ public class RelationshipStatement extends RefsetSpecStatement {
                     String hash = null;
                     for (RelationshipVersionBI rel : v1Rels) {
                         if (rel.getGroup() == group && a1.getCharacteristicNid() == rel.getCharacteristicNid()) {
-                            if(rel.getCharacteristicNid() == SnomedMetadataRfx.getREL_CH_INFERRED_RELATIONSHIP_NID() 
-                                    && rel.getStatusNid() == SnomedMetadataRfx.getSTATUS_CURRENT_NID()){
-                               RelationshipVersionBI mergeVersion = (RelationshipVersionBI) rel.getChronicle().getVersion(v2_is);
-                                if(mergeVersion != null && (mergeVersion.getTime() > rel.getTime())){
-                                    //there has been a classification on the merge path that retired the classificaiton on the target path
-                                    //should use this instead
-                                    rel = mergeVersion;
-                                }
-                            }
                             hash = Ts.get().getUuidPrimordialForNid(rel.getSourceNid()).toString()
                                     + Ts.get().getUuidPrimordialForNid(rel.getTypeNid()).toString()
                                     + Ts.get().getUuidPrimordialForNid(rel.getTargetNid()).toString()
                                     + Ts.get().getUuidPrimordialForNid(rel.getCharacteristicNid()).toString()
                                     + Ts.get().getUuidPrimordialForNid(rel.getStatusNid()).toString();
-                            //classifier creates duplicate relationships these should not be considered
-                            if(rel.getCharacteristicNid() == SnomedMetadataRfx.getREL_CH_INFERRED_RELATIONSHIP_NID()){
-                                if(!hashes.contains(hash)){
-                                    hashes.add(hash);
-                                }
-                            }else{
-                                hashes.add(hash);
-                            }
+                            hashes.add(hash);
                         }
                     }
                     Collections.sort(hashes);
@@ -901,13 +884,13 @@ public class RelationshipStatement extends RefsetSpecStatement {
                                         + Ts.get().getUuidPrimordialForNid(r.getTargetNid()).toString()
                                         + Ts.get().getUuidPrimordialForNid(r.getCharacteristicNid()).toString()
                                         + Ts.get().getUuidPrimordialForNid(r.getStatusNid()).toString();
-                                
-                                //classifier creates duplicate relationships these should not be considered
-                                if (r.getCharacteristicNid() == SnomedMetadataRfx.getREL_CH_INFERRED_RELATIONSHIP_NID()) {
-                                    if (!hashes.contains(hash)) {
-                                        hashes.add(hash);
+                                boolean add = true;
+                                for(String h : hashes){
+                                    if(h.equals(hash)){
+                                        add = false;
                                     }
-                                } else {
+                                }
+                                if(add){
                                     hashes.add(hash);
                                 }
                             }

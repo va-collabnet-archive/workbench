@@ -184,7 +184,7 @@ public class LineagePlugin extends AbstractPlugin implements HierarchyListener {
             if (bean != null) {
                 lineageRenderer.setFocusBean(bean);
 
-                lineage = getLineage(bean, new HashSet());
+                lineage = getLineage(bean, 0);
 
                 if (AceLog.getAppLog().isLoggable(Level.FINE)) {
                     StringBuilder buf = new StringBuilder();
@@ -284,10 +284,8 @@ public class LineagePlugin extends AbstractPlugin implements HierarchyListener {
         return inferredViewIcon;
     }
 
-    // added HashSet<Integer> encountered to ignore cycles
-    private List<List<I_GetConceptData>> getLineage(I_GetConceptData bean, HashSet<Integer> encountered)
+    private List<List<I_GetConceptData>> getLineage(I_GetConceptData bean, int depth)
             throws IOException, TerminologyException {
-        encountered.add(bean.getNid());
         List<List<I_GetConceptData>> lineage = new ArrayList<List<I_GetConceptData>>();
         List<? extends I_RelTuple> sourceRelTuples =
                 bean.getSourceRelTuples(getHost().getConfig().getAllowedStatus(),
@@ -297,13 +295,12 @@ public class LineagePlugin extends AbstractPlugin implements HierarchyListener {
                 getHost().getConfig().getConflictResolutionStrategy(),
                 coordinate.getClassifierNid(), coordinate.getRelationshipAssertionType());
 
-        if (sourceRelTuples.size() > 0) {
+        if ((sourceRelTuples.size() > 0) && (depth < 40)) {
             for (I_RelTuple rel : sourceRelTuples) {
-                if (rel.getSourceNid() != rel.getTargetNid() &&
-                        !encountered.contains(rel.getC2Id())) {
+                if (rel.getSourceNid() != rel.getTargetNid()) {
                     I_GetConceptData parent = Terms.get().getConcept(rel.getC2Id());
 
-                    List<List<I_GetConceptData>> parentLineage = getLineage(parent,  new HashSet(encountered));
+                    List<List<I_GetConceptData>> parentLineage = getLineage(parent, depth + 1);
 
                     for (List<I_GetConceptData> parentLine : parentLineage) {
                         parentLine.add(bean);
