@@ -80,6 +80,7 @@ import java.lang.reflect.InvocationTargetException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -926,9 +927,25 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
     public static boolean addRefsetMetadata(boolean markedParentOnly, I_GetConceptData memberRefset) {
         try {
             if (memberRefset == null) {
+                JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
+                        "No refset has been added to the refset spec panel.", "",
+                        JOptionPane.INFORMATION_MESSAGE);
                 return false;
             }
             I_ConfigAceFrame aceConfig = Terms.get().getActiveAceFrameConfig();
+            I_GetConceptData markedParentRel =
+                    (I_GetConceptData) Ts.get().getConcept(RefsetAuxiliary.Concept.MARKED_PARENT_REFSET.getUids());
+            
+            //check if already added
+            ConceptVersionBI cv =  ((ConceptChronicleBI) memberRefset).getVersion(aceConfig.getViewCoordinate());
+            Collection<? extends ConceptVersionBI> markedParentRels = cv.getRelationshipsOutgoingTargetConcepts(markedParentRel.getConceptNid());
+            if(!markedParentRels.isEmpty()){
+                JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
+                        "Refset metadata already added.", "",
+                        JOptionPane.INFORMATION_MESSAGE);
+                return false;
+            }
+            
             Set<PathBI> originalPathSet = new HashSet<>();
             originalPathSet.addAll(aceConfig.getEditingPathSet());
             aceConfig.getEditingPathSet().clear();
@@ -954,8 +971,6 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
                     (I_GetConceptData) Ts.get().getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids());
             I_GetConceptData supportingRefset =
                     (I_GetConceptData) Ts.get().getConcept(RefsetAuxiliary.Concept.SUPPORTING_REFSETS.getUids());
-            I_GetConceptData markedParentRel =
-                    (I_GetConceptData) Ts.get().getConcept(RefsetAuxiliary.Concept.MARKED_PARENT_REFSET.getUids());
             I_GetConceptData markedParentIsATypeRel =
                     (I_GetConceptData) Ts.get().getConcept(RefsetAuxiliary.Concept.MARKED_PARENT_IS_A_TYPE.getUids());
             I_GetConceptData specifiesRefsetRel =
