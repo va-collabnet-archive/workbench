@@ -44,7 +44,7 @@ public class RefsetHelper {
                 componentNid,
                 refsetNid);
         memberBp.put(RefexProperty.CNID1, memberTypeNid);
-        memberBp.setMemberUuid(memberBp.computeMemberComponentUuid());
+        memberBp.setMemberUuid(memberBp.computeMemberContentUuid());
         return builder.constructIfNotCurrent(memberBp);
     }
 
@@ -57,7 +57,7 @@ public class RefsetHelper {
                 refsetNid);
         memberBp.put(RefexProperty.CNID1, c1Nid);
         memberBp.put(RefexProperty.CNID2, c2Nid);
-        memberBp.setMemberUuid(memberBp.computeMemberComponentUuid());
+        memberBp.setMemberUuid(memberBp.computeMemberContentUuid());
         return builder.constructIfNotCurrent(memberBp);
     }
 
@@ -68,7 +68,7 @@ public class RefsetHelper {
                 componentNid,
                 refsetNid);
         memberBp.put(RefexProperty.STRING1, extString);
-        memberBp.setMemberUuid(memberBp.computeMemberComponentUuid());
+        memberBp.setMemberUuid(memberBp.computeMemberContentUuid());
         return builder.constructIfNotCurrent(memberBp);
     }
 
@@ -78,7 +78,7 @@ public class RefsetHelper {
                 componentNid,
                 refsetNid);
         memberBp.put(RefexProperty.LONG1, extLong);
-        memberBp.setMemberUuid(memberBp.computeMemberComponentUuid());
+        memberBp.setMemberUuid(memberBp.computeMemberContentUuid());
         return builder.constructIfNotCurrent(memberBp);
     }
 
@@ -90,7 +90,7 @@ public class RefsetHelper {
                 refsetNid);
         memberBp.put(RefexProperty.CNID1, c1Nid);
         memberBp.put(RefexProperty.STRING1, extString);
-        memberBp.setMemberUuid(memberBp.computeMemberComponentUuid());
+        memberBp.setMemberUuid(memberBp.computeMemberContentUuid());
         return builder.constructIfNotCurrent(memberBp);
     }
 
@@ -100,7 +100,7 @@ public class RefsetHelper {
                 componentNid,
                 refsetNid);
         memberBp.put(RefexProperty.INTEGER1, int1);
-        memberBp.setMemberUuid(memberBp.computeMemberComponentUuid());
+        memberBp.setMemberUuid(memberBp.computeMemberContentUuid());
         return builder.constructIfNotCurrent(memberBp);
     }
 
@@ -110,7 +110,7 @@ public class RefsetHelper {
                 componentNid,
                 refsetNid);
         memberBp.put(RefexProperty.CNID1, c1Nid);
-        memberBp.setMemberUuid(memberBp.computeMemberComponentUuid());
+        memberBp.setMemberUuid(memberBp.computeMemberContentUuid());
         return builder.constructIfNotCurrent(memberBp);
     }
     
@@ -120,7 +120,7 @@ public class RefsetHelper {
                 componentNid,
                 refsetNid);
         memberBp.put(RefexProperty.BOOLEAN1, boolean1);
-        memberBp.setMemberUuid(memberBp.computeMemberComponentUuid());
+        memberBp.setMemberUuid(memberBp.computeMemberContentUuid());
         return builder.constructIfNotCurrent(memberBp);
     }
 
@@ -133,7 +133,7 @@ public class RefsetHelper {
         memberBp.put(RefexProperty.CNID1, c1Nid);
         memberBp.put(RefexProperty.CNID2, c2Nid);
         memberBp.put(RefexProperty.CNID3, c3Nid);
-        memberBp.setMemberUuid(memberBp.computeMemberComponentUuid());
+        memberBp.setMemberUuid(memberBp.computeMemberContentUuid());
         return builder.constructIfNotCurrent(memberBp);
     }
 
@@ -146,7 +146,7 @@ public class RefsetHelper {
         memberBp.put(RefexProperty.CNID1, c1Nid);
         memberBp.put(RefexProperty.CNID2, c2Nid);
         memberBp.put(RefexProperty.STRING1, string1);
-        memberBp.setMemberUuid(memberBp.computeMemberComponentUuid());
+        memberBp.setMemberUuid(memberBp.computeMemberContentUuid());
         return builder.constructIfNotCurrent(memberBp);
     }
 
@@ -156,7 +156,7 @@ public class RefsetHelper {
                 refsetNid);
         memberBp.put(RefexProperty.CNID1, memberTypeNid);
         memberBp.setRetired();
-        memberBp.setMemberUuid(memberBp.computeMemberComponentUuid());
+        memberBp.setMemberUuid(memberBp.computeMemberContentUuid());
         return builder.constructIfNotCurrent(memberBp);
     }
     
