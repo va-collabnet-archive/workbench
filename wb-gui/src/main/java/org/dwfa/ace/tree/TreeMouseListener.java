@@ -83,7 +83,7 @@ public class TreeMouseListener extends MouseAdapter {
       JMenu newSubMenuGrouping = new JMenu(groupingFile.getName());
 
       popup.add(newSubMenuGrouping);
-      ProcessPopupUtil.addSubmenMenuItems(newSubMenuGrouping, groupingFile,
+      ProcessPopupUtil.addSubMenuItems(newSubMenuGrouping, groupingFile,
               ace.getAceFrameConfig().getWorker());
 
       // sub-menu for "concept-contains-desc" and "concept-contains-rel"
@@ -92,7 +92,7 @@ public class TreeMouseListener extends MouseAdapter {
          JMenu newSubMenuContains = new JMenu(containsFile.getName());
 
          popup.add(newSubMenuContains);
-         ProcessPopupUtil.addSubmenMenuItems(newSubMenuContains, containsFile,
+         ProcessPopupUtil.addSubMenuItems(newSubMenuContains, containsFile,
                  ace.getAceFrameConfig().getWorker());
       }
 
@@ -102,14 +102,14 @@ public class TreeMouseListener extends MouseAdapter {
          JMenu newSubMenuConcept = new JMenu(conceptFile.getName());
 
          popup.add(newSubMenuConcept);
-         ProcessPopupUtil.addSubmenMenuItems(newSubMenuConcept, conceptFile,
+         ProcessPopupUtil.addSubMenuItems(newSubMenuConcept, conceptFile,
                  ace.getAceFrameConfig().getWorker());
 
          // sub-menu for diff
          conceptFile       = new File(AceFrame.pluginRoot, "refsetspec/branch-popup/diff");
          newSubMenuConcept = new JMenu(conceptFile.getName());
          popup.add(newSubMenuConcept);
-         ProcessPopupUtil.addSubmenMenuItems(newSubMenuConcept, conceptFile,
+         ProcessPopupUtil.addSubMenuItems(newSubMenuConcept, conceptFile,
                  ace.getAceFrameConfig().getWorker());
       }
 
@@ -119,7 +119,7 @@ public class TreeMouseListener extends MouseAdapter {
          JMenu newSubMenuDesc = new JMenu(descFile.getName());
 
          popup.add(newSubMenuDesc);
-         ProcessPopupUtil.addSubmenMenuItems(newSubMenuDesc, descFile, ace.getAceFrameConfig().getWorker());
+         ProcessPopupUtil.addSubMenuItems(newSubMenuDesc, descFile, ace.getAceFrameConfig().getWorker());
       }
 
       // sub-menu for rel based clauses e.g. rel is
@@ -128,7 +128,7 @@ public class TreeMouseListener extends MouseAdapter {
          JMenu newSubMenuRel = new JMenu(relFile.getName());
 
          popup.add(newSubMenuRel);
-         ProcessPopupUtil.addSubmenMenuItems(newSubMenuRel, relFile, ace.getAceFrameConfig().getWorker());
+         ProcessPopupUtil.addSubMenuItems(newSubMenuRel, relFile, ace.getAceFrameConfig().getWorker());
       }
    }
 
@@ -288,7 +288,7 @@ public class TreeMouseListener extends MouseAdapter {
       popup.add(searchForSimilarConcepts);
       searchForSimilarConcepts.addActionListener(new SetSearchToSimilar());
       popup.addSeparator();
-      ProcessPopupUtil.addSubmenMenuItems(popup, new File(AceFrame.pluginRoot, "taxonomy"),
+      ProcessPopupUtil.addSubMenuItems(popup, new File(AceFrame.pluginRoot, "taxonomy"),
               ace.getAceFrameConfig().getWorker());
 
       return popup;

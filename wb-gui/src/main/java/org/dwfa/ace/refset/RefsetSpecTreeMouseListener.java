@@ -241,14 +241,14 @@ public class RefsetSpecTreeMouseListener extends MouseAdapter {
         File groupingFile = new File(AceFrame.pluginRoot, "refsetspec/branch-popup/grouping");
         JMenu newSubMenuGrouping = new JMenu(groupingFile.getName());
         popup.add(newSubMenuGrouping);
-        ProcessPopupUtil.addSubmenMenuItems(newSubMenuGrouping, groupingFile, this.aceConfig.getWorker());
+        ProcessPopupUtil.addSubMenuItems(newSubMenuGrouping, groupingFile, this.aceConfig.getWorker());
 
         // sub-menu for "concept-contains-desc" and "concept-contains-rel"
         if (!excludesContains) {
             File containsFile = new File(AceFrame.pluginRoot, "refsetspec/branch-popup/contains");
             JMenu newSubMenuContains = new JMenu(containsFile.getName());
             popup.add(newSubMenuContains);
-            ProcessPopupUtil.addSubmenMenuItems(newSubMenuContains, containsFile, this.aceConfig.getWorker());
+            ProcessPopupUtil.addSubMenuItems(newSubMenuContains, containsFile, this.aceConfig.getWorker());
         }
 
         // sub-menu for concept based clauses e.g. concept is, concept is child of
@@ -256,12 +256,12 @@ public class RefsetSpecTreeMouseListener extends MouseAdapter {
             File conceptFile = new File(AceFrame.pluginRoot, "refsetspec/branch-popup/concept");
             JMenu newSubMenuConcept = new JMenu(conceptFile.getName());
             popup.add(newSubMenuConcept);
-            ProcessPopupUtil.addSubmenMenuItems(newSubMenuConcept, conceptFile, this.aceConfig.getWorker());
+            ProcessPopupUtil.addSubMenuItems(newSubMenuConcept, conceptFile, this.aceConfig.getWorker());
             // sub-menu for diff
             conceptFile = new File(AceFrame.pluginRoot, "refsetspec/branch-popup/diff");
             newSubMenuConcept = new JMenu(conceptFile.getName());
             popup.add(newSubMenuConcept);
-            ProcessPopupUtil.addSubmenMenuItems(newSubMenuConcept, conceptFile, this.aceConfig.getWorker());
+            ProcessPopupUtil.addSubMenuItems(newSubMenuConcept, conceptFile, this.aceConfig.getWorker());
         }
 
         // sub-menu for desc based clauses e.g. desc is, desc is child of
@@ -269,7 +269,7 @@ public class RefsetSpecTreeMouseListener extends MouseAdapter {
             File descFile = new File(AceFrame.pluginRoot, "refsetspec/branch-popup/desc");
             JMenu newSubMenuDesc = new JMenu(descFile.getName());
             popup.add(newSubMenuDesc);
-            ProcessPopupUtil.addSubmenMenuItems(newSubMenuDesc, descFile, this.aceConfig.getWorker());
+            ProcessPopupUtil.addSubMenuItems(newSubMenuDesc, descFile, this.aceConfig.getWorker());
         }
 
         // sub-menu for rel based clauses e.g. rel is
@@ -277,7 +277,7 @@ public class RefsetSpecTreeMouseListener extends MouseAdapter {
             File relFile = new File(AceFrame.pluginRoot, "refsetspec/branch-popup/rel");
             JMenu newSubMenuRel = new JMenu(relFile.getName());
             popup.add(newSubMenuRel);
-            ProcessPopupUtil.addSubmenMenuItems(newSubMenuRel, relFile, this.aceConfig.getWorker());
+            ProcessPopupUtil.addSubMenuItems(newSubMenuRel, relFile, this.aceConfig.getWorker());
         }
 
         if (specPart != null) {
@@ -334,7 +334,7 @@ public class RefsetSpecTreeMouseListener extends MouseAdapter {
         JPopupMenu popup = new JPopupMenu();
         JMenuItem noActionItem = new JMenuItem("");
         popup.add(noActionItem);
-        ProcessPopupUtil.addSubmenMenuItems(popup, directory, this.aceConfig.getWorker());
+        ProcessPopupUtil.addSubMenuItems(popup, directory, this.aceConfig.getWorker());
         if (specPart != null) {
             popup.addSeparator();
 

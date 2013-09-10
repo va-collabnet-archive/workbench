@@ -143,7 +143,7 @@ public class DescSearchResultsTablePopupListener extends MouseAdapter implements
 
    private void addProcessItems(JPopupMenu popup, File directory) {
       try {
-         ProcessPopupUtil.addSubmenMenuItems(popup, directory, config.getWorker());
+         ProcessPopupUtil.addSubMenuItems(popup, directory, config.getWorker());
       } catch (FileNotFoundException e) {
          AceLog.getAppLog().alertAndLogException(e);
       } catch (IOException e) {
