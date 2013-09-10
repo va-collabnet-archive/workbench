@@ -25,6 +25,8 @@ import java.util.Comparator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.*;
+import javax.swing.event.RowSorterEvent;
+import javax.swing.event.RowSorterListener;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 import org.dwfa.ace.ACE;
@@ -34,6 +36,7 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.table.JTableWithDragImage;
 import org.dwfa.ace.task.classify.SnoQuery;
 import org.dwfa.ace.task.classify.SnoRel;
+import org.dwfa.tapi.ComputationCanceled;
 import org.dwfa.tapi.TerminologyException;
 
 public class DiffReportPanel extends JPanel {
@@ -77,7 +80,6 @@ public class DiffReportPanel extends JPanel {
             this.add(jbtn, c);
 
             ArrayList<SnoRelReport> srrl = new ArrayList<>();
-            ArrayList<SnoRel> asd = SnoQuery.getIsaAdded();
             for (SnoRel snoRel : SnoQuery.getIsaAdded()) {
                 srrl.add(new SnoRelReport(snoRel, true));
             }
@@ -139,15 +141,14 @@ public class DiffReportPanel extends JPanel {
         // sorter
         TableRowSorter<DiffReportTableModel> sorter = new TableRowSorter<>();
         sorter.setModel(theTableModel);
-        Comparator<SnoRelReport> comparatorIsAdded = new ComparatorIsAdded();
+        Comparator<String> comparatorIsAdded = new ComparatorIsAdded();
         sorter.setComparator(0, comparatorIsAdded);
-        Comparator<SnoRelReport> comparatorC1 = new ComparatorC1();
-        sorter.setComparator(1, comparatorC1);
-        Comparator<SnoRelReport> comparatorType = new ComparatorType();
-        sorter.setComparator(2, comparatorType);
-        Comparator<SnoRelReport> comparatorC2 = new ComparatorC2();
-        sorter.setComparator(3, comparatorC2);
+        Comparator<I_GetConceptData> comparatorName = new ComparatorName();
+        sorter.setComparator(1, comparatorName);
+        sorter.setComparator(2, comparatorName);
+        sorter.setComparator(3, comparatorName);
         sorter.setSortable(4, false); // not sortable by group
+        sorter.addRowSorterListener(new rsl());
         table.setRowSorter(sorter);
 
         // set column widths
@@ -183,18 +184,22 @@ public class DiffReportPanel extends JPanel {
             try {
                 JList conceptList = config.getBatchConceptList();
                 I_ModelTerminologyList conceptListModel = (I_ModelTerminologyList) conceptList.getModel();
+                // conceptListModel.clear();
 
-                ArrayList<SnoRel> added = SnoQuery.getIsaAdded();
-                Collections.sort(added);
+                ArrayList<SnoRel> conceptsToBeAdded = new ArrayList<SnoRel>(SnoQuery.getIsaAdded());
+                conceptsToBeAdded.addAll(SnoQuery.getIsaDropped());
+                conceptsToBeAdded.addAll(SnoQuery.getRoleAdded());
+                conceptsToBeAdded.addAll(SnoQuery.getRoleDropped());
+                Collections.sort(conceptsToBeAdded);
 
-                for (int i = 0; i < added.size(); i++) {
-                    if (i < added.size() - 1) {
-                        if (added.get(i).c1Id != added.get(i + 1).c1Id) {
-                            I_GetConceptData cb = Terms.get().getConcept(added.get(i).c1Id);
+                for (int i = 0; i < conceptsToBeAdded.size(); i++) {
+                    if (i < conceptsToBeAdded.size() - 1) {
+                        if (conceptsToBeAdded.get(i).c1Id != conceptsToBeAdded.get(i + 1).c1Id) {
+                            I_GetConceptData cb = Terms.get().getConcept(conceptsToBeAdded.get(i).c1Id);
                             conceptListModel.addElement(cb);
                         }
                     } else {
-                        I_GetConceptData cb = Terms.get().getConcept(added.get(i).c1Id);
+                        I_GetConceptData cb = Terms.get().getConcept(conceptsToBeAdded.get(i).c1Id);
                         conceptListModel.addElement(cb);
                     }
                 }
@@ -212,67 +217,85 @@ public class DiffReportPanel extends JPanel {
 
         for (int i = 0; i < totalRows; i++) {
             for (int j = 0; j < totalCol; j++) {
-                tableStrings[i][j] = srl.get(i);
+                SnoRelReport srr = srl.get(i);
+                if (j == 0) {
+                    if (srr.isAdded) {
+                        tableStrings[i][j] = "added";
+                    } else {
+                        tableStrings[i][j] = "retired";
+                    }
+                } else if (j == 1) {
+                    tableStrings[i][j] = Terms.get().getConcept(srr.snoRel.c1Id);
+                } else if (j == 2) {
+                    tableStrings[i][j] = Terms.get().getConcept(srr.snoRel.typeId);
+                } else if (j == 3) {
+                    tableStrings[i][j] = Terms.get().getConcept(srr.snoRel.c2Id);
+                } else if (j == 4) {
+                    tableStrings[i][j] = (Integer) srr.snoRel.group;
+                }
             }
         }
 
         return tableStrings;
     }
 
-    private static class ComparatorC1 implements Comparator<SnoRelReport> {
+    private static class ComparatorName implements Comparator<I_GetConceptData> {
 
-        public ComparatorC1() {
+        public ComparatorName() {
         }
 
         @Override
-        public int compare(SnoRelReport sr1, SnoRelReport sr2) {
-            String strings1 = sr1.snoRel.toStringC1();
-            String strings2 = sr2.snoRel.toStringC1();
+        public int compare(I_GetConceptData cb1, I_GetConceptData cb2) {
+            String strings1 = cb1.toUserString();
+            String strings2 = cb2.toUserString();
             return strings1.compareTo(strings2);
         }
     }
 
-    private static class ComparatorType implements Comparator<SnoRelReport> {
-
-        public ComparatorType() {
-        }
-
-        @Override
-        public int compare(SnoRelReport sr1, SnoRelReport sr2) {
-            String strings1 = sr1.snoRel.toStringType();
-            String strings2 = sr2.snoRel.toStringType();
-            return strings1.compareTo(strings2);
-        }
-    }
-
-    private static class ComparatorC2 implements Comparator<SnoRelReport> {
-
-        public ComparatorC2() {
-        }
-
-        @Override
-        public int compare(SnoRelReport sr1, SnoRelReport sr2) {
-            String strings1 = sr1.snoRel.toStringC2();
-            String strings2 = sr2.snoRel.toStringC2();
-            return strings1.compareTo(strings2);
-        }
-    }
-
-    private static class ComparatorIsAdded implements Comparator<SnoRelReport> {
+    private static class ComparatorIsAdded implements Comparator<String> {
 
         public ComparatorIsAdded() {
         }
 
         @Override
-        public int compare(SnoRelReport sr1, SnoRelReport sr2) {
-            boolean boolean1 = sr1.isAdded;
-            boolean boolean2 = sr2.isAdded;
-            if (boolean1 == true && boolean2 == false) {
-                return 1;
-            } else if (boolean1 == false && boolean2 == true) {
-                return -1;
-            }
-            return 0;
+        public int compare(String sr1, String sr2) {
+            return sr1.compareTo(sr2);
         }
     }
+
+    I_ShowActivity sortActivityPanel = null;
+    long sortStartTime;
+
+    private class rsl implements RowSorterListener {
+
+        @Override
+        public void sorterChanged(RowSorterEvent e) {
+            // Show in Activity Viewer
+            if (e.getType() == RowSorterEvent.Type.SORT_ORDER_CHANGED) {
+                sortActivityPanel = tf.newActivityPanel(true, config, "Sort classifier differences report", true);
+                sortActivityPanel.setIndeterminate(false);
+                sortActivityPanel.setValue(0);
+                sortActivityPanel.setProgressInfoLower("Sorting column ...");
+                sortStartTime = System.currentTimeMillis();
+            } else if (sortActivityPanel != null) {
+                // e.getType() == RowSorterEvent.Type.SORTED
+                    sortActivityPanel.setProgressInfoLower("Sort completed. time = "
+                            + toStringLapseSec(sortStartTime));
+                try {
+                    sortActivityPanel.complete();
+                } catch (ComputationCanceled ex) {
+                    Logger.getLogger(DiffReportPanel.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }
+    }
+    
+        private String toStringLapseSec(long startTime) {
+        StringBuilder s = new StringBuilder();
+        long stopTime = System.currentTimeMillis();
+        long lapseTime = stopTime - startTime;
+        s.append((float) lapseTime / 1000).append(" (seconds)");
+        return s.toString();
+    }
+    
 }
