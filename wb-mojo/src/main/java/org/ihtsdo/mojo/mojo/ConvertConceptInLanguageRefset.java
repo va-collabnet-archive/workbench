@@ -105,8 +105,8 @@ public class ConvertConceptInLanguageRefset extends AbstractMojo {
 				String name = membershipConcept.toString(); 
 
 				I_GetConceptData newCommentsConcept = null;
-                if(Ts.get().hasUuid(Type5UuidFactory.get(name  + " - comments refset - for UUID generation"))){
-                    newCommentsConcept = (I_GetConceptData) Ts.get().getConcept(Type5UuidFactory.get(name  + " - comments refset - for UUID generation"));
+                if(tf.hasId(Type5UuidFactory.get(name  + " - comments refset - for UUID generation"))){
+                    newCommentsConcept = (I_GetConceptData) tf.getConcept(Type5UuidFactory.get(name  + " - comments refset - for UUID generation"));
                 }else{
                     newCommentsConcept = tf.newConcept(
                         Type5UuidFactory.get(name  + " - comments refset - for UUID generation"), 
@@ -126,8 +126,8 @@ public class ConvertConceptInLanguageRefset extends AbstractMojo {
 						current, 0, config);
 
                 I_GetConceptData newPromotionConcept = null;
-                if(Ts.get().hasUuid(Type5UuidFactory.get(name  + " - promotion refset - for UUID generation"))){
-                    newPromotionConcept = (I_GetConceptData) Ts.get().getConcept(Type5UuidFactory.get(name  + " - promotion refset - for UUID generation"));
+                if(tf.hasId(Type5UuidFactory.get(name  + " - promotion refset - for UUID generation"))){
+                    newPromotionConcept = (I_GetConceptData) tf.getConcept(Type5UuidFactory.get(name  + " - promotion refset - for UUID generation"));
                 }else{
                     newPromotionConcept = tf.newConcept(
                         Type5UuidFactory.get(name  + " - promotion refset - for UUID generation")
