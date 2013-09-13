@@ -79,9 +79,12 @@ public class SctRf2RefsetSimpleToArfMojo extends AbstractMojo implements Seriali
      * @parameter 
      */
     private ConceptDescriptor pathConcept = new ConceptDescriptor("8c230474-9f11-30ce-9cad-185a96fd03a2","SNOMED Core");
-    
+     /**
+     * Path to import concepts on. Defaults to SNOMED Core.
+     * @parameter default-value="8c230474-9f11-30ce-9cad-185a96fd03a2"
+     */
+    private String pathUuid;
     String uuidSourceSnomedLongStr;
-    String uuidPathStr;
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
@@ -97,6 +100,10 @@ public class SctRf2RefsetSimpleToArfMojo extends AbstractMojo implements Seriali
         String pathStr = null;
         try {
         	pathStr = pathConcept.getUuid();
+                // If either pathUuid is not the default and pathStr is, override with pathUuid
+        	if (!pathUuid.equals("8c230474-9f11-30ce-9cad-185a96fd03a2") &&
+        			pathStr.equals("8c230474-9f11-30ce-9cad-185a96fd03a2"))
+        		pathStr = pathUuid;
         } catch (RuntimeException e) {
         	getLog().error("Poorly configured path concept, at least one UUID must be specified", e);
         	throw e;
