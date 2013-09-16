@@ -184,11 +184,12 @@ public final class BatchActionEditorPanel extends javax.swing.JPanel {
         try {
             // parentLinkages from preference settings
             I_IntSet parentLinkageTypes = ace.aceFrameConfig.getDestRelTypes();
-            parentLinkageTypes.remove(TermAux.IS_A.getLenient().getConceptNid());
             int[] types = parentLinkageTypes.getSetValues();
             for (int typeNid : types) {
-                ComponentVersionBI cvbi = ts.getComponentVersion(vc, typeNid);
-                parentLinkages.add(cvbi);
+                if(typeNid != TermAux.IS_A.getLenient().getConceptNid()){
+                    ComponentVersionBI cvbi = ts.getComponentVersion(vc, typeNid);
+                    parentLinkages.add(cvbi);
+                }
             }
             
             
