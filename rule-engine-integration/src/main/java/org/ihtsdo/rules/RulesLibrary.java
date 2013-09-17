@@ -394,7 +394,7 @@ public class RulesLibrary {
 				}
 				AceLog.getAppLog().alertAndLogException(e);
 			} else {
-				System.out.println("Error in QA check on concept: " + concept.toString() + " for " + context.toString());
+				System.out.println("Error in QA check on concept: " + concept.toString() + " for " + context.toString() + e.getMessage());
 			}
 			//throw(e);
 		}
