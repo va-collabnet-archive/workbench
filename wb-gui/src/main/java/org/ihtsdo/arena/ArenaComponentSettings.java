@@ -51,6 +51,8 @@ import com.mxgraph.swing.handler.mxCellHandler;
 import com.mxgraph.swing.view.mxICellEditor;
 import com.mxgraph.util.mxRectangle;
 import com.mxgraph.view.mxGraph;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 public abstract class ArenaComponentSettings implements Serializable,
         ComponentListener, HierarchyBoundsListener {
@@ -141,17 +143,30 @@ public abstract class ArenaComponentSettings implements Serializable,
         
         setupSubtypes();
     }
-    private JPanel newFontSizePanel() {
+     private JPanel newFontSizePanel() {
         SpinnerModel fontSizeModel =
                 new SpinnerNumberModel(fontSize, //initial value
                 9, //min
                 20, //max
                 1);                //step
         JSpinner fontSizeSpinner = new JSpinner(fontSizeModel);
+        fontSizeSpinner.addChangeListener(new SpinnerListener());
         JPanel fontSizePanel = new JPanel(new GridLayout(1, 1));
         fontSizePanel.add(fontSizeSpinner);
         return fontSizePanel;
     }
+    
+    private class SpinnerListener implements ChangeListener{
+
+        @Override
+        public void stateChanged(ChangeEvent e) {
+            JSpinner mySpinner = (JSpinner)(e.getSource());
+            Double value = (Double) mySpinner.getModel().getValue();
+            fontSize = value.floatValue();
+        }
+    
+    }
+
 
     protected abstract void setupSubtypes();
 
