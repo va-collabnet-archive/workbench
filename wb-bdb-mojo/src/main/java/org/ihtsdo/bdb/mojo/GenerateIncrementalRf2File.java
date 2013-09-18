@@ -176,6 +176,12 @@ public class GenerateIncrementalRf2File extends AbstractMojo {
      */
     private String countryCode;
     /**
+     * country code
+     *
+     * @parameter default-value="EN"
+     */
+    private String languageCode;
+    /**
      * Refsets to exclude
      *
      * @parameter
@@ -383,7 +389,7 @@ public class GenerateIncrementalRf2File extends AbstractMojo {
             for(UUID moduleId : moduleUuids){
                 Rf2Export exporter = new Rf2Export(output,
                     releaseType,
-                    LANG_CODE.EN,
+                    LANG_CODE.valueOf(languageCode),
                     COUNTRY_CODE.valueOf(countryCode),
                     namespace,
                     moduleId.toString(),

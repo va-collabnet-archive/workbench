@@ -294,36 +294,39 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                     + TimeHelper.getShortFileDateFormat().format(effectiveDate) + ".txt");
         } else {
             identifiersFile = new File(directory,
-                    "sct2_Identifier_UUID_" + releaseType.suffix + "_"
+                    "sct2_Identifier_UUID" + releaseType.suffix + "_"
                     + country.getFormatedCountryCode().toUpperCase() + namespace + "_"
                     + TimeHelper.getShortFileDateFormat().format(effectiveDate) + ".txt");
         }
         File associationFile = new File(directory,
-                "der2_cRefset_AssociationReference_UUID_" + releaseType.suffix + "-"
-                + LANG_CODE.EN.getFormatedLanguageCode().toUpperCase() + namespace + "_"
+                "der2_cRefset_AssociationReference_UUID" + releaseType.suffix + "_"
+                +  country.getFormatedCountryCode().toUpperCase() + namespace + "_"
                 + TimeHelper.getShortFileDateFormat().format(effectiveDate) + ".txt");
         File attributeValueFile = new File(directory,
-                "der2_cRefset_AttributeValue_UUID_" + releaseType.suffix + "-"
-                + LANG_CODE.EN.getFormatedLanguageCode().toUpperCase() + namespace + "_"
+                "der2_cRefset_AttributeValue_UUID" + releaseType.suffix + "_"
+                +  country.getFormatedCountryCode().toUpperCase() + namespace + "_"
                 + TimeHelper.getShortFileDateFormat().format(effectiveDate) + ".txt");
         File langRefsetsFile = new File(directory,
-                "der2_cRefset_Language_UUID_" + releaseType.suffix + "-"
-                + LANG_CODE.EN.getFormatedLanguageCode().toUpperCase() + namespace + "_"
+                "der2_cRefset_Language_UUID" + releaseType.suffix + "-"
+                + LANG_CODE.EN.getFormatedLanguageCode() + "_" 
+                + country.getFormatedCountryCode().toUpperCase() 
+                + namespace + "_"
                 + TimeHelper.getShortFileDateFormat().format(effectiveDate) + ".txt");
         File otherLangRefsetsFile = new File(directory,
-                "der2_cRefset_Language_UUID_" + releaseType.suffix + "-"
-                + country.getFormatedCountryCode().toUpperCase() + namespace + "_"
+                "der2_cRefset_Language_UUID" + releaseType.suffix + "-"
+                + language.getFormatedLanguageNoDialectCode() + "_" 
+                + country.getFormatedCountryCode().toUpperCase() 
                 + TimeHelper.getShortFileDateFormat().format(effectiveDate) + ".txt");
         File modDependFile = new File(directory,
-                "der2_ssRefset_ModuleDependency_UUID_" + releaseType.suffix + "_"
+                "der2_ssRefset_ModuleDependency_UUID" + releaseType.suffix + "_"
                 + country.getFormatedCountryCode().toUpperCase() + namespace + "_"
                 + TimeHelper.getShortFileDateFormat().format(effectiveDate) + ".txt");
         File descTypeFile = new File(directory,
-                "der2_ciRefset_DescriptionType_UUID_" + releaseType.suffix + "_"
+                "der2_ciRefset_DescriptionType_UUID" + releaseType.suffix + "_"
                 + country.getFormatedCountryCode().toUpperCase() + namespace + "_"
                 + TimeHelper.getShortFileDateFormat().format(effectiveDate) + ".txt");
         File refsetDescFile = new File(directory,
-                "der2_cciRefset_RefsetDescriptor_UUID_" + releaseType.suffix + "_"
+                "der2_cciRefset_RefsetDescriptor_UUID" + releaseType.suffix + "_"
                 + country.getFormatedCountryCode().toUpperCase() + namespace + "_"
                 + TimeHelper.getShortFileDateFormat().format(effectiveDate) + ".txt");
 
@@ -628,7 +631,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                     refsetName = refsetName.concat("SimpleRefset");
                 }
                 File simpleRefsetFile = new File(directory,
-                        "der2_cRefset_" + refsetName + "_UUID_" + releaseType.suffix + "_"
+                        "der2_cRefset_" + refsetName + "_UUID" + releaseType.suffix + "_"
                         + country.getFormatedCountryCode().toUpperCase() + namespace + "_"
                         + TimeHelper.getShortFileDateFormat().format(effectiveDate) + ".txt");
                 FileOutputStream simpleRefsetOs = new FileOutputStream(simpleRefsetFile);
@@ -743,7 +746,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                     refsetName = refsetName.concat("ConceptNumberRefset");
                 }
                 File conNumRefsetFile = new File(directory,
-                        "der2_ciRefset_" + refsetName + "_UUID_" + releaseType.suffix + "_"
+                        "der2_ciRefset_" + refsetName + "_UUID" + releaseType.suffix + "_"
                         + country.getFormatedCountryCode().toUpperCase() + namespace + "_"
                         + TimeHelper.getShortFileDateFormat().format(effectiveDate) + ".txt");
                 FileOutputStream conNumRefsetOs = new FileOutputStream(conNumRefsetFile);
