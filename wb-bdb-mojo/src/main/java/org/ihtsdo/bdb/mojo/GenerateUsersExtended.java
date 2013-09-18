@@ -632,7 +632,6 @@ NEXT_WHILE:
                      getLog().warn("No relPermissionsFile: "
                                    + relPermissionsFile.getAbsolutePath());
                   }
-//               }
 
                Terms.get().commit();
                getLog().info("Starting close.");
@@ -670,7 +669,7 @@ NEXT_WHILE:
       if (!username.equals("username")) {
          UUID editParentPathUuid = null;
 
-         if (!projectDevelopmentParentPathUuid.equals("")) {
+         if (!projectDevelopmentParentPathUuid.trim().equals("")) {
             editParentPathUuid =
                UUID.fromString(projectDevelopmentParentPathUuid);
          } else {
@@ -1452,7 +1451,7 @@ NEXT_WHILE:
       addUserToAddressList(username);
 
       // Create new concept for user...
-      if ((userUuid == null) || userUuid.equals("")) {
+      if ((userUuid == null) || userUuid.trim().equals("")) {
          createUser();
       } else {
          setUserConcept(userUuid);
@@ -1662,7 +1661,7 @@ NEXT_WHILE:
          if (create) {
             createdUsers = true;
 
-            if (userConfigList.equals("")) {
+            if (userConfigList.trim().equals("")) {
                userConfigFile = new File(defaultUserConfig + File.separator
                                          + "userConfig.txt");
                readUserConfigFile();
@@ -2336,7 +2335,7 @@ NEXT_WHILE:
    }
 
    private ConceptSpec getConceptSpecFromPrefs(String configString) {
-      if ((configString != null) &&!configString.equals("")) {
+      if ((configString != null) &&!configString.trim().equals("")) {
          String prefTerm = configString.substring(configString.indexOf("(")
                               + 1, configString.indexOf(","));
          String uuidString = configString.substring(configString.indexOf(",")
@@ -2353,7 +2352,7 @@ NEXT_WHILE:
            String configString) {
       ArrayList<ConceptSpec> conceptSpecList = new ArrayList<ConceptSpec>();
 
-      if ((configString != null) &&!configString.equals("")) {
+      if ((configString != null) &&!configString.trim().equals("")) {
          String[] conceptSpecs = configString.split(";");
 
          if (conceptSpecs.length > 0) {
@@ -2370,7 +2369,7 @@ NEXT_WHILE:
            String configString) {
       ArrayList<String> stringList = new ArrayList<String>();
 
-      if ((configString != null) &&!configString.equals("")) {
+      if ((configString != null) &&!configString.trim().equals("")) {
          String[] strings = configString.split(";");
 
          if (strings.length > 0) {
