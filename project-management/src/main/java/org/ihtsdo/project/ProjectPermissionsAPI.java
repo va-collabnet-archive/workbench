@@ -321,6 +321,59 @@ public class ProjectPermissionsAPI {
         return permisionGranted;
     }
 
+
+    /**
+     * Check permission for project.
+     *
+     * @param user the user
+     * @param target the target
+     * @param permission the permission
+     * @return true, if successful
+     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws TerminologyException the terminology exception
+     */
+    public boolean getPermissionForUser(I_GetConceptData user, I_GetConceptData permission) throws IOException, TerminologyException {
+        boolean permisionGranted = false;
+        long latestVersion = Long.MIN_VALUE;
+
+        I_IntSet isaType = Terms.get().newIntSet();
+        isaType.add(ArchitectonicAuxiliary.Concept.IS_A_REL.localize().getNid());
+
+        I_IntSet allowedTypes = Terms.get().newIntSet();
+        allowedTypes.add(permission.getConceptNid());
+
+        for (I_GetConceptData parent : permission.getSourceRelTargets(
+                config.getAllowedStatus(),
+                isaType,
+                config.getViewPositionSetReadOnly(),
+                Precedence.TIME,
+                config.getConflictResolutionStrategy())) {
+            allowedTypes.add(parent.getConceptNid());
+        }
+
+        I_RelTuple lastestTuple = null;
+        List<? extends I_RelTuple> relationships = user.getSourceRelTuples(
+                config.getAllowedStatus(),
+                allowedTypes,
+                config.getViewPositionSetReadOnly(),
+                Precedence.TIME,
+                config.getConflictResolutionStrategy());
+        for (I_RelTuple rel : relationships) {
+            if (rel.getTime() > latestVersion) {
+                latestVersion = rel.getTime();
+                lastestTuple = rel;
+            }
+        }
+
+        if (lastestTuple != null) {
+            if (isActive(lastestTuple.getStatusNid())) {
+                permisionGranted = true;
+            }
+        }
+
+        return permisionGranted;
+    }
+
     /**
      * Gets the users for role.
      *
@@ -384,14 +437,22 @@ public class ProjectPermissionsAPI {
      * @throws IOException Signals that an I/O exception has occurred.
      * @throws TerminologyException the terminology exception
      */
-    public Set<I_GetConceptData> getRolesForUser(I_GetConceptData user, I_GetConceptData project) throws IOException, TerminologyException {
+    public Set<I_GetConceptData> getRolesForUser(I_GetConceptData user) throws IOException, TerminologyException {
 
         Set<I_GetConceptData> returnRoles = new HashSet<I_GetConceptData>();
         Set<I_GetConceptData> allRoles = new HashSet<I_GetConceptData>();
-        allRoles = getDescendants(allRoles, Terms.get().getConcept(ArchitectonicAuxiliary.Concept.USER_ROLE.getUids()));
+        // allRoles = getDescendants(allRoles, Terms.get().getConcept(ArchitectonicAuxiliary.Concept.USER_ROLE.getUids()));
+
+        if (Terms.get().hasId(UUID.fromString("824308c5-1bdb-5f32-9558-faa51f650118"))) {
+        	// VA
+        	allRoles = getDescendants(allRoles, Terms.get().getConcept(UUID.fromString("824308c5-1bdb-5f32-9558-faa51f650118")));
+        } else {
+        	// JIF
+        	allRoles = getDescendants(allRoles, Terms.get().getConcept(UUID.fromString("c0670d51-e25a-5384-9d6c-9737025642cd")));
+        }
 
         for (I_GetConceptData role : allRoles) {
-            if (checkPermissionForProject(user, project, role)) {
+            if (getPermissionForUser(user, role)) {
                 returnRoles.add(role);
             }
         }
@@ -408,17 +469,24 @@ public class ProjectPermissionsAPI {
      * @throws TerminologyException the terminology exception
      */
     public Map<I_GetConceptData, I_GetConceptData> getPermissionsForUser(I_GetConceptData user) throws IOException, TerminologyException {
+        I_TermFactory tf = Terms.get();
 
         Map<I_GetConceptData, I_GetConceptData> returnRoles = new HashMap<I_GetConceptData, I_GetConceptData>();
         Set<I_GetConceptData> allRoles = new HashSet<I_GetConceptData>();
-        allRoles = getDescendants(allRoles, Terms.get().getConcept(ArchitectonicAuxiliary.Concept.USER_ROLE.getUids()));
+//        allRoles = getDescendants(allRoles, Terms.get().getConcept(ArchitectonicAuxiliary.Concept.USER_ROLE.getUids()));
+       
+        if (tf.hasId(UUID.fromString("824308c5-1bdb-5f32-9558-faa51f650118"))) {
+        	// VA
+        	allRoles = getDescendants(allRoles, tf.getConcept(UUID.fromString("824308c5-1bdb-5f32-9558-faa51f650118")));
+        } else {
+        	// JIF
+        	allRoles = getDescendants(allRoles, tf.getConcept(UUID.fromString("c0670d51-e25a-5384-9d6c-9737025642cd")));
+        }
 
         Set<Integer> allRolesNid = new HashSet<Integer>();
         for (I_GetConceptData loopRole : allRoles) {
             allRolesNid.add(loopRole.getNid());
         }
-
-        I_TermFactory tf = Terms.get();
 
         I_IntSet isaType = tf.newIntSet();
         isaType.add(ArchitectonicAuxiliary.Concept.IS_A_REL.localize().getNid());
@@ -439,6 +507,51 @@ public class ProjectPermissionsAPI {
         return returnRoles;
     }
 
+
+    public Map<I_GetConceptData, Set<I_GetConceptData>> getMultiplePermissionsForUser(I_GetConceptData user) throws IOException, TerminologyException {
+        I_TermFactory tf = Terms.get();
+
+        Map<I_GetConceptData, Set<I_GetConceptData>> returnRoles = new HashMap<I_GetConceptData, Set<I_GetConceptData>>();
+        Set<I_GetConceptData> allRoles = new HashSet<I_GetConceptData>();
+//        allRoles = getDescendants(allRoles, Terms.get().getConcept(ArchitectonicAuxiliary.Concept.USER_ROLE.getUids()));
+       
+        if (tf.hasId(UUID.fromString("824308c5-1bdb-5f32-9558-faa51f650118"))) {
+        	// VA
+        	allRoles = getDescendants(allRoles, tf.getConcept(UUID.fromString("824308c5-1bdb-5f32-9558-faa51f650118")));
+        } else {
+        	// JIF
+        	allRoles = getDescendants(allRoles, tf.getConcept(UUID.fromString("c0670d51-e25a-5384-9d6c-9737025642cd")));
+        }
+
+        Set<Integer> allRolesNid = new HashSet<Integer>();
+        for (I_GetConceptData loopRole : allRoles) {
+            allRolesNid.add(loopRole.getNid());
+        }
+
+        I_IntSet isaType = tf.newIntSet();
+        isaType.add(ArchitectonicAuxiliary.Concept.IS_A_REL.localize().getNid());
+
+
+        List<? extends I_RelTuple> relationships = user.getSourceRelTuples(
+                config.getAllowedStatus(),
+                null, config.getViewPositionSetReadOnly(),
+                Precedence.TIME, config.getConflictResolutionStrategy());
+        for (I_RelTuple rel : relationships) {
+            if (allRolesNid.contains(rel.getTypeNid())) {
+                I_GetConceptData role = tf.getConcept(rel.getTypeNid());
+                I_GetConceptData hierarchy = tf.getConcept(rel.getC2Id());
+                
+                if (!returnRoles.containsKey(role)) {
+                	returnRoles.put(role,  new HashSet<I_GetConceptData>());
+                }
+                
+                returnRoles.get(role).add(hierarchy);
+            }
+        }
+
+        return returnRoles;
+    }
+    
     /**
      * Calculates a set of valid users - a user is valid is they are a child of
      * the User concept in the top hierarchy, and have a description of type

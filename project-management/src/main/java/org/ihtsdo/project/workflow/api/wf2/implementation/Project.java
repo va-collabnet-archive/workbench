@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import org.dwfa.ace.api.I_GetConceptData;
@@ -67,12 +68,14 @@ public class Project implements ProjectBI {
 		WfComponentProvider prov = new WfComponentProvider();
 		List<WfPermissionBI> permissions = new ArrayList<WfPermissionBI>();
 		ProjectPermissionsAPI permApi = new ProjectPermissionsAPI(Terms.get().getActiveAceFrameConfig());
-		Map<I_GetConceptData, I_GetConceptData> permMap = permApi.getPermissionsForUser(Terms.get().getConcept(user.getUuid()));
+		Map<I_GetConceptData, Set<I_GetConceptData>> permMap = permApi.getMultiplePermissionsForUser(Terms.get().getConcept(user.getUuid()));
 
 		for (I_GetConceptData roleConcept : permMap.keySet()) {
-			WfPermissionImpl loopPerm = new WfPermissionImpl(user, prov.roleConceptToWfRole(roleConcept), 
-					permMap.get(roleConcept).getPrimUuid(), project.getUids().iterator().next());
-			permissions.add(loopPerm);
+			for (I_GetConceptData roleOnCon : permMap.get(roleConcept)) {
+				WfPermissionImpl loopPerm = new WfPermissionImpl(user, prov.roleConceptToWfRole(roleConcept), 
+						roleOnCon.getPrimUuid(), project.getUids().iterator().next());
+				permissions.add(loopPerm);
+			}
 		}
 
 		return permissions;
@@ -85,12 +88,14 @@ public class Project implements ProjectBI {
 		ProjectPermissionsAPI permApi = new ProjectPermissionsAPI(Terms.get().getActiveAceFrameConfig());
 
 		for (WfUser user : prov.getUsers()) {
-			Map<I_GetConceptData, I_GetConceptData> permMap = permApi.getPermissionsForUser(Terms.get().getConcept(user.getUuid()));
+			Map<I_GetConceptData, Set<I_GetConceptData>> permMap = permApi.getMultiplePermissionsForUser(Terms.get().getConcept(user.getUuid()));
 			for (I_GetConceptData roleConcept : permMap.keySet()) {
-				WfPermissionBI loopPerm = new WfPermissionImpl(user, 
-						prov.roleConceptToWfRole(roleConcept), 
-						permMap.get(roleConcept).getPrimUuid(), project.getUids().iterator().next());
-				permissions.add(loopPerm);
+				for (I_GetConceptData roleOnCon : permMap.get(roleConcept)) {
+					WfPermissionBI loopPerm = new WfPermissionImpl(user, 
+							prov.roleConceptToWfRole(roleConcept), 
+							roleOnCon.getPrimUuid(), project.getUids().iterator().next());
+					permissions.add(loopPerm);
+				}
 			}
 		}
 

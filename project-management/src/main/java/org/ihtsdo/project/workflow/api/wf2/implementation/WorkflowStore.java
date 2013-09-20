@@ -45,11 +45,14 @@ import org.ihtsdo.project.filter.WfProjectFilter;
 import org.ihtsdo.project.filter.WfWorklistFilter;
 import org.ihtsdo.project.model.I_TerminologyProject;
 import org.ihtsdo.project.model.WorkList;
+import org.ihtsdo.project.model.WorkListMember;
 import org.ihtsdo.project.workflow.api.WfComponentProvider;
 import org.ihtsdo.project.workflow.api.WorkflowDefinitionManager;
 import org.ihtsdo.project.workflow.api.WorkflowInterpreter;
 import org.ihtsdo.project.workflow.model.WfAction;
 import org.ihtsdo.project.workflow.model.WfInstance;
+import org.ihtsdo.project.workflow.model.WfMembership;
+import org.ihtsdo.project.workflow.model.WfRole;
 import org.ihtsdo.project.workflow.model.WfUser;
 import org.ihtsdo.project.workflow.model.WorkflowDefinition;
 import org.ihtsdo.tk.Ts;
@@ -506,14 +509,18 @@ public class WorkflowStore implements WorkflowStoreBI {
 	public Collection<WfActivityBI> getActivities(WfProcessInstanceBI instance, WfUserBI user) throws Exception {
 
 		List<WfActivityBI> activities = new ArrayList<WfActivityBI>();
-
+		
+		if (!((WorkList) instance.getWorkList()).getUsers().contains(user)) {
+			return activities;
+		}
+		
 		WorkflowDefinition oldStyleDefinition = ((WfProcessDefinition) instance.getProcessDefinition()).getDefinition();
 		WorkflowInterpreter interpreter = WorkflowInterpreter.createWorkflowInterpreter(oldStyleDefinition);
 
-		List<WfAction> possibleActions = interpreter.getPossibleActions((WfInstance) instance, (WfUser) user);
+		List<WfAction> possibleActions = interpreter.getPossibleActionsInWorklist((WfInstance) instance, (WfUser) user);
 		List<WfAction> autoActions = interpreter.getAutomaticActions((WfInstance) instance, (WfUser) user);
-
-		for (WfAction loopAction : possibleActions) {
+		
+ 		for (WfAction loopAction : possibleActions) {
 			WfActivity loopActivity = new WfActivity(loopAction);
 			loopActivity.setAutomatic(false);
 			activities.add(loopActivity);
@@ -524,6 +531,7 @@ public class WorkflowStore implements WorkflowStoreBI {
 			loopActivity.setAutomatic(true);
 			activities.add(loopActivity);
 		}
+		
 
 		return activities;
 	}
@@ -566,7 +574,11 @@ public class WorkflowStore implements WorkflowStoreBI {
 		NidList changedNids = ReportingHelper.getChangedConceptNids(startTime, endTime);
 		System.out.println("Changed Nids: " + changedNids.size());
 		Iterator<Integer> nidsIterator = changedNids.iterator();
-		ConceptChronicleBI rootConcept = Ts.get().getConcept(UUID.fromString("ee9ac5d2-a07c-3981-a57a-f7f26baf38d8"));
+//		ConceptChronicleBI rootConcept = Ts.get().getConcept(UUID.fromString("ee9ac5d2-a07c-3981-a57a-f7f26baf38d8"));
+		Set<ConceptChronicleBI> nonRootConcepts = new HashSet<ConceptChronicleBI>();
+		nonRootConcepts.add(Ts.get().getConcept(UUID.fromString("1c698388-c309-3dfa-96f0-86248753fac5")));
+		nonRootConcepts.add(Ts.get().getConcept(UUID.fromString("f4d2fabc-7e96-3b3a-a348-ae867ba74029")));
+
 		int total = changedNids.size();
 		int count = 0;
 		while (nidsIterator.hasNext()) {
@@ -574,8 +586,16 @@ public class WorkflowStore implements WorkflowStoreBI {
 			I_RepresentIdSet nidsToEvaluate = new IdentifierSet();
 			Integer loopNid = nidsIterator.next();
 			ConceptChronicleBI loopConcept = Ts.get().getConcept(loopNid);
-			boolean isKindOfSnomed = Ts.get().isKindOf(loopConcept.getConceptNid(), rootConcept.getConceptNid(), config.getViewCoordinate());
-			if (isKindOfSnomed) {
+//			boolean isKindOfSnomed = Ts.get().isKindOf(loopConcept.getConceptNid(), rootConcept.getConceptNid(), config.getViewCoordinate());
+			
+			boolean nonRootConceptModification = false;
+			for (ConceptChronicleBI nonRoot : nonRootConcepts) {
+				if (Ts.get().isKindOf(loopConcept.getConceptNid(), nonRoot.getConceptNid(), config.getViewCoordinate())) {
+					nonRootConceptModification = true;
+				}
+			}
+
+			if (nonRootConceptModification) {
 				System.out.print("Sending: " + loopNid);
 				System.out.println(" - Concept: " + loopConcept.toString());
 				nidsToEvaluate.setMember(loopNid);

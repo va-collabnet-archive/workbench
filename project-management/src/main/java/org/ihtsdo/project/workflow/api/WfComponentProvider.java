@@ -43,6 +43,7 @@ import org.ihtsdo.project.model.WorkList;
 import org.ihtsdo.project.model.WorkSet;
 import org.ihtsdo.project.workflow.model.TestXstream;
 import org.ihtsdo.project.workflow.model.WfInstance;
+import org.ihtsdo.project.workflow.model.WfMembership;
 import org.ihtsdo.project.workflow.model.WfPermission;
 import org.ihtsdo.project.workflow.model.WfRole;
 import org.ihtsdo.project.workflow.model.WfState;
@@ -287,14 +288,64 @@ public class WfComponentProvider {
 		try {
 			config = Terms.get().getActiveAceFrameConfig();
 			ProjectPermissionsAPI permissionsApi = new ProjectPermissionsAPI(config);
-			Map<I_GetConceptData, I_GetConceptData> permissions = permissionsApi.getPermissionsForUser(Terms.get().getConcept(user.getId()));
+			Map<I_GetConceptData, Set<I_GetConceptData>> permissions = permissionsApi.getMultiplePermissionsForUser(Terms.get().getConcept(user.getId()));
+			
 			for (I_GetConceptData loopRole : permissions.keySet()) {
-				I_GetConceptData loopHierarchy = permissions.get(loopRole);
-				WfPermission loopPerm = new WfPermission();
-				loopPerm.setId(UUID.randomUUID());
-				loopPerm.setRole(roleConceptToWfRole(Terms.get().getConcept(loopRole.getPrimUuid())));
-				loopPerm.setHiearchyId(loopHierarchy.getPrimUuid());
-				wfPermissions.add(loopPerm);
+				for (I_GetConceptData loopHierarchy : permissions.get(loopRole)) {
+					WfPermission loopPerm = new WfPermission();
+					loopPerm.setId(UUID.randomUUID());
+					loopPerm.setRole(roleConceptToWfRole(Terms.get().getConcept(loopRole.getPrimUuid())));
+					loopPerm.setHiearchyId(loopHierarchy.getPrimUuid());
+					wfPermissions.add(loopPerm);
+				}
+			}
+		} catch (TerminologyException e) {
+			AceLog.getAppLog().alertAndLogException(e);
+		} catch (IOException e) {
+			AceLog.getAppLog().alertAndLogException(e);
+		}
+		return wfPermissions;
+	}
+
+	/**
+	 * Gets the permissions for user.
+	 * 
+	 * @param user
+	 *            the user
+	 * @return the permissions for user
+	 */
+	public List<WfPermission> getPermissionsForUserInWorklist(WfUser user, WfInstance instance) {
+		List<WfPermission> wfPermissions = new ArrayList<WfPermission>();
+		I_ConfigAceFrame config;
+		try {
+			config = Terms.get().getActiveAceFrameConfig();
+			ProjectPermissionsAPI permissionsApi = new ProjectPermissionsAPI(config);
+			Map<I_GetConceptData, Set<I_GetConceptData>> allPermissions = permissionsApi.getMultiplePermissionsForUser(Terms.get().getConcept(user.getId()));
+			Map<I_GetConceptData, Set<I_GetConceptData>> worklistPermissions = new HashMap<I_GetConceptData, Set<I_GetConceptData>>();
+			
+			List<WfMembership> userRoles = ((WorkList) instance.getWorkList()).getWorkflowUserRoles();
+			List<WfRole> currentUserRoles = new ArrayList<WfRole>();
+			
+			for (WfMembership membership : userRoles) {
+				if (membership.getUser().equals(user)) {
+					currentUserRoles.add(membership.getRole());
+				}
+			}
+
+			for (I_GetConceptData role : allPermissions.keySet()) {
+				if (currentUserRoles.contains(roleConceptToWfRole(role))) {
+					worklistPermissions.put(role, allPermissions.get(role));
+				}
+			}
+			
+			for (I_GetConceptData loopRole : worklistPermissions.keySet()) {
+				for (I_GetConceptData loopHierarchy : worklistPermissions.get(loopRole)) {
+					WfPermission loopPerm = new WfPermission();
+					loopPerm.setId(UUID.randomUUID());
+					loopPerm.setRole(roleConceptToWfRole(Terms.get().getConcept(loopRole.getPrimUuid())));
+					loopPerm.setHiearchyId(loopHierarchy.getPrimUuid());
+					wfPermissions.add(loopPerm);
+				}
 			}
 		} catch (TerminologyException e) {
 			AceLog.getAppLog().alertAndLogException(e);
@@ -317,15 +368,16 @@ public class WfComponentProvider {
 			config = Terms.get().getActiveAceFrameConfig();
 			ProjectPermissionsAPI permissionsApi = new ProjectPermissionsAPI(config);
 			for (WfUser loopUser : getUsers()) {
-				Map<I_GetConceptData, I_GetConceptData> permissions = permissionsApi.getPermissionsForUser(Terms.get().getConcept(loopUser.getId()));
+				Map<I_GetConceptData, Set<I_GetConceptData>> permissions = permissionsApi.getMultiplePermissionsForUser(Terms.get().getConcept(loopUser.getId()));
 
 				for (I_GetConceptData loopRole : permissions.keySet()) {
-					I_GetConceptData loopHierarchy = permissions.get(loopRole);
-					WfPermission loopPerm = new WfPermission();
-					loopPerm.setId(UUID.randomUUID());
-					loopPerm.setRole(roleConceptToWfRole(Terms.get().getConcept(loopRole.getPrimUuid())));
-					loopPerm.setHiearchyId(loopHierarchy.getPrimUuid());
-					wfPermissions.add(loopPerm);
+					for (I_GetConceptData loopHierarchy : permissions.get(loopRole)) {
+						WfPermission loopPerm = new WfPermission();
+						loopPerm.setId(UUID.randomUUID());
+						loopPerm.setRole(roleConceptToWfRole(Terms.get().getConcept(loopRole.getPrimUuid())));
+						loopPerm.setHiearchyId(loopHierarchy.getPrimUuid());
+						wfPermissions.add(loopPerm);
+					}
 				}
 			}
 		} catch (TerminologyException e) {

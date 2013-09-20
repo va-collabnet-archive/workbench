@@ -185,44 +185,43 @@ public class DataGridCollectorFromList extends JPanel implements I_fastWizard {
 
 		try {
 			ProjectPermissionsAPI ppa = new ProjectPermissionsAPI(Terms.get().getActiveAceFrameConfig());
-			I_GetConceptData projectRoot = Terms.get().getConcept(SNOMED.Concept.ROOT.getUids());
 			WfComponentProvider wfcp = new WfComponentProvider();
 			List<Object[]> rows = new ArrayList<Object[]>();
 			List<Object[]> active = new ArrayList<Object[]>();
 
 			for (WfUser obj : users) {
-				Set<I_GetConceptData> userRoles = ppa.getRolesForUser(Terms.get().getConcept(obj.getId()), projectRoot);
-				if (userRoles.size() == 0)
-					continue;
-				Object[] row = new Object[columnNames.length];
-				Object[] act = new Object[columnNames.length];
-				for (int i = 0; i < columnNames.length; i++) {
-					row[i] = false;
-					act[i] = false;
-				}
-				int counter = 0;
-				for (I_GetConceptData i_GetConceptData : userRoles) {
-					WfRole userRole = wfcp.roleConceptToWfRole(i_GetConceptData);
-					int index = -1;
-					for (int i = 0; i < roles.size(); i++) {
-						if (roles.get(i).getId().equals(userRole.getId())) {
-							index = i;
-							break;
+				Set<I_GetConceptData> userRoles = ppa.getRolesForUser(Terms.get().getConcept(obj.getId())); // All Roles for all users
+					if (userRoles.size() == 0)
+						continue;
+					Object[] row = new Object[columnNames.length];
+					Object[] act = new Object[columnNames.length];
+					for (int i = 0; i < columnNames.length; i++) {
+						row[i] = false;
+						act[i] = false;
+					}
+					int counter = 0;
+					for (I_GetConceptData i_GetConceptData : userRoles) {
+						WfRole userRole = wfcp.roleConceptToWfRole(i_GetConceptData);
+						int index = -1;
+						for (int i = 0; i < roles.size(); i++) {
+							if (roles.get(i).getId().equals(userRole.getId())) {
+								index = i;
+								break;
+							}
+						}
+						if (index != -1) {
+							counter++;
+							act[index * 2 + 1] = true;
+							act[index * 2 + 2] = true;
 						}
 					}
-					if (index != -1) {
-						counter++;
-						act[index * 2 + 1] = true;
-						act[index * 2 + 2] = true;
-					}
+					if (counter == 0)
+						continue;
+					row[0] = obj;
+					rows.add(row);
+					active.add(act);
 				}
-				if (counter == 0)
-					continue;
-				row[0] = obj;
-				rows.add(row);
-				active.add(act);
-			}
-
+			
 			data = new Object[active.size()][];
 			for (int i = 0; i < data.length; i++) {
 				data[i] = (Object[]) active.get(i);
