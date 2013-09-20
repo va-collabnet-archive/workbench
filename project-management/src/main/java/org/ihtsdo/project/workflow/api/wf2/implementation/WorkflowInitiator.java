@@ -3,28 +3,25 @@ package org.ihtsdo.project.workflow.api.wf2.implementation;
 import java.beans.PropertyChangeEvent;
 import java.io.IOException;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CancellationException;
-
-import javax.swing.SwingUtilities;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_RepresentIdSet;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
-import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.ihtsdo.project.TerminologyProjectDAO;
 import org.ihtsdo.project.model.I_TerminologyProject;
 import org.ihtsdo.project.model.WorkList;
 import org.ihtsdo.project.workflow.model.WfState;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.NidBitSetItrBI;
-import org.ihtsdo.tk.api.NidSet;
 import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
 import org.ihtsdo.tk.api.changeset.ChangeSetGenerationThreadingPolicy;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
@@ -35,9 +32,10 @@ import org.ihtsdo.tk.workflow.api.WorkflowStoreBI;
 public class WorkflowInitiator implements WorkflowInitiatiorBI {
 
 	public static Map<Integer, LruCache> alreadySeen;
-	private static ConceptChronicleBI rootConcept;
+//	private static ConceptChronicleBI rootConcept;
 	private static WorkflowStoreBI wfStore;
 	private PropertyChangeEvent myEvt;
+	private static Set<ConceptChronicleBI> nonRootConcepts = new HashSet<ConceptChronicleBI>();
 
 
 	public WorkflowInitiator() {
@@ -104,11 +102,23 @@ public class WorkflowInitiator implements WorkflowInitiatiorBI {
 		try {
 			config = Terms.get().getActiveAceFrameConfig();
 
-			if (rootConcept == null) {
-				rootConcept = Ts.get().getConcept(UUID.fromString("ee9ac5d2-a07c-3981-a57a-f7f26baf38d8"));
+//			if (rootConcept == null) {
+//				rootConcept = Ts.get().getConcept(UUID.fromString("ee9ac5d2-a07c-3981-a57a-f7f26baf38d8"));
+//			}
+			
+			if (nonRootConcepts.isEmpty()) {
+				nonRootConcepts.add(Ts.get().getConcept(UUID.fromString("1c698388-c309-3dfa-96f0-86248753fac5")));
+				nonRootConcepts.add(Ts.get().getConcept(UUID.fromString("f4d2fabc-7e96-3b3a-a348-ae867ba74029")));
 			}
 
-			if (Ts.get().isKindOf(concept.getConceptNid(), rootConcept.getConceptNid(), config.getViewCoordinate())) {
+			boolean nonRootConceptModification = false;
+			for (ConceptChronicleBI nonRoot : nonRootConcepts) {
+				if (Ts.get().isKindOf(concept.getConceptNid(), nonRoot.getConceptNid(), config.getViewCoordinate())) {
+					nonRootConceptModification = true;
+				}
+			}
+
+			if (!nonRootConceptModification) {
 
 				I_GetConceptData worklistConcept = config.getDefaultWorkflowForChangedConcept();
 				I_GetConceptData projectConcept = config.getDefaultProjectForChangedConcept();
