@@ -164,6 +164,45 @@ public class WorkflowInterpreter {
 	 *            the user
 	 * @return the possible actions
 	 */
+	public List<WfAction> getPossibleActionsInWorklist(WfInstance instance, WfUser user) {
+		List<WfAction> possibleActions = new ArrayList<WfAction>();
+		WfComponentProvider cp = new WfComponentProvider();
+
+		// KnowledgeRuntimeLoggerFactory.newConsoleLogger(ksession);
+
+		actions = new ArrayList<String>();
+		ksession.setGlobal("actions", actions);
+		autoActions = new ArrayList<String>();
+		ksession.setGlobal("autoActions", autoActions);
+		prepActions = new ArrayList<String>();
+		ksession.setGlobal("prepActions", prepActions);
+		ksession.setGlobal("kindOfComputer", new SimpleKindOfComputer());
+
+		ArrayList<Object> facts = new ArrayList<Object>();
+		facts.add(instance);
+		facts.add(user);
+		facts.addAll(cp.getPermissionsForUserInWorklist(user, instance));
+		ksession.execute(facts);
+
+		for (String returnedActionName : actions) {
+			for (String loopActionName : wfDefinition.getActions().keySet()) {
+				if (loopActionName.equals(returnedActionName)) {
+					possibleActions.add(wfDefinition.getActions().get(loopActionName));
+				}
+			}
+		}
+
+		return possibleActions;
+	}
+	/**
+	 * Gets the possible actions.
+	 * 
+	 * @param instance
+	 *            the instance
+	 * @param user
+	 *            the user
+	 * @return the possible actions
+	 */
 	public List<WfAction> getPossibleActions(WfInstance instance, WfUser user) {
 		List<WfAction> possibleActions = new ArrayList<WfAction>();
 		WfComponentProvider cp = new WfComponentProvider();
@@ -212,7 +251,7 @@ public class WorkflowInterpreter {
 		ArrayList<Object> facts = new ArrayList<Object>();
 		facts.add(instance);
 		facts.add(user);
-		facts.addAll(cp.getPermissionsForUser(user));
+		facts.addAll(cp.getPermissionsForUserInWorklist(user, instance));
 		ksession.execute(facts);
 
 		for (String returnedActionName : autoActions) {
