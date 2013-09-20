@@ -36,6 +36,7 @@ import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.NoMappingException;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.types.IntList;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 
 public class RefsetDefaults implements I_RefsetDefaults, Serializable {
 
@@ -98,8 +99,10 @@ public class RefsetDefaults implements I_RefsetDefaults, Serializable {
         defaultRefset = Terms.get().getConcept(RefsetAuxiliary.Concept.REFSET_AUXILIARY.getUids());
         refsetPopupIds.add(defaultRefset.getConceptNid());
 
-        defaultStatusForRefset = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
+//        defaultStatusForRefset = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
+        defaultStatusForRefset = Terms.get().getConcept(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getPrimUuid());
         statusPopupIds.add(defaultStatusForRefset.getConceptNid());
+        statusPopupIds.add(SnomedMetadataRf2.INACTIVE_VALUE_RF2.getLenient().getConceptNid());
     }
 
     public I_GetConceptData getDefaultRefset() {

@@ -28,8 +28,6 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 
 public class AddDescription extends AddComponent {
 	
-	private static I_GetConceptData synonymDescType;
-
     public AddDescription(I_ContainTermComponent termContainer, I_ConfigAceFrame config) {
         super(termContainer, config);
     }
@@ -42,14 +40,8 @@ public class AddDescription extends AddComponent {
             AceLog.getAppLog().alertAndLogException(
                 new Exception("Cannot add a description while the component viewer is empty..."));
         } else {
-            if (synonymDescType == null) {
-                int typeId = Terms.get().uuidToNative(
-                        ArchitectonicAuxiliary.Concept.SYNONYM_DESCRIPTION_TYPE.getUids());
-                synonymDescType = Terms.get().getConcept(typeId);
-            }
-            
             Terms.get().newDescription(UUID.randomUUID(), 
-            		cb, "en", "New Description", synonymDescType, config);
+            		cb, "en", "New Description", Terms.get().getActiveAceFrameConfig().getDefaultDescriptionType(), config);
             Terms.get().addUncommitted(cb);
             termContainer.setTermComponent(cb);
         }

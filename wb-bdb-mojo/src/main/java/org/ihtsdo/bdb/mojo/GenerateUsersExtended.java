@@ -983,7 +983,7 @@ NEXT_WHILE:
             conceptPopupIds.add(spec.getLenient().getConceptNid());
          }
       }
-
+/*
       I_IntList conceptStatusPopupIds = conceptPreferences.getStatusPopupIds();
 
       conceptStatusPopupIds.clear();
@@ -991,7 +991,7 @@ NEXT_WHILE:
       for (ConceptSpec spec : cConceptRefsetStatus) {
          conceptStatusPopupIds.add(spec.getLenient().getNid());
       }
-
+*/
       I_IntList conceptConceptPopupIds =
          conceptPreferences.getConceptPopupIds();
 
@@ -1107,14 +1107,16 @@ NEXT_WHILE:
          }
       }
 
+/*
       I_IntList descStatusPopupIds = conceptPreferencesDesc.getStatusPopupIds();
-
+ 
       descStatusPopupIds.clear();
 
       for (ConceptSpec spec : dConceptRefsetStatus) {
          descStatusPopupIds.add(spec.getLenient().getNid());
       }
 
+*/
       I_IntList descConceptPopupIds =
          conceptPreferencesDesc.getConceptPopupIds();
 
@@ -1886,11 +1888,13 @@ NEXT_WHILE:
          }
       }
 
-      I_IntList conceptStatusPopupIds = conceptPreferences.getStatusPopupIds();
-
+/*
+       I_IntList conceptStatusPopupIds = conceptPreferences.getStatusPopupIds();
+ 
       for (ConceptSpec spec : cConceptRefsetStatus) {
          conceptStatusPopupIds.add(spec.getLenient().getNid());
       }
+*/
 
       I_IntList conceptConceptPopupIds =
          conceptPreferences.getConceptPopupIds();
@@ -1992,13 +1996,14 @@ NEXT_WHILE:
             conceptPopupIdsDesc.add(spec.getLenient().getConceptNid());
          }
       }
-
+/*
       I_IntList descStatusPopupIds = conceptPreferencesDesc.getStatusPopupIds();
 
       for (ConceptSpec spec : dConceptRefsetStatus) {
          descStatusPopupIds.add(spec.getLenient().getNid());
       }
-
+*/
+      
       I_IntList descConceptPopupIds =
          conceptPreferencesDesc.getConceptPopupIds();
 
