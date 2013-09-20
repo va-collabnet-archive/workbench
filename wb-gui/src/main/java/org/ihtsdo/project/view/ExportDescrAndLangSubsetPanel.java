@@ -29,6 +29,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.HashSet;
+import java.util.UUID;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
@@ -107,7 +108,8 @@ public class ExportDescrAndLangSubsetPanel extends JPanel {
 			I_GetConceptData transStatusCpt = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.TRANSLATION_STATUS.getUids());
 
 			lModel.addElement(Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_DELIVERED_STATUS.getUids()));
-			lModel.addElement(Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_ASSIGNED_STATUS.getUids()));
+//			lModel.addElement(Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_ASSIGNED_STATUS.getUids()));
+			lModel.addElement(Terms.get().getConcept(UUID.fromString("ed055320-2c26-50f8-91fd-a8533f5db793")));
 
 			for (I_GetConceptData child : transStatusCpt.getDestRelOrigins(
 					config.getAllowedStatus(),

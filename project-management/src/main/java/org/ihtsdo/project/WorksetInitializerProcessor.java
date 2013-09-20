@@ -162,6 +162,7 @@ public class WorksetInitializerProcessor implements ProcessUnfetchedConceptDataB
             completedWorkflowNids.setMember(ArchitectonicAuxiliary.Concept.APPROVED_FOR_PUBLICATION_FAST_TRACK_STATUS.localize().getNid());
             completedWorkflowNids.setMember(ArchitectonicAuxiliary.Concept.APPROVED_FOR_PUBLICATION_STATUS.localize().getNid());
             completedWorkflowNids.setMember(ArchitectonicAuxiliary.Concept.APPROVED_FOR_PUBLICATION_TPO_REV_STATUS.localize().getNid());
+            completedWorkflowNids.setMember(ArchitectonicAuxiliary.Concept.APPROVED_FOR_PUBLICATION_TPO_REV_STATUS.localize().getNid());
 
             updater.setTaskMessage("Processing sourceMembers");
             ConceptChronicleBI sourceRefsetChronicle = (ConceptChronicleBI) sourceRefset;

@@ -33,6 +33,7 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
 import javax.swing.JButton;
@@ -784,8 +785,9 @@ public class WorklistMemberReAssignment extends JPanel {
 		@Override
 		protected String doInBackground() throws Exception {
 			statusCombo.addItem("Loading...");
-			Concept wias = ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_ASSIGNED_STATUS;
-			I_GetConceptData stateConcept = Terms.get().getConcept(wias.getUids());
+//			Concept wias = ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_ASSIGNED_STATUS;
+//			I_GetConceptData stateConcept = Terms.get().getConcept(wias.getUids());
+			I_GetConceptData stateConcept = Terms.get().getConcept(UUID.fromString("ed055320-2c26-50f8-91fd-a8533f5db793"));
 			statusCombo.addItem(new WfState(stateConcept.getInitialText(), stateConcept.getPrimUuid()));
 			if (workflowInterpreterInitWorker != null) {
 				while (!workflowInterpreterInitWorker.isDone()) {

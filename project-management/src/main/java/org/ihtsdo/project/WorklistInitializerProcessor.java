@@ -172,11 +172,15 @@ public class WorklistInitializerProcessor implements
 					.getPrimUuid();
 			inactiveUuid = SnomedMetadataRf1.RETIRED_INACTIVE_STATUS_RF1
 					.getLenient().getPrimUuid();
+//			assignedNid = Terms
+//					.get()
+//					.uuidToNative(
+//							ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_ASSIGNED_STATUS
+//									.getUids());
 			assignedNid = Terms
 					.get()
-					.uuidToNative(
-							ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_ASSIGNED_STATUS
-									.getUids());
+					.uuidToNative(UUID.fromString("ed055320-2c26-50f8-91fd-a8533f5db793"));
+			
 			if (updater != null) {
 				updater.setTaskMessage("Initializing WorkList");
 				updater.startCount(membersNidSet.cardinality());
@@ -184,12 +188,17 @@ public class WorklistInitializerProcessor implements
 			WfInstance instance = new WfInstance();
 			WfComponentProvider prov = new WfComponentProvider();
 			instance.setComponentId(SNOMED.Concept.ROOT.getPrimoridalUid());
+//			instance.setState(prov
+//					.statusConceptToWfState(Terms
+//							.get()
+//							.getConcept(
+//									ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_ASSIGNED_STATUS
+//											.getUids())));
 			instance.setState(prov
 					.statusConceptToWfState(Terms
 							.get()
-							.getConcept(
-									ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_ASSIGNED_STATUS
-											.getUids())));
+							.getConcept(UUID.fromString("ed055320-2c26-50f8-91fd-a8533f5db793"))));
+			
 			instance.setWfDefinition(workList.getWorkflowDefinition());
 			instance.setWorkList(workList);
 			instance.setLastChangeTime(System.currentTimeMillis());

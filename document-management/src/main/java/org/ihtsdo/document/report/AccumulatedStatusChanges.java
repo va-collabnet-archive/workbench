@@ -30,6 +30,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import java.util.logging.Level;
 
 import javax.swing.JFrame;
@@ -241,7 +242,8 @@ public class AccumulatedStatusChanges extends SwingWorker<File, String> implemen
 												}
 												I_GetConceptData wlMemeberActivityStatus = member.getActivityStatus();
 												boolean sameStatus = previousStatus.getConceptNid() == wlMemeberActivityStatus.getConceptNid();
-												if (!statusConcept.getUids().iterator().next().equals(ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_ASSIGNED_STATUS.getUids().iterator().next()) && (!sameDestinationAndAuthor || !sameStatus)) {
+												//if (!statusConcept.getUids().iterator().next().equals(ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_ASSIGNED_STATUS.getUids().iterator().next()) && (!sameDestinationAndAuthor || !sameStatus)) {
+												if (!statusConcept.getUids().iterator().next().equals(UUID.fromString("ed055320-2c26-50f8-91fd-a8533f5db793")) && (!sameDestinationAndAuthor || !sameStatus)) {
 													dataFound = true;
 													UserStatusCount current = new UserStatusCount();
 													current.setDate(formatter.format(new Date(version.getTime())));

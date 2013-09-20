@@ -3380,7 +3380,8 @@ public class TerminologyProjectDAO {
 			Partition partition = workList.getPartition();
 			addConceptAsPartitionMember(concept, partition, config);
 			Terms.get().addUncommittedNoChecks(partition.getConcept());
-			I_GetConceptData assingStatus = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_ASSIGNED_STATUS.getUids());
+			//I_GetConceptData assingStatus = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_ASSIGNED_STATUS.getUids());
+			I_GetConceptData assingStatus = Terms.get().getConcept(UUID.fromString("ed055320-2c26-50f8-91fd-a8533f5db793"));
 			WorkListMember workListMember = new WorkListMember(getConceptString(concept), concept.getConceptNid(), concept.getUids(), workList.getUids().iterator().next(), assingStatus, new java.util.Date().getTime());
 			WorkflowInterpreter interpreter = WorkflowInterpreter.createWorkflowInterpreter(workList.getWorkflowDefinition());
 			WfComponentProvider provider = new WfComponentProvider();
@@ -4767,7 +4768,9 @@ public class TerminologyProjectDAO {
 	 */
 	public static void retireWorkList(WorkList workList, I_ConfigAceFrame config) throws Exception {
 		for (WorkListMember member : workList.getWorkListMembers()) {
-			if (!ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_ASSIGNED_STATUS.getUids().contains(member.getActivityStatus()) && !ArchitectonicAuxiliary.Concept.RETIRED.getUids().contains(member.getActivityStatus())
+//			if (!ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_ASSIGNED_STATUS.getUids().contains(member.getActivityStatus()) && !ArchitectonicAuxiliary.Concept.RETIRED.getUids().contains(member.getActivityStatus())
+//					&& !SnomedMetadataRf2.INACTIVE_VALUE_RF2.getLenient().getUUIDs().contains(member.getActivityStatus())) {
+			if (!UUID.fromString("ed055320-2c26-50f8-91fd-a8533f5db793").equals(member.getActivityStatus()) && !ArchitectonicAuxiliary.Concept.RETIRED.getUids().contains(member.getActivityStatus())
 					&& !SnomedMetadataRf2.INACTIVE_VALUE_RF2.getLenient().getUUIDs().contains(member.getActivityStatus())) {
 				throw new Exception("WorkList cannot be retired, some members have been delivered and are still active.");
 			}
@@ -5714,7 +5717,8 @@ public class TerminologyProjectDAO {
 		WfInstance instance = new WfInstance();
 		WfComponentProvider prov = new WfComponentProvider();
 		instance.setComponentId(SNOMED.Concept.ROOT.getPrimoridalUid());
-		instance.setState(prov.statusConceptToWfState(Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_ASSIGNED_STATUS.getUids())));
+//		instance.setState(prov.statusConceptToWfState(Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_ASSIGNED_STATUS.getUids())));
+		instance.setState(prov.statusConceptToWfState(Terms.get().getConcept(UUID.fromString("ed055320-2c26-50f8-91fd-a8533f5db793"))));
 		instance.setWfDefinition(workList.getWorkflowDefinition());
 		instance.setWorkList(workList);
 		instance.setLastChangeTime(System.currentTimeMillis());
@@ -5738,8 +5742,8 @@ public class TerminologyProjectDAO {
 
 		RefexCAB newSpec = new RefexCAB(TK_REFEX_TYPE.CID, concept.getNid(), ts.getNidForUuids(workList.getUids()));
 		int activeNid = SnomedMetadataRf1.CURRENT_RF1.getLenient().getNid();
-		int assignedNid = Terms.get().uuidToNative(ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_ASSIGNED_STATUS.getUids());
-
+//		int assignedNid = Terms.get().uuidToNative(ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_ASSIGNED_STATUS.getUids());
+		int assignedNid = Terms.get().uuidToNative(UUID.fromString("ed055320-2c26-50f8-91fd-a8533f5db793"));
 		newSpec.put(RefexProperty.CNID1, activeNid);
 
 		TerminologyBuilderBI tc = Ts.get().getTerminologyBuilder(config.getEditCoordinate(), config.getViewCoordinate());

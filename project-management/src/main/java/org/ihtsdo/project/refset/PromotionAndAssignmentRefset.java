@@ -18,6 +18,7 @@ package org.ihtsdo.project.refset;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.UUID;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
@@ -65,7 +66,8 @@ public class PromotionAndAssignmentRefset extends PromotionRefset {
         this.refsetId = refsetConcept.getConceptNid();
         this.termFactory = Terms.get();
         this.activeValueNid = SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid();
-        this.defaultStatusNid = Terms.get().uuidToNative(ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_ASSIGNED_STATUS.getPrimoridalUid());
+        // this.defaultStatusNid = Terms.get().uuidToNative(ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_ASSIGNED_STATUS.getPrimoridalUid());
+        this.defaultStatusNid = Terms.get().uuidToNative(UUID.fromString("ed055320-2c26-50f8-91fd-a8533f5db793"));
         this.defaultUserNid = Terms.get().uuidToNative(ArchitectonicAuxiliary.Concept.USER.getPrimoridalUid());
 
     }
