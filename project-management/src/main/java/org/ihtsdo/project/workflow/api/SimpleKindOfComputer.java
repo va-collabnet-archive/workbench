@@ -50,6 +50,9 @@ public class SimpleKindOfComputer {
 				subtypeConcept = Ts.get().getConceptVersion(Terms.get().getActiveAceFrameConfig().getViewCoordinate(), descendant);
 				if (parentConcept == null || subtypeConcept == null) {
 					result = false;
+				}
+				if (Terms.get().hasPath(parentConcept.getConceptNid())) {
+					result = isConceptOriginInPath(parentConcept, subtypeConcept);
 				} else {
 					result = subtypeConcept.isKindOf(parentConcept);
 				}
@@ -65,6 +68,16 @@ public class SimpleKindOfComputer {
 			AceLog.getAppLog().alertAndLogException(e);
 		}
 		return result;
+	}
+
+	private boolean isConceptOriginInPath(ConceptVersionBI path, ConceptVersionBI concept) {
+		try {
+			return concept.getConceptAttributes().getPrimordialVersion().getPathNid() == path.getConceptNid();
+		} catch (IOException e) {
+			AceLog.getAppLog().alertAndLogException(e);
+		}
+		
+		return false;
 	}
 
 }
