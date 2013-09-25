@@ -1274,4 +1274,13 @@ public class ContradictionConfig implements I_ConfigAceFrame {
 		return config.getDefaultWorkflowForChangedConcept();
 	}
 
+	@Override
+	public void setVaProject(boolean isVaProject) {
+		config.setVaProject(isVaProject);;
+	}
+
+	@Override
+	public boolean isVaProject() {
+		return config.isVaProject();
+	}
 }

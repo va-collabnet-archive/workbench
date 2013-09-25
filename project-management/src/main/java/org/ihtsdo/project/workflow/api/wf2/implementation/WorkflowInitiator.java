@@ -165,7 +165,7 @@ public class WorkflowInitiator implements WorkflowInitiatiorBI {
 						(System.currentTimeMillis() - completeInstanceInSameWorklist.getLastChangeTime()) > 3000 ) {
 					//I_GetConceptData assingStatus = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_ASSIGNED_STATUS.getUids());
 					I_GetConceptData assingStatus;
-			        if (Terms.get().hasId(UUID.fromString("904447b8-d079-5167-8bf0-928bbdcb9e5b"))) {
+			        if (Terms.get().getActiveAceFrameConfig().isVaProject()) {
 			        	assingStatus = Terms.get().getConcept(UUID.fromString("904447b8-d079-5167-8bf0-928bbdcb9e5b"));
 			        } else {
 			        	assingStatus = Terms.get().getConcept(UUID.fromString("2cd075aa-fa92-5aa5-9f3d-d68c1c241d42"));

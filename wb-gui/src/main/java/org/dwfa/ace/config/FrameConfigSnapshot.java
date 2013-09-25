@@ -1441,4 +1441,13 @@ public class FrameConfigSnapshot implements I_ConfigAceFrame {
 		return baseFrame.getDefaultWorkflowForChangedConcept();
 	}
 
+	@Override
+	public void setVaProject(boolean isVaProject) {
+		baseFrame.setVaProject(isVaProject);;
+	}
+
+	@Override
+	public boolean isVaProject() {
+		return baseFrame.isVaProject();
+	}
 }

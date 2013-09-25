@@ -3382,7 +3382,7 @@ public class TerminologyProjectDAO {
 			Terms.get().addUncommittedNoChecks(partition.getConcept());
 			//I_GetConceptData assingStatus = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_ASSIGNED_STATUS.getUids());
 			I_GetConceptData assingStatus;
-	        if (Terms.get().hasId(UUID.fromString("904447b8-d079-5167-8bf0-928bbdcb9e5b"))) {
+	        if (Terms.get().getActiveAceFrameConfig().isVaProject()) {
 	        	assingStatus = Terms.get().getConcept(UUID.fromString("904447b8-d079-5167-8bf0-928bbdcb9e5b"));
 	        } else {
 	        	assingStatus = Terms.get().getConcept(UUID.fromString("2cd075aa-fa92-5aa5-9f3d-d68c1c241d42"));
@@ -5724,7 +5724,7 @@ public class TerminologyProjectDAO {
 		WfComponentProvider prov = new WfComponentProvider();
 		instance.setComponentId(SNOMED.Concept.ROOT.getPrimoridalUid());
 //		instance.setState(prov.statusConceptToWfState(Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_ASSIGNED_STATUS.getUids())));
-		if (Terms.get().hasId(UUID.fromString("904447b8-d079-5167-8bf0-928bbdcb9e5b"))) {
+        if (Terms.get().getActiveAceFrameConfig().isVaProject()) {
 			instance.setState(prov.statusConceptToWfState(Terms.get().getConcept(UUID.fromString("904447b8-d079-5167-8bf0-928bbdcb9e5b"))));
 		} else {
 			instance.setState(prov.statusConceptToWfState(Terms.get().getConcept(UUID.fromString("2cd075aa-fa92-5aa5-9f3d-d68c1c241d42"))));
@@ -5754,7 +5754,7 @@ public class TerminologyProjectDAO {
 		int activeNid = SnomedMetadataRf1.CURRENT_RF1.getLenient().getNid();
 //		int assignedNid = Terms.get().uuidToNative(ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_ASSIGNED_STATUS.getUids());
 		int assignedNid = -1;
-		if (Terms.get().hasId(UUID.fromString("904447b8-d079-5167-8bf0-928bbdcb9e5b"))) {
+        if (Terms.get().getActiveAceFrameConfig().isVaProject()) {
 			assignedNid = Terms.get().uuidToNative(UUID.fromString("904447b8-d079-5167-8bf0-928bbdcb9e5b"));
 		} else {
 			assignedNid = Terms.get().uuidToNative(UUID.fromString("2cd075aa-fa92-5aa5-9f3d-d68c1c241d42"));

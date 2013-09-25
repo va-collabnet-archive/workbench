@@ -456,6 +456,8 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 	// 53
 	private I_GetConceptData defaultWorkflowForChangedConcept;
 	
+	private boolean isVaProject;
+	
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
         out.writeBoolean(active);
@@ -3530,5 +3532,15 @@ private void writeConceptAsId(I_GetConceptData concept, ObjectOutputStream out) 
     @Override
 	public I_GetConceptData getDefaultWorkflowForChangedConcept() {
 		return defaultWorkflowForChangedConcept;
+	}
+
+	@Override
+	public void setVaProject(boolean isVaProject) {
+		this.isVaProject = isVaProject;
+	}
+
+	@Override
+	public boolean isVaProject() {
+		return this.isVaProject;
 	}
 }

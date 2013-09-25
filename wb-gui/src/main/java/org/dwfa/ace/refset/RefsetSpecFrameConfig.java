@@ -1426,4 +1426,13 @@ public class RefsetSpecFrameConfig implements I_ConfigAceFrame {
 		return frameConfig.getDefaultWorkflowForChangedConcept();
 	}
 
+	@Override
+	public void setVaProject(boolean isVaProject) {
+		frameConfig.setVaProject(isVaProject);;
+	}
+
+	@Override
+	public boolean isVaProject() {
+		return frameConfig.isVaProject();
+	}
 }

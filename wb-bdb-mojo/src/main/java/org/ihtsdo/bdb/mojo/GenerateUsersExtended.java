@@ -2461,6 +2461,12 @@ NEXT_WHILE:
       UUID moduleUuid = module.getLenient().getPrimUuid();
 
       userConfig.setModuleNid(Ts.get().getNidForUuids(moduleUuid));
+      
+      if (moduleUuid.equals(module.getDescription().contains("VA "))) {
+    	  userConfig.setVaProject(true);
+      } else {
+    	  userConfig.setVaProject(false);
+      }
       Terms.get().setActiveAceFrameConfig(userConfig);
    }
 

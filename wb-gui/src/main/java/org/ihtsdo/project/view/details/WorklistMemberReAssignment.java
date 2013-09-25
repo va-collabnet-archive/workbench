@@ -788,7 +788,7 @@ public class WorklistMemberReAssignment extends JPanel {
 //			Concept wias = ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_ASSIGNED_STATUS;
 //			I_GetConceptData stateConcept = Terms.get().getConcept(wias.getUids());
 			I_GetConceptData stateConcept; 
-			if (Terms.get().hasId(UUID.fromString("904447b8-d079-5167-8bf0-928bbdcb9e5b"))) {
+	        if (Terms.get().getActiveAceFrameConfig().isVaProject()) {
 				stateConcept = Terms.get().getConcept(UUID.fromString("904447b8-d079-5167-8bf0-928bbdcb9e5b"));
 			} else {
 				stateConcept = Terms.get().getConcept(UUID.fromString("2cd075aa-fa92-5aa5-9f3d-d68c1c241d42"));

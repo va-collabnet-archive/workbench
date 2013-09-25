@@ -177,7 +177,7 @@ public class WorklistInitializerProcessor implements
 //					.uuidToNative(
 //							ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_ASSIGNED_STATUS
 //									.getUids());
-			if (Terms.get().hasId(UUID.fromString("904447b8-d079-5167-8bf0-928bbdcb9e5b"))) {
+	        if (Terms.get().getActiveAceFrameConfig().isVaProject()) {
 				assignedNid = Terms
 						.get()
 						.uuidToNative(UUID.fromString("904447b8-d079-5167-8bf0-928bbdcb9e5b"));
@@ -199,7 +199,7 @@ public class WorklistInitializerProcessor implements
 //							.getConcept(
 //									ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_ASSIGNED_STATUS
 //											.getUids())));
-			if (Terms.get().hasId(UUID.fromString("904447b8-d079-5167-8bf0-928bbdcb9e5b"))) {
+	        if (Terms.get().getActiveAceFrameConfig().isVaProject()) {
 				instance.setState(prov
 						.statusConceptToWfState(Terms
 								.get()

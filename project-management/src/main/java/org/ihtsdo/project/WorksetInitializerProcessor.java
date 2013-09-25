@@ -163,7 +163,7 @@ public class WorksetInitializerProcessor implements ProcessUnfetchedConceptDataB
 //            completedWorkflowNids.setMember(ArchitectonicAuxiliary.Concept.APPROVED_FOR_PUBLICATION_STATUS.localize().getNid());
 //            completedWorkflowNids.setMember(ArchitectonicAuxiliary.Concept.APPROVED_FOR_PUBLICATION_TPO_REV_STATUS.localize().getNid());
 //            completedWorkflowNids.setMember(ArchitectonicAuxiliary.Concept.APPROVED_FOR_PUBLICATION_TPO_REV_STATUS.localize().getNid());
-            if (Terms.get().hasId(UUID.fromString("cdd1524b-f308-53f9-8361-0c2098458eb0"))) {
+            if (Terms.get().getActiveAceFrameConfig().isVaProject()) {
             	completedWorkflowNids.setMember(Terms.get().uuidToNative(UUID.fromString("cdd1524b-f308-53f9-8361-0c2098458eb0")));
             } else {
             	completedWorkflowNids.setMember(Terms.get().uuidToNative(UUID.fromString("b59420f6-c6a1-5bab-a379-45f0642044c4")));

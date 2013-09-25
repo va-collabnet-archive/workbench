@@ -1285,4 +1285,14 @@ public class PromotionSourceConfig implements I_ConfigAceFrame {
     public I_GetConceptData getDefaultWorkflowForChangedConcept() {
         return config.getDefaultWorkflowForChangedConcept();
     }
+
+	@Override
+	public void setVaProject(boolean isVaProject) {
+		config.setVaProject(isVaProject);;
+	}
+
+	@Override
+	public boolean isVaProject() {
+		return config.isVaProject();
+	}
 }

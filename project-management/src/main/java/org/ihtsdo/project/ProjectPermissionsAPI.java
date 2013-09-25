@@ -443,7 +443,7 @@ public class ProjectPermissionsAPI {
         Set<I_GetConceptData> allRoles = new HashSet<I_GetConceptData>();
         // allRoles = getDescendants(allRoles, Terms.get().getConcept(ArchitectonicAuxiliary.Concept.USER_ROLE.getUids()));
 
-        if (Terms.get().hasId(UUID.fromString("824308c5-1bdb-5f32-9558-faa51f650118"))) {
+        if (Terms.get().getActiveAceFrameConfig().isVaProject()) {
         	// VA
         	allRoles = getDescendants(allRoles, Terms.get().getConcept(UUID.fromString("824308c5-1bdb-5f32-9558-faa51f650118")));
         } else {
@@ -475,7 +475,7 @@ public class ProjectPermissionsAPI {
         Set<I_GetConceptData> allRoles = new HashSet<I_GetConceptData>();
 //        allRoles = getDescendants(allRoles, Terms.get().getConcept(ArchitectonicAuxiliary.Concept.USER_ROLE.getUids()));
        
-        if (tf.hasId(UUID.fromString("824308c5-1bdb-5f32-9558-faa51f650118"))) {
+        if (Terms.get().getActiveAceFrameConfig().isVaProject()) {
         	// VA
         	allRoles = getDescendants(allRoles, tf.getConcept(UUID.fromString("824308c5-1bdb-5f32-9558-faa51f650118")));
         } else {
@@ -515,7 +515,7 @@ public class ProjectPermissionsAPI {
         Set<I_GetConceptData> allRoles = new HashSet<I_GetConceptData>();
 //        allRoles = getDescendants(allRoles, Terms.get().getConcept(ArchitectonicAuxiliary.Concept.USER_ROLE.getUids()));
        
-        if (tf.hasId(UUID.fromString("824308c5-1bdb-5f32-9558-faa51f650118"))) {
+        if (Terms.get().getActiveAceFrameConfig().isVaProject()) {
         	// VA
         	allRoles = getDescendants(allRoles, tf.getConcept(UUID.fromString("824308c5-1bdb-5f32-9558-faa51f650118")));
         } else {
