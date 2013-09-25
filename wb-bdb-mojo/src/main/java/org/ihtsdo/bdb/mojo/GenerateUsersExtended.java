@@ -2462,7 +2462,7 @@ NEXT_WHILE:
 
       userConfig.setModuleNid(Ts.get().getNidForUuids(moduleUuid));
       
-      if (moduleUuid.equals(module.getDescription().contains("VA "))) {
+      if (module.getDescription().contains("VA ")) {
     	  userConfig.setVaProject(true);
       } else {
     	  userConfig.setVaProject(false);
