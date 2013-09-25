@@ -243,15 +243,19 @@ public class AccumulatedStatusChanges extends SwingWorker<File, String> implemen
 												I_GetConceptData wlMemeberActivityStatus = member.getActivityStatus();
 												boolean sameStatus = previousStatus.getConceptNid() == wlMemeberActivityStatus.getConceptNid();
 												//if (!statusConcept.getUids().iterator().next().equals(ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_ASSIGNED_STATUS.getUids().iterator().next()) && (!sameDestinationAndAuthor || !sameStatus)) {
-												if (!statusConcept.getUids().iterator().next().equals(UUID.fromString("ed055320-2c26-50f8-91fd-a8533f5db793")) && (!sameDestinationAndAuthor || !sameStatus)) {
-													dataFound = true;
-													UserStatusCount current = new UserStatusCount();
-													current.setDate(formatter.format(new Date(version.getTime())));
-													I_GetConceptData user = tf.getConcept(version.getAuthorNid());
-													current.setUserName(user + "");
-													current.setStatus(statusConcept + "");
-													current.setRole(getUserRole(wl, user));
-													results.add(current);
+												UUID matchingUid = statusConcept.getUids().iterator().next();
+												if (!matchingUid.equals(UUID.fromString("904447b8-d079-5167-8bf0-928bbdcb9e5b")) && !matchingUid.equals(UUID.fromString("2cd075aa-fa92-5aa5-9f3d-d68c1c241d42")))
+												{
+													if (!sameDestinationAndAuthor || !sameStatus) {
+														dataFound = true;
+														UserStatusCount current = new UserStatusCount();
+														current.setDate(formatter.format(new Date(version.getTime())));
+														I_GetConceptData user = tf.getConcept(version.getAuthorNid());
+														current.setUserName(user + "");
+														current.setStatus(statusConcept + "");
+														current.setRole(getUserRole(wl, user));
+														results.add(current);
+													}
 												}
 											}
 										}

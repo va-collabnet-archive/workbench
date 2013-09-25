@@ -157,12 +157,17 @@ public class WorksetInitializerProcessor implements ProcessUnfetchedConceptDataB
 
             completedWorkflowNids = ts.getEmptyNidSet();
 
-            completedWorkflowNids.setMember(ArchitectonicAuxiliary.Concept.COMPLETED.localize().getNid());
-            completedWorkflowNids.setMember(ArchitectonicAuxiliary.Concept.APPROVED_FOR_PUBLICATION_EB_STATUS.localize().getNid());
-            completedWorkflowNids.setMember(ArchitectonicAuxiliary.Concept.APPROVED_FOR_PUBLICATION_FAST_TRACK_STATUS.localize().getNid());
-            completedWorkflowNids.setMember(ArchitectonicAuxiliary.Concept.APPROVED_FOR_PUBLICATION_STATUS.localize().getNid());
-            completedWorkflowNids.setMember(ArchitectonicAuxiliary.Concept.APPROVED_FOR_PUBLICATION_TPO_REV_STATUS.localize().getNid());
-            completedWorkflowNids.setMember(ArchitectonicAuxiliary.Concept.APPROVED_FOR_PUBLICATION_TPO_REV_STATUS.localize().getNid());
+//            completedWorkflowNids.setMember(ArchitectonicAuxiliary.Concept.COMPLETED.localize().getNid());
+//            completedWorkflowNids.setMember(ArchitectonicAuxiliary.Concept.APPROVED_FOR_PUBLICATION_EB_STATUS.localize().getNid());
+//            completedWorkflowNids.setMember(ArchitectonicAuxiliary.Concept.APPROVED_FOR_PUBLICATION_FAST_TRACK_STATUS.localize().getNid());
+//            completedWorkflowNids.setMember(ArchitectonicAuxiliary.Concept.APPROVED_FOR_PUBLICATION_STATUS.localize().getNid());
+//            completedWorkflowNids.setMember(ArchitectonicAuxiliary.Concept.APPROVED_FOR_PUBLICATION_TPO_REV_STATUS.localize().getNid());
+//            completedWorkflowNids.setMember(ArchitectonicAuxiliary.Concept.APPROVED_FOR_PUBLICATION_TPO_REV_STATUS.localize().getNid());
+            if (Terms.get().hasId(UUID.fromString("cdd1524b-f308-53f9-8361-0c2098458eb0"))) {
+            	completedWorkflowNids.setMember(Terms.get().uuidToNative(UUID.fromString("cdd1524b-f308-53f9-8361-0c2098458eb0")));
+            } else {
+            	completedWorkflowNids.setMember(Terms.get().uuidToNative(UUID.fromString("b59420f6-c6a1-5bab-a379-45f0642044c4")));
+            }
 
             updater.setTaskMessage("Processing sourceMembers");
             ConceptChronicleBI sourceRefsetChronicle = (ConceptChronicleBI) sourceRefset;

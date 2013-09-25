@@ -213,7 +213,7 @@ public class WfComponentProvider {
 
 			// JIF
 			Set<I_GetConceptData> jifRoles = new HashSet<I_GetConceptData>();
-			jifRoles = ProjectPermissionsAPI.getDescendants(jifRoles, Terms.get().getConcept(UUID.fromString("c0670d51-e25a-5384-9d6c-9737025642cd")));
+			jifRoles = ProjectPermissionsAPI.getDescendants(jifRoles, Terms.get().getConcept(UUID.fromString("f6561a78-a48f-594f-89df-5f77a215d807")));
 
 			for (I_GetConceptData role : jifRoles) {
 				returnRoles.add(roleConceptToWfRole(role));
@@ -410,7 +410,7 @@ public class WfComponentProvider {
 			// VA
 			allStates.addAll(ProjectPermissionsAPI.getDescendants(allStates, Terms.get().getConcept(UUID.fromString("041a7ea1-942d-58d2-b9df-ee33d684ae1b"))));
 			// JIF
-			allStates.addAll(ProjectPermissionsAPI.getDescendants(allStates, Terms.get().getConcept(UUID.fromString("56ccc98b-6c1f-5e05-beae-65d9ff12f0f3"))));
+			allStates.addAll(ProjectPermissionsAPI.getDescendants(allStates, Terms.get().getConcept(UUID.fromString("4af7ffa0-dadd-541b-bdb3-25cda4f89810"))));
 			
 			for (I_GetConceptData state : allStates) {
 				returnStates.add(statusConceptToWfState(state));

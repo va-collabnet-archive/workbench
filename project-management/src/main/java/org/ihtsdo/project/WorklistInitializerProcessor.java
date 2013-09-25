@@ -177,10 +177,15 @@ public class WorklistInitializerProcessor implements
 //					.uuidToNative(
 //							ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_ASSIGNED_STATUS
 //									.getUids());
-			assignedNid = Terms
-					.get()
-					.uuidToNative(UUID.fromString("ed055320-2c26-50f8-91fd-a8533f5db793"));
-			
+			if (Terms.get().hasId(UUID.fromString("904447b8-d079-5167-8bf0-928bbdcb9e5b"))) {
+				assignedNid = Terms
+						.get()
+						.uuidToNative(UUID.fromString("904447b8-d079-5167-8bf0-928bbdcb9e5b"));
+			} else {
+				assignedNid = Terms
+						.get()
+						.uuidToNative(UUID.fromString("2cd075aa-fa92-5aa5-9f3d-d68c1c241d42"));
+			}
 			if (updater != null) {
 				updater.setTaskMessage("Initializing WorkList");
 				updater.startCount(membersNidSet.cardinality());
@@ -194,11 +199,17 @@ public class WorklistInitializerProcessor implements
 //							.getConcept(
 //									ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_ASSIGNED_STATUS
 //											.getUids())));
-			instance.setState(prov
-					.statusConceptToWfState(Terms
-							.get()
-							.getConcept(UUID.fromString("ed055320-2c26-50f8-91fd-a8533f5db793"))));
-			
+			if (Terms.get().hasId(UUID.fromString("904447b8-d079-5167-8bf0-928bbdcb9e5b"))) {
+				instance.setState(prov
+						.statusConceptToWfState(Terms
+								.get()
+								.getConcept(UUID.fromString("904447b8-d079-5167-8bf0-928bbdcb9e5b"))));
+			} else {
+				instance.setState(prov
+						.statusConceptToWfState(Terms
+								.get()
+								.getConcept(UUID.fromString("2cd075aa-fa92-5aa5-9f3d-d68c1c241d42"))));
+			}
 			instance.setWfDefinition(workList.getWorkflowDefinition());
 			instance.setWorkList(workList);
 			instance.setLastChangeTime(System.currentTimeMillis());

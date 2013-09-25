@@ -471,6 +471,73 @@ public class GenerateUsersExtended extends AbstractMojo {
 
    @Override
    public void execute() throws MojoExecutionException {
+	   try {
+/*
+ * Veteran Affairs role
+Veteran Affairs approver
+Veteran Affairs editor
+Veteran Affairs reviewer
+Veteran Affairs status
+For approval workflow status
+Item assigned workflow status
+Approved for publication workflow status
+For review workflow status
+Project Refsets
+SNOMED CT Refsets
+VA Extension development path
+VA Extension release candidate path
+*/
+		   System.out.println("*********Veteran Affairs role: " + Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, "Veteran Affairs role"));
+		   System.out.println("*********Veteran Affairs approver: " + Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, "Veteran Affairs approver"));
+		   System.out.println("*********Veteran Affairs editor: " + Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, "Veteran Affairs editor"));
+		   System.out.println("*********Veteran Affairs reviewer: " + Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, "Veteran Affairs reviewer"));
+		   
+		   System.out.println("*********Veteran Affairs status: " + Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, "Veteran Affairs status"));
+		   System.out.println("*********Veteran Affairs for approval workflow status: " + Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, "Veteran Affairs for approval workflow status"));
+		   System.out.println("*********Veteran Affairs item assigned workflow status: " + Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, "Veteran Affairs item assigned workflow status"));
+		   System.out.println("*********Veteran Affairs approved for publication workflow status: " + Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, "Veteran Affairs approved for publication workflow status"));
+		   System.out.println("*********Veteran Affairs for review workflow status: " + Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, "Veteran Affairs for review workflow status"));
+
+		   System.out.println("*********Project Refsets: " + Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, "Project Refsets"));
+		   System.out.println("*********SNOMED CT Refsets: " + Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, "SNOMED CT Refsets"));
+
+		   System.out.println("*********VA Extension development path: " + Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, "VA Extension development path"));
+		   System.out.println("*********VA Extension release candidate path: " + Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, "VA Extension release candidate path"));
+
+		   System.out.println("*********VA maintained module (core metadata concept): " + Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, "VA maintained module (core metadata concept)"));
+		   System.out.println("*********VA Terminology Workbench development origin: " + Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, "VA Terminology Workbench development origin"));
+		   System.out.println("*********VA Terminology Workbench development path: " + Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, "VA Terminology Workbench development path"));
+		   System.out.println("*********VA Terminology Workbench release candidate path: " + Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, "VA Terminology Workbench release candidate path"));
+
+		   System.out.println("*********Joint Incentive Funds role: " + Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, "Joint Incentive Funds role"));
+		   System.out.println("*********Joint Incentive Funds approver: " + Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, "Joint Incentive Funds approver"));
+		   System.out.println("*********Joint Incentive Funds editor: " + Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, "Joint Incentive Funds editor"));
+		   System.out.println("*********Joint Incentive Funds reviewer: " + Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, "Joint Incentive Funds reviewer"));
+		   
+		   System.out.println("*********Joint Incentive Funds status: " + Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, "Joint Incentive Funds status"));
+		   System.out.println("*********Joint Incentive Funds for approval workflow status: " + Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, "Joint Incentive Funds for approval workflow status"));
+		   System.out.println("*********Joint Incentive Funds item assigned workflow status: " + Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, "Joint Incentive Funds item assigned workflow status"));
+		   System.out.println("*********Joint Incentive Funds approved for publication workflow status: " + Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, "Joint Incentive Funds approved for publication workflow status"));
+		   System.out.println("*********Joint Incentive Funds for review workflow status: " + Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, "Joint Incentive Funds for review workflow status"));
+
+		   System.out.println("*********Project Refsets: " + Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, "Project Refsets"));
+		   System.out.println("*********SNOMED CT Refsets: " + Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, "SNOMED CT Refsets"));
+
+		   System.out.println("*********JIF Extension development path: " + Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, "JIF Extension development path"));
+		   System.out.println("*********JIF Extension release candidate path: " + Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, "JIF Extension release candidate path"));
+
+	   
+		   System.out.println("*********JIF maintained module (core metadata concept): " + Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, "JIF maintained module (core metadata concept)"));
+		   System.out.println("*********JIF Terminology Workbench development origin: " + Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, "JIF Terminology Workbench development origin"));
+		   System.out.println("*********JIF Terminology Workbench development path: " + Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, "JIF Terminology Workbench development path"));
+		   System.out.println("*********JIF Terminology Workbench release candidate path: " + Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, "JIF Terminology Workbench release candidate path"));
+} catch (NoSuchAlgorithmException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	} catch (UnsupportedEncodingException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
       executeMojo();
    }
 

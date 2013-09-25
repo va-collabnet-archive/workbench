@@ -787,7 +787,12 @@ public class WorklistMemberReAssignment extends JPanel {
 			statusCombo.addItem("Loading...");
 //			Concept wias = ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_ASSIGNED_STATUS;
 //			I_GetConceptData stateConcept = Terms.get().getConcept(wias.getUids());
-			I_GetConceptData stateConcept = Terms.get().getConcept(UUID.fromString("ed055320-2c26-50f8-91fd-a8533f5db793"));
+			I_GetConceptData stateConcept; 
+			if (Terms.get().hasId(UUID.fromString("904447b8-d079-5167-8bf0-928bbdcb9e5b"))) {
+				stateConcept = Terms.get().getConcept(UUID.fromString("904447b8-d079-5167-8bf0-928bbdcb9e5b"));
+			} else {
+				stateConcept = Terms.get().getConcept(UUID.fromString("2cd075aa-fa92-5aa5-9f3d-d68c1c241d42"));
+			}
 			statusCombo.addItem(new WfState(stateConcept.getInitialText(), stateConcept.getPrimUuid()));
 			if (workflowInterpreterInitWorker != null) {
 				while (!workflowInterpreterInitWorker.isDone()) {

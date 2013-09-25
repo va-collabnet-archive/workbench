@@ -67,7 +67,11 @@ public class PromotionAndAssignmentRefset extends PromotionRefset {
         this.termFactory = Terms.get();
         this.activeValueNid = SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid();
         // this.defaultStatusNid = Terms.get().uuidToNative(ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_ASSIGNED_STATUS.getPrimoridalUid());
-        this.defaultStatusNid = Terms.get().uuidToNative(UUID.fromString("ed055320-2c26-50f8-91fd-a8533f5db793"));
+        if (Terms.get().hasId(UUID.fromString("904447b8-d079-5167-8bf0-928bbdcb9e5b"))) {
+        	this.defaultStatusNid = Terms.get().uuidToNative(UUID.fromString("904447b8-d079-5167-8bf0-928bbdcb9e5b"));
+        } else {
+        	this.defaultStatusNid = Terms.get().uuidToNative(UUID.fromString("2cd075aa-fa92-5aa5-9f3d-d68c1c241d42"));
+        }
         this.defaultUserNid = Terms.get().uuidToNative(ArchitectonicAuxiliary.Concept.USER.getPrimoridalUid());
 
     }

@@ -3381,7 +3381,12 @@ public class TerminologyProjectDAO {
 			addConceptAsPartitionMember(concept, partition, config);
 			Terms.get().addUncommittedNoChecks(partition.getConcept());
 			//I_GetConceptData assingStatus = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_ASSIGNED_STATUS.getUids());
-			I_GetConceptData assingStatus = Terms.get().getConcept(UUID.fromString("ed055320-2c26-50f8-91fd-a8533f5db793"));
+			I_GetConceptData assingStatus;
+	        if (Terms.get().hasId(UUID.fromString("904447b8-d079-5167-8bf0-928bbdcb9e5b"))) {
+	        	assingStatus = Terms.get().getConcept(UUID.fromString("904447b8-d079-5167-8bf0-928bbdcb9e5b"));
+	        } else {
+	        	assingStatus = Terms.get().getConcept(UUID.fromString("2cd075aa-fa92-5aa5-9f3d-d68c1c241d42"));
+	        }
 			WorkListMember workListMember = new WorkListMember(getConceptString(concept), concept.getConceptNid(), concept.getUids(), workList.getUids().iterator().next(), assingStatus, new java.util.Date().getTime());
 			WorkflowInterpreter interpreter = WorkflowInterpreter.createWorkflowInterpreter(workList.getWorkflowDefinition());
 			WfComponentProvider provider = new WfComponentProvider();
@@ -4770,7 +4775,8 @@ public class TerminologyProjectDAO {
 		for (WorkListMember member : workList.getWorkListMembers()) {
 //			if (!ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_ASSIGNED_STATUS.getUids().contains(member.getActivityStatus()) && !ArchitectonicAuxiliary.Concept.RETIRED.getUids().contains(member.getActivityStatus())
 //					&& !SnomedMetadataRf2.INACTIVE_VALUE_RF2.getLenient().getUUIDs().contains(member.getActivityStatus())) {
-			if (!UUID.fromString("ed055320-2c26-50f8-91fd-a8533f5db793").equals(member.getActivityStatus()) && !ArchitectonicAuxiliary.Concept.RETIRED.getUids().contains(member.getActivityStatus())
+			if (!UUID.fromString("904447b8-d079-5167-8bf0-928bbdcb9e5b").equals(member.getActivityStatus()) && !UUID.fromString("2cd075aa-fa92-5aa5-9f3d-d68c1c241d42").equals(member.getActivityStatus()) 
+					&& !ArchitectonicAuxiliary.Concept.RETIRED.getUids().contains(member.getActivityStatus())
 					&& !SnomedMetadataRf2.INACTIVE_VALUE_RF2.getLenient().getUUIDs().contains(member.getActivityStatus())) {
 				throw new Exception("WorkList cannot be retired, some members have been delivered and are still active.");
 			}
@@ -5718,7 +5724,11 @@ public class TerminologyProjectDAO {
 		WfComponentProvider prov = new WfComponentProvider();
 		instance.setComponentId(SNOMED.Concept.ROOT.getPrimoridalUid());
 //		instance.setState(prov.statusConceptToWfState(Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_ASSIGNED_STATUS.getUids())));
-		instance.setState(prov.statusConceptToWfState(Terms.get().getConcept(UUID.fromString("ed055320-2c26-50f8-91fd-a8533f5db793"))));
+		if (Terms.get().hasId(UUID.fromString("904447b8-d079-5167-8bf0-928bbdcb9e5b"))) {
+			instance.setState(prov.statusConceptToWfState(Terms.get().getConcept(UUID.fromString("904447b8-d079-5167-8bf0-928bbdcb9e5b"))));
+		} else {
+			instance.setState(prov.statusConceptToWfState(Terms.get().getConcept(UUID.fromString("2cd075aa-fa92-5aa5-9f3d-d68c1c241d42"))));
+		}
 		instance.setWfDefinition(workList.getWorkflowDefinition());
 		instance.setWorkList(workList);
 		instance.setLastChangeTime(System.currentTimeMillis());
@@ -5743,7 +5753,12 @@ public class TerminologyProjectDAO {
 		RefexCAB newSpec = new RefexCAB(TK_REFEX_TYPE.CID, concept.getNid(), ts.getNidForUuids(workList.getUids()));
 		int activeNid = SnomedMetadataRf1.CURRENT_RF1.getLenient().getNid();
 //		int assignedNid = Terms.get().uuidToNative(ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_ASSIGNED_STATUS.getUids());
-		int assignedNid = Terms.get().uuidToNative(UUID.fromString("ed055320-2c26-50f8-91fd-a8533f5db793"));
+		int assignedNid = -1;
+		if (Terms.get().hasId(UUID.fromString("904447b8-d079-5167-8bf0-928bbdcb9e5b"))) {
+			assignedNid = Terms.get().uuidToNative(UUID.fromString("904447b8-d079-5167-8bf0-928bbdcb9e5b"));
+		} else {
+			assignedNid = Terms.get().uuidToNative(UUID.fromString("2cd075aa-fa92-5aa5-9f3d-d68c1c241d42"));
+		}
 		newSpec.put(RefexProperty.CNID1, activeNid);
 
 		TerminologyBuilderBI tc = Ts.get().getTerminologyBuilder(config.getEditCoordinate(), config.getViewCoordinate());

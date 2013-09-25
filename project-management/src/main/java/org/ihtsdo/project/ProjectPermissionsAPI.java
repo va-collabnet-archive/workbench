@@ -448,7 +448,7 @@ public class ProjectPermissionsAPI {
         	allRoles = getDescendants(allRoles, Terms.get().getConcept(UUID.fromString("824308c5-1bdb-5f32-9558-faa51f650118")));
         } else {
         	// JIF
-        	allRoles = getDescendants(allRoles, Terms.get().getConcept(UUID.fromString("c0670d51-e25a-5384-9d6c-9737025642cd")));
+        	allRoles = getDescendants(allRoles, Terms.get().getConcept(UUID.fromString("f6561a78-a48f-594f-89df-5f77a215d807")));
         }
 
         for (I_GetConceptData role : allRoles) {
@@ -480,7 +480,7 @@ public class ProjectPermissionsAPI {
         	allRoles = getDescendants(allRoles, tf.getConcept(UUID.fromString("824308c5-1bdb-5f32-9558-faa51f650118")));
         } else {
         	// JIF
-        	allRoles = getDescendants(allRoles, tf.getConcept(UUID.fromString("c0670d51-e25a-5384-9d6c-9737025642cd")));
+        	allRoles = getDescendants(allRoles, tf.getConcept(UUID.fromString("f6561a78-a48f-594f-89df-5f77a215d807")));
         }
 
         Set<Integer> allRolesNid = new HashSet<Integer>();
@@ -520,7 +520,7 @@ public class ProjectPermissionsAPI {
         	allRoles = getDescendants(allRoles, tf.getConcept(UUID.fromString("824308c5-1bdb-5f32-9558-faa51f650118")));
         } else {
         	// JIF
-        	allRoles = getDescendants(allRoles, tf.getConcept(UUID.fromString("c0670d51-e25a-5384-9d6c-9737025642cd")));
+        	allRoles = getDescendants(allRoles, tf.getConcept(UUID.fromString("f6561a78-a48f-594f-89df-5f77a215d807")));
         }
 
         Set<Integer> allRolesNid = new HashSet<Integer>();

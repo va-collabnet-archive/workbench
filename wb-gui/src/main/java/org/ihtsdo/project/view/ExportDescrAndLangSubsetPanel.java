@@ -109,7 +109,11 @@ public class ExportDescrAndLangSubsetPanel extends JPanel {
 
 			lModel.addElement(Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_DELIVERED_STATUS.getUids()));
 //			lModel.addElement(Terms.get().getConcept(ArchitectonicAuxiliary.Concept.WORKLIST_ITEM_ASSIGNED_STATUS.getUids()));
-			lModel.addElement(Terms.get().getConcept(UUID.fromString("ed055320-2c26-50f8-91fd-a8533f5db793")));
+			if (Terms.get().hasId(UUID.fromString("904447b8-d079-5167-8bf0-928bbdcb9e5b"))) {
+				lModel.addElement(Terms.get().getConcept(UUID.fromString("904447b8-d079-5167-8bf0-928bbdcb9e5b")));
+			} else {
+				lModel.addElement(Terms.get().getConcept(UUID.fromString("2cd075aa-fa92-5aa5-9f3d-d68c1c241d42")));
+			}
 
 			for (I_GetConceptData child : transStatusCpt.getDestRelOrigins(
 					config.getAllowedStatus(),
