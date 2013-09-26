@@ -1317,4 +1317,16 @@ public class DifferenceSearchConfig implements I_ConfigAceFrame {
 		return frameConfig.getDefaultWorkflowForChangedConcept();
 	}
 
+	@Override
+	public void setVaProject(boolean isVaProject) {
+		frameConfig.setVaProject(isVaProject);
+		
+	}
+
+	@Override
+	public boolean isVaProject() {
+		// TODO Auto-generated method stub
+		return frameConfig.isVaProject();	
+	}
+
 }
