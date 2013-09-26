@@ -75,6 +75,14 @@ public class RF2AttributeValueExporterMojo extends AbstractMojo {
 	private String password;
 
 	/**
+	 * Language Code for file names of release
+	 * 
+	 * @parameter 
+	 * default-value="en"
+	 */
+	private String languageCode;
+	
+	/**
 	 * Filter configurations
 	 * 
 	 * @parameter
@@ -117,6 +125,7 @@ public class RF2AttributeValueExporterMojo extends AbstractMojo {
 			config.setUsername(username);
 			config.setPassword(password);
 			config.setEndPoint(endpointURL);
+			config.setLanguageCode(languageCode);
 
 			// initialize ace framwork and meta hierarchy
 			ExportUtil.init(config);
