@@ -669,8 +669,25 @@ public class LoadBdbMulti extends AbstractMojo {
                   conceptBp.addFullySpecifiedName(p, LANG_CODE.EN);
                }
 
-               ConceptChronicleBI concept =
-                  builder.constructIfNotCurrent(conceptBp);
+               ConceptChronicleBI concept = null;
+				try 
+				{
+					concept = builder.constructIfNotCurrent(conceptBp);
+				} 
+				catch (InvalidCAB e) 
+				{
+					if (e.getMessage().startsWith("Concept already exists"))
+					{
+						System.out.println("**IGNORING CREATION REQUEST for: " + fsn + " "+ (conceptUuid == null ? "" : conceptUuid + " ") 
+								+ "because the concept already exists");
+						line = conceptsReader.readLine();
+						continue;
+					}
+					else
+					{
+						throw e;
+					}
+				}
 
                if (makeAnnotation.equalsIgnoreCase("true")) {
                   concept.setAnnotationStyleRefex(true);
