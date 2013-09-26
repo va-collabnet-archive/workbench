@@ -50,6 +50,7 @@ public class RF2DescriptionInactivationImpl extends RF2AbstractImpl implements I
 			String valueId = "";
 			String conceptStatus="";
 
+			String languageCode = getConfig().getLanguageCode();
 			int descInactivationRefsetNid = getNid(I_Constants.DESCRIPTION_INACTIVATION_REFSET_UID);
 			String refsetId = getSctId(descInactivationRefsetNid);
 			String moduleId = "";
@@ -64,7 +65,7 @@ public class RF2DescriptionInactivationImpl extends RF2AbstractImpl implements I
 					Date descriptionEffectiveDate = new Date(getTermFactory().convertToThickVersion(description.getVersion()));
 					effectiveTime = getDateFormat().format(descriptionEffectiveDate);
 
-					if (!sDescType.equals("4") && !description.getLang().equals("es"))  { // Ignore text-defination & spanish description
+					if (!sDescType.equals("4")  && description.getLang().equals(languageCode) )  { // Ignore text-defination 
 						String referencedComponentId = getDescriptionId(description.getDescId(), ExportUtil.getSnomedCorePathNid());
 
 						if (referencedComponentId==null || referencedComponentId.equals("")){
