@@ -323,6 +323,7 @@ public class BinaryChangeSetResolveIds {
                     try {
                         timeStampEccsL = in.readLong();
                         eConcept = new TkConcept(in);
+                        tweakTimeStamps(eConcept);
                         enclosingUuid = eConcept.primordialUuid;
                         // :!!!:DEBUG:
 //                        if (debugSet.contains(eConcept.getPrimordialUuid())) {
@@ -1265,4 +1266,199 @@ public class BinaryChangeSetResolveIds {
         /////
         developmentPath = UUID.fromString("3770e517-7adc-5a24-a447-77a9daa3eedf"); // destination development path :: KPET CMT Project development path
     }
+    
+    private class TimeStamp implements Comparable<TimeStamp> {
+        long timePrimordial;
+        long time;
+        UUID status;
+
+        public TimeStamp(long timePrimordial, long time, UUID status) {
+            this.timePrimordial = timePrimordial;
+            this.time = time;
+            this.status = status;
+        }
+
+        @Override
+        public int compareTo(TimeStamp o) {
+            if (this.time > o.time) {
+                return 1; // this is greater than received
+            } else if (this.time < o.time) {
+                return -1; // this is less than received
+            } else {
+                return 0; // this == received
+            }
+        }
+    }
+    
+    private void tweakTimeStamps(TkConcept eConcept) throws IOException {
+        if (eConcept.conceptAttributes != null) {
+            TkConceptAttributes attributes = eConcept.conceptAttributes;
+            UUID uuidStatus = attributes.getStatusUuid();
+            if (attributes.revisions != null) {
+                List<TkConceptAttributesRevision> r = attributes.revisions;
+                TimeStamp[] tsa = new TimeStamp[r.size() + 1];
+                int i = 0;
+                long timePrimordial = attributes.time;
+                tsa[i++] = new TimeStamp(timePrimordial, timePrimordial, uuidStatus);
+                for (TkConceptAttributesRevision tkConceptAttributesRevision : r) {
+                    uuidStatus = tkConceptAttributesRevision.statusUuid;
+                    long time = tkConceptAttributesRevision.time;
+                    tsa[i++] = new TimeStamp(timePrimordial, time, uuidStatus);
+                }
+                Arrays.sort(tsa);
+                for (int j = 0; j < tsa.length - 1; j++) {
+                    if (tsa[j].time == tsa[j + 1].time) {
+                        eccsLogExceptionsWriter.append(":WARNING: found duplicate concept attributes time.");
+                        eccsLogExceptionsWriter.append(" Concept: ");
+                        eccsLogExceptionsWriter.append(eConcept.primordialUuid.toString());
+                        eccsLogExceptionsWriter.append(" revisions.size=");
+                        eccsLogExceptionsWriter.append(Integer.toString(r.size()));
+                        eccsLogExceptionsWriter.append(" Status: ");
+                        eccsLogExceptionsWriter.append(tsa[j].status.toString());
+                        eccsLogExceptionsWriter.append(" ");
+                        eccsLogExceptionsWriter.append(tsa[j+1].status.toString());
+                        eccsLogExceptionsWriter.append("\r\n");
+                    }
+                }
+            }
+        }
+                
+        if (eConcept.descriptions != null) {
+            HashSet<UUID> dropDescriptionEccsSet = new HashSet();
+            List<TkDescription> descriptionList = eConcept.descriptions;
+            for (TkDescription tkDescription : descriptionList) {
+                if (tkDescription != null) {
+                    UUID uuidStatus = tkDescription.getStatusUuid();
+                    if (tkDescription.revisions != null) {
+                        List<TkDescriptionRevision> r = tkDescription.revisions;
+                        TimeStamp[] tsa = new TimeStamp[r.size() + 1];
+                        int i = 0;
+                        long timePrimordial = tkDescription.time;
+                        tsa[i++] = new TimeStamp(timePrimordial, timePrimordial, uuidStatus);
+                        for (TkDescriptionRevision tkDescriptionRevision : r) {
+                            uuidStatus = tkDescriptionRevision.statusUuid;
+                            long time = tkDescriptionRevision.time;
+                            tsa[i++] = new TimeStamp(timePrimordial, time, uuidStatus);
+                        }
+                        Arrays.sort(tsa);
+                        for (int j = 0; j < tsa.length - 1; j++) {
+                            if (tsa[j].time == tsa[j + 1].time) {
+                                dropDescriptionEccsSet.add(tkDescription.primordialUuid);
+                                eccsLogExceptionsWriter.append(":WARNING: found duplicate description revision time.");
+                                eccsLogExceptionsWriter.append(" Concept: ");
+                                eccsLogExceptionsWriter.append(eConcept.primordialUuid.toString());
+                                eccsLogExceptionsWriter.append(" Description: ");
+                                eccsLogExceptionsWriter.append(tkDescription.primordialUuid.toString());
+                                eccsLogExceptionsWriter.append(" revisions.size=");
+                                eccsLogExceptionsWriter.append(Integer.toString(r.size()));
+                                eccsLogExceptionsWriter.append(" Status: ");
+                                eccsLogExceptionsWriter.append(tsa[j].status.toString());
+                                eccsLogExceptionsWriter.append(" ");
+                                eccsLogExceptionsWriter.append(tsa[j + 1].status.toString());
+                                eccsLogExceptionsWriter.append("\r\n");
+                            }
+                        }
+                    }
+                }
+                if (dropDescriptionEccsSet.size() > 0) {
+                    eccsLogExceptionsWriter.append("...... dropping whole description(s) with revision containing the same timestamp.\r\n");
+                    ArrayList<TkDescription> tempDescriptionList = new ArrayList();
+                    for (TkDescription tkd : eConcept.descriptions) {
+                        if (!dropDescriptionEccsSet.contains(tkd.primordialUuid)) {
+                            tempDescriptionList.add(tkd); // just keep the descriptions without the ambiguous duplicate timestamps
+                        } else {
+                            eccsLogExceptionsWriter.append("...... dropped: ");
+                            eccsLogExceptionsWriter.append(tkd.primordialUuid.toString());
+                            eccsLogExceptionsWriter.append("\r\n");
+                        }
+                    }
+                    eConcept.descriptions = tempDescriptionList;
+                }
+            }
+        }
+        
+        if (eConcept.relationships != null) {
+            List<TkRelationship> relationshipList = eConcept.relationships;
+            for (TkRelationship tkRelationship : relationshipList) {
+                if (tkRelationship != null) {
+                    UUID uuidStatus = tkRelationship.getStatusUuid();
+                    if (tkRelationship.revisions != null) {
+                        List<TkRelationshipRevision> r = tkRelationship.revisions;
+                        TimeStamp[] tsa = new TimeStamp[r.size() + 1];
+                        int i = 0;
+                        long timePrimordial = tkRelationship.time;
+                        tsa[i++] = new TimeStamp(timePrimordial, timePrimordial, uuidStatus);
+                        for (TkRelationshipRevision tkRelationshipRevision : r) {
+                            uuidStatus = tkRelationshipRevision.statusUuid;
+                            long time = tkRelationshipRevision.time;
+                            tsa[i++] = new TimeStamp(timePrimordial, time, uuidStatus);
+                        }
+                        Arrays.sort(tsa);
+                        for (int j = 0; j < tsa.length - 1; j++) {
+                            if (tsa[j].time == tsa[j + 1].time) {
+                                eccsLogExceptionsWriter.append(":WARNING: found relationship with same revision timestamp.");
+                                eccsLogExceptionsWriter.append(" Concept: ");
+                                eccsLogExceptionsWriter.append(eConcept.primordialUuid.toString());
+                                eccsLogExceptionsWriter.append(" Relationship: ");
+                                eccsLogExceptionsWriter.append(tkRelationship.primordialUuid.toString());
+                                eccsLogExceptionsWriter.append(" revisions.size=");
+                                eccsLogExceptionsWriter.append(Integer.toString(r.size()));
+                                eccsLogExceptionsWriter.append(" Status: ");
+                                eccsLogExceptionsWriter.append(tsa[j].status.toString());
+                                eccsLogExceptionsWriter.append(" ");
+                                eccsLogExceptionsWriter.append(tsa[j + 1].status.toString());
+                                eccsLogExceptionsWriter.append("\r\n");
+                            }
+                            if (r.size() == 1) {
+                                tkRelationship.revisions = null;
+                                tkRelationship.statusUuid = rf2ActiveUuid;
+                                eccsLogExceptionsWriter.append("...... dropped relationship revision with same timestamp. made primordial active\r\n");
+                            } else {
+                                throw new UnsupportedOperationException("relationship with more than one duplicate timestamp not supported");
+                            }
+                        }
+                    }
+                }
+            }
+        } 
+        
+        if (eConcept.refsetMembers != null) {
+            List<TkRefexAbstractMember<?>> refsetMemberList = eConcept.refsetMembers;
+            for (TkRefexAbstractMember member : refsetMemberList) {
+                if (member != null) {
+                    UUID uuidStatus = member.getStatusUuid();
+                    if (member.revisions != null) {
+                        List<TkRelationshipRevision> r = member.revisions;
+                        TimeStamp[] tsa = new TimeStamp[r.size() + 1];
+                        int i = 0;
+                        long timePrimordial = member.time;
+                        tsa[i++] = new TimeStamp(timePrimordial, timePrimordial, uuidStatus);
+                        for (TkRelationshipRevision tkRelationshipRevision : r) {
+                            uuidStatus = tkRelationshipRevision.statusUuid;
+                            long time = tkRelationshipRevision.time;
+                            tsa[i++] = new TimeStamp(timePrimordial, time, uuidStatus);
+                        }
+                        Arrays.sort(tsa);
+                        for (int j = 0; j < tsa.length - 1; j++) {
+                            if (tsa[j].time == tsa[j + 1].time) {
+                                eccsLogExceptionsWriter.append(":WARNING: found relationship with same revision timestamp.");
+                                eccsLogExceptionsWriter.append(" Concept: ");
+                                eccsLogExceptionsWriter.append(eConcept.primordialUuid.toString());
+                                eccsLogExceptionsWriter.append(" Refset member: ");
+                                eccsLogExceptionsWriter.append(member.primordialUuid.toString());
+                                eccsLogExceptionsWriter.append(" revisions.size=");
+                                eccsLogExceptionsWriter.append(Integer.toString(r.size()));
+                                eccsLogExceptionsWriter.append(" Status: ");
+                                eccsLogExceptionsWriter.append(tsa[j].status.toString());
+                                eccsLogExceptionsWriter.append(" ");
+                                eccsLogExceptionsWriter.append(tsa[j + 1].status.toString());
+                                eccsLogExceptionsWriter.append("\r\n");
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    } // tweakTimeStamps()
+
 }
