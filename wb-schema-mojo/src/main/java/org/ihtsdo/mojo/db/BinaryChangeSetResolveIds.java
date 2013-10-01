@@ -1394,6 +1394,7 @@ public class BinaryChangeSetResolveIds {
                             tsa[i++] = new TimeStamp(timePrimordial, time, uuidStatus);
                         }
                         Arrays.sort(tsa);
+                        boolean rejectRevision = false;
                         for (int j = 0; j < tsa.length - 1; j++) {
                             if (tsa[j].time == tsa[j + 1].time) {
                                 eccsLogExceptionsWriter.append(":WARNING: found relationship with same revision timestamp.");
@@ -1408,16 +1409,17 @@ public class BinaryChangeSetResolveIds {
                                 eccsLogExceptionsWriter.append(" ");
                                 eccsLogExceptionsWriter.append(tsa[j + 1].status.toString());
                                 eccsLogExceptionsWriter.append("\r\n");
-                            }
-                            if (r.size() == 1) {
-                                tkRelationship.revisions = null;
-                                tkRelationship.statusUuid = rf2ActiveUuid;
-                                eccsLogExceptionsWriter.append("...... dropped relationship revision with same timestamp. made primordial active\r\n");
-                            } else {
-                                throw new UnsupportedOperationException("relationship with more than one duplicate timestamp not supported");
+                                rejectRevision = true;
                             }
                         }
-                    }
+                        if (rejectRevision && r.size() == 1) {
+                            tkRelationship.revisions = null;
+                            tkRelationship.statusUuid = rf2ActiveUuid;
+                            eccsLogExceptionsWriter.append("...... dropped relationship revision with same timestamp. made primordial active\r\n");
+                        } else if (rejectRevision) {
+                            throw new UnsupportedOperationException("relationship with other than one duplicate timestamp not supported");
+                        }
+                    } // tkRelationship.revisions != null
                 }
             }
         } 
