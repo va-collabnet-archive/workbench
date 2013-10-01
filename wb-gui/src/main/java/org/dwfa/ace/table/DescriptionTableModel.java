@@ -86,7 +86,7 @@ public abstract class DescriptionTableModel extends AbstractTableModel {
         AUTHOR("author", 5, 90, 150),
         TYPE("type", 5, 85, 450),
         VERSION("time", 5, 140, 140),
-        PATH("path", 5, 90, 150),
+        PATH("path", 5, 90, 400),
         CONCEPT_ID("id", 5, 100, 300),
         DESC_FSN("fsn", 5, 100, 2000);
         private String columnName;

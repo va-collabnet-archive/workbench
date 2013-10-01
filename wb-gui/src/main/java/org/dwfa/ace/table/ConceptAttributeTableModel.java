@@ -234,7 +234,7 @@ public class ConceptAttributeTableModel extends AbstractTableModel implements Pr
         DEFINED("defined", 5, 85, 1550),
         AUTHOR("author", 5, 90, 150),
         VERSION("time", 5, 140, 140),
-        PATH("path", 5, 90, 150);
+        PATH("path", 5, 90, 400);
 
         private String columnName;
 

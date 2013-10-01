@@ -265,7 +265,7 @@ public abstract class RelTableModel extends AbstractTableModel implements Proper
         STATUS("status", 5, 50, 250),
         AUTHOR("author", 5, 90, 150),
         VERSION("time", 5, 140, 140),
-        PATH("path", 5, 90, 180);
+        PATH("path", 5, 90, 400);
         private String columnName;
         private int min;
         private int pref;
