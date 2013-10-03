@@ -65,7 +65,9 @@ public class WfProcessDefinition implements WfProcessDefinitionBI {
 
 	@Override
 	public boolean isCompleteState(WfStateBI state) {
-		if (state.getName().startsWith("Approved") || state.getName().startsWith("Cancel")) {
+		if (state.getName().startsWith("Approved") || state.getName().startsWith("Cancel") ||
+			state.getUuid().equals(UUID.fromString("cdd1524b-f308-53f9-8361-0c2098458eb0")) || 
+			state.getUuid().equals(UUID.fromString("b59420f6-c6a1-5bab-a379-45f0642044c4"))) {
 			return true;
 		} else {
 			return false;
@@ -74,7 +76,9 @@ public class WfProcessDefinition implements WfProcessDefinitionBI {
 
 	@Override
 	public boolean isPromoteState(WfStateBI state) {
-		if (state.getName().startsWith("Approved")) {
+		if (state.getName().startsWith("Approved") ||
+			state.getUuid().equals(UUID.fromString("cdd1524b-f308-53f9-8361-0c2098458eb0")) || 
+			state.getUuid().equals(UUID.fromString("b59420f6-c6a1-5bab-a379-45f0642044c4"))) {
 			return true;
 		} else {
 			return false;

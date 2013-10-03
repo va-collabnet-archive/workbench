@@ -449,7 +449,9 @@ public class WfInstance implements Serializable, WfProcessInstanceBI {
 
 	@Override
 	public boolean isActive() {
-		if (status.getName().toLowerCase().startsWith("approved") || status.getName().toLowerCase().startsWith("cancel")) {
+		if (status.getName().toLowerCase().startsWith("approved") || status.getName().toLowerCase().startsWith("cancel") ||
+			status.getUuid().equals(UUID.fromString("cdd1524b-f308-53f9-8361-0c2098458eb0")) || 
+			status.getUuid().equals(UUID.fromString("b59420f6-c6a1-5bab-a379-45f0642044c4"))) {
 			return false;
 		} else {
 			return true;
@@ -458,7 +460,9 @@ public class WfInstance implements Serializable, WfProcessInstanceBI {
 
 	@Override
 	public boolean isCompleted() {
-		if (status.getName().toLowerCase().startsWith("approved") || status.getName().toLowerCase().startsWith("cancel")) {
+		if (status.getName().toLowerCase().startsWith("approved") || status.getName().toLowerCase().startsWith("cancel") ||
+			status.getUuid().equals(UUID.fromString("cdd1524b-f308-53f9-8361-0c2098458eb0")) || 
+			status.getUuid().equals(UUID.fromString("b59420f6-c6a1-5bab-a379-45f0642044c4"))) {
 			return true;
 		} else {
 			return false;
@@ -537,7 +541,9 @@ public class WfInstance implements Serializable, WfProcessInstanceBI {
 
 	@Override
 	public boolean isPromoted() {
-		if (status.getName().startsWith("Approved")) {
+		if (status.getName().startsWith("Approved") ||
+			status.getUuid().equals(UUID.fromString("cdd1524b-f308-53f9-8361-0c2098458eb0")) || 
+			status.getUuid().equals(UUID.fromString("b59420f6-c6a1-5bab-a379-45f0642044c4"))) {
 			return true;
 		} else {
 			return false;
