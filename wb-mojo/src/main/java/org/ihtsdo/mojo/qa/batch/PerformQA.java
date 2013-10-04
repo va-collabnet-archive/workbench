@@ -277,7 +277,8 @@ public class PerformQA implements I_ProcessConcepts {
 				}
 			}
 
-			if (uniqueFsnMap.containsKey(Type5UuidFactory.get(fsn))) {
+            // case insensitive FSN check
+			if (uniqueFsnMap.containsKey(Type5UuidFactory.get(fsn.toLowerCase()))) {
 				if (!duplicatesSet.contains(loopConcept.getNid())) {
 					ResultsItem r1 = new ResultsItem();
 					r1.setErrorCode(4);
@@ -293,7 +294,8 @@ public class PerformQA implements I_ProcessConcepts {
 					duplicatesSet.add(loopConcept.getNid());
 				}
 
-				I_GetConceptData duplicateConcept = Terms.get().getConcept(uniqueFsnMap.get(Type5UuidFactory.get(fsn)));
+                // case insensitive FSN check
+				I_GetConceptData duplicateConcept = Terms.get().getConcept(uniqueFsnMap.get(Type5UuidFactory.get(fsn.toLowerCase())));
 				if (!duplicatesSet.contains(duplicateConcept.getNid())) {
 					ResultsItem r2 = new ResultsItem();
 					r2.setErrorCode(4);
@@ -310,7 +312,8 @@ public class PerformQA implements I_ProcessConcepts {
 				}
 				System.out.println("* Found FSN duplication: " + fsn);
 			} else {
-				uniqueFsnMap.put(Type5UuidFactory.get(fsn), loopConcept.getNid());
+                // case insensitive FSN check
+				uniqueFsnMap.put(Type5UuidFactory.get(fsn.toLowerCase()), loopConcept.getNid());
 			}
 		}
 		//System.out.println("Individual loop for " + loopConcept.toString() + " in " + individualElapsed + " ms.");
