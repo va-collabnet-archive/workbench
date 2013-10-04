@@ -62,6 +62,7 @@ import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.refex.type_nid.RefexNidVersionBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 import org.ihtsdo.tk.helper.TerminologyHelperDrools;
 import org.ihtsdo.tk.spec.ConceptSpec;
 
@@ -270,7 +271,18 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 	public boolean isDescriptionTextNotUniqueInProvidedHierarchy(String descText, String conceptUuid, 
 			String hierarchyConceptUuid) throws Exception {
 		I_TermFactory tf = Terms.get();
-		SearchResult result = Terms.get().doLuceneSearch(QueryParser.escape(descText));
+        // (target, replacement)
+        String  searchStr = descText.trim(); // trim the white space
+        searchStr = searchStr.replace("(", "");
+        searchStr = searchStr.replace(")", "");
+        while (searchStr.contains("  ")) { // strip out extra middle spaces
+            searchStr = searchStr.replace("  ", " ");
+        }
+        searchStr = QueryParser.escape(searchStr);
+        searchStr = "+" + searchStr; // '+' to require first words
+        searchStr = searchStr.replace(" ", " +"); // '+' to require all words
+        
+		SearchResult result = Terms.get().doLuceneSearch(searchStr);
 		int conceptNid = Terms.get().uuidToNative(UUID.fromString(conceptUuid));
 		boolean unique = true;
 		if (result.topDocs.totalHits == 0) {
@@ -292,17 +304,18 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 						} catch (Exception e) {
 							// ignore, no pfdn in this environment
 						}
-						// if its not null and not "patient friendly preferred term" type and not preferred term type
-						if (potential_match != null && potential_match.getTypeNid() != pfdn && 
-								potential_match.getTypeNid() != Terms.get().uuidToNative(UUID.fromString("d8e3b37d-7c11-33ef-b1d0-8769e2264d44"))) {
+						// if its not null and not "patient friendly preferred term" type and not "RF1 Preferred Term"aka RF2 Preferred type
+						if (potential_match != null && 
+                                potential_match.getTypeNid() != pfdn && 
+								potential_match.getTypeNid() != SnomedMetadataRfx.getDES_SYNONYM_PREFERRED_NAME_NID()) {
 							boolean preferredInUs = false;
 
 							for (RefexChronicleBI annot : potential_match.getAnnotations()) {
-								// has an US refset extension (annotated)
-								if (annot.getRefexNid() == Terms.get().uuidToNative(UUID.fromString("29bf812c-7a77-595d-8b12-ea37c473a5e6"))) {
+								// has an US Language refset extension (annotated)
+								if (annot.getRefexNid() == SnomedMetadataRfx.getUS_DIALECT_REFEX_NID()) {
 									RefexNidVersionBI langAnnot = (RefexNidVersionBI) annot.getVersion(Terms.get().getActiveAceFrameConfig().getViewCoordinate());
 									// has preferred acceptability value
-									if (langAnnot != null && langAnnot.getNid1() == Terms.get().uuidToNative(UUID.fromString("15877c09-60d7-3464-bed8-635a98a7e5b2"))) {
+									if (langAnnot != null && langAnnot.getNid1() == SnomedMetadataRfx.getDESC_PREFERRED_NID()) {
 										preferredInUs = true;
 									}
 
@@ -315,17 +328,17 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 									String part_searchText1 = "";
 									String descText2 = "";
 
-									//                            if (part_search.getText().contains("(") && part_search.getText().indexOf("(") > 2) {
-									//                                text1 = part_search.getText().substring(0, part_search.getText().lastIndexOf("(")-1).toLowerCase().trim();
-									//                            } else {
-									//                                text1 = part_search.getText().toLowerCase().trim();
-									//                            }
-									//                            
-									//                            if (descText.contains("(")  && descText.indexOf("(") > 2) {
-									//                                text2 = descText.substring(0, descText.lastIndexOf("(")-1).toLowerCase().trim();
-									//                            } else {
-									//                                text2 = descText.toLowerCase().trim();
-									//                            }
+									// if (part_search.getText().contains("(") && part_search.getText().indexOf("(") > 2) {
+									//     text1 = part_search.getText().substring(0, part_search.getText().lastIndexOf("(")-1).toLowerCase().trim();
+									// } else {
+									//     text1 = part_search.getText().toLowerCase().trim();
+									// }
+									// 
+									// if (descText.contains("(")  && descText.indexOf("(") > 2) {
+									//     text2 = descText.substring(0, descText.lastIndexOf("(")-1).toLowerCase().trim();
+									// } else {
+									//     text2 = descText.toLowerCase().trim();
+									// }
 
 									if (descText.contains("(")  
 											&& descText.indexOf("(") > 2
