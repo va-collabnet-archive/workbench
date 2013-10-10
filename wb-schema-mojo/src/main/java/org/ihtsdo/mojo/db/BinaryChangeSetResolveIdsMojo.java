@@ -79,11 +79,17 @@ public class BinaryChangeSetResolveIdsMojo extends AbstractMojo {
      */
     private String idCacheDir = "";
     /**
-     * Primordial UUIDs of eConcepts to be skip ... i.e. not included in load.
+     * Primordial UUIDs of eConcepts to be skip ... i.e. not included in the database load.
      *
      * @parameter
      */
     private String[] skipUuids;
+    /**
+     * Primordial UUIDs of non-annotated members to be skip ... i.e. not included in the database load.
+     *
+     * @parameter
+     */
+    private String[] skipMemberUuids;
 
 
     @Override
@@ -122,6 +128,15 @@ public class BinaryChangeSetResolveIdsMojo extends AbstractMojo {
                     skipUuidSet.add(UUID.fromString(str));
                 }
                 rcsi.setSkipUuidSet(skipUuidSet);
+            }
+
+            // skip non-annotated refset members
+            if (skipMemberUuids != null) {
+                HashSet<UUID> skipMemberUuidSet = new HashSet<>();
+                for (String str : skipMemberUuids) {
+                    skipMemberUuidSet.add(UUID.fromString(str));
+                }
+                rcsi.setSkipMemberUuidSet(skipMemberUuidSet);
             }
 
             rcsi.processFiles();

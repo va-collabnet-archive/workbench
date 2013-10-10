@@ -75,9 +75,14 @@ public class BinaryChangeSetResolveIds {
     private SctIdResolution resolution;
     private UuidUuidRemapper sctPrimorialUuidRemapper;
     private HashSet<UUID> skipUuidSet;
+    private HashSet<UUID> skipMemberUuidSet;
 
-    void setSkipUuidSet(HashSet<UUID> skipUuidSet) {
-        this.skipUuidSet = skipUuidSet;
+    void setSkipUuidSet(HashSet<UUID> uuidSet) {
+        this.skipUuidSet = uuidSet;
+    }
+    
+    void setSkipMemberUuidSet(HashSet<UUID> uuidSet) {
+        this.skipMemberUuidSet = uuidSet;
     }
 
     void setSctPrimorialUuidRemapper(UuidUuidRemapper uuidUuidRemapper) {
@@ -141,6 +146,7 @@ public class BinaryChangeSetResolveIds {
         this.eccsTimeThreshold = 1327996800000L; // :!!!:TEMP: move to POM parameter
 
         this.skipUuidSet = null;
+        this.skipMemberUuidSet = null;
 
         setupPathRemapping();
     }
@@ -359,6 +365,12 @@ public class BinaryChangeSetResolveIds {
                         break;
                     }
 
+                    if (eConcept.refsetMembers != null &&
+                            eConcept.refsetMembers.size() > 0 &&
+                            skipMemberUuidSet != null) {
+                        processRefsetMembers(eConcept);
+                    }
+                    
                     long timeFirstEditL = timeStampEccsL;
                     eccsPathExceptionFoundB = false;
 
@@ -734,6 +746,22 @@ public class BinaryChangeSetResolveIds {
             }
         }
         return filteredIdList;
+    }
+
+    private void processRefsetMembers(TkConcept eConcept) throws IOException {
+        ArrayList<TkRefexAbstractMember<?>> memberList = new ArrayList<>();
+        for (TkRefexAbstractMember<?> member : eConcept.refsetMembers) {
+            if (skipMemberUuidSet.contains(member.primordialUuid)) {
+                eccsLogExceptionsWriter.append("skipped refset member :: \t");
+                eccsLogExceptionsWriter.append(member.primordialUuid.toString());
+                eccsLogExceptionsWriter.append("\t of component : \t");
+                eccsLogExceptionsWriter.append(member.componentUuid.toString());
+                eccsLogExceptionsWriter.append("\n");
+            } else {
+                memberList.add(member); // keep this member
+            }
+        }
+        eConcept.refsetMembers = memberList;
     }
 
 //    private void printPathAuthor(UUID authorUuid, UUID pathUuid) {
