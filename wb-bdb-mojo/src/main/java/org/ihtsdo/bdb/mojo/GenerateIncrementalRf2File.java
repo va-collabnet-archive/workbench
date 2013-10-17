@@ -15,7 +15,10 @@
  */
 package org.ihtsdo.bdb.mojo;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ConcurrentSkipListSet;
@@ -222,11 +225,11 @@ public class GenerateIncrementalRf2File extends AbstractMojo {
      */
     private ConceptDescriptor refsetParentConceptSpec;
     /**
-     * Set to true to make initial sct to uuid mapping files.
+     * Directory containing SCTID to UUID mapping files.
      *
-     * @parameter default-value="false"
+     * @parameter default-value="${basedir}/src/main/sct-uuid-maps"
      */
-    private boolean makeInitialMappingFiles;
+    private File mappingFileDir;
     /**
      * Effective date of previous release.
      *
@@ -367,12 +370,27 @@ public class GenerateIncrementalRf2File extends AbstractMojo {
             }
             getLog().info("Release type: " + releaseType);
             getLog().info("Criterion matches " + stampsToWrite.size() + " sapNids: " + stampsToWrite);
-            if (makeInitialMappingFiles) {
-                UuidToSctIdMapper mapper = new UuidToSctIdMapper(Ts.get().getAllConceptNids(), namespace, output);
+            boolean initMapper = true;
+            String[] paths = mappingFileDir.list(new FilenameFilter() {
+                @Override
+                public boolean accept(File file, String string) {
+                    return string.endsWith(".txt");
+                }
+            });
+            for (String s : paths) {
+                BufferedReader reader = new BufferedReader(new FileReader(mappingFileDir + System.getProperty("file.separator") + s));
+                String readLine = reader.readLine();
+                if (reader.readLine() != null) {
+                    initMapper = false;
+                }
+                reader.close();
+            }
+            if(initMapper){
+                UuidToSctIdMapper mapper = new UuidToSctIdMapper(Ts.get().getAllConceptNids(), namespace, mappingFileDir);
                 Ts.get().iterateConceptDataInSequence(mapper);
                 mapper.close();
             }
-            UuidSnomedMapHandler handler = new UuidSnomedMapHandler(output, output);
+            UuidSnomedMapHandler handler = new UuidSnomedMapHandler(mappingFileDir, mappingFileDir);
             handler.setNamespace(namespace);
             Integer refsetParentConceptNid = 0;
             if (refsetParentConceptSpec != null) {
