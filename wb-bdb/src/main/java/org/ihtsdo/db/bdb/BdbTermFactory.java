@@ -1099,7 +1099,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         timer.start();
 
         try {
-            query = QueryParser.escape(query);
+            query = query.replace("/","//");
             Query q = new QueryParser(LuceneManager.version, "desc",
                     new StandardAnalyzer(LuceneManager.version)).parse(query);
 
