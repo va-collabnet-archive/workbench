@@ -257,6 +257,7 @@ public class GenerateUsersExtended extends AbstractMojo {
    private ArrayList<ConceptSpec> additionalRoots = new ArrayList<>();
    private HashMap<UUID, Color> pathColors = new HashMap<>();
    private String pathColorProp;
+   private boolean isVaProject;
 
    private void addRelPermission(String userName, String typeUid,
                                  String typeName, String targetUid,
@@ -1490,6 +1491,8 @@ NEXT_WHILE:
                activeConfig.setRefsetInToggleVisible(refsetType, t, true);
            }
        }
+       
+       activeConfig.setVaProject(isVaProject);
 
       return activeConfig;
    }
@@ -1642,9 +1645,13 @@ NEXT_WHILE:
             makeUserDevPath = true;
          }
 
-         module        =
-            getConceptSpecFromPrefs(configProps.getProperty("module"));
-         generateAdjCs = configProps.getProperty("generateAdjCs");
+		module = getConceptSpecFromPrefs(configProps.getProperty("module"));
+		if (configProps.getProperty("isVaProject").equalsIgnoreCase("true")) {
+			isVaProject = true;
+		} else {
+			isVaProject = false;
+		}
+		generateAdjCs = configProps.getProperty("generateAdjCs");
          pathColorProp = configProps.getProperty("pathColors");
          processPathColors();
       } catch (FileNotFoundException ex) {
@@ -2387,6 +2394,8 @@ NEXT_WHILE:
          userConfig.setRefsetInToggleVisible(refsetType, t, true);
       }
 
+      userConfig.setVaProject(isVaProject);
+
       return userConfig;
    }
 
@@ -2459,14 +2468,8 @@ NEXT_WHILE:
       userConfig.getDbConfig().setProfileFile(userProfile);
 
       UUID moduleUuid = module.getLenient().getPrimUuid();
-
       userConfig.setModuleNid(Ts.get().getNidForUuids(moduleUuid));
       
-      if (module.getDescription().contains("VA ")) {
-    	  userConfig.setVaProject(true);
-      } else {
-    	  userConfig.setVaProject(false);
-      }
       Terms.get().setActiveAceFrameConfig(userConfig);
    }
 

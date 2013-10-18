@@ -306,7 +306,7 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
      *
      */
     private static final long serialVersionUID = 1L;
-    private static final int dataVersion = 53; // keep current with
+    private static final int dataVersion = 54; // keep current with
     // objDataVersion logic
     private static final int DEFAULT_TREE_TERM_DIV_LOC = 350;
     private transient VetoableChangeSupport vetoSupport = new VetoableChangeSupport(this);
@@ -455,8 +455,8 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 	private I_GetConceptData defaultProjectForChangedConcept;
 	// 53
 	private I_GetConceptData defaultWorkflowForChangedConcept;
-	
-	private boolean isVaProject;
+	// 54
+	private static boolean isVaProject = false;
 	
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
@@ -688,8 +688,12 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
 
     // 53
     writeConceptAsId(defaultWorkflowForChangedConcept, out);
+
+    // 54
+    out.writeBoolean(isVaProject);
 }
-private void writeConceptAsId(I_GetConceptData concept, ObjectOutputStream out) throws IOException {
+
+    private void writeConceptAsId(I_GetConceptData concept, ObjectOutputStream out) throws IOException {
         if (concept == null) {
             out.writeObject(null);
         } else {
@@ -1210,6 +1214,11 @@ private void writeConceptAsId(I_GetConceptData concept, ObjectOutputStream out) 
 				}
             }
             //54 see above
+            if (objDataVersion >= 54) {
+				isVaProject = in.readBoolean();
+			} else {
+				isVaProject = false;
+            }
         } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
         }
