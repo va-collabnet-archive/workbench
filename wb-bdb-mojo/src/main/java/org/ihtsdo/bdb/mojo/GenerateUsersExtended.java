@@ -203,6 +203,13 @@ public class GenerateUsersExtended extends AbstractMojo {
     * @parameter expression="${project.artifactId}"
     */
    private String artifactId;
+  
+   /**
+    * The value identifying if the project is VA or JIF
+    *
+    * @parameter default-value="false"
+    */
+   private boolean isVaProject;
 
    /**
     * The version to use when constructing a user preference appPrefix.
@@ -257,7 +264,6 @@ public class GenerateUsersExtended extends AbstractMojo {
    private ArrayList<ConceptSpec> additionalRoots = new ArrayList<>();
    private HashMap<UUID, Color> pathColors = new HashMap<>();
    private String pathColorProp;
-   private boolean isVaProject;
 
    private void addRelPermission(String userName, String typeUid,
                                  String typeName, String targetUid,
@@ -1646,11 +1652,6 @@ NEXT_WHILE:
          }
 
 		module = getConceptSpecFromPrefs(configProps.getProperty("module"));
-		if (configProps.getProperty("isVaProject").equalsIgnoreCase("true")) {
-			isVaProject = true;
-		} else {
-			isVaProject = false;
-		}
 		generateAdjCs = configProps.getProperty("generateAdjCs");
          pathColorProp = configProps.getProperty("pathColors");
          processPathColors();
