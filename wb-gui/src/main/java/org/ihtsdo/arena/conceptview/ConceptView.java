@@ -130,6 +130,7 @@ public class ConceptView extends JPanel {
         }
         kb = ConceptTemplates.getKb();
         addCommitListener(settings);
+        addFontListener(settings);
         setupPrefMap();
         dropPanelMgr = new DropPanelActionManager();
         Ts.get().addTermChangeListener(cvChangeListener);
@@ -168,6 +169,19 @@ public class ConceptView extends JPanel {
         });
     }
 
+    private void addFontListener(ConceptViewSettings settings) {
+        settings.addPropertyChangeListener("font-size", new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                try {
+                    layoutConcept(ConceptView.this.concept);
+                } catch (IOException ex) {
+                    AceLog.getAppLog().alertAndLogException(ex);
+                }
+            }
+        });
+    }
+    
     public void addHostListener(PropertyChangeListener l) {
         if ((settings != null) && (settings.getHost() != null)) {
             settings.getHost().addPropertyChangeListener("termComponent", l);

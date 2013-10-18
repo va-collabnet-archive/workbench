@@ -51,8 +51,11 @@ import com.mxgraph.swing.handler.mxCellHandler;
 import com.mxgraph.swing.view.mxICellEditor;
 import com.mxgraph.util.mxRectangle;
 import com.mxgraph.view.mxGraph;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeSupport;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import org.dwfa.ace.config.AceFrameConfig;
 
 public abstract class ArenaComponentSettings implements Serializable,
         ComponentListener, HierarchyBoundsListener {
@@ -80,6 +83,7 @@ public abstract class ArenaComponentSettings implements Serializable,
     protected JComponent preferences;
     protected JComponent renderer;
     private DefaultMutableTreeNode prefRoot;
+    public PropertyChangeSupport pcs = new PropertyChangeSupport(this);
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
@@ -160,11 +164,46 @@ public abstract class ArenaComponentSettings implements Serializable,
 
         @Override
         public void stateChanged(ChangeEvent e) {
+            float oldValue = fontSize;
             JSpinner mySpinner = (JSpinner)(e.getSource());
             Double value = (Double) mySpinner.getModel().getValue();
             fontSize = value.floatValue();
+            PropertyChangeEvent pce = new PropertyChangeEvent(this, "font-size", oldValue, value.floatValue());
+            pcs.firePropertyChange(pce);
         }
     
+    }
+        public synchronized void removePropertyChangeListener(String string,
+            PropertyChangeListener propertyChangeListener) {
+        pcs.removePropertyChangeListener(string, propertyChangeListener);
+    }
+
+    /**
+     * Removes the specified property change listener.
+     *
+     * @param propertyChangeListener the property change listener
+     */
+    public synchronized void removePropertyChangeListener(PropertyChangeListener propertyChangeListener) {
+        pcs.removePropertyChangeListener(propertyChangeListener);
+    }
+
+    /**
+     * Adds the specified property change listener.
+     *
+     * @param string the string describing the property name
+     * @param propertyChangeListener the property change listener
+     */
+    public synchronized void addPropertyChangeListener(String string, PropertyChangeListener propertyChangeListener) {
+        pcs.addPropertyChangeListener(string, propertyChangeListener);
+    }
+
+    /**
+     * Adds the specified property change listener.
+     *
+     * @param propertyChangeListener the property change listener
+     */
+    public synchronized void addPropertyChangeListener(PropertyChangeListener propertyChangeListener) {
+        pcs.addPropertyChangeListener(propertyChangeListener);
     }
 
 
