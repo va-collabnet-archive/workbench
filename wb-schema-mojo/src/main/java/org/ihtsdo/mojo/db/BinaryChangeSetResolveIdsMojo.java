@@ -100,7 +100,7 @@ public class BinaryChangeSetResolveIdsMojo extends AbstractMojo {
             resolution = SctIdResolution.KEEP_ALL_SCTID;
         } else if (resolutionApproach.equalsIgnoreCase("KEEP_NO_ECCS_SCTID")) {
             resolution = SctIdResolution.KEEP_NO_ECCS_SCTID;
-        } else if (resolutionApproach.equalsIgnoreCase("KEEP_LAST_CURRENT_USE")) {
+        } else if (resolutionApproach.equalsIgnoreCase("KEEP_LAST_CURRENT_USE_SCTID")) {
             resolution = SctIdResolution.KEEP_LAST_CURRENT_USE;
         } else if (resolutionApproach.equalsIgnoreCase("FILTER_DESCRIPTION_SCTIDS")) {
             // only process descriptions

@@ -65,7 +65,8 @@ public class BinaryChangeSetResolveIds {
     private UUID snomedIntUuid;
     private UUID rf1ActiveUuid;
     private UUID rf2ActiveUuid;
-    private UUID userAuthorUuid;
+    //private UUID userAuthorUuid;
+    private UUID moduleUuid;
     private UUID extensionPath;
     private UUID snomedCorePath;
     private long eccsTimeThreshold; // :!!!:TEMP: move to POM parameter
@@ -114,7 +115,9 @@ public class BinaryChangeSetResolveIds {
         this.snomedIntUuid = ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.getPrimoridalUid();
         this.rf1ActiveUuid = SnomedMetadataRf1.CURRENT_RF1.getUuids()[0];
         this.rf2ActiveUuid = SnomedMetadataRf2.ACTIVE_VALUE_RF2.getUuids()[0];
-        this.userAuthorUuid = UUID.fromString("f7495b58-6630-3499-a44e-2052b5fcf06c");
+        //this.userAuthorUuid = UUID.fromString("f7495b58-6630-3499-a44e-2052b5fcf06c");
+        // KP Extension module "815d5052-4fd5-599f-b996-4640eb166eeb"
+        this.moduleUuid = UUID.fromString("815d5052-4fd5-599f-b996-4640eb166eeb");
         this.eccsInputFiles = new ArrayList<>();
         File rootDir = new File(rootDirStr);
         listFilesRecursive(eccsInputFiles, rootDir, "", ".eccs");
@@ -476,6 +479,7 @@ public class BinaryChangeSetResolveIds {
                                 preList = tkram.additionalIds;
                                 postList = processIdListWithFilter(enclosingUuid, preList);
                                 tkram.additionalIds = postList;
+                                tkram.moduleUuid = moduleUuid;
                                 timeFirstEditL = findIdListFirstUseDate(postList, timeFirstEditL);
                             }
                         }
@@ -809,6 +813,7 @@ public class BinaryChangeSetResolveIds {
             // printPathAuthor(attributes.authorUuid, attributes.pathUuid);
             attributes.authorUuid = remapAuthor(attributes.authorUuid, attributes.pathUuid);
             attributes.pathUuid = remapPath(attributes.authorUuid, attributes.pathUuid);
+            attributes.moduleUuid = moduleUuid;
             // IDS
             if (attributes.additionalIds != null) {
                 List<TkIdentifier> ids = attributes.additionalIds;
@@ -816,6 +821,7 @@ public class BinaryChangeSetResolveIds {
                     // printPathAuthor(tki.authorUuid, tki.pathUuid);
                     tki.authorUuid = remapAuthor(tki.authorUuid, tki.pathUuid);
                     tki.pathUuid = remapPath(tki.authorUuid, tki.pathUuid);
+                    tki.moduleUuid = moduleUuid;
                 }
             }
             // ANNOTATIONS
@@ -825,6 +831,7 @@ public class BinaryChangeSetResolveIds {
                     // printPathAuthor(tkram.authorUuid, tkram.pathUuid);
                     tkram.authorUuid = remapAuthor(tkram.authorUuid, tkram.pathUuid);
                     tkram.pathUuid = remapPath(tkram.authorUuid, tkram.pathUuid);
+                    tkram.moduleUuid = moduleUuid;
                     List<?> revisions = tkram.revisions;
                     if (revisions != null) {
                         for (Object o : revisions) {
@@ -832,6 +839,7 @@ public class BinaryChangeSetResolveIds {
                                 TkRevision trur = (TkRevision) o;
                                 trur.authorUuid = remapAuthor(trur.authorUuid, trur.pathUuid);
                                 trur.pathUuid = remapPath(trur.authorUuid, trur.pathUuid);
+                                trur.moduleUuid = moduleUuid;
                             } else {
                                 throw new UnsupportedOperationException("remapPathUuids attributes revision" + o.getClass());
                             }
@@ -846,6 +854,7 @@ public class BinaryChangeSetResolveIds {
                     // printPathAuthor(tkcar.authorUuid, tkcar.pathUuid);
                     tkcar.authorUuid = remapAuthor(tkcar.authorUuid, tkcar.pathUuid);
                     tkcar.pathUuid = remapPath(tkcar.authorUuid, tkcar.pathUuid);
+                    tkcar.moduleUuid = moduleUuid;
                 }
             }
         }
@@ -856,6 +865,7 @@ public class BinaryChangeSetResolveIds {
                 // printPathAuthor(tkd.authorUuid, tkd.pathUuid);
                 tkd.authorUuid = remapAuthor(tkd.authorUuid, tkd.pathUuid);
                 tkd.pathUuid = remapPath(tkd.authorUuid, tkd.pathUuid);
+                tkd.moduleUuid = moduleUuid;
                 // IDS
                 if (tkd.additionalIds != null) {
                     List<TkIdentifier> ids = tkd.additionalIds;
@@ -863,6 +873,7 @@ public class BinaryChangeSetResolveIds {
                         // printPathAuthor(tki.authorUuid, tki.pathUuid);
                         tki.authorUuid = remapAuthor(tki.authorUuid, tki.pathUuid);
                         tki.pathUuid = remapPath(tki.authorUuid, tki.pathUuid);
+                        tki.moduleUuid = moduleUuid;
                     }
                 }
                 // ANNOTATIONS
@@ -872,6 +883,7 @@ public class BinaryChangeSetResolveIds {
                         // printPathAuthor(tkram.authorUuid, tkram.pathUuid);
                         tkram.authorUuid = remapAuthor(tkram.authorUuid, tkram.pathUuid);
                         tkram.pathUuid = remapPath(tkram.authorUuid, tkram.pathUuid);
+                        tkram.moduleUuid = moduleUuid;
                         List<?> revisions = tkram.revisions;
                         if (revisions != null) {
                             for (Object o : revisions) {
@@ -879,6 +891,7 @@ public class BinaryChangeSetResolveIds {
                                     TkRevision trur = (TkRevision) o;
                                     trur.authorUuid = remapAuthor(trur.authorUuid, trur.pathUuid);
                                     trur.pathUuid = remapPath(trur.authorUuid, trur.pathUuid);
+                                    trur.moduleUuid = moduleUuid;
                                 } else {
                                     throw new UnsupportedOperationException("remapPathUuids description revision" + o.getClass());
                                 }
@@ -893,6 +906,7 @@ public class BinaryChangeSetResolveIds {
                         // printPathAuthor(tkdr.authorUuid, tkdr.pathUuid);
                         tkdr.authorUuid = remapAuthor(tkdr.authorUuid, tkdr.pathUuid);
                         tkdr.pathUuid = remapPath(tkdr.authorUuid, tkdr.pathUuid);
+                        tkdr.moduleUuid = moduleUuid;
                     }
                 }
             }
@@ -904,6 +918,7 @@ public class BinaryChangeSetResolveIds {
                 // printPathAuthor(tkr.authorUuid, tkr.pathUuid);
                 tkr.authorUuid = remapAuthor(tkr.authorUuid, tkr.pathUuid);
                 tkr.pathUuid = remapPath(tkr.authorUuid, tkr.pathUuid);
+                tkr.moduleUuid = moduleUuid;
                 // IDS
                 if (tkr.additionalIds != null) {
                     List<TkIdentifier> ids = tkr.additionalIds;
@@ -911,6 +926,7 @@ public class BinaryChangeSetResolveIds {
                         // printPathAuthor(tki.authorUuid, tki.pathUuid);
                         tki.authorUuid = remapAuthor(tki.authorUuid, tki.pathUuid);
                         tki.pathUuid = remapPath(tki.authorUuid, tki.pathUuid);
+                        tki.moduleUuid = moduleUuid;
                     }
                 }
                 // ANNOTATIONS
@@ -920,6 +936,7 @@ public class BinaryChangeSetResolveIds {
                         // printPathAuthor(tkram.authorUuid, tkram.pathUuid);
                         tkram.authorUuid = remapAuthor(tkram.authorUuid, tkram.pathUuid);
                         tkram.pathUuid = remapPath(tkram.authorUuid, tkram.pathUuid);
+                        tkram.moduleUuid = moduleUuid;
                         List<?> revisions = tkram.revisions;
                         if (revisions != null) {
                             for (Object o : revisions) {
@@ -927,6 +944,7 @@ public class BinaryChangeSetResolveIds {
                                     TkRevision trur = (TkRevision) o;
                                     trur.authorUuid = remapAuthor(trur.authorUuid, trur.pathUuid);
                                     trur.pathUuid = remapPath(trur.authorUuid, trur.pathUuid);
+                                    trur.moduleUuid = moduleUuid;
                                 } else {
                                     throw new UnsupportedOperationException("remapPathUuids relationship revision" + o.getClass());
                                 }
@@ -941,6 +959,7 @@ public class BinaryChangeSetResolveIds {
                         // printPathAuthor(tkrr.authorUuid, tkrr.pathUuid);
                         tkrr.authorUuid = remapAuthor(tkrr.authorUuid, tkrr.pathUuid);
                         tkrr.pathUuid = remapPath(tkrr.authorUuid, tkrr.pathUuid);
+                        tkrr.moduleUuid = moduleUuid;
                     }
                 }
             }
@@ -953,6 +972,7 @@ public class BinaryChangeSetResolveIds {
                 // printPathAuthor(tkram.authorUuid, tkram.pathUuid);
                 tkram.authorUuid = remapAuthor(tkram.authorUuid, tkram.pathUuid);
                 tkram.pathUuid = remapPath(tkram.authorUuid, tkram.pathUuid);
+                tkram.moduleUuid = moduleUuid;
                 // IDS
                 List<TkIdentifier> ids = tkram.additionalIds;
                 if (ids != null) {
@@ -960,6 +980,7 @@ public class BinaryChangeSetResolveIds {
                         // printPathAuthor(tki.authorUuid, tki.pathUuid);
                         tki.authorUuid = remapAuthor(tki.authorUuid, tki.pathUuid);
                         tki.pathUuid = remapPath(tki.authorUuid, tki.pathUuid);
+                        tki.moduleUuid = moduleUuid;
                     }
                 }
                 // ANNOTATIONS
