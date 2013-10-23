@@ -706,10 +706,9 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
                     
                     if(settings.getRelAssertionType().equals(RelAssertionType.SHORT_NORMAL_FORM)){
                         HashSet<Integer> parentNids = new HashSet<>();
-                        HashSet<RelationshipVersionBI> allParentRels = new HashSet<>();
-                        allParentRels = findProximalPrimitve(inferredRels);
-                        HashSet<RelationshipVersionBI> noDupsParentRels = new HashSet<>();
-                        for(RelationshipVersionBI r : allParentRels){
+                        HashSet<RelationshipVersionBI> primitiveParentRels = findProximalPrimitve(inferredRels); //final all proximal primitives
+                        HashSet<RelationshipVersionBI> noDupsParentRels = new HashSet<>(); //remove any duplicates
+                        for(RelationshipVersionBI r : primitiveParentRels){
                             if(!parentNids.contains(r.getTargetNid())){
                                 parentNids.add(r.getTargetNid());
                                 noDupsParentRels.add(r);
@@ -718,7 +717,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
                         
                         HashSet<RelationshipVersionBI> filteredParentRels = new HashSet<>(noDupsParentRels);
                         for(RelationshipVersionBI childRel : noDupsParentRels){
-                            int childNid = childRel.getTargetNid();
+                            int childNid = childRel.getTargetNid(); //what's happening here?
                             for(RelationshipVersionBI parentRel : noDupsParentRels){
                                 int parentNid = parentRel.getTargetNid();
                                 if(Ts.get().isKindOf(childNid, parentNid, coordinate) &&
@@ -1155,6 +1154,8 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
     private HashSet<RelationshipVersionBI> findShortNormRoleRelsToDisplay(HashSet<RelationshipVersionBI> roleRels, HashSet<RelationshipVersionBI> proximalParents) throws IOException, ContradictionException, NoSuchAlgorithmException{
          HashSet<RelationshipVersionBI> relsToKeep = new HashSet<>();
         HashSet<UUID> parentRelHashes = new HashSet<>();
+        RelAssertionType oldRelType = coordinate.getRelationshipAssertionType();
+        coordinate.setRelationshipAssertionType(RelAssertionType.STATED);
         //find parents
         for (RelationshipVersionBI p : proximalParents) {
             ConceptVersionBI parent = Ts.get().getConceptVersion(coordinate, p.getTargetNid());
@@ -1162,7 +1163,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
             HashSet<RelationshipVersionBI> roleRelsParent = new HashSet<>();
             for (RelationshipVersionBI r : rels) {
                 if (r.getTypeNid() != Snomed.IS_A.getLenient().getNid()
-                        && r.getCharacteristicNid() == SnomedMetadataRf2.INFERRED_RELATIONSHIP_RF2.getLenient().getNid()) {
+                        && r.getCharacteristicNid() == SnomedMetadataRf2.STATED_RELATIONSHIP_RF2.getLenient().getNid()) {
                     roleRelsParent.add(r);
                 }
             }
@@ -1170,10 +1171,8 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
             if (!roleRelsParent.isEmpty()) {
                 for (RelationshipVersionBI rel : roleRelsParent) {
                     if (rel.getGroup() == 0) {
-                        UUID hash = Type5UuidFactory.get(Ts.get().getUuidPrimordialForNid(rel.getSourceNid()).toString()
-                                + Ts.get().getUuidPrimordialForNid(rel.getTypeNid()).toString()
-                                + Ts.get().getUuidPrimordialForNid(rel.getTargetNid()).toString()
-                                + Ts.get().getUuidPrimordialForNid(rel.getCharacteristicNid()).toString());
+                        UUID hash = Type5UuidFactory.get(Ts.get().getUuidPrimordialForNid(rel.getTypeNid()).toString()
+                                + Ts.get().getUuidPrimordialForNid(rel.getTargetNid()).toString());
                         parentRelHashes.add(hash);
                     } else {
                         int group = rel.getGroup();
@@ -1181,10 +1180,8 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
                         String hash = null;
                         for (RelationshipVersionBI r : roleRelsParent) {
                             if (r.getGroup() == group && r.getCharacteristicNid() == rel.getCharacteristicNid()) {
-                                hash = Ts.get().getUuidPrimordialForNid(r.getSourceNid()).toString()
-                                        + Ts.get().getUuidPrimordialForNid(r.getTypeNid()).toString()
-                                        + Ts.get().getUuidPrimordialForNid(r.getTargetNid()).toString()
-                                        + Ts.get().getUuidPrimordialForNid(r.getCharacteristicNid()).toString();
+                                hash = Ts.get().getUuidPrimordialForNid(r.getTypeNid()).toString()
+                                        + Ts.get().getUuidPrimordialForNid(r.getTargetNid()).toString();
                                 hashes.add(hash);
                             }
                         }
@@ -1204,10 +1201,8 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
        
         for (RelationshipVersionBI rel : roleRels) {
             if (rel.getGroup() == 0) {
-                UUID hash = Type5UuidFactory.get(Ts.get().getUuidPrimordialForNid(rel.getSourceNid()).toString()
-                        + Ts.get().getUuidPrimordialForNid(rel.getTypeNid()).toString()
-                        + Ts.get().getUuidPrimordialForNid(rel.getTargetNid()).toString()
-                        + Ts.get().getUuidPrimordialForNid(rel.getCharacteristicNid()).toString());
+                UUID hash = Type5UuidFactory.get(Ts.get().getUuidPrimordialForNid(rel.getTypeNid()).toString()
+                        + Ts.get().getUuidPrimordialForNid(rel.getTargetNid()).toString());
                 if(!parentRelHashes.contains(hash)){
                     relsToKeep.add(rel);
                 }
@@ -1218,10 +1213,8 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
                 String hash = null;
                 for (RelationshipVersionBI r : roleRels) {
                     if (r.getGroup() == group && r.getCharacteristicNid() == rel.getCharacteristicNid()) {
-                        hash = Ts.get().getUuidPrimordialForNid(r.getSourceNid()).toString()
-                                + Ts.get().getUuidPrimordialForNid(r.getTypeNid()).toString()
-                                + Ts.get().getUuidPrimordialForNid(r.getTargetNid()).toString()
-                                + Ts.get().getUuidPrimordialForNid(r.getCharacteristicNid()).toString();
+                        hash = Ts.get().getUuidPrimordialForNid(r.getTypeNid()).toString()
+                                + Ts.get().getUuidPrimordialForNid(r.getTargetNid()).toString();
                         hashes.add(hash);
                         relGroup.add(r);
                     }
@@ -1238,7 +1231,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
             }
         }
                 
-        
+        coordinate.setRelationshipAssertionType(oldRelType);
         return relsToKeep;
     }
     
@@ -1252,8 +1245,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
          //make hashes for role rels
         for (RelationshipVersionBI rel : roleRels) {
             if (rel.getGroup() == 0) {
-                UUID hash = Type5UuidFactory.get(Ts.get().getUuidPrimordialForNid(rel.getSourceNid()).toString()
-                        + Ts.get().getUuidPrimordialForNid(rel.getTypeNid()).toString()
+                UUID hash = Type5UuidFactory.get(Ts.get().getUuidPrimordialForNid(rel.getTypeNid()).toString()
                         + Ts.get().getUuidPrimordialForNid(rel.getTargetNid()).toString());
                 childRelHashes.add(hash);
                 relToHashMap.put(hash, rel);
@@ -1265,8 +1257,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
                 HashSet<RelationshipVersionBI> relGroup = new HashSet<>();
                 for (RelationshipVersionBI r : roleRels) {
                     if (r.getGroup() == group && r.getCharacteristicNid() == rel.getCharacteristicNid()) {
-                        hash = Ts.get().getUuidPrimordialForNid(r.getSourceNid()).toString()
-                                + Ts.get().getUuidPrimordialForNid(r.getTypeNid()).toString()
+                        hash = Ts.get().getUuidPrimordialForNid(r.getTypeNid()).toString()
                                 + Ts.get().getUuidPrimordialForNid(r.getTargetNid()).toString();
                         hashes.add(hash);
                         relGroup.add(r);
@@ -1298,8 +1289,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
             if (!roleRelsParent.isEmpty()) {
                 for (RelationshipVersionBI rel : roleRelsParent) {
                     if (rel.getGroup() == 0) {
-                        UUID hash = Type5UuidFactory.get(Ts.get().getUuidPrimordialForNid(rel.getSourceNid()).toString()
-                                + Ts.get().getUuidPrimordialForNid(rel.getTypeNid()).toString()
+                        UUID hash = Type5UuidFactory.get(Ts.get().getUuidPrimordialForNid(rel.getTypeNid()).toString()
                                 + Ts.get().getUuidPrimordialForNid(rel.getTargetNid()).toString());
                         if(!childRelHashes.contains(hash)){
                             relsToKeep.add(rel);
@@ -1313,8 +1303,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
                         HashSet<RelationshipVersionBI> relGroup = new HashSet<>();
                         for (RelationshipVersionBI r : roleRelsParent) {
                             if (r.getGroup() == group && r.getCharacteristicNid() == rel.getCharacteristicNid()) {
-                                 hash = Ts.get().getUuidPrimordialForNid(r.getSourceNid()).toString()
-                                        + Ts.get().getUuidPrimordialForNid(r.getTypeNid()).toString()
+                                 hash = Ts.get().getUuidPrimordialForNid(r.getTypeNid()).toString()
                                         + Ts.get().getUuidPrimordialForNid(r.getTargetNid()).toString();
                                 hashes.add(hash);
                                 relGroup.add(r);
