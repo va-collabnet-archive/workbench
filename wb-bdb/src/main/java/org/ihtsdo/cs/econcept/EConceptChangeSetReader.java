@@ -109,12 +109,12 @@ public class EConceptChangeSetReader implements I_ReadChangeSet {
             try {
                 EConcept eConcept = new EConcept(dataStream);
 
-                if (eConcept.getPrimordialUuid().compareTo(UUID.fromString("9ef4e796-d5b9-538e-b1b4-43b4d9d7815a")) == 0) {
-                    System.out.println(":!!!:DEBUG: EConceptChangeSetReader ....AAA.... EDG Clinical Contextset Member Id\n" + eConcept.toString());
-                }
-                if (eConcept.getPrimordialUuid().compareTo(UUID.fromString("9db37d8b-9be4-5e92-8644-35fc12836e7f")) == 0) {
-                    System.out.println(":!!!:DEBUG: EConceptChangeSetReader ....AAA.... Ophthalmology Problem List\n" + eConcept.toString());
-                }
+//                 if (eConcept.getPrimordialUuid().compareTo(UUID.fromString("9ef4e796-d5b9-538e-b1b4-43b4d9d7815a")) == 0) {
+//                     System.out.println(":!!!:DEBUG: EConceptChangeSetReader ....AAA.... EDG Clinical Contextset Member Id\n" + eConcept.toString());
+//                 }
+//                 if (eConcept.getPrimordialUuid().compareTo(UUID.fromString("9db37d8b-9be4-5e92-8644-35fc12836e7f")) == 0) {
+//                     System.out.println(":!!!:DEBUG: EConceptChangeSetReader ....AAA.... Ophthalmology Problem List\n" + eConcept.toString());
+//                 }
                 if (csreOut != null) {
                     csreOut.append("\n*******************************\n");
                     csreOut.append(TimeHelper.formatDateForFile(nextCommitTime()));
@@ -202,12 +202,12 @@ public class EConceptChangeSetReader implements I_ReadChangeSet {
             return null;
         }
 
-        if (eConcept.getPrimordialUuid().compareTo(UUID.fromString("9ef4e796-d5b9-538e-b1b4-43b4d9d7815a")) == 0) {
-            System.out.println(":!!!:DEBUG: EConceptChangeSetReader ....CCC.... EDG Clinical Contextset Member Id\n" + eConcept.toString());
-        }
-        if (eConcept.getPrimordialUuid().compareTo(UUID.fromString("9db37d8b-9be4-5e92-8644-35fc12836e7f")) == 0) {
-            System.out.println(":!!!:DEBUG: EConceptChangeSetReader ....CCC.... Ophthalmology Problem List\n" + eConcept.toString());
-        }
+//         if (eConcept.getPrimordialUuid().compareTo(UUID.fromString("9ef4e796-d5b9-538e-b1b4-43b4d9d7815a")) == 0) {
+//             System.out.println(":!!!:DEBUG: EConceptChangeSetReader ....CCC.... EDG Clinical Contextset Member Id\n" + eConcept.toString());
+//         }
+//         if (eConcept.getPrimordialUuid().compareTo(UUID.fromString("9db37d8b-9be4-5e92-8644-35fc12836e7f")) == 0) {
+//             System.out.println(":!!!:DEBUG: EConceptChangeSetReader ....CCC.... Ophthalmology Problem List\n" + eConcept.toString());
+//         }
 
         try {
             assert time != Long.MAX_VALUE;
