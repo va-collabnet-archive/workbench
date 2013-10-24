@@ -38,11 +38,6 @@ public abstract class StringWithTuple<T extends I_CellTextWithTuple<T>> implemen
             }
             text = "<html><em style=\"color:red\">" + text + "</em>";
         }
-        if(text.startsWith("<html>")){
-            text = StringEscapeUtils.escapeHtml(text);
-        }else{
-            text = "<html>"+ StringEscapeUtils.escapeHtml(text);
-        }
         return text;
     }
 
