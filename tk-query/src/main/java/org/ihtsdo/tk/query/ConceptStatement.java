@@ -1,16 +1,19 @@
 /**
- * Copyright (c) 2009 International Health Terminology Standards Development Organisation
+ * Copyright (c) 2009 International Health Terminology Standards Development
+ * Organisation
  *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
- * compliance with the License. You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
  *
  * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software distributed under the License is
- * distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  */
-
 package org.ihtsdo.tk.query;
 
 import java.io.IOException;
@@ -29,8 +32,8 @@ import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.query.RefsetSpecQuery.GROUPING_TYPE;
 
 /**
- * Represents partial information contained in a refset spec. An example of a statement is : "NOT: Concept is
- * : Paracetamol"
+ * Represents partial information contained in a refset spec. An example of a
+ * statement is : "NOT: Concept is : Paracetamol"
  *
  */
 public class ConceptStatement extends RefsetSpecStatement {
@@ -44,7 +47,8 @@ public class ConceptStatement extends RefsetSpecStatement {
      * @param useNotQualifier Whether to use the NOT qualifier.
      * @param queryToken The query type to use (e.g. "concept is")
      * @param queryConstraint The destination concept (e.g. "paracetamol")
-     * @param viewCoordinate  The <code>ViewCoordinate</code> specifying active/inactive versions
+     * @param viewCoordinate The <code>ViewCoordinate</code> specifying
+     * active/inactive versions
      * @throws Exception
      */
     public ConceptStatement(boolean useNotQualifier, ConceptChronicleBI queryToken, ConceptChronicleBI queryConstraint,
@@ -97,7 +101,7 @@ public class ConceptStatement extends RefsetSpecStatement {
                     possibleConcepts.or(parentPossibleConcepts);
                 } else {
                     NidBitSetBI results = Ts.get().getEmptyNidSet();
-                    for(int nid : Ts.get().getChildren(queryConstraintConcept.getNid(), viewCoordinate)){
+                    for (int nid : Ts.get().getChildren(queryConstraintConcept.getNid(), viewCoordinate)) {
                         results.setMember(nid);
                     }
                     possibleConcepts.or(results);
@@ -113,8 +117,8 @@ public class ConceptStatement extends RefsetSpecStatement {
                 }
                 break;
             case CONCEPT_IS_MEMBER_OF:
-                                Collection<? extends RefexChronicleBI<?>> refsetExtensions = 
-                        termFactory.getConcept(((ConceptChronicleBI) queryConstraint).getNid()).getRefsetMembers();
+                Collection<? extends RefexChronicleBI<?>> refsetExtensions
+                        = termFactory.getConcept(((ConceptChronicleBI) queryConstraint).getNid()).getRefsetMembers();
                 NidBitSetBI refsetMemberSet = termFactory.getEmptyNidSet();
                 for (RefexChronicleBI ext : refsetExtensions) {
                     int componentId = ext.getReferencedComponentNid();
@@ -147,18 +151,18 @@ public class ConceptStatement extends RefsetSpecStatement {
         }
         setPossibleConceptsCount(possibleConcepts.cardinality());
 
-            long endTime = System.currentTimeMillis();
-            long elapsed = endTime - startTime;
-            String elapsedStr = TimeHelper.getElapsedTimeString(elapsed);
-            System.out.println("Elapsed: " + elapsedStr + ";  Incoming count: "
-                    + parentPossibleConcepts.cardinality() + "; Outgoing count: " + possibleConcepts.cardinality());
+        long endTime = System.currentTimeMillis();
+        long elapsed = endTime - startTime;
+        String elapsedStr = TimeHelper.getElapsedTimeString(elapsed);
+        System.out.println("Elapsed: " + elapsedStr + ";  Incoming count: "
+                + parentPossibleConcepts.cardinality() + "; Outgoing count: " + possibleConcepts.cardinality());
         return possibleConcepts;
     }
 
     @Override
     public boolean getStatementResult(int componentNid, Object component, GROUPING_TYPE groupingVersion, ViewCoordinate v1_is,
             ViewCoordinate v2_is) throws IOException, ContradictionException {
-        if(ConceptChronicleBI.class.isAssignableFrom(component.getClass())){
+        if (ConceptChronicleBI.class.isAssignableFrom(component.getClass())) {
             ConceptChronicleBI concept = (ConceptChronicleBI) component;
 //TODO: what was the point of this?
 //        if (version != null || v1_is != null || v2_is != null) {
@@ -188,81 +192,85 @@ public class ConceptStatement extends RefsetSpecStatement {
 //            }
 //        }
 
-        switch (tokenEnum) {
-            case CONCEPT_IS:
-                if (groupingVersion == null) {
-                    return conceptIs(componentNid);
-                } else {
-                    return conceptIs(componentNid);
-                }
-            case CONCEPT_IS_CHILD_OF:
-                if (groupingVersion == null) {
-                    return conceptIsChildOf(componentNid, viewCoordinate);
-                } else {
-                    return conceptIsChildOf(componentNid, getViewCoordinate(groupingVersion, v1_is, v2_is));
-                }
-            case CONCEPT_IS_DESCENDENT_OF:
-                if (groupingVersion == null) {
-                    return conceptIsDescendantOf(componentNid, viewCoordinate);
-                } else {
-                    return conceptIsDescendantOf(componentNid, getViewCoordinate(groupingVersion, v1_is, v2_is));
-                }
-            case CONCEPT_IS_KIND_OF:
-                if (groupingVersion == null) {
-                    return conceptIsKindOf(componentNid, viewCoordinate);
-                } else {
-                    return conceptIsKindOf(componentNid, getViewCoordinate(groupingVersion, v1_is, v2_is));
-                }
-            case CONCEPT_IS_MEMBER_OF:
-                if (groupingVersion == null) {
-                    return conceptIsMemberOf(concept.getVersion(viewCoordinate));
-                } else {
-                    throw new IOException(tokenEnum
-                            + ": Unsupported operation for version scope.");
-                }
-            case CONCEPT_STATUS_IS:
-                if (groupingVersion == null) {
-                    return conceptStatusIs(concept.getVersion(viewCoordinate));
-                } else {
-                    return conceptStatusIs(concept.getVersion(getViewCoordinate(groupingVersion, v1_is, v2_is)));
-                }
-            case CONCEPT_STATUS_IS_CHILD_OF:
-                if (groupingVersion == null) {
-                    return conceptStatusIsChildOf(concept.getVersion(viewCoordinate));
-                } else {
-                    return conceptStatusIsChildOf(concept.getVersion(getViewCoordinate(groupingVersion, v1_is, v2_is)));
-                }
-            case CONCEPT_STATUS_IS_DESCENDENT_OF:
-                if (groupingVersion == null) {
-                    return conceptStatusIsDescendantOf(concept.getVersion(viewCoordinate));
-                } else {
-                    return conceptStatusIsDescendantOf(concept.getVersion(getViewCoordinate(groupingVersion, v1_is, v2_is)));
-                }
-            case CONCEPT_STATUS_IS_KIND_OF:
-                if (groupingVersion == null) {
-                    return conceptStatusIsKindOf(concept.getVersion(viewCoordinate));
-                } else {
-                    return conceptStatusIsKindOf(concept.getVersion(getViewCoordinate(groupingVersion, v1_is, v2_is)));
-                }
-            case ADDED_CONCEPT:
-                return addedConcept(concept, v1_is, v2_is);
-            case CHANGED_CONCEPT_STATUS:
-                return changedConceptStatus(concept, v1_is, v2_is);
-            case CHANGED_CONCEPT_DEFINED:
-                return changedConceptDefined(concept, v1_is, v2_is);
-            default:
-                throw new RuntimeException("Can't handle queryToken: " + queryToken);
-        }
-        }else{
+            switch (tokenEnum) {
+                case CONCEPT_IS:
+                    if (groupingVersion == null) {
+                        return conceptIs(componentNid);
+                    } else {
+                        return conceptIs(componentNid);
+                    }
+                case CONCEPT_IS_CHILD_OF:
+                    if (groupingVersion == null) {
+                        return conceptIsChildOf(componentNid, viewCoordinate);
+                    } else {
+                        return conceptIsChildOf(componentNid, getViewCoordinate(groupingVersion, v1_is, v2_is));
+                    }
+                case CONCEPT_IS_DESCENDENT_OF:
+                    if (groupingVersion == null) {
+                        return conceptIsDescendantOf(componentNid, viewCoordinate);
+                    } else {
+                        return conceptIsDescendantOf(componentNid, getViewCoordinate(groupingVersion, v1_is, v2_is));
+                    }
+                case CONCEPT_IS_KIND_OF:
+                    if (groupingVersion == null) {
+                        return conceptIsKindOf(componentNid, viewCoordinate);
+                    } else {
+                        return conceptIsKindOf(componentNid, getViewCoordinate(groupingVersion, v1_is, v2_is));
+                    }
+                case CONCEPT_IS_MEMBER_OF:
+                    if (groupingVersion == null) {
+                        return conceptIsMemberOf(concept.getVersion(viewCoordinate));
+                    } else {
+                        throw new IOException(tokenEnum
+                                + ": Unsupported operation for version scope.");
+                    }
+                case CONCEPT_STATUS_IS:
+                    if (groupingVersion == null) {
+                        return conceptStatusIs(concept.getVersion(viewCoordinate));
+                    } else {
+                        return conceptStatusIs(concept.getVersion(getViewCoordinate(groupingVersion, v1_is, v2_is)));
+                    }
+                case CONCEPT_STATUS_IS_CHILD_OF:
+                    if (groupingVersion == null) {
+                        return conceptStatusIsChildOf(concept.getVersion(viewCoordinate));
+                    } else {
+                        return conceptStatusIsChildOf(concept.getVersion(getViewCoordinate(groupingVersion, v1_is, v2_is)));
+                    }
+                case CONCEPT_STATUS_IS_DESCENDENT_OF:
+                    if (groupingVersion == null) {
+                        return conceptStatusIsDescendantOf(concept.getVersion(viewCoordinate));
+                    } else {
+                        return conceptStatusIsDescendantOf(concept.getVersion(getViewCoordinate(groupingVersion, v1_is, v2_is)));
+                    }
+                case CONCEPT_STATUS_IS_KIND_OF:
+                    if (groupingVersion == null) {
+                        return conceptStatusIsKindOf(concept.getVersion(viewCoordinate));
+                    } else {
+                        return conceptStatusIsKindOf(concept.getVersion(getViewCoordinate(groupingVersion, v1_is, v2_is)));
+                    }
+                case ADDED_CONCEPT:
+                    return addedConcept(concept, v1_is, v2_is);
+                case CHANGED_CONCEPT_STATUS:
+                    return changedConceptStatus(concept, v1_is, v2_is);
+                case CHANGED_CONCEPT_DEFINED:
+                    return changedConceptDefined(concept, v1_is, v2_is);
+                default:
+                    throw new RuntimeException("Can't handle queryToken: " + queryToken);
+            }
+        } else {
             return false;
         }
     }
 
     /**
-     * Tests if the concept being tested is an immediate child of the query constraint.
+     * Tests if the concept being tested is an immediate child of the query
+     * constraint.
+     *
      * @param conceptNid the nid of the concept being tested
-     * @param viewCoordinate the <code>ViewCoordinate</code> specifying active/inactive versions
-     * @return <code>true</code> if the concept is a child of the query constraint, otherwise <code>false</code>
+     * @param viewCoordinate the <code>ViewCoordinate</code> specifying
+     * active/inactive versions
+     * @return <code>true</code> if the concept is a child of the query
+     * constraint, otherwise <code>false</code>
      * @throws IOException indicates an I/O Exception has occurred
      */
     private boolean conceptIsChildOf(int conceptNid, ViewCoordinate viewCoordinate) throws IOException {
@@ -277,10 +285,13 @@ public class ConceptStatement extends RefsetSpecStatement {
     /**
      * Tests of the concept being tested is a member of the specified refset.
      *
-     * @param concept the <code>ConceptVersionBI</code> representing the concept being tested
-     * @return true if the concept is a member of the specified refset, <code>false</code> otherwise
+     * @param concept the <code>ConceptVersionBI</code> representing the concept
+     * being tested
+     * @return true if the concept is a member of the specified refset,
+     * <code>false</code> otherwise
      * @throws IOException indicates an I/O Exception as occurred
-     * @throws TerminologyException indicates a Terminolgoy Exception has occurred
+     * @throws TerminologyException indicates a Terminolgoy Exception has
+     * occurred
      */
     private boolean conceptIsMemberOf(ConceptVersionBI conceptBeingTested) throws IOException {
         return componentIsMemberOf(conceptBeingTested);
@@ -290,18 +301,21 @@ public class ConceptStatement extends RefsetSpecStatement {
      * Tests of the current concept is the same as the query constraint.
      *
      * @param concept the nid of the concept being tested
-     * @return <code>true</code> if the concept is the same, <code>false</code> otherwise
+     * @return <code>true</code> if the concept is the same, <code>false</code>
+     * otherwise
      */
     private boolean conceptIs(int conceptNid) {
         return conceptNid == queryConstraintConcept.getConceptNid();
     }
 
     /**
-     * Tests if the current concept is a child of the query constraint. This does not return true if they are
-     * the same concept. This will check depth >= 1 to find children.
+     * Tests if the current concept is a child of the query constraint. This
+     * does not return true if they are the same concept. This will check depth
+     * >= 1 to find children.
      *
      * @param concept the nid of the concept being tested
-     * @param concept the <code>ViewCoordinate</code> specifying which versions are active/inactive
+     * @param concept the <code>ViewCoordinate</code> specifying which versions
+     * are active/inactive
      * @return
      * @throws IOException
      * @throws TerminologyException
@@ -316,8 +330,9 @@ public class ConceptStatement extends RefsetSpecStatement {
     }
 
     /**
-     * Tests if the current concept is a child of the query constraint. This will return true if they are the
-     * same concept. This will check depth >= 1 to find children.
+     * Tests if the current concept is a child of the query constraint. This
+     * will return true if they are the same concept. This will check depth >= 1
+     * to find children.
      *
      * @param concept
      * @return
@@ -329,9 +344,10 @@ public class ConceptStatement extends RefsetSpecStatement {
     }
 
     /**
-     * Tests if the current concept has a status the same as the query constraint.
+     * Tests if the current concept has a status the same as the query
+     * constraint.
      *
-     * @param concept the 
+     * @param concept the
      * @return
      * @throws IOException
      * @throws TerminologyException
@@ -343,28 +359,21 @@ public class ConceptStatement extends RefsetSpecStatement {
             throw new IOException(ex);
         }
     }
-    
+
     private boolean conceptStatusIsChildOf(ConceptVersionBI conceptBeingTested) throws IOException {
         try {
-            Collection<? extends ConceptVersionBI> childStatuses
-                    = ((ConceptChronicleBI) queryConstraint).getVersion(viewCoordinate).getRelationshipsIncomingSourceConceptsActiveIsa();
-
-            for (ConceptVersionBI childStatus : childStatuses) {
-                if (conceptStatusIs(childStatus)) {
-                    return true;
-                }
-            }
-
-            return false;
+            return Ts.get().isChildOf(conceptBeingTested.getStatusNid(), queryConstraintConcept.getConceptNid(), viewCoordinate);
         } catch (Exception e) {
             throw new IOException(e.getMessage());
         }
     }
 
     private boolean conceptStatusIsDescendantOf(ConceptVersionBI conceptBeingTested) throws IOException, ContradictionException {
-        ConceptChronicleBI statusBeingChecked = termFactory.getConcept(conceptBeingTested.getStatusNid());           
-            return termFactory.isChildOf(statusBeingChecked.getNid(),
-                    ((ConceptChronicleBI) queryConstraint).getNid(), viewCoordinate);
+        int parentNid = queryConstraintConcept.getNid();
+        if (conceptBeingTested.getStatusNid() == parentNid) {
+            return false;
+        }
+        return ts.isKindOf(conceptBeingTested.getStatusNid(), parentNid, viewCoordinate);
     }
 
     private boolean conceptStatusIsKindOf(ConceptVersionBI conceptBeingTested) throws IOException, ContradictionException {
@@ -401,7 +410,7 @@ public class ConceptStatement extends RefsetSpecStatement {
             ConceptVersionBI a2 = concept.getVersion(v2_is);
             return (a1 != null
                     && a2 != null
-                    && !(a1.getPathNid() == a2.getPathNid() && a1.getTime() == a2.getTime()) 
+                    && !(a1.getPathNid() == a2.getPathNid() && a1.getTime() == a2.getTime())
                     && a1.getStatusNid() != a2.getStatusNid());
         } catch (Exception e) {
             throw new IOException(e.getMessage());

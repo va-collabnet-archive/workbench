@@ -25,8 +25,8 @@ import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ComponentChronicleBI;
 import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.NidBitSetBI;
+import org.ihtsdo.tk.api.TerminologyStoreDI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
-import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
@@ -42,6 +42,7 @@ import org.ihtsdo.tk.query.RefsetSpecQuery.GROUPING_TYPE;
  */
 public class RelationshipStatement extends RefsetSpecStatement {
 
+    private TerminologyStoreDI ts;
 
     /**
      * Constructor for refset spec statement.
@@ -51,11 +52,12 @@ public class RelationshipStatement extends RefsetSpecStatement {
      * @param queryConstraint The destination concept (e.g. "paracetamol")
      * @throws Exception
      */
-    public RelationshipStatement(boolean useNotQualifier, 
-            ConceptChronicleBI queryToken, 
+    public RelationshipStatement(boolean useNotQualifier,
+            ConceptChronicleBI queryToken,
             ConceptChronicleBI queryConstraint,
             ViewCoordinate viewCoordinate) throws Exception {
         super(useNotQualifier, queryToken, queryConstraint, viewCoordinate);
+        ts = Ts.get();
         this.viewCoordinate = viewCoordinate;
         for (QUERY_TOKENS token : QUERY_TOKENS.values()) {
             if (queryToken.getConceptNid() == token.nid) {
@@ -72,9 +74,13 @@ public class RelationshipStatement extends RefsetSpecStatement {
     @Override
     public boolean getStatementResult(int componentNid, Object component, GROUPING_TYPE groupingVersion, ViewCoordinate v1_is,
             ViewCoordinate v2_is) throws IOException, ContradictionException {
-        ComponentChronicleBI<?> component1 = Ts.get().getComponent(componentNid);
-        RelationshipChronicleBI relationship = (RelationshipChronicleBI) Ts.get().getComponent(componentNid);
-        RelationshipVersionBI relVersion = relationship.getVersion(viewCoordinate);
+        RelationshipVersionBI relVersion = null;
+        if(RelationshipVersionBI.class.isAssignableFrom(component.getClass())){
+            relVersion = (RelationshipVersionBI) component;
+        }else{
+            System.out.println("DEBUG: SOMETHING IS WRONG -- NOT rel version");
+        }
+        RelationshipChronicleBI relChronicle = (RelationshipChronicleBI) relVersion.getChronicle();
 //TODO
 //        if (groupingVersion != null || v1_is != null || v2_is != null) {
 //            if (groupingVersion == null) {
@@ -224,17 +230,17 @@ public class RelationshipStatement extends RefsetSpecStatement {
                 }
                 return relDestinationIsDescendentOf(relVersion);
             case ADDED_RELATIONSHIP:
-                return addedRelationship(relationship, v1_is, v2_is);
+                return addedRelationship(relChronicle, v1_is, v2_is);
             case CHANGED_RELATIONSHIP_CHARACTERISTIC:
-                return changedRelationshipCharacteristic(relationship, v1_is, v2_is);
+                return changedRelationshipCharacteristic(relChronicle, v1_is, v2_is);
             case CHANGED_RELATIONSHIP_GROUP:
-                return changedRelationshipGroup(relationship, v1_is, v2_is);
+                return changedRelationshipGroup(relChronicle, v1_is, v2_is);
             case CHANGED_RELATIONSHIP_REFINABILITY:
-                return changedRelationshipRefinability(relationship, v1_is, v2_is);
+                return changedRelationshipRefinability(relChronicle, v1_is, v2_is);
             case CHANGED_RELATIONSHIP_STATUS:
-                return changedRelationshipStatus(relationship, v1_is, v2_is);
+                return changedRelationshipStatus(relChronicle, v1_is, v2_is);
             case CHANGED_RELATIONSHIP_TYPE:
-                return changedRelationshipType(relationship, v1_is, v2_is);
+                return changedRelationshipType(relChronicle, v1_is, v2_is);
             default:
                 throw new RuntimeException("Can't handle queryToken: " + queryToken);
         }
@@ -304,12 +310,11 @@ public class RelationshipStatement extends RefsetSpecStatement {
         }
         setPossibleConceptsCount(possibleConcepts.cardinality());
 
-
-            long endTime = System.currentTimeMillis();
-            long elapsed = endTime - startTime;
-            String elapsedStr = TimeHelper.getElapsedTimeString(elapsed);
-            System.out.println("Elapsed: " + elapsedStr + ";  Incoming count: "
-                    + parentPossibleConcepts.cardinality() + "; Outgoing count: " + possibleConcepts.cardinality());
+        long endTime = System.currentTimeMillis();
+        long elapsed = endTime - startTime;
+        String elapsedStr = TimeHelper.getElapsedTimeString(elapsed);
+        System.out.println("Elapsed: " + elapsedStr + ";  Incoming count: "
+                + parentPossibleConcepts.cardinality() + "; Outgoing count: " + possibleConcepts.cardinality());
         return possibleConcepts;
     }
 
@@ -330,20 +335,12 @@ public class RelationshipStatement extends RefsetSpecStatement {
     private boolean relRefinabilityIsDescendentOf(ConceptChronicleBI requiredRefinability,
             RelationshipVersionBI relationship)
             throws IOException {
-
         try {
-            Collection<? extends ConceptVersionBI> children =
-                    requiredRefinability.getVersion(viewCoordinate).getRelationshipsIncomingSourceConceptsActiveIsa();
-
-            for (ConceptVersionBI child : children) {
-                if (relRefinabilityIs(child, relationship)) {
-                    return true;
-                } else if (relRefinabilityIsDescendentOf(child, relationship)) {
-                    return true;
-                }
+            int parentNid = requiredRefinability.getNid();
+            if (relationship.getRefinabilityNid() == parentNid) {
+                return false;
             }
-
-            return false;
+            return ts.isKindOf(relationship.getRefinabilityNid(), parentNid, viewCoordinate);
         } catch (Exception e) {
             e.printStackTrace();
             throw new IOException(e.getMessage());
@@ -352,16 +349,7 @@ public class RelationshipStatement extends RefsetSpecStatement {
 
     private boolean relRefinabilityIsChildOf(RelationshipVersionBI relTuple) throws IOException {
         try {
-            Collection<? extends ConceptVersionBI> children
-                    = ((ConceptChronicleBI) queryConstraint).getVersion(viewCoordinate).getRelationshipsIncomingSourceConceptsActiveIsa();
-           
-            for (ConceptVersionBI child : children) {
-                if (relRefinabilityIs(child, relTuple)) {
-                    return true;
-                }
-            }
-
-            return false;
+            return ts.isChildOf(relTuple.getRefinabilityNid(), ((ConceptChronicleBI) queryConstraint).getNid(), viewCoordinate);
         } catch (Exception e) {
             e.printStackTrace();
             throw new IOException(e.getMessage());
@@ -369,12 +357,12 @@ public class RelationshipStatement extends RefsetSpecStatement {
     }
 
     private boolean relRefinabilityIsKindOf(RelationshipVersionBI relTuple) throws IOException {
-        if (relRefinabilityIs(relTuple)) {
-            return true;
+        try {
+            return ts.isKindOf(relTuple.getRefinabilityNid(), ((ConceptChronicleBI) queryConstraint).getNid(), viewCoordinate);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new IOException(e.getMessage());
         }
-
-        return relRefinabilityIsDescendentOf((ConceptChronicleBI) queryConstraint, relTuple);
-
     }
 
     private boolean relRefinabilityIs(RelationshipVersionBI relTuple) {
@@ -391,37 +379,20 @@ public class RelationshipStatement extends RefsetSpecStatement {
 
     private boolean relCharIsDescendentOf(ConceptChronicleBI requiredCharType, RelationshipVersionBI relTuple) throws IOException {
         try {
-            Collection<? extends ConceptVersionBI> children =
-                    requiredCharType.getVersion(viewCoordinate).getRelationshipsIncomingSourceConceptsActiveIsa();
-            
-            for (ConceptChronicleBI child : children) {
-                if (relCharIs(child, relTuple)) {
-                    return true;
-                } else if (relCharIsDescendentOf(child, relTuple)) {
-                    return true;
-                }
+            int parentNid = requiredCharType.getNid();
+            if (relTuple.getCharacteristicNid() == parentNid) {
+                return false;
             }
+            return ts.isKindOf(relTuple.getCharacteristicNid(), parentNid, viewCoordinate);
         } catch (Exception e) {
             e.printStackTrace();
             throw new IOException(e.getMessage());
         }
-
-        return false;
     }
 
     private boolean relCharIsChildOf(RelationshipVersionBI relTuple) throws IOException {
         try {
-
-            Collection<? extends ConceptVersionBI> children
-                    = ((ConceptChronicleBI) queryConstraint).getVersion(viewCoordinate).getRelationshipsIncomingSourceConceptsActiveIsa();
-            
-            for (ConceptChronicleBI child : children) {
-                if (relCharIs(child, relTuple)) {
-                    return true;
-                }
-            }
-
-            return false;
+            return ts.isChildOf(relTuple.getCharacteristicNid(), ((ConceptChronicleBI) queryConstraint).getNid(), viewCoordinate);
         } catch (Exception e) {
             e.printStackTrace();
             throw new IOException(e.getMessage());
@@ -429,13 +400,12 @@ public class RelationshipStatement extends RefsetSpecStatement {
     }
 
     private boolean relCharIsKindOf(RelationshipVersionBI relTuple) throws IOException {
-
-        if (relCharIs(relTuple)) {
-            return true;
+        try {
+            return ts.isKindOf(relTuple.getCharacteristicNid(), ((ConceptChronicleBI) queryConstraint).getNid(), viewCoordinate);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new IOException(e.getMessage());
         }
-
-        return relCharIsDescendentOf((ConceptChronicleBI) queryConstraint, relTuple);
-
     }
 
     private boolean relCharIs(RelationshipVersionBI relTuple) {
@@ -460,26 +430,17 @@ public class RelationshipStatement extends RefsetSpecStatement {
 
     private boolean relTypeIsKindOf(RelationshipVersionBI relTuple) throws IOException {
 
-        if (relTypeIs(relTuple)) {
-            return true;
+        try {
+            return ts.isKindOf(relTuple.getTypeNid(), ((ConceptChronicleBI) queryConstraint).getNid(), viewCoordinate);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new IOException(e.getMessage());
         }
-
-        return relTypeIsDescendentOf(relTuple);
     }
 
     private boolean relTypeIsChildOf(RelationshipVersionBI relTuple) throws IOException {
         try {
-
-            Collection<? extends ConceptVersionBI> children
-                    = ((ConceptChronicleBI) queryConstraint).getVersion(viewCoordinate).getRelationshipsIncomingSourceConceptsActiveIsa();
-
-            for (ConceptVersionBI child : children) {
-                if (relTypeIs(child, relTuple)) {
-                    return true;
-                }
-            }
-
-            return false;
+            return ts.isChildOf(relTuple.getTypeNid(), ((ConceptChronicleBI) queryConstraint).getNid(), viewCoordinate);
         } catch (Exception e) {
             e.printStackTrace();
             throw new IOException(e.getMessage());
@@ -492,19 +453,10 @@ public class RelationshipStatement extends RefsetSpecStatement {
 
     private boolean relTypeIsDescendentOf(ConceptChronicleBI requiredRelType, RelationshipVersionBI relTuple) throws IOException {
         try {
-
-            Collection<? extends ConceptVersionBI> children
-                    = requiredRelType.getVersion(viewCoordinate).getRelationshipsIncomingSourceConceptsActiveIsa();
-            
-            for (ConceptVersionBI child : children) {
-                if (relTypeIs(child, relTuple)) {
-                    return true;
-                } else if (relTypeIsDescendentOf(child, relTuple)) {
-                    return true;
-                }
+            if (requiredRelType.getNid() == relTuple.getTypeNid()) {
+                return false;
             }
-
-            return false;
+            return ts.isKindOf(relTuple.getTypeNid(), requiredRelType.getNid(), viewCoordinate);
         } catch (Exception e) {
             e.printStackTrace();
             throw new IOException(e.getMessage());
@@ -518,19 +470,10 @@ public class RelationshipStatement extends RefsetSpecStatement {
     private boolean relStatusIsDescendentOf(ConceptChronicleBI requiredStatus, RelationshipVersionBI relTuple)
             throws IOException {
         try {
-
-            Collection<? extends ConceptVersionBI> children
-                    = requiredStatus.getVersion(viewCoordinate).getRelationshipsIncomingSourceConceptsActiveIsa();
-           
-            for (ConceptChronicleBI child : children) {
-                if (relStatusIs(child, relTuple)) {
-                    return true;
-                } else if (relStatusIsDescendentOf(child, relTuple)) {
-                    return true;
-                }
+            if (requiredStatus.getNid() == relTuple.getTypeNid()) {
+                return false;
             }
-
-            return false;
+            return ts.isKindOf(relTuple.getStatusNid(), requiredStatus.getNid(), viewCoordinate);
         } catch (Exception e) {
             e.printStackTrace();
             throw new IOException(e.getMessage());
@@ -539,29 +482,20 @@ public class RelationshipStatement extends RefsetSpecStatement {
 
     private boolean relStatusIsChildOf(RelationshipVersionBI relTuple) throws IOException {
         try {
-
-            Collection<? extends ConceptVersionBI> children
-                    = ((ConceptChronicleBI) queryConstraint).getVersion(viewCoordinate).getRelationshipsIncomingSourceConceptsActiveIsa();
-
-            for (ConceptChronicleBI child : children) {
-                if (relStatusIs(child, relTuple)) {
-                    return true;
-                }
-            }
+            return ts.isChildOf(relTuple.getStatusNid(), ((ConceptChronicleBI) queryConstraint).getNid(), viewCoordinate);
         } catch (Exception e) {
             e.printStackTrace();
             throw new IOException(e.getMessage());
         }
-
-        return false;
     }
 
     private boolean relStatusIsKindOf(RelationshipVersionBI relTuple) throws IOException {
-        if (relStatusIs(relTuple)) {
-            return true;
+        try {
+            return ts.isKindOf(relTuple.getStatusNid(), ((ConceptChronicleBI) queryConstraint).getNid(), viewCoordinate);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new IOException(e.getMessage());
         }
-
-        return relStatusIsDescendentOf(relTuple);
     }
 
     private boolean relStatusIs(RelationshipVersionBI relTuple) {
@@ -569,7 +503,7 @@ public class RelationshipStatement extends RefsetSpecStatement {
     }
 
     private boolean relStatusIs(ConceptChronicleBI requiredStatus, RelationshipVersionBI relTuple) {
-           return componentStatusIs(requiredStatus, relTuple);
+        return componentStatusIs(requiredStatus, relTuple);
     }
 
     private boolean relIs(RelationshipVersionBI relTuple) throws IOException {
@@ -578,7 +512,7 @@ public class RelationshipStatement extends RefsetSpecStatement {
     }
 
     private boolean relRestrictionIs(RelationshipVersionBI relTuple) throws IOException {
-        throw new IOException("Unimplemented query : rel restriction is"); 
+        throw new IOException("Unimplemented query : rel restriction is");
     }
 
     private boolean relLogicalQuantifierIsDescendentOf(RelationshipVersionBI relTuple) throws IOException {
@@ -610,28 +544,17 @@ public class RelationshipStatement extends RefsetSpecStatement {
     }
 
     private boolean relDestinationIsKindOf(RelationshipVersionBI relTuple) throws IOException {
-
-        if (relDestinationIs(relTuple)) {
-            return true;
+        try {
+            return Ts.get().isKindOf(relTuple.getTargetNid(), ((ConceptChronicleBI) queryConstraint).getNid(), viewCoordinate);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new IOException(e.getMessage());
         }
-
-        return relDestinationIsDescendentOf(relTuple);
     }
 
     private boolean relDestinationIsChildOf(RelationshipVersionBI relTuple) throws IOException {
         try {
-
-            Collection<? extends ConceptVersionBI> children
-                    = ((ConceptChronicleBI) queryConstraint).getVersion(viewCoordinate).getRelationshipsIncomingSourceConceptsActiveIsa();
-
-
-            for (ConceptChronicleBI child : children) {
-                if (relDestinationIs(child, relTuple)) {
-                    return true;
-                }
-            }
-
-            return false;
+            return Ts.get().isChildOf(relTuple.getTargetNid(), ((ConceptChronicleBI) queryConstraint).getNid(), viewCoordinate);
         } catch (Exception e) {
             e.printStackTrace();
             throw new IOException(e.getMessage());
@@ -645,20 +568,10 @@ public class RelationshipStatement extends RefsetSpecStatement {
     private boolean relDestinationIsDescendentOf(ConceptChronicleBI requiredDestination, RelationshipVersionBI relTuple)
             throws IOException {
         try {
-
-            Collection<? extends ConceptVersionBI> children
-                    = requiredDestination.getVersion(viewCoordinate).getRelationshipsIncomingSourceConceptsActiveIsa();
-
-
-            for (ConceptChronicleBI child : children) {
-                if (relDestinationIs(child, relTuple)) {
-                    return true;
-                } else if (relDestinationIsDescendentOf(child, relTuple)) {
-                    return true;
-                }
+            if (requiredDestination.getNid() == relTuple.getTargetNid()) {
+                return false;
             }
-
-            return false;
+            return Ts.get().isKindOf(relTuple.getTargetNid(), requiredDestination.getNid(), viewCoordinate);
         } catch (Exception e) {
             e.printStackTrace();
             throw new IOException(e.getMessage());

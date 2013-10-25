@@ -1,14 +1,18 @@
 /**
- * Copyright (c) 2009 International Health Terminology Standards Development Organisation
+ * Copyright (c) 2009 International Health Terminology Standards Development
+ * Organisation
  *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
- * compliance with the License. You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
  *
  * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software distributed under the License is
- * distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  */
 package org.ihtsdo.tk.query;
 
@@ -22,10 +26,11 @@ import java.util.regex.Pattern;
 import org.dwfa.tapi.ComputationCanceled;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.helper.time.TimeHelper;
+import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.NidBitSetBI;
+import org.ihtsdo.tk.api.TerminologyStoreDI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
-import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.description.DescriptionChronicleBI;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
@@ -34,35 +39,32 @@ import org.ihtsdo.tk.api.search.ScoredComponentReference;
 import org.ihtsdo.tk.query.RefsetSpecQuery.GROUPING_TYPE;
 
 /**
- * Represents partial information contained in a refset spec. An example of a statement is : "NOT: Concept is
- * : Paracetamol"
+ * Represents partial information contained in a refset spec. An example of a
+ * statement is : "NOT: Concept is : Paracetamol"
  *
  * @author Chrissy Hill
  *
  */
 public class DescStatement extends RefsetSpecStatement {
-   
 
     private NidBitSetBI possibleLuceneDescMatches;
     private NidBitSetBI possibleLuceneConcMatches;
     private Pattern regexPattern;
     private ViewCoordinate viewCoordinate;
-
+    private TerminologyStoreDI ts;
 
     /**
      * Constructor for refset spec statement.
-     * 
-     * @param useNotQualifier
-     *            Whether to use the NOT qualifier.
-     * @param queryToken
-     *            The query type to use (e.g. "concept is")
-     * @param queryConstraint
-     *            The destination concept (e.g. "paracetamol")
+     *
+     * @param useNotQualifier Whether to use the NOT qualifier.
+     * @param queryToken The query type to use (e.g. "concept is")
+     * @param queryConstraint The destination concept (e.g. "paracetamol")
      * @throws Exception
      */
     public DescStatement(boolean useNotQualifier, ConceptChronicleBI queryToken, ConceptChronicleBI queryConstraint,
             ViewCoordinate viewCoordinate) throws Exception {
         super(useNotQualifier, queryToken, queryConstraint, viewCoordinate);
+        ts = Ts.get();
         for (QUERY_TOKENS token : QUERY_TOKENS.values()) {
             if (queryToken.getConceptNid() == token.nid) {
                 tokenEnum = token;
@@ -76,13 +78,10 @@ public class DescStatement extends RefsetSpecStatement {
 
     /**
      * Constructor for refset spec statement.
-     * 
-     * @param useNotQualifier
-     *            Whether to use the NOT qualifier.
-     * @param queryToken
-     *            The query type to use (e.g. "concept is")
-     * @param queryConstraint
-     *            String value for regex or lucene search
+     *
+     * @param useNotQualifier Whether to use the NOT qualifier.
+     * @param queryToken The query type to use (e.g. "concept is")
+     * @param queryConstraint String value for regex or lucene search
      * @throws Exception
      */
     public DescStatement(boolean useNotQualifier, ConceptChronicleBI queryToken, String queryConstraint,
@@ -102,7 +101,8 @@ public class DescStatement extends RefsetSpecStatement {
 
     @Override
     public boolean getStatementResult(int componentNid, Object component, GROUPING_TYPE groupingVersion,
-    ViewCoordinate v1Is, ViewCoordinate v2Is) throws IOException, ContradictionException {
+            ViewCoordinate v1Is, ViewCoordinate v2Is) throws IOException, ContradictionException {
+        DescriptionVersionBI descVersion = null;
         if (DescriptionChronicleBI.class.isAssignableFrom(component.getClass())) {
             DescriptionChronicleBI description = (DescriptionChronicleBI) component;
 
@@ -119,7 +119,6 @@ public class DescStatement extends RefsetSpecStatement {
 //                    throw new IOException("Need to set V2 IS: " + tokenEnum + " " + description.toUserString());
 //                }
 //            }
-
             switch (tokenEnum) {
                 case DESC_IS:
                     if (groupingVersion == null) {
@@ -227,8 +226,8 @@ public class DescStatement extends RefsetSpecStatement {
                 possibleConcepts.or(parentPossibleConcepts);
                 break;
             case DESC_IS_MEMBER_OF:
-                Collection<? extends RefexChronicleBI<?>> refsetExtensions = 
-                        termFactory.getConcept(((ConceptChronicleBI) queryConstraint).getConceptNid()).getRefsetMembers();
+                Collection<? extends RefexChronicleBI<?>> refsetExtensions
+                        = termFactory.getConcept(((ConceptChronicleBI) queryConstraint).getConceptNid()).getRefsetMembers();
                 NidBitSetBI refsetMemberSet = termFactory.getEmptyNidSet();
                 for (RefexChronicleBI ext : refsetExtensions) {
                     refsetMemberSet.setMember(ext.getReferencedComponentNid());
@@ -271,11 +270,11 @@ public class DescStatement extends RefsetSpecStatement {
         }
         setPossibleConceptsCount(possibleConcepts.cardinality());
 
-            long endTime = System.currentTimeMillis();
-            long elapsed = endTime - startTime;
-            String elapsedStr = TimeHelper.getElapsedTimeString(elapsed);
-            System.out.println("Elapsed: " + elapsedStr + ";  Incoming count: "
-                    + parentPossibleConcepts.cardinality() + "; Outgoing count: " + possibleConcepts.cardinality());
+        long endTime = System.currentTimeMillis();
+        long elapsed = endTime - startTime;
+        String elapsedStr = TimeHelper.getElapsedTimeString(elapsed);
+        System.out.println("Elapsed: " + elapsedStr + ";  Incoming count: "
+                + parentPossibleConcepts.cardinality() + "; Outgoing count: " + possibleConcepts.cardinality());
         return possibleConcepts;
     }
 
@@ -294,13 +293,13 @@ public class DescStatement extends RefsetSpecStatement {
             case DESC_IS:
                 if (isNegated()) {
                     possibleDescriptions.or(parentPossibleDescriptions);
-                } else {                
+                } else {
                     possibleDescriptions.setMember(((DescriptionVersionBI) queryConstraint).getConceptNid());
                 }
                 break;
             case DESC_IS_MEMBER_OF:
-                Collection<? extends RefexChronicleBI<?>> refsetExtensions = 
-                        termFactory.getConcept(((ConceptChronicleBI) queryConstraint).getNid()).getRefsetMembers();
+                Collection<? extends RefexChronicleBI<?>> refsetExtensions
+                        = termFactory.getConcept(((ConceptChronicleBI) queryConstraint).getNid()).getRefsetMembers();
                 NidBitSetBI refsetMemberSet = termFactory.getEmptyNidSet();
                 for (RefexChronicleBI ext : refsetExtensions) {
                     int componentId = ext.getReferencedComponentNid();
@@ -338,22 +337,22 @@ public class DescStatement extends RefsetSpecStatement {
                     try {
                         String queryConstraintString = (String) queryConstraint;
 
-                            Collection<ScoredComponentReference> results = termFactory.doTextSearch(queryConstraintString);
+                        Collection<ScoredComponentReference> results = termFactory.doTextSearch(queryConstraintString);
 
-                            if (results == null || !results.isEmpty()) {
-                                possibleDescriptions.or(parentPossibleDescriptions);
-                                break;
-                            }
-                            possibleLuceneConcMatches = termFactory.getEmptyNidSet();
-                            possibleLuceneDescMatches = termFactory.getEmptyNidSet();
-                            for (ScoredComponentReference result : results) {
-                                int cnid = result.getConceptNid();
-                                int dnid = result.getComponentNid();
-                                possibleLuceneDescMatches.setMember(dnid);
-                                possibleLuceneConcMatches.setMember(cnid);
-                                possibleDescriptions.setMember(dnid);
+                        if (results == null || !results.isEmpty()) {
+                            possibleDescriptions.or(parentPossibleDescriptions);
+                            break;
+                        }
+                        possibleLuceneConcMatches = termFactory.getEmptyNidSet();
+                        possibleLuceneDescMatches = termFactory.getEmptyNidSet();
+                        for (ScoredComponentReference result : results) {
+                            int cnid = result.getConceptNid();
+                            int dnid = result.getComponentNid();
+                            possibleLuceneDescMatches.setMember(dnid);
+                            possibleLuceneConcMatches.setMember(cnid);
+                            possibleDescriptions.setMember(dnid);
 
-                            }
+                        }
                     } catch (ParseException ex) {
                         Logger.getLogger(DescStatement.class.getName()).log(Level.SEVERE, null, ex);
                     }
@@ -390,14 +389,14 @@ public class DescStatement extends RefsetSpecStatement {
      */
     private boolean descriptionTypeIsKindOf(DescriptionVersionBI descriptionBeingChecked) throws IOException, ContradictionException {
 
-            ConceptChronicleBI descTypeBeingChecked = termFactory.getConcept(descriptionBeingChecked.getTypeNid());           
-            return termFactory.isKindOf(descTypeBeingChecked.getNid(),
-                    ((ConceptChronicleBI) queryConstraint).getNid(), viewCoordinate);
-   }
+        ConceptChronicleBI descTypeBeingChecked = termFactory.getConcept(descriptionBeingChecked.getTypeNid());
+        return termFactory.isKindOf(descTypeBeingChecked.getNid(),
+                ((ConceptChronicleBI) queryConstraint).getNid(), viewCoordinate);
+    }
 
     /**
      * This checks the description type for depth >= 1.
-     * 
+     *
      * @param requiredType
      * @param descriptionBeingChecked
      * @return
@@ -406,9 +405,12 @@ public class DescStatement extends RefsetSpecStatement {
      */
     private boolean descriptionTypeIsDescendentOf(ConceptChronicleBI requiredType, DescriptionVersionBI descriptionBeingChecked)
             throws IOException, ContradictionException {
-            ConceptChronicleBI descTypeBeingChecked = termFactory.getConcept(descriptionBeingChecked.getTypeNid());       
-            return termFactory.isChildOf(descTypeBeingChecked.getNid(),
-                    ((ConceptChronicleBI) queryConstraint).getNid(), viewCoordinate);
+        ConceptChronicleBI descTypeBeingChecked = termFactory.getConcept(descriptionBeingChecked.getTypeNid());
+        if (descTypeBeingChecked.getNid() == ((ConceptChronicleBI) queryConstraint).getNid()) {
+            return false;
+        }
+        return termFactory.isKindOf(descTypeBeingChecked.getNid(),
+                ((ConceptChronicleBI) queryConstraint).getNid(), viewCoordinate);
     }
 
     private boolean descriptionTypeIsDescendentOf(DescriptionVersionBI descriptionBeingChecked) throws IOException, ContradictionException {
@@ -417,47 +419,23 @@ public class DescStatement extends RefsetSpecStatement {
 
     private boolean descriptionTypeIsChildOf(DescriptionVersionBI descriptionBeingChecked) throws IOException {
         try {
-
-            // get list of all children of input concept
-            Collection<? extends ConceptVersionBI> childDescTypes
-                    = ((ConceptChronicleBI) queryConstraint).getVersion(viewCoordinate).getRelationshipsIncomingSourceConceptsActiveIsa();
-
-            // call descriptionTypeIs on each
-            for (ConceptVersionBI childDescType : childDescTypes) {
-                if (descriptionTypeIs(childDescType, descriptionBeingChecked)) {
-                    return true;
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new IOException(e.getMessage());
+            ConceptChronicleBI descTypeBeingChecked = termFactory.getConcept(descriptionBeingChecked.getTypeNid());
+            return termFactory.isChildOf(descTypeBeingChecked.getNid(),
+                    ((ConceptChronicleBI) queryConstraint).getNid(), viewCoordinate);
+        } catch (ContradictionException ex) {
+            throw new IOException(ex.getMessage());
         }
-
-        return false;
     }
 
     private boolean descriptionStatusIs(DescriptionVersionBI descriptionBeingChecked) throws IOException {
         return descriptionBeingChecked.getStatusNid() == ((ConceptChronicleBI) queryConstraint).getConceptNid();
     }
 
-    private boolean descriptionStatusIs(ConceptChronicleBI requiredStatus, DescriptionVersionBI descriptionBeingChecked)
-            throws IOException {
-        return descriptionBeingChecked.getStatusNid() == requiredStatus.getConceptNid();
-    }
-
     private boolean descriptionStatusIsChildOf(DescriptionVersionBI descriptionBeingChecked) throws IOException {
         try {
-
-            Collection<? extends ConceptVersionBI> childStatuses
-                    = ((ConceptChronicleBI) queryConstraint).getVersion(viewCoordinate).getRelationshipsIncomingSourceConceptsActiveIsa();
-
-            for (ConceptVersionBI childStatus : childStatuses) {
-                if (descriptionStatusIs(childStatus, descriptionBeingChecked)) {
-                    return true;
-                }
-            }
-
-            return false;
+            ConceptChronicleBI descTypeBeingChecked = termFactory.getConcept(descriptionBeingChecked.getStatusNid());
+            return termFactory.isChildOf(descTypeBeingChecked.getNid(),
+                    ((ConceptChronicleBI) queryConstraint).getNid(), viewCoordinate);
         } catch (Exception e) {
             throw new IOException(e.getMessage());
         }
@@ -469,16 +447,18 @@ public class DescStatement extends RefsetSpecStatement {
 
     private boolean descriptionStatusIsDescendentOf(ConceptChronicleBI requiredStatus,
             DescriptionVersionBI descriptionBeingChecked) throws IOException, ContradictionException {
-
-            ConceptChronicleBI statusBeingChecked = termFactory.getConcept(descriptionBeingChecked.getStatusNid());         
-            return termFactory.isChildOf(statusBeingChecked.getNid(),
-                    ((ConceptChronicleBI) queryConstraint).getNid(), viewCoordinate);
+        ConceptChronicleBI statusBeingChecked = termFactory.getConcept(descriptionBeingChecked.getStatusNid());
+        if (statusBeingChecked.getNid() == requiredStatus.getNid()) {
+            return false;
+        }
+        return termFactory.isKindOf(statusBeingChecked.getNid(),
+                requiredStatus.getNid(), viewCoordinate);
     }
 
     private boolean descriptionStatusIsKindOf(DescriptionVersionBI descriptionBeingChecked) throws IOException, ContradictionException {
-            ConceptChronicleBI statusBeingChecked = termFactory.getConcept(descriptionBeingChecked.getStatusNid());      
-            return termFactory.isChildOf(statusBeingChecked.getNid(),
-                    ((ConceptChronicleBI) queryConstraint).getNid(), viewCoordinate);
+        ConceptChronicleBI statusBeingChecked = termFactory.getConcept(descriptionBeingChecked.getStatusNid());
+        return termFactory.isChildOf(statusBeingChecked.getNid(),
+                ((ConceptChronicleBI) queryConstraint).getNid(), viewCoordinate);
     }
 
     private boolean descriptionIs(DescriptionVersionBI descriptionBeingChecked) throws IOException {
@@ -554,8 +534,8 @@ public class DescStatement extends RefsetSpecStatement {
             DescriptionVersionBI a2 = descriptionBeingTested.getVersion(v2_is);
             return (a1 != null
                     && a2 != null
-                    && !(a1.getPathNid() == a2.getPathNid() 
-                    && a1.getTime() == a2.getTime()) 
+                    && !(a1.getPathNid() == a2.getPathNid()
+                    && a1.getTime() == a2.getTime())
                     && a1.isInitialCaseSignificant() != a2.isInitialCaseSignificant());
         } catch (Exception e) {
             e.printStackTrace();
@@ -572,8 +552,8 @@ public class DescStatement extends RefsetSpecStatement {
             DescriptionVersionBI a2 = descriptionBeingTested.getVersion(v2_is);
             return (a1 != null
                     && a2 != null
-                    && !(a1.getPathNid() == a2.getPathNid() 
-                    && a1.getTime() == a2.getTime()) 
+                    && !(a1.getPathNid() == a2.getPathNid()
+                    && a1.getTime() == a2.getTime())
                     && !a1.getLang().equals(a2.getLang()));
         } catch (Exception e) {
             e.printStackTrace();
@@ -589,8 +569,8 @@ public class DescStatement extends RefsetSpecStatement {
             DescriptionVersionBI a1 = descriptionBeingTested.getVersion(v1_is);
             DescriptionVersionBI a2 = descriptionBeingTested.getVersion(v2_is);
             return (a1 != null && a2 != null
-                    && !(a1.getPathNid() == a2.getPathNid() 
-                    && a1.getTime() == a2.getTime()) 
+                    && !(a1.getPathNid() == a2.getPathNid()
+                    && a1.getTime() == a2.getTime())
                     && a1.getStatusNid() != a2.getStatusNid());
         } catch (Exception e) {
             e.printStackTrace();
@@ -607,8 +587,8 @@ public class DescStatement extends RefsetSpecStatement {
             DescriptionVersionBI a2 = descriptionBeingTested.getVersion(v2_is);
             return (a1 != null
                     && a2 != null
-                    && !(a1.getPathNid() == a2.getPathNid() 
-                    && a1.getTime() == a2.getTime()) 
+                    && !(a1.getPathNid() == a2.getPathNid()
+                    && a1.getTime() == a2.getTime())
                     && !a1.getText().equals(a2.getText()));
         } catch (Exception e) {
             e.printStackTrace();
@@ -625,107 +605,12 @@ public class DescStatement extends RefsetSpecStatement {
             DescriptionVersionBI a2 = descriptionBeingTested.getVersion(v2_is);
             return (a1 != null
                     && a2 != null
-                    && !(a1.getPathNid() == a2.getPathNid() 
-                    && a1.getTime() == a2.getTime()) 
+                    && !(a1.getPathNid() == a2.getPathNid()
+                    && a1.getTime() == a2.getTime())
                     && a1.getTypeNid() != a2.getTypeNid());
         } catch (Exception e) {
             e.printStackTrace();
             throw new IOException(e.getMessage());
         }
-    }
-
-    private boolean descriptionIs(
-            DescriptionChronicleBI descriptionBeingTested, ViewCoordinate viewCoorindate)
-            throws IOException, ContradictionException {
-        DescriptionChronicleBI queryConstraintDesc = (DescriptionChronicleBI) queryConstraint;
-        DescriptionVersionBI a = descriptionBeingTested.getVersion(viewCoordinate);
-        return (a != null && descriptionBeingTested.getNid() == queryConstraintDesc.getNid());
-    }
-
-    private boolean descriptionStatusIs(
-            DescriptionChronicleBI descriptionBeingTested, ViewCoordinate viewCoordinate)
-            throws IOException, ContradictionException {
-        DescriptionVersionBI a = descriptionBeingTested.getVersion(viewCoordinate);
-        return (a != null && a.getStatusNid() == ((DescriptionChronicleBI) queryConstraint).getConceptNid());
-    }
-
-    private boolean descriptionStatusIsChildOf(
-            DescriptionChronicleBI descriptionBeingTested, ViewCoordinate viewCoordinate)
-            throws IOException, ContradictionException {
-        DescriptionVersionBI a = descriptionBeingTested.getVersion(viewCoordinate);
-        if (a == null) {
-            return false;
-        }
-            return conceptIsChildOf(termFactory.getConcept(a.getStatusNid()),
-                    (ConceptChronicleBI) queryConstraint, viewCoordinate);
-    }
-
-    private boolean descriptionStatusIsDescendentOf(
-            DescriptionChronicleBI descriptionBeingTested, ViewCoordinate viewCoordinate)
-            throws IOException, ContradictionException {
-        DescriptionVersionBI a = descriptionBeingTested.getVersion(viewCoordinate);
-        if (a == null) {
-            return false;
-        }
-            return conceptIsDescendantOf(termFactory.getConcept(a.getStatusNid()),
-                    (ConceptChronicleBI) queryConstraint, viewCoordinate);
-    }
-
-    private boolean descriptionStatusIsKindOf(
-            DescriptionChronicleBI descriptionBeingTested, ViewCoordinate viewCoordinate)
-            throws IOException, ContradictionException {
-        return descriptionStatusIs(descriptionBeingTested, viewCoordinate)
-                || descriptionStatusIsDescendentOf(descriptionBeingTested, viewCoordinate);
-    }
-
-    private boolean descriptionTypeIs(
-            DescriptionChronicleBI descriptionBeingTested, ViewCoordinate viewCoordinate)
-            throws IOException, ContradictionException {
-        DescriptionVersionBI a = descriptionBeingTested.getVersion(viewCoordinate);
-        return (a != null && a.getTypeNid() == ((ConceptChronicleBI) queryConstraint).getConceptNid());
-    }
-
-    private boolean descriptionTypeIsChildOf(
-            DescriptionChronicleBI descriptionBeingTested, ViewCoordinate viewCoordinate)
-            throws IOException, ContradictionException {
-            DescriptionVersionBI a = descriptionBeingTested.getVersion(viewCoordinate);
-            if (a == null) {
-                return false;
-            }
-            return conceptIsChildOf(termFactory.getConcept(a.getTypeNid()),
-                    (ConceptChronicleBI) queryConstraint, viewCoordinate);
-    }
-
-    private boolean descriptionTypeIsDescendentOf(
-            DescriptionChronicleBI descriptionBeingTested, ViewCoordinate viewCoordinate)
-            throws IOException, ContradictionException {
-            DescriptionVersionBI a = descriptionBeingTested.getVersion(viewCoordinate);
-            if (a == null) {
-                return false;
-            }
-            return conceptIsDescendantOf(termFactory.getConcept(a.getTypeNid()),
-                    (ConceptChronicleBI) queryConstraint, viewCoordinate); 
-    }
-
-    private boolean descriptionTypeIsKindOf(
-            DescriptionChronicleBI descriptionBeingTested, ViewCoordinate viewCoordinate)
-            throws IOException, ContradictionException {
-        return descriptionTypeIs(descriptionBeingTested, viewCoordinate) 
-                || descriptionTypeIsDescendentOf(descriptionBeingTested, viewCoordinate);
-    }
-
-    private boolean descriptionRegexMatch(
-            DescriptionChronicleBI descriptionBeingTested, ViewCoordinate viewCoordinate)
-            throws IOException, ContradictionException {
-        if (regexPattern == null) {
-            String queryConstraintString = (String) queryConstraint;
-            regexPattern = Pattern.compile(queryConstraintString);
-            System.out.println("Compiling regex: " + regexPattern + " into: " + regexPattern);
-        }
-        DescriptionVersionBI a = descriptionBeingTested.getVersion(viewCoordinate);
-        if (a == null) {
-            return false;
-        }
-        return regexPattern.matcher(a.getText()).find();
     }
 }
