@@ -180,7 +180,7 @@ public abstract class RF2AbstractImpl {
 			snomedCTModelComponent = tf.getConcept(UUID.fromString("a60bd881-9010-3260-9653-0c85716b4391"));
 			coreMetaConceptRoot = tf.getConcept(UUID.fromString("4c6d8b0b-774a-341e-b0e5-1fc2deedb5a5"));
 			foundationMetaDataConceptRoot = tf.getConcept(UUID.fromString("f328cdec-6198-36c4-9c55-d7f4f5b30922"));
-			File mappingFile = new File("SubsetMapping.txt");
+			File mappingFile = new File("target/SubsetMapping.txt");
 
 			FileInputStream fis = new FileInputStream(mappingFile);
 			InputStreamReader isr = new InputStreamReader(fis, "UTF-8");
