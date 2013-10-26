@@ -129,7 +129,8 @@ public class Bdb {
     public static int getCachePercent() {
         return Bdb.mutable.bdbEnv.getMutableConfig().getCachePercent();
     }
-    static ConcurrentSkipListSet<Concept> annotationConcepts = new ConcurrentSkipListSet<Concept>();
+    
+    static ConcurrentSkipListSet<Concept> annotationConcepts;
 
     public static void xrefAnnotation(RefexChronicleBI annotation) throws IOException {
         Concept refexConcept = Concept.get(annotation.getRefexNid());
@@ -269,6 +270,7 @@ public class Bdb {
 
     public static void setup(String dbRoot, ActivityPanel activity) {
         sapNidCache = new ConcurrentHashMap<String, Integer>();
+        annotationConcepts = new ConcurrentSkipListSet<>();
         watchList = new ConcurrentHashMap<Integer, Integer>();
         try {
             closed = false;
