@@ -486,9 +486,9 @@ public class RefsetSpecTreeMouseListener extends MouseAdapter {
                     if (n == JOptionPane.YES_OPTION) {
                         try {
                             // retire all children as well as the selected/current clause
+                            retireAllDescendants(selectedRoot);
                             retireClause(thinExtByRefTuple);
 
-                            retireAllDescendants(selectedRoot);
                             Terms.get().addUncommitted(Terms.get().getConcept(clauseBeingRetired.getRefsetId()));
                         } catch (Exception e) {
                             AceLog.getAppLog().alertAndLogException(e);
@@ -609,9 +609,8 @@ public class RefsetSpecTreeMouseListener extends MouseAdapter {
                     if (n == JOptionPane.YES_OPTION) {
                         try {
                             // cancel all children as well as the selected/current clause
-                            forgetClause(specPart);
-
                             forgetAllDescendants(selectedRoot);
+                            forgetClause(specPart);
 
                         } catch (Exception e) {
                             AceLog.getAppLog().alertAndLogException(e);
