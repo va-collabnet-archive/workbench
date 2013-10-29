@@ -27,9 +27,11 @@ import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -69,6 +71,10 @@ public class BinaryChangeSetResolveIds {
     private UUID moduleUuid;
     private UUID extensionPath;
     private UUID snomedCorePath;
+    //
+    private UUID uuidKpdType;
+    private UUID uuidPfdnType;
+    //
     private long eccsTimeThreshold; // :!!!:TEMP: move to POM parameter
     private HashMap<Long, UUID> keepMap;
     private StringBuilder instancesNotKept;
@@ -77,6 +83,7 @@ public class BinaryChangeSetResolveIds {
     private UuidUuidRemapper sctPrimorialUuidRemapper;
     private HashSet<UUID> skipUuidSet;
     private HashSet<UUID> skipMemberUuidSet;
+    
 
     void setSkipUuidSet(HashSet<UUID> uuidSet) {
         this.skipUuidSet = uuidSet;
@@ -88,6 +95,32 @@ public class BinaryChangeSetResolveIds {
 
     void setSctPrimorialUuidRemapper(UuidUuidRemapper uuidUuidRemapper) {
         this.sctPrimorialUuidRemapper = uuidUuidRemapper;
+    }
+
+    private void writeSctIdHistory(TkDescription tkd, TkIdentifier tki) throws IOException {
+        BufferedWriter w = eccsLogSctIdHistoryWriter;
+        SimpleDateFormat dateFormatter = new SimpleDateFormat("dd-MMM-yyyy HH:mm:ss");
+        w.write(((Long) tki.getDenotation()).toString()); // "ID_DENOTATION_SCTID"
+        w.write("\t");
+        w.write(tkd.primordialUuid.toString()); // "DESCRIPTION_UUID"
+        w.write("\t");
+        w.write(tkd.conceptUuid.toString()); // "CONCEPT_UUID"
+        w.write("\t");
+        w.write(tkd.text); // "DESCRIPTION_TEXT"
+        w.write("\t");
+        w.write(tki.statusUuid.toString()); // "ID_STATUS_UUID"
+        w.write("\t");
+        Long time = tki.time;
+        w.write(time.toString()); // "ID_TIME"
+        w.write("\t");
+        w.write(dateFormatter.format(new Date(time))); // "ID_TIME_EFFECTIVE"
+        w.write("\t");
+        w.write(tki.authorUuid.toString()); // "ID_AUTHOR_UUID"
+        w.write("\t");
+        w.write(tki.pathUuid.toString()); // "MODULE_UUID"
+        w.write("\t");
+        w.write(tki.pathUuid.toString()); // "ID_PATH_UUID"
+        w.write("\n");
     }
 
     public enum SctIdResolution {
@@ -103,6 +136,8 @@ public class BinaryChangeSetResolveIds {
     BufferedWriter eccsLogPostWriter;
     private File eccsLogExceptionsFile; // list concepts with path change
     BufferedWriter eccsLogExceptionsWriter;
+    private File eccsLogSctIdHistoryFile; // PFDN/KP Description SCTID History File
+    BufferedWriter eccsLogSctIdHistoryWriter; // 
     boolean eccsPathExceptionFoundB;
 
     public BinaryChangeSetResolveIds(String rootDirStr,
@@ -138,6 +173,7 @@ public class BinaryChangeSetResolveIds {
             this.eccsLogPostFile = new File(targetDirStr + File.separator + "eccs_out.txt");
         }
         this.eccsLogExceptionsFile = new File(targetDirStr + File.separator + "eccs_exception.txt");
+        this.eccsLogSctIdHistoryFile = new File(targetDirStr + File.separator + "eccs_sctid_history.txt");
         this.eccsPathExceptionFoundB = false;
 
         // EXTENSION PATH ON WHICH ALL ECCS CHANGES WILL BE PUT
@@ -147,6 +183,9 @@ public class BinaryChangeSetResolveIds {
         }
         this.snomedCorePath = UUID.fromString("8c230474-9f11-30ce-9cad-185a96fd03a2");
         this.eccsTimeThreshold = 1327996800000L; // :!!!:TEMP: move to POM parameter
+
+        this.uuidKpdType = UUID.fromString("ecfd4324-04de-5503-8274-3116f8f07217");
+        this.uuidPfdnType = UUID.fromString("084283a0-b7ca-5626-b604-6dd69fb5ff2d");
 
         this.skipUuidSet = null;
         this.skipMemberUuidSet = null;
@@ -176,6 +215,7 @@ public class BinaryChangeSetResolveIds {
             eccsLogPostWriter = new BufferedWriter(new FileWriter(eccsLogPostFile));
         }
         eccsLogExceptionsWriter = new BufferedWriter(new FileWriter(eccsLogExceptionsFile));
+        eccsLogSctIdHistoryWriter = new BufferedWriter(new FileWriter(eccsLogSctIdHistoryFile));
 
         pass2CreateUpdatedEccsFile(eccsInputFiles);
 
@@ -191,6 +231,9 @@ public class BinaryChangeSetResolveIds {
         eccsLogExceptionsWriter.append(descriptionsKept.toString());
         eccsLogExceptionsWriter.flush();
         eccsLogExceptionsWriter.close();
+        
+        eccsLogSctIdHistoryWriter.flush();
+        eccsLogSctIdHistoryWriter.close();
 
         // Logger logger = Logger.getLogger(BinaryChangeSetResolveIds.class.getName());
         // logger.log(Level.INFO, instancesNotKept.toString());
@@ -306,6 +349,27 @@ public class BinaryChangeSetResolveIds {
 //        debugSet.add(UUID.fromString("cdf6415e-c388-52f3-8944-b9157d30166c"));        
         // :DEBUG:END:
         try {
+            eccsLogSctIdHistoryWriter.write("ID_DENOTATION_SCTID");
+            eccsLogSctIdHistoryWriter.write("\t");
+            eccsLogSctIdHistoryWriter.write("DESCRIPTION_UUID");
+            eccsLogSctIdHistoryWriter.write("\t");
+            eccsLogSctIdHistoryWriter.write("CONCEPT_UUID");
+            eccsLogSctIdHistoryWriter.write("\t");
+            eccsLogSctIdHistoryWriter.write("DESCRIPTION_TEXT");
+            eccsLogSctIdHistoryWriter.write("\t");
+            eccsLogSctIdHistoryWriter.write("ID_STATUS_UUID");
+            eccsLogSctIdHistoryWriter.write("\t");
+            eccsLogSctIdHistoryWriter.write("ID_TIME");
+            eccsLogSctIdHistoryWriter.write("\t");
+            eccsLogSctIdHistoryWriter.write("ID_TIME_EFFECTIVE");
+            eccsLogSctIdHistoryWriter.write("\t");
+            eccsLogSctIdHistoryWriter.write("ID_AUTHOR_UUID");
+            eccsLogSctIdHistoryWriter.write("\t");
+            eccsLogSctIdHistoryWriter.write("ID_MODULE_UUID");
+            eccsLogSctIdHistoryWriter.write("\t");
+            eccsLogSctIdHistoryWriter.write("ID_PATH_UUID");
+            eccsLogSctIdHistoryWriter.write("\n");
+
             for (File file : eccsInputFilesList) {
                 FileInputStream fis = new FileInputStream(file);
                 BufferedInputStream bis = new BufferedInputStream(fis);
@@ -324,7 +388,7 @@ public class BinaryChangeSetResolveIds {
                 eccsLogExceptionsWriter.write("\n####### ");
                 eccsLogExceptionsWriter.write(file.getName());
                 eccsLogExceptionsWriter.write("\n");
-
+                
                 while (true) {
                     long timeStampEccsL;
                     TkConcept eConcept;
@@ -334,6 +398,13 @@ public class BinaryChangeSetResolveIds {
                         eConcept = new TkConcept(in);
                         tweakTimeStamps(eConcept);
                         enclosingUuid = eConcept.primordialUuid;
+                        if (eConcept.refsetMembers != null && eConcept.refsetMembers.size() > 0) {
+                            eccsLogExceptionsWriter.write("  NON-ANNOTATED REFSET \t");
+                            eccsLogExceptionsWriter.write(eConcept.primordialUuid.toString());
+                            eccsLogExceptionsWriter.write("\t member change count = \t");
+                            eccsLogExceptionsWriter.write(Integer.toString(eConcept.refsetMembers.size()));
+                            eccsLogExceptionsWriter.write("\n");
+                        }
                         // :!!!:DEBUG:
 //                        if (debugSet.contains(eConcept.getPrimordialUuid())) {
 //                            System.out.println(":!!!:DEBUG: BinaryChangeSetResolveIds .IN. \n" + eConcept.toString());
@@ -602,15 +673,13 @@ public class BinaryChangeSetResolveIds {
         File[] files = root.listFiles();
         if (files.length > 0) {
             Arrays.sort(files);
-            for (int i = 0; i < files.length; i++) {
-                String name = files[i].getName().toUpperCase();
-
-                if (files[i].isFile() && name.endsWith(postfix.toUpperCase())
-                        && name.contains(infix.toUpperCase())) {
-                    list.add(files[i]);
+            for (File file : files) {
+                String name = file.getName().toUpperCase();
+                if (file.isFile() && name.endsWith(postfix.toUpperCase()) && name.contains(infix.toUpperCase())) {
+                    list.add(file);
                 }
-                if (files[i].isDirectory()) {
-                    listFilesRecursive(list, files[i], infix, postfix);
+                if (file.isDirectory()) {
+                    listFilesRecursive(list, file, infix, postfix);
                 }
             }
         }
@@ -729,6 +798,7 @@ public class BinaryChangeSetResolveIds {
                         instancesNotKept.append("\t");
                         instancesNotKept.append(tkd.pathUuid.toString());
                         instancesNotKept.append("\tDROP\n");
+                        writeSctIdHistory(tkd, tki);
                     }
                 } else if (resolution.compareTo(SctIdResolution.KEEP_NO_ECCS_SCTID) != 0) {
                     if (keepMap.containsKey((Long) tki.getDenotation())) {
