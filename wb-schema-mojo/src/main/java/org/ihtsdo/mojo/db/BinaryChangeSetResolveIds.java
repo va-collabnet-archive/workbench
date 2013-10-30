@@ -72,9 +72,6 @@ public class BinaryChangeSetResolveIds {
     private UUID extensionPath;
     private UUID snomedCorePath;
     //
-    private UUID uuidKpdType;
-    private UUID uuidPfdnType;
-    //
     private long eccsTimeThreshold; // :!!!:TEMP: move to POM parameter
     private HashMap<Long, UUID> keepMap;
     private StringBuilder instancesNotKept;
@@ -183,9 +180,6 @@ public class BinaryChangeSetResolveIds {
         }
         this.snomedCorePath = UUID.fromString("8c230474-9f11-30ce-9cad-185a96fd03a2");
         this.eccsTimeThreshold = 1327996800000L; // :!!!:TEMP: move to POM parameter
-
-        this.uuidKpdType = UUID.fromString("ecfd4324-04de-5503-8274-3116f8f07217");
-        this.uuidPfdnType = UUID.fromString("084283a0-b7ca-5626-b604-6dd69fb5ff2d");
 
         this.skipUuidSet = null;
         this.skipMemberUuidSet = null;
