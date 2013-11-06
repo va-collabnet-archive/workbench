@@ -39,6 +39,7 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
+import org.ihtsdo.tk.binding.snomed.Snomed;
 
 /**
  * Goal which finds all concepts that have no parents.
@@ -56,7 +57,15 @@ public class VodbFindOrphans extends AbstractMojo {
      * 
      * @parameter
      */
-    private ConceptDescriptor[] branches = null;
+    private final ConceptDescriptor[] branches = null;
+
+    /**
+     * List of branches which will included in search.
+     * If left undefined, all will be included.
+     * 
+     * @parameter
+     */
+    private final ConceptDescriptor[] statuses = null;
 
     /**
      * The html output file location.
@@ -70,7 +79,7 @@ public class VodbFindOrphans extends AbstractMojo {
      * 
      * @parameter
      */
-    private String outputHtmlFileName = "report.html";
+    private final String outputHtmlFileName = "report.html";
 
     /**
      * The text file output location.
@@ -84,7 +93,7 @@ public class VodbFindOrphans extends AbstractMojo {
      * 
      * @parameter
      */
-    private String outputTextFileName = "uuids.txt";
+    private final String outputTextFileName = "uuids.txt";
 
     private class FindComponents implements I_ProcessConcepts {
 
@@ -100,10 +109,11 @@ public class VodbFindOrphans extends AbstractMojo {
                 + outputTextFileName)));
             htmlWriter = new BufferedWriter(new BufferedWriter(new FileWriter(outputHtmlDirectory + File.separator
                 + outputHtmlFileName)));
-            origins = new HashSet<PositionBI>();
+            origins = new HashSet<>();
             termFactory = Terms.get();
         }
 
+        @Override
         public void processConcept(I_GetConceptData concept) throws Exception {
             // get origins
             PathBI architectonicPath = termFactory.getPath(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getUids());
@@ -114,24 +124,35 @@ public class VodbFindOrphans extends AbstractMojo {
 
             origins.add(latestOnArchitectonicPath);
 
-            Set<PositionBI> branchPositions = new HashSet<PositionBI>();
+            Set<PositionBI> branchPositions = new HashSet<>();
 
             // get the concepts/paths/positions for the branches to be compared
-            for (ConceptDescriptor branch : branches) {
-                I_GetConceptData currentConcept = branch.getVerifiedConcept();
-                PathBI currentPath = termFactory.getPath(currentConcept.getUids());
-                PositionBI currentPosition = termFactory.newPosition(currentPath, Long.MAX_VALUE);
-                branchPositions.add(currentPosition);
+            if (branches != null) {
+                for (ConceptDescriptor branch : branches) {
+                    I_GetConceptData currentConcept = branch.getVerifiedConcept();
+                    PathBI currentPath = termFactory.getPath(currentConcept.getUids());
+                    PositionBI currentPosition = termFactory.newPosition(currentPath, Long.MAX_VALUE);
+                    branchPositions.add(currentPosition);
+                }
             }
 
             // get latest IS-A relationships
             I_IntSet isARel = termFactory.newIntSet();
             isARel.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()).getConceptNid());
+            isARel.add(termFactory.getConcept(Snomed.IS_A.getUuids()).getConceptNid());
 
-            List<? extends I_RelTuple> results = concept.getSourceRelTuples(null, isARel, new PositionSetReadOnly(branchPositions), 
+            I_IntSet allowStatuses = null;
+            if (statuses != null) {
+                allowStatuses = termFactory.newIntSet();
+                for (ConceptDescriptor status : statuses) {
+                    allowStatuses.add(status.getVerifiedConcept().getNid());
+                }
+            }
+
+            List<? extends I_RelTuple> results = concept.getSourceRelTuples(allowStatuses, isARel, new PositionSetReadOnly(branchPositions), 
                 config.getPrecedence(), config.getConflictResolutionStrategy());
-            if (results.size() == 0) {
-                String message = "Found an orphaned concept: " + concept;
+            if (results.isEmpty()) {
+                String message = "Found an orphaned concept: " + concept.getPrimUuid().toString() + "  " + concept.toUserString();
                 getLog().info(message);
                 htmlWriter.append(message);
                 htmlWriter.append("<br>");
@@ -158,6 +179,7 @@ public class VodbFindOrphans extends AbstractMojo {
         }
     }
 
+    @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         I_TermFactory termFactory = LocalVersionedTerminology.get();
         try {
