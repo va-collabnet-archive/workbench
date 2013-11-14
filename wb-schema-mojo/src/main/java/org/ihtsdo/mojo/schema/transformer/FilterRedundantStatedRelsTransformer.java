@@ -89,6 +89,8 @@ public class FilterRedundantStatedRelsTransformer extends AbstractTransformer {
 
     /**
      * Instantiates a new transformer.
+     * @throws org.ihtsdo.tk.spec.ValidationException
+     * @throws org.dwfa.tapi.TerminologyException
      */
     public FilterRedundantStatedRelsTransformer()
             throws ValidationException, IOException, TerminologyException {
@@ -148,7 +150,7 @@ public class FilterRedundantStatedRelsTransformer extends AbstractTransformer {
             refsetsToFilter.add(UUID.fromString(loopValue));
         }
         watchUuidSet = new HashSet();
-        // watchUuidSet.add(UUID.fromString("ded44500-d486-59ab-9749-68aa719e74a4")); // KPET CMT Project release candidate path
+        watchUuidSet.add(UUID.fromString("1adb3f25-66be-47a8-a024-efe8b31146e6")); // KPET CMT Project release candidate path
         // watchUuidSet.add(UUID.fromString("3770e517-7adc-5a24-a447-77a9daa3eedf")); // KPET CMT Project development path
         // watchUuidSet.add(UUID.fromString("098eed03-204c-5bf0-91c0-3c9610beec6b")); // KPET CMT Project development origin path
         // watchUuidSet.add(UUID.fromString("2bfc4102-f630-5fbe-96b8-625f2a6b3d5a")); // KPET Extension Path

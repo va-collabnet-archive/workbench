@@ -49,8 +49,116 @@ public class LogicalRelComputer {
         this.reportListRoleGroupAdditionsWriter = reportListRoleGroupAdditionsWriter;
     }
 
+    private enum RelFlavor {
+
+        REL_FROM_SNOMED,
+        REL_FROM_SNOMED_WITH_LEGACY_FILLER_SCTID,
+        REL_FROM_EXTENSION,
+        REL_FROM_ECCS;
+    }
+
+    private RelFlavor processRelFlavor(LogicalRel rel) {
+        if (rel.relSctIdPath != null
+                && rel.relSctIdPath.compareTo(snomedPathUuid) != 0
+                && rel.pathLastRevisionUuid.compareTo(snomedPathUuid) == 0) {
+            // disregard snomed relationships to which KPs only change is to add an id 
+            return RelFlavor.REL_FROM_SNOMED_WITH_LEGACY_FILLER_SCTID;
+        } else if (rel.relSctIdPath != null
+                && rel.relSctIdPath.compareTo(snomedPathUuid) == 0) {
+            return RelFlavor.REL_FROM_SNOMED;
+        } else if (rel.relSctIdPath != null
+                && rel.relSctIdPath.compareTo(extensionPathUuid) == 0) {
+            return RelFlavor.REL_FROM_EXTENSION;
+        } else {
+            return RelFlavor.REL_FROM_EXTENSION;
+        }
+    }
+
     // exceptions list:  SCTID or UUID <tab> short name <\n>
     public ArrayList<LogicalRel> processRelsGroup0(ArrayList<LogicalRel> a)
+            throws NoSuchAlgorithmException, UnsupportedEncodingException {
+        ArrayList<LogicalRel> keepList = new ArrayList<>();
+        // SORT BY [C1-Group-RoleType-C2]
+        Collections.sort(a);
+
+        ArrayList<LogicalRel> equivalentRelList = new ArrayList<>();
+        for (int i = 0; i < a.size(); i++) {
+            LogicalRel currentRel = a.get(i);
+            equivalentRelList.add(currentRel);
+            if (i == a.size() - 1) {
+                // BOUNDARY: last rel on list
+                processRelsGroup0EquivList(equivalentRelList, keepList);
+            } else {
+                LogicalRel nextRel = a.get(i + 1);  // LOOK AHEAD
+                if (currentRel.c2SnoId.compareTo(nextRel.c2SnoId) != 0
+                        || currentRel.typeSnoId.compareTo(nextRel.typeSnoId) != 0) {
+                    processRelsGroup0EquivList(equivalentRelList, keepList);
+                    equivalentRelList.clear();
+                }
+            }
+        }
+        return keepList;
+    }
+
+    private void processRelsGroup0EquivList(ArrayList<LogicalRel> equivalentRelList,
+            ArrayList<LogicalRel> keepList) {
+        ArrayList<LogicalRel> tempList = new ArrayList<>();
+        for (LogicalRel logicalRel : equivalentRelList) {
+            RelFlavor relFlavor = processRelFlavor(logicalRel);
+            switch (relFlavor) {
+                case REL_FROM_SNOMED_WITH_LEGACY_FILLER_SCTID:
+                    //do not keep 
+                    break;
+                case REL_FROM_SNOMED:
+                case REL_FROM_EXTENSION:
+                case REL_FROM_ECCS:
+                    tempList.add(logicalRel);
+                    break;
+            }
+        }
+
+        if (tempList.isEmpty()) {
+            System.out.printf("\n>>>>> :LogicalRelComputer: filter tempList == 0 :: %s equivList size = %s <<<<<",
+                    equivalentRelList.get(0).c1SnoId.toString(),
+                    equivalentRelList.size());
+            System.out.print(processRelFlavor(equivalentRelList.get(0)).toString());
+            System.out.printf(" #### %s\n", equivalentRelList.get(0).tkr.toString());
+            keepList.addAll(tempList);
+        } else if (tempList.size() == 1) {
+            keepList.addAll(tempList);
+        } else if (tempList.size() == 2) {
+            System.out.printf("\n>>>>> :LogicalRelComputer: filter tempList == %d :: %s ", 
+                    tempList.size(),
+                    equivalentRelList.get(0).c1SnoId.toString());
+            for (LogicalRel logicalRel : tempList) {
+                System.out.printf("####  c1 : %s", logicalRel.c1SnoId);
+                System.out.printf(" type : %s", logicalRel.typeSnoId);
+                System.out.printf(" c2 : %s", logicalRel.c2SnoId);
+                System.out.printf(" sctid : %s ", logicalRel.relSctId);
+                System.out.print(processRelFlavor(logicalRel));
+                System.out.printf(" <<<<< %s ", logicalRel.tkr.toString());
+            }
+            System.out.printf("\n");
+            keepList.addAll(tempList);
+        } else { // tempList.size() > 2
+            System.out.printf("\n>>>>> :LogicalRelComputer: filter tempList == %d :: %s ", 
+                    tempList.size(),
+                    equivalentRelList.get(0).c1SnoId.toString());
+            for (LogicalRel logicalRel : tempList) {
+                System.out.printf(">>>>>  c1 : %s", logicalRel.c1SnoId);
+                System.out.printf(" type : %s", logicalRel.typeSnoId);
+                System.out.printf(" c2 : %s", logicalRel.c2SnoId);
+                System.out.printf(" sctid : %s ", logicalRel.relSctId);
+                System.out.print(processRelFlavor(logicalRel));
+                System.out.printf(" <<<<< %s ", logicalRel.tkr.toString());
+            }
+            System.out.printf("\n");
+            keepList.addAll(tempList);
+        }
+    }
+
+    // exceptions list:  SCTID or UUID <tab> short name <\n>
+    public ArrayList<LogicalRel> processRelsGroup0Was(ArrayList<LogicalRel> a)
             throws NoSuchAlgorithmException, UnsupportedEncodingException {
         ArrayList<LogicalRel> keepList = new ArrayList<>();
         // SORT BY [C1-Group-RoleType-C2]
