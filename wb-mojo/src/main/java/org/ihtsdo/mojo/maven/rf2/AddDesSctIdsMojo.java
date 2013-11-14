@@ -91,8 +91,10 @@ public class AddDesSctIdsMojo extends AbstractMojo {
     long effectiveTimeL;
 
     // Internal Variables
+    private static final String UUID_STATUS_CURRENT_RF1 = "2faa9261-8fb2-11db-b606-0800200c9a66";
+    private static final UUID uuidStatusCurrentRf1 = UUID.fromString(UUID_STATUS_CURRENT_RF1);
     private static final String UUID_STATUS_ACTIVE = "d12702ee-c37f-385f-a070-61d56d4d0f1f";
-    private static final UUID uuidStatusActive = UUID.fromString(UUID_STATUS_ACTIVE);
+    private static final UUID uuidStatusActiveRf2 = UUID.fromString(UUID_STATUS_ACTIVE);
     // SNOMED integer id -- Workbench Auxiliary
     private static final String UUID_SCTID_SOURCE = "0418a591-f75b-39ad-be2c-3ab849326da9";
     private static final UUID uuidSctIdSource = UUID.fromString(UUID_SCTID_SOURCE);
@@ -166,7 +168,10 @@ public class AddDesSctIdsMojo extends AbstractMojo {
                 // DESCRIPTION_TEXT = 3;
                 // String descriptionText = line[DESCRIPTION_TEXT];
                 // ID_STATUS_UUID = 4;
-                UUID statusUuid = UUID.fromString(line[ID_STATUS_UUID]);
+                UUID idStatusUuid = UUID.fromString(line[ID_STATUS_UUID]);
+                if (idStatusUuid.compareTo(uuidStatusCurrentRf1) == 0) {
+                    idStatusUuid = uuidStatusActiveRf2;
+                }
                 // ID_TIME = 5; // yyyy-MM-dd HH:mm:ss
                 Long idTime = Long.parseLong(line[ID_TIME]);
                 // ID_TIME_EFFECTIVE = 6;
@@ -178,13 +183,10 @@ public class AddDesSctIdsMojo extends AbstractMojo {
                 // ID_PATH_UUID = 9;
                 UUID idPathUuid = UUID.fromString(line[ID_PATH_UUID]);
 
-                if (descriptionUuid.compareTo(UUID.fromString("379f0f89-87b8-5644-8530-314ee69a233a")) == 0) {
-                    System.out.println(":DEBUG: DescRecord of interest");
-                }
                 descriptionList.add(new DescRecord(idDenotationSctId,
                         descriptionUuid,
                         conceptUuid,
-                        statusUuid,
+                        idStatusUuid,
                         idTime,
                         idAuthorUuid,
                         idModuleUuid,
@@ -195,6 +197,7 @@ public class AddDesSctIdsMojo extends AbstractMojo {
 
     private ArrayList<DescRecord> step2_keepMostCurrentActiveSctIds(ArrayList<DescRecord> descriptionList) {
         ArrayList<DescRecord> keepList = new ArrayList<>();
+        int countSctIdWithActiveUse = 0;
         int countSctIdWithoutActiveUse = 0;
 
         Collections.sort(descriptionList);
@@ -204,20 +207,16 @@ public class AddDesSctIdsMojo extends AbstractMojo {
         for (int i = 0; i < descriptionList.size(); i++) {
             DescRecord dRecCurrent = descriptionList.get(i);
             if (i < descriptionList.size() - 1) {
-                DescRecord dRecNext = descriptionList.get(i);
-                if (dRecCurrent.idDenotationSctId == dRecNext.idDenotationSctId) {
-                    if (dRecCurrent.idStatusUuid == null
-                            || uuidStatusActive == null) {
-                        System.out.println(":DEBUG: found null");
-                    }
-                    if (dRecCurrent.idStatusUuid.compareTo(uuidStatusActive) == 0) { // 
-                        mostRecentActiveRecord = dRecCurrent;
-                    } else {
-                        // mostRecentInactiveRecord = dRecCurrent;
-                    }
+                if (dRecCurrent.idStatusUuid.compareTo(uuidStatusActiveRf2) == 0) { // 
+                    mostRecentActiveRecord = dRecCurrent;
                 } else {
+                    // mostRecentInactiveRecord = dRecCurrent;
+                }
+                DescRecord dRecNext = descriptionList.get(i + 1);
+                if (dRecCurrent.idDenotationSctId != dRecNext.idDenotationSctId) {
                     if (mostRecentActiveRecord != null) {
                         keepList.add(mostRecentActiveRecord);
+                        countSctIdWithActiveUse++;
                     } else {
                         countSctIdWithoutActiveUse++;
                     }
@@ -225,19 +224,21 @@ public class AddDesSctIdsMojo extends AbstractMojo {
                     // mostRecentInactiveRecord = null;
                 }
             } else { // last description
-                if (dRecCurrent.idStatusUuid.compareTo(uuidStatusActive) == 0) { // 
+                if (dRecCurrent.idStatusUuid.compareTo(uuidStatusActiveRf2) == 0) { // 
                     mostRecentActiveRecord = dRecCurrent;
                 } else {
                     // mostRecentInactiveRecord = dRecCurrent;
                 }
                 if (mostRecentActiveRecord != null) {
                     keepList.add(mostRecentActiveRecord);
+                    countSctIdWithActiveUse++;
                 } else {
                     countSctIdWithoutActiveUse++;
                 }
             }
         }
 
+        getLog().info("countSctIdWithActiveUse : " + countSctIdWithActiveUse); //
         getLog().info("countSctIdWithoutActiveUse : " + countSctIdWithoutActiveUse); //
         return keepList;
     }
