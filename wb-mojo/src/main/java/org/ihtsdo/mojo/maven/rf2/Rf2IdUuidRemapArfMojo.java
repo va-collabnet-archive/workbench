@@ -74,14 +74,14 @@ public class Rf2IdUuidRemapArfMojo
      *
      * @parameter
      */
-    private String idSubDir = "";
+    private final String idSubDir = "";
     /**
      * Input Directory.<br> The directory array parameter supported extensions via separate
      * directories in the array.
      *
      * @parameter
      */
-    private String idInputDir = "";
+    private final String idInputDir = "";
     /**
      * Input Directories Array.<br> The directory array parameter supported extensions via separate
      * directories in the array.
@@ -101,7 +101,7 @@ public class Rf2IdUuidRemapArfMojo
      *
      * @parameter
      */
-    private String idCacheDir = "";
+    private final String idCacheDir = "";
 
     @Override
     public void execute()
@@ -123,9 +123,13 @@ public class Rf2IdUuidRemapArfMojo
         }
 
         CreateUuidRemapCache(wDir, idCacheFName);
+
         try {
+            UuidUuidRemapper idLookup = new UuidUuidRemapper(idCacheFName);
+            // idLookup.setupReverseLookup();
+            
             if (remapArfDirs != null) {
-                RemapAllFiles(wDir, remapSubDir, remapArfDirs, idCacheFName);
+                RemapAllFiles(wDir, remapSubDir, remapArfDirs, idLookup);
             }
         } catch (IOException ex) {
             throw new MojoExecutionException("failed uuid remap", ex);
@@ -148,10 +152,9 @@ public class Rf2IdUuidRemapArfMojo
 
     }
 
-    void RemapAllFiles(String tDir, String tSubDir, String[] inDirs, String idCacheFName)
+    void RemapAllFiles(String tDir, String tSubDir, String[] inDirs, UuidUuidRemapper idLookup)
             throws IOException {
         long startTime = System.currentTimeMillis();
-        UuidUuidRemapper idLookup = new UuidUuidRemapper(idCacheFName);
         System.out.println((System.currentTimeMillis() - startTime) + " mS");
 
         for (String inDirName : inDirs) {
@@ -311,7 +314,7 @@ public class Rf2IdUuidRemapArfMojo
                 }
                 StringBuilder sb = new StringBuilder();
                 sb.append("\n::: parseToUuidRemapCacheFile(..) ");
-                sb.append("\n::: PARSED & WRITTEN TO ID CACHE: ");
+                sb.append("\n::: PARSED & WRITTEN TO UUID ID REMAP CACHE: ");
                 sb.append(f.file.toURI().toString());
                 if (idSchemeSet.size() > 0) {
                     Long[] idSchemeArray = idSchemeSet.toArray(new Long[0]);

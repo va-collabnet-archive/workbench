@@ -23,6 +23,7 @@ import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -33,8 +34,10 @@ import java.util.logging.Logger;
  */
 public class UuidUuidRemapper {
 
-    public UUID uuidComputedArray[];
-    public UUID uuidDeclaredArray[];
+    public UUID[] uuidComputedArrayLookupByComputed;
+    public UUID[] uuidDeclaredArrayLookupByComputed;
+    public UUID[] uuidComputedArrayLookupByDeclared;
+    public UUID[] uuidDeclaredArrayLookupByDeclared;
 
     public UuidUuidRemapper(String filePathName)
             throws IOException {
@@ -59,6 +62,80 @@ public class UuidUuidRemapper {
 
     public UuidUuidRemapper(ArrayList<UuidUuidRecord> idList) {
         setupArrays(idList);
+    }
+    
+    public void setupReverseLookup() {
+        ArrayList<UuidUuidRecord> idList = new ArrayList<>();
+        for (int i = 0; i < uuidComputedArrayLookupByComputed.length; i++) {
+            idList.add(new UuidUuidRecord(uuidComputedArrayLookupByComputed[i], 
+                    uuidDeclaredArrayLookupByComputed[i]));
+        }
+        
+        Comparator<UuidUuidRecord> byDeclaredComparator = new Comparator<UuidUuidRecord>() {
+
+            @Override
+            public int compare(UuidUuidRecord o1, UuidUuidRecord o2) {
+                int more = 1;
+                int less = -1;
+                if (o1.uuidDeclared.compareTo(o2.uuidDeclared) < 0) {
+                    return less; // instance less than received
+                } else if (o1.uuidDeclared.compareTo(o2.uuidDeclared) > 0) {
+                    return more; // instance greater than received
+                } else {
+                    if (o1.uuidComputed.compareTo(o2.uuidComputed) < 0) {
+                        return less; // instance less than received
+                    } else if (o1.uuidComputed.compareTo(o2.uuidComputed) > 0) {
+                        return more; // instance greater than received
+                    } else {
+                        return 0; // instance == received
+                    }
+                }
+            }
+        };
+        Collections.sort(idList, byDeclaredComparator);
+    
+        int countDuplicates = 0;
+        int countPairUuidChanged = 0;
+        StringBuilder sb = new StringBuilder();
+        // check for duplicates
+        for (int i = 0; i < idList.size() - 1; i++) {
+            if (idList.get(i).uuidComputed.compareTo(idList.get(i + 1).uuidComputed) == 0) {
+                countDuplicates++;
+                boolean isNotChanged = true;
+                if (idList.get(i).uuidDeclared.compareTo(idList.get(i + 1).uuidDeclared) == 0) {
+                    countPairUuidChanged++;
+                    isNotChanged = false;
+                }
+                if (countDuplicates < 200) {
+                    if (isNotChanged) {
+                        sb.append("\r\n::: reverse lookup :: AMBIGUOUS REVERSE PRIMORDIAL UUID ====\r\n");
+                    } else {
+                        sb.append("\r\n::: reverse lookup :: AMBIGUOUS PRIMORDIAL UUID\r\n");
+                    }
+                    sb.append(idList.get(i).uuidComputed);
+                    sb.append("\t");
+                    sb.append(idList.get(i).uuidDeclared);
+                    sb.append("\r\n");
+                }
+            }
+        }
+        sb.append("\r\n::: reverse lookup :: countDuplicates = ");
+        sb.append(countDuplicates);
+        sb.append("\r\n::: reverse lookup :: countPairUuidChanged = ");
+        sb.append(countPairUuidChanged);
+        sb.append("\r\n");
+        Logger logger = Logger.getLogger(this.getClass().getName());
+        logger.info(sb.toString());
+        if (countDuplicates > 0) {
+            throw new UnsupportedOperationException(" reverse lookup :: duplicate uuids not supported");
+        }
+        this.uuidComputedArrayLookupByDeclared = new UUID[idList.size()];
+        this.uuidDeclaredArrayLookupByDeclared = new UUID[idList.size()];
+        for (int i = 0; i < idList.size(); i++) {
+            UuidUuidRecord uuidUuidRecord = idList.get(i);
+            this.uuidComputedArrayLookupByDeclared[i] = uuidUuidRecord.uuidComputed;
+            this.uuidDeclaredArrayLookupByDeclared[i] = uuidUuidRecord.uuidDeclared;
+        }
     }
 
     private void setupArrays(ArrayList<UuidUuidRecord> idList) {
@@ -97,12 +174,12 @@ public class UuidUuidRemapper {
         if (countDuplicates > 0) {
             throw new UnsupportedOperationException("duplicate uuids not supported");
         }
-        this.uuidComputedArray = new UUID[idList.size()];
-        this.uuidDeclaredArray = new UUID[idList.size()];
+        this.uuidComputedArrayLookupByComputed = new UUID[idList.size()];
+        this.uuidDeclaredArrayLookupByComputed = new UUID[idList.size()];
         for (int i = 0; i < idList.size(); i++) {
             UuidUuidRecord uuidUuidRecord = idList.get(i);
-            this.uuidComputedArray[i] = uuidUuidRecord.uuidComputed;
-            this.uuidDeclaredArray[i] = uuidUuidRecord.uuidDeclared;
+            this.uuidComputedArrayLookupByComputed[i] = uuidUuidRecord.uuidComputed;
+            this.uuidDeclaredArrayLookupByComputed[i] = uuidUuidRecord.uuidDeclared;
         }
     }
 
@@ -111,12 +188,20 @@ public class UuidUuidRemapper {
     }
 
     public UUID getUuid(UUID cUuid) {
-        int idx = Arrays.binarySearch(uuidComputedArray, cUuid);
+        int idx = Arrays.binarySearch(uuidComputedArrayLookupByComputed, cUuid);
         if (idx >= 0) {
-            return uuidDeclaredArray[idx];
+            return uuidDeclaredArrayLookupByComputed[idx];
         } else {
             return null;
         }
     }
     
+    public UUID getComputedUuid(UUID cUuid) {
+        int idx = Arrays.binarySearch(uuidDeclaredArrayLookupByDeclared, cUuid);
+        if (idx >= 0) {
+            return uuidComputedArrayLookupByDeclared[idx];
+        } else {
+            return null;
+        }
+    }
 }
