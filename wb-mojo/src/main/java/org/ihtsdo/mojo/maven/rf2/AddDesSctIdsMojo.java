@@ -32,6 +32,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 import java.util.logging.Level;
@@ -105,9 +106,18 @@ public class AddDesSctIdsMojo extends AbstractMojo {
     private static final UUID uuidKpd = UUID.fromString("ecfd4324-04de-5503-8274-3116f8f07217");
     // KpAxiomConcepts.DescriptionTypes.UUID_PT_FRIENDLY_DESCRIPTION_TYPE    
     private static final UUID uuidPfdn = UUID.fromString("084283a0-b7ca-5626-b604-6dd69fb5ff2d");
+    // WATCHSET
+    private HashSet<UUID> watchConceptSet = null;
+    private HashSet<Long> watchSctIdSet = null;
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
+        watchConceptSet = new HashSet<>();
+        //watchConceptSet.add(UUID.fromString("b95f7cac-8021-40bc-92d9-4e236b48967b"));
+        //watchConceptSet.add(UUID.fromString("3f18d530-fe1a-3884-953f-26bcc3480d0d"));
+        watchSctIdSet = new HashSet<>();
+        //watchSctIdSet.add(2169711000119110L);
+
         getLog().info("AddDesSctIdsMojo : add current active sctids ");
         // SHOW DIRECTORIES
         String wDir = targetDirectory.getAbsolutePath();
@@ -206,6 +216,10 @@ public class AddDesSctIdsMojo extends AbstractMojo {
         // DescRecord mostRecentInactiveRecord = null;
         for (int i = 0; i < descriptionList.size(); i++) {
             DescRecord dRecCurrent = descriptionList.get(i);
+            Long currentSctId = dRecCurrent.idDenotationSctId;
+            if (watchSctIdSet.contains(currentSctId)) {
+                System.out.printf(":WATCH: step2_keepMostCurrentActiveSctIds found %s\n", dRecCurrent.toString());
+            }
             if (i < descriptionList.size() - 1) {
                 if (dRecCurrent.idStatusUuid.compareTo(uuidStatusActiveRf2) == 0) { // 
                     mostRecentActiveRecord = dRecCurrent;
@@ -213,7 +227,7 @@ public class AddDesSctIdsMojo extends AbstractMojo {
                     // mostRecentInactiveRecord = dRecCurrent;
                 }
                 DescRecord dRecNext = descriptionList.get(i + 1);
-                if (dRecCurrent.idDenotationSctId != dRecNext.idDenotationSctId) {
+                if (dRecCurrent.idDenotationSctId.compareTo(dRecNext.idDenotationSctId) != 0) {
                     if (mostRecentActiveRecord != null) {
                         keepList.add(mostRecentActiveRecord);
                         countSctIdWithActiveUse++;
@@ -290,6 +304,9 @@ public class AddDesSctIdsMojo extends AbstractMojo {
 
     private TkConcept addSctIdToEConcept(TkConcept tkConcept, UUID[] dUuidArray,
             ArrayList<DescRecord> descriptionList) {
+        if (watchConceptSet.contains(tkConcept.primordialUuid)) {
+            System.out.println(":WATCH: addSctIdToEConcept found BEFORE : " + tkConcept.toString());
+        }
 
         // Descriptions
         List<TkDescription> eDescriptions = tkConcept.getDescriptions();
@@ -318,6 +335,9 @@ public class AddDesSctIdsMojo extends AbstractMojo {
             }
         }
 
+        if (watchConceptSet.contains(tkConcept.primordialUuid)) {
+            System.out.println(":WATCH: addSctIdToEConcept found AFTER : " + tkConcept.toString());
+        }
         return tkConcept;
     }
 
@@ -348,18 +368,34 @@ public class AddDesSctIdsMojo extends AbstractMojo {
 
         @Override
         public int compareTo(DescRecord o) {
-            if (this.idDenotationSctId < o.idDenotationSctId) {
+            if (this.idDenotationSctId.compareTo(o.idDenotationSctId) < 0) {
                 return -1; // instance less than received
-            } else if (this.idDenotationSctId > o.idDenotationSctId) {
+            } else if (this.idDenotationSctId.compareTo(o.idDenotationSctId) > 0) {
                 return 1; // instance greater than received
             } else {
-                if (this.idTime < o.idTime) {
+                if (this.idTime.compareTo(idTime) < 0) {
                     return -1; // instance less than received
-                } else if (this.idTime > o.idTime) {
+                } else if (this.idTime.compareTo(idTime) > 0) {
                     return 1; // instance greater than received
                 }
             }
             return 0; // instance == received
+        }
+        
+        @Override
+        public String toString(){
+            StringBuilder sb = new StringBuilder();
+            sb.append("sctid:");
+            sb.append(this.idDenotationSctId.toString());
+            sb.append(" time:");
+            sb.append(this.idTime.toString());
+            sb.append(" description:");
+            sb.append(this.descriptionUuid.toString());
+            sb.append(" concept:");
+            sb.append(this.conceptUuid.toString());
+            sb.append(" status:");
+            sb.append(this.idStatusUuid.toString());
+            return sb.toString();
         }
 
     }
