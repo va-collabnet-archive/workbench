@@ -114,7 +114,7 @@ public class BinaryChangeSetResolveIds {
         w.write("\t");
         w.write(tki.authorUuid.toString()); // "ID_AUTHOR_UUID"
         w.write("\t");
-        w.write(tki.pathUuid.toString()); // "MODULE_UUID"
+        w.write(tki.moduleUuid.toString()); // "ID_MODULE_UUID"
         w.write("\t");
         w.write(tki.pathUuid.toString()); // "ID_PATH_UUID"
         w.write("\n");

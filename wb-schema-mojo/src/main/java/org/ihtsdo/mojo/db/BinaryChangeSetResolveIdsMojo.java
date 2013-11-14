@@ -77,7 +77,7 @@ public class BinaryChangeSetResolveIdsMojo extends AbstractMojo {
      *
      * @parameter default-value = "id-cache"
      */
-    private String idCacheDir = "";
+    private final String idCacheDir = "";
     /**
      * Primordial UUIDs of eConcepts to be skip ... i.e. not included in the database load.
      *
