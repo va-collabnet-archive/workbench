@@ -79,6 +79,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
     private Writer descriptionsWriter;
     private Date effectiveDate;
     private String effectiveDateString;
+    private Date snomedCoreReleaseDate;
     private Writer identifiersWriter;
     private Writer publicIdentifiersWriter;
     private LANG_CODE language;
@@ -135,6 +136,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
      * @param module the String representing the module associated with the
      * released content
      * @param effectiveDate specifying the official release date
+     * @param snomedCoreReleaseDate specifying the release date of SNOMED core content used by this release
      * @param stampNids the valid stamp nids associated with content for this
      * release
      * @param viewCoordinate specifying which versions of the concepts to
@@ -152,7 +154,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
      * @throws IOException signals that an I/O exception has occurred
      */
     public Rf2Export(File directory, ReleaseType releaseType, LANG_CODE language, COUNTRY_CODE country,
-            String namespace, String module, Date effectiveDate, Set<Integer> stampNids, ViewCoordinate viewCoordinate,
+            String namespace, String module, Date effectiveDate, Date snomedCoreReleaseDate, Set<Integer> stampNids, ViewCoordinate viewCoordinate,
             Set<Integer> excludedRefsetIds, NidBitSetBI conceptsToProcess, boolean makePrivateIdFile, int refsetParentConceptNid,
             Date previousReleaseDate, Set<Integer> stampsToRemove, Collection taxonomyParentNids)
             throws IOException, ContradictionException {
@@ -160,6 +162,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
         directory.mkdirs();
         this.releaseType = releaseType;
         this.effectiveDate = effectiveDate;
+        this.snomedCoreReleaseDate = snomedCoreReleaseDate;
         this.language = language;
         this.country = country;
         this.namespace = namespace;
@@ -204,6 +207,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
      * @param module the String representing the module associated with the
      * released content
      * @param effectiveDate specifying the official release date
+     * @param snomedCoreReleaseDate specifying the release date of SNOMED core content used by this release
      * @param stampNids the valid stamp nids associated with content for this
      * release
      * @param viewCoordinate specifying which versions of the concepts to
@@ -222,7 +226,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
      * @throws IOException signals that an I/O exception has occurred
      */
     public Rf2Export(File directory, ReleaseType releaseType, LANG_CODE language, COUNTRY_CODE country,
-            String namespace, String module, Date effectiveDate, Set<Integer> stampNids, ViewCoordinate viewCoordinate,
+            String namespace, String module, Date effectiveDate, Date snomedCoreReleaseDate,Set<Integer> stampNids, ViewCoordinate viewCoordinate,
             Set<Integer> excludedRefsetIds, NidBitSetBI conceptsToProcess, boolean makePrivateIdFile, int refsetParentConceptNid,
             Date previousReleaseDate, Set<Integer> stampsToRemove, Collection taxonomyParentNids, Integer conNumRefesetParentConceptNid)
             throws IOException, ContradictionException {
@@ -230,6 +234,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
         directory.mkdirs();
         this.releaseType = releaseType;
         this.effectiveDate = effectiveDate;
+        this.snomedCoreReleaseDate = snomedCoreReleaseDate;
         this.language = language;
         this.country = country;
         this.namespace = namespace;
@@ -2069,7 +2074,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                     break;
 
                 case TARGET_TIME:
-                    modDependWriter.write(effectiveDateString + field.seperator);
+                    modDependWriter.write(TimeHelper.getShortFileDateFormat().format(snomedCoreReleaseDate) + field.seperator);
 
                     break;
             }

@@ -158,6 +158,13 @@ public class GenerateIncrementalRf2File extends AbstractMojo {
      */
     private String effectiveDate;
     /**
+     * Effective date, in yyyy-MM-dd-HH.mm.ss format.
+     *
+     * @parameter
+     * @required
+     */
+    private String snomedCoreReleaseDate;
+    /**
      * Project ID namespace, as SCT id
      *
      * @parameter
@@ -412,6 +419,8 @@ public class GenerateIncrementalRf2File extends AbstractMojo {
                     namespace,
                     moduleId.toString(),
                     new Date(TimeHelper.getTimeFromString(effectiveDate,
+                    TimeHelper.getAltFileDateFormat())),
+                    new Date(TimeHelper.getTimeFromString(snomedCoreReleaseDate,
                     TimeHelper.getAltFileDateFormat())),
                     stampsToWrite.getAsSet(),
                     vc,
