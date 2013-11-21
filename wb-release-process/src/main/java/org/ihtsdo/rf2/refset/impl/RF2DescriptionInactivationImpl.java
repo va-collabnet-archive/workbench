@@ -69,7 +69,7 @@ public class RF2DescriptionInactivationImpl extends RF2AbstractImpl implements I
 						String referencedComponentId = getDescriptionId(description.getDescId(), ExportUtil.getSnomedCorePathNid());
 
 						if (referencedComponentId==null || referencedComponentId.equals("")){
-							referencedComponentId=Terms.get().getUids(description.getDescId()).iterator().next().toString();
+							continue;
 						}
 						UUID uuid = Type5UuidFactory.get(refsetId + referencedComponentId);
 
