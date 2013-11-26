@@ -3,7 +3,7 @@
 	<parent>
         <groupId>org.ihtsdo</groupId>
         <artifactId>wb-mmb</artifactId>
-		<version>2.38-trek-no-jini-dkpatch-1</version>
+		<version>dk-1.0-SNAPSHOT</version>
     </parent>
 	<artifactId>issue-repository-integration</artifactId>
 	<packaging>jar</packaging>
@@ -19,19 +19,19 @@
 		<dependency>
 			<groupId>org.ihtsdo</groupId>
 			<artifactId>wb-api</artifactId>
-			<version>${project.version}</version>
+			<version>1.0-dk-SNAPSHOT</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.ihtsdo</groupId>
 			<artifactId>wb-gui</artifactId>
-			<version>${project.version}</version>
+			<version>1.0-dk-SNAPSHOT</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.ihtsdo</groupId>
 			<artifactId>issue-management</artifactId>
-			<version>${project.version}</version>
+			<version>1.0-dk-SNAPSHOT</version>
 			<scope>compile</scope>
 		</dependency>
 	</dependencies>
