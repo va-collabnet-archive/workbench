@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.ihtsdo</groupId>
         <artifactId>wb-mmb</artifactId>
-        <version>dk-1.0-SNAPSHOT</version>
+        <version>1.0-dk-SNAPSHOT</version>
     </parent>
     <artifactId>tk-drools</artifactId>
   <version>1.0-dk-SNAPSHOT</version>
@@ -45,7 +45,7 @@
         <dependency>
             <groupId>org.ihtsdo</groupId>
             <artifactId>tk-concept-component</artifactId>
-            <version>dk-1.0-SNAPSHOT</version>
+            <version>1.0-dk-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>

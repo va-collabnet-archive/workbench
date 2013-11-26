@@ -19,7 +19,7 @@
     <parent>
         <groupId>org.ihtsdo</groupId>
         <artifactId>wb-mmb</artifactId>
-        <version>dk-1.0-SNAPSHOT</version>
+        <version>1.0-dk-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>wb-gui</artifactId>
@@ -32,7 +32,7 @@
         <dependency>
             <groupId>org.ihtsdo</groupId>
             <artifactId>tk-arena-spec</artifactId>
-            <version>dk-1.0-SNAPSHOT</version>
+            <version>1.0-dk-SNAPSHOT</version>
             <type>jar</type>
         </dependency>
         <dependency>

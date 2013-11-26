@@ -316,6 +316,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                 "der2_cRefset_Language_UUID" + releaseType.suffix + "-"
                 + language.getFormatedLanguageNoDialectCode() + "_" 
                 + country.getFormatedCountryCode().toUpperCase() 
+                + namespace + "_"
                 + TimeHelper.getShortFileDateFormat().format(effectiveDate) + ".txt");
         File modDependFile = new File(directory,
                 "der2_ssRefset_ModuleDependency_UUID" + releaseType.suffix + "_"
