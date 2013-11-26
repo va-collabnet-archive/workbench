@@ -3,12 +3,12 @@
 	<parent>
 		<groupId>org.ihtsdo</groupId>
 		<artifactId>wb-mmb</artifactId>
-		<version>1.0-dk-SNAPSHOT</version>
+		<version>1.0-dk</version>
 	</parent>
 
 	<groupId>org.ihtsdo</groupId>
 	<artifactId>tk-qa-ws-client</artifactId>
-  <version>1.0-dk-SNAPSHOT</version>
+  <version>1.0-dk</version>
 	<packaging>jar</packaging>
 	<name>${branch}: QA Database Web Service Client</name>
 	<url>http://maven.apache.org</url>
