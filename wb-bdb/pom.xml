@@ -4,10 +4,10 @@
     <parent>
         <groupId>org.ihtsdo</groupId>
         <artifactId>wb-mmb</artifactId>
-        <version>1.0-dk-SNAPSHOT</version>
+        <version>1.0-dk</version>
     </parent>
     <artifactId>wb-bdb</artifactId>
-  <version>1.0-dk-SNAPSHOT</version>
+  <version>1.0-dk</version>
     <name>${branch}: Workbench Berkeley Database</name>
     <dependencies>
         <dependency>
