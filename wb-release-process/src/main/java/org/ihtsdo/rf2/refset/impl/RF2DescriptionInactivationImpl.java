@@ -65,8 +65,8 @@ public class RF2DescriptionInactivationImpl extends RF2AbstractImpl implements I
 				if (!sDescType.equals("4") && !description.getLang().equals("es"))  { // Ignore text-defination & spanish description
 					String referencedComponentId = getDescriptionId(description.getDescId(), ExportUtil.getSnomedCorePathNid());
 
-					if (referencedComponentId==null || referencedComponentId.equals("")){
-						referencedComponentId=Terms.get().getUids(description.getDescId()).iterator().next().toString();
+					if (referencedComponentId==null || referencedComponentId.equals("") || referencedComponentId.equals("0")){
+						continue;
 					}
 					UUID uuid = Type5UuidFactory.get(refsetId + referencedComponentId);
 
