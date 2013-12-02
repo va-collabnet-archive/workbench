@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 
 import org.ihtsdo.rf2.identifier.mojo.RefSetParam;
+import org.ihtsdo.rf2.postexport.RF2ArtifactPostExportAbst.FILE_TYPE;
 
 
 public class RF2ArtifactPostExportImpl extends RF2ArtifactPostExportAbst{
@@ -36,7 +37,7 @@ public class RF2ArtifactPostExportImpl extends RF2ArtifactPostExportAbst{
 	private ArrayList<RefSetParam> refsetData;
 
 	private String exportFolder;
-	
+
 
 	public RF2ArtifactPostExportImpl(FILE_TYPE fType, File rf2FullFolder,
 			File rf2OutputFolder, File buildDirectory,
@@ -44,8 +45,8 @@ public class RF2ArtifactPostExportImpl extends RF2ArtifactPostExportAbst{
 			ArrayList<RefSetParam> refsetData,String fileExtension,
 			String languageCode,String namespace,String exportFolder) throws IOException {
 		this( fType,  rf2FullFolder,
-				 null,  rf2OutputFolder,  buildDirectory,
-				 previousReleaseDate,  releaseDate);
+				null,  rf2OutputFolder,  buildDirectory,
+				previousReleaseDate,  releaseDate);
 		this.exportFolder=exportFolder;
 		this.fileExtension="." + fileExtension;
 		this.refsetData=refsetData;
@@ -64,7 +65,7 @@ public class RF2ArtifactPostExportImpl extends RF2ArtifactPostExportAbst{
 			String languageCode,String namespace) throws IOException {
 		this( fType,  rf2FullFolder,
 				rf2Exported,  rf2OutputFolder,  buildDirectory,
-				 previousReleaseDate,  releaseDate);
+				previousReleaseDate,  releaseDate);
 		this.fileExtension="." + fileExtension;
 		if (languageCode!=null && !languageCode.equals("")){
 			this.langCode="-" + languageCode;
@@ -73,7 +74,7 @@ public class RF2ArtifactPostExportImpl extends RF2ArtifactPostExportAbst{
 		}
 		this.namespace=namespace;
 	}
-	
+
 	public RF2ArtifactPostExportImpl(FILE_TYPE fType, File rf2FullFolder,
 			File rf2Exported, File rf2OutputFolder, File buildDirectory,
 			String previousReleaseDate, String releaseDate) throws IOException {
@@ -82,12 +83,12 @@ public class RF2ArtifactPostExportImpl extends RF2ArtifactPostExportAbst{
 		this.langCode="-en";
 		this.namespace="INT";
 		this.fType = fType;
-//		this.rf2FullFolder = new File(rf2FullFolder.getAbsolutePath() + "/org/ihtsdo/rf2");
+		//		this.rf2FullFolder = new File(rf2FullFolder.getAbsolutePath() + "/org/ihtsdo/rf2");
 		this.rf2FullFolder = new File(rf2FullFolder.getAbsolutePath() );
 		this.rf2Exported = rf2Exported;
 		this.previousReleaseDate = previousReleaseDate;
 		this.releaseDate = releaseDate;
-		
+
 		folderTmp=new File(buildDirectory.getAbsolutePath() + "/" + getTmpPostExport() );
 		if (!folderTmp.exists()){
 			folderTmp.mkdir();
@@ -160,21 +161,21 @@ public class RF2ArtifactPostExportImpl extends RF2ArtifactPostExportAbst{
 		sortedExportedfile=new File(sortedfolderTmp,"exp_" + rf2Exported.getName());
 		postProcess( previousFile, sortedExportedfile);
 	}
-	
+
 
 	private void postProcess(File previousFile,File sortedExportedfile) throws Exception{
 		File sortedPreviousfile=new File(sortedfolderTmp,"pre_" + previousFile.getName());
-		
+
 		FileSorter fsc=new FileSorter(previousFile, sortedPreviousfile, sortTmpfolderSortedTmp, fType.getColumnIndexes());
 		fsc.execute();
 		fsc=null;
 		System.gc();
-		
+
 		fsc=new FileSorter(rf2Exported, sortedExportedfile, sortTmpfolderSortedTmp, fType.getColumnIndexes());
 		fsc.execute();
 		fsc=null;
 		System.gc();
-		
+
 		File snapshotSortedPreviousfile=new File(snapshotfolderTmp,"pre_" + previousFile.getName());
 		SnapshotGeneratorMultiColumn sg=new SnapshotGeneratorMultiColumn(sortedPreviousfile, previousReleaseDate, fType.getSnapshotIndex(), fType.getEffectiveTimeColIndex(), snapshotSortedPreviousfile, null, null);
 		sg.execute();
@@ -197,20 +198,25 @@ public class RF2ArtifactPostExportImpl extends RF2ArtifactPostExportAbst{
 			cis.execute();
 			cis=null;
 			System.gc();
+		}else if (fType==FILE_TYPE.RF2_ASSOCIATION || fType==FILE_TYPE.RF2_SIMPLE || fType==FILE_TYPE.RF2_SIMPLE_MAP ){
+			ConsolidateSnapshotAndDeltaRefset cs=new ConsolidateSnapshotAndDeltaRefset(fType,snapshotSortedPreviousfile,snapshotSortedExportedfile,snapshotFinalFile,deltaFinalFile,releaseDate);
+			cs.execute();
+			cs=null;
+			System.gc();
 		}else{
 			ConsolidateSnapshotAndDelta cs=new ConsolidateSnapshotAndDelta(fType,snapshotSortedPreviousfile,snapshotSortedExportedfile,snapshotFinalFile,deltaFinalFile,releaseDate);
 			cs.execute();
 			cs=null;
 			System.gc();
 		}
-		
+
 		HashSet<File> hFile=new HashSet<File>();
 		hFile.add(sortedPreviousfile);
 		hFile.add(deltaFinalFile);
 
 		CommonUtils.MergeFile(hFile,  fullFinalFile);
 		System.gc();
-		
+
 	}
-	
+
 }
