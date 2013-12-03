@@ -66,11 +66,11 @@ public class ConsolidateSnapshotAndDeltaRefset extends AbstractTask {
 
 			double lines=0;
 			String line1;
-			String header=br1.readLine();
+			String header=br2.readLine();
 			if (header==null){
-				header=br2.readLine();
+				header=br1.readLine();
 			}else{
-				br2.readLine();
+				br1.readLine();
 			}
 			bw.append(header);
 			bw.append(newLine);
