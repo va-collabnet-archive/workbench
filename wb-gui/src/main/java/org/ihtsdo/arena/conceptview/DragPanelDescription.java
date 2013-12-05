@@ -169,6 +169,7 @@ public class DragPanelDescription extends DragPanelComponentVersion<DescriptionA
         textPane.setOpaque(false);
         textPane.setFont(textPane.getFont().deriveFont(getSettings().getFontSize()));
         textPane.setText(StringEscapeUtils.escapeHtml(getDesc().getText()));
+        textPane.setToolTipText(textPane.extractText());
         if(canDrop && viewLayout.cView.focus){
             textPane.selectAll();
         }
