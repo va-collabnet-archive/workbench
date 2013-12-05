@@ -459,4 +459,32 @@ public class AddLegacyUuidsMojo extends AbstractMojo {
         return additionalIds;
     }
 
+    private List<TkIdentifier> processIdListLastActiveUse(UUID primordialUuid,
+            List<TkIdentifier> additionalIds,
+            UuidUuidRemapper idLookup) {
+        UUID remapUuid = idLookup.getComputedUuid(primordialUuid);
+        if (remapUuid != null) {
+            EIdentifierUuid tmpId = createNewEIdentifierUuid(remapUuid);
+            if (additionalIds == null) {
+                ArrayList<TkIdentifier> tmpAdditionalIds = new ArrayList<>();
+                tmpAdditionalIds.add(tmpId);
+                return tmpAdditionalIds;
+            } else {
+                Boolean foundInList = false;
+                for (TkIdentifier tkIdentifier : additionalIds) {
+                    if (tkIdentifier.authorityUuid.compareTo(TkIdentifierUuid.generatedUuid) == 0) {
+                        UUID denotation = ((TkIdentifierUuid)tkIdentifier).denotation;
+                        if (denotation.compareTo(remapUuid) == 0) {
+                            foundInList = true;
+                        }
+                    }
+                }
+                if (!foundInList) {
+                    additionalIds.add(tmpId);
+                }
+                return additionalIds;
+            }
+        }
+        return additionalIds;
+    }
 }
