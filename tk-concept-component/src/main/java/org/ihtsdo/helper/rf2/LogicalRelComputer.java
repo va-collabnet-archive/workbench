@@ -25,6 +25,7 @@ import java.util.HashSet;
 import java.util.UUID;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.TerminologyStoreDI;
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 
 /**
@@ -41,12 +42,24 @@ public class LogicalRelComputer {
     // 
     private final BufferedWriter reportGroupAdditionsWriter;
     private final BufferedWriter reportListRoleGroupAdditionsWriter;
+    private final StringBuffer sbType0List;
+    private final StringBuffer sbType2List;
+    private final StringBuffer sbType3List;
+    private final StringBuffer sbType0Verbose;
+    private final StringBuffer sbType2Verbose;
+    private final StringBuffer sbType3Verbose;
 
     public LogicalRelComputer(BufferedWriter reportGroupAdditionsWriter, BufferedWriter reportListRoleGroupAdditionsWriter) {
         this.ts = Ts.get();
         this.reportItemList = new ArrayList<>();
         this.reportGroupAdditionsWriter = reportGroupAdditionsWriter;
         this.reportListRoleGroupAdditionsWriter = reportListRoleGroupAdditionsWriter;
+        this.sbType0List = new StringBuffer("##############\n### Case 0 ###\n##############\n");
+        this.sbType2List = new StringBuffer("##############\n### Case 2 ###\n##############\n");
+        this.sbType3List = new StringBuffer("##############\n### Case 3 ###\n##############\n");
+        this.sbType0Verbose = new StringBuffer("####################\n### Case 0 LISTS ###\n####################\n");
+        this.sbType2Verbose = new StringBuffer("####################\n### Case 2 LISTS ###\n####################\n");
+        this.sbType3Verbose = new StringBuffer("####################\n### Case 3 LISTS ###\n####################\n");
     }
 
     private enum RelFlavor {
@@ -76,7 +89,7 @@ public class LogicalRelComputer {
 
     // exceptions list:  SCTID or UUID <tab> short name <\n>
     public ArrayList<LogicalRel> processRelsGroup0(ArrayList<LogicalRel> a)
-            throws NoSuchAlgorithmException, UnsupportedEncodingException {
+            throws NoSuchAlgorithmException, UnsupportedEncodingException, IOException {
         ArrayList<LogicalRel> keepList = new ArrayList<>();
         // SORT BY [C1-Group-RoleType-C2]
         Collections.sort(a);
@@ -101,7 +114,7 @@ public class LogicalRelComputer {
     }
 
     private void processRelsGroup0EquivList(ArrayList<LogicalRel> equivalentRelList,
-            ArrayList<LogicalRel> keepList) {
+            ArrayList<LogicalRel> keepList) throws IOException {
         ArrayList<LogicalRel> tempList = new ArrayList<>();
         for (LogicalRel logicalRel : equivalentRelList) {
             RelFlavor relFlavor = processRelFlavor(logicalRel);
@@ -118,41 +131,105 @@ public class LogicalRelComputer {
         }
 
         if (tempList.isEmpty()) {
-            System.out.printf("\n>>>>> :LogicalRelComputer: filter tempList == 0 :: %s equivList size = %s <<<<<",
-                    equivalentRelList.get(0).c1SnoId.toString(),
-                    equivalentRelList.size());
-            System.out.print(processRelFlavor(equivalentRelList.get(0)).toString());
-            System.out.printf(" #### %s\n", equivalentRelList.get(0).tkr.toString());
-            keepList.addAll(tempList);
+            sbType0List.append(equivalentRelList.get(0).c1SnoId.toString());
+            sbType0List.append("\t");
+            ConceptChronicleBI cb = ts.getConcept(equivalentRelList.get(0).c1SnoId);
+            if (cb != null) {
+                sbType0List.append(cb.toUserString());
+            } else {
+                sbType0List.append("NULL CONCEPT");
+            }
+            sbType0List.append("\n");
+
+            sbType0Verbose.append("###  tempList.size() relationship would not have been kept.\n");
+            sbType0Verbose.append("Concept: ");
+            sbType0Verbose.append(equivalentRelList.get(0).c1SnoId.toString());
+            sbType0Verbose.append("\n");
+            sbType0Verbose.append("  ## equivalentRelList ... kept ##\n");
+            for (LogicalRel logicalRel : equivalentRelList) {
+                sbType0Verbose.append("  Relationship: ");
+                sbType0Verbose.append(logicalRel.logicalRelUuid.toString());
+                sbType0Verbose.append(" ");
+                sbType0Verbose.append(processRelFlavor(logicalRel).toString());
+                sbType0Verbose.append("\n");
+            }
+            sbType0Verbose.append("  ## tempList ##\n");
+            for (LogicalRel logicalRel : tempList) {
+                sbType0Verbose.append("  Relationship: ");
+                sbType0Verbose.append(logicalRel.logicalRelUuid.toString());
+                sbType0Verbose.append(" ");
+                sbType0Verbose.append(processRelFlavor(logicalRel).toString());
+                sbType0Verbose.append("\n");
+            }
+            keepList.addAll(equivalentRelList);
+            // keepList.addAll(tempList);
         } else if (tempList.size() == 1) {
             keepList.addAll(tempList);
         } else if (tempList.size() == 2) {
-            System.out.printf("\n>>>>> :LogicalRelComputer: filter tempList == %d :: %s ", 
-                    tempList.size(),
-                    equivalentRelList.get(0).c1SnoId.toString());
-            for (LogicalRel logicalRel : tempList) {
-                System.out.printf("####  c1 : %s", logicalRel.c1SnoId);
-                System.out.printf(" type : %s", logicalRel.typeSnoId);
-                System.out.printf(" c2 : %s", logicalRel.c2SnoId);
-                System.out.printf(" sctid : %s ", logicalRel.relSctId);
-                System.out.print(processRelFlavor(logicalRel));
-                System.out.printf(" <<<<< %s ", logicalRel.tkr.toString());
+            sbType2List.append(equivalentRelList.get(0).c1SnoId.toString());
+            sbType2List.append("\t");
+            ConceptChronicleBI cb = ts.getConcept(equivalentRelList.get(0).c1SnoId);
+            if (cb != null) {
+                sbType2List.append(cb.toUserString());
+            } else {
+                sbType2List.append("NULL CONCEPT");
             }
-            System.out.printf("\n");
+            sbType2List.append("\n");
+
+            sbType2Verbose.append("###  tempList.size()==2\n");
+            sbType2Verbose.append("Concept: ");
+            sbType2Verbose.append(equivalentRelList.get(0).c1SnoId.toString());
+            sbType2Verbose.append("\n");
+            sbType2Verbose.append("  ## equivalentRelList ##\n");
+            for (LogicalRel logicalRel : equivalentRelList) {
+                sbType2Verbose.append("  Relationship: ");
+                sbType2Verbose.append(logicalRel.logicalRelUuid.toString());
+                sbType2Verbose.append(" ");
+                sbType2Verbose.append(processRelFlavor(logicalRel).toString());
+                sbType2Verbose.append("\n");
+            }
+            sbType2Verbose.append("  ## tempList ... kept ##\n");
+            for (LogicalRel logicalRel : tempList) {
+                sbType2Verbose.append("  Relationship: ");
+                sbType2Verbose.append(logicalRel.logicalRelUuid.toString());
+                sbType2Verbose.append(" ");
+                sbType2Verbose.append(processRelFlavor(logicalRel).toString());
+                sbType2Verbose.append("\n");
+            }
             keepList.addAll(tempList);
         } else { // tempList.size() > 2
-            System.out.printf("\n>>>>> :LogicalRelComputer: filter tempList == %d :: %s ", 
-                    tempList.size(),
-                    equivalentRelList.get(0).c1SnoId.toString());
-            for (LogicalRel logicalRel : tempList) {
-                System.out.printf(">>>>>  c1 : %s", logicalRel.c1SnoId);
-                System.out.printf(" type : %s", logicalRel.typeSnoId);
-                System.out.printf(" c2 : %s", logicalRel.c2SnoId);
-                System.out.printf(" sctid : %s ", logicalRel.relSctId);
-                System.out.print(processRelFlavor(logicalRel));
-                System.out.printf(" <<<<< %s ", logicalRel.tkr.toString());
+            sbType3List.append(equivalentRelList.get(0).c1SnoId.toString());
+            sbType3List.append("\t");
+            ConceptChronicleBI cb = ts.getConcept(equivalentRelList.get(0).c1SnoId);
+            if (cb != null) {
+                sbType3List.append(cb.toUserString());
+            } else {
+                sbType3List.append("NULL CONCEPT");
             }
-            System.out.printf("\n");
+            sbType3List.append("\n");
+
+            sbType3Verbose.append("###  tempList.size()==");
+            sbType3Verbose.append(tempList.size());
+            sbType3Verbose.append("\n");
+            sbType3Verbose.append("Concept: ");
+            sbType3Verbose.append(equivalentRelList.get(0).c1SnoId.toString());
+            sbType3Verbose.append("\n");
+            sbType3Verbose.append("  ## equivalentRelList ##\n");
+            for (LogicalRel logicalRel : equivalentRelList) {
+                sbType3Verbose.append("  Relationship: ");
+                sbType3Verbose.append(logicalRel.logicalRelUuid.toString());
+                sbType3Verbose.append(" ");
+                sbType3Verbose.append(processRelFlavor(logicalRel).toString());
+                sbType3Verbose.append("\n");
+            }
+            sbType3Verbose.append("  ## tempList ... kept ##\n");
+            for (LogicalRel logicalRel : tempList) {
+                sbType3Verbose.append("  Relationship: ");
+                sbType3Verbose.append(logicalRel.logicalRelUuid.toString());
+                sbType3Verbose.append(" ");
+                sbType3Verbose.append(processRelFlavor(logicalRel).toString());
+                sbType3Verbose.append("\n");
+            }
             keepList.addAll(tempList);
         }
     }
@@ -253,9 +330,10 @@ public class LogicalRelComputer {
      * does the snomedRel match all critical files where b is redundant
      */
     private boolean isSnomedCloseEnough(LogicalRel snomedRel, LogicalRel b) {
-        if (snomedRel.statusUuid.compareTo(b.statusUuid) == 0
-                && snomedRel.refinabilityUuid.compareTo(b.refinabilityUuid) == 0) {
-            return true;
+        if (snomedRel.statusUuid.compareTo(b.statusUuid) == 0) {
+            if (snomedRel.refinabilityUuid.compareTo(b.refinabilityUuid) == 0) {
+                return true;
+            }
         }
         return false;
     }
@@ -292,25 +370,22 @@ public class LogicalRelComputer {
             return false;
         }
         String nameSpaceIdentifier = sctidStr.substring(length - 10, length - 3);
-        if (nameSpaceIdentifier.equalsIgnoreCase("1000119")) {
-            // :NYI: "1000119" needs to be generalized for broader applications
-            return true;
-        }
-        return false;
+        return nameSpaceIdentifier.equalsIgnoreCase("1000119");
     }
 
-    private ArrayList<LogicalRelGroup> convertToRelGroups(ArrayList<LogicalRel> a, boolean keepHistory)
+    private ArrayList<LogicalRelGroup> convertToRelGroups(ArrayList<LogicalRel> relsNonGroup0List,
+            boolean keepHistory)
             throws NoSuchAlgorithmException, UnsupportedEncodingException {
         ArrayList<LogicalRelGroup> logicalRelGroupList = new ArrayList<>();
         // SORT BY [C1-Group-RoleType-C2]
-        Collections.sort(a);
+        Collections.sort(relsNonGroup0List);
 
         int prevRelGroup = -1;
-        LogicalRelGroup thisRelGroup = null;
-        for (LogicalRel thisRel : a) {
+        LogicalRelGroup thisRelGroup = new LogicalRelGroup();
+        for (LogicalRel thisRel : relsNonGroup0List) {
             // check role group number
             if (thisRel.group != prevRelGroup) {
-                if (thisRelGroup != null) {
+                if (!thisRelGroup.isEmpty()) {
                     thisRelGroup.updateLogicalIds();
                     logicalRelGroupList.add(thisRelGroup);
                 }
@@ -323,7 +398,7 @@ public class LogicalRelComputer {
                 thisRelGroup.add(thisRel);
             }
         }
-        if (thisRelGroup != null && !thisRelGroup.isEmpty()) {
+        if (!thisRelGroup.isEmpty()) {
             thisRelGroup.updateLogicalIds();
             logicalRelGroupList.add(thisRelGroup);
         }
@@ -429,10 +504,23 @@ public class LogicalRelComputer {
         }
         return keepRels;
     }
-    private ArrayList<ReportItem> reportItemList;
+    private final ArrayList<ReportItem> reportItemList;
 
     public String toStringReport() {
+        System.out.print(sbType0List.toString());
+        System.out.print(sbType2List.toString());
+        System.out.print(sbType3List.toString());
+        System.out.print(sbType0Verbose.toString());
+        System.out.print(sbType2Verbose.toString());
+        System.out.print(sbType3Verbose.toString());
+
         StringBuilder sb = new StringBuilder();
+        sb.append(sbType0List.toString());
+        sb.append(sbType2List.toString());
+        sb.append(sbType3List.toString());
+        sb.append(sbType0Verbose.toString());
+        sb.append(sbType2Verbose.toString());
+        sb.append(sbType3Verbose.toString());
         sb.append("\n");
         sb.append("#############################\n");
         sb.append("# LOGICAL RELATIONSHIP REPORT\n");

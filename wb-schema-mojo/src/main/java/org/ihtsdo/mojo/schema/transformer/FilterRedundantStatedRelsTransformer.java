@@ -248,7 +248,7 @@ public class FilterRedundantStatedRelsTransformer extends AbstractTransformer {
             throws NoSuchAlgorithmException, UnsupportedEncodingException, IOException {
         List<TkRelationship> finalRelList = new ArrayList<>();
         // INTERMEDIATE LISTS
-        ArrayList<LogicalRel> statedLogicalRels = new ArrayList<>();
+        ArrayList<LogicalRel> statedNonGroup0LogicalRels = new ArrayList<>();
         ArrayList<LogicalRel> statedGroup0LogicalRels = new ArrayList<>();
         List<TkRelationship> rels = eConcept.getRelationships();
 
@@ -257,7 +257,7 @@ public class FilterRedundantStatedRelsTransformer extends AbstractTransformer {
                 if (tkr.relGroup == 0) {
                     statedGroup0LogicalRels.add(new LogicalRel(tkr));
                 } else {
-                    statedLogicalRels.add(new LogicalRel(tkr));
+                    statedNonGroup0LogicalRels.add(new LogicalRel(tkr));
                 }
             } else {
                 finalRelList.add(tkr);
@@ -278,7 +278,7 @@ public class FilterRedundantStatedRelsTransformer extends AbstractTransformer {
         }
 
         // PROCESS REL GROUPS
-        list = logicalRelComputer.processRelGroups(statedLogicalRels);
+        list = logicalRelComputer.processRelGroups(statedNonGroup0LogicalRels);
         for (LogicalRel logicalRel : list) {
             finalRelList.add(logicalRel.tkr);
         }
