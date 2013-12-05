@@ -33,7 +33,6 @@ import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_ProcessConcepts;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_TermFactory;
-import org.dwfa.ace.api.LocalVersionedTerminology;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.cement.ArchitectonicAuxiliary;
@@ -97,7 +96,7 @@ public class VodbFindOrphans extends AbstractMojo {
 
     private class FindComponents implements I_ProcessConcepts {
 
-        I_TermFactory termFactory;
+        I_TermFactory tf;
         Set<PositionBI> origins;
         BufferedWriter textWriter;
         BufferedWriter htmlWriter;
@@ -110,17 +109,17 @@ public class VodbFindOrphans extends AbstractMojo {
             htmlWriter = new BufferedWriter(new BufferedWriter(new FileWriter(outputHtmlDirectory + File.separator
                 + outputHtmlFileName)));
             origins = new HashSet<>();
-            termFactory = Terms.get();
+            tf = Terms.get();
         }
 
         @Override
         public void processConcept(I_GetConceptData concept) throws Exception {
             // get origins
-            PathBI architectonicPath = termFactory.getPath(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getUids());
+            PathBI architectonicPath = tf.getPath(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getUids());
 
             // TODO replace with passed in config...
             I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
-            PositionBI latestOnArchitectonicPath = termFactory.newPosition(architectonicPath, Long.MAX_VALUE);
+            PositionBI latestOnArchitectonicPath = tf.newPosition(architectonicPath, Long.MAX_VALUE);
 
             origins.add(latestOnArchitectonicPath);
 
@@ -130,20 +129,20 @@ public class VodbFindOrphans extends AbstractMojo {
             if (branches != null) {
                 for (ConceptDescriptor branch : branches) {
                     I_GetConceptData currentConcept = branch.getVerifiedConcept();
-                    PathBI currentPath = termFactory.getPath(currentConcept.getUids());
-                    PositionBI currentPosition = termFactory.newPosition(currentPath, Long.MAX_VALUE);
+                    PathBI currentPath = tf.getPath(currentConcept.getUids());
+                    PositionBI currentPosition = tf.newPosition(currentPath, Long.MAX_VALUE);
                     branchPositions.add(currentPosition);
                 }
             }
 
             // get latest IS-A relationships
-            I_IntSet isARel = termFactory.newIntSet();
-            isARel.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()).getConceptNid());
-            isARel.add(termFactory.getConcept(Snomed.IS_A.getUuids()).getConceptNid());
+            I_IntSet isARel = tf.newIntSet();
+            isARel.add(tf.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()).getConceptNid());
+            isARel.add(tf.getConcept(Snomed.IS_A.getUuids()).getConceptNid());
 
             I_IntSet allowStatuses = null;
             if (statuses != null) {
-                allowStatuses = termFactory.newIntSet();
+                allowStatuses = tf.newIntSet();
                 for (ConceptDescriptor status : statuses) {
                     allowStatuses.add(status.getVerifiedConcept().getNid());
                 }
@@ -159,7 +158,6 @@ public class VodbFindOrphans extends AbstractMojo {
                 textWriter.append(concept.getUids().toString());
                 textWriter.newLine();
             }
-            termFactory.addUncommitted(concept);
         }
 
         public BufferedWriter getHtmlWriter() {
@@ -181,10 +179,10 @@ public class VodbFindOrphans extends AbstractMojo {
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
-        I_TermFactory termFactory = LocalVersionedTerminology.get();
+        I_TermFactory tf = Terms.get();
         try {
             FindComponents find = new FindComponents();
-            termFactory.iterateConcepts(find);
+            tf.iterateConcepts(find);
             find.getTextWriter().close();
             find.getHtmlWriter().close();
         } catch (Exception e) {
