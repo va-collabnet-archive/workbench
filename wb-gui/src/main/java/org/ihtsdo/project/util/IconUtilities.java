@@ -651,6 +651,8 @@ public class IconUtilities {
                 return ESP;
             } else if (type.equals("be446b41-0eda-3d36-84e4-ae196f05858b")) {
                 return DAN;
+            }else if (type.equals("e57ec728-742f-56b3-9b53-9613670fb24d")){
+            	return SVE;
             }
 
         } catch (Exception e) {
