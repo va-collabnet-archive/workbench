@@ -625,7 +625,7 @@ public class Bdb {
         if (readOnly != null && readOnly.bdbEnv != null) {
             readOnly.bdbEnv.close();
         }
-        annotationConcepts = null;
+        annotationConcepts.clear();
         conceptDb = null;
         mutable = null;
         nidCidMapDb = null;
