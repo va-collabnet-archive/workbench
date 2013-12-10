@@ -1529,8 +1529,13 @@ public class BinaryChangeSetResolveIds {
                             tkRelationship.revisions = null;
                             tkRelationship.statusUuid = rf2ActiveUuid;
                             eccsLogExceptionsWriter.append("...... dropped relationship revision with same timestamp. made primordial active\r\n");
+                            eccsLogExceptionsWriter.append(tkRelationship.toString());
+                            eccsLogExceptionsWriter.append("\r\n###\r\n");
                         } else if (rejectRevision) {
-                            throw new UnsupportedOperationException("relationship with other than one duplicate timestamp not supported");
+                            tkRelationship.revisions = null;
+                            eccsLogExceptionsWriter.append("...... dropped multiple relationship revisions with same timestamp. left the primordial status as-is\r\n");
+                            eccsLogExceptionsWriter.append(tkRelationship.toString());
+                            eccsLogExceptionsWriter.append("\r\n###\r\n");
                         }
                     } // tkRelationship.revisions != null
                 }
