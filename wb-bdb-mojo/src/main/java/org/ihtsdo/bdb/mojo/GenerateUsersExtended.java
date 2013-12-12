@@ -167,13 +167,6 @@ public class GenerateUsersExtended extends AbstractMojo {
    private File usersFile;
    
    /**
-    * recreateUserProfiles will delete and replace exiting '*.wb' user profiles
-    * 
-    * @parameter expression=false
-    */
-   private Boolean recreateUserProfiles;
-
-   /**
     *
     * @parameter expression="${project.build.directory}/users/userPermissionRefset.txt"
     */
@@ -1623,13 +1616,7 @@ NEXT_WHILE:
                                  PROFILE_ROOT + File.separator + username);
          File userProfile = new File(userDir, username + ".wb");
 
-         create = false;
-         if (!userProfile.exists()) {
-             create = true;
-         } else if (userProfile.exists() && recreateUserProfiles) {
-             userProfile.delete();
-             create = true;
-         }
+         create = create = !userProfile.exists();
 
          if (create) {
             createdUsers = true;
