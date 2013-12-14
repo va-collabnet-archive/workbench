@@ -36,6 +36,7 @@ import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
+import org.dwfa.ace.classifier.SnoRelReport;
 import org.dwfa.ace.dnd.AceTransferAction;
 import org.dwfa.ace.dnd.ConceptTransferable;
 import org.dwfa.ace.dnd.DescriptionTransferable;
@@ -513,6 +514,16 @@ public class JTableWithDragImage extends JTable {
             return new ConceptTransferable(cc);
          } else if (obj instanceof SnoRel) {
              int cnid = ((SnoRel) obj).c1Id;
+             I_GetConceptData cc = Terms.get().getConcept(cnid);
+             return new ConceptTransferable(cc);
+         } else if (obj instanceof SnoRelReport) {
+             SnoRelReport srr = (SnoRelReport) obj;
+             int cnid = srr.snoRel.c1Id;
+             if (column == 2) {
+                cnid = srr.snoRel.typeId;
+             } else if (column == 3) {
+                cnid = srr.snoRel.c2Id;
+             }
              I_GetConceptData cc = Terms.get().getConcept(cnid);
              return new ConceptTransferable(cc);
          } else {

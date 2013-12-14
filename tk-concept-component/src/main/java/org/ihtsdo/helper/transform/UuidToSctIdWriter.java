@@ -897,11 +897,13 @@ public class UuidToSctIdWriter {
             for (Rf2File.IdentifiersFileFields field : Rf2File.IdentifiersFileFields.values()) {
                 switch (field) {
                     case IDENTIFIER_SCHEME_ID:
-                        String schemeSctId = handler.getWithGeneration(uuidIdScheme.getLenient().getPrimUuid(),
-                                SctIdGenerator.TYPE.CONCEPT).toString();
+                        String schemeId = uuidIdScheme.getLenient().getPrimUuid().toString();
+                        String schemeSctId = getExistingSctId(schemeId);
+                        if (schemeSctId == null) {
+                            schemeSctId = handler.getWithGeneration(UUID.fromString(schemeId), SctIdGenerator.TYPE.CONCEPT).toString();
+                            this.uuidToSctMap.put(UUID.fromString(schemeId), schemeSctId);
+                        }
                         writer.write(schemeSctId + field.seperator);
-
-                        break;
 
                     case ALTERNATE_IDENTIFIER:
                         String primUuid = key.toString();
@@ -945,8 +947,12 @@ public class UuidToSctIdWriter {
             for (Rf2File.IdentifiersFileFields field : Rf2File.IdentifiersFileFields.values()) {
                 switch (field) {
                     case IDENTIFIER_SCHEME_ID:
-                        String schemeSctId = handler.getWithGeneration(uuidIdScheme.getLenient().getPrimUuid(),
-                                SctIdGenerator.TYPE.CONCEPT).toString();
+                        String schemeId = uuidIdScheme.getLenient().getPrimUuid().toString();
+                        String schemeSctId = getExistingSctId(schemeId);
+                        if (schemeSctId == null) {
+                            schemeSctId = handler.getWithGeneration(UUID.fromString(schemeId), SctIdGenerator.TYPE.CONCEPT).toString();
+                            this.uuidToSctMap.put(UUID.fromString(schemeId), schemeSctId);
+                        }
                         writer.write(schemeSctId + field.seperator);
 
                         break;

@@ -28,6 +28,7 @@ import javax.swing.UIManager;
 import javax.swing.plaf.basic.BasicHTML;
 import javax.swing.table.TableColumn;
 import javax.swing.text.View;
+import org.apache.commons.lang.StringEscapeUtils;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.table.DescriptionTableModel.StringWithDescTuple;
@@ -137,17 +138,17 @@ public class DescriptionTableRenderer extends AceTableRenderer {
                         table.setRowHeight(row, (int) (prefYSpan + 4));
                     }
                 } else {
-                    View v = BasicHTML.createHTMLView(renderComponent, "<html>" + swt.getCellText());
+                    View v = BasicHTML.createHTMLView(renderComponent, "<html>" + StringEscapeUtils.escapeHtml(swt.getCellText()));
                     v.setSize(c.getWidth(), 0);
                     float prefYSpan = v.getPreferredSpan(View.Y_AXIS);
                     if (prefYSpan > table.getRowHeight(row)) {
                         table.setRowHeight(row, (int) (prefYSpan + 4));
                         if (isSelected) {
-                            renderComponent.setText("<html>Y" + swt.getCellText());
+                            renderComponent.setText("<html>Y" + StringEscapeUtils.escapeHtml(swt.getCellText()));
                         }
                     }
                     if (table.getRowHeight(row) > 16) {
-                        renderComponent.setText("<html>" + swt.getCellText());
+                        renderComponent.setText("<html>" + StringEscapeUtils.escapeHtml(swt.getCellText()));
                     }
                 }
             }
