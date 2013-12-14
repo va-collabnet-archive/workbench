@@ -86,7 +86,7 @@
         <dependency>
             <groupId>jgraphx</groupId>
             <artifactId>jgraphx-examples</artifactId>
-            <version>1.7.0.7</version>
+            <version>1.7.0.7-fixed</version>
             <type>jar</type>
             <optional>false</optional>
         </dependency>
