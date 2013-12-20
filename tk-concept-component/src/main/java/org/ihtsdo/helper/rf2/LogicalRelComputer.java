@@ -54,12 +54,12 @@ public class LogicalRelComputer {
         this.reportItemList = new ArrayList<>();
         this.reportGroupAdditionsWriter = reportGroupAdditionsWriter;
         this.reportListRoleGroupAdditionsWriter = reportListRoleGroupAdditionsWriter;
-        this.sbType0List = new StringBuffer("##############\n### Case 0 ###\n##############\n");
-        this.sbType2List = new StringBuffer("##############\n### Case 2 ###\n##############\n");
-        this.sbType3List = new StringBuffer("##############\n### Case 3 ###\n##############\n");
-        this.sbType0Verbose = new StringBuffer("####################\n### Case 0 LISTS ###\n####################\n");
-        this.sbType2Verbose = new StringBuffer("####################\n### Case 2 LISTS ###\n####################\n");
-        this.sbType3Verbose = new StringBuffer("####################\n### Case 3 LISTS ###\n####################\n");
+        this.sbType0List = new StringBuffer("\n##############\n### Case 0 ###\n##############\n");
+        this.sbType2List = new StringBuffer("\n##############\n### Case 2 ###\n##############\n");
+        this.sbType3List = new StringBuffer("\n##############\n### Case 3 ###\n##############\n");
+        this.sbType0Verbose = new StringBuffer("\n####################\n### Case 0 LISTS ###\n####################\n");
+        this.sbType2Verbose = new StringBuffer("\n####################\n### Case 2 LISTS ###\n####################\n");
+        this.sbType3Verbose = new StringBuffer("\n####################\n### Case 3 LISTS ###\n####################\n");
     }
 
     private enum RelFlavor {
@@ -148,16 +148,34 @@ public class LogicalRelComputer {
             sbType0Verbose.append("  ## equivalentRelList ... kept ##\n");
             for (LogicalRel logicalRel : equivalentRelList) {
                 sbType0Verbose.append("  Relationship: ");
-                sbType0Verbose.append(logicalRel.logicalRelUuid.toString());
-                sbType0Verbose.append(" ");
+                if (logicalRel.tkr != null) {
+                    sbType0Verbose.append(logicalRel.tkr.primordialUuid.toString());
+                    sbType0Verbose.append(" (primordial) ");
+                }
+                if (logicalRel.logicalRelUuid != null) {
+                    sbType0Verbose.append(logicalRel.logicalRelUuid.toString());
+                    sbType0Verbose.append(" (logical) ");
+                }
+                if (logicalRel.tkr == null && logicalRel.logicalRelUuid == null) {
+                    sbType0Verbose.append(" (null) ");
+                }
                 sbType0Verbose.append(processRelFlavor(logicalRel).toString());
                 sbType0Verbose.append("\n");
             }
             sbType0Verbose.append("  ## tempList ##\n");
             for (LogicalRel logicalRel : tempList) {
                 sbType0Verbose.append("  Relationship: ");
-                sbType0Verbose.append(logicalRel.logicalRelUuid.toString());
-                sbType0Verbose.append(" ");
+                if (logicalRel.tkr != null) {
+                    sbType0Verbose.append(logicalRel.tkr.primordialUuid.toString());
+                    sbType0Verbose.append(" (primordial) ");
+                }
+                if (logicalRel.logicalRelUuid != null) {
+                    sbType0Verbose.append(logicalRel.logicalRelUuid.toString());
+                    sbType0Verbose.append(" (logical) ");
+                }
+                if (logicalRel.tkr == null && logicalRel.logicalRelUuid == null) {
+                    sbType0Verbose.append(" (null) ");
+                }
                 sbType0Verbose.append(processRelFlavor(logicalRel).toString());
                 sbType0Verbose.append("\n");
             }
@@ -183,16 +201,34 @@ public class LogicalRelComputer {
             sbType2Verbose.append("  ## equivalentRelList ##\n");
             for (LogicalRel logicalRel : equivalentRelList) {
                 sbType2Verbose.append("  Relationship: ");
-                sbType2Verbose.append(logicalRel.logicalRelUuid.toString());
-                sbType2Verbose.append(" ");
+                if (logicalRel.tkr != null) {
+                    sbType2Verbose.append(logicalRel.tkr.primordialUuid.toString());
+                    sbType2Verbose.append(" (primordial) ");
+                }
+                if (logicalRel.logicalRelUuid != null) {
+                    sbType2Verbose.append(logicalRel.logicalRelUuid.toString());
+                    sbType2Verbose.append(" (logical) ");
+                }
+                if (logicalRel.tkr == null && logicalRel.logicalRelUuid == null) {
+                    sbType2Verbose.append(" (null) ");
+                }
                 sbType2Verbose.append(processRelFlavor(logicalRel).toString());
                 sbType2Verbose.append("\n");
             }
             sbType2Verbose.append("  ## tempList ... kept ##\n");
             for (LogicalRel logicalRel : tempList) {
                 sbType2Verbose.append("  Relationship: ");
-                sbType2Verbose.append(logicalRel.logicalRelUuid.toString());
-                sbType2Verbose.append(" ");
+                if (logicalRel.tkr != null) {
+                    sbType2Verbose.append(logicalRel.tkr.primordialUuid.toString());
+                    sbType2Verbose.append(" (primordial) ");
+                }
+                if (logicalRel.logicalRelUuid != null) {
+                    sbType2Verbose.append(logicalRel.logicalRelUuid.toString());
+                    sbType2Verbose.append(" (logical) ");
+                }
+                if (logicalRel.tkr == null && logicalRel.logicalRelUuid == null) {
+                    sbType2Verbose.append(" (null) ");
+                }
                 sbType2Verbose.append(processRelFlavor(logicalRel).toString());
                 sbType2Verbose.append("\n");
             }
@@ -217,16 +253,34 @@ public class LogicalRelComputer {
             sbType3Verbose.append("  ## equivalentRelList ##\n");
             for (LogicalRel logicalRel : equivalentRelList) {
                 sbType3Verbose.append("  Relationship: ");
-                sbType3Verbose.append(logicalRel.logicalRelUuid.toString());
-                sbType3Verbose.append(" ");
+                if (logicalRel.tkr != null) {
+                    sbType3Verbose.append(logicalRel.tkr.primordialUuid.toString());
+                    sbType3Verbose.append(" (primordial) ");
+                }
+                if (logicalRel.logicalRelUuid != null) {
+                    sbType3Verbose.append(logicalRel.logicalRelUuid.toString());
+                    sbType3Verbose.append(" (logical) ");
+                }
+                if (logicalRel.tkr == null && logicalRel.logicalRelUuid == null) {
+                    sbType3Verbose.append(" (null) ");
+                }
                 sbType3Verbose.append(processRelFlavor(logicalRel).toString());
                 sbType3Verbose.append("\n");
             }
             sbType3Verbose.append("  ## tempList ... kept ##\n");
             for (LogicalRel logicalRel : tempList) {
                 sbType3Verbose.append("  Relationship: ");
-                sbType3Verbose.append(logicalRel.logicalRelUuid.toString());
-                sbType3Verbose.append(" ");
+                if (logicalRel.tkr != null) {
+                    sbType3Verbose.append(logicalRel.tkr.primordialUuid.toString());
+                    sbType3Verbose.append(" (primordial) ");
+                }
+                if (logicalRel.logicalRelUuid != null) {
+                    sbType3Verbose.append(logicalRel.logicalRelUuid.toString());
+                    sbType3Verbose.append(" (logical) ");
+                }
+                if (logicalRel.tkr == null && logicalRel.logicalRelUuid == null) {
+                    sbType3Verbose.append(" (null) ");
+                }
                 sbType3Verbose.append(processRelFlavor(logicalRel).toString());
                 sbType3Verbose.append("\n");
             }
