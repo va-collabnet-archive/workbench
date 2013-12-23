@@ -396,6 +396,11 @@ public class IndexCacheRecord {
                             append(record.getTypeNid()).append("]: ").
                             append(Concept.get(record.getDestinationNid()).toString()).append(" [").
                             append(record.getDestinationNid()).append("]\n");
+                    for(RelationshipIndexVersion version : record.getVersions()){
+                        sb.append("            VERSION: ");
+                        sb.append(Concept.get(version.getCharacteristicNid()).toString()).append(" ").
+                                append(version.stamp).append(" \n");
+                    }
                 } catch (IOException ex) {
                     Logger.getLogger(IndexCacheRecord.class.getName()).log(Level.SEVERE, null, ex);
                 }

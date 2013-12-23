@@ -217,5 +217,14 @@ public class UniversalChangeSetReader implements I_ReadChangeSet {
 	public boolean isContentMerged() {
 		return true;
 	}
-
+        
+        @Override
+        public int getConceptCount(){
+            return conceptCount;
+        }
+        
+    @Override
+    public boolean isForWorkflow() {
+        return false;
+    }
 }

@@ -421,76 +421,17 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
         TkConceptAttributes eAttr = eConcept.getConceptAttributes();
 
         if (eAttr != null) {
-            if (c.getConAttrs() == null) {
-                setAttributesFromEConcept(c, eAttr);
-            } else {
-                ConceptAttributes ca = c.getConAttrs();
-                ca.merge(new ConceptAttributes(eAttr, c), indexedAnnotationConcepts);
-            }
-            ChangeNotifier.touch(c.nid, ChangeNotifier.Change.COMPONENT);
-        }
-
-        // check if different primordial UUIDs are being merged
-        if (c.getPrimUuid().compareTo(UUID.fromString("00000000-0000-0000-c000-000000000046")) != 0
-                && c.getUUIDs().contains(eConcept.primordialUuid) == false) {
-            if (eConcept.getConceptAttributes() == null) {
-                StringBuilder sb = new StringBuilder();
-                sb.append("\r\nmergeWithEConcept eConcept.getConceptAttributes() == null");
-                sb.append(" insufficient information to add UUID_ADDITIONAL:\t");
-                sb.append(c.getPrimUuid());
-                sb.append("\t");
-                sb.append(c.toUserString());
-                sb.append("\tUUID_PRIMORDIAL:\t");
-                sb.append(eConcept.getPrimordialUuid().toString());
-                if (eConcept.getDescriptions() != null && eConcept.getDescriptions().size() > 0) {
-                    sb.append("\t");
-                    sb.append(eConcept.getDescriptions().get(0).text);
-                }
-                sb.append("\r\n");
-                AceLog.getAppLog().log(Level.INFO, sb.toString());
-            } else {
-                TerminologyStoreDI ts = Ts.get();
-                int unspecifiedUuidNid = ts.getNidForUuids(ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.getUids());
-
-                // check if Concept c already has the extra UUID
-                if (c.getUUIDs().contains(eConcept.primordialUuid) == false) {
-                    // add EConcept eConcept primordial uuid into Concept c additional ids
-                    // RF2 Active
-                    int idStatusNid = ts.getNidForUuids(UUID.fromString("d12702ee-c37f-385f-a070-61d56d4d0f1f"));
-                    long idTime = eConcept.getConceptAttributes().time;
-                    int idAuthorNid = ts.getNidForUuids(eConcept.getConceptAttributes().authorUuid);
-                    int idModuleNid = ts.getNidForUuids(eConcept.getConceptAttributes().moduleUuid);
-                    int idPathNid = ts.getNidForUuids(eConcept.getConceptAttributes().pathUuid);
-
-                    c.getConceptAttributes().addUuidId(
-                            eConcept.getPrimordialUuid(), 
-                            unspecifiedUuidNid, 
-                            idStatusNid, 
-                            idTime, 
-                            idAuthorNid, 
-                            idModuleNid, 
-                            idPathNid); // STAMP
-
+            // first, check if different primordial UUIDs are being merged
+            if (c.getPrimUuid().compareTo(UUID.fromString("00000000-0000-0000-c000-000000000046")) != 0
+                    && c.getUUIDs().contains(eConcept.primordialUuid) == false) {
+                if (eConcept.getConceptAttributes() == null) {
                     StringBuilder sb = new StringBuilder();
-                    sb.append("\r\nmergeWithEConcept SCTID:\t");
-                    if (eConcept.getConceptAttributes() != null
-                            && eConcept.getConceptAttributes().getEIdentifiers() != null) {
-                        List<TkIdentifier> ids = eConcept.getConceptAttributes().getEIdentifiers();
-                        for (TkIdentifier tkIdentifier : ids) {
-                            UUID authorityUuid = tkIdentifier.getAuthorityUuid();
-                            UUID snomedIntIdUuid = UUID.fromString("0418a591-f75b-39ad-be2c-3ab849326da9");
-                            if (authorityUuid.compareTo(snomedIntIdUuid) == 0) {
-                                sb.append(((Long) tkIdentifier.getDenotation()).toString());
-                                sb.append("\t");
-                                break;
-                            }
-                        }
-                    }
-                    sb.append("\tUUID_PRIMORDIAL:\t");
+                    sb.append("\r\nmergeWithEConcept eConcept.getConceptAttributes() == null");
+                    sb.append(" insufficient information to add UUID_ADDITIONAL:\t");
                     sb.append(c.getPrimUuid());
                     sb.append("\t");
                     sb.append(c.toUserString());
-                    sb.append("\tUUID_ADDITIONAL:\t");
+                    sb.append("\tUUID_PRIMORDIAL:\t");
                     sb.append(eConcept.getPrimordialUuid().toString());
                     if (eConcept.getDescriptions() != null && eConcept.getDescriptions().size() > 0) {
                         sb.append("\t");
@@ -498,10 +439,69 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
                     }
                     sb.append("\r\n");
                     AceLog.getAppLog().log(Level.INFO, sb.toString());
+                } else {
+                    TerminologyStoreDI ts = Ts.get();
+                    int unspecifiedUuidNid = ts.getNidForUuids(ArchitectonicAuxiliary.Concept.UNSPECIFIED_UUID.getUids());
 
-                    ChangeNotifier.touch(c.nid, ChangeNotifier.Change.COMPONENT);
+                    // check if Concept c already has the extra UUID
+                    if (c.getUUIDs().contains(eConcept.primordialUuid) == false) {
+                        // add EConcept eConcept primordial uuid into Concept c additional ids
+                        // RF2 Active
+                        int idStatusNid = ts.getNidForUuids(UUID.fromString("d12702ee-c37f-385f-a070-61d56d4d0f1f"));
+                        long idTime = eConcept.getConceptAttributes().time;
+                        int idAuthorNid = ts.getNidForUuids(eConcept.getConceptAttributes().authorUuid);
+                        int idModuleNid = ts.getNidForUuids(eConcept.getConceptAttributes().moduleUuid);
+                        int idPathNid = ts.getNidForUuids(eConcept.getConceptAttributes().pathUuid);
+
+                        c.getConceptAttributes().addUuidId(
+                                eConcept.getPrimordialUuid(),
+                                unspecifiedUuidNid,
+                                idStatusNid,
+                                idTime,
+                                idAuthorNid,
+                                idModuleNid,
+                                idPathNid); // STAMP
+
+                        StringBuilder sb = new StringBuilder();
+                        sb.append("\r\nmergeWithEConcept SCTID:\t");
+                        if (eConcept.getConceptAttributes() != null
+                                && eConcept.getConceptAttributes().getEIdentifiers() != null) {
+                            List<TkIdentifier> ids = eConcept.getConceptAttributes().getEIdentifiers();
+                            for (TkIdentifier tkIdentifier : ids) {
+                                UUID authorityUuid = tkIdentifier.getAuthorityUuid();
+                                UUID snomedIntIdUuid = UUID.fromString("0418a591-f75b-39ad-be2c-3ab849326da9");
+                                if (authorityUuid.compareTo(snomedIntIdUuid) == 0) {
+                                    sb.append(((Long) tkIdentifier.getDenotation()).toString());
+                                    sb.append("\t");
+                                    break;
+                                }
+                            }
+                        }
+                        sb.append("\tUUID_PRIMORDIAL:\t");
+                        sb.append(c.getPrimUuid());
+                        sb.append("\t");
+                        sb.append(c.toUserString());
+                        sb.append("\tUUID_ADDITIONAL:\t");
+                        sb.append(eConcept.getPrimordialUuid().toString());
+                        if (eConcept.getDescriptions() != null && eConcept.getDescriptions().size() > 0) {
+                            sb.append("\t");
+                            sb.append(eConcept.getDescriptions().get(0).text);
+                        }
+                        sb.append("\r\n");
+                        AceLog.getAppLog().log(Level.INFO, sb.toString());
+
+                        ChangeNotifier.touch(c.nid, ChangeNotifier.Change.COMPONENT);
+                    }
                 }
             }
+
+            if (c.getConAttrs() == null) {
+                setAttributesFromEConcept(c, eAttr);
+            } else {
+                ConceptAttributes ca = c.getConAttrs();
+                ca.merge(new ConceptAttributes(eAttr, c), indexedAnnotationConcepts);
+            }
+            ChangeNotifier.touch(c.nid, ChangeNotifier.Change.COMPONENT);
         }
 
         if ((eConcept.getDescriptions() != null) && !eConcept.getDescriptions().isEmpty()) {

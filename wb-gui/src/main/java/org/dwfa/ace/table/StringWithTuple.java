@@ -16,6 +16,8 @@
  */
 package org.dwfa.ace.table;
 
+import org.apache.commons.lang.StringEscapeUtils;
+
 public abstract class StringWithTuple<T extends I_CellTextWithTuple<T>> implements I_CellTextWithTuple<T> {
 
     private String cellText;

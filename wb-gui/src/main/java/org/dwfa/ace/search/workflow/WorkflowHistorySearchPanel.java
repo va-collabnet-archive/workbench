@@ -30,7 +30,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FilenameFilter;
-import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
@@ -63,6 +62,7 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableColumn;
+import javax.swing.tree.TreePath;
 
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_ConfigAceFrame;
@@ -78,14 +78,20 @@ import org.dwfa.ace.search.DescSearchResultsTablePopupListener;
 import org.dwfa.ace.search.I_MakeCriterionPanel;
 import org.dwfa.ace.search.QueryBean;
 import org.dwfa.ace.table.JTableWithDragImage;
+import org.dwfa.ace.task.cs.ChangeSetImporter;
 import org.dwfa.ace.task.search.I_TestSearchResults;
-import org.dwfa.ace.tree.ExpandPathToNodeStateListener;
-import org.dwfa.ace.tree.JTreeWithDragImage;
 import org.ihtsdo.ace.table.WorkflowHistoryTableModel;
 import org.ihtsdo.ace.table.WorkflowHistoryTableModel.WORKFLOW_FIELD;
 import org.ihtsdo.ace.table.WorkflowHistoryTableModel.WorkflowStringWithConceptTuple;
 import org.ihtsdo.ace.table.WorkflowHistoryTableRenderer;
 import org.ihtsdo.ace.task.workflow.search.AbstractWorkflowHistorySearchTest;
+import org.ihtsdo.concurrent.future.FutureHelper;
+import org.ihtsdo.taxonomy.model.NodePath;
+import org.ihtsdo.taxonomy.model.TaxonomyModel;
+import org.ihtsdo.taxonomy.nodes.RootNode;
+import org.ihtsdo.taxonomy.nodes.TaxonomyNode;
+import org.ihtsdo.taxonomy.path.PathExpander;
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 
 public class WorkflowHistorySearchPanel extends JPanel implements I_MakeCriterionPanel {
 
@@ -193,39 +199,44 @@ public class WorkflowHistorySearchPanel extends JPanel implements I_MakeCriterio
 
         public void valueChanged(ListSelectionEvent e) {
             try {
-				// Ignore extra messages.
-				if (e.getValueIsAdjusting())
-				    return;
+                // Ignore extra messages.
+                if (e.getValueIsAdjusting()) {
+                    return;
+                }
 
-				ListSelectionModel lsm = (ListSelectionModel) e.getSource();
-				if (lsm.isSelectionEmpty()) {
-				    // no rows are selected
-				} else {
-				    int viewRowIndex = lsm.getMinSelectionIndex();
-	                int modelRow = wfHistoryTable.convertRowIndexToModel(viewRowIndex);
+                ListSelectionModel lsm = (ListSelectionModel) e.getSource();
+                if (lsm.isSelectionEmpty()) {
+                    // no rows are selected
+                } else {
+                    int viewRowIndex = lsm.getMinSelectionIndex();
+                    int modelRow = wfHistoryTable.convertRowIndexToModel(viewRowIndex);
 
-	                WorkflowStringWithConceptTuple result = (WorkflowStringWithConceptTuple) wfHistoryTable.getModel().getValueAt(modelRow, 0);
-	            	I_GetConceptData concept = Terms.get().getConcept(result.getTuple().getConceptNid());
+                    WorkflowStringWithConceptTuple result = (WorkflowStringWithConceptTuple) wfHistoryTable.getModel().getValueAt(modelRow, 0);
+                    I_GetConceptData concept = Terms.get().getConcept(result.getTuple().getConceptNid());
 
-	                for (I_ContainTermComponent l : linkedComponents) {
-	                    l.setTermComponent(concept);
-	                }
+                    for (I_ContainTermComponent l : linkedComponents) {
+                        l.setTermComponent(concept);
+                    }
 
-	                if (linkType == LINK_TYPE.TREE_LINK) {
-    	                try {
-	                        new ExpandPathToNodeStateListener((JTreeWithDragImage) config.getTreeInTaxonomyPanel(), 
-	                        								  config, concept);
-	                        config.setHierarchySelection(concept);
-	                    } catch (IOException e1) {
-	                        AceLog.getAppLog().alertAndLogException(e1);
-	                    }
-	                }
-				}
-			} catch (Exception e1) {
-				AceLog.getAppLog().alertAndLogException(e1);
-			}
+                    if (linkType == LINK_TYPE.TREE_LINK) {
+                        TaxonomyModel model = (TaxonomyModel) ace.getTree().getModel();
+                        RootNode root = model.getRoot();
+                        for (Long childNodeId : root.children) {
+                            TaxonomyNode childNode = model.getNodeStore().get(childNodeId);
+                            TreePath path = NodePath.getTreePath(model, childNode);
+                            ace.getTree().collapsePath(path);
+                        }
+
+                        PathExpander epl = new PathExpander(ace.getTree(), config,
+                                (ConceptChronicleBI) concept);
+                        config.setHierarchySelection((I_GetConceptData) concept);
+                        FutureHelper.addFuture(ace.threadPool.submit(epl));
+                    }
+                }
+            } catch (Exception e1) {
+                AceLog.getAppLog().alertAndLogException(e1);
+            }
         }
-
     }
 
     private class LinkListModel extends AbstractSpinnerModel {
@@ -374,9 +385,11 @@ public class WorkflowHistorySearchPanel extends JPanel implements I_MakeCriterio
 
     private JCheckBox workflowInProgress;
     private JCheckBox workflowCompleted;
+    private ACE ace;
 
     public WorkflowHistorySearchPanel(I_ConfigAceFrame config, ACE ace) {
         super(new GridBagLayout());
+        this.ace = ace;
         this.config = config;
         this.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "search");
         this.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "search");
@@ -660,7 +673,9 @@ public class WorkflowHistorySearchPanel extends JPanel implements I_MakeCriterio
     }
 
     private void startSearch() {
-        if (updateExtraCriterion()) {
+        if (ChangeSetImporter.indexGenerating.get() == true) {
+            JOptionPane.showMessageDialog(null, "Please wait until workflow index has regenerated.", "Please wait.", JOptionPane.OK_OPTION);
+        }else if (updateExtraCriterion()) {
 		    setShowProgress(true);
 		    ACE.threadPool.execute(new SearchWfHxWorker(this, model, config, this.workflowInProgress.isSelected(), this.workflowCompleted.isSelected()));
         }
