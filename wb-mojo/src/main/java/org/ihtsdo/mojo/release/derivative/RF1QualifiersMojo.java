@@ -180,9 +180,9 @@ public class RF1QualifiersMojo extends AbstractMojo {
 			ExportUtil.setQualStartStopFile(qualStartStop);
 			ExportUtil.setSCTID_Code_MapFile(sctid_Code_map);
 
-			RF2QualifierFactory factory = new RF2QualifierFactory(config);
-			factory.export();
-			
+//			RF2QualifierFactory factory = new RF2QualifierFactory(config);
+//			factory.export();
+//			
 
 			String outputFolderName = config.getOutputFolderName();
 
@@ -213,18 +213,18 @@ public class RF1QualifiersMojo extends AbstractMojo {
 			
 			File inferFile=new File(currentInferRels.getParent(),"Infer_"  + currentInferRels.getName());
 						
-			FileFilterAndSorter ffs=new FileFilterAndSorter(currentInferRels, inferFile, tmpFol, new int[]{0}, new Integer[]{4}, new String[]{"0"});
-			ffs.execute();
-			ffs=null;
+//			FileFilterAndSorter ffs=new FileFilterAndSorter(currentInferRels, inferFile, tmpFol, new int[]{0}, new Integer[]{4}, new String[]{"0"});
+//			ffs.execute();
+//			ffs=null;
 			
 			File histFile=new File(currentInferRels.getParent(),"Hist_"  + currentInferRels.getName());
-		    ffs=new FileFilterAndSorter(currentInferRels, histFile, tmpFol, new int[]{0}, new Integer[]{4}, new String[]{"2"});
-		    ffs.execute();
-			ffs=null;
+//		    ffs=new FileFilterAndSorter(currentInferRels, histFile, tmpFol, new int[]{0}, new Integer[]{4}, new String[]{"2"});
+//		    ffs.execute();
+//			ffs=null;
 		    File addFile=new File(currentInferRels.getParent(),"Add_"  + currentInferRels.getName());
-		    ffs=new FileFilterAndSorter(currentInferRels, addFile, tmpFol, new int[]{0}, new Integer[]{4}, new String[]{"3"});
-		    ffs.execute();
-			ffs=null;
+//		    ffs=new FileFilterAndSorter(currentInferRels, addFile, tmpFol, new int[]{0}, new Integer[]{4}, new String[]{"3"});
+//		    ffs.execute();
+//			ffs=null;
 			System.gc();
 			
 		    HashSet<File> hFile=new HashSet<File>();
