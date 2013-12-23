@@ -2,6 +2,7 @@ package org.ihtsdo.rf2.util;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -12,7 +13,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
@@ -46,6 +49,7 @@ import org.ihtsdo.idgeneration.IdAssignmentImpl;
 import org.ihtsdo.rf2.constant.I_Constants;
 import org.ihtsdo.rf2.core.dao.ModuleIDDAO;
 import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
 import org.ihtsdo.tk.api.changeset.ChangeSetGeneratorBI;
@@ -171,7 +175,363 @@ public class ExportUtil {
 			logger.error(e.getMessage()); 
 		}
 	}
+	private static File qualStartStopFile;
 
+	private static HashMap<Integer, String> type;
+
+	private static HashMap<Integer, ArrayList<Integer[]>> domain;
+
+	private static HashMap<Integer, ArrayList<String[]>> range;
+
+	private static HashMap<Integer, Integer> sctidNidMap;
+
+	private static HashMap<String, String> order;
+
+	private static HashMap<Integer,ArrayList<Integer[]>> domaex;
+
+	private static File SCTID_Code_mapFile;
+
+	private static HashMap<Integer, String> sctidCodeMap;
+
+	private static HashMap<String, Integer> refList;
+
+	private static HashMap<String, String> qualIds;
+
+	private static File previousQualIdsFile;
+
+	private static File currentInferRelsFile;
+
+	private static HashMap<String, String> infRels;
+
+	public static void setQualStartStopFile(File qualStartStop){
+		qualStartStopFile=qualStartStop;
+	}
+
+	public static void setPreviousQualIdsFile(File previousQualIds){
+		previousQualIdsFile=previousQualIds;
+	}
+	public static void setCurrentInferRelsFile(File currentInferRels){
+		currentInferRelsFile=currentInferRels;
+	}
+
+	public static void setSCTID_Code_MapFile(File SCTID_Code_map){
+		SCTID_Code_mapFile=SCTID_Code_map;
+	}
+
+	public static void loadConceptForQualStartStop( )throws IOException {
+
+		refList=new HashMap<String,Integer>();
+
+		FileInputStream rfis = new FileInputStream(qualStartStopFile	);
+		InputStreamReader risr = new InputStreamReader(rfis,"UTF-8");
+		BufferedReader rbr = new BufferedReader(risr);
+
+		String line;
+		String[] spl;
+		while((line=rbr.readLine())!=null){
+
+			spl=line.split("\t",-1);
+//			if (!spl[5].equals("Self")){
+				refList.put(spl[6], -1);
+//			}
+		}
+		rbr.close();
+		rbr=null;
+	}
+	public enum hierCondition{Self,DescendantsOrSelf,Descendants};
+
+	public static void loadPreviousQualIds() throws IOException{
+
+		FileInputStream rfis = new FileInputStream(previousQualIdsFile	);
+		InputStreamReader risr = new InputStreamReader(rfis,"UTF-8");
+		BufferedReader rbr = new BufferedReader(risr);
+
+		qualIds=new HashMap<String, String>();
+		String line;
+		String[] spl;
+		while((line=rbr.readLine())!=null){
+
+			spl=line.split("\t",-1);
+			if (spl[4].equals("1")){
+				qualIds.put(spl[1] + "-" + spl[2] + "-" + spl[3], spl[0]);
+			}
+		}
+		rbr.close();
+		rbr=null;
+	}
+
+	public static void loadCurrentInferRels() throws IOException{
+
+		FileInputStream rfis = new FileInputStream(currentInferRelsFile	);
+		InputStreamReader risr = new InputStreamReader(rfis,"UTF-8");
+		BufferedReader rbr = new BufferedReader(risr);
+
+		String line;
+		String[] spl;
+		infRels=new HashMap<String,String>();
+		String types=null;
+		while((line=rbr.readLine())!=null){
+
+			spl=line.split("\t",-1);
+			if (spl[4].equals("0") && !spl[2].equals("116680003")){
+				String key=spl[1];
+				if (infRels.containsKey(key)){
+					types=infRels.get(key);
+					types+=spl[2] + "-";
+				}else{
+					types="-" + spl[2] + "-";
+				}
+				infRels.put( spl[1],types);
+			}
+		}
+		rbr.close();
+		rbr=null;
+	}
+
+	public static void loadQualStartStop( )throws IOException {
+
+		FileInputStream rfis = new FileInputStream(qualStartStopFile	);
+		InputStreamReader risr = new InputStreamReader(rfis,"UTF-8");
+		BufferedReader rbr = new BufferedReader(risr);
+
+		String line;
+		String[] spl;
+
+		type=new HashMap<Integer,String>();
+		//		order=new HashMap<String,String>();
+		domain=new HashMap<Integer,ArrayList<Integer[]>>();
+		domaex=new HashMap<Integer,ArrayList<Integer[]>>();
+		range=new HashMap<Integer,ArrayList<String[]>>();
+		ArrayList<Integer[]> inte=new ArrayList<Integer[]>();
+		ArrayList<String[]> stri=null;
+		while((line=rbr.readLine())!=null){
+
+			spl=line.split("\t",-1);
+			Integer order=Integer.valueOf(spl[2]);
+			type.put(order, spl[0]);
+			if (spl[6].equals("0")){
+				boolean bstop=true;
+			}
+			if (spl[3].equals("Domain")){
+				if (spl[4].equals("Include")){
+					if (domain.containsKey(order)){
+						inte=domain.get(order);
+					}else{
+						inte=new ArrayList<Integer[]>();
+					}
+
+					if (refList.get(spl[6])==null){
+						boolean bstop=true;
+					}
+					inte.add( new Integer[]{hierCondition.valueOf(spl[5]).ordinal(),refList.get(spl[6])});
+					domain.put(order,inte);
+
+				}else if (spl[4].equals("Exclude")){
+
+					if (domaex.containsKey(order)){
+						inte=domaex.get(order);
+					}else{
+						inte=new ArrayList<Integer[]>();
+					}
+					if (refList.get(spl[6])==null){
+						boolean bstop=true;
+					}
+					inte.add( new Integer[]{hierCondition.valueOf(spl[5]).ordinal(),refList.get(spl[6])});
+					domaex.put(order,inte);
+				}
+			}
+
+			if (spl[3].equals("Range")){
+				if (range.containsKey(order)){
+					stri=range.get(order);
+				}else{
+					stri=new ArrayList<String[]>();
+				}
+				stri.add( new String[]{spl[5],spl[6]});
+				range.put(order,stri);
+			}
+		}
+		rbr.close();
+		rbr=null;
+	}
+	public static HashMap<Integer, String> getTypeForQualifiers(){
+		return type;
+	}
+
+
+
+	public static String getQualifierRF1Row(Integer order2, 
+			String conceptId,Config config) {
+		StringBuffer sb=new StringBuffer("");
+		String typeId=type.get(order2);
+
+		List<String[]> stri=range.get(order2);
+		String refinability = null;
+		String strTypes;
+		for (String[] str:stri){
+
+			String conceptId2 = str[1];
+			if (infRels.containsKey(conceptId)){
+				strTypes=infRels.get(conceptId);
+				if (strTypes.contains("-" + typeId + "-")){
+					continue;
+				}
+			}
+			hierCondition hc=hierCondition.valueOf(str[0]);
+			switch(hc){
+			case Descendants:
+				refinability="2";
+				break;
+			case DescendantsOrSelf:
+				refinability="1";
+				break;
+			case Self:
+				refinability="0";
+
+			}
+			String relationshipId = getPreviousQualId(conceptId,typeId,conceptId2);
+			if (relationshipId==null){
+				UUID uuid=UUID.randomUUID();
+				relationshipId=getSCTId(config,uuid,Integer.valueOf(config.getNamespaceId()),config.getPartitionId(),config.getReleaseId(),config.getExecutionId(),config.getModuleId());
+			}
+			sb.append(relationshipId);
+			sb.append("\t");
+			sb.append(conceptId);
+			sb.append("\t");
+			sb.append(typeId);
+			sb.append("\t");
+			sb.append(conceptId2);
+			sb.append("\t");
+			sb.append("1");
+			sb.append("\t");
+			sb.append(refinability);
+			sb.append("\t");
+			sb.append("0");
+			sb.append("\r\n");
+		}
+		return sb.toString();
+	}
+
+
+	private static String getPreviousQualId(String conceptId, String typeId,
+			String conceptId2) {
+		String strKey=conceptId + "-" + typeId + "-" + conceptId2;
+
+		return qualIds.get(strKey);
+	}
+
+
+
+	public static boolean testDomain(Integer order2,I_GetConceptData testCpt,I_ConfigAceFrame currenAceConfig) throws TerminologyException, IOException, ContradictionException {
+
+		List<Integer[]> domaexc=domaex.get(order2);
+		hierCondition[] hierCondValues = hierCondition.values();
+		boolean ret=true;
+		if (domaexc!=null){
+
+			for(Integer[] inte:domaexc){
+
+				hierCondition hc=hierCondValues[inte[0]];
+				if (inte[1]==null){
+					boolean bstop=true;
+				}
+				I_GetConceptData cpt=Terms.get().getConcept(inte[1]);
+				switch(hc){
+				case Descendants:
+					ret=cpt.isParentOf(testCpt, currenAceConfig.getAllowedStatus(),
+							currenAceConfig.getDestRelTypes(), 
+							currenAceConfig.getViewPositionSetReadOnly(), 
+							currenAceConfig.getPrecedence(), 
+							currenAceConfig.getConflictResolutionStrategy());
+					if (ret){
+						return false;
+					}
+					break;
+				case DescendantsOrSelf:
+
+					ret=cpt.isParentOfOrEqualTo(testCpt, currenAceConfig.getAllowedStatus(),
+							currenAceConfig.getDestRelTypes(), 
+							currenAceConfig.getViewPositionSetReadOnly(), 
+							currenAceConfig.getPrecedence(), 
+							currenAceConfig.getConflictResolutionStrategy());
+					if (ret){
+						return false;
+					}
+					break;
+				case Self:
+					if ((cpt.getNid()==testCpt.getNid())){
+						return false;
+					}
+				}
+			}
+		}
+		ret=false;
+		List<Integer[]> domains=domain.get(order2);
+		for(Integer[] inte:domains){
+
+			hierCondition hc=hierCondValues[inte[0]];
+			if (inte[1]==null){
+				boolean bstop=true;
+			}
+			I_GetConceptData cpt=Terms.get().getConcept(inte[1]);
+			switch(hc){
+			case Descendants:
+				ret=cpt.isParentOf(testCpt, currenAceConfig.getAllowedStatus(),
+						currenAceConfig.getDestRelTypes(), 
+						currenAceConfig.getViewPositionSetReadOnly(), 
+						currenAceConfig.getPrecedence(), 
+						currenAceConfig.getConflictResolutionStrategy());
+				if (ret){
+					return true;
+				}
+				break;
+			case DescendantsOrSelf:
+
+				ret=cpt.isParentOfOrEqualTo(testCpt, currenAceConfig.getAllowedStatus(),
+						currenAceConfig.getDestRelTypes(), 
+						currenAceConfig.getViewPositionSetReadOnly(), 
+						currenAceConfig.getPrecedence(), 
+						currenAceConfig.getConflictResolutionStrategy());
+				if (ret){
+					return true;
+				}
+				break;
+			case Self:
+				if (cpt.getNid()==testCpt.getNid()){
+					return true;
+				}
+			}
+		}
+		return ret;
+	}
+
+
+
+	public static void loadSCTID_map( )throws IOException, TerminologyException {
+
+
+		FileInputStream rfis = new FileInputStream(SCTID_Code_mapFile	);
+		InputStreamReader risr = new InputStreamReader(rfis,"UTF-8");
+		BufferedReader rbr = new BufferedReader(risr);
+
+		String line;
+		String[] spl;
+
+		while((line=rbr.readLine())!=null){
+
+			spl=line.split("\t",-1);
+			if (refList.containsKey(spl[1])){
+				Integer nid=Terms.get().uuidToNative(UUID.fromString(spl[0]));
+				if (nid==null){
+
+					boolean bstop=true;
+				}
+				refList.put(spl[1], nid);
+			}
+		}
+		rbr.close();
+		rbr=null;
+	}
 
 	public static String getParentSnomedId(I_GetConceptData concept) throws Exception{		
 		Set<I_GetConceptData> parents = new HashSet<I_GetConceptData>();
@@ -221,15 +581,15 @@ public class ExportUtil {
 
 			ChangeSetWriterHandler.addWriter(newDbProfile.getUsername() + ".commitLog.xls",
 					new CommitLog(new File(newDbProfile.getChangeSetRoot(),
-					"commitLog.xls"), new File(newDbProfile.getChangeSetRoot(),
-							"." + "commitLog.xls")));	
+							"commitLog.xls"), new File(newDbProfile.getChangeSetRoot(),
+									"." + "commitLog.xls")));	
 
 			flag = i_Identify.addLongId(Long.parseLong(wsSctId), ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.localize().getNid(),
-                    statusNid,
-                    effectiveDate,
-                    aceConfig.getEditCoordinate().getAuthorNid(),
-                    aceConfig.getEditCoordinate().getModuleNid(),
-                    pathNid);
+					statusNid,
+					effectiveDate,
+					aceConfig.getEditCoordinate().getAuthorNid(),
+					aceConfig.getEditCoordinate().getModuleNid(),
+					pathNid);
 			I_GetConceptData commitedConcept = getTermFactory().getConceptForNid(componentNid);
 
 			getTermFactory().addUncommitted(commitedConcept);
@@ -284,8 +644,8 @@ public class ExportUtil {
 
 		ChangeSetWriterHandler.addWriter(newDbProfile.getUsername() + ".commitLog.xls",
 				new CommitLog(new File(newDbProfile.getChangeSetRoot(),
-				"commitLog.xls"), new File(newDbProfile.getChangeSetRoot(),
-						"." + "commitLog.xls")));	
+						"commitLog.xls"), new File(newDbProfile.getChangeSetRoot(),
+								"." + "commitLog.xls")));	
 
 		Ts.get().addChangeSetGenerator(tempKey, generator);
 	}
@@ -298,11 +658,11 @@ public class ExportUtil {
 		try {	
 			I_Identify i_Identify = getTermFactory().getId(componentNid);
 			flag = i_Identify.addStringId(wsSnomedId, ArchitectonicAuxiliary.Concept.SNOMED_RT_ID.localize().getNid(),
-                    statusNid,
-                    Long.MAX_VALUE,
-                    aceConfig.getEditCoordinate().getAuthorNid(),
-                    aceConfig.getEditCoordinate().getModuleNid(),
-                    pathNid);
+					statusNid,
+					Long.MAX_VALUE,
+					aceConfig.getEditCoordinate().getAuthorNid(),
+					aceConfig.getEditCoordinate().getModuleNid(),
+					pathNid);
 			I_GetConceptData commitedConcept = getTermFactory().getConcept(componentNid);
 
 			getTermFactory().addUncommitted(commitedConcept);
@@ -328,10 +688,10 @@ public class ExportUtil {
 			}
 
 			flag = i_Identify.addStringId(wsCtv3Id, ArchitectonicAuxiliary.Concept.CTV3_ID.localize().getNid(), statusNid,
-                    Long.MAX_VALUE,
-                    aceConfig.getEditCoordinate().getAuthorNid(),
-                    aceConfig.getEditCoordinate().getModuleNid(),
-                    pathNid);
+					Long.MAX_VALUE,
+					aceConfig.getEditCoordinate().getAuthorNid(),
+					aceConfig.getEditCoordinate().getModuleNid(),
+					pathNid);
 			I_GetConceptData commitedConcept = getTermFactory().getConcept(componentNid);
 
 			getTermFactory().addUncommitted(commitedConcept);
@@ -360,11 +720,11 @@ public class ExportUtil {
 
 			flag = i_Identify.addStringId(wsSnomedId, ArchitectonicAuxiliary.Concept.SNOMED_RT_ID.localize().getNid(),
 					statusNid,
-                                            effectiveDate,
-                                            aceConfig.getEditCoordinate().getAuthorNid(),
-                                            aceConfig.getEditCoordinate().getModuleNid(),
-                                            pathNid);
-			
+					effectiveDate,
+					aceConfig.getEditCoordinate().getAuthorNid(),
+					aceConfig.getEditCoordinate().getModuleNid(),
+					pathNid);
+
 			I_GetConceptData commitedConcept = getTermFactory().getConcept(componentNid);
 			//getTermFactory().addUncommitted(commitedConcept);
 			//getTermFactory().commit();
@@ -391,10 +751,10 @@ public class ExportUtil {
 
 			flag = i_Identify.addStringId(wsCtv3Id, ArchitectonicAuxiliary.Concept.CTV3_ID.localize().getNid(),
 					statusNid,
-                                            effectiveDate,
-                                            aceConfig.getEditCoordinate().getAuthorNid(),
-                                            aceConfig.getEditCoordinate().getModuleNid(),
-                                            pathNid);
+					effectiveDate,
+					aceConfig.getEditCoordinate().getAuthorNid(),
+					aceConfig.getEditCoordinate().getModuleNid(),
+					pathNid);
 
 			I_GetConceptData commitedConcept = getTermFactory().getConcept(componentNid);
 			//getTermFactory().addUncommitted(commitedConcept);
@@ -460,7 +820,7 @@ public class ExportUtil {
 	}*/
 
 	public static Long getLatestActivePart(List<I_RelPart> parts)
-	throws Exception {
+			throws Exception {
 		long latestVersion = Integer.MIN_VALUE;
 		for (I_RelPart rel : parts) {
 			if (rel.getTime() > latestVersion && rel.getStatusNid()==getNid("d12702ee-c37f-385f-a070-61d56d4d0f1f")) {
@@ -774,7 +1134,7 @@ public class ExportUtil {
 				String effectivetime = moduleIdDAO.getEffectiveTime();
 				//need to sort effectivetime issue
 				if(snomedIntegerId.equals(conceptid) //&& effectivetime.equals(effectivetime)
-				){
+						){
 					moduleId = I_Constants.META_MODULE_ID;
 					break;
 				}
@@ -1767,7 +2127,7 @@ public class ExportUtil {
 	// get the relationshipId for the given UUID using Specific namespace and partition values
 	public static String getRelationshipId(Config config, UUID uuid) {
 		IdAssignmentImpl idGen = getIdGeneratorClient( config);
-		
+
 		long relationshipId = 0L;
 		String partitionId = "";
 		String sctModuleId = "Relationship Component";
@@ -1803,11 +2163,11 @@ public class ExportUtil {
 			I_Identify i_Identify = getTermFactory().getId(componentNid);	
 			I_GetConceptData commitedConcept = getTermFactory().getConceptForNid(componentNid);
 			flag = i_Identify.addLongId(Long.parseLong(wsSctId), ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.localize().getNid(),
-                    statusNid,
-                    Long.MAX_VALUE,
-                    aceConfig.getEditCoordinate().getAuthorNid(),
-                    aceConfig.getEditCoordinate().getModuleNid(),
-                    pathNid);
+					statusNid,
+					Long.MAX_VALUE,
+					aceConfig.getEditCoordinate().getAuthorNid(),
+					aceConfig.getEditCoordinate().getModuleNid(),
+					pathNid);
 			getTermFactory().addUncommitted(commitedConcept);
 
 		} catch (Exception ex) {
