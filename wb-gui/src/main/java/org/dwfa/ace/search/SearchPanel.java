@@ -448,8 +448,8 @@ public class SearchPanel extends JPanel implements I_MakeCriterionPanel, I_HostC
                         }
 
                         PathExpander epl = new PathExpander(ace.getTree(), config,
-                                (ConceptChronicleBI) termComponent);
-                        config.setHierarchySelection((I_GetConceptData) termComponent);
+                                (ConceptChronicleBI) cb);
+                        config.setHierarchySelection((I_GetConceptData) cb);
                         FutureHelper.addFuture(ace.threadPool.submit(epl));
                     }
                     setTermComponent(cb);
