@@ -176,10 +176,15 @@ public class ExportConceptMemberRefsetToRefset {
                     bSkip = true;
                 }
                 if (!bSkip) {
-                    String sctId_id = rUtil.getSnomedId(ext.getNid(), termFactory);
+                	String sctId_id = null;
                     try {
-                        Long.parseLong(sctId_id);
-                    } catch (NumberFormatException e) {
+                        sctId_id = rUtil.getSnomedId(ext.getNid(), termFactory);
+                        try {
+                            Long.parseLong(sctId_id);
+                        } catch (NumberFormatException e) {
+                            sctId_id = id;
+                        }
+                    } catch (NullPointerException e) {
                         sctId_id = id;
                     }
                     String sctId_moduleId = rUtil.getSnomedId(lastPart.getPathNid(), termFactory);
