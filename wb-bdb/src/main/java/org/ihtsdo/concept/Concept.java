@@ -426,12 +426,13 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
                     && c.getUUIDs().contains(eConcept.primordialUuid) == false) {
                 if (eConcept.getConceptAttributes() == null) {
                     StringBuilder sb = new StringBuilder();
-                    sb.append("\r\nmergeWithEConcept eConcept.getConceptAttributes() == null");
-                    sb.append(" insufficient information to add UUID_ADDITIONAL:\t");
+                    sb.append("\r\nmergeWithEConcept unable to merge concept attibutes");
+                    sb.append(" concept primordial UUID: \t");
+
                     sb.append(c.getPrimUuid());
                     sb.append("\t");
                     sb.append(c.toUserString());
-                    sb.append("\tUUID_PRIMORDIAL:\t");
+                    sb.append("\t eConcept UUID:\t");
                     sb.append(eConcept.getPrimordialUuid().toString());
                     if (eConcept.getDescriptions() != null && eConcept.getDescriptions().size() > 0) {
                         sb.append("\t");

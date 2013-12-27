@@ -132,6 +132,10 @@ public class Bdb {
     static ConcurrentSkipListSet<Concept> annotationConcepts = new ConcurrentSkipListSet<Concept>();
 
     public static void xrefAnnotation(RefexChronicleBI annotation) throws IOException {
+        if(annotationConcepts == null){
+            System.out.println("#### Annotation concepts was null.");
+            annotationConcepts = new ConcurrentSkipListSet<>();
+        }
         Concept refexConcept = Concept.get(annotation.getRefexNid());
         if (refexConcept.isAnnotationIndex()) {
             if (refexConcept.addMemberNid(annotation.getNid())) {
@@ -621,7 +625,7 @@ public class Bdb {
         if (readOnly != null && readOnly.bdbEnv != null) {
             readOnly.bdbEnv.close();
         }
-        annotationConcepts = null;
+        annotationConcepts.clear();
         conceptDb = null;
         mutable = null;
         nidCidMapDb = null;
