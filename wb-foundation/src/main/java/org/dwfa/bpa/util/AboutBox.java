@@ -19,6 +19,8 @@
  */
 package org.dwfa.bpa.util;
 
+import static org.dwfa.bpa.util.AppInfoProperties.ABOUT_BOX_RELEASE_EDITION;
+import static org.dwfa.bpa.util.AppInfoProperties.ABOUT_BOX_RELEASE_VERSION;
 import static org.dwfa.bpa.util.AppInfoProperties.ARCHETYPE_ARTIFACT_ID;
 import static org.dwfa.bpa.util.AppInfoProperties.ARCHETYPE_GROUP_ID;
 import static org.dwfa.bpa.util.AppInfoProperties.ARCHETYPE_VERSION;
@@ -27,10 +29,12 @@ import static org.dwfa.bpa.util.AppInfoProperties.GROUP_ID;
 import static org.dwfa.bpa.util.AppInfoProperties.SITE_URL;
 import static org.dwfa.bpa.util.AppInfoProperties.VERSION;
 
-import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Desktop;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.event.MouseAdapter;
@@ -42,12 +46,14 @@ import java.net.URL;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
+import javax.swing.border.EmptyBorder;
 
 /**
  * @author kec
@@ -64,6 +70,8 @@ public class AboutBox {
 
         String title = getTitle();
         final JDialog aboutBox = new JDialog(parent, title);
+        
+        aboutBox.getContentPane().setBackground(Color.WHITE);
 
         String graphic = getGraphic();
         URL aboutBoxUrl = aboutBox.getClass().getResource(graphic);
@@ -85,17 +93,29 @@ public class AboutBox {
         } else {
             aboutLabel = new JLabel("Cannot find " + graphic);
         }
+        aboutLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         // On some platforms, changing the resizable state affects
         // the insets of the Dialog.  As a result, multiple calls
         // to pack() can change the size of the dialog.  Fix that here
         // by preemptively calling setResizeable before the first pack().
         aboutBox.setResizable(false);
+        
+        aboutBox.setLayout(new BoxLayout(aboutBox.getContentPane(), BoxLayout.Y_AXIS));
 
         // As a convenience, JDialog adds to the contentPane directly.
-        aboutBox.add(aboutLabel, BorderLayout.CENTER);
+        aboutBox.add(aboutLabel);
+        
+        final JLabel releaseEdition = createReleaseEditionLabel();
+        aboutBox.add(releaseEdition);
+        final JLabel releaseVersion = createReleaseVersionLabel();
+        aboutBox.add(releaseVersion);
+        
+        final JLabel legal = createLegalLabel();
+        aboutBox.add(legal);
+        
         final JLabel versionLabel = createVersionLabel();
-        aboutBox.add(versionLabel, BorderLayout.SOUTH);
+        aboutBox.add(versionLabel);
         aboutBox.pack();
         aboutBox.setModal(true);
 
@@ -142,6 +162,34 @@ public class AboutBox {
         
         return title;
     }
+    
+    private static JLabel createReleaseVersionLabel() {
+        Properties appInfoProperties = AppInfoProperties.getProperties();
+        JLabel label = new JLabel(appInfoProperties.getProperty(ABOUT_BOX_RELEASE_VERSION));
+        label.setAlignmentX(Component.CENTER_ALIGNMENT);
+        label.setBorder(new EmptyBorder(5, 0, 5, 0));
+        return label;
+    }
+    
+    private static JLabel createReleaseEditionLabel() {
+        Properties appInfoProperties = AppInfoProperties.getProperties();
+        JLabel label = new JLabel(appInfoProperties.getProperty(ABOUT_BOX_RELEASE_EDITION));
+        label.setAlignmentX(Component.CENTER_ALIGNMENT);
+        label.setBorder(new EmptyBorder(5, 0, 5, 0));
+        return label;
+    }
+    
+    private static JLabel createLegalLabel() {
+        JLabel label = new JLabel("<html>Legal Notices:<br>This product includes software developed by the Apache Software Foundation<br>"
+            + "(http://www.apache.org)<br><br>"
+            + "The programs and Clinical Terminologies included herin are subject to a<br>"
+            + "restricted use license and can only be used in conjunction with this application.<br>"
+            + "Please see the software license file that accompanies this distribution.</html>");
+        label.setAlignmentX(Component.CENTER_ALIGNMENT);
+        label.setFont(new Font(label.getFont().getName(), Font.PLAIN, 11));
+        label.setBorder(new EmptyBorder(15, 10, 15, 10));
+        return label;
+    }
 
     private static JLabel createVersionLabel() {
         Properties appInfoProperties = AppInfoProperties.getProperties();
@@ -161,7 +209,7 @@ public class AboutBox {
         }
 
         // Center label within dialog. 
-        label.setVerticalAlignment(SwingConstants.CENTER);
+        label.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         // Make invisible until activated by user.
         label.setVisible(false);

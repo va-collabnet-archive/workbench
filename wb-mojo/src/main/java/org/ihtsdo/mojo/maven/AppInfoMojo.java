@@ -23,6 +23,8 @@ import static org.dwfa.bpa.util.AppInfoProperties.ARTIFACT_ID;
 import static org.dwfa.bpa.util.AppInfoProperties.GROUP_ID;
 import static org.dwfa.bpa.util.AppInfoProperties.SITE_URL;
 import static org.dwfa.bpa.util.AppInfoProperties.VERSION;
+import static org.dwfa.bpa.util.AppInfoProperties.ABOUT_BOX_RELEASE_EDITION;
+import static org.dwfa.bpa.util.AppInfoProperties.ABOUT_BOX_RELEASE_VERSION;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -109,6 +111,23 @@ public class AppInfoMojo extends AbstractMojo {
      * @parameter expression="${archetypeVersion}"
      */
     private String archetypeVersion;
+    
+    /**
+     * A user friendly release name - displayed in the about box
+     * May be {@code null}.
+     *
+     * @parameter expression="${aboutBoxReleaseEdition}"
+     */
+    private String aboutBoxReleaseEdition;
+    
+    /**
+     * A user friendly version string - displayed in the about box
+     * May be {@code null}.
+     *
+     * @parameter expression="${aboutBoxReleaseVersion}"
+     */
+    private String aboutBoxReleaseVersion;
+
 
     public void execute() throws MojoExecutionException, MojoFailureException {
         try {
@@ -141,6 +160,14 @@ public class AppInfoMojo extends AbstractMojo {
        }
        if (archetypeVersion != null) {
            appInfoProperties.setProperty(ARCHETYPE_VERSION, archetypeVersion);
+       }
+       
+       if (aboutBoxReleaseEdition != null) {
+           appInfoProperties.setProperty(ABOUT_BOX_RELEASE_EDITION, aboutBoxReleaseEdition);
+       }
+       
+       if (aboutBoxReleaseVersion != null) {
+           appInfoProperties.setProperty(ABOUT_BOX_RELEASE_VERSION, aboutBoxReleaseVersion);
        }
 
        // Write out to file.

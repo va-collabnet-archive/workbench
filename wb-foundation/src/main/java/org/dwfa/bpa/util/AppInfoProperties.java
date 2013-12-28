@@ -28,6 +28,9 @@ public final class AppInfoProperties {
     public static final String ARCHETYPE_GROUP_ID = "archetypeGroupId";
     public static final String ARCHETYPE_ARTIFACT_ID = "archetypeArtifactId";
     public static final String ARCHETYPE_VERSION = "archetypeVersion";
+    
+    public static final String ABOUT_BOX_RELEASE_EDITION = "aboutBoxReleaseEdition";
+    public static final String ABOUT_BOX_RELEASE_VERSION = "aboutBoxReleaseVersion";
 
     private static final Properties APP_INFO = new Properties();
     
