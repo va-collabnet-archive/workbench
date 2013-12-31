@@ -17,11 +17,13 @@
 package org.dwfa.ace.task.classify;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
@@ -50,11 +52,12 @@ public class SnoConGrpList extends ArrayList<SnoConGrp> {
     }
 
     // dump equivalent concepts to file
-    public static void dumpSnoConGrpList(SnoConGrpList scgl, String fName) {
+    public static void dumpSnoConGrpList(SnoConGrpList scgl, File file) {
+        Logger.getLogger(SnoConGrpList.class.getName()).log(Level.INFO, "Writing: " + file.getAbsolutePath());
         I_TermFactory tf = Terms.get();
         BufferedWriter bw = null;
         try {
-            bw = new BufferedWriter(new FileWriter(fName));
+            bw = new BufferedWriter(new FileWriter(file));
             // "COMPARE" UUIDs, //NIDs, Initial Text
             int setNumber = 1;
             for (SnoConGrp scg : scgl) {
@@ -73,7 +76,10 @@ public class SnoConGrpList extends ArrayList<SnoConGrp> {
             Logger.getLogger(SnoConGrpList.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             try {
-                bw.close();
+            	if (bw != null)
+            	{
+            		bw.close();
+            	}
             } catch (IOException ex) {
                 Logger.getLogger(SnoConGrpList.class.getName()).log(Level.SEVERE, null, ex);
             }

@@ -118,6 +118,13 @@ public class SnorocketMojoEx extends AbstractMojo {
      * @parameter expression="${project.build.directory}/generated-resources/berkeley-db"
      */
     private File berkeleyDir;
+    
+    /**
+     * Directory of output files.
+     *
+     * @parameter expression="${project.build.directory}/"
+     */
+    private File outputDir;
     /**
      * <uuidClassRoot>ee9ac5d2-a07c-3981-a57a-f7f26baf38d8</uuidClassRoot>
      * <uuidClassIsa>c93a30b9-ba77-3adb-a9b8-4589c9f8fb25</uuidClassIsa>
@@ -533,19 +540,19 @@ public class SnorocketMojoEx extends AbstractMojo {
             sb.append(SnoQuery.getRoleDropped().size());
             logger.info(sb.toString());
             if (reportChanges != null) {
-                SnoRel.dumpToFile(SnoQuery.getIsaAdded(), reportChanges + "_ISA_ADD.txt", 2);
+                SnoRel.dumpToFile(SnoQuery.getIsaAdded(), new File(outputDir, reportChanges + "_ISA_ADD.txt"), 2);
                 SnoRel.dumpToFile(SnoQuery.getIsaDropped(),
-                        reportChanges + "_ISA_DROP.txt", 2);
+                        new File(outputDir, reportChanges + "_ISA_DROP.txt"), 2);
                 SnoRel.dumpToFile(SnoQuery.getRoleAdded(),
-                        reportChanges + "_ROLE_ADD.txt", 2);
+                        new File(outputDir, reportChanges + "_ROLE_ADD.txt"), 2);
                 SnoRel.dumpToFile(SnoQuery.getRoleDropped(),
-                        reportChanges + "_ROLE_DROP.txt", 2);
+                        new File(outputDir, reportChanges + "_ROLE_DROP.txt"), 2);
             }
         } else {
             logger.info("\r\n::: [SnorocketMojoEx] NO CLASSIFICATION CHANGES");
             if (reportChanges != null) {
                 SnoRel.dumpToFile(SnoQuery.getIsaAdded(),
-                        reportChanges + "_NO_CHANGES.txt", 2);
+                        new File(outputDir, reportChanges + "_NO_CHANGES.txt"), 2);
             }
         }
 
@@ -554,13 +561,13 @@ public class SnorocketMojoEx extends AbstractMojo {
                     + SnoQuery.getEquiv().size());
             if (reportEquivalences != null) {
                 SnoConGrpList.dumpSnoConGrpList(SnoQuery.getEquiv(),
-                        reportEquivalences + "_FAIL.txt");
+                        new File(outputDir, reportEquivalences + "_FAIL.txt"));
             }
         } else {
             logger.info("\r\n::: [SnorocketMojoEx] NO EQUIVALENCES DETECTED");
             if (reportEquivalences != null) {
                 SnoConGrpList.dumpSnoConGrpList(SnoQuery.getEquiv(),
-                        reportEquivalences + "_PASS.txt");
+                        new File(outputDir, reportEquivalences + "_PASS.txt"));
             }
         }
 

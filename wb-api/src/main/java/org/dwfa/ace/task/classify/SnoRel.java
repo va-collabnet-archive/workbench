@@ -17,6 +17,7 @@
 package org.dwfa.ace.task.classify;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Collections;
@@ -24,6 +25,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
@@ -178,12 +180,13 @@ public class SnoRel implements Comparable<Object> {
         return "relId     \t" + "c1Id      \t" + "c2Id      \t" + "typeId    \t" + "group";
     }
 
-    public static void dumpToFile(List<SnoRel> srl, String fName, int format) {
-
+    public static void dumpToFile(List<SnoRel> srl, File file, int format) {
+        Logger.getLogger(SnoRel.class.getName()).log(Level.INFO, "Writing: " + file.getAbsolutePath());
+        BufferedWriter bw = null;
         try {
             I_TermFactory tf = Terms.get();
 
-            BufferedWriter bw = new BufferedWriter(new FileWriter(fName));
+            bw = new BufferedWriter(new FileWriter(file));
             if (format == 1) { // RAW NIDs
                 for (SnoRel sr : srl) {
                     bw.write(sr.c1Id + "\t" + sr.typeId + "\t" + sr.c2Id + "\t" + sr.group + "\r\n");
@@ -293,6 +296,17 @@ public class SnoRel implements Comparable<Object> {
         } catch (IOException e) {
             // can be caused by new FileWriter
             Logger.getLogger(SnoRel.class.getName()).log(Level.SEVERE, null, e);
+        }
+        finally
+        {
+            try {
+                if (bw != null)
+                {
+                    bw.close();
+                }
+            } catch (IOException ex) {
+                Logger.getLogger(SnoRel.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }
 } // class SnoRel

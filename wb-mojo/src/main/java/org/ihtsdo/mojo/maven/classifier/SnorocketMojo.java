@@ -119,6 +119,13 @@ public class SnorocketMojo extends AbstractMojo {
      * @parameter expression="${project.build.directory}/generated-resources/berkeley-db"
      */
     private File berkeleyDir;
+    
+    /**
+     * Location to write the output files
+     *
+     * @parameter expression="${project.build.directory}/"
+     */
+    private File outputDir;
     /**
     <uuidClassRoot>ee9ac5d2-a07c-3981-a57a-f7f26baf38d8</uuidClassRoot>
     <uuidClassIsa>c93a30b9-ba77-3adb-a9b8-4589c9f8fb25</uuidClassIsa>
@@ -532,19 +539,19 @@ public class SnorocketMojo extends AbstractMojo {
             sb.append(sb.toString());
             if (reportChanges != null) {
                 SnoRel.dumpToFile(SnoQuery.getIsaAdded(),
-                        "target" + File.separator + reportChanges + "_ISA_ADD.txt", 2);
+                        new File(outputDir, reportChanges + "_ISA_ADD.txt"), 2);
                 SnoRel.dumpToFile(SnoQuery.getIsaDropped(),
-                        "target" + File.separator + reportChanges + "_ISA_DROP.txt", 2);
+                        new File(outputDir, reportChanges + "_ISA_DROP.txt"), 2);
                 SnoRel.dumpToFile(SnoQuery.getRoleAdded(),
-                        "target" + File.separator + reportChanges + "_ROLE_ADD.txt", 2);
+                        new File(outputDir, reportChanges + "_ROLE_ADD.txt"), 2);
                 SnoRel.dumpToFile(SnoQuery.getRoleDropped(),
-                        "target" + File.separator + reportChanges + "_ROLE_DROP.txt", 2);
+                       new File(outputDir, reportChanges + "_ROLE_DROP.txt"), 2);
             }
         } else {
             logger.info("\r\n::: [SnorocketMojo] NO CLASSIFICATION CHANGES");
             if (reportChanges != null) {
                 SnoRel.dumpToFile(SnoQuery.getIsaAdded(),
-                        "target" + File.separator + reportChanges + "_NO_CHANGES.txt", 2);
+                        new File(outputDir, reportChanges + "_NO_CHANGES.txt"), 2);
             }
         }
 
@@ -552,13 +559,13 @@ public class SnorocketMojo extends AbstractMojo {
             logger.info("\r\n::: [SnorocketMojo] EQUIVALENCES DETECTED = " + SnoQuery.getEquiv().size());
             if (reportEquivalences != null) {
                 SnoConGrpList.dumpSnoConGrpList(SnoQuery.getEquiv(),
-                        "target" + File.separator + reportEquivalences + "_FAIL.txt");
+                        new File(outputDir, reportEquivalences + "_FAIL.txt"));
             }
         } else {
             logger.info("\r\n::: [SnorocketMojo] NO EQUIVALENCES DETECTED");
             if (reportEquivalences != null) {
                 SnoConGrpList.dumpSnoConGrpList(SnoQuery.getEquiv(),
-                        "target" + File.separator + reportEquivalences + "_PASS.txt");
+                        new File(outputDir, reportEquivalences + "_PASS.txt"));
             }
         }
 
