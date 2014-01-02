@@ -175,7 +175,7 @@ public class ConceptView extends JPanel {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 try {
-                    layoutConcept(ConceptView.this.concept);
+                    redoConceptViewLayout();
                 } catch (IOException ex) {
                     AceLog.getAppLog().alertAndLogException(ex);
                 }
