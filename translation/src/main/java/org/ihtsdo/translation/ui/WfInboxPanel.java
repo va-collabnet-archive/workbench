@@ -309,7 +309,7 @@ public class WfInboxPanel extends JPanel {
 		mediator.suscribe(EventType.INBOX_ITEM_SELECTED, new InboxItemSelectedEventHandler<InboxItemSelectedEvent>(this) {
 			@Override
 			public void handleEvent(InboxItemSelectedEvent event) {
-				currentRow = null;
+				// currentRow = null;
 				newInboxItem = event.getInboxItem();
 				if (newInboxItem instanceof InboxTag) {
 					InboxTag tag = (InboxTag) newInboxItem;
@@ -557,11 +557,11 @@ public class WfInboxPanel extends JPanel {
 	 */
 	private void updateFilters() {
 		presentFilters = false;
-		
+
 		String defaultText = this.defaultDescText.getText();
-		
+
 		WfDefaultDescFilter wfDefDescFilter = new WfDefaultDescFilter("");
-		
+
 		if (!defaultText.equals("")) {
 			wfDefDescFilter = new WfDefaultDescFilter(defaultText);
 			filterList.put(wfDefDescFilter.getType(), wfDefDescFilter);
@@ -683,8 +683,9 @@ public class WfInboxPanel extends JPanel {
 						int n = JOptionPane.showOptionDialog(this, "Uncommited concept in editor", "Uncommited", JOptionPane.YES_NO_CANCEL_OPTION,
 								JOptionPane.WARNING_MESSAGE, null, options, options[2]);
 						if (n == JOptionPane.YES_OPTION) {
-							boolean commited = previousConcept.commit(ChangeSetGenerationPolicy.INCREMENTAL, ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);
-							if(!commited){
+							boolean commited = previousConcept.commit(ChangeSetGenerationPolicy.INCREMENTAL,
+									ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);
+							if (!commited) {
 								returnToPreviousItem(previousIndex);
 							}
 						} else if (n == JOptionPane.NO_OPTION) {
@@ -700,14 +701,14 @@ public class WfInboxPanel extends JPanel {
 
 				UUID memberUUid = previousInstance.getComponentId();
 				String memberStringUUid = previousInstance.getComponentId().toString();
-				
-				I_TerminologyProject project= TerminologyProjectDAO.getProjectForWorklist(previousInstance.getWorkList(), config);
+
+				I_TerminologyProject project = TerminologyProjectDAO.getProjectForWorklist(previousInstance.getWorkList(), config);
 
 				JTabbedPane tpc = ((AceFrameConfig) config).getAceFrame().getCdePanel().getConceptTabs();
-				if (project.getProjectType().compareTo(Type.TRANSLATION)!=0){
+				if (project.getProjectType().compareTo(Type.TRANSLATION) != 0) {
 					I_HostConceptPlugins viewer = config.getConceptViewer(1);
 					I_GetConceptData concept = Terms.get().getConcept(memberUUid);
-					if (concept!=null){
+					if (concept != null) {
 						viewer.setTermComponent(concept);
 
 						int tabCount = tpc.getTabCount();
@@ -716,18 +717,21 @@ public class WfInboxPanel extends JPanel {
 								tpc.setSelectedIndex(i);
 							}
 						}
-//						JOptionPane pane = new JOptionPane("The concept was sent to arena", JOptionPane.INFORMATION_MESSAGE);
-//						JDialog dialog = pane.createDialog(this, "Sent concept");
-//
-//						dialog.setVisible(true);
-//						pane.setVisible(true);
-//						Thread.sleep(2000);
-//						dialog.setVisible(false);
-//						pane.setVisible(false);
-//						dialog.dispose();
-//						dialog=null;
-//						pane=null;
-						
+						// JOptionPane pane = new
+						// JOptionPane("The concept was sent to arena",
+						// JOptionPane.INFORMATION_MESSAGE);
+						// JDialog dialog = pane.createDialog(this,
+						// "Sent concept");
+						//
+						// dialog.setVisible(true);
+						// pane.setVisible(true);
+						// Thread.sleep(2000);
+						// dialog.setVisible(false);
+						// pane.setVisible(false);
+						// dialog.dispose();
+						// dialog=null;
+						// pane=null;
+
 					}
 					return;
 				}
@@ -823,7 +827,9 @@ public class WfInboxPanel extends JPanel {
 						inboxTreePanel1.itemUserAndStateChanged(oldWfInstance, newWfInstance);
 					} else {
 						try {
-							tagManager.sendToOutbox(TagManager.getTagWorklistConceptUuids(newWfInstance));
+							if (!newWfInstance.isCompleted() && newWfInstance.isActive()) {
+								tagManager.sendToOutbox(TagManager.getTagWorklistConceptUuids(newWfInstance));
+							}
 							EventMediator.getInstance().fireEvent(new ItemDestinationChangedEvent(newWfInstance));
 							inboxTreePanel1.itemStateChanged(oldWfInstance, newWfInstance);
 						} catch (IOException e) {
@@ -841,7 +847,10 @@ public class WfInboxPanel extends JPanel {
 						} catch (Exception e) {
 						}
 						if (!specialTag) {
-							model.removeRow(currentModelRowNum);
+							WfInstance efi = (WfInstance) model.getRow(currentModelRowNum)[InboxColumn.values().length];
+							if (model.getRowCount() > currentModelRowNum && efi.getComponentId().equals(oldWfInstance.getComponentId())) {
+								model.removeRow(currentModelRowNum);
+							}
 							if (inboxTable.getRowCount() > 0 && inboxTable.getRowCount() > currentItemViewIndex) {
 								inboxTable.setRowSelectionInterval(currentItemViewIndex, currentItemViewIndex);
 							} else if (inboxTable.getRowCount() <= currentItemViewIndex && inboxTable.getRowCount() > 0) {
@@ -856,7 +865,9 @@ public class WfInboxPanel extends JPanel {
 					break;
 				case OUTBOX:
 					try {
-						tagManager.sendToOutbox(TagManager.getTagWorklistConceptUuids((WfInstance) currentRow[InboxColumn.values().length]));
+						if (!newWfInstance.isCompleted() && newWfInstance.isActive()) {
+							tagManager.sendToOutbox(TagManager.getTagWorklistConceptUuids((WfInstance) currentRow[InboxColumn.values().length]));
+						}
 						EventMediator.getInstance().fireEvent(new ItemSentToSpecialFolderEvent(newWfInstance, oldWfInstance));
 						int currentItemViewIndex = 0;
 						try {
@@ -869,7 +880,10 @@ public class WfInboxPanel extends JPanel {
 										.contains(oldWfInstance.getComponentId().toString())) {
 							EventMediator.getInstance().fireEvent(new RestFromToDoEvent());
 						}
-						model.removeRow(currentModelRowNum);
+						WfInstance efi = (WfInstance) model.getRow(currentModelRowNum)[InboxColumn.values().length];
+						if (model.getRowCount() > currentModelRowNum && efi.getComponentId().equals(oldWfInstance.getComponentId())) {
+							model.removeRow(currentModelRowNum);
+						}
 						if (inboxTable.getRowCount() > 0 && inboxTable.getRowCount() > currentItemViewIndex) {
 							inboxTable.setRowSelectionInterval(currentItemViewIndex, currentItemViewIndex);
 						} else if (inboxTable.getRowCount() <= currentItemViewIndex && inboxTable.getRowCount() > 0) {
@@ -895,14 +909,19 @@ public class WfInboxPanel extends JPanel {
 			}
 		} else if (type.equals(ActionType.SEND_TO_OUTBOX_LAUNCHED)) {
 			try {
-				tagManager.sendToOutbox(TagManager.getTagWorklistConceptUuids((WfInstance) currentRow[InboxColumn.values().length]));
+				if (!newWfInstance.isCompleted() && newWfInstance.isActive()) {
+					tagManager.sendToOutbox(TagManager.getTagWorklistConceptUuids((WfInstance) currentRow[InboxColumn.values().length]));
+				}
 				EventMediator.getInstance().fireEvent(new ItemSentToSpecialFolderEvent(oldWfInstance, oldWfInstance));
 				int currentItemViewIndex = 0;
 				try {
 					currentItemViewIndex = inboxTable.convertRowIndexToView(currentModelRowNum);
 				} catch (Exception e) {
 				}
-				model.removeRow(currentModelRowNum);
+				WfInstance efi = (WfInstance) model.getRow(currentModelRowNum)[InboxColumn.values().length];
+				if (model.getRowCount() > currentModelRowNum && efi.getComponentId().equals(oldWfInstance.getComponentId())) {
+					model.removeRow(currentModelRowNum);
+				}
 				if (inboxTable.getRowCount() > 0 && inboxTable.getRowCount() > currentItemViewIndex) {
 					inboxTable.setRowSelectionInterval(currentItemViewIndex, currentItemViewIndex);
 				} else if (inboxTable.getRowCount() <= currentItemViewIndex && inboxTable.getRowCount() > 0) {
@@ -1402,7 +1421,7 @@ public class WfInboxPanel extends JPanel {
 							((GridBagLayout) panel3.getLayout()).rowHeights = new int[] { 0, 0, 0 };
 							((GridBagLayout) panel3.getLayout()).columnWeights = new double[] { 1.0, 1.0, 1.0, 1.0, 1.0, 1.0E-4 };
 							((GridBagLayout) panel3.getLayout()).rowWeights = new double[] { 0.0, 0.0, 1.0E-4 };
-							
+
 							lblDefaultDescription = new JLabel("Default description");
 							GridBagConstraints gbc_lblDefaultDescription = new GridBagConstraints();
 							gbc_lblDefaultDescription.insets = new Insets(0, 0, 5, 5);
@@ -1429,7 +1448,7 @@ public class WfInboxPanel extends JPanel {
 							label6.setText("Status");
 							panel3.add(label6, new GridBagConstraints(4, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH,
 									new Insets(0, 0, 5, 0), 0, 0));
-							
+
 							defaultDescText = new JTextField();
 							GridBagConstraints gbc_defaultDescText = new GridBagConstraints();
 							gbc_defaultDescText.insets = new Insets(0, 0, 0, 5);

@@ -211,8 +211,20 @@ public class BdbCommitManager {
                 
                 try {
                     checkRunner.latch.await();
+                    int errorCount = 0;
+                    int warningCount = 0;
+                    warningsAndErrors.addAll(checkRunner.get());
+                    for (AlertToDataConstraintFailure alert : warningsAndErrors) {
+                        if (alert.getAlertType().equals(ALERT_TYPE.ERROR)) {
+                            errorCount++;
+                        } else if (alert.getAlertType().equals(ALERT_TYPE.OMG)) {
+                            errorCount++;
+                        } else if (alert.getAlertType().equals(ALERT_TYPE.WARNING)) {
+                            warningCount++;
+                        }
+                    }
                 
-                    if(checkRunner.get().isEmpty()){
+                    if(checkRunner.get().isEmpty() || errorCount == 0){
                         ConceptTemplates.dataChecks.put(concept.getNid(), false);
                         Ts.get().touchComponentAlert(concept.getNid());
                     }else{
@@ -446,13 +458,6 @@ public class BdbCommitManager {
                                     checkRunner.latch.await();
 
                                     warningsAndErrors.addAll(checkRunner.get());
-                                    if (checkRunner.get().isEmpty()) {
-                                        ConceptTemplates.dataChecks.put(uncommittedCNidItr.nid(), false);
-                                        Ts.get().touchComponentAlert(uncommittedCNidItr.nid());
-                                    } else {
-                                        ConceptTemplates.dataChecks.put(uncommittedCNidItr.nid(), true);
-                                        Ts.get().touchComponentAlert(uncommittedCNidItr.nid());
-                                    }
                                     for (AlertToDataConstraintFailure alert : warningsAndErrors) {
                                         if (alert.getAlertType().equals(ALERT_TYPE.ERROR)) {
                                             errorCount++;
@@ -462,6 +467,15 @@ public class BdbCommitManager {
                                             warningCount++;
                                         }
                                     }
+                                    
+                                    if (checkRunner.get().isEmpty() || errorCount == 0) {
+                                        ConceptTemplates.dataChecks.put(uncommittedCNidItr.nid(), false);
+                                        Ts.get().touchComponentAlert(uncommittedCNidItr.nid());
+                                    } else {
+                                        ConceptTemplates.dataChecks.put(uncommittedCNidItr.nid(), true);
+                                        Ts.get().touchComponentAlert(uncommittedCNidItr.nid());
+                                    }
+                                    
                             }
                         }
                         if (errorCount + warningCount != 0) {
@@ -481,7 +495,8 @@ public class BdbCommitManager {
                                     int selection = JOptionPane.showConfirmDialog(new JFrame(),
                                             "Do you want to continue with commit?", "Warnings Detected",
                                             JOptionPane.YES_NO_OPTION);
-
+                                    if(selection == JOptionPane.YES_OPTION){
+                                    }
                                     performCommit = selection == JOptionPane.YES_OPTION;
                                 } else {
                                     try {
@@ -664,14 +679,6 @@ public class BdbCommitManager {
             latch.await();
             warningsAndErrors.addAll(checkRunner.get());
             
-            if(checkRunner.get().isEmpty()){
-                 ConceptTemplates.dataChecks.put(c.getNid(), false);
-                 Ts.get().touchComponentAlert(c.getNid());
-            }else{
-                 ConceptTemplates.dataChecks.put(c.getNid(), true);
-                 Ts.get().touchComponentAlert(c.getNid());
-            }
-
             for (AlertToDataConstraintFailure alert : warningsAndErrors) {
                 if (alert.getAlertType().equals(ALERT_TYPE.ERROR)) {
                     errorCount++;
@@ -681,6 +688,16 @@ public class BdbCommitManager {
                     warningCount++;
                 }
             }
+            
+            if(checkRunner.get().isEmpty() || errorCount == 0){
+                 ConceptTemplates.dataChecks.put(c.getNid(), false);
+                 Ts.get().touchComponentAlert(c.getNid());
+            }else{
+                ConceptTemplates.dataChecks.put(c.getNid(), true);
+                Ts.get().touchComponentAlert(c.getNid());
+            }
+
+            
             if (errorCount + warningCount != 0) {
                 if (errorCount > 0) {
                     performCommit = false;
@@ -830,11 +847,14 @@ public class BdbCommitManager {
 
                         aceInstance.getDataCheckListScroller();
                         aceInstance.getUncommittedListModel().clear();
-                        
-                        for (Collection<AlertToDataConstraintFailure> alerts : dataCheckMap.values()) {
-                            aceInstance.getUncommittedListModel().addAll(alerts);
+                        if(uncommittedCNids.cardinality() > 0){
+                            for (I_GetConceptData key : dataCheckMap.keySet()) {
+                                if(key.isUncommitted()){
+                                    aceInstance.getUncommittedListModel().addAll(dataCheckMap.get(key));
+                                }
+                            }
                         }
-
+                        
                         if (aceInstance.getUncommittedListModel().size() > 0) {
                             for (int i = 0; i < aceInstance.getLeftTabs().getTabCount(); i++) {
                                 if (aceInstance.getLeftTabs().getTitleAt(i).equals(ACE.DATA_CHECK_TAB_LABEL)) {
@@ -1408,8 +1428,19 @@ public class BdbCommitManager {
                     DataCheckRunner checkRunner = DataCheckRunner.runDataChecks(toTest, commitTests);
 
                     checkRunner.latch.await();
-                    
-                    if(checkRunner.get().isEmpty()){
+                    int errorCount = 0;
+                    int warningCount = 0;
+                    warningsAndErrors.addAll(checkRunner.get());
+                    for (AlertToDataConstraintFailure alert : warningsAndErrors) {
+                        if (alert.getAlertType().equals(ALERT_TYPE.ERROR)) {
+                            errorCount++;
+                        } else if (alert.getAlertType().equals(ALERT_TYPE.OMG)) {
+                            errorCount++;
+                        } else if (alert.getAlertType().equals(ALERT_TYPE.WARNING)) {
+                            warningCount++;
+                        }
+                    }
+                    if(checkRunner.get().isEmpty() || errorCount == 0){
                         ConceptTemplates.dataChecks.put(cNidItr.nid(), false);
                         Ts.get().touchComponentAlert(cNidItr.nid());
                     }else{

@@ -81,6 +81,12 @@ public class BdbTermBuilder implements TerminologyBuilderBI {
         if(Ts.get().getConcept(annot.getRefexNid()).isAnnotationStyleRefex() 
                 && annot.getReferencedComponentNid() != Integer.MAX_VALUE){
             ComponentChronicleBI<?> component = Ts.get().getComponent(annot.getReferencedComponentNid());
+            if(component == null){
+                System.out.println("### DIAGNOSTIC: component was null. Nid: "  + annot.getReferencedComponentNid());
+                System.out.println("For annotation: " + annot.toString());
+                System.out.println("For blueprint: " + blueprint.toString());
+                throw new InvalidCAB("Referenced component is null. Please see log for diagnostic details and create a tracker.");
+            }
             component.addAnnotation(annot);
             if(annot.getReferencedComponentNid() ==
                     Ts.get().getConceptNidForNid(annot.getReferencedComponentNid())){

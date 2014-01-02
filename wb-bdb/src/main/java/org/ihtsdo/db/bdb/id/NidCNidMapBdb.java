@@ -573,6 +573,10 @@ public class NidCNidMapBdb extends ComponentBdb {
             return false;
         }
         IndexCacheRecord indexCacheRecord = getIndexCacheRecord(childNid);
+        if (vc.getPositionSet().isEmpty()) {
+            throw new UnsupportedOperationException(
+                    "No view position selected.");
+        }
         Iterator<PositionBI> viewPositionItr = vc.getPositionSet().iterator();
         PositionBI position = viewPositionItr.next();
 
@@ -580,9 +584,7 @@ public class NidCNidMapBdb extends ComponentBdb {
             throw new UnsupportedOperationException(
                     "Can only determine is kind of with a single view position. " + vc);
         }
-
         RelativePositionComputerBI computer = RelativePositionComputer.getComputer(position);
-
         return indexCacheRecord.isChildOf(parentNid, vc, computer);
     }
 
@@ -594,7 +596,12 @@ public class NidCNidMapBdb extends ComponentBdb {
         IndexCacheRecord indexCacheRecord = getIndexCacheRecord(childNid);
         Iterator<PositionBI> viewPositionItr = vc.getPositionSet().iterator();
         PositionBI position = viewPositionItr.next();
-
+        
+        if (vc.getPositionSet().isEmpty()) {
+            throw new UnsupportedOperationException(
+                    "No view position selected.");
+        }
+        
         if (viewPositionItr.hasNext()) {
             throw new UnsupportedOperationException(
                     "Can only determine is kind of with a single view position. " + vc);

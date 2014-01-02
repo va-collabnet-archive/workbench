@@ -23,6 +23,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.ihtsdo.concept.Concept;
 import org.ihtsdo.helper.version.RelativePositionComputerBI;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ContradictionException;
@@ -332,4 +335,22 @@ public class RelationshipIndexRecord implements Iterable<RelationshipIndexRecord
          return false;
       }
    }
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        try {
+            sb.append("  ").append(Concept.get(getTypeNid()).toString()).append(" [").
+                    append(getTypeNid()).append("]: ").
+                    append(Concept.get(getDestinationNid()).toString()).append(" [").
+                    append(getDestinationNid()).append("]\n");
+            for (RelationshipIndexVersion version : getVersions()) {
+                sb.append("            VERSION: ");
+                sb.append(Concept.get(version.getCharacteristicNid()).toString()).append(" ").
+                        append(version.stamp).append(" \n");
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(IndexCacheRecord.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return sb.toString();
+    }
 }

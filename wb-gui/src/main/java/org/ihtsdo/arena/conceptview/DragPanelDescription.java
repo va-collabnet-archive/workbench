@@ -16,6 +16,7 @@ import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 //~--- JDK imports ------------------------------------------------------------
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.LayoutManager;
@@ -27,7 +28,6 @@ import java.io.IOException;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Random;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -35,6 +35,7 @@ import javax.swing.JLabel;
 import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
 import javax.swing.TransferHandler;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.ihtsdo.arena.editor.ArenaEditor;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
@@ -47,6 +48,7 @@ public class DragPanelDescription extends DragPanelComponentVersion<DescriptionA
      */
     private static final long serialVersionUID = 1L;
     private ConceptViewLayout viewLayout;
+    private FixedWidthJEditorPane textPane;
 
     //~--- constructors --------------------------------------------------------
     public DragPanelDescription(ConceptViewLayout viewLayout, CollapsePanel parentCollapsePanel,
@@ -69,7 +71,7 @@ public class DragPanelDescription extends DragPanelComponentVersion<DescriptionA
     private void layoutDescription() throws TerminologyException, IOException {
         boolean canDrop = false;
 
-        if (!ArenaEditor.diffColor.isEmpty()){
+        if (!ArenaEditor.diffColor.isEmpty() && viewLayout.getSettings().isForPromotion()){
             if(ArenaEditor.diffColor.containsKey(getThingToDrag().getNid())){
                 Color color = ArenaEditor.diffColor.get(getThingToDrag().getNid());
                 setBackground(color);
@@ -96,6 +98,8 @@ public class DragPanelDescription extends DragPanelComponentVersion<DescriptionA
         }
 
         descLabel.setOpaque(true);
+        descLabel.setMinimumSize(new Dimension(20, 28));
+        descLabel.setPreferredSize(new Dimension(20, 28));
         setDropPopupInset(descLabel.getPreferredSize().width);
 
         GridBagConstraints gbc = new GridBagConstraints();
@@ -159,12 +163,16 @@ public class DragPanelDescription extends DragPanelComponentVersion<DescriptionA
         gbc.weightx = 1;
         gbc.gridx++;
 
-        FixedWidthJEditorPane textPane = new FixedWidthJEditorPane();
+        textPane = new FixedWidthJEditorPane();
 
         textPane.setEditable(canDrop);
         textPane.setOpaque(false);
         textPane.setFont(textPane.getFont().deriveFont(getSettings().getFontSize()));
-        textPane.setText(getDesc().getText());
+        textPane.setText(StringEscapeUtils.escapeHtml(getDesc().getText()));
+        textPane.setToolTipText(textPane.extractText());
+        if(canDrop && viewLayout.cView.focus){
+            textPane.selectAll();
+        }
         add(textPane, gbc);
         gbc.weightx = 0;
         gbc.gridx++;
@@ -274,6 +282,10 @@ public class DragPanelDescription extends DragPanelComponentVersion<DescriptionA
         return DragPanelDataFlavors.descVersionFlavor;
     }
 
+    public FixedWidthJEditorPane getTextPane() {
+        return textPane;
+    }
+    
     @Override
     public Collection<DragPanelComponentVersion<DescriptionAnalogBI>> getOtherVersionPanels()
             throws IOException, TerminologyException {

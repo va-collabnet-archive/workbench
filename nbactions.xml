@@ -14,6 +14,7 @@
             <goals>
                 <goal>clean</goal>
                 <goal>install</goal>
+                <goal>-e</goal>
             </goals>
             <properties>
                 <Env.MAVEN_OPTS>-ea -XX:MaxPermSize=256M -d64 -XX:+UseCompressedOops -Xmx4g -Xms2g</Env.MAVEN_OPTS>
@@ -24,6 +25,18 @@
             <reactor>also-make</reactor>
             <goals>
                 <goal>install</goal>
+            </goals>
+            <properties>
+                <Env.MAVEN_OPTS>-ea -XX:MaxPermSize=256M -d64 -XX:+UseCompressedOops -Xmx4g -Xms2g</Env.MAVEN_OPTS>
+            </properties>
+        </action>
+        <action>
+            <actionName>CUSTOM-offline</actionName>
+            <displayName>offline</displayName>
+            <goals>
+                <goal>clean</goal>
+                <goal>install</goal>
+                <goal>-o</goal>
             </goals>
             <properties>
                 <Env.MAVEN_OPTS>-ea -XX:MaxPermSize=256M -d64 -XX:+UseCompressedOops -Xmx4g -Xms2g</Env.MAVEN_OPTS>

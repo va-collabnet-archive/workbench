@@ -75,6 +75,7 @@ import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
@@ -104,6 +105,7 @@ public class QueueViewerPanel extends JPanel {
     JSplitPane                           splitPane              = new JSplitPane();
     JSplitPane                           queueContentsSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
     private JButton                      execute                = new JButton("execute");
+    private JButton                      delete                = new JButton("delete");
     private JButton                      refresh                = new JButton("<html><font color='#006400'>refresh");
     private JLabel                       statusMessage          = new JLabel();
     private I_Work                       worker;
@@ -114,12 +116,14 @@ public class QueueViewerPanel extends JPanel {
     QueueTableModel                      tableOfQueueEntriesModel;
     JTable                               tableOfQueueEntries;
     private ExecuteProcessActionListener executeActionListener;
+    private DeleteProcessActionListener deleteActionListener;
     private I_QueueProcesses             selectedQueue;
 
     public QueueViewerPanel(I_Work worker) throws Exception {
         super(new GridBagLayout());
         this.worker = worker;
         this.worker.addPropertyChangeListener("executing", new ExecutionPropertyChangeListener());
+        this.worker.addPropertyChangeListener("executing", new DeletePropertyChangeListener());
         this.splitPane.setLeftComponent(createTableOfQueues());
         this.splitPane.setRightComponent(this.queueContentsSplitPane);
         this.splitPane.setDividerLocation(250);
@@ -143,8 +147,11 @@ public class QueueViewerPanel extends JPanel {
         this.execute.setEnabled(false);
         this.executeActionListener = new ExecuteProcessActionListener(UUID.randomUUID(), worker);
         this.execute.addActionListener(executeActionListener);
+        this.delete.setEnabled(false);
+        this.deleteActionListener = new DeleteProcessActionListener(worker);
+        this.delete.addActionListener(deleteActionListener);
 
-        JPanel statusPanel = makeStatusPanel(this.statusMessage, refresh, execute);
+        JPanel statusPanel = makeStatusPanel(this.statusMessage, refresh, execute, delete);
 
         c.weighty = 0;
         c.gridy   = 1;
@@ -165,8 +172,20 @@ public class QueueViewerPanel extends JPanel {
             }
         }
     }
+    
+    private void setupDeleteButton() {
+        if (worker.isExecuting()) {
+            delete.setText("delete");
+            delete.setEnabled(false);
+        } else {
+            if (process != null) {
+                delete.setText("<html><font color='#006400'>delete");
+                delete.setEnabled(true);
+            }
+        }
+    }
 
-    private JPanel makeStatusPanel(JLabel statusMessage, JButton refresh, JButton execute) {
+    private JPanel makeStatusPanel(JLabel statusMessage, JButton refresh, JButton execute, JButton delete) {
         JPanel             panel = new JPanel(new GridBagLayout());
         GridBagConstraints c     = new GridBagConstraints();
 
@@ -175,10 +194,12 @@ public class QueueViewerPanel extends JPanel {
         c.weightx = 0;
         c.weighty = 0;
         c.gridy   = 0;
-        c.gridx   = 6;
+        c.gridx   = 7;
         panel.add(new JLabel("    "), c);    // filler for grow box.
-        c.gridx = 5;
+        c.gridx = 6;
         panel.add(refresh, c);
+        c.gridx = 5;
+        panel.add(delete, c);
         c.gridx = 4;
         panel.add(execute, c);
         c.gridx   = 3;
@@ -553,6 +574,7 @@ public class QueueViewerPanel extends JPanel {
                         @Override
                         public void run() {
                             setupExecuteButton();
+                            setupDeleteButton();
 
                             if (exceptionMessage.equals("")) {
                                 statusMessage.setText("<html><font color='blue'>Process complete");
@@ -583,16 +605,109 @@ public class QueueViewerPanel extends JPanel {
             new Thread(r, this.getClass().getCanonicalName()).start();
         }
     }
-
-
+    
+    
     private class ExecutionPropertyChangeListener implements PropertyChangeListener {
         @Override
         public void propertyChange(PropertyChangeEvent evt) {
             setupExecuteButton();
         }
     }
+    
+    private class DeletePropertyChangeListener implements PropertyChangeListener {
 
+        @Override
+        public void propertyChange(PropertyChangeEvent evt) {
+            setupDeleteButton();
+        }
+    }
 
+    private class DeleteProcessActionListener implements ActionListener {
+
+        String exceptionMessage = "";
+        List<I_Work> cloneList = new ArrayList<>();
+        @SuppressWarnings("unused")
+        UUID id;
+        I_Work worker;
+        boolean indexOutOfBoundsExceptionThrown;
+
+        /**
+         * @param config
+         * @param id
+         * @param worker
+         * @param frames
+         */
+        public DeleteProcessActionListener(I_Work worker) {
+            super();
+            this.id = id;
+            this.worker = worker;
+        }
+
+        /**
+         * @see
+         * java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+         */
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            
+            int option = JOptionPane.showConfirmDialog(queueContentsSplitPane, "Are you sure you want to delete this item from the inbox?", "Delete?", JOptionPane.YES_NO_OPTION);
+
+            switch (option) {
+                case JOptionPane.YES_OPTION:
+                    delete.setText("delete");
+                    delete.setEnabled(false);
+                    indexOutOfBoundsExceptionThrown = false;
+                    ListSelectionModel lsm = tableOfQueueEntries.getSelectionModel();
+                    int firstSelectedRow = lsm.getMinSelectionIndex();
+                    int lastSelectedRow = lsm.getMaxSelectionIndex();
+
+                    if (logger.isLoggable(Level.FINE)) {
+                        logger.log(Level.FINE, "firstSelectedRow: {0} lastSelectedRow: {1}",
+                                new Object[]{firstSelectedRow,
+                            lastSelectedRow});
+                    }
+
+                    List<I_DescribeQueueEntry> selectedProcesses = new ArrayList<>();
+                    for (int i = firstSelectedRow; i <= lastSelectedRow; i++) {
+                        if (lsm.isSelectedIndex(i)) {
+                            try {
+                                I_DescribeQueueEntry processMeta = tableOfQueueEntriesModel.getRowMetaData(i);
+
+                                selectedProcesses.add(processMeta);
+
+                                if (logger.isLoggable(Level.FINE)) {
+                                    logger.log(Level.FINE, "selectedProcesses: {0}", processMeta);
+                                }
+                            } catch (IndexOutOfBoundsException ex) {
+                                logger.log(Level.WARNING, ex.toString(), ex);
+                                indexOutOfBoundsExceptionThrown = true;
+                            }
+                        }
+                    }
+
+                    Iterator<I_DescribeQueueEntry> selectionItr = selectedProcesses.iterator();
+
+                    while (selectionItr.hasNext()) {
+                        I_DescribeQueueEntry processMeta = selectionItr.next();
+
+                        try {
+                            tableOfQueueEntriesModel.getQueue().delete(processMeta.getEntryID(),
+                                    worker.getActiveTransaction());
+
+                        } catch (Throwable e1) {
+                            logger.log(Level.WARNING, e1.toString(), e1);
+                            exceptionMessage = e1.toString();
+                        }
+                    }
+                    refresh.doClick();
+                    lsm.setSelectionInterval(0, 0);
+                    break;
+                case JOptionPane.NO_OPTION:
+                    return;
+            }
+        }
+    }
+    
     public class MoveToDiskActionListener implements ActionListener {
 
         /**
@@ -682,6 +797,7 @@ public class QueueViewerPanel extends JPanel {
                             @Override
                             public void run() {
                                 setupExecuteButton();
+                                setupDeleteButton();
                                 statusMessage.setText("<html><font color='blue'>Take complete");
                                 refresh.doClick();
                             }
@@ -748,6 +864,7 @@ public class QueueViewerPanel extends JPanel {
                                     queueContentsSplitPane.setBottomComponent(new JScrollPane(processPanel));
                                     queueContentsSplitPane.setDividerLocation(dividerLoc);
                                     setupExecuteButton();
+                                    setupDeleteButton();
                                 } catch (NoMatchingEntryException ex) {
                                     logger.log(Level.INFO, " NoMatchingEntry: {0}", ex);
                                     lsm.clearSelection();

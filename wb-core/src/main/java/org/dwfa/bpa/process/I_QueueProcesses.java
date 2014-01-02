@@ -66,6 +66,8 @@ public interface I_QueueProcesses {
      */
     public I_EncodeBusinessProcess take(ProcessID processID, Transaction t) throws IOException,
             ClassNotFoundException, NoMatchingEntryException;
+    
+    public void delete(EntryID entryID, Transaction t) throws NoMatchingEntryException;
 
     /**
      * Takes the first process (as ordered by the Queue's native ordering) that

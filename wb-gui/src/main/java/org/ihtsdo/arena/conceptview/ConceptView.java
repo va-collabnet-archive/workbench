@@ -94,6 +94,7 @@ public class ConceptView extends JPanel {
     private Object lastThingBeingDropped;
     private ConceptViewSettings settings;
     private CVChangeListener cvChangeListener = new CVChangeListener();
+    public boolean focus = true;
 
     protected void redoConceptViewLayout() throws IOException {
         if (concept != null) {
@@ -408,6 +409,7 @@ public class ConceptView extends JPanel {
                 globals.put("actions", actions);
                 globals.put("vc", config.getViewCoordinate());
                 globals.put("config", config);
+                globals.put("cvSettings", getSettings());
 
                 View viewType;
 

@@ -261,8 +261,8 @@ public class ExportWorkflowHistoryAsEConcept extends AbstractMojo {
 	private String toXml(String[] row, long effectiveTimestamp) throws IOException, TerminologyException
 	{
 		try 
-		{
-			UUID modeler = lookupModeler(row[WorkflowHelper.modelerPosition]);
+		{	
+                    UUID modeler = lookupModeler(row[WorkflowHelper.modelerPosition]);
 			UUID action = lookupAction(row[WorkflowHelper.actionPosition]);
 			UUID state = lookupState(row[WorkflowHelper.statePosition]);
 
@@ -432,6 +432,14 @@ public class ExportWorkflowHistoryAsEConcept extends AbstractMojo {
     		return ArchitectonicAuxiliary.Concept.JANE_HOWARTH.getPrimoridalUid();
     	}else if (modeler.equalsIgnoreCase("pamos")) {
     		return ArchitectonicAuxiliary.Concept.PAUL_AMOS.getPrimoridalUid();
+    	}else if (modeler.equalsIgnoreCase("ysgao")) {
+    		return ArchitectonicAuxiliary.Concept.YONG_SHENG_GAO.getPrimoridalUid();
+    	}else if (modeler.equalsIgnoreCase("mbraithwaite")) {
+    		return ArchitectonicAuxiliary.Concept.MARIA_BRAITHWAITE.getPrimoridalUid();
+    	}else if (modeler.equalsIgnoreCase("mharry")) {
+    		return ArchitectonicAuxiliary.Concept.MONICA_HARRY.getPrimoridalUid();
+    	}else if (modeler.equalsIgnoreCase("kcampbell")) {
+    		return ArchitectonicAuxiliary.Concept.KEITH_CAMPBELL.getPrimoridalUid();
     	}
     	
     	return null;

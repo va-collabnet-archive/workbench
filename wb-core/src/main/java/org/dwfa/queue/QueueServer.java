@@ -70,7 +70,12 @@ public class QueueServer extends ObjectServerCore<I_DescribeBusinessProcess>
             ClassNotFoundException, NoMatchingEntryException {
         return (I_EncodeBusinessProcess) super.take(entryID, t);
     }
-
+    
+    @Override
+    public void delete(EntryID entryID, Transaction t) throws NoMatchingEntryException {
+        super.delete(entryID, t);
+    }
+    
     @Override
     public I_EncodeBusinessProcess take(ProcessID processID, Transaction t) throws IOException,
             ClassNotFoundException, NoMatchingEntryException {

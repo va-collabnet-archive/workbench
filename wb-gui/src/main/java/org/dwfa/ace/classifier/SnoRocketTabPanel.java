@@ -15,7 +15,6 @@ import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
-import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
@@ -39,7 +38,7 @@ public class SnoRocketTabPanel extends JPanel implements ActionListener {
             // TODO Auto-generated method stub
             if (SnoQuery.isDirty()) {
                 // DIFFS JPANEL
-                diffPathJPanel.update();
+                diffReportJPanel.update();
 
                 // EQUIVALENTS JPANEL
                 equivJPanel.update();
@@ -64,7 +63,7 @@ public class SnoRocketTabPanel extends JPanel implements ActionListener {
     private boolean viewPathTF = false;
 
     // ** GUI **
-    private DiffPathPanel diffPathJPanel;
+    private DiffReportPanel diffReportJPanel;
     private EquivPanel equivJPanel;
     private DLPanel logicJPanel;
     private ViewPathPanel viewPathJPanel;
@@ -92,10 +91,10 @@ public class SnoRocketTabPanel extends JPanel implements ActionListener {
         // tabbedPane.setMinimumSize(new Dimension(0, 0));
 
         // ADD DIFF VIEW
-        diffPathJPanel = new DiffPathPanel(config);
-        diffPathJPanel.setBorder(BorderFactory.createTitledBorder(TAB_DIFF + ": "));
+        diffReportJPanel = new DiffReportPanel(config);
+        diffReportJPanel.setBorder(BorderFactory.createTitledBorder(TAB_DIFF + ": "));
         String tip = "All differences between the current and previous run of the Classifer.";
-        tabbedPane.addTab(TAB_DIFF, null, diffPathJPanel, tip);
+        tabbedPane.addTab(TAB_DIFF, null, diffReportJPanel, tip);
 
         // ADD EQUIVALENCE VIEW
         equivJPanel = new EquivPanel(config);
@@ -149,7 +148,7 @@ public class SnoRocketTabPanel extends JPanel implements ActionListener {
     public void updateSubPanels() throws IOException {
 
         // DIFFS JPANEL
-        diffPathJPanel.update();
+        diffReportJPanel.update();
 
         // EQUIVALENTS JPANEL
         equivJPanel.update();
@@ -197,7 +196,7 @@ public class SnoRocketTabPanel extends JPanel implements ActionListener {
             I_GetConceptData cClassPathObj = config.getClassifierOutputPath();
             if (cClassPathObj != null) {
                 PathBI cClassIPath = tf.getPath(cClassPathObj.getUids());
-                cClassPositionBIList = new ArrayList<PositionBI>();
+                cClassPositionBIList = new ArrayList<>();
                 cClassPositionBIList.add(new Position(Long.MAX_VALUE, cClassIPath));
                 addPathOrigins(cClassPositionBIList, cClassIPath);
             } else {
@@ -209,17 +208,15 @@ public class SnoRocketTabPanel extends JPanel implements ActionListener {
                             + config.getViewPositionSet();
                     AceLog.getAppLog().alertAndLog(Level.SEVERE, errStr, new Exception(errStr));
                 } else {
-                    cClassPositionBIList = new ArrayList<PositionBI>();
+                    cClassPositionBIList = new ArrayList<>();
                     cClassPositionBIList.add(config.getViewPositionSet().iterator().next());
                 }
             }
 
             SnoAB.posList = cClassPositionBIList;
-            SnoAB.snorocketAuthorNid = tf.uuidToNative(ArchitectonicAuxiliary.Concept.USER.SNOROCKET
+            SnoAB.snorocketAuthorNid = tf.uuidToNative(ArchitectonicAuxiliary.Concept.SNOROCKET
                     .getUids());
-        } catch (TerminologyException e) {
-            AceLog.getAppLog().alertAndLogException(e);
-        } catch (IOException e) {
+        } catch (TerminologyException | IOException e) {
             AceLog.getAppLog().alertAndLogException(e);
         }
     }

@@ -31,6 +31,7 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.id.Type5UuidFactory;
+import org.ihtsdo.tk.Ts;
 
 /**
  * Goal which converts a refset concept in la language refste concept adding promotion refset,
@@ -104,9 +105,14 @@ public class ConvertConceptInLanguageRefset extends AbstractMojo {
 
 				String name = membershipConcept.toString(); 
 
-				I_GetConceptData newCommentsConcept = tf.newConcept(
+				I_GetConceptData newCommentsConcept = null;
+                                if(Ts.get().hasUuid(Type5UuidFactory.get(name  + " - comments refset - for UUID generation"))){
+                                    newCommentsConcept = (I_GetConceptData) Ts.get().getConcept(Type5UuidFactory.get(name  + " - comments refset - for UUID generation"));
+                                }else{
+                                    newCommentsConcept = tf.newConcept(
                                         Type5UuidFactory.get(name  + " - comments refset - for UUID generation"), 
                                         false, config);
+                                }
 				tf.newDescription(UUID.randomUUID(), newCommentsConcept, "en",
 						name + " - comments refset", 
 						tf.getConcept(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.localize().getNid())
@@ -119,10 +125,16 @@ public class ConvertConceptInLanguageRefset extends AbstractMojo {
 						current, 0, config);
 				I_RelVersioned r1 = tf.newRelationship(UUID.randomUUID(), membershipConcept, commentsRelConcept, newCommentsConcept, defining, refinability, 
 						current, 0, config);
-
-				I_GetConceptData newPromotionConcept = tf.newConcept(
+                                
+                                I_GetConceptData newPromotionConcept = null;
+                                if(Ts.get().hasUuid(Type5UuidFactory.get(name  + " - promotion refset - for UUID generation"))){
+                                    newPromotionConcept = (I_GetConceptData) Ts.get().getConcept(Type5UuidFactory.get(name  + " - promotion refset - for UUID generation"));
+                                }else{
+                                    newPromotionConcept = tf.newConcept(
                                         Type5UuidFactory.get(name  + " - promotion refset - for UUID generation")
                                         , false, config);
+                                }
+                                
 				newPromotionConcept.setAnnotationStyleRefex(true);
 				tf.newDescription(UUID.randomUUID(), newPromotionConcept, "en",
 						name + " - promotion refset", 

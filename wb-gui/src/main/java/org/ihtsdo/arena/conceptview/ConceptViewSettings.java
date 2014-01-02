@@ -45,6 +45,8 @@ import org.ihtsdo.arena.ArenaComponentSettings;
 import org.ihtsdo.arena.PreferencesNode;
 import org.ihtsdo.arena.contradiction.ContradictionConfig;
 import org.ihtsdo.arena.promotion.PromotionConfig;
+import org.ihtsdo.arena.promotion.PromotionSourceConfig;
+import org.ihtsdo.arena.promotion.PromotionTargetConfig;
 import org.ihtsdo.taxonomy.TaxonomyHelper;
 import org.ihtsdo.taxonomy.TaxonomyMouseListener;
 import org.ihtsdo.taxonomy.TaxonomyTree;
@@ -52,6 +54,7 @@ import org.ihtsdo.taxonomy.path.PathExpander;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.RelAssertionType;
+import static org.ihtsdo.tk.api.RelAssertionType.SHORT_NORMAL_FORM;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.description.DescriptionChronicleBI;
@@ -72,7 +75,8 @@ public class ConceptViewSettings extends ArenaComponentSettings {
 	private static ImageIcon statedView = new ImageIcon(ConceptViewRenderer.class.getResource("/16x16/plain/graph_edge.png"));
 	private static ImageIcon inferredView = new ImageIcon(ConceptViewRenderer.class.getResource("/16x16/plain/chrystal_ball.png"));
 	private static ImageIcon inferredAndStatedView = new ImageIcon(ConceptViewRenderer.class.getResource("/16x16/plain/inferred-then-stated.png"));
-        private static ImageIcon shortNormalView = new ImageIcon(ConceptViewRenderer.class.getResource("/16x16/plain/pin_green.png"));
+        private static ImageIcon shortNormalView = new ImageIcon(ConceptViewRenderer.class.getResource("/16x16/plain/pencil--minus.png"));
+        private static ImageIcon longNormalView = new ImageIcon(ConceptViewRenderer.class.getResource("/16x16/plain/pencil--plus.png"));
 	public static HashMap<Integer, Set<WeakReference>> arenaPanelMap = new HashMap<>();
 	// ~--- fields
 	// --------------------------------------------------------------
@@ -222,7 +226,8 @@ public class ConceptViewSettings extends ArenaComponentSettings {
 				view.getSettings().setForAdjudication(true);
 			}
                         
-                        if (config instanceof PromotionConfig) {
+                        if (config instanceof PromotionConfig || config instanceof PromotionSourceConfig
+                                || config instanceof PromotionTargetConfig) {
 				view.getSettings().setForPromotion(true);
 			}
 
@@ -737,11 +742,18 @@ public class ConceptViewSettings extends ArenaComponentSettings {
 				case INFERRED_THEN_STATED:
 					relAssertionType = RelAssertionType.SHORT_NORMAL_FORM;
 					button.setIcon(shortNormalView);
-					button.setToolTipText("showing short normal form, toggle to show stated...");
+					button.setToolTipText("showing short normal form, toggle to show long nomal form...");
 					fireConceptChanged();
 
 					break;
                                 case SHORT_NORMAL_FORM:
+					relAssertionType = RelAssertionType.LONG_NORMAL_FORM;
+					button.setIcon(longNormalView);
+					button.setToolTipText("showing long normal form, toggle to show stated...");
+					fireConceptChanged();
+
+					break;
+                                case LONG_NORMAL_FORM:
 					relAssertionType = RelAssertionType.STATED;
 					button.setIcon(statedView);
 					button.setToolTipText("showing stated, toggle to show inferred...");

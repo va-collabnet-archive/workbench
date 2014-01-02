@@ -15,6 +15,7 @@ import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 //~--- JDK imports ------------------------------------------------------------
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.LayoutManager;
@@ -34,9 +35,12 @@ import javax.swing.JLabel;
 import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
 import javax.swing.TransferHandler;
+import javax.swing.border.Border;
+import javax.swing.border.CompoundBorder;
 import org.ihtsdo.arena.editor.ArenaEditor;
 import org.ihtsdo.tk.Ts;
-import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
+import org.ihtsdo.tk.api.ContradictionException;
+import org.ihtsdo.tk.api.conceptattribute.ConceptAttributeVersionBI;
 
 public class DragPanelRel extends DragPanelComponentVersion<RelationshipVersionBI> {
 
@@ -50,30 +54,40 @@ public class DragPanelRel extends DragPanelComponentVersion<RelationshipVersionB
    private boolean inferred;
    ImageIcon       inferredIcon;
    private JLabel  relLabel;
+   private ConceptViewLayout cvLayout;
+   private static ImageIcon definedIcon =
+      new ImageIcon(DragPanelRel.class.getResource("/16x16/plain/taxonomy/defined-single-parent.png"));
+   private static ImageIcon primitiveIcon =
+      new ImageIcon(DragPanelRel.class.getResource("/16x16/plain/taxonomy/primitive-single-parent.png"));
+   private static ImageIcon dupIcon =
+      new ImageIcon(DragPanelRel.class.getResource("/16x16/plain/text_sum.png"));
+   private JLabel dupLabel = new JLabel(dupIcon);
 
    //~--- constructors --------------------------------------------------------
 
    public DragPanelRel(ConceptViewLayout viewLayout, CollapsePanel parentCollapsePanel,
                        RelationshipVersionBI rel, boolean inferred)
-           throws TerminologyException, IOException {
+           throws TerminologyException, IOException, ContradictionException {
       super(viewLayout, parentCollapsePanel, rel);
+      this.cvLayout = viewLayout;
       layoutRel();
    }
 
    public DragPanelRel(LayoutManager layout, ConceptViewLayout viewLayout, CollapsePanel parentCollapsePanel,
                        RelationshipVersionBI rel, boolean inferred)
-           throws TerminologyException, IOException {
+           throws TerminologyException, IOException, ContradictionException {
       super(layout, viewLayout, parentCollapsePanel, rel);
       this.inferred = inferred;
+      this.cvLayout = viewLayout;
       layoutRel();
    }
 
    //~--- methods -------------------------------------------------------------
 
-   private void layoutRel() throws TerminologyException, IOException {
+   private void layoutRel() throws TerminologyException, IOException, ContradictionException {
       boolean canDrop = false;
       
-      if (!ArenaEditor.diffColor.isEmpty()){
+      if (!ArenaEditor.diffColor.isEmpty() && viewLayout.getSettings().isForPromotion()){
             if(ArenaEditor.diffColor.containsKey(getThingToDrag().getNid())){
                 Color color = ArenaEditor.diffColor.get(getThingToDrag().getNid());
                 setBackground(color);
@@ -86,12 +100,29 @@ public class DragPanelRel extends DragPanelComponentVersion<RelationshipVersionB
          setBackground(Color.YELLOW);
          canDrop = true;
       }
+      
+      ConceptAttributeVersionBI conceptAttributesActive = Ts.get().getConceptVersion(cvLayout.getSettings().getConfig().getViewCoordinate(), getRel().getTargetNid()).getConceptAttributesActive();
+       if (conceptAttributesActive != null) {
+           if (Ts.get().getConceptVersion(cvLayout.getSettings().getConfig().getViewCoordinate(), getRel().getTargetNid()).getConceptAttributesActive().isDefined()) {
+               relLabel = new JLabel(definedIcon);
+           } else {
+               relLabel = new JLabel(primitiveIcon);
+           }
+       }else{
+           relLabel = new JLabel(" ");
+       }
 
       setupDrag(getRel());
       setBorder(BorderFactory.createRaisedBevelBorder());
-      relLabel = getJLabel(" ");
+       //      relLabel = getJLabel(" ");
+      Border inside = BorderFactory.createEmptyBorder();
+      Border outside = BorderFactory.createEmptyBorder(4, 2, 4, 2);
+      CompoundBorder border = BorderFactory.createCompoundBorder(outside, inside);
       relLabel.setBackground(Color.BLUE);
       relLabel.setOpaque(true);
+      relLabel.setBorder(border);
+      relLabel.setMinimumSize(new Dimension(20, 28));
+      relLabel.setPreferredSize(new Dimension(20, 28));
       setDropPopupInset(relLabel.getPreferredSize().width);
 
       GridBagConstraints gbc = new GridBagConstraints();
@@ -107,13 +138,17 @@ public class DragPanelRel extends DragPanelComponentVersion<RelationshipVersionB
       add(relLabel, gbc);
       gbc.gridx++;
       
+       
       if (!getThingToDrag().isActive(getSettings().getConfig().getAllowedStatus())) {
          add(new JLabel(getGhostIcon()), gbc);
          gbc.gridx++;
       }
-
+      
       add(conflictLabel, gbc);
       conflictLabel.setVisible(false);
+      gbc.gridx++;
+      add(dupLabel, gbc);
+      dupLabel.setVisible(false);
       gbc.gridx++;
       gbc.weightx = 1;
       gbc.gridx++;
@@ -239,7 +274,12 @@ public class DragPanelRel extends DragPanelComponentVersion<RelationshipVersionB
          }
 
          if (!thingToDrag.equals(dav)) {
-            DragPanelRel dpd = new DragPanelRel(new GridBagLayout(), viewLayout, null, dav, inferred);
+            DragPanelRel dpd;
+             try {
+                 dpd = new DragPanelRel(new GridBagLayout(), viewLayout, null, dav, inferred);
+             } catch (ContradictionException ex) {
+                 throw new TerminologyException(ex);
+             }
 
             dpd.setInactiveBackground();
             panelList.add(dpd);
@@ -282,5 +322,9 @@ public class DragPanelRel extends DragPanelComponentVersion<RelationshipVersionB
 
    private void setInactiveBackground() {
       relLabel.setBackground(relLabel.getBackground().darker());
+   }
+   
+   protected void setInheritedDuplicate(){
+       dupLabel.setVisible(true);
    }
 }
