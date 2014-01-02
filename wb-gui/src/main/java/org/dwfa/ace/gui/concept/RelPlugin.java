@@ -187,6 +187,7 @@ public abstract class RelPlugin extends AbstractPlugin implements TableModelList
             c.anchor = GridBagConstraints.NORTH;
         }
         JButton addToList = new JButton(new ImageIcon(ACE.class.getResource("/24x24/plain/notebook_add.png")));
+        addToList.setToolTipText("add to list view");
         addToList.addActionListener(new AddToList(model));
         relPanel.add(addToList, c);
         c.weighty = 0.0;
