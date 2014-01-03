@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.ihtsdo</groupId>
         <artifactId>wb-mmb</artifactId>
-        <version>1.5-trek-refset</version>
+        <version>1.6-trek-refset-SNAPSHOT</version>
     </parent>
     <artifactId>tk-drools</artifactId>
     <name>${branch}: Toolkit Extensions for DROOLS</name>

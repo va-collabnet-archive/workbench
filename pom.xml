@@ -17,7 +17,7 @@ the specific language governing permissions and limitations under the License. -
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.ihtsdo</groupId>
     <artifactId>wb-mmb</artifactId>
-    <version>1.5-trek-refset</version>
+    <version>1.6-trek-refset-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>${branch}: (MMP) Workbench Toolkit</name>
     <description>The IHTSDO Workbench provides two software frameworks for
@@ -28,9 +28,9 @@ the specific language governing permissions and limitations under the License. -
         needs of their end users.
     </description>
     <scm>
-        <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/tags/wb-mmb-1.5-trek-refset</connection>
-        <developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/tags/wb-mmb-1.5-trek-refset</developerConnection>
-        <url>https://csfe.aceworkspace.net/integration/viewvc/viewvc.cgi/tags?root=workbench&amp;system=exsy1002/wb-mmb-1.5-trek-refset</url>
+        <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/branches/trek-refset-performance2</connection>
+        <developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/branches/trek-refset-performance2</developerConnection>
+        <url>https://csfe.aceworkspace.net/integration/viewvc/viewvc.cgi/branches/trek-refset-performance2?root=workbench&amp;system=exsy1002</url>
     </scm>
     <properties>
         <branch>REFSET-2</branch>
