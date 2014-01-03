@@ -499,7 +499,7 @@ public class StatusAtPositionBdb extends ComponentBdb {
                 }
             }
             if (moduleNids != null) {
-                if(moduleNids.contains(sapNid)){
+                if(!moduleNids.contains(getModuleNid(sapNid))){
                     passed = false;
                 }
             }
