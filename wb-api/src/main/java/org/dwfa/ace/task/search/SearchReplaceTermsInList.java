@@ -35,8 +35,6 @@ import javax.swing.JScrollPane;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionPart;
-import org.dwfa.ace.api.I_DescriptionTuple;
-import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_ModelTerminologyList;
@@ -64,11 +62,8 @@ import org.ihtsdo.tk.api.blueprint.DescriptionCAB;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
-import org.ihtsdo.tk.api.description.DescriptionChronicleBI;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
-import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
-import org.ihtsdo.tk.dto.concept.component.refex.TK_REFEX_TYPE;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 
 

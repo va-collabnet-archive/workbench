@@ -69,6 +69,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.ihtsdo.tk.api.blueprint.ConceptCB;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
+import org.ihtsdo.tk.api.refex.type_int.RefexIntVersionBI;
+import org.ihtsdo.tk.api.refex.type_nid.RefexNidVersionBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf1;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 
@@ -617,9 +619,19 @@ public class ConceptVersion implements ConceptVersionBI, Comparable<ConceptVersi
 
     @Override
     public Collection<? extends DescriptionVersionBI> getDescriptionsPreferredActive() throws IOException {
-        setupPreferredOrder();
+        HashSet<DescriptionVersionBI> returnSet = new HashSet<>();
+        for(DescriptionVersionBI d : getDescriptionsActive(SnomedMetadataRfx.getDES_SYNONYM_NID())){
+            for(RefexVersionBI r : d.getRefexesActive(vc)){
+                if(RefexNidVersionBI.class.isAssignableFrom(r.getClass())){
+                    RefexNidVersionBI ri = (RefexNidVersionBI) r;
+                    if(ri.getNid1()== SnomedMetadataRfx.getDESC_PREFERRED_NID()){
+                        returnSet.add(d);
+                    }
+                }
+            }
+        }
 
-        return getDescriptionsActive(new IntSet(preferredOrder.getListArray()));
+        return returnSet;
     }
 
     @Override
@@ -629,7 +641,7 @@ public class ConceptVersion implements ConceptVersionBI, Comparable<ConceptVersi
         return concept.getDescTuple(preferredOrder, vc.getLangPrefList(), vc.getAllowedStatusNids(),
                 vc.getPositionSet(), LANGUAGE_SORT_PREF.getPref(vc.getLangSort()),
                 vc.getPrecedence(), vc.getContradictionManager());
-    }
+                    }
 
     @Override
     public UUID getPrimUuid() {

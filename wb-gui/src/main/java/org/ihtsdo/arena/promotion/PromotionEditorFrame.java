@@ -199,12 +199,12 @@ public class PromotionEditorFrame extends ComponentFrame implements PropertyChan
                         } else if (RelationshipChronicleBI.class.isAssignableFrom(component.getClass())) {
                             RelationshipChronicleBI r = (RelationshipChronicleBI) component;
                             RelationshipVersionBI version = r.getVersion(mergeConfig.getViewCoordinate().getViewCoordinateWithAllStatusValues());
-                            int charNid = version.getCharacteristicNid();
-                            if (charNid == SnomedMetadataRfx.getREL_CH_INFERRED_RELATIONSHIP_NID()) {
-                                infChange.setMember(component.getNid());
-                            } else if (charNid == SnomedMetadataRfx.getREL_CH_STATED_RELATIONSHIP_NID()) {
-                                statedChange.setMember(component.getNid());
-                            }
+                                int charNid = version.getCharacteristicNid();
+                                if (charNid == SnomedMetadataRfx.getREL_CH_INFERRED_RELATIONSHIP_NID()) {
+                                    infChange.setMember(component.getNid());
+                                } else if (charNid == SnomedMetadataRfx.getREL_CH_STATED_RELATIONSHIP_NID()) {
+                                    statedChange.setMember(component.getNid());
+                                }
                         } else if (ConceptChronicleBI.class.isAssignableFrom(component.getClass())) {
                             statedChange.setMember(component.getNid());
                         }
@@ -304,8 +304,8 @@ public class PromotionEditorFrame extends ComponentFrame implements PropertyChan
         SnoRocketTabPanel classifierPanel = new SnoRocketTabPanel(mergeConfig);
         conceptTabsPane.add("classifier", classifierPanel);
         mergeArena = new Arena(mergeConfig, new File("arena/1-up.mxe"), false, true);
-        sourceArena = new Arena(sourceConfig, new File("arena/1-up.mxe"), false);
-        targetArena = new Arena(targetConfig, new File("arena/1-up.mxe"), false);
+        sourceArena = new Arena(sourceConfig, new File("arena/1-up.mxe"), false, true);
+        targetArena = new Arena(targetConfig, new File("arena/1-up.mxe"), false, true);
 
         JPanel arenaHolder = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
@@ -629,6 +629,9 @@ public class PromotionEditorFrame extends ComponentFrame implements PropertyChan
                             Ts.get().commit(mergePathConcept);
                             PromotionTerminologyTableModel model = (PromotionTerminologyTableModel) promotionConceptTable.getModel();
                             model.fireTableDataChanged();
+                            SnorocketExTask classifierTarget = new SnorocketExTask();
+                            classifierTarget.runClassifier(targetConfig);
+                            classifierTarget.commitClassification();
                             promoteDone = true;
                         } catch (IOException ex) {
                             Logger.getLogger(PromotionEditorFrame.class.getName()).log(Level.SEVERE, null, ex);
@@ -696,6 +699,9 @@ public class PromotionEditorFrame extends ComponentFrame implements PropertyChan
                             Ts.get().commit(mergePathConcept);
                             PromotionTerminologyTableModel model = (PromotionTerminologyTableModel) promotionConceptTable.getModel();
                             model.fireTableDataChanged();
+                            SnorocketExTask classifierTarget = new SnorocketExTask();
+                            classifierTarget.runClassifier(targetConfig);
+                            classifierTarget.commitClassification();
                             promoteDone = true;
                         } catch (IOException ex) {
                             Logger.getLogger(PromotionEditorFrame.class.getName()).log(Level.SEVERE, null, ex);
@@ -763,6 +769,9 @@ public class PromotionEditorFrame extends ComponentFrame implements PropertyChan
 
                             PromotionTerminologyTableModel model = (PromotionTerminologyTableModel) promotionConceptTable.getModel();
                             model.fireTableDataChanged();
+                            SnorocketExTask classifierTarget = new SnorocketExTask();
+                            classifierTarget.runClassifier(targetConfig);
+                            classifierTarget.commitClassification();
                             promoteDone = true;
                         } catch (IOException ex) {
                             Logger.getLogger(PromotionEditorFrame.class.getName()).log(Level.SEVERE, null, ex);
@@ -830,6 +839,9 @@ public class PromotionEditorFrame extends ComponentFrame implements PropertyChan
 
                             PromotionTerminologyTableModel model = (PromotionTerminologyTableModel) promotionConceptTable.getModel();
                             model.fireTableDataChanged();
+                            SnorocketExTask classifierTarget = new SnorocketExTask();
+                            classifierTarget.runClassifier(targetConfig);
+                            classifierTarget.commitClassification();
                             promoteDone = true;
                         } catch (IOException ex) {
                             Logger.getLogger(PromotionEditorFrame.class.getName()).log(Level.SEVERE, null, ex);
@@ -969,6 +981,7 @@ public class PromotionEditorFrame extends ComponentFrame implements PropertyChan
                 pathConceptBp.getComponentUuid(),
                 RefsetAux.PATH_ORIGIN_REFEST.getLenient().getNid(), null, null);
         pathOriginRefexBp.put(RefexCAB.RefexProperty.UUID1, Ts.get().getUuidPrimordialForNid(originPath.getConceptNid()));
+        //        pathOriginRefexBp.put(RefexCAB.RefexProperty.INTEGER1, Terms.get().convertToThinVersion(System.currentTimeMillis()));
         pathOriginRefexBp.put(RefexCAB.RefexProperty.INTEGER1, Integer.MAX_VALUE);
         pathRefexBp.setMemberUuid(UUID.randomUUID());
 

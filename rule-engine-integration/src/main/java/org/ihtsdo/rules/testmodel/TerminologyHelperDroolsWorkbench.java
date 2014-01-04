@@ -55,6 +55,7 @@ import org.ihtsdo.tk.api.PositionSet;
 import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.RelAssertionType;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
@@ -251,7 +252,14 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 		if (parentConcept ==  null || subtypeConcept == null) {
 			result = false;
 		} else {
-			result = subtypeConcept.isKindOf(parentConcept);
+			// OLD Implementation 
+			//result = subtypeConcept.isKindOf(parentConcept);
+			
+			// NEW Implementation
+			ViewCoordinate testViewCoordinate = new ViewCoordinate(config.getViewCoordinate());
+
+			testViewCoordinate.setRelationshipAssertionType(RelAssertionType.STATED);
+			result =  Ts.get().isKindOf(subtypeConceptNid, parentConceptNid, testViewCoordinate);
 		}
 		return result;
 	}
@@ -283,7 +291,7 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 					int dnid = Integer.parseInt(doc.get("dnid"));
 					if (cnid != conceptNid) {
 						I_DescriptionVersioned<?> potential_match = Terms.get().getDescription(dnid, cnid);
-						
+
 						int pfdn = Integer.MAX_VALUE;
 
 						try {

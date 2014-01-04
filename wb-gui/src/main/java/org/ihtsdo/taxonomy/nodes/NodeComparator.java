@@ -26,6 +26,15 @@ public class NodeComparator implements Comparator<Long> {
         }
         TaxonomyNode n1 = nodeStore.get(nId1);
         TaxonomyNode n2 = nodeStore.get(nId2);
+        if(n1 == null && n2 == null){
+            return 0;
+        }
+        if(n1 == null){//assume n1 > n2
+            return 1;
+        }
+        if(n2 == null){//assume n1 < n2
+            return -1;
+        }
         int maxIndex = Math.min(n1.nodesToCompare.length, n2.nodesToCompare.length);
         for (int i = 0; i < maxIndex; i++) {
             if (n1.nodesToCompare[i] == Long.MAX_VALUE && n2.nodesToCompare[i] == Long.MAX_VALUE) {

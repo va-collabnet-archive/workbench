@@ -15,12 +15,12 @@
  */
 package org.dwfa.ace.task;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.Collection;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.log.AceLog;
+import org.dwfa.ace.task.cs.ChangeSetImporter;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
@@ -36,8 +36,7 @@ import org.ihtsdo.tk.Ts;
 public class RegenerateWorkflowIndex extends AbstractTask{
     // Serialization Properties
     private static final long serialVersionUID = 1;
-    private static final int dataVersion = 1;
-    
+    private static final int dataVersion = 1;      
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
     }
@@ -65,17 +64,14 @@ public class RegenerateWorkflowIndex extends AbstractTask{
                         @Override
                         public void run() {
                             try {
+                                if(ChangeSetImporter.indexGenerating.get() == false){
+                                    ChangeSetImporter.indexGenerating.getAndSet(true);
                                 System.out.println("*** Starting workflow history lucene index regeneration.");
-                                File wfLuceneDirectory = new File("workflow/lucene");
-                                if (wfLuceneDirectory.exists()) {
-                                    for (File wfFile : wfLuceneDirectory.listFiles()) {
-                                        wfFile.delete();
-                                    }
-                                    wfLuceneDirectory.delete();
-                                }
                                 I_ConfigAceFrame config = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
                                 Ts.get().regenerateWfHxLuceneIndex(config.getViewCoordinate());
+                                ChangeSetImporter.indexGenerating.getAndSet(false);
                                 System.out.println("*** Finished workflow history lucene index regeneration.");
+                                }
                             } catch (IOException ex) {
                                 AceLog.getAppLog().alertAndLogException(ex);
                             } catch (Exception ex) {

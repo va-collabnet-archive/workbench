@@ -109,7 +109,7 @@ public class BinaryChangeSetReadAll extends AbstractMojo {
         runLocal();
         
         try {
-            importAllChangeSetsTask.importAllChangeSets(new LoggerAdaptor(getLog()));
+            importAllChangeSetsTask.importAllChangeSets(new LoggerAdaptor(getLog()), true);
         } catch (TaskFailedException e) {
             throw new MojoExecutionException(e.getLocalizedMessage(), e);
         }

@@ -16,6 +16,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -1009,7 +1010,9 @@ public class PromotionTargetConfig implements I_ConfigAceFrame {
     }
 
     public Set<PathBI> getEditingPathSet() {
-        Set<PathBI> editSet = getPromotionPathSet();
+        PathBI editPath = targetPos.getPath();
+        Set<PathBI> editSet = new HashSet<>();
+        editSet.add(editPath);
         return editSet;
     }
 

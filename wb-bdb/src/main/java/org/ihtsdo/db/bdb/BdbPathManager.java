@@ -23,7 +23,6 @@ package org.ihtsdo.db.bdb;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_Position;
-import org.dwfa.ace.api.RefsetPropertyMap;
 import org.dwfa.ace.api.TerminologyHelper;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
@@ -40,7 +39,6 @@ import org.ihtsdo.concept.component.refset.RefsetMember;
 import org.ihtsdo.concept.component.refsetmember.cid.CidMember;
 import org.ihtsdo.concept.component.refsetmember.cidInt.CidIntMember;
 import org.ihtsdo.db.bdb.computer.ReferenceConcepts;
-import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
@@ -53,20 +51,18 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.ihtsdo.concept.component.refsetmember.str.StrMember;
 import org.ihtsdo.tk.api.TerminologyBuilderBI;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
-import org.ihtsdo.tk.api.refex.type_nid.RefexNidVersionBI;
-import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 import org.ihtsdo.tk.dto.concept.component.refex.TK_REFEX_TYPE;
 
 /**
@@ -292,16 +288,16 @@ public class BdbPathManager implements I_Manage<PathBI> {
    @SuppressWarnings("unchecked")
    private Path getFromDisk(int cNid) throws IOException {
       try {
-         for (RefsetMember extPart : getPathRefsetConcept().getExtensions()) {
-            CidMember conceptExtension = (CidMember) extPart;
-            int       pathId           = conceptExtension.getC1Nid();
-
-            if (pathId == cNid) {
-               pathMap.put(pathId, new Path(pathId, getPathOriginsFromDb(pathId)));
-
-               return pathMap.get(cNid);
-            }
-         }
+          for (RefsetMember extPart : getPathRefsetConcept().getExtensions()) {
+              if (!StrMember.class.isAssignableFrom(extPart.getClass())) {
+                  CidMember conceptExtension = (CidMember) extPart;
+                  int pathId = conceptExtension.getC1Nid();
+                  if (pathId == cNid) {
+                      pathMap.put(pathId, new Path(pathId, getPathOriginsFromDb(pathId)));
+                      return pathMap.get(cNid);
+                  }
+              }
+          }
       } catch (Exception e) {
          throw new IOException("Unable to retrieve all paths.", e);
       }

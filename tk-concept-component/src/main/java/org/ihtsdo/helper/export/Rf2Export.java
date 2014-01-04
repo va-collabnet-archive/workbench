@@ -79,6 +79,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
     private Writer descriptionsWriter;
     private Date effectiveDate;
     private String effectiveDateString;
+    private Date snomedCoreReleaseDate;
     private Writer identifiersWriter;
     private Writer publicIdentifiersWriter;
     private LANG_CODE language;
@@ -135,6 +136,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
      * @param module the String representing the module associated with the
      * released content
      * @param effectiveDate specifying the official release date
+     * @param snomedCoreReleaseDate specifying the release date of SNOMED core content used by this release
      * @param stampNids the valid stamp nids associated with content for this
      * release
      * @param viewCoordinate specifying which versions of the concepts to
@@ -152,7 +154,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
      * @throws IOException signals that an I/O exception has occurred
      */
     public Rf2Export(File directory, ReleaseType releaseType, LANG_CODE language, COUNTRY_CODE country,
-            String namespace, String module, Date effectiveDate, Set<Integer> stampNids, ViewCoordinate viewCoordinate,
+            String namespace, String module, Date effectiveDate, Date snomedCoreReleaseDate, Set<Integer> stampNids, ViewCoordinate viewCoordinate,
             Set<Integer> excludedRefsetIds, NidBitSetBI conceptsToProcess, boolean makePrivateIdFile, int refsetParentConceptNid,
             Date previousReleaseDate, Set<Integer> stampsToRemove, Collection taxonomyParentNids)
             throws IOException, ContradictionException {
@@ -160,6 +162,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
         directory.mkdirs();
         this.releaseType = releaseType;
         this.effectiveDate = effectiveDate;
+        this.snomedCoreReleaseDate = snomedCoreReleaseDate;
         this.language = language;
         this.country = country;
         this.namespace = namespace;
@@ -204,6 +207,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
      * @param module the String representing the module associated with the
      * released content
      * @param effectiveDate specifying the official release date
+     * @param snomedCoreReleaseDate specifying the release date of SNOMED core content used by this release
      * @param stampNids the valid stamp nids associated with content for this
      * release
      * @param viewCoordinate specifying which versions of the concepts to
@@ -222,7 +226,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
      * @throws IOException signals that an I/O exception has occurred
      */
     public Rf2Export(File directory, ReleaseType releaseType, LANG_CODE language, COUNTRY_CODE country,
-            String namespace, String module, Date effectiveDate, Set<Integer> stampNids, ViewCoordinate viewCoordinate,
+            String namespace, String module, Date effectiveDate, Date snomedCoreReleaseDate,Set<Integer> stampNids, ViewCoordinate viewCoordinate,
             Set<Integer> excludedRefsetIds, NidBitSetBI conceptsToProcess, boolean makePrivateIdFile, int refsetParentConceptNid,
             Date previousReleaseDate, Set<Integer> stampsToRemove, Collection taxonomyParentNids, Integer conNumRefesetParentConceptNid)
             throws IOException, ContradictionException {
@@ -230,6 +234,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
         directory.mkdirs();
         this.releaseType = releaseType;
         this.effectiveDate = effectiveDate;
+        this.snomedCoreReleaseDate = snomedCoreReleaseDate;
         this.language = language;
         this.country = country;
         this.namespace = namespace;
@@ -294,36 +299,40 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                     + TimeHelper.getShortFileDateFormat().format(effectiveDate) + ".txt");
         } else {
             identifiersFile = new File(directory,
-                    "sct2_Identifier_UUID_" + releaseType.suffix + "_"
+                    "sct2_Identifier_UUID" + releaseType.suffix + "_"
                     + country.getFormatedCountryCode().toUpperCase() + namespace + "_"
                     + TimeHelper.getShortFileDateFormat().format(effectiveDate) + ".txt");
         }
         File associationFile = new File(directory,
-                "der2_cRefset_AssociationReference_UUID_" + releaseType.suffix + "-"
-                + LANG_CODE.EN.getFormatedLanguageCode().toUpperCase() + namespace + "_"
+                "der2_cRefset_AssociationReference_UUID" + releaseType.suffix + "_"
+                +  country.getFormatedCountryCode().toUpperCase() + namespace + "_"
                 + TimeHelper.getShortFileDateFormat().format(effectiveDate) + ".txt");
         File attributeValueFile = new File(directory,
-                "der2_cRefset_AttributeValue_UUID_" + releaseType.suffix + "-"
-                + LANG_CODE.EN.getFormatedLanguageCode().toUpperCase() + namespace + "_"
+                "der2_cRefset_AttributeValue_UUID" + releaseType.suffix + "_"
+                +  country.getFormatedCountryCode().toUpperCase() + namespace + "_"
                 + TimeHelper.getShortFileDateFormat().format(effectiveDate) + ".txt");
         File langRefsetsFile = new File(directory,
-                "der2_cRefset_Language_UUID_" + releaseType.suffix + "-"
-                + LANG_CODE.EN.getFormatedLanguageCode().toUpperCase() + namespace + "_"
+                "der2_cRefset_Language_UUID" + releaseType.suffix + "-"
+                + LANG_CODE.EN.getFormatedLanguageCode() + "_" 
+                + country.getFormatedCountryCode().toUpperCase() 
+                + namespace + "_"
                 + TimeHelper.getShortFileDateFormat().format(effectiveDate) + ".txt");
         File otherLangRefsetsFile = new File(directory,
-                "der2_cRefset_Language_UUID_" + releaseType.suffix + "-"
-                + country.getFormatedCountryCode().toUpperCase() + namespace + "_"
+                "der2_cRefset_Language_UUID" + releaseType.suffix + "-"
+                + language.getFormatedLanguageNoDialectCode() + "_" 
+                + country.getFormatedCountryCode().toUpperCase()
+                + namespace + "_"
                 + TimeHelper.getShortFileDateFormat().format(effectiveDate) + ".txt");
         File modDependFile = new File(directory,
-                "der2_ssRefset_ModuleDependency_UUID_" + releaseType.suffix + "_"
+                "der2_ssRefset_ModuleDependency_UUID" + releaseType.suffix + "_"
                 + country.getFormatedCountryCode().toUpperCase() + namespace + "_"
                 + TimeHelper.getShortFileDateFormat().format(effectiveDate) + ".txt");
         File descTypeFile = new File(directory,
-                "der2_ciRefset_DescriptionType_UUID_" + releaseType.suffix + "_"
+                "der2_ciRefset_DescriptionType_UUID" + releaseType.suffix + "_"
                 + country.getFormatedCountryCode().toUpperCase() + namespace + "_"
                 + TimeHelper.getShortFileDateFormat().format(effectiveDate) + ".txt");
         File refsetDescFile = new File(directory,
-                "der2_cciRefset_RefsetDescriptor_UUID_" + releaseType.suffix + "_"
+                "der2_cciRefset_RefsetDescriptor_UUID" + releaseType.suffix + "_"
                 + country.getFormatedCountryCode().toUpperCase() + namespace + "_"
                 + TimeHelper.getShortFileDateFormat().format(effectiveDate) + ".txt");
 
@@ -628,7 +637,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                     refsetName = refsetName.concat("SimpleRefset");
                 }
                 File simpleRefsetFile = new File(directory,
-                        "der2_cRefset_" + refsetName + "_UUID_" + releaseType.suffix + "_"
+                        "der2_cRefset_" + refsetName + "_UUID" + releaseType.suffix + "_"
                         + country.getFormatedCountryCode().toUpperCase() + namespace + "_"
                         + TimeHelper.getShortFileDateFormat().format(effectiveDate) + ".txt");
                 FileOutputStream simpleRefsetOs = new FileOutputStream(simpleRefsetFile);
@@ -743,7 +752,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                     refsetName = refsetName.concat("ConceptNumberRefset");
                 }
                 File conNumRefsetFile = new File(directory,
-                        "der2_ciRefset_" + refsetName + "_UUID_" + releaseType.suffix + "_"
+                        "der2_ciRefset_" + refsetName + "_UUID" + releaseType.suffix + "_"
                         + country.getFormatedCountryCode().toUpperCase() + namespace + "_"
                         + TimeHelper.getShortFileDateFormat().format(effectiveDate) + ".txt");
                 FileOutputStream conNumRefsetOs = new FileOutputStream(conNumRefsetFile);
@@ -848,6 +857,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
      */
     private void processConceptAttribute(ConceptAttributeChronicleBI conceptAttributeChronicle) throws IOException, Exception {
         if (conceptAttributeChronicle != null) {
+            ConceptAttributeVersionBI primordialVersion = conceptAttributeChronicle.getPrimordialVersion();
             Collection<ConceptAttributeVersionBI> versions = new HashSet<>();
             if (releaseType.equals(ReleaseType.FULL)) {
                 //if not previously released or latest version remove
@@ -867,8 +877,8 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
             boolean writeIds = true;
 
             for (ConceptAttributeVersionBI car : versions) {
-                if (sameCycleStampNids.contains(car.getStampNid())) {
-                    if (car == null || !car.isActive(viewCoordinate)) {
+                if (sameCycleStampNids.contains(primordialVersion.getStampNid()) && sameCycleStampNids.contains(car.getStampNid())) {
+                    if (car == null || !car.isActive(viewCoordinate)) { //concept has been created and inactivated in the same release cycle
                         write = false;
                     }
                 }
@@ -938,13 +948,11 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
     private void processDescription(DescriptionChronicleBI descriptionChronicle) throws IOException, Exception {
         if (descriptionChronicle != null) {
             Collection<DescriptionVersionBI> versions = new HashSet<>();
+            DescriptionVersionBI primordialVersion = descriptionChronicle.getPrimordialVersion();
             if (releaseType.equals(ReleaseType.FULL)) {
                 //if not previously released or latest version remove
                 DescriptionVersionBI latest = descriptionChronicle.getVersion(viewCoordinateAllStatus);
                 for(DescriptionVersionBI d : descriptionChronicle.getVersions()){
-                    if(latest == null){
-                        System.out.println("DEBUG");
-                    }
                     if(!sameCycleStampNids.contains(d.getStampNid()) || d.getStampNid() == latest.getStampNid()){
                         versions.add(d);
                     }
@@ -960,8 +968,8 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
 
 
             for (DescriptionVersionBI descr : versions) {
-                if (sameCycleStampNids.contains(descr.getStampNid())) {
-                    if (descr == null || !descr.isActive(viewCoordinate)) {
+                if (sameCycleStampNids.contains(primordialVersion.getStampNid()) && sameCycleStampNids.contains(descr.getStampNid())) {
+                    if (descr == null || !descr.isActive(viewCoordinate)) { //description has been created and retired in the same release cycle
                         write = false;
                     }
                 }
@@ -1046,7 +1054,8 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
     private void processRelationship(RelationshipChronicleBI relationshipChronicle) throws IOException, Exception {
         if (relationshipChronicle != null) {
             Collection<RelationshipVersionBI> versions = new HashSet<>();
-            if (releaseType.equals(ReleaseType.FULL)) {
+            RelationshipVersionBI primordialVersion = relationshipChronicle.getPrimordialVersion();
+            if (!releaseType.equals(ReleaseType.FULL)) {
                 //if not previously released or latest version remove
                 RelationshipVersionBI latest = relationshipChronicle.getVersion(viewCoordinateAllStatus);
                 for(RelationshipVersionBI r : relationshipChronicle.getVersions()){
@@ -1066,8 +1075,8 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
             boolean inTaxonomy = false;
             for (RelationshipVersionBI rv : versions) {
                 //TODO: need to support refset specs
-                if (sameCycleStampNids.contains(rv.getStampNid())) {
-                    if (!rv.isActive(viewCoordinate)) {
+                if (sameCycleStampNids.contains(primordialVersion.getStampNid()) && sameCycleStampNids.contains(rv.getStampNid())) {
+                    if (!rv.isActive(viewCoordinate)) { //relationship has been created and retired in the same release cycle
                         write = false;
                     }
                 }
@@ -1259,6 +1268,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
     private void processAssociationRefset(RefexChronicleBI refexChronicle) throws IOException, Exception {
         if (refexChronicle != null) {
             Collection<RefexVersionBI> versions = new HashSet<>();
+            ComponentVersionBI primordialVersion = refexChronicle.getPrimordialVersion();
             if (releaseType.equals(ReleaseType.FULL)) {
                 versions = refexChronicle.getVersions();
                 //if not previously released or latest version remove
@@ -1277,9 +1287,9 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
             }
             boolean write = true;
                 for (RefexVersionBI refex : versions) {
-                    if (sameCycleStampNids.contains(refex.getStampNid())) {
+                    if (sameCycleStampNids.contains(primordialVersion.getStampNid()) && sameCycleStampNids.contains(refex.getStampNid())) {
                         RefexVersionBI version = (RefexVersionBI) refexChronicle.getVersion(viewCoordinateAllStatus);
-                        if (version == null || !version.isActive(viewCoordinate)) {
+                        if (version == null || !version.isActive(viewCoordinate)) { //refex member has been created and inactivated during the same release cycle
                             write = false;
                         }
                     }
@@ -1325,6 +1335,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
 
       private void processAttributeValueRefset(RefexChronicleBI refexChronicle) throws IOException, Exception {
         if (refexChronicle != null) {
+            ComponentVersionBI primordialVersion = refexChronicle.getPrimordialVersion();
             Collection<RefexVersionBI> versions = new HashSet<>();
             if (releaseType.equals(ReleaseType.FULL)) {
                 //if not previously released or latest version remove
@@ -1344,9 +1355,9 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
             boolean write = true;
             
                 for (RefexVersionBI refex : versions) {
-                    if (sameCycleStampNids.contains(refex.getStampNid())) {
+                    if (sameCycleStampNids.contains(primordialVersion.getStampNid()) && sameCycleStampNids.contains(refex.getStampNid())) {
                         RefexVersionBI version = (RefexVersionBI) refexChronicle.getVersion(viewCoordinateAllStatus);
-                        if (!version.isActive(viewCoordinate)) {
+                        if (!version.isActive(viewCoordinate)) { //refex member has been created and inactivated during the same release cycle
                             write = false;
                         }
                     }
@@ -1456,7 +1467,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                 Collection<RefexVersionBI> versions = new HashSet<>();
                 if (releaseType.equals(ReleaseType.FULL)) {
                     //if not previously released or latest version remove
-                    RefexVersionBI latest = (RefexVersionBI) refexChronicle.getVersion(viewCoordinateAllStatus);
+                    RefexVersionBI latest = (RefexVersionBI) refexChronicle.getVersion(viewCoordinateAllStatusTime); //CHANGE FOR DK, before merge back use viewCoordinateAllStatus
                     for (Object o : refexChronicle.getVersions()) {
                         RefexVersionBI r = (RefexVersionBI) o;
                         if (!sameCycleStampNids.contains(r.getStampNid()) || r.getStampNid() == latest.getStampNid()) {
@@ -1476,7 +1487,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                             write = false;
                         }
                     }
-                    if(rv.isActive(viewCoordinate)){
+                    if(rv.isActive(viewCoordinate)){ //CHANGE FOR DK, source data incorrect, retired descriptions should also have retired lang refsets
                         ComponentVersionBI rc = Ts.get().getComponentVersion(viewCoordinate, rv.getReferencedComponentNid());
                         if(rc == null || !rc.isActive(viewCoordinate)){
                             write = false;
@@ -2069,7 +2080,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                     break;
 
                 case TARGET_TIME:
-                    modDependWriter.write(effectiveDateString + field.seperator);
+                    modDependWriter.write(TimeHelper.getShortFileDateFormat().format(snomedCoreReleaseDate) + field.seperator);
 
                     break;
             }

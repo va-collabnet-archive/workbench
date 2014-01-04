@@ -120,6 +120,11 @@ public class SnorocketExTask extends AbstractTask implements ActionListener {
     List<SnoCon> cEditSnoCons; // "Edit Path" Relationships
     List<SnoRel> cClassSnoRels; // "Classifier Path" Relationships
     List<SnoRel> cRocketSnoRels; // "Snorocket Results Set" Relationships
+    // SNOQUERY DATASETS
+    ArrayList<SnoRel> isaAdded;
+    ArrayList<SnoRel> isaDropped;
+    ArrayList<SnoRel> roleAdded;
+    ArrayList<SnoRel> roleDropped;
     // USER INTERFACE
     private static Logger logger;
     private I_TermFactory tf = null;
@@ -783,7 +788,17 @@ public class SnorocketExTask extends AbstractTask implements ActionListener {
 
                 // WRITEBACK RESULTS
                 startTime = System.currentTimeMillis();
+                this.isaAdded = new ArrayList<SnoRel>();
+                this.isaDropped = new ArrayList<SnoRel>();
+                this.roleAdded = new ArrayList<SnoRel>();
+                this.roleDropped = new ArrayList<SnoRel>();
+
                 logger.info(compareAndWriteBack(cClassSnoRels, cRocketSnoRels, cViewPathNid));
+                
+                SnoQuery.isaAdded = this.isaAdded;
+                SnoQuery.isaDropped = this.isaDropped;
+                SnoQuery.roleAdded = this.roleAdded;
+                SnoQuery.roleDropped = this.roleDropped;
 
                 // Commit
                 tf.commit(ChangeSetPolicy.OFF, ChangeSetWriterThreading.SINGLE_THREAD);
@@ -1388,9 +1403,9 @@ public class SnorocketExTask extends AbstractTask implements ActionListener {
                     ts.writeDirect(thisC1);
 
                     if (rel_A.typeId == isaNid) {
-                        SnoQuery.isaDropped.add(rel_A);
+                        this.isaDropped.add(rel_A);
                     } else {
-                        SnoQuery.roleDropped.add(rel_A);
+                        this.roleDropped.add(rel_A);
                     }
 
                 } else if (rvList.isEmpty()) {
@@ -1425,9 +1440,9 @@ public class SnorocketExTask extends AbstractTask implements ActionListener {
     private void writeBackCurrent(SnoRel rel_B, int writeToNid, long versionTime)
             throws TerminologyException, IOException {
         if (rel_B.typeId == isaNid) {
-            SnoQuery.isaAdded.add(rel_B);
+            this.isaAdded.add(rel_B);
         } else {
-            SnoQuery.roleAdded.add(rel_B);
+            this.roleAdded.add(rel_B);
         }
 
         I_GetConceptData thisC1 = tf.getConcept(rel_B.c1Id);

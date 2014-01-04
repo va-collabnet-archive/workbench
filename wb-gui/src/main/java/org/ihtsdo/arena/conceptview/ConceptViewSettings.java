@@ -45,6 +45,8 @@ import org.ihtsdo.arena.ArenaComponentSettings;
 import org.ihtsdo.arena.PreferencesNode;
 import org.ihtsdo.arena.contradiction.ContradictionConfig;
 import org.ihtsdo.arena.promotion.PromotionConfig;
+import org.ihtsdo.arena.promotion.PromotionSourceConfig;
+import org.ihtsdo.arena.promotion.PromotionTargetConfig;
 import org.ihtsdo.taxonomy.TaxonomyHelper;
 import org.ihtsdo.taxonomy.TaxonomyMouseListener;
 import org.ihtsdo.taxonomy.TaxonomyTree;
@@ -224,7 +226,8 @@ public class ConceptViewSettings extends ArenaComponentSettings {
 				view.getSettings().setForAdjudication(true);
 			}
                         
-                        if (config instanceof PromotionConfig) {
+                        if (config instanceof PromotionConfig || config instanceof PromotionSourceConfig
+                                || config instanceof PromotionTargetConfig) {
 				view.getSettings().setForPromotion(true);
 			}
 

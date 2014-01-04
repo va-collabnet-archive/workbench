@@ -15,7 +15,10 @@
  */
 package org.ihtsdo.bdb.mojo;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ConcurrentSkipListSet;
@@ -159,6 +162,13 @@ public class GenerateIncrementalRf2File extends AbstractMojo {
      */
     private String effectiveDate;
     /**
+     * Effective date, in yyyy-MM-dd-HH.mm.ss format.
+     *
+     * @parameter
+     * @required
+     */
+    private String snomedCoreReleaseDate;
+    /**
      * Project ID namespace, as SCT id
      *
      * @parameter
@@ -179,6 +189,12 @@ public class GenerateIncrementalRf2File extends AbstractMojo {
      * @required
      */
     private String countryCode;
+    /**
+     * country code
+     *
+     * @parameter default-value="EN"
+     */
+    private String languageCode;
     /**
      * Refsets to exclude
      *
@@ -220,11 +236,11 @@ public class GenerateIncrementalRf2File extends AbstractMojo {
      */
     private ConceptDescriptor refsetParentConceptSpec;
     /**
-     * Set to true to make initial sct to uuid mapping files.
+     * Directory containing SCTID to UUID mapping files.
      *
-     * @parameter default-value="false"
+     * @parameter default-value="${basedir}/src/main/sct-uuid-maps"
      */
-    private boolean makeInitialMappingFiles;
+    private File mappingFileDir;
     /**
      * Effective date of previous release.
      *
@@ -335,21 +351,7 @@ public class GenerateIncrementalRf2File extends AbstractMojo {
             for(UUID uuid : moduleUuids){
                 moduleIds.add(Ts.get().getNidForUuids(uuid));
             }
-            File metaDir = new File(output.getParentFile(), "refset-econcept");
-            metaDir.mkdir();
-//          compute spec refsets
-            Integer refsetParentConceptNid = null;
-            if (refsetParentConceptSpec != null) {
-                refsetParentConceptNid = Ts.get().getNidForUuids(UUID.fromString(refsetParentConceptSpec.getUuid()));
-                vc.getPositionSet().getViewPathNidSet();
-                EditCoordinate ec = new EditCoordinate(TermAux.USER.getLenient().getConceptNid(),
-                        Ts.get().getNidForUuids(UUID.fromString(moduleConcepts[0].getUuid())),
-                        viewPathNid);
-                ReleaseSpecProcessor refsetSpecComputer = new ReleaseSpecProcessor(ec,
-                        vc, ChangeSetPolicy.OFF, refsetParentConceptNid);
-                refsetSpecComputer.process();
-                refsetSpecComputer.writeRefsetSpecMetadata(metaDir);
-            }
+            
             File refsetCs = new File(output.getParentFile(), "changesets");
             refsetCs.mkdir();
 //          write RF2 specific metadata refsets  
@@ -365,7 +367,7 @@ public class GenerateIncrementalRf2File extends AbstractMojo {
                     stampsToWrite.add(stamp);
                 }
             }
-//          get stamps after refset computations
+            
             stampsToWrite = Bdb.getSapDb().getSpecifiedSapNids(null,
                     TimeHelper.getTimeFromString(startDate, TimeHelper.getFileDateFormat()),
                     TimeHelper.getTimeFromString(endDate, TimeHelper.getFileDateFormat()),
@@ -380,14 +382,32 @@ public class GenerateIncrementalRf2File extends AbstractMojo {
             }
             getLog().info("Release type: " + releaseType);
             getLog().info("Criterion matches " + stampsToWrite.size() + " sapNids: " + stampsToWrite);
-            if (makeInitialMappingFiles) {
-                UuidToSctIdMapper mapper = new UuidToSctIdMapper(Ts.get().getAllConceptNids(), namespace, output);
+            boolean initMapper = true;
+            String[] paths = mappingFileDir.list(new FilenameFilter() {
+                @Override
+                public boolean accept(File file, String string) {
+                    return string.endsWith(".txt");
+                }
+            });
+            for (String s : paths) {
+                BufferedReader reader = new BufferedReader(new FileReader(mappingFileDir + System.getProperty("file.separator") + s));
+                String readLine = reader.readLine();
+                if (reader.readLine() != null) {
+                    initMapper = false;
+                }
+                reader.close();
+            }
+            if(initMapper){
+                UuidToSctIdMapper mapper = new UuidToSctIdMapper(Ts.get().getAllConceptNids(), namespace, mappingFileDir);
                 Ts.get().iterateConceptDataInSequence(mapper); //why sequence?
                 mapper.close();
             }
-            UuidSnomedMapHandler handler = new UuidSnomedMapHandler(output, output);
+            UuidSnomedMapHandler handler = new UuidSnomedMapHandler(mappingFileDir, mappingFileDir);
             handler.setNamespace(namespace);
-            
+            Integer refsetParentConceptNid = 0;
+            if (refsetParentConceptSpec != null) {
+                refsetParentConceptNid = Ts.get().getNidForUuids(UUID.fromString(refsetParentConceptSpec.getUuid()));
+            }
             Integer conNumRefsetParentConceptNid = null;
             if (conceptNumberRefsetParentConceptSpec != null) {
                 conNumRefsetParentConceptNid = Ts.get().getNidForUuids(UUID.fromString(conceptNumberRefsetParentConceptSpec.getUuid()));
@@ -399,11 +419,13 @@ public class GenerateIncrementalRf2File extends AbstractMojo {
             for(UUID moduleId : moduleUuids){
                 Rf2Export exporter = new Rf2Export(output,
                     releaseType,
-                    LANG_CODE.EN,
+                    LANG_CODE.valueOf(languageCode),
                     COUNTRY_CODE.valueOf(countryCode),
                     namespace,
                     moduleId.toString(),
                     new Date(TimeHelper.getTimeFromString(effectiveDate,
+                    TimeHelper.getAltFileDateFormat())),
+                    new Date(TimeHelper.getTimeFromString(snomedCoreReleaseDate,
                     TimeHelper.getAltFileDateFormat())),
                     stampsToWrite.getAsSet(),
                     vc,

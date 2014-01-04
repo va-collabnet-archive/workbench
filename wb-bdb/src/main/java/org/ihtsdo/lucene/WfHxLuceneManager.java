@@ -27,12 +27,12 @@ import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 public class WfHxLuceneManager extends LuceneManager {
 	public final static int matchLimit = 10000000;
     static final String wfLuceneFileSuffix = "lucene";
-	public static File wfHxLuceneDirFile = new File("target" + File.separatorChar + "workflow" + File.separatorChar + "lucene");
-	protected static File runningLuceneDirFile = new File("workflow" + File.separatorChar + "lucene");
+	public static File wfHxLuceneDirFile = new File("target/workflow/lucene");
+	protected static File runningLuceneDirFile = new File("workflow/lucene");
 
 	private static HashSet<WorkflowHistoryJavaBean> beansToAdd;
 
-	public static void writeToLuceneNoLock(Collection<WorkflowHistoryJavaBean> beans, Map<UUID, WorkflowLuceneSearchResult> lastBeanInWfMap, ViewCoordinate viewCoord) throws IOException, TerminologyException {
+	public static int writeToLuceneNoLock(Collection<WorkflowHistoryJavaBean> beans, Map<UUID, WorkflowLuceneSearchResult> lastBeanInWfMap, ViewCoordinate viewCoord) throws IOException, TerminologyException {
 		int recordsImported = 0;
 		Set<UUID> processedIds = new HashSet<UUID>();
         WorkflowHistoryRefsetSearcher searcher = new WorkflowHistoryRefsetSearcher();
@@ -91,8 +91,9 @@ public class WfHxLuceneManager extends LuceneManager {
 			AceLog.getAppLog().warning("Failed on bean: " + currentBean);
         }
 
-		AceLog.getAppLog().log(Level.INFO, "Have written " + recordsImported + " workflow history lucene records");
+		AceLog.getAppLog().log(Level.INFO, "Have written " + recordsImported + " workflow history lucene records to " + wfHxWriter.getDirectory());
 		beans.clear();
+                return recordsImported;
     }
 
 	public static SearchResult searchAllWorkflowCriterion(List<I_TestSearchResults> checkList, boolean wfInProgress, boolean completedWf) throws Exception {
@@ -131,12 +132,14 @@ public class WfHxLuceneManager extends LuceneManager {
 		beansToAdd.add(latestWorkflow);
 	}
 
-	public static void writeUnwrittenWorkflows() throws IOException, TerminologyException {
+	public static int writeUnwrittenWorkflows() throws IOException, TerminologyException {
 		init(LuceneSearchType.WORKFLOW_HISTORY);
 
 	    if (LuceneManager.indexExists(LuceneSearchType.WORKFLOW_HISTORY) != false) {
-		writeToLuceneNoLock(beansToAdd, null, null);
+		int records = writeToLuceneNoLock(beansToAdd, null, null);
 		beansToAdd.clear();
+                return records;
 	    }
+            return 0;
 	} 
 }
