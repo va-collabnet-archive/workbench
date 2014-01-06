@@ -226,18 +226,24 @@ public class UuidToSctIdWriter {
             attribValueLine = attributeValueReader.readLine();
         }
 
-        String langRefLine = langRefsetsReader.readLine();
-        langRefLine = langRefsetsReader.readLine();
-        while (langRefLine != null) {
-            processLangRefsets(langRefLine);
+        if (langRefsetsReader != null)
+        {
+            String langRefLine = langRefsetsReader.readLine();
             langRefLine = langRefsetsReader.readLine();
+            while (langRefLine != null) {
+                processLangRefsets(langRefLine);
+                langRefLine = langRefsetsReader.readLine();
+            }
         }
 
-        String otherLangRefLine = otherLangRefsetsReader.readLine();
-        otherLangRefLine = otherLangRefsetsReader.readLine();
-        while (otherLangRefLine != null) {
-            processOtherLangRefsets(otherLangRefLine);
+        if (otherLangRefsetsReader != null)
+        {
+            String otherLangRefLine = otherLangRefsetsReader.readLine();
             otherLangRefLine = otherLangRefsetsReader.readLine();
+            while (otherLangRefLine != null) {
+                processOtherLangRefsets(otherLangRefLine);
+                otherLangRefLine = otherLangRefsetsReader.readLine();
+            }
         }
 
         String modDependLine = modDependReader.readLine();
@@ -391,10 +397,18 @@ public class UuidToSctIdWriter {
                 associationFileUuid.getName().replace("der2_cRefset_AssociationReference_UUID", "der2_cRefset_AssociationReference"));
         File attributeValueFile = new File(content,
                 attributeValueFileUuid.getName().replace("der2_cRefset_AttributeValue_UUID", "der2_cRefset_AttributeValue"));
-        File langRefsetsFile = new File(languageDir,
+        File langRefsetsFile = null;
+        if (langRefsetsFileUuid != null)
+        {
+            langRefsetsFile = new File(languageDir,
                 langRefsetsFileUuid.getName().replace("der2_cRefset_Language_UUID", "der2_cRefset_Language"));
-        File otherLangRefsetsFile = new File(languageDir,
+        }
+        File otherLangRefsetsFile = null;
+        if (otherLangRefsetsFileUuid != null)
+        {
+            otherLangRefsetsFile = new File(languageDir,
                 otherLangRefsetsFileUuid.getName().replace("der2_cRefset_Language_UUID", "der2_cRefset_Language"));
+        }
         File modDependFile = new File(metadata,
                 modDependFileUuid.getName().replace("der2_ssRefset_ModuleDependency_UUID", "der2_ssRefset_ModuleDependency"));
         File descTypeFile = new File(metadata,
@@ -422,10 +436,16 @@ public class UuidToSctIdWriter {
         associationWriter = new BufferedWriter(new OutputStreamWriter(associationOs, "UTF8"));
         FileOutputStream attributeValueOs = new FileOutputStream(attributeValueFile);
         attributeValueWriter = new BufferedWriter(new OutputStreamWriter(attributeValueOs, "UTF8"));
-        FileOutputStream langRefOs = new FileOutputStream(langRefsetsFile);
-        langRefsetsWriter = new BufferedWriter(new OutputStreamWriter(langRefOs, "UTF8"));
-        FileOutputStream langOs = new FileOutputStream(otherLangRefsetsFile);
-        otherLangRefsetsWriter = new BufferedWriter(new OutputStreamWriter(langOs, "UTF8"));
+        if (langRefsetsFile != null)
+        {
+            FileOutputStream langRefOs = new FileOutputStream(langRefsetsFile);
+            langRefsetsWriter = new BufferedWriter(new OutputStreamWriter(langRefOs, "UTF8"));
+        }
+        if (otherLangRefsetsFile != null)
+        {
+            FileOutputStream langOs = new FileOutputStream(otherLangRefsetsFile);
+            otherLangRefsetsWriter = new BufferedWriter(new OutputStreamWriter(langOs, "UTF8"));
+        }
         FileOutputStream modDependOs = new FileOutputStream(modDependFile);
         modDependWriter = new BufferedWriter(new OutputStreamWriter(modDependOs, "UTF8"));
         FileOutputStream descTypeOs = new FileOutputStream(descTypeFile);
@@ -463,14 +483,20 @@ public class UuidToSctIdWriter {
             attributeValueWriter.write(field.headerText + field.seperator);
         }
 
-        for (Rf2File.LanguageRefsetFileFields field : Rf2File.LanguageRefsetFileFields.values()) {
-            langRefsetsWriter.write(field.headerText + field.seperator);
+        if (langRefsetsWriter != null)
+        {
+            for (Rf2File.LanguageRefsetFileFields field : Rf2File.LanguageRefsetFileFields.values()) {
+                langRefsetsWriter.write(field.headerText + field.seperator);
+            }
         }
 
-        for (Rf2File.LanguageRefsetFileFields field : Rf2File.LanguageRefsetFileFields.values()) {
-            otherLangRefsetsWriter.write(field.headerText + field.seperator);
+        if (otherLangRefsetsWriter != null)
+        {
+            for (Rf2File.LanguageRefsetFileFields field : Rf2File.LanguageRefsetFileFields.values()) {
+                otherLangRefsetsWriter.write(field.headerText + field.seperator);
+            }
         }
-
+        
         for (Rf2File.ModuleDependencyFileFields field : Rf2File.ModuleDependencyFileFields.values()) {
             modDependWriter.write(field.headerText + field.seperator);
         }
