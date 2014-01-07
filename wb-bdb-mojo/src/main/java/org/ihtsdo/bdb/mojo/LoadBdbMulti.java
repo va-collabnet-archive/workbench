@@ -112,7 +112,7 @@ public class LoadBdbMulti extends AbstractMojo {
    private int runtimeConverterSize =
       Runtime.getRuntime().availableProcessors() * 2;
    private int                               converterSize      = 1;
-   ConcurrentSkipListSet<Object>             watchSet           =
+   ConcurrentSkipListSet<Object>             watchUuidSet           =
       new ConcurrentSkipListSet<>();
    ConcurrentSkipListSet<ConceptChronicleBI> indexedAnnotations =
       new ConcurrentSkipListSet<>();
@@ -217,7 +217,7 @@ public class LoadBdbMulti extends AbstractMojo {
            throws MojoExecutionException {
       if (watchConceptUuids != null) {
          for (String uuidStr : watchConceptUuids) {
-            watchSet.add(UUID.fromString(uuidStr));
+            watchUuidSet.add(UUID.fromString(uuidStr));
          }
       }
 
@@ -960,12 +960,20 @@ public class LoadBdbMulti extends AbstractMojo {
             nidCnidMap = Bdb.getNidCNidMap();
          }
 
-         boolean watch = watchSet.contains(eConcept.getPrimordialUuid());
+         boolean watch = watchUuidSet.contains(eConcept.getPrimordialUuid());
 
          if (watch) {
-            AceLog.getAppLog().info("Watch found: " + eConcept);
-            AceLog.getAppLog().info(
-                "UUID set: " + eConcept.getConceptAttributes().getUuids());
+             StringBuilder sb = new StringBuilder();
+             sb.append("LoadBdbMulti Watch found: ");
+             List<UUID> uuidList = eConcept.getConceptAttributes().getUuids();
+             for (UUID uuid : uuidList) {
+                 sb.append(uuid.toString());
+                 sb.append("    ");                 
+             }
+            sb.append("\n");
+            sb.append(eConcept.toString());
+            sb.append("\n");
+            AceLog.getAppLog().info(sb.toString());
          }
 
          try {
