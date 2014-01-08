@@ -97,7 +97,11 @@ public class BinaryChangeSetResolveIds {
     private void writeSctIdHistory(TkDescription tkd, TkIdentifier tki) throws IOException {
         BufferedWriter w = eccsLogSctIdHistoryWriter;
         SimpleDateFormat dateFormatter = new SimpleDateFormat("dd-MMM-yyyy HH:mm:ss");
-        w.write(((Long) tki.getDenotation()).toString()); // "ID_DENOTATION_SCTID"
+        if (String.class.isAssignableFrom(tki.getDenotation().getClass())) {
+            w.write((String) tki.getDenotation()); // "ID_DENOTATION_SCTID"
+        } else {
+            w.write(((Long) tki.getDenotation()).toString()); // "ID_DENOTATION_SCTID"
+        }
         w.write("\t");
         w.write(tkd.primordialUuid.toString()); // "DESCRIPTION_UUID"
         w.write("\t");
@@ -136,6 +140,8 @@ public class BinaryChangeSetResolveIds {
     private File eccsLogSctIdHistoryFile; // PFDN/KP Description SCTID History File
     BufferedWriter eccsLogSctIdHistoryWriter; // 
     boolean eccsPathExceptionFoundB;
+    long countSctIdsAsString;
+    long countSctIdsAsLong;
 
     public BinaryChangeSetResolveIds(String rootDirStr,
             String targetDirStr,
@@ -326,6 +332,9 @@ public class BinaryChangeSetResolveIds {
         List<TkIdentifier> preList;
         List<TkIdentifier> postList;
         List<TkChangeSortable> bcsList = new ArrayList<>();
+        countSctIdsAsString = 0;
+        countSctIdsAsLong = 0;
+
         // :DEBUG:BEGIN:
 //        HashSet<UUID> debugSet = new HashSet<>();
 //        debugSet.add(UUID.fromString("9ef4e796-d5b9-538e-b1b4-43b4d9d7815a"));
@@ -590,6 +599,9 @@ public class BinaryChangeSetResolveIds {
             Logger.getLogger(BinaryChangeSetResolveIds.class.getName()).log(Level.SEVERE, null, ex);
         }
 
+        // RF1 import change which the SCTIDs started showing up as String instead of Long
+        System.out.println("SCTIDs as Long = " + countSctIdsAsLong);
+        System.out.println("SCTIDs as String = " + countSctIdsAsString);
     }
 
     private ArrayList<SctIdUseInstance> gatherIdsUseList(ArrayList<File> eccsInputFilesList) {
@@ -693,6 +705,9 @@ public class BinaryChangeSetResolveIds {
         }
         for (TkIdentifier tki : idList) {
             if (tki.authorityUuid.compareTo(snomedIntUuid) == 0) {
+                if (String.class.isAssignableFrom(tki.getDenotation().getClass())) {
+                    System.out.println(":WARNING:2: found as String : " + tki.getDenotation());
+                }
                 boolean status = false;
                 if (tki.statusUuid.compareTo(rf1ActiveUuid) == 0
                         || tki.statusUuid.compareTo(rf2ActiveUuid) == 0) {
@@ -728,6 +743,10 @@ public class BinaryChangeSetResolveIds {
             }
             // Process additional ids
             if (tki.authorityUuid.compareTo(snomedIntUuid) == 0) {
+                if (String.class.isAssignableFrom(tki.getDenotation().getClass())) {
+                    System.out.println(":WARNING:3: found as String : " + tki.getDenotation());
+                }
+
                 if (resolution.compareTo(SctIdResolution.KEEP_NO_ECCS_SCTID) != 0) {
                     if (keepMap.containsKey((Long) tki.getDenotation())) {
                         UUID keepUuid = keepMap.get((Long) tki.getDenotation());
@@ -775,6 +794,7 @@ public class BinaryChangeSetResolveIds {
                             || tki.pathUuid.compareTo(snomedCorePath) == 0) {
                         // only keep SCTID on extension path or SNOMED Core path
                         filteredIdList.add(tki);
+                        countSctIdsAsLong++;
                         descriptionsKept.append((Long) tki.getDenotation());
                         descriptionsKept.append("\t");
                         descriptionsKept.append(enclosingConceptUuid.toString());
@@ -784,7 +804,14 @@ public class BinaryChangeSetResolveIds {
                         descriptionsKept.append(tkd.pathUuid.toString());
                         descriptionsKept.append("\tKEEP\n");
                     } else {
-                        instancesNotKept.append((Long) tki.getDenotation());
+                        if (String.class.isAssignableFrom(tki.getDenotation().getClass())) {
+                            System.out.println(":WARNING: found as String : " + tki.getDenotation());
+                            countSctIdsAsString++;
+                            instancesNotKept.append(tki.getDenotation());
+                        } else {
+                            instancesNotKept.append((Long) tki.getDenotation());
+                            countSctIdsAsLong++;
+                        }
                         instancesNotKept.append("\t");
                         instancesNotKept.append(enclosingConceptUuid.toString());
                         instancesNotKept.append("\t");
