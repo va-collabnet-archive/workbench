@@ -3,7 +3,7 @@
 	<parent>
         <groupId>org.ihtsdo</groupId>
         <artifactId>wb-mmb</artifactId>
-		<version>1.1-dk-SNAPSHOT</version>
+		<version>1.1-dk</version>
     </parent>
 	<artifactId>issue-repository-integration</artifactId>
 	<packaging>jar</packaging>
@@ -19,19 +19,19 @@
 		<dependency>
 			<groupId>org.ihtsdo</groupId>
 			<artifactId>wb-api</artifactId>
-			<version>1.1-dk-SNAPSHOT</version>
+			<version>1.1-dk</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.ihtsdo</groupId>
 			<artifactId>wb-gui</artifactId>
-			<version>1.1-dk-SNAPSHOT</version>
+			<version>1.1-dk</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.ihtsdo</groupId>
 			<artifactId>issue-management</artifactId>
-			<version>1.1-dk-SNAPSHOT</version>
+			<version>1.1-dk</version>
 			<scope>compile</scope>
 		</dependency>
 	</dependencies>
