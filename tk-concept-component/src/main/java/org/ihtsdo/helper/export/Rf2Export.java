@@ -118,6 +118,13 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
     private Set<Integer> sameCycleStampNids;
     private Collection<Integer> taxonomyParentNids;
     private ConceptVersionBI conNumRefsetParentConcept;
+    private UUID[] specialDescriptions = {UUID.fromString("bde55671-0ee8-310e-8253-bc3251077388"),
+                                          UUID.fromString("407bce95-c0dc-3bfa-9eef-203ae8f37329"),
+                                          UUID.fromString("04e78b32-610a-345b-a8a5-fa69f2dc79b0"),
+                                          UUID.fromString("fd656f85-efa8-3e3c-8a85-7b92e113727d"),
+                                          UUID.fromString("fa71ad99-5c93-3673-84f8-a24e14867b4f"),
+                                          UUID.fromString("072e8611-372a-3c9f-870d-028b9b614918")};
+    private List<UUID> specialDescriptionsList = Arrays.asList(specialDescriptions);
 
     //~--- constructors --------------------------------------------------------
         /**
@@ -852,27 +859,36 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
      */
     private void processConceptAttribute(ConceptAttributeChronicleBI conceptAttributeChronicle) throws IOException, Exception {
         if (conceptAttributeChronicle != null) {
+            ConceptAttributeVersionBI primordialVersion = conceptAttributeChronicle.getPrimordialVersion();
             Collection<ConceptAttributeVersionBI> versions = new HashSet<>();
             if (releaseType.equals(ReleaseType.FULL)) {
                 //if not previously released or latest version remove
-                ConceptAttributeVersionBI latest = conceptAttributeChronicle.getVersion(viewCoordinateAllStatusTime);//CHANGE FOR DK, before merge back use viewCoordinateAllStatus
-                for(ConceptAttributeVersionBI ca : conceptAttributeChronicle.getVersions()){
-                    if(!sameCycleStampNids.contains(ca.getStampNid()) || ca.getStampNid() == latest.getStampNid()){
-                        versions.add(ca);
+                if(conceptAttributeChronicle.getPrimUuid().equals(UUID.fromString("f1bc3ad3-960f-3035-b570-cf9f7b64fe9b"))){ //Panodil is a special case
+                    versions.add(conceptAttributeChronicle.getPrimordialVersion());
+                }else {
+                    ConceptAttributeVersionBI latest = conceptAttributeChronicle.getVersion(viewCoordinateAllStatusTime);//CHANGE FOR DK, before merge back use viewCoordinateAllStatus
+                    for (ConceptAttributeVersionBI ca : conceptAttributeChronicle.getVersions()) {
+                        if (!sameCycleStampNids.contains(ca.getStampNid()) || ca.getStampNid() == latest.getStampNid()) {
+                            versions.add(ca);
+                        }
                     }
                 }
             } else {
-                ConceptAttributeVersionBI version = conceptAttributeChronicle.getVersion(viewCoordinateAllStatusTime);//CHANGE FOR DK, before merge back use viewCoordinateAllStatus
-                if(version != null){
-                    versions.add(version);
+                if (conceptAttributeChronicle.getPrimUuid().equals(UUID.fromString("f1bc3ad3-960f-3035-b570-cf9f7b64fe9b"))) { //Panodil is a special case
+                    versions.add(conceptAttributeChronicle.getPrimordialVersion());
+                } else {
+                    ConceptAttributeVersionBI version = conceptAttributeChronicle.getVersion(viewCoordinateAllStatusTime);//CHANGE FOR DK, before merge back use viewCoordinateAllStatus
+                    if (version != null) {
+                        versions.add(version);
+                    }
                 }
             }
             boolean write = true;
             boolean writeIds = true;
 
             for (ConceptAttributeVersionBI car : versions) {
-                if (sameCycleStampNids.contains(car.getStampNid())) {
-                    if (car == null || !car.isActive(viewCoordinate)) {
+                if (sameCycleStampNids.contains(primordialVersion.getStampNid()) && sameCycleStampNids.contains(car.getStampNid())) {
+                    if (car == null || !car.isActive(viewCoordinate)) { //concept has been created and inactivated in the same release cycle
                         write = false;
                     }
                 }
@@ -941,18 +957,25 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
      */
     private void processDescription(DescriptionChronicleBI descriptionChronicle) throws IOException, Exception {
         if (descriptionChronicle != null) {
+            DescriptionVersionBI primordialVersion = descriptionChronicle.getPrimordialVersion();
             Collection<DescriptionVersionBI> versions = new HashSet<>();
             if (releaseType.equals(ReleaseType.FULL)) {
                 //if not previously released or latest version remove
-                DescriptionVersionBI latest = descriptionChronicle.getVersion(viewCoordinateAllStatus);
-                for(DescriptionVersionBI d : descriptionChronicle.getVersions()){
-                    if(!sameCycleStampNids.contains(d.getStampNid()) || d.getStampNid() == latest.getStampNid()){
-                        versions.add(d);
+                if (Arrays.asList(specialDescriptions).contains(descriptionChronicle.getPrimUuid())) {
+                    versions.add(descriptionChronicle.getPrimordialVersion());
+                } else {
+                    DescriptionVersionBI latest = descriptionChronicle.getVersion(viewCoordinateAllStatusTime);
+                    for (DescriptionVersionBI d : descriptionChronicle.getVersions()) {
+                        if (!sameCycleStampNids.contains(d.getStampNid()) || d.getStampNid() == latest.getStampNid()) {
+                            versions.add(d);
+                        }
                     }
                 }
             } else {
                 DescriptionVersionBI version = descriptionChronicle.getVersion(viewCoordinateAllStatus);
-                if(version != null){
+                if (Arrays.asList(specialDescriptions).contains(descriptionChronicle.getPrimUuid())) {
+                    versions.add(descriptionChronicle.getPrimordialVersion());
+                } else if (version != null) {
                     versions.add(version);
                 }
             }
@@ -961,8 +984,8 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
 
 
             for (DescriptionVersionBI descr : versions) {
-                if (sameCycleStampNids.contains(descr.getStampNid())) {
-                    if (descr == null || !descr.isActive(viewCoordinate)) {
+                if (sameCycleStampNids.contains(primordialVersion.getStampNid()) && sameCycleStampNids.contains(descr.getStampNid())) {
+                    if (descr == null || !descr.isActive(viewCoordinate)) { //description has been created and retired in the same release cycle
                         write = false;
                     }
                 }
@@ -1046,19 +1069,28 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
      */
     private void processRelationship(RelationshipChronicleBI relationshipChronicle) throws IOException, Exception {
         if (relationshipChronicle != null) {
+            RelationshipVersionBI primordialVersion = relationshipChronicle.getPrimordialVersion();
             Collection<RelationshipVersionBI> versions = new HashSet<>();
             if (releaseType.equals(ReleaseType.FULL)) {
                 //if not previously released or latest version remove
-                RelationshipVersionBI latest = relationshipChronicle.getVersion(viewCoordinateAllStatus);
-                for(RelationshipVersionBI r : relationshipChronicle.getVersions()){
-                    if(!sameCycleStampNids.contains(r.getStampNid()) || r.getStampNid() == latest.getStampNid()){
-                        versions.add(r);
+                if(relationshipChronicle.getPrimUuid().equals(UUID.fromString("385aa618-4321-34aa-8703-c2ee8d711944"))){ //relationship is special case
+                    versions.add(relationshipChronicle.getPrimordialVersion());
+                }else {
+                    RelationshipVersionBI latest = relationshipChronicle.getVersion(viewCoordinateAllStatusTime);
+                    for (RelationshipVersionBI r : relationshipChronicle.getVersions()) {
+                        if (!sameCycleStampNids.contains(r.getStampNid()) || r.getStampNid() == latest.getStampNid()) {
+                            versions.add(r);
+                        }
                     }
                 }
             } else {
-                RelationshipVersionBI version = relationshipChronicle.getVersion(viewCoordinateAllStatus);
-                if(version != null){
-                    versions.add(version);
+                if (relationshipChronicle.getPrimUuid().equals(UUID.fromString("385aa618-4321-34aa-8703-c2ee8d711944"))) { //relationship is special case
+                    versions.add(relationshipChronicle.getPrimordialVersion());
+                } else {
+                    RelationshipVersionBI version = relationshipChronicle.getVersion(viewCoordinateAllStatus);
+                    if (version != null) {
+                        versions.add(version);
+                    }
                 }
             }
             boolean write = true;
@@ -1067,8 +1099,8 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
             boolean inTaxonomy = false;
             for (RelationshipVersionBI rv : versions) {
                 //TODO: need to support refset specs
-                if (sameCycleStampNids.contains(rv.getStampNid())) {
-                    if (!rv.isActive(viewCoordinate)) {
+                if (sameCycleStampNids.contains(primordialVersion.getStampNid()) && sameCycleStampNids.contains(rv.getStampNid())) {
+                    if (!rv.isActive(viewCoordinate)) { //relationship has been created and retired in the same release cycle
                         write = false;
                     }
                 }
@@ -1260,8 +1292,10 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
     private void processAssociationRefset(RefexChronicleBI refexChronicle) throws IOException, Exception {
         if (refexChronicle != null) {
             Collection<RefexVersionBI> versions = new HashSet<>();
+            ComponentVersionBI primordialVersion = refexChronicle.getPrimordialVersion();
+
             if (releaseType.equals(ReleaseType.FULL)) {
-                versions = refexChronicle.getVersions();
+                versions = new HashSet<>(refexChronicle.getVersions());
                 //if not previously released or latest version remove
                 RefexVersionBI latest = (RefexVersionBI) refexChronicle.getVersion(viewCoordinateAllStatusTime); //CHANGE FOR DK, before merge back use viewCoordinateAllStatus
                 for(Object o : refexChronicle.getVersions()){
@@ -1278,9 +1312,9 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
             }
             boolean write = true;
                 for (RefexVersionBI refex : versions) {
-                    if (sameCycleStampNids.contains(refex.getStampNid())) {
+                    if (sameCycleStampNids.contains(primordialVersion.getStampNid()) && sameCycleStampNids.contains(refex.getStampNid())) {
                         RefexVersionBI version = (RefexVersionBI) refexChronicle.getVersion(viewCoordinateAllStatus);
-                        if (version == null || !version.isActive(viewCoordinate)) {
+                        if (version == null || !version.isActive(viewCoordinate)) { //refex member has been created and inactivated during the same release cycle
                             write = false;
                         }
                     }
@@ -1326,6 +1360,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
 
       private void processAttributeValueRefset(RefexChronicleBI refexChronicle) throws IOException, Exception {
         if (refexChronicle != null) {
+            ComponentVersionBI primordialVersion = refexChronicle.getPrimordialVersion();
             Collection<RefexVersionBI> versions = new HashSet<>();
             if (releaseType.equals(ReleaseType.FULL)) {
                 //if not previously released or latest version remove
@@ -1345,9 +1380,9 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
             boolean write = true;
             
                 for (RefexVersionBI refex : versions) {
-                    if (sameCycleStampNids.contains(refex.getStampNid())) {
+                    if (sameCycleStampNids.contains(primordialVersion.getStampNid()) && sameCycleStampNids.contains(refex.getStampNid())) {
                         RefexVersionBI version = (RefexVersionBI) refexChronicle.getVersion(viewCoordinateAllStatus);
-                        if (!version.isActive(viewCoordinate)) {
+                        if (!version.isActive(viewCoordinate)) { //refex member has been created and inactivated during the same release cycle
                             write = false;
                         }
                     }

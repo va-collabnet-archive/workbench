@@ -1094,7 +1094,7 @@ private void processIdentifiers(String line, Writer writer) throws IOException {
                     break;
                 case VALUE_ID:
                     //concept
-                   String valueId = parts[Rf2File.AttribValueRefsetFileFields.REFSET_ID.ordinal()];
+                   String valueId = parts[Rf2File.AttribValueRefsetFileFields.VALUE_ID.ordinal()];
                         String valueSctId = getExistingSctId(valueId);
                         if (valueSctId == null) {
                             valueSctId = handler.getWithGeneration(UUID.fromString(valueId), SctIdGenerator.TYPE.CONCEPT).toString(); //TODO akf: subset?
