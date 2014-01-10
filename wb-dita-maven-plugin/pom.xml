@@ -4,7 +4,7 @@
   <parent>
     <artifactId>wb-mmb</artifactId>
     <groupId>org.ihtsdo</groupId>
-    <version>1.1-dk-SNAPSHOT</version>
+    <version>1.1-dk</version>
   </parent>
   <artifactId>wb-dita-maven-plugin</artifactId>
   <packaging>maven-plugin</packaging>
@@ -50,7 +50,7 @@
     <dependency>
       <groupId>org.ihtsdo</groupId>
       <artifactId>wb-bdb</artifactId>
-      <version>1.1-dk-SNAPSHOT</version>
+      <version>1.1-dk</version>
     </dependency>
    </dependencies>
 </project>
