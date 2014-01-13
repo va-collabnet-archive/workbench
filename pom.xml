@@ -251,7 +251,6 @@ the specific language governing permissions and limitations under the License. -
         <module>wb-api</module>
         <module>tk-workflow-api</module>
         <module>id-generation-ws-client</module>
-        <!--  <module>id-generation-ws</module>  -->
         <module>id-generation-api</module>
         <module>wb-release-process</module>
         <module>wb-mojo</module>
@@ -273,7 +272,6 @@ the specific language governing permissions and limitations under the License. -
         <module>tk-cern-prim</module>
         <module>tk-refset</module>
         <module>wb-schema-mojo</module>
-        <!-- <module>bdb-properties</module> -->
         <module>issue-management</module>
         <module>issue-repository-integration</module>
         <module>project-management</module>
@@ -288,6 +286,15 @@ the specific language governing permissions and limitations under the License. -
             </activation>
             <modules>
                 <module>api-test-execution</module>
+            </modules>
+        </profile>
+        <profile>
+            <id>id-generation</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <modules>
+                <module>id-generation-ws</module>
             </modules>
         </profile>
     </profiles>
