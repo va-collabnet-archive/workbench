@@ -5889,13 +5889,15 @@ public class TerminologyProjectDAO {
 		for (String line : list) {
 			String[] fields = line.split("\\|");
 			I_GetConceptData userConcept = Terms.get().getConcept(UUID.fromString(fields[1]));
-			WfUser user = new WfUser(getConceptString(userConcept), userConcept.getPrimUuid());
-
-			I_GetConceptData roleConcept = Terms.get().getConcept(UUID.fromString(fields[2]));
-			WfRole role = new WfRole(getConceptString(roleConcept), roleConcept.getPrimUuid());
-
-			WfMembership member = new WfMembership(UUID.fromString(fields[0]), user, role, Boolean.parseBoolean(fields[3]));
-			members.add(member);
+			if (userConcept.getDescriptions().size() > 0) {
+				WfUser user = new WfUser(getConceptString(userConcept), userConcept.getPrimUuid());
+	
+				I_GetConceptData roleConcept = Terms.get().getConcept(UUID.fromString(fields[2]));
+				WfRole role = new WfRole(getConceptString(roleConcept), roleConcept.getPrimUuid());
+	
+				WfMembership member = new WfMembership(UUID.fromString(fields[0]), user, role, Boolean.parseBoolean(fields[3]));
+				members.add(member);
+			}
 		}
 
 		return members;

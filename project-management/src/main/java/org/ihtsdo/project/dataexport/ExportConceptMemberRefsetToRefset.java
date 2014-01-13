@@ -19,24 +19,32 @@ package org.ihtsdo.project.dataexport;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HelpRefsets;
 import org.dwfa.ace.api.I_Identify;
+import org.dwfa.ace.api.I_ProcessConcepts;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
 import org.dwfa.ace.refset.spec.I_HelpSpecRefset;
 import org.dwfa.ace.task.refset.members.RefsetUtilImpl;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.ihtsdo.project.TerminologyProjectDAO;
 import org.ihtsdo.project.refset.ConceptMembershipRefset;
+import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 
 /**
@@ -80,18 +88,21 @@ public class ExportConceptMemberRefsetToRefset {
      * The formatter.
      */
     SimpleDateFormat formatter;
+    SimpleDateFormat formatter2;
     /**
      * The output file writer2.
      */
     private BufferedWriter outputFileWriter2;
+	private BufferedWriter outputFileWriter3;
 
     /**
      * Instantiates a new export concept member refset to refset.
+     * @param rf2Format 
      */
     public ExportConceptMemberRefsetToRefset() {
         termFactory = Terms.get();
         formatter = new SimpleDateFormat("yyyyMMddHHmmss");
-
+        formatter2 = new SimpleDateFormat("MMM dd, yyyy HH:mm:ss");
     }
 
     /**
@@ -100,16 +111,18 @@ public class ExportConceptMemberRefsetToRefset {
      * @param exportFile the export file
      * @param exportFile2 the export file2
      * @param reportFile the report file
+     * @param reportFile2, File reportFile3 
      * @param refsetConcept the refset concept
      * @param exportToCsv the export to csv
      * @return the long[]
      * @throws Exception the exception
      */
-    public Long[] exportFile(File exportFile, File exportFile2, File reportFile, I_GetConceptData refsetConcept, boolean exportToCsv) throws Exception {
+    public Long[] exportFile(File exportFile, File exportFile2, File exportFile3, File reportFile, I_GetConceptData refsetConcept, boolean exportToCsv) throws Exception {
 
         reportFileWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(reportFile), "UTF8"));
         outputFileWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(exportFile), "UTF8"));
         outputFileWriter2 = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(exportFile2), "UTF8"));
+        outputFileWriter3 = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(exportFile3), "UTF8"));
 
         String begEnd;
         String sep;
@@ -126,6 +139,12 @@ public class ExportConceptMemberRefsetToRefset {
         Collection<? extends I_ExtendByRef> extensions = Terms.get().getRefsetExtensionMembers(
                 refsetConcept.getConceptNid());
 
+        if (extensions.size() == 0) {
+        	AnnotationProcesser processor = new AnnotationProcesser(refsetConcept.getConceptNid());
+			Terms.get().iterateConcepts(processor);
+			extensions = processor.getExtensions();
+        }
+        
         I_ConfigAceFrame config = termFactory.getActiveAceFrameConfig();
 
         RefsetUtilImpl rUtil = new RefsetUtilImpl();
@@ -157,6 +176,7 @@ public class ExportConceptMemberRefsetToRefset {
                 //UUID file
                 String id = ext.getUUIDs().iterator().next().toString();
                 String effectiveTime = formatter.format(lastPart.getTime());
+                String reportTime = formatter2.format(lastPart.getTime());
                 String compoID = Terms.get().getConcept(ext.getComponentNid()).getUUIDs().iterator().next().toString();
                 String moduleId = Terms.get().getConcept(lastPart.getPathNid()).getUids().iterator().next().toString();
 
@@ -196,6 +216,14 @@ public class ExportConceptMemberRefsetToRefset {
                     outputFileWriter2.append(begEnd + sctId_id + sep + effectiveTime + sep + "1" + sep + sctId_moduleId + sep + refsetSCTID + sep + conceptId + begEnd
                             + "\r\n");
 
+                    if (refsetConcept.getInitialText().contains("JIF Reactants")) {
+                    	I_ExtendByRefPartCid concExt = (I_ExtendByRefPartCid)ext;
+                    	
+                    	outputFileWriter3.append(begEnd +  getDescForCon(conceptId) + sep + getDescForCon(concExt.getC1id()) + sep + reportTime + begEnd + "\r\n");
+                    } else {
+                    	outputFileWriter3.append(begEnd +  getDescForCon(conceptId) + sep + reportTime + begEnd + "\r\n");
+                    }
+
                     SCTIDlineCount++;
 
                 }
@@ -209,7 +237,64 @@ public class ExportConceptMemberRefsetToRefset {
         outputFileWriter.close();
         outputFileWriter2.flush();
         outputFileWriter2.close();
+        outputFileWriter3.flush();
+        outputFileWriter3.close();
 
         return new Long[]{UUIDlineCount, SCTIDlineCount};
     }
+    
+    private String getDescForCon(int nid) {
+    	try {
+	        I_GetConceptData con  = Terms.get().getConcept(nid);
+        	return con.getInitialText();
+    	} catch (Exception e) {
+    		e.printStackTrace();
+    		return "<BAD CON ID>";
+    	}
+	}
+
+	private String getDescForCon(String sctId_id) {
+    	try {
+	        Set<I_GetConceptData> cons = Terms.get().getConcept(sctId_id);
+	        if (cons.size() != 1) {
+	        	throw new Exception("Id: " + sctId_id + " could not be found");
+	        } else {
+	        	return cons.iterator().next().getInitialText();
+	        }
+    	} catch (Exception e) {
+    		e.printStackTrace();
+    		return "<BAD CON ID>";
+    	}
+	}
+
+	private class AnnotationProcesser implements I_ProcessConcepts {
+    	private List<I_ExtendByRef> extensions = new ArrayList<I_ExtendByRef>();
+		private int refsetNid;
+		private int rootNid;
+
+        public AnnotationProcesser(int refsetNid) {
+        		this.refsetNid = refsetNid;
+        		try {
+					rootNid = Ts.get().getConcept(UUID.fromString("ee9ac5d2-a07c-3981-a57a-f7f26baf38d8")).getConceptNid();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+        }
+
+        public void processConcept(I_GetConceptData concept) throws Exception {
+        	if (Ts.get().isKindOf(concept.getConceptNid(), rootNid, Terms.get().getActiveAceFrameConfig().getViewCoordinate())) {
+	            for (RefexChronicleBI<?> annotation : concept.getAnnotations()) {
+	        		if (annotation.getRefexNid() == refsetNid) {
+	                	extensions.add((I_ExtendByRef) annotation);
+	        		}
+	        	}
+	        } 
+        }
+        
+		public Collection<? extends I_ExtendByRef> getExtensions() {
+			return extensions;
+		}
+    }
+
 }

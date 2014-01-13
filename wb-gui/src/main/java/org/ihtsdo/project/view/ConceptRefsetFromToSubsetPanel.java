@@ -451,6 +451,7 @@ public class ConceptRefsetFromToSubsetPanel extends JPanel {
 
 						String fileDate=formatter.format(new java.util.Date().getTime());
 						String fileName=	txtFileExp.getText().trim() + File.separator + clabelExp.getText() + EFFECTIVETIME_SEPARATOR + fileDate ;
+						String fileName3=	txtFileExp.getText().trim() + File.separator + clabelExp.getText() + EFFECTIVETIME_SEPARATOR + fileDate ;
 						
 						if (txtExplogFile.getText().trim().equals("")){
 							txtExplogFile.setText(fileName + ".log");
@@ -460,12 +461,17 @@ public class ConceptRefsetFromToSubsetPanel extends JPanel {
 						
 						String fileName2=fileName;
 						File exportFile2=null;
+						File exportFile3=null;
 						if (rbERF2.isSelected()){
 							fileName2+="_SCTID";
 							fileName2+= (rbTxt.isSelected()? ".txt": ".csv");
 							exportFile2=new File(fileName2);
 							
 							fileName+="_UUID";
+							
+							fileName3+="_Report";
+							fileName3+= (rbTxt.isSelected()? ".txt": ".csv");
+							exportFile3 = new File(fileName3);
 						}
 						
 						fileName+= (rbTxt.isSelected()? ".txt": ".csv");
@@ -480,9 +486,10 @@ public class ConceptRefsetFromToSubsetPanel extends JPanel {
 								txtERes.setText("Exported to file " + exportFile.getName()  + " : " + eRes[0] + " lines");
 							}else{
 								ExportConceptMemberRefsetToRefset expConcept=new ExportConceptMemberRefsetToRefset();
-								eRes=expConcept.exportFile(exportFile,exportFile2, reportFile, refsetExp,rbCsv.isSelected());
+								eRes=expConcept.exportFile(exportFile,exportFile2, exportFile3, reportFile, refsetExp,rbCsv.isSelected());
 								txtERes.setText("Exported to UUID file " + exportFile.getName()  + " : " + eRes[0] + " lines.\n" +
-												"Exported to SCTID file " + exportFile2.getName()  + " : " + eRes[1] + " lines");
+												"Exported to SCTID file " + exportFile2.getName()  + " : " + eRes[1] + " lines.\n" + 
+												"Exported to Descrtion file " + exportFile3.getName()  + " : " + eRes[1] + " lines.");
 
 							}
 						} catch (TerminologyException e) {
