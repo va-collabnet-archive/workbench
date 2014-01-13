@@ -28,9 +28,9 @@ the specific language governing permissions and limitations under the License. -
         needs of their end users.
     </description>
     <scm>
-        <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/branches/trek-no-jini-2.33-id-july</connection>
-        <developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/branches/trek-no-jini-2.33-id-july</developerConnection>
-        <url>https://csfe.aceworkspace.net/integration/viewvc/viewvc.cgi/tags/branches/trek-no-jini-2.33-id-july?root=workbench&amp;system=exsy1002/wb-mmb-2.33-trek-no-jini</url>
+        <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/branches/trek-no-jini-2.33-r201407</connection>
+        <developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/branches/trek-no-jini-2.33-r201407</developerConnection>
+        <url>https://csfe.aceworkspace.net/svn/repos/workbench/branches/trek-no-jini-2.33-r201407</url>
     </scm>
     <properties>
         <branch>id-july</branch>
