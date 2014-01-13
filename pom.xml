@@ -28,9 +28,9 @@
         needs of their end users.
     </description>
 	<scm>
-		<connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/branches/wb-mmb-2.6.0-trek-147</connection>
-		<developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/branches/wb-mmb-2.6.0-trek-147</developerConnection>
-		<url>https://csfe.aceworkspace.net/svn/repos/workbench/branches/wb-mmb-2.6.0-trek-147</url>
+		<connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/branches/wb-mmb-2.6.0-trek-147-patch-r201401</connection>
+		<developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/branches/wb-mmb-2.6.0-trek-147-patch-r201401</developerConnection>
+		<url>https://csfe.aceworkspace.net/svn/repos/workbench/branches/wb-mmb-2.6.0-trek-147-patch-r201401</url>
 	</scm>
 	<properties>
 		<branch>trek</branch>
