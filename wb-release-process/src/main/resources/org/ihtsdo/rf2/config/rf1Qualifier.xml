@@ -1,39 +1,39 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <config>
-	<exportFileName>der2_cRefset_AssociationReferenceFull_INT_</exportFileName>
-	<droolsDrlFile>org/ihtsdo/rf2/drools/HistoricalReleaseRules.drl</droolsDrlFile>
+	<exportFileName>sct1_Qualifiers_</exportFileName>
+	<droolsDrlFile>org/ihtsdo/rf2/drools/QualifierReleaseRules.drl</droolsDrlFile>
 	<column>
-		<name>id</name>
+		<name>RELATIONSHIPID</name>
 		<description></description>
 		<delimiter>\t</delimiter>
 	</column>
 	<column>
-		<name>effectiveTime</name>
+		<name>CONCEPTID1</name>
 		<description></description>
 		<delimiter>\t</delimiter>
 	</column>
 	<column>
-		<name>active</name>
+		<name>RELATIONSHIPTYPE</name>
 		<description></description>
 		<delimiter>\t</delimiter>
 	</column>
 	<column>
-		<name>moduleId</name>
+		<name>CONCEPTID2</name>
 		<description></description>
 		<delimiter>\t</delimiter>
 	</column>
 	<column>
-		<name>refsetId</name>
+		<name>CHARACTERISTICTYPE</name>
 		<description></description>
 		<delimiter>\t</delimiter>
 	</column>
 	<column>
-		<name>referencedComponentId</name>
+		<name>REFINABILITY</name>
 		<description></description>
 		<delimiter>\t</delimiter>
 	</column>
 	<column>
-		<name>targetComponentId</name>
+		<name>RELATIONSHIPGROUP</name>
 		<description></description>
 		<delimiter>\r\n</delimiter>
 	</column>

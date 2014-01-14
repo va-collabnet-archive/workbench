@@ -139,11 +139,20 @@ public class RF2RelationshipImpl extends RF2AbstractImpl implements I_ProcessCon
 							}
 						}
 					}
-					
+
+					effectiveTime = getDateFormat().format(new Date(rel.getTime()));
 					relationshipStatusId = rel.getStatusNid();
 					if (relationshipStatusId == activeNid) {               
 						active = "1";
-						moduleId = getConceptMetaModuleID(sourceConcept,releaseDate);
+
+						if (sourceId.equals("900000000000441003") 
+								&& destinationId.equals("138875005")
+								&& relTypeId.equals("116680003") 
+								&& effectiveTime.compareTo("20130131")>0){
+							moduleId=I_Constants.CORE_MODULE_ID;
+						}else{
+							moduleId = getConceptMetaModuleID(sourceConcept,releaseDate);
+						}
 				     } else if (relationshipStatusId == inactiveNid) {               
 					      active = "0";
 					      moduleId=I_Constants.CORE_MODULE_ID;
@@ -173,7 +182,6 @@ public class RF2RelationshipImpl extends RF2AbstractImpl implements I_ProcessCon
 					}
 					
 					
-					effectiveTime = getDateFormat().format(new Date(rel.getTime()));
 					
 					int relationshipGroup = rel.getGroup();
 
@@ -195,7 +203,6 @@ public class RF2RelationshipImpl extends RF2AbstractImpl implements I_ProcessCon
 							continue;
 						}
 					}
-					
 					
 					if ((relationshipId==null || relationshipId.equals("")) && active.equals("1")){
 						relationshipId=rel.getUUIDs().iterator().next().toString();						
