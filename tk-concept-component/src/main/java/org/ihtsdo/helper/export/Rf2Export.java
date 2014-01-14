@@ -317,12 +317,15 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                 + country.getFormatedCountryCode().toUpperCase() 
                 + namespace + "_"
                 + TimeHelper.getShortFileDateFormat().format(effectiveDate) + ".txt");
-        File otherLangRefsetsFile = new File(directory,
+        File otherLangRefsetsFile = null;
+        if(!language.getFormatedLanguageNoDialectCode().equals(LANG_CODE.EN.getFormatedLanguageCode())){
+             otherLangRefsetsFile = new File(directory,
                 "der2_cRefset_Language_UUID" + releaseType.suffix + "-"
                 + language.getFormatedLanguageNoDialectCode() + "_" 
                 + country.getFormatedCountryCode().toUpperCase()
                 + namespace + "_"
                 + TimeHelper.getShortFileDateFormat().format(effectiveDate) + ".txt");
+        }
         File modDependFile = new File(directory,
                 "der2_ssRefset_ModuleDependency_UUID" + releaseType.suffix + "_"
                 + country.getFormatedCountryCode().toUpperCase() + namespace + "_"
@@ -363,8 +366,10 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
         attributeValueWriter = new BufferedWriter(new OutputStreamWriter(attributeValueOs, "UTF8"));
         FileOutputStream langRefOs = new FileOutputStream(langRefsetsFile);
         langRefsetsWriter = new BufferedWriter(new OutputStreamWriter(langRefOs, "UTF8"));
-        FileOutputStream langOs = new FileOutputStream(otherLangRefsetsFile);
-        otherLangRefsetsWriter = new BufferedWriter(new OutputStreamWriter(langOs, "UTF8"));
+        if(otherLangRefsetsFile != null){
+            FileOutputStream langOs = new FileOutputStream(otherLangRefsetsFile);
+            otherLangRefsetsWriter = new BufferedWriter(new OutputStreamWriter(langOs, "UTF8"));
+        }
         FileOutputStream modDependOs = new FileOutputStream(modDependFile);
         modDependWriter = new BufferedWriter(new OutputStreamWriter(modDependOs, "UTF8"));
         FileOutputStream descTypeOs = new FileOutputStream(descTypeFile);
@@ -404,9 +409,10 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
         for (Rf2File.LanguageRefsetFileFields field : Rf2File.LanguageRefsetFileFields.values()) {
             langRefsetsWriter.write(field.headerText + field.seperator);
         }
-
-        for (Rf2File.LanguageRefsetFileFields field : Rf2File.LanguageRefsetFileFields.values()) {
-            otherLangRefsetsWriter.write(field.headerText + field.seperator);
+        if(otherLangRefsetsWriter != null){
+            for (Rf2File.LanguageRefsetFileFields field : Rf2File.LanguageRefsetFileFields.values()) {
+                otherLangRefsetsWriter.write(field.headerText + field.seperator);
+            }
         }
 
         for (Rf2File.ModuleDependencyFileFields field : Rf2File.ModuleDependencyFileFields.values()) {
