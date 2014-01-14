@@ -1505,7 +1505,9 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                         } else if (refexChronicle.getRefexNid() == RefsetAux.EN_US_REFEX.getLenient().getNid()) {
                             processLang(rv);
                         } else {
-                            processOtherLang(rv);
+                            if(otherLangRefsetsWriter != null){
+                                processOtherLang(rv);
+                            }
                         }
                     }
 

@@ -474,9 +474,11 @@ public class UuidToSctIdWriter {
         for (Rf2File.LanguageRefsetFileFields field : Rf2File.LanguageRefsetFileFields.values()) {
             langRefsetsWriter.write(field.headerText + field.seperator);
         }
-
-        for (Rf2File.LanguageRefsetFileFields field : Rf2File.LanguageRefsetFileFields.values()) {
-            otherLangRefsetsWriter.write(field.headerText + field.seperator);
+        
+        if (otherLangRefsetsWriter != null) {
+            for (Rf2File.LanguageRefsetFileFields field : Rf2File.LanguageRefsetFileFields.values()) {
+                otherLangRefsetsWriter.write(field.headerText + field.seperator);
+            }
         }
 
         for (Rf2File.ModuleDependencyFileFields field : Rf2File.ModuleDependencyFileFields.values()) {
