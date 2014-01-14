@@ -290,7 +290,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
         File identifiersFile = null;
         if (makePrivateIdFile) {
             privateIdentifiersFile = new File(directory,
-                    "sct2_Identifier_Auxiliary_UUID_" + releaseType.suffix + "_"
+                    "sct2_IdentifierAuxiliary_UUID_" + releaseType.suffix + "_"
                     + country.getFormatedCountryCode().toUpperCase() + namespace + "_"
                     + TimeHelper.getShortFileDateFormat().format(effectiveDate) + ".txt");
             identifiersFile = new File(directory,

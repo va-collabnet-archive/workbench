@@ -340,7 +340,7 @@ public class UuidToSctIdWriter {
             } else if (inputFile.getName().startsWith("sct2_Identifier_UUID_" + this.releaseType.suffix)) {
                 identifiersFileUuid = inputFile;
                 identifiersReader = new BufferedReader(new InputStreamReader(new FileInputStream(inputFile), "UTF8"));
-            } else if (inputFile.getName().startsWith("sct2_Identifier_Auxiliary_UUID_" + this.releaseType.suffix)) {
+            } else if (inputFile.getName().startsWith("sct2_IdentifierAuxiliary_UUID_" + this.releaseType.suffix)) {
                 privateIdentifiersFileUuid = inputFile;
                 privateIdentifiersReader = new BufferedReader(new InputStreamReader(new FileInputStream(inputFile), "UTF8"));
             } else if (inputFile.getName().startsWith("sct2_StatedRelationship_UUID_" + this.releaseType.suffix)) {
