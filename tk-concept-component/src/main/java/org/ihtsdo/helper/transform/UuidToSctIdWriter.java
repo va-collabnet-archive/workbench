@@ -415,6 +415,9 @@ public class UuidToSctIdWriter {
         if (privateIdentifiersFile != null) {
             FileOutputStream privIdOs = new FileOutputStream(privateIdentifiersFile);
             privateIdentifiersWriter = new BufferedWriter(new OutputStreamWriter(privIdOs, "UTF8"));
+            for (Rf2File.IdentifiersFileFields field : Rf2File.IdentifiersFileFields.values()) {
+                privateIdentifiersWriter.write(field.headerText + field.seperator);
+            }
         }
         FileOutputStream relStatedOs = new FileOutputStream(statedRelFile);
         relationshipsStatedWriter = new BufferedWriter(new OutputStreamWriter(relStatedOs, "UTF8"));
