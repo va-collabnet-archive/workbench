@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -127,7 +128,7 @@ public class Rf2CreatePlaceHoldersMojo extends AbstractMojo implements Serializa
      */
     ArrayList<Long> foundSctIds;
     ArrayList<Long> neededSctIds;
-    List<List<Rf2File>> listOfDirs = new ArrayList<List<Rf2File>>();
+    List<List<Rf2File>> listOfDirs = new ArrayList<>();
     
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
@@ -218,12 +219,31 @@ public class Rf2CreatePlaceHoldersMojo extends AbstractMojo implements Serializa
                 expectedConcepts = mergeConceptArrays(expectedConcepts, scratchConcepts);
             }
             
+            // USE UUIDs FROM IDENTIFIER FILE
+            // Parse IHTSDO Terminology Identifiers to Sct_CompactId cache file.
+            List<Rf2File> idFilesIn = new ArrayList<>();
+            String cachePath = targetDirectory.getAbsolutePath() + FILE_SEPARATOR;
+            String idCacheFName = cachePath + "uuidRemapCache.ser";
+            if ((new File(cachePath)).mkdirs()) {
+                getLog().info("::: Directory added : " + cachePath);
+            }
+            getLog().info("::: UUID Remap Cache : " + idCacheFName);
+            
+            for (Rf2Dir rf2dir : rf2Dirs) {
+                idFilesIn.addAll(Rf2File.getFiles(targetDirectory.toString(), targetSubDir, rf2dir.getDirName(),"dentifier_", ".txt"));
+            }
+            Sct2_UuidUuidRecord.parseToUuidRemapCacheFile(idFilesIn, idCacheFName);
+
+            Sct2_UuidUuidRemapper idLookup = new Sct2_UuidUuidRemapper(idCacheFName);
+
             if (expectedConcepts != null && expectedConcepts.length > 0) {
-                writePlaceHolderConcepts(expectedConcepts);
+                writePlaceHolderConcepts(expectedConcepts, idLookup);
             }
             
         } catch (IOException e) {
             throw new MojoExecutionException(e.getMessage());
+        } catch (Exception ex) {
+            throw new MojoExecutionException(ex.getMessage());
         }
         
         getLog().info("::: END Rf2CreatePlaceHoldersMojo");
@@ -281,7 +301,7 @@ public class Rf2CreatePlaceHoldersMojo extends AbstractMojo implements Serializa
                     + " unique concept ids: " + a.length + " concepts, "
                     + (System.currentTimeMillis() - start) + " milliseconds");
             
-        } catch (Exception e) {
+        } catch (IOException | NumberFormatException e) {
             throw new MojoFailureException("parseForConceptIds failed");
         }
         
@@ -405,16 +425,16 @@ public class Rf2CreatePlaceHoldersMojo extends AbstractMojo implements Serializa
     private List<Rf2File> getRF2Files(File wDir, String subDir, Rf2Dir[] inDirs,
             String prefix, String postfix) throws MojoFailureException {
         
-        List<Rf2File> listOfRf2Dirs = new ArrayList<Rf2File>();
+        List<Rf2File> listOfRf2Dirs = new ArrayList<>();
         for (Rf2Dir rf2Dir : inDirs) {
-            ArrayList<Rf2File> listOfFiles = new ArrayList<Rf2File>();
+            ArrayList<Rf2File> listOfFiles = new ArrayList<>();
             
             getLog().info(
                     String.format("%1$s (%2$s%3$s%4$s) ", prefix.toUpperCase(), wDir, subDir,
                     rf2Dir.getDirName()));
             
             File f1 = new File(new File(wDir, subDir), rf2Dir.getDirName());
-            ArrayList<File> fv = new ArrayList<File>();
+            ArrayList<File> fv = new ArrayList<>();
             listFilesRecursive(fv, f1, prefix, postfix);
             
             File[] files = new File[0];
@@ -504,20 +524,19 @@ public class Rf2CreatePlaceHoldersMojo extends AbstractMojo implements Serializa
         }
         File[] files = root.listFiles();
         Arrays.sort(files);
-        for (int i = 0; i < files.length; i++) {
-            String name = files[i].getName().toUpperCase();
-            
-            if (files[i].isFile() && name.endsWith(postfix.toUpperCase())
-                    && name.contains(prefix.toUpperCase())) {
-                list.add(files[i]);
+        for (File file : files) {
+            String name = file.getName().toUpperCase();
+            if (file.isFile() && name.endsWith(postfix.toUpperCase()) && name.contains(prefix.toUpperCase())) {
+                list.add(file);
             }
-            if (files[i].isDirectory()) {
-                listFilesRecursive(list, files[i], prefix, postfix);
+            if (file.isDirectory()) {
+                listFilesRecursive(list, file, prefix, postfix);
             }
         }
     }
     
-    private void writePlaceHolderConcepts(long[] expectedConcepts)
+    private void writePlaceHolderConcepts(long[] expectedConcepts, 
+            Sct2_UuidUuidRemapper uuidUuidRemapper)
             throws MojoFailureException {
         
         try {
@@ -536,7 +555,15 @@ public class Rf2CreatePlaceHoldersMojo extends AbstractMojo implements Serializa
                     writeDirStr, "ids_placeholders.txt")), "UTF-8"));
             
             for (long sid : expectedConcepts) {
-                String conceptUuidStr = Type3UuidFactory.fromSNOMED(sid).toString();
+                UUID sctComputedUuid = Type3UuidFactory.fromSNOMED(sid);
+                String conceptUuidStr;
+                UUID assignedUuid = uuidUuidRemapper.getUuid(sctComputedUuid);
+                if (assignedUuid !=null) {
+                    conceptUuidStr = assignedUuid.toString();
+                } else {
+                    conceptUuidStr = sctComputedUuid.toString();
+                }
+
                 concepts.append(conceptUuidStr); // concept uuid
                 concepts.append("\t");
                 concepts.append("FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF"); //status uuid
