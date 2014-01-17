@@ -17,7 +17,7 @@ the specific language governing permissions and limitations under the License. -
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.ihtsdo</groupId>
     <artifactId>wb-mmb</artifactId>
-    <version>1.0-oct-sprint</version>
+    <version>1.1-oct-sprint-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>${branch}: (MMP) Workbench Toolkit</name>
     <description>The IHTSDO Workbench provides two software frameworks for
@@ -28,9 +28,9 @@ the specific language governing permissions and limitations under the License. -
         needs of their end users.
     </description>
     <scm>
-        <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/tags/wb-mmb-1.0-oct-sprint</connection>
-        <developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/tags/wb-mmb-1.0-oct-sprint</developerConnection>
-        <url>https://csfe.aceworkspace.net/integration/viewvc/viewvc.cgi/tags/tags?root=workbench&amp;system=exsy1002/wb-mmb-2.32-trek-no-jini/wb-mmb-1.0-oct-sprint</url>
+        <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/branches/oct-sprint-no-jini-32</connection>
+        <developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/branches/oct-sprint-no-jini-32</developerConnection>
+        <url>https://csfe.aceworkspace.net/integration/viewvc/viewvc.cgi/tags/branches/oct-sprint-no-jini-32?root=workbench&amp;system=exsy1002/wb-mmb-2.32-trek-no-jini</url>
     </scm>
     <properties>
         <branch>October-sprint</branch>
