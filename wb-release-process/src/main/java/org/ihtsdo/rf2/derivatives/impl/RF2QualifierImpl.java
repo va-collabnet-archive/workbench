@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
@@ -69,7 +70,10 @@ public class RF2QualifierImpl extends RF2AbstractImpl implements I_ProcessConcep
 					return;
 				}
 				HashMap<Integer, String> types = ExportUtil.getTypeForQualifiers();
-				
+
+				if (conceptid.contains("-")){
+					conceptid=getSCTId(getConfig(), UUID.fromString(conceptid));
+				}
 				for (Integer order:types.keySet()){
 					if (ExportUtil.testDomain(order, concept, currenAceConfig)){
 						String line=ExportUtil.getQualifierRF1Row(order,  conceptid, getConfig());
