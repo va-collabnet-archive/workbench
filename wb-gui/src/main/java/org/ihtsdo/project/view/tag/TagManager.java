@@ -18,13 +18,20 @@ package org.ihtsdo.project.view.tag;
 
 import java.awt.Color;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.net.URI;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -116,7 +123,9 @@ public class TagManager {
 			return result;
 		}
 		for (File file : tags) {
-			if (!file.isHidden() && !file.getName().contains(".svn") && !file.getName().contains("svn")) {
+			String name = file.getName();
+			String decodedName = URLDecoder.decode(name, "UTF-8");
+			if (!file.isHidden() && !decodedName.contains(".svn") && !decodedName.contains("svn")) {
 				FileInputStream ifis = new FileInputStream(file);
 				InputStreamReader iisr = new InputStreamReader(ifis, "UTF-8");
 				BufferedReader br = new BufferedReader(iisr);
@@ -126,6 +135,7 @@ public class TagManager {
 					String uuid = br.readLine();
 					uuidList.add(uuid.split(","));
 				}
+				br.close();
 				InboxTag tag = new InboxTag(getName(tagHeader), getHtmlColor(getColorFromHeader(tagHeader)),
 						getHtmlColor(getTextColorFromHeader(tagHeader)), uuidList);
 				result.add(tag);
@@ -181,7 +191,9 @@ public class TagManager {
 	private void removeUuidFromAllTagFiles(String[] uuidToRemove) throws FileNotFoundException, IOException {
 		File[] tags = tagFolder.listFiles();
 		for (File file : tags) {
-			if (!file.isHidden() && !file.getName().contains(".svn") && !file.getName().contains("svn")) {
+			String name = file.getName();
+			String decodedName = URLDecoder.decode(name, "UTF-8");
+			if (!file.isHidden() && !decodedName.contains(".svn") && !decodedName.contains("svn")) {
 				FileInputStream ifis = new FileInputStream(file);
 				InputStreamReader iisr = new InputStreamReader(ifis, "UTF-8");
 				BufferedReader br = new BufferedReader(iisr);
@@ -192,7 +204,9 @@ public class TagManager {
 					uuidList.add(uuid.split(","));
 				}
 				br.close();
-				PrintWriter pw = new PrintWriter(file);
+				FileOutputStream fos = new FileOutputStream(file);
+				OutputStreamWriter osw = new OutputStreamWriter(fos, "UTF-8");
+				PrintWriter pw = new PrintWriter(osw);
 				pw.println(tagHeader);
 				List<String[]> tmpUuidList = new ArrayList<String[]>();
 				for (String[] strings : uuidList) {
@@ -236,7 +250,9 @@ public class TagManager {
 			header = reader.readLine();
 			reader.close();
 		}
-		PrintWriter pw = new PrintWriter(tagFile);
+		FileOutputStream fos = new FileOutputStream(tagFile);
+		OutputStreamWriter osw = new OutputStreamWriter(fos, "UTF-8");
+		PrintWriter pw = new PrintWriter(osw);
 		pw.println(header);
 		pw.flush();
 		pw.close();
@@ -258,7 +274,10 @@ public class TagManager {
 			return result;
 		}
 		for (File file : tags) {
-			if (!file.isHidden() && !file.getName().contains(".svn") && !file.getName().contains("svn")) {
+			String name = file.getName();
+			String decodedName = URLDecoder.decode(name, "UTF-8");
+			
+			if (!file.isHidden() && !name.contains(".svn") && !name.contains("svn")) {
 				FileInputStream ifis = new FileInputStream(file);
 				InputStreamReader iisr = new InputStreamReader(ifis, "UTF-8");
 				BufferedReader br = new BufferedReader(iisr);
@@ -322,7 +341,7 @@ public class TagManager {
 	 *             Signals that an I/O exception has occurred.
 	 */
 	public InboxTag persistTag(InboxTag tag) throws IOException {
-		File tagFile = new File(tagFolder, tag.getTagName() + ".tag");
+		File tagFile = new File(tagFolder, URLEncoder.encode(tag.getTagName(),"UTF-8") + ".tag");
 		String header = "";
 		List<String[]> uuidList = new ArrayList<String[]>();
 		if (tagFile.exists()) {
@@ -349,8 +368,9 @@ public class TagManager {
 				tmpList.add(string);
 			}
 		}
-
-		PrintWriter pw = new PrintWriter(tagFile);
+		FileOutputStream fos = new FileOutputStream(tagFile);
+		OutputStreamWriter osw = new OutputStreamWriter(fos, "UTF-8");
+		PrintWriter pw = new PrintWriter(osw);
 		pw.println(header);
 		for (String[] uuid : tmpList) {
 			pw.print(uuid[InboxTag.TERM_WORKLIST_UUID_INDEX] + ",");
@@ -377,7 +397,7 @@ public class TagManager {
 	 *             Signals that an I/O exception has occurred.
 	 */
 	public void sendBackToInbox(InboxTag tag, WfInstance wfInstance) throws IOException {
-		File tagFile = new File(tagFolder, tag.getTagName() + ".tag");
+		File tagFile = new File(tagFolder, URLEncoder.encode(tag.getTagName(),"UTF-8") + ".tag");
 		String header = "";
 		List<String[]> uuidList = new ArrayList<String[]>();
 		if (tagFile.exists()) {
@@ -398,7 +418,9 @@ public class TagManager {
 				nameColorCache.remove(nameColorTag);
 			}
 		} else {
-			PrintWriter pw = new PrintWriter(tagFile);
+			FileOutputStream fos = new FileOutputStream(tagFile);
+			OutputStreamWriter osw = new OutputStreamWriter(fos, "UTF-8");
+			PrintWriter pw = new PrintWriter(osw);
 			pw.println(header);
 			for (String[] uuid : uuidList) {
 				pw.print(uuid[InboxTag.TERM_WORKLIST_UUID_INDEX] + ",");
@@ -420,7 +442,7 @@ public class TagManager {
 	 *             Signals that an I/O exception has occurred.
 	 */
 	public InboxTag removeTag(InboxTag tag, String[] uuidToRemove) throws IOException {
-		File tagFile = new File(tagFolder, tag.getTagName() + ".tag");
+		File tagFile = new File(tagFolder, URLEncoder.encode(tag.getTagName(),"UTF-8") + ".tag");
 		String header = "";
 		List<String[]> uuidList = new ArrayList<String[]>();
 		if (tagFile.exists()) {
@@ -441,7 +463,9 @@ public class TagManager {
 				nameColorCache.remove(nameColorTag);
 			}
 		} else {
-			PrintWriter pw = new PrintWriter(tagFile);
+			FileOutputStream fos = new FileOutputStream(tagFile);
+			OutputStreamWriter osw = new OutputStreamWriter(fos, "UTF-8");
+			PrintWriter pw = new PrintWriter(osw);
 			pw.println(header);
 			for (String[] uuid : uuidList) {
 				pw.print(uuid[InboxTag.TERM_WORKLIST_UUID_INDEX] + ",");
@@ -485,7 +509,9 @@ public class TagManager {
 		InboxTag result = null;
 		File[] tags = tagFolder.listFiles();
 		for (File file : tags) {
-			if (file.getName().equals(tagName + ".tag")) {
+			String name = file.getName();
+			String decodedName = URLDecoder.decode(name, "UTF-8");
+			if (decodedName.equals(tagName + ".tag")) {
 				BufferedReader br = new BufferedReader(new FileReader(file));
 				String tagHeader = br.readLine();
 				String color = getHtmlColor(getColorFromHeader(tagHeader));
