@@ -299,7 +299,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                     + TimeHelper.getShortFileDateFormat().format(effectiveDate) + ".txt");
         } else {
             identifiersFile = new File(directory,
-                    "sct2_Identifier_UUID" + releaseType.suffix + "_"
+                    "sct2_Identifier_UUID_" + releaseType.suffix + "_"
                     + country.getFormatedCountryCode().toUpperCase() + namespace + "_"
                     + TimeHelper.getShortFileDateFormat().format(effectiveDate) + ".txt");
         }

@@ -351,9 +351,31 @@ public class GenerateIncrementalRf2File extends AbstractMojo {
             for(UUID uuid : moduleUuids){
                 moduleIds.add(Ts.get().getNidForUuids(uuid));
             }
-            
+            File metaDir = new File(output.getParentFile(), "refset-econcept");
+            metaDir.mkdir();
+//          compute spec refsets
+            Integer refsetParentConceptNid = null;
+            if (refsetParentConceptSpec != null) {
+                refsetParentConceptNid = Ts.get().getNidForUuids(UUID.fromString(refsetParentConceptSpec.getUuid()));
+                vc.getPositionSet().getViewPathNidSet();
+                EditCoordinate ec = new EditCoordinate(TermAux.USER.getLenient().getConceptNid(),
+                        Ts.get().getNidForUuids(UUID.fromString(moduleConcepts[0].getUuid())),
+                        viewPathNid);
+                ReleaseSpecProcessor refsetSpecComputer = new ReleaseSpecProcessor(ec,
+                        vc, ChangeSetPolicy.OFF, refsetParentConceptNid);
+                refsetSpecComputer.process();
+                if(releaseType == ReleaseType.FULL){
+                    refsetSpecComputer.writeRefsetSpecMetadata(metaDir); //only care about FULL for import
+                }
+            }
             File refsetCs = new File(output.getParentFile(), "changesets");
             refsetCs.mkdir();
+//            get stamps after refset computations
+            stampsToWrite = Bdb.getSapDb().getSpecifiedSapNids(null,
+                    TimeHelper.getTimeFromString(startDate, TimeHelper.getFileDateFormat()),
+                    TimeHelper.getTimeFromString(endDate, TimeHelper.getFileDateFormat()),
+                    null, moduleIds, pathIds);
+            
 //          write RF2 specific metadata refsets  
             if (makeRf2Refsets) {
                 Rf2RefexComputer rf2RefexComputer = new Rf2RefexComputer(vc, Ts.get().getMetadataEditCoordinate(),
@@ -367,13 +389,7 @@ public class GenerateIncrementalRf2File extends AbstractMojo {
                     stampsToWrite.add(stamp);
                 }
             }
-            
-            stampsToWrite = Bdb.getSapDb().getSpecifiedSapNids(null,
-                    TimeHelper.getTimeFromString(startDate, TimeHelper.getFileDateFormat()),
-                    TimeHelper.getTimeFromString(endDate, TimeHelper.getFileDateFormat()),
-                    null, moduleIds, pathIds);
-            
-
+//          
             IntSet sapsToRemove = new IntSet();
             if (previousReleaseDate != null) {
                 sapsToRemove = Bdb.getSapDb().getSpecifiedSapNids(pathIds,
@@ -404,7 +420,7 @@ public class GenerateIncrementalRf2File extends AbstractMojo {
             }
             UuidSnomedMapHandler handler = new UuidSnomedMapHandler(mappingFileDir, mappingFileDir);
             handler.setNamespace(namespace);
-            Integer refsetParentConceptNid = 0;
+
             if (refsetParentConceptSpec != null) {
                 refsetParentConceptNid = Ts.get().getNidForUuids(UUID.fromString(refsetParentConceptSpec.getUuid()));
             }
@@ -416,13 +432,12 @@ public class GenerateIncrementalRf2File extends AbstractMojo {
             TaxonomyFilter filter = new TaxonomyFilter();
             Ts.get().iterateConceptDataInParallel(filter);
             NidBitSetBI nidsToRelease = filter.getResults();
-            for(UUID moduleId : moduleUuids){
                 Rf2Export exporter = new Rf2Export(output,
                     releaseType,
                     LANG_CODE.valueOf(languageCode),
                     COUNTRY_CODE.valueOf(countryCode),
                     namespace,
-                    moduleId.toString(),
+                    moduleConcepts[0].getUuid(),
                     new Date(TimeHelper.getTimeFromString(effectiveDate,
                     TimeHelper.getAltFileDateFormat())),
                     new Date(TimeHelper.getTimeFromString(snomedCoreReleaseDate,
@@ -441,13 +456,12 @@ public class GenerateIncrementalRf2File extends AbstractMojo {
             Ts.get().iterateConceptDataInSequence(exporter);
             exporter.writeOneTimeFiles();
             exporter.close();
-            UuidToSctIdWriter writer = new UuidToSctIdWriter(namespace, moduleId.toString(),
+            UuidToSctIdWriter writer = new UuidToSctIdWriter(namespace, moduleConcepts[0].getUuid(),
                     output, handler, releaseType, COUNTRY_CODE.valueOf(countryCode),
                     new Date(TimeHelper.getTimeFromString(effectiveDate,
                     TimeHelper.getAltFileDateFormat())), vc);
             writer.write();
             writer.close();
-            }
             handler.writeMaps();
         } catch (Exception e) {
             throw new MojoExecutionException(e.getLocalizedMessage(), e);

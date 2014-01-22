@@ -16,6 +16,7 @@
 package org.ihtsdo.tk.query.persistance;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -85,7 +86,8 @@ public class PersistanceEngine {
         memberRefsetHelper = new RefsetHelper(viewCoordinate, editCoordinate);
         markedParentRefsetHelper = new MarkedParentRefsetHelper(viewCoordinate, editCoordinate, refsetNid);
         markedParentRefsetConcept = ts.getConcept(markedParentRefsetHelper.getParentRefsetNid());
-        for (RefexChronicleBI r : markedParentRefsetConcept.getRefsetMembers()) {
+        Collection<? extends RefexChronicleBI<?>> refsetMembers = markedParentRefsetConcept.getRefsetMembers();
+        for (RefexChronicleBI r : refsetMembers) {
             if (!r.getVersions(viewCoordinate).isEmpty()) {
                 originalActiveMarkedParentRefCompNids.setMember(r.getReferencedComponentNid());
             }

@@ -137,7 +137,7 @@ public class SctRf2RefsetSimpleToArfMojo extends AbstractMojo implements Seriali
             BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(
                     outDir + "concept_simple_rf2.refset"), "UTF-8"));
             getLog().info("::: SIMPLE REFSET FILE: " + outDir + "concept_simple_rf2.refset");
-            filesIn = Rf2File.getFiles(wDir, targetSubDir, inputDir, "Simple", ".txt");
+            filesIn = Rf2File.getFiles(wDir, targetSubDir, inputDir, "der2_cRefset_", ".txt");
             for (Rf2File rf2File : filesIn) {
                 Rf2_RefsetSimpleRecord[] members = Rf2_RefsetSimpleRecord.parseRefset(rf2File, pathUuid);
                 for (Rf2_RefsetSimpleRecord m : members) {
