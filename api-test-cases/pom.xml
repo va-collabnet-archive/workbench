@@ -3,7 +3,7 @@
     <parent>
         <groupId>org.ihtsdo</groupId>
         <artifactId>wb-mmb</artifactId>
-        <version>1.6-trek-refset-SNAPSHOT</version>
+        <version>1.6-trek-refset</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 

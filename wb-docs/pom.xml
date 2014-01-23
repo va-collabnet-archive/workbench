@@ -5,7 +5,7 @@
 	<parent>
 		<artifactId>wb-mmb</artifactId>
 		<groupId>org.ihtsdo</groupId>
-		<version>1.6-trek-refset-SNAPSHOT</version>
+		<version>1.6-trek-refset</version>
 	</parent>
 
 	<artifactId>wb-docs</artifactId>
