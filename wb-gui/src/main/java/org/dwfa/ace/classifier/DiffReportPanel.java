@@ -222,7 +222,7 @@ public class DiffReportPanel extends JPanel {
                     if (srr.isAdded) {
                         tableStrings[i][j] = "added";
                     } else {
-                        tableStrings[i][j] = "retired";
+                        tableStrings[i][j] = "was retired";
                     }
                 } else if (j == 1) {
                     tableStrings[i][j] = Terms.get().getConcept(srr.snoRel.c1Id);
