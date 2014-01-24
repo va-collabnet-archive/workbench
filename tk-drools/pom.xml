@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.ihtsdo</groupId>
         <artifactId>wb-mmb</artifactId>
-        <version>1.2-oct-sprint</version>
+        <version>1.3-oct-sprint-SNAPSHOT</version>
     </parent>
     <artifactId>tk-drools</artifactId>
     <name>${branch}: Toolkit Extensions for DROOLS</name>
