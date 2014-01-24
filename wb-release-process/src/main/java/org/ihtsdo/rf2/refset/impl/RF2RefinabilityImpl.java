@@ -22,7 +22,7 @@ import org.ihtsdo.rf2.util.WriteUtil;
  * Title: RF2RefinabilityImpl Description: Iterating over all the concept in workbench and fetching all the components required by RF2 Refinability Refset File Copyright: Copyright (c) 2010
  * Company:IHTSDO
  * 
- * @author Varsha Parekh
+ * * @author Alejandro Rodriguez
  * @version 1.0
  */
 

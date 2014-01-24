@@ -23,7 +23,7 @@ import org.ihtsdo.tk.api.RelAssertionType;
  * Title: RF2HistoricalRelationshipImpl Description: Iterating over all the concept in workbench and fetching all the components required by RF2 HistoricalRelationship File Copyright: Copyright (c) 2010
  * Company: IHTSDO
  * 
- * @author Varsha Parekh
+ * * @author Alejandro Rodriguez
  * @version 1.0
  */
 public class RF2HistoricalRelationshipImpl extends RF2AbstractImpl implements I_ProcessConcepts {

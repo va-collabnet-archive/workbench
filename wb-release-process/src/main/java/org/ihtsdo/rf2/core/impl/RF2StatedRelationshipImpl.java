@@ -24,7 +24,7 @@ import org.ihtsdo.tk.api.RelAssertionType;
  * Title: RF2StatedRelationshipImpl Description: Iterating over all the concept in workbench and fetching all the components required by RF2 StatedRelationship File Copyright: Copyright (c) 2010
  * Company: IHTSDO
  * 
- * @author Varsha Parekh
+ * * @author Alejandro Rodriguez
  * @version 1.0
  */
 public class RF2StatedRelationshipImpl extends RF2AbstractImpl implements I_ProcessConcepts {

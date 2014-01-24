@@ -27,7 +27,7 @@ import org.ihtsdo.tk.api.RelAssertionType;
 /**
  * Title: RF2InsertIdentifierImpl Description: Inserting Identifier in the workbench by fetching newly created all the components Copyright: Copyright (c) 2010 Company: IHTSDO
  * 
- * @author Varsha Parekh
+ * * @author Alejandro Rodriguez
  * @version 1.0
  */
 

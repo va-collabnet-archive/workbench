@@ -31,7 +31,7 @@ import org.ihtsdo.tk.api.Precedence;
 /**
  * Title: RF2IdGeneratorImpl Description: Generating sct identifier for all the newly created content RF2 Release File Copyright: Copyright (c) 2010 Company: IHTSDO
  * 
- * @author Varsha Parekh
+ * * @author Alejandro Rodriguez
  * @version 1.0
  */
 

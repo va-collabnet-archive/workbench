@@ -11,7 +11,7 @@ import org.ihtsdo.rf2.util.Config;
 /**
  * Title: RF2RelationshipIdListGeneratorFactory Relationship: Generating relationshipId by calling idgenerator webservice using specific combination Copyright: Copyright (c) 2010 Company: IHTSDO
  * 
- * @author Varsha Parekh
+ * * @author Alejandro Rodriguez
  * @version 1.0
  */
 

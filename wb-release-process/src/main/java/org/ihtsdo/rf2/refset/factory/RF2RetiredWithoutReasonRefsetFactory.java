@@ -16,7 +16,7 @@ import org.ihtsdo.rf2.util.ExportUtil;
 /**
  * Title: RF2RetiredWithoutReasonRefsetFactory Concept: RF2 Release QA Specific methods Copyright: Copyright (c) 2010 Company: IHTSDO
  * 
- * @author Varsha Parekh
+ * * @author Alejandro Rodriguez
  * @version 1.0
  */
 
