@@ -383,7 +383,7 @@ public class UuidToSctIdWriter {
         File privateIdentifiersFile = null;
         if (privateIdentifiersFileUuid != null) {
             privateIdentifiersFile = new File(terminology,
-                    privateIdentifiersFileUuid.getName().replace("sct2_Identifier_Auxiliary_UUID_", "sct2_Identifier_Auxiliary_"));
+                    privateIdentifiersFileUuid.getName().replace("sct2_IdentifierAuxiliary_UUID_", "sct2_IdentifierAuxiliary_"));
         }
         File statedRelFile = new File(terminology,
                 statedRelFileUuid.getName().replace("sct2_StatedRelationship_UUID_", "sct2_StatedRelationship_"));
