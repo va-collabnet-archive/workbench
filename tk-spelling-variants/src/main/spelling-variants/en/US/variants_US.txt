@@ -106,8 +106,6 @@ cephalhaematoma|cephalhematoma
 cephalohaematoma|cephalohematoma
 characterised|characterized
 chequebook|checkbook
-cheques|checks
-cheque|check
 chilli|chili
 chloridorrhoea|chloridorrhea
 cholaemia|cholemia

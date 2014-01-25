@@ -286,7 +286,7 @@ public class DialectHelper {
                     tokens[i] = dialectVariants.get(word.toLowerCase());
                 }
                 if (upperCase) {
-                    if (Character.isLowerCase(word.charAt(0))) {
+                    if (Character.isLowerCase(tokens[i].charAt(0))) {
                         tokens[i] = Character.toUpperCase(tokens[i].charAt(0))
                                 + tokens[i].substring(1);
                     }
