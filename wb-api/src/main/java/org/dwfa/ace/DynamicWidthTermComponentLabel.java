@@ -62,6 +62,7 @@ import javax.swing.UIManager;
 import javax.swing.border.Border;
 import javax.swing.plaf.basic.BasicHTML;
 import javax.swing.text.View;
+import org.dwfa.ace.TermComponentLabel.LabelText;
 
 import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_ConfigAceFrame;
@@ -83,7 +84,7 @@ import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 
 import sun.awt.dnd.SunDragSourceContextPeer;
 
-public class TermComponentLabel extends JLabel
+public class DynamicWidthTermComponentLabel extends JLabel
         implements FocusListener, I_ContainTermComponent, ClipboardOwner {
 
     public class CommitListener implements PropertyChangeListener {
@@ -105,16 +106,16 @@ public class TermComponentLabel extends JLabel
     }
     private I_AmTermComponent termComponent;
     private I_ConfigAceFrame config;
-    private boolean lineWrapEnabled = false;
-    private int fixedWidth = 150;
+//    private boolean lineWrapEnabled = false;
+//    private int fixedWidth = 150;
 
-    public boolean isLineWrapEnabled() {
-        return lineWrapEnabled;
-    }
-
-    public void setLineWrapEnabled(boolean lineWrapEnabled) {
-        this.lineWrapEnabled = lineWrapEnabled;
-    }
+//    public boolean isLineWrapEnabled() {
+//        return lineWrapEnabled;
+//    }
+//
+//    public void setLineWrapEnabled(boolean lineWrapEnabled) {
+//        this.lineWrapEnabled = lineWrapEnabled;
+//    }
 
     private class TermLabelDragSourceListener implements DragSourceListener {
 
@@ -209,7 +210,7 @@ public class TermComponentLabel extends JLabel
                 buff.append("</concept>\n");
                 StringSelection transferable = new StringSelection(buff.toString());
 
-                clipboard.setContents(transferable, TermComponentLabel.this);
+                clipboard.setContents(transferable, DynamicWidthTermComponentLabel.this);
             } catch (Exception ex) {
                 AceLog.getAppLog().alertAndLogException(ex);
             }
@@ -264,7 +265,7 @@ public class TermComponentLabel extends JLabel
                 }
                 StringSelection transferable = new StringSelection(buff.toString());
 
-                clipboard.setContents(transferable, TermComponentLabel.this);
+                clipboard.setContents(transferable, DynamicWidthTermComponentLabel.this);
             } catch (Exception ex) {
                 AceLog.getAppLog().alertAndLogException(ex);
             }
@@ -320,7 +321,7 @@ public class TermComponentLabel extends JLabel
                 }
                 StringSelection transferable = new StringSelection(buff.toString());
 
-                clipboard.setContents(transferable, TermComponentLabel.this);
+                clipboard.setContents(transferable, DynamicWidthTermComponentLabel.this);
             } catch (Exception ex) {
                 AceLog.getAppLog().alertAndLogException(ex);
             }
@@ -369,9 +370,9 @@ public class TermComponentLabel extends JLabel
             boolean showing = (flags & HierarchyEvent.SHOWING_CHANGED) != 0;
             if (displayability || showing) {
                 if (e.getChanged().isShowing()) {
-                    TermComponentLabel.this.config.addPropertyChangeListener("commit", commitListener);
+                    DynamicWidthTermComponentLabel.this.config.addPropertyChangeListener("commit", commitListener);
                 } else {
-                    TermComponentLabel.this.config.removePropertyChangeListener("commit", commitListener);
+                    DynamicWidthTermComponentLabel.this.config.removePropertyChangeListener("commit", commitListener);
                 }
             }
         }
@@ -382,10 +383,10 @@ public class TermComponentLabel extends JLabel
     private static final long serialVersionUID = 1L;
     CommitListener commitListener = new CommitListener();
 
-    public enum LabelText {
-
-        FULLYSPECIFIED, PREFERRED
-    };
+//    public enum LabelText {
+//
+//        FULLYSPECIFIED, PREFERRED
+//    };
     private LabelText textType = LabelText.FULLYSPECIFIED;
 
     public LabelText getTextType() {
@@ -396,21 +397,21 @@ public class TermComponentLabel extends JLabel
         this.textType = textType;
     }
 
-    public TermComponentLabel() throws TerminologyException, IOException {
+    public DynamicWidthTermComponentLabel() throws TerminologyException, IOException {
         this(Terms.get().getActiveAceFrameConfig());
     }
 
-    public TermComponentLabel(LabelText textType) throws TerminologyException, IOException {
+    public DynamicWidthTermComponentLabel(LabelText textType) throws TerminologyException, IOException {
         this(Terms.get().getActiveAceFrameConfig());
         this.textType = textType;
     }
 
-    public TermComponentLabel(I_ConfigAceFrame config, LabelText textType) {
+    public DynamicWidthTermComponentLabel(I_ConfigAceFrame config, LabelText textType) {
         this(config);
         this.textType = textType;
     }
 
-    public TermComponentLabel(I_ConfigAceFrame config) {
+    public DynamicWidthTermComponentLabel(I_ConfigAceFrame config) {
         super("<html><font color=red>Empty");
         this.setHorizontalAlignment(LEFT);
         this.setVerticalAlignment(TOP);
@@ -460,7 +461,6 @@ public class TermComponentLabel extends JLabel
             = UIManager.getBorder("List.focusCellHighlightBorder");
     private static final Border noFocusBorder
             = BorderFactory.createEmptyBorder(0, 0, 0, 0);
-
     @Override
     public void focusGained(FocusEvent e) {
         setBorder(hasFocusBorder);
@@ -481,15 +481,15 @@ public class TermComponentLabel extends JLabel
         return termComponent;
     }
     private boolean frozen = false;
-    private Dimension wrapSize = new Dimension(fixedWidth, 16);
+//    private Dimension wrapSize = new Dimension(fixedWidth, 16);
 
-    public int getFixedWidth() {
-        return fixedWidth;
-    }
-
-    public void setFixedWidth(int fixedWidth) {
-        this.fixedWidth = fixedWidth;
-    }
+//    public int getFixedWidth() {
+//        return fixedWidth;
+//    }
+//
+//    public void setFixedWidth(int fixedWidth) {
+//        this.fixedWidth = fixedWidth;
+//    }
     long lastChange = Long.MIN_VALUE;
     /*
      * (non-Javadoc)
@@ -594,99 +594,99 @@ public class TermComponentLabel extends JLabel
         } else if (text.matches(".*Definition.*")) {
             text = text.replace("Definition", "DEF");
         }
-        if (lineWrapEnabled) {
-            if (!BasicHTML.isHTMLString(text)) {
-                text = "<html>" + text;
-            }
+//        if (lineWrapEnabled) {
+//            if (!BasicHTML.isHTMLString(text)) {
+//                text = "<html>" + text;
+//            }
+//            super.setText(text);
+//            View v = BasicHTML.createHTMLView(this, getText());
+//            v.setSize(fixedWidth, 0);
+//            float prefYSpan = v.getPreferredSpan(View.Y_AXIS);
+//            if (prefYSpan > 16) {
+//                wrapSize = new Dimension(fixedWidth, (int) (prefYSpan + 4));
+//                setSize(wrapSize);
+//            } else {
+//                wrapSize = new Dimension(fixedWidth, (int) prefYSpan);
+//                setSize(wrapSize);
+//            }
+//        } else {
             super.setText(text);
-            View v = BasicHTML.createHTMLView(this, getText());
-            v.setSize(fixedWidth, 0);
-            float prefYSpan = v.getPreferredSpan(View.Y_AXIS);
-            if (prefYSpan > 16) {
-                wrapSize = new Dimension(fixedWidth, (int) (prefYSpan + 4));
-                setSize(wrapSize);
-            } else {
-                wrapSize = new Dimension(fixedWidth, (int) prefYSpan);
-                setSize(wrapSize);
-            }
-        } else {
-            super.setText(text);
-        }
+//        }
     }
 
-    @Override
-    public void setSize(Dimension d) {
-        if (lineWrapEnabled) {
-            if (d.height < wrapSize.height) {
-                d.height = wrapSize.height;
-            }
-            d.width = fixedWidth;
-            super.setSize(d);
-        } else {
-            super.setSize(d);
-        }
-    }
-
-    @Override
-    public void setSize(int width, int height) {
-        if (lineWrapEnabled) {
-            if (height < wrapSize.height) {
-                height = wrapSize.height;
-            }
-            super.setSize(fixedWidth, height);
-        } else {
-            super.setSize(width, height);
-        }
-    }
-
-    @Override
-    public void setBounds(int x, int y, int width, int height) {
-        if (lineWrapEnabled) {
-            if (height < wrapSize.height) {
-                height = wrapSize.height;
-            }
-            super.setBounds(x, y, fixedWidth, height);
-        } else {
-            super.setBounds(x, y, width, height);
-        }
-    }
-
-    @Override
-    public void setBounds(Rectangle r) {
-        if (lineWrapEnabled) {
-            if (r.height < wrapSize.height) {
-                r.height = wrapSize.height;
-            }
-            setBounds(r.x, r.y, fixedWidth, r.height);
-        } else {
-            setBounds(r.x, r.y, r.width, r.height);
-        }
-
-    }
-
-    @Override
-    public Dimension getMaximumSize() {
-        if (lineWrapEnabled) {
-            return wrapSize;
-        }
-        return super.getMaximumSize();
-    }
-
-    @Override
-    public Dimension getMinimumSize() {
-        if (lineWrapEnabled) {
-            return wrapSize;
-        }
-        return super.getMinimumSize();
-    }
-
-    @Override
-    public Dimension getPreferredSize() {
-        if (lineWrapEnabled) {
-            return wrapSize;
-        }
-        return super.getPreferredSize();
-    }
+//    @Override
+//    public void setSize(Dimension d) {
+//        if (lineWrapEnabled) {
+//            if (d.height < wrapSize.height) {
+//                d.height = wrapSize.height;
+//            }
+//            d.width = fixedWidth;
+//            super.setSize(d);
+//        } else {
+//            super.setSize(d);
+//        }
+//    }
+//
+//    @Override
+//    public void setSize(int width, int height) {
+//        if (lineWrapEnabled) {
+//            if (height < wrapSize.height) {
+//                height = wrapSize.height;
+//            }
+//            super.setSize(fixedWidth, height);
+//        } else {
+//            super.setSize(width, height);
+//        }
+//    }
+//
+//    @Override
+//    public void setBounds(int x, int y, int width, int height) {
+//        if (lineWrapEnabled) {
+//            if (height < wrapSize.height) {
+//                height = wrapSize.height;
+//            }
+//            super.setBounds(x, y, fixedWidth, height);
+//        } else {
+//            super.setBounds(x, y, width, height);
+//        }
+//    }
+//
+//    @Override
+//    public void setBounds(Rectangle r) {
+//        if (lineWrapEnabled) {
+//            if (r.height < wrapSize.height) {
+//                r.height = wrapSize.height;
+//            }
+//            setBounds(r.x, r.y, fixedWidth, r.height);
+//        } else {
+//            setBounds(r.x, r.y, r.width, r.height);
+//        }
+//
+//    }
+//
+//    @Override
+//    public Dimension getMaximumSize() {
+//        if (lineWrapEnabled) {
+//            return wrapSize;
+//        }
+//        return super.getMaximumSize();
+//    }
+//
+//    @Override
+//    public Dimension getMinimumSize() {
+//        if (lineWrapEnabled) {
+//            return wrapSize;
+//        }
+//        return super.getMinimumSize();
+//    }
+//
+//    @Override
+//    public Dimension getPreferredSize() {
+//        if (lineWrapEnabled) {
+//            return wrapSize;
+//        }
+//        return super.getPreferredSize();
+//    }
 
     public void addTermChangeListener(PropertyChangeListener l) {
         addPropertyChangeListener("termComponent", l);

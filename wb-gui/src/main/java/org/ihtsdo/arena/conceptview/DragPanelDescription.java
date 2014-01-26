@@ -31,11 +31,17 @@ import java.util.Collection;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JEditorPane;
 import javax.swing.JLabel;
+import javax.swing.JLayeredPane;
 import javax.swing.JSeparator;
+import javax.swing.JTextArea;
+import javax.swing.JTextPane;
 import javax.swing.SwingConstants;
 import javax.swing.TransferHandler;
+import javax.swing.plaf.basic.BasicHTML;
 import org.apache.commons.lang.StringEscapeUtils;
+import org.dwfa.ace.DynamicWidthTermComponentLabel;
 import org.ihtsdo.arena.editor.ArenaEditor;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
@@ -48,7 +54,7 @@ public class DragPanelDescription extends DragPanelComponentVersion<DescriptionA
      */
     private static final long serialVersionUID = 1L;
     private ConceptViewLayout viewLayout;
-    private FixedWidthJEditorPane textPane;
+    private JTextArea textPane;
 
     //~--- constructors --------------------------------------------------------
     public DragPanelDescription(ConceptViewLayout viewLayout, CollapsePanel parentCollapsePanel,
@@ -88,47 +94,72 @@ public class DragPanelDescription extends DragPanelComponentVersion<DescriptionA
         setupDrag(getDesc());
         setBorder(BorderFactory.createRaisedBevelBorder());
 
-        JLabel descLabel = getJLabel(" ");
-
-        if ((getParentCollapsePanel() == null)
-                || !getSettings().getView().getConfig().getAllowedStatus().contains(getDesc().getStatusNid())) {
-            descLabel.setBackground(Color.ORANGE.darker());
-        } else {
-            descLabel.setBackground(Color.ORANGE);
-        }
-
-        descLabel.setOpaque(true);
-        descLabel.setMinimumSize(new Dimension(20, 28));
-        descLabel.setPreferredSize(new Dimension(20, 28));
-        setDropPopupInset(descLabel.getPreferredSize().width);
-
         GridBagConstraints gbc = new GridBagConstraints();
 
         gbc.anchor = GridBagConstraints.NORTHWEST;
         gbc.weightx = 0;
         gbc.weighty = 0;
         gbc.fill = GridBagConstraints.BOTH;
-        gbc.gridheight = 1;
+        gbc.gridheight = 3;
         gbc.gridwidth = 1;
         gbc.gridx = 0;
         gbc.gridy = 0;
-        add(descLabel, gbc);
+        if ((getParentCollapsePanel() == null)
+                || !getSettings().getView().getConfig().getAllowedStatus().contains(getDesc().getStatusNid())) {
+            JLabel descLabel = getJLabel(" ");
+            descLabel.setOpaque(true);
+            descLabel.setMinimumSize(new Dimension(20, 28));
+            descLabel.setPreferredSize(new Dimension(20, 28));
+            setDropPopupInset(descLabel.getPreferredSize().width);
+            descLabel.setBackground(Color.ORANGE.darker());
+            add(descLabel, gbc);
+        } else {
+            gbc.gridheight = 1;
+            gbc.fill = GridBagConstraints.HORIZONTAL;
+            JButton button = getComponentActionMenuButton();
+            button.setMinimumSize(new Dimension(20, 16));
+            button.setPreferredSize(new Dimension(20, 16));
+            button.setBackground(Color.ORANGE);
+            button.setOpaque(true);
+//            button.setBorder(BorderFactory.createLineBorder(Color.blue));
+            add(button, gbc);
+            gbc.gridy++;
+            gbc.fill = GridBagConstraints.BOTH;
+            gbc.gridheight = GridBagConstraints.REMAINDER;
+            gbc.weighty = 1;
+            JLabel descLabel = getJLabel(" ");
+            descLabel.setOpaque(true);
+            descLabel.setMinimumSize(new Dimension(20, 20));
+            descLabel.setPreferredSize(new Dimension(20, 20));
+            setDropPopupInset(descLabel.getPreferredSize().width);
+            descLabel.setBackground(Color.ORANGE);
+            add(descLabel, gbc);
+            gbc.gridy = 0;
+            gbc.gridheight = 3;
+            gbc.weighty = 0;
+        }
         gbc.gridx++;
         if (!getDesc().isActive(getSettings().getConfig().getAllowedStatus())) {
+            gbc.gridheight = 1;
             add(new JLabel(getGhostIcon()), gbc);
+            gbc.gridheight = 3;
             gbc.gridx++;
         }
 
         add(conflictLabel, gbc);
         conflictLabel.setVisible(false);
         gbc.gridx++;
-        gbc.anchor = GridBagConstraints.NORTHWEST;
-        gbc.gridx++;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.gridheight = 1;
+        gbc.gridwidth = 1;
 
-        TermComponentLabel typeLabel = getLabel(getDesc().getTypeNid(), canDrop, getSettings().getDescType());
-
+        DynamicWidthTermComponentLabel typeLabel = getDynamicLabel(getDesc().getTypeNid(), canDrop, getSettings().getDescType());
+//        typeLabel.setPreferredSize(new Dimension(20, 5));
+        typeLabel.setSize(new Dimension(5,5));
+//        typeLabel.setBorder(BorderFactory.createLineBorder(Color.yellow));
+        typeLabel.setBorder(BorderFactory.createEmptyBorder(0,3,0,0));
         add(typeLabel, gbc);
-
+        
         if (getDesc().isUncommitted()
                 && (getDesc().getStatusNid() == SnomedMetadataRfx.getSTATUS_RETIRED_NID())) {
             typeLabel.setFrozen(true);
@@ -158,25 +189,8 @@ public class DragPanelDescription extends DragPanelComponentVersion<DescriptionA
                     });
         }
 
-        gbc.gridx++;
-        add(new JSeparator(SwingConstants.VERTICAL), gbc);
-        gbc.weightx = 1;
-        gbc.gridx++;
-
-        textPane = new FixedWidthJEditorPane();
-
-        textPane.setEditable(canDrop);
-        textPane.setOpaque(false);
-        textPane.setFont(textPane.getFont().deriveFont(getSettings().getFontSize()));
-        textPane.setText(StringEscapeUtils.escapeHtml(getDesc().getText()));
-        textPane.setToolTipText(textPane.extractText());
-        if(canDrop && viewLayout.cView.focus){
-            textPane.selectAll();
-        }
-        add(textPane, gbc);
-        gbc.weightx = 0;
-        gbc.gridx++;
-
+        gbc.gridy++;
+        gbc.fill = GridBagConstraints.VERTICAL;
         String lang = getDesc().getLang();
 
         if ((lang != null) && (lang.length() > 2)) {
@@ -222,10 +236,10 @@ public class DragPanelDescription extends DragPanelComponentVersion<DescriptionA
             lang = "<html>" + lang + ":pt" + sb.toString();
         }
         JLabel langLabel = getJLabel(lang);
-
+//        langLabel.setBorder(BorderFactory.createLineBorder(Color.red));
+        langLabel.setBorder(BorderFactory.createEmptyBorder(0,3,0,2));
         add(langLabel, gbc);
         gbc.gridx++;
-
         // check for case sensitivity
         String caseStr = "ci";
         String descText = getDesc().getText();
@@ -245,16 +259,51 @@ public class DragPanelDescription extends DragPanelComponentVersion<DescriptionA
         }
 
         JLabel caseLabel = getJLabel(caseStr);
-
+//        caseLabel.setBorder(BorderFactory.createLineBorder(Color.blue));
         add(caseLabel, gbc);
+        
+        JLabel emptyThing = new JLabel(" ");
+//        emptyThing.setBorder(BorderFactory.createLineBorder(Color.green));
+        gbc.gridy++;
+        gbc.weighty = 1;
+        add(emptyThing, gbc);
+        gbc.weighty = 0;
+        
         gbc.gridx++;
-        add(getComponentActionMenuButton(), gbc);
+        gbc.gridy = gbc.gridy - 2;
+        gbc.gridheight = 3;
+        
+        add(new JSeparator(SwingConstants.VERTICAL), gbc);
+        gbc.gridx++;
+        gbc.weightx = 1;
+        gbc.weighty = 1;
+        gbc.fill = GridBagConstraints.BOTH;
+        
+        textPane = new JTextArea();
+        textPane.setLineWrap(true);
+        textPane.setWrapStyleWord(true);
+        textPane.setEditable(canDrop);
+        textPane.setOpaque(false);
+        textPane.setFont(textPane.getFont().deriveFont(getSettings().getFontSize()));
+//        textPane.setText(StringEscapeUtils.escapeHtml(getDesc().getText()));
+        textPane.setText(getDesc().getText());
+        textPane.setToolTipText(textPane.getText());
+        if(canDrop && viewLayout.cView.focus){
+            textPane.selectAll();
+        }
+//        textPane.setBorder(BorderFactory.createLineBorder(Color.magenta));
+        add(textPane, gbc);
+        gbc.weightx = 0;
+        gbc.weighty = 1;
+        gbc.gridwidth = 1;
+        gbc.gridheight = 1;
         gbc.gridx++;
 
         JButton collapseExpandButton = getCollapseExpandButton();
-
+        gbc.gridheight = 2;
+//        collapseExpandButton.setBorder(BorderFactory.createLineBorder(Color.black));
         add(collapseExpandButton, gbc);
-
+             
         if (getDesc().isUncommitted()
                 && (getDesc().getStatusNid() == SnomedMetadataRfx.getSTATUS_RETIRED_NID())) {
             textPane.setEditable(false);
@@ -264,7 +313,9 @@ public class DragPanelDescription extends DragPanelComponentVersion<DescriptionA
                 && (getDesc().getStatusNid() != SnomedMetadataRfx.getSTATUS_RETIRED_NID())) {
             textPane.getDocument().addDocumentListener(new UpdateTextDocumentListener(textPane, getDesc()));
         }
-
+        gbc.gridy = 3;
+        gbc.gridheight = 1;
+        gbc.fill = GridBagConstraints.BOTH;
         addSubPanels(gbc);
     }
 
@@ -282,7 +333,7 @@ public class DragPanelDescription extends DragPanelComponentVersion<DescriptionA
         return DragPanelDataFlavors.descVersionFlavor;
     }
 
-    public FixedWidthJEditorPane getTextPane() {
+    public JTextArea getTextPane() {
         return textPane;
     }
     
