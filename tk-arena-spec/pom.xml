@@ -16,7 +16,7 @@
     <parent>
         <groupId>org.ihtsdo</groupId>
         <artifactId>wb-mmb</artifactId>
-        <version>1.4-july-id-SNAPSHOT</version>
+        <version>1.4-july-id</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>tk-arena-spec</artifactId>
