@@ -5,7 +5,7 @@
 	<parent>
 		<artifactId>wb-mmb</artifactId>
 		<groupId>org.ihtsdo</groupId>
-		<version>1.4-july-id</version>
+		<version>1.5-july-id-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>wb-docs</artifactId>

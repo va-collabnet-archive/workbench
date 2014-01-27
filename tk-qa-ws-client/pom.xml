@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>org.ihtsdo</groupId>
 		<artifactId>wb-mmb</artifactId>
-		<version>1.4-july-id</version>
+		<version>1.5-july-id-SNAPSHOT</version>
 	</parent>
 
 	<groupId>org.ihtsdo</groupId>
