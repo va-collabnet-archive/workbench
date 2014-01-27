@@ -38,6 +38,14 @@ public class RF2ConceptExporterMojo extends AbstractMojo {
 	 * @required
 	 */
 	private String releaseDate;
+	
+	/**
+	 * previous release date.
+	 * 
+	 * @parameter
+	 * @required
+	 */
+	private String previousReleaseDate;
 
 	/**
 	 * Location of the exportFoler.
@@ -134,6 +142,7 @@ public class RF2ConceptExporterMojo extends AbstractMojo {
 			config.setOutputFolderName(exportFolder);
 			
 			config.setReleaseDate(releaseDate);
+			config.setPreviousReleaseDate(previousReleaseDate);
 			config.setRf2Format(rF2Format);
 			config.setFlushCount(10000);
 			config.setFileExtension("txt");
