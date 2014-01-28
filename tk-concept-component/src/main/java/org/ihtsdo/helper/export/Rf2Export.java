@@ -1276,7 +1276,6 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
             Collection<RefexVersionBI> versions = new HashSet<>();
             ComponentVersionBI primordialVersion = refexChronicle.getPrimordialVersion();
             if (releaseType.equals(ReleaseType.FULL)) {
-                versions = refexChronicle.getVersions();
                 //if not previously released or latest version remove
                 RefexVersionBI latest = (RefexVersionBI) refexChronicle.getVersion(viewCoordinateAllStatus);
                 for(Object o : refexChronicle.getVersions()){
