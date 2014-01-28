@@ -177,7 +177,9 @@ public class ConceptViewRenderer extends JLayeredPane {
 			}
 			setDividerLocation();
                     try {
-                        settings.getView().redoConceptViewLayout();
+                        if(conceptViewPanel.isShowing()){
+                            settings.getView().redoConceptViewLayout();
+                        }
                     } catch (IOException ex) {
                         Logger.getLogger(ConceptViewRenderer.class.getName()).log(Level.SEVERE, null, ex);
                     }

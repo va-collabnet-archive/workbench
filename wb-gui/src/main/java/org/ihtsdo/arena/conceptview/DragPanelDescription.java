@@ -121,7 +121,6 @@ public class DragPanelDescription extends DragPanelComponentVersion<DescriptionA
             button.setPreferredSize(new Dimension(20, 16));
             button.setBackground(Color.ORANGE);
             button.setOpaque(true);
-//            button.setBorder(BorderFactory.createLineBorder(Color.blue));
             add(button, gbc);
             gbc.gridy++;
             gbc.fill = GridBagConstraints.BOTH;
@@ -129,8 +128,8 @@ public class DragPanelDescription extends DragPanelComponentVersion<DescriptionA
             gbc.weighty = 1;
             JLabel descLabel = getJLabel(" ");
             descLabel.setOpaque(true);
-            descLabel.setMinimumSize(new Dimension(20, 20));
-            descLabel.setPreferredSize(new Dimension(20, 20));
+            descLabel.setMinimumSize(new Dimension(20, 12));
+            descLabel.setPreferredSize(new Dimension(20, 12));
             setDropPopupInset(descLabel.getPreferredSize().width);
             descLabel.setBackground(Color.ORANGE);
             add(descLabel, gbc);
@@ -154,9 +153,7 @@ public class DragPanelDescription extends DragPanelComponentVersion<DescriptionA
         gbc.gridwidth = 1;
 
         DynamicWidthTermComponentLabel typeLabel = getDynamicLabel(getDesc().getTypeNid(), canDrop, getSettings().getDescType());
-//        typeLabel.setPreferredSize(new Dimension(20, 5));
         typeLabel.setSize(new Dimension(5,5));
-//        typeLabel.setBorder(BorderFactory.createLineBorder(Color.yellow));
         typeLabel.setBorder(BorderFactory.createEmptyBorder(0,3,0,0));
         add(typeLabel, gbc);
         
@@ -236,7 +233,6 @@ public class DragPanelDescription extends DragPanelComponentVersion<DescriptionA
             lang = "<html>" + lang + ":pt" + sb.toString();
         }
         JLabel langLabel = getJLabel(lang);
-//        langLabel.setBorder(BorderFactory.createLineBorder(Color.red));
         langLabel.setBorder(BorderFactory.createEmptyBorder(0,3,0,2));
         add(langLabel, gbc);
         gbc.gridx++;
@@ -259,15 +255,8 @@ public class DragPanelDescription extends DragPanelComponentVersion<DescriptionA
         }
 
         JLabel caseLabel = getJLabel(caseStr);
-//        caseLabel.setBorder(BorderFactory.createLineBorder(Color.blue));
         add(caseLabel, gbc);
         
-        JLabel emptyThing = new JLabel(" ");
-//        emptyThing.setBorder(BorderFactory.createLineBorder(Color.green));
-        gbc.gridy++;
-        gbc.weighty = 1;
-        add(emptyThing, gbc);
-        gbc.weighty = 0;
         
         gbc.gridx++;
         gbc.gridy = gbc.gridy - 2;
@@ -285,13 +274,12 @@ public class DragPanelDescription extends DragPanelComponentVersion<DescriptionA
         textPane.setEditable(canDrop);
         textPane.setOpaque(false);
         textPane.setFont(textPane.getFont().deriveFont(getSettings().getFontSize()));
-//        textPane.setText(StringEscapeUtils.escapeHtml(getDesc().getText()));
         textPane.setText(getDesc().getText());
         textPane.setToolTipText(textPane.getText());
         if(canDrop && viewLayout.cView.focus){
             textPane.selectAll();
         }
-//        textPane.setBorder(BorderFactory.createLineBorder(Color.magenta));
+
         add(textPane, gbc);
         gbc.weightx = 0;
         gbc.weighty = 1;
@@ -301,7 +289,6 @@ public class DragPanelDescription extends DragPanelComponentVersion<DescriptionA
 
         JButton collapseExpandButton = getCollapseExpandButton();
         gbc.gridheight = 2;
-//        collapseExpandButton.setBorder(BorderFactory.createLineBorder(Color.black));
         add(collapseExpandButton, gbc);
              
         if (getDesc().isUncommitted()
