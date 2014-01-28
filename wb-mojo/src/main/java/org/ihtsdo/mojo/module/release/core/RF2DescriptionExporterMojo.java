@@ -163,7 +163,7 @@ public class RF2DescriptionExporterMojo extends AbstractMojo {
 			else
 			 config = JAXBUtil.getConfig("/org/ihtsdo/rf2/config/descriptionqa.xml");
 			
-			
+			config.setExportFileName(config.getExportFileName().replace("Full", "Delta").replace("INT_",""));
 			// set all the values passed via mojo
 			config.setOutputFolderName(exportFolder);
 			config.setReleaseDate(releaseDate);

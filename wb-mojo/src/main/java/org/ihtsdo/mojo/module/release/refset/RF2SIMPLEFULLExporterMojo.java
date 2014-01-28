@@ -103,6 +103,7 @@ public class RF2SIMPLEFULLExporterMojo extends AbstractMojo {
 
 			Config config = JAXBUtil.getConfig("/org/ihtsdo/rf2/config/simpleFullRefset.xml");
 
+			config.setExportFileName(config.getExportFileName().replace("Full", "Delta").replace("INT_",""));
 			// set all the values passed via mojo
 			config.setOutputFolderName(exportFolder);
 			config.setReleaseDate(releaseDate);
