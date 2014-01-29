@@ -16,9 +16,11 @@ import org.ihtsdo.rf2.module.util.I_amFilter;
 import org.ihtsdo.rf2.module.util.JAXBUtil;
 import org.ihtsdo.rf2.module.util.TestFilters;
 
+// TODO: Auto-generated Javadoc
 /**
+ * The Class RF2AssociationValueExporterMojo.
+ *
  * @author Alejandro Rodriguez
- * 
  * @goal export-bymod-association-references-refset
  * @requiresDependencyResolution compile
  */
@@ -58,38 +60,21 @@ public class RF2AssociationValueExporterMojo extends AbstractMojo {
 	private String exportFolder;
 
 	// for accessing the web service
-	/**
-	 * endpointURL
-	 * 
-	 * @parameter
-	 * 
-	 */
+	/** endpointURL. @parameter */
 	private String endpointURL;
 	
-	/**
-	 * username
-	 * 
-	 * @parameter
-	 * 
-	 */
+	/** username. @parameter */
 	private String username;
 	
-	/**
-	 * password
-	 * 
-	 * @parameter
-	 * 
-	 */
+	/** password. @parameter */
 	private String password;
 
-	/**
-	 * Filter configurations
-	 * 
-	 * @parameter
-	 * 
-	 */
+	/** Filter configurations. @parameter */
 	private ArrayList<FilterConfig> filterConfigs;
 	
+	/* (non-Javadoc)
+	 * @see org.apache.maven.plugin.Mojo#execute()
+	 */
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		System.setProperty("java.awt.headless", "true");
 		try {
@@ -141,10 +126,20 @@ public class RF2AssociationValueExporterMojo extends AbstractMojo {
 		}
 	}
 
+	/**
+	 * Gets the target directory.
+	 *
+	 * @return the target directory
+	 */
 	public File getTargetDirectory() {
 		return targetDirectory;
 	}
 
+	/**
+	 * Sets the target directory.
+	 *
+	 * @param targetDirectory the new target directory
+	 */
 	public void setTargetDirectory(File targetDirectory) {
 		this.targetDirectory = targetDirectory;
 	}

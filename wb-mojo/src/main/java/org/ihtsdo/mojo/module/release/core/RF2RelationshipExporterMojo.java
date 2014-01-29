@@ -15,9 +15,11 @@ import org.ihtsdo.rf2.module.util.JAXBUtil;
 import org.ihtsdo.rf2.module.util.TestFilters;
 import org.ihtsdo.tk.binding.snomed.Snomed;
 
+// TODO: Auto-generated Javadoc
 /**
+ * The Class RF2RelationshipExporterMojo.
+ *
  * @author Alejandro Rodriguez
- * 
  * @goal export-bymod-relationship
  * @requiresDependencyResolution compile
  */
@@ -68,87 +70,40 @@ public class RF2RelationshipExporterMojo extends AbstractMojo {
 	
 	//Below Parameters are necessary for ID-Generation
 	
-	/**
-	 * namespaceId
-	 * 
-	 * @parameter 
-	 * 
-	 */
+	/** namespaceId. @parameter */
 	private String namespaceId;
 	
-	/**
-	 * partitionId
-	 * 
-	 * @parameter 
-	 * 
-	 */
+	/** partitionId. @parameter */
 	private String partitionId;
 	
-	/**
-	 * executionId
-	 * 
-	 * @parameter 
-	 * 
-	 */
+	/** executionId. @parameter */
 	private String executionId;
 	
-	/**
-	 * moduleId
-	 * 
-	 * @parameter 
-	 * 
-	 */
+	/** moduleId. @parameter */
 	private String releaseId;
 	
-	/**
-	 * componentType
-	 * 
-	 * @parameter 
-	 * 
-	 */
+	/** componentType. @parameter */
 	private String componentType;
 	
 	// for accessing the web service
-	/**
-	 * endpointURL
-	 * 
-	 * @parameter
-	 * 
-	 */
+	/** endpointURL. @parameter */
 	private String endpointURL;
 	
-	/**
-	 * username
-	 * 
-	 * @parameter
-	 * 
-	 */
+	/** username. @parameter */
 	private String username;
 	
-	/**
-	 * password
-	 * 
-	 * @parameter
-	 * 
-	 */
+	/** password. @parameter */
 	private String password;
 
-	/**
-	 * Filter configurations
-	 * 
-	 * @parameter
-	 * 
-	 */
+	/** Filter configurations. @parameter */
 	private ArrayList<FilterConfig> filterConfigs;
 	
-	/**
-	 * Default Module for inferred relationships where the classifier add UNSPECIFED_MODULE
-	 * 
-	 * @parameter
-	 * 
-	 */
+	/** Default Module for inferred relationships where the classifier add UNSPECIFED_MODULE. @parameter */
 	private String defaultModule;
 	
+	/* (non-Javadoc)
+	 * @see org.apache.maven.plugin.Mojo#execute()
+	 */
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		try {
 			Config config;
@@ -208,10 +163,20 @@ public class RF2RelationshipExporterMojo extends AbstractMojo {
 		}
 	}
 
+	/**
+	 * Gets the target directory.
+	 *
+	 * @return the target directory
+	 */
 	public File getTargetDirectory() {
 		return targetDirectory;
 	}
 
+	/**
+	 * Sets the target directory.
+	 *
+	 * @param targetDirectory the new target directory
+	 */
 	public void setTargetDirectory(File targetDirectory) {
 		this.targetDirectory = targetDirectory;
 	}

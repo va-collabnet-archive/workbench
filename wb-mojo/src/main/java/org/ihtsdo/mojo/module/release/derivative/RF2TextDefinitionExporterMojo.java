@@ -16,9 +16,11 @@ import org.ihtsdo.rf2.module.util.I_amFilter;
 import org.ihtsdo.rf2.module.util.JAXBUtil;
 import org.ihtsdo.rf2.module.util.TestFilters;
 
+// TODO: Auto-generated Javadoc
 /**
+ * The Class RF2TextDefinitionExporterMojo.
+ *
  * @author Alejandro Rodriguez
- * 
  * @goal export-bymod-text-definition
  * @requiresDependencyResolution compile
  */
@@ -66,79 +68,37 @@ public class RF2TextDefinitionExporterMojo extends AbstractMojo {
 	private String rF2Format;
 	
 	// for accessing the web service
-	/**
-	 * endpointURL
-	 * 
-	 * @parameter
-	 * 
-	 */
+	/** endpointURL. @parameter */
 	private String endpointURL;
 	
-	/**
-	 * username
-	 * 
-	 * @parameter
-	 * 
-	 */
+	/** username. @parameter */
 	private String username;
 	
-	/**
-	 * password
-	 * 
-	 * @parameter
-	 * 
-	 */
+	/** password. @parameter */
 	private String password;
 	
 	
-	/**
-	 * namespaceId
-	 * 
-	 * @parameter 
-	 * 
-	 */
+	/** namespaceId. @parameter */
 	private String namespaceId;
 	
-	/**
-	 * partitionId
-	 * 
-	 * @parameter 
-	 * 
-	 */
+	/** partitionId. @parameter */
 	private String partitionId;
 	
-	/**
-	 * executionId
-	 * 
-	 * @parameter
-	 * 
-	 */
+	/** executionId. @parameter */
 	private String executionId;
 	
-	/**
-	 * releaseId
-	 * 
-	 * @parameter 
-	 * 
-	 */
+	/** releaseId. @parameter */
 	private String releaseId;
 	
-	/**
-	 * componentType
-	 * 
-	 * @parameter 
-	 * 
-	 */
+	/** componentType. @parameter */
 	private String componentType;
 
-	/**
-	 * Filter configurations
-	 * 
-	 * @parameter
-	 * 
-	 */
+	/** Filter configurations. @parameter */
 	private ArrayList<FilterConfig> filterConfigs;
 	
+	/* (non-Javadoc)
+	 * @see org.apache.maven.plugin.Mojo#execute()
+	 */
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		System.setProperty("java.awt.headless", "true");
 		try {
@@ -203,10 +163,20 @@ public class RF2TextDefinitionExporterMojo extends AbstractMojo {
 		}
 	}
 
+	/**
+	 * Gets the target directory.
+	 *
+	 * @return the target directory
+	 */
 	public File getTargetDirectory() {
 		return targetDirectory;
 	}
 
+	/**
+	 * Sets the target directory.
+	 *
+	 * @param targetDirectory the new target directory
+	 */
 	public void setTargetDirectory(File targetDirectory) {
 		this.targetDirectory = targetDirectory;
 	}
