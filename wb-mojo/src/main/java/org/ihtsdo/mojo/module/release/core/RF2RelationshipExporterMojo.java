@@ -16,7 +16,7 @@ import org.ihtsdo.rf2.module.util.TestFilters;
 import org.ihtsdo.tk.binding.snomed.Snomed;
 
 /**
- * @author Varsha Parekh
+ * @author Alejandro Rodriguez
  * 
  * @goal export-bymod-relationship
  * @requiresDependencyResolution compile

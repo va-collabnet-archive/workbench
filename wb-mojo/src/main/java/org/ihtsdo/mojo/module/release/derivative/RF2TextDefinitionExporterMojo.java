@@ -17,7 +17,7 @@ import org.ihtsdo.rf2.module.util.JAXBUtil;
 import org.ihtsdo.rf2.module.util.TestFilters;
 
 /**
- * @author Varsha Parekh
+ * @author Alejandro Rodriguez
  * 
  * @goal export-bymod-text-definition
  * @requiresDependencyResolution compile
