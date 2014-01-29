@@ -60,16 +60,36 @@ public class RF2AssociationValueExporterMojo extends AbstractMojo {
 	private String exportFolder;
 
 	// for accessing the web service
-	/** endpointURL. @parameter */
+	/**
+	 * endpointURL
+	 * 
+	 * @parameter
+	 * 
+	 */
 	private String endpointURL;
 	
-	/** username. @parameter */
+	/**
+	 * username
+	 * 
+	 * @parameter
+	 * 
+	 */
 	private String username;
 	
-	/** password. @parameter */
+	/**
+	 * password
+	 * 
+	 * @parameter
+	 * 
+	 */
 	private String password;
 
-	/** Filter configurations. @parameter */
+	/**
+	 * Filter configurations
+	 * 
+	 * @parameter
+	 * 
+	 */
 	private ArrayList<FilterConfig> filterConfigs;
 	
 	/* (non-Javadoc)

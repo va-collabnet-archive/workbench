@@ -61,36 +61,86 @@ public class RF2LanguageOpenExporterMojo extends AbstractMojo {
 	private String exportFolder;
 
 	// for accessing the web service
-	/** endpointURL. @parameter */
+	/**
+	 * endpointURL
+	 * 
+	 * @parameter
+	 * 
+	 */
 	private String endpointURL;
 	
-	/** username. @parameter */
+	/**
+	 * username
+	 * 
+	 * @parameter
+	 * 
+	 */
 	private String username;
 	
-	/** password. @parameter */
+	/**
+	 * password
+	 * 
+	 * @parameter
+	 * 
+	 */
 	private String password;
 
-	/** namespaceId. @parameter */
+	/**
+	 * namespaceId
+	 * 
+	 * @parameter 
+	 * 
+	 */
 	private String namespaceId;
 	
-	/** partitionId. @parameter */
+	/**
+	 * partitionId
+	 * 
+	 * @parameter 
+	 * 
+	 */
 	private String partitionId;
 	
-	/** executionId. @parameter */
+	/**
+	 * executionId
+	 * 
+	 * @parameter 
+	 * 
+	 */
 	private String executionId;
 	
-	/** moduleId. @parameter */
+	/**
+	 * moduleId
+	 * 
+	 * @parameter 
+	 * 
+	 */
 	private String releaseId;
 	
-	/** componentType. @parameter */
+	/**
+	 * componentType
+	 * 
+	 * @parameter 
+	 * 
+	 */
 	private String componentType;
-	
-	/** Filter configurations. @parameter */
+	/**
+	 * Filter configurations
+	 * 
+	 * @parameter
+	 * 
+	 */
 	
 	private ArrayList<FilterConfig> filterConfigs;
 	
-	/** Refset Files. @parameter @required */
+	/**
+	 * Refset Files
+	 * 
+	 * @parameter
+	 * @required
+	 */
 	private ArrayList<RefSetParam> refsetData;
+	
 	
 	/* (non-Javadoc)
 	 * @see org.apache.maven.plugin.Mojo#execute()

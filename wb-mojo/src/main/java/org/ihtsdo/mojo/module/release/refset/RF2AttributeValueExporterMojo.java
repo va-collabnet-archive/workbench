@@ -60,20 +60,46 @@ public class RF2AttributeValueExporterMojo extends AbstractMojo {
 	private String exportFolder;
 
 	// for accessing the web service
-	/** endpointURL. @parameter */
+	/**
+	 * endpointURL
+	 * 
+	 * @parameter
+	 * 
+	 */
 	private String endpointURL;
 	
-	/** username. @parameter */
+	/**
+	 * username
+	 * 
+	 * @parameter
+	 * 
+	 */
 	private String username;
 	
-	/** password. @parameter */
+	/**
+	 * password
+	 * 
+	 * @parameter
+	 * 
+	 */
 	private String password;
 
-	/** Language Code for file names of release. @parameter default-value="en" */
+	/**
+	 * Language Code for file names of release
+	 * 
+	 * @parameter 
+	 * default-value="en"
+	 */
 	private String languageCode;
 	
-	/** Filter configurations. @parameter */
+	/**
+	 * Filter configurations
+	 * 
+	 * @parameter
+	 * 
+	 */
 	private ArrayList<FilterConfig> filterConfigs;
+	
 	
 	/* (non-Javadoc)
 	 * @see org.apache.maven.plugin.Mojo#execute()

@@ -68,34 +68,79 @@ public class RF2TextDefinitionExporterMojo extends AbstractMojo {
 	private String rF2Format;
 	
 	// for accessing the web service
-	/** endpointURL. @parameter */
+	/**
+	 * endpointURL
+	 * 
+	 * @parameter
+	 * 
+	 */
 	private String endpointURL;
 	
-	/** username. @parameter */
+	/**
+	 * username
+	 * 
+	 * @parameter
+	 * 
+	 */
 	private String username;
 	
-	/** password. @parameter */
+	/**
+	 * password
+	 * 
+	 * @parameter
+	 * 
+	 */
 	private String password;
 	
 	
-	/** namespaceId. @parameter */
+	/**
+	 * namespaceId
+	 * 
+	 * @parameter 
+	 * 
+	 */
 	private String namespaceId;
 	
-	/** partitionId. @parameter */
+	/**
+	 * partitionId
+	 * 
+	 * @parameter 
+	 * 
+	 */
 	private String partitionId;
 	
-	/** executionId. @parameter */
+	/**
+	 * executionId
+	 * 
+	 * @parameter
+	 * 
+	 */
 	private String executionId;
 	
-	/** releaseId. @parameter */
+	/**
+	 * releaseId
+	 * 
+	 * @parameter 
+	 * 
+	 */
 	private String releaseId;
 	
-	/** componentType. @parameter */
+	/**
+	 * componentType
+	 * 
+	 * @parameter 
+	 * 
+	 */
 	private String componentType;
 
-	/** Filter configurations. @parameter */
+	/**
+	 * Filter configurations
+	 * 
+	 * @parameter
+	 * 
+	 */
 	private ArrayList<FilterConfig> filterConfigs;
-	
+
 	/* (non-Javadoc)
 	 * @see org.apache.maven.plugin.Mojo#execute()
 	 */

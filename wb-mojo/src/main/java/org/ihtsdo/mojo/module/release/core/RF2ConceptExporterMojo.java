@@ -66,27 +66,64 @@ public class RF2ConceptExporterMojo extends AbstractMojo {
 	private String rF2Format;
 	//Below Parameters are necessary for ID-Generation
 	// for accessing the web service
-	/** endpointURL. @parameter */
+
+	/**
+	 * endpointURL
+	 * 
+	 * @parameter
+	 * 
+	 */
 	private String endpointURL;
 	
-	/** username. @parameter */
+	/**
+	 * username
+	 * 
+	 * @parameter
+	 * 
+	 */
 	private String username;
 	
-	/** password. @parameter */
+	/**
+	 * password
+	 * 
+	 * @parameter
+	 * 
+	 */
 	private String password;
 	
 	
-	/** namespaceId. @parameter */
+	/**
+	 * namespaceId
+	 * 
+	 * @parameter 
+	 * 
+	 */
 	private String namespaceId;
 	
-	/** partitionId. @parameter */
+	/**
+	 * partitionId
+	 * 
+	 * @parameter 
+	 * 
+	 */
 	private String partitionId;
 	
-	/** executionId. @parameter */
+	/**
+	 * executionId
+	 * 
+	 * @parameter 
+	 * 
+	 */
 	private String executionId;
-	
-	/** releaseId. @parameter */
+		
+	/**
+	 * releaseId
+	 * 
+	 * @parameter 
+	 * 
+	 */
 	private String releaseId;
+	
 
 	/** Filter configurations. @parameter */
 	private ArrayList<FilterConfig> filterConfigs;
