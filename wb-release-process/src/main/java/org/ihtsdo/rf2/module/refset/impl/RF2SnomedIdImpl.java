@@ -17,21 +17,32 @@ import org.ihtsdo.rf2.module.util.Config;
 import org.ihtsdo.rf2.module.util.WriteUtil;
 import org.ihtsdo.tk.api.Precedence;
 
+// TODO: Auto-generated Javadoc
 /**
  * Title: RF2SnomedIdImpl Description: Iterating over all the concept in workbench and fetching all the components required by RF2 SnomedId Refset File Copyright: Copyright (c) 2010 Company: IHTSDO
  * 
- * * @author Alejandro Rodriguez
+ * * @author Alejandro Rodriguez.
+ *
  * @version 1.0
  */
 
 public class RF2SnomedIdImpl extends RF2AbstractImpl implements I_ProcessConcepts {
 
+	/** The logger. */
 	private static Logger logger = Logger.getLogger(RF2SnomedIdImpl.class);
 
+	/**
+	 * Instantiates a new r f2 snomed id impl.
+	 *
+	 * @param config the config
+	 */
 	public RF2SnomedIdImpl(Config config) {
 		super(config);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.dwfa.ace.api.I_ProcessConcepts#processConcept(org.dwfa.ace.api.I_GetConceptData)
+	 */
 	@Override
 	public void processConcept(I_GetConceptData concept) throws Exception {
 
@@ -39,6 +50,9 @@ public class RF2SnomedIdImpl extends RF2AbstractImpl implements I_ProcessConcept
 
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.rf2.module.impl.RF2AbstractImpl#export(org.dwfa.ace.api.I_GetConceptData, java.lang.String)
+	 */
 	@Override
 	public void export(I_GetConceptData concept, String referencedComponentId) {
 		try{
@@ -112,6 +126,18 @@ public class RF2SnomedIdImpl extends RF2AbstractImpl implements I_ProcessConcept
 	}
 
 
+	/**
+	 * Write r f2 type line.
+	 *
+	 * @param uuid the uuid
+	 * @param effectiveTime the effective time
+	 * @param active the active
+	 * @param moduleId the module id
+	 * @param refsetId the refset id
+	 * @param referencedComponentId the referenced component id
+	 * @param mapTarget the map target
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	private void writeRF2TypeLine(UUID uuid, String effectiveTime, String active, String moduleId, String refsetId, String referencedComponentId, String mapTarget) throws IOException {
 
 		WriteUtil.write(getConfig(), uuid + "\t" + effectiveTime + "\t" + active + "\t" + moduleId + "\t" + refsetId + "\t" + referencedComponentId + "\t" + mapTarget);

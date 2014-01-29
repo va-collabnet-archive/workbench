@@ -11,8 +11,18 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class JAXBUtil.
+ */
 public class JAXBUtil {
 
+	/**
+	 * Gets the config.
+	 *
+	 * @param fileName the file name
+	 * @return the config
+	 */
 	public static Config getConfig(String fileName) {
 
 		Config config = null;
@@ -33,6 +43,11 @@ public class JAXBUtil {
 		return config;
 	}
 
+	/**
+	 * Creates the concept config.
+	 *
+	 * @param args the args
+	 */
 	public static void createConceptConfig(String[] args) {
 
 		try {

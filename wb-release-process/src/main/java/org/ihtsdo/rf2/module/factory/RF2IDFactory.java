@@ -12,12 +12,23 @@ import org.ihtsdo.rf2.module.util.Column;
 import org.ihtsdo.rf2.module.util.Config;
 import org.ihtsdo.rf2.module.util.WriteUtil;
 
+// TODO: Auto-generated Javadoc
+/**
+ * A factory for creating RF2ID objects.
+ */
 public abstract class RF2IDFactory {
 
+	/** The config. */
 	private static Config config;
 
+	/** The logger. */
 	private static Logger logger = Logger.getLogger(RF2IDFactory.class);
 
+	/**
+	 * Instantiates a new r f2 id factory.
+	 *
+	 * @param config the config
+	 */
 	public RF2IDFactory(Config config) {
 		super();
 
@@ -27,6 +38,11 @@ public abstract class RF2IDFactory {
 	}
 	
 
+	/**
+	 * Write header.
+	 *
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	private static void writeHeader() throws IOException {
 
 		ArrayList<Column> columnsList = config.getColumn();
@@ -42,6 +58,9 @@ public abstract class RF2IDFactory {
 		WriteUtil.write(config, column.getDelimiter());
 	}
 
+	/**
+	 * Sets the buffered writer.
+	 */
 	public static void setBufferedWriter() {
 
 		try {
@@ -73,10 +92,20 @@ public abstract class RF2IDFactory {
 		}
 	}
 
+	/**
+	 * Close export file writer.
+	 *
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	public static void closeExportFileWriter() throws IOException {
 		WriteUtil.closeWriter(getConfig().getBw());
 	}
 
+	/**
+	 * Gets the config.
+	 *
+	 * @return the config
+	 */
 	public static Config getConfig() {
 		return config;
 	}

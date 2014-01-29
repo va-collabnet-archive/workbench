@@ -10,22 +10,32 @@ import org.ihtsdo.rf2.module.refset.impl.RF2SimpleRefsetImpl;
 import org.ihtsdo.rf2.module.util.Config;
 import org.ihtsdo.rf2.module.util.RefSetParam;
 
+// TODO: Auto-generated Javadoc
 /**
- * Title: RF2SimpleRefsetFactory Description: Creating Simple Refset Specific methods Copyright: Copyright (c) 2013 Company: IHTSDO
- * 
+ * Title: RF2SimpleRefsetFactory Description: Creating Simple Refset Specific methods Copyright: Copyright (c) 2013 Company: IHTSDO.
+ *
  * @author Alejandro Rodriguez
  * @version 1.0
  */
 
 public class RF2SimpleRefsetFactory extends RF2AbstractFactory {
 
+	/** The logger. */
 	private static Logger logger = Logger.getLogger(RF2SimpleRefsetFactory.class);
 
+	/**
+	 * Instantiates a new r f2 simple refset factory.
+	 *
+	 * @param config the config
+	 */
 	public RF2SimpleRefsetFactory(Config config) {
 		super();
 		setConfig(config);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.rf2.module.factory.RF2AbstractFactory#export()
+	 */
 	public void export() {
 
 		try {

@@ -22,24 +22,36 @@ import org.ihtsdo.rf2.module.util.WriteUtil;
 import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.RelAssertionType;
 
+// TODO: Auto-generated Javadoc
 /**
  * Title: RF2ConceptInactivationImpl Description: Iterating over all the concept in workbench and fetching all the components required by RF2 ConceptInactivation Refset File Copyright: Copyright (c)
  * 2010 Company: IHTSDO
  * 
- * * @author Alejandro Rodriguez
+ * * @author Alejandro Rodriguez.
+ *
  * @version 1.0
- * 
  */
 
 public class RF2ConceptInactivationImpl extends RF2AbstractImpl implements I_ProcessConcepts {
 
+	/** The logger. */
 	private static Logger logger = Logger.getLogger(RF2ConceptInactivationImpl.class);
+	
+	/** The record counter. */
 	private static int recordCounter = 0;
 
+	/**
+	 * Instantiates a new r f2 concept inactivation impl.
+	 *
+	 * @param config the config
+	 */
 	public RF2ConceptInactivationImpl(Config config) {
 		super(config);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.dwfa.ace.api.I_ProcessConcepts#processConcept(org.dwfa.ace.api.I_GetConceptData)
+	 */
 	@Override
 	public void processConcept(I_GetConceptData concept) throws Exception {
 
@@ -47,6 +59,15 @@ public class RF2ConceptInactivationImpl extends RF2AbstractImpl implements I_Pro
 
 	}
 
+	/**
+	 * Gets the concept inactivation relationship value id.
+	 *
+	 * @param concept the concept
+	 * @return the concept inactivation relationship value id
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws TerminologyException the terminology exception
+	 * @throws ParseException the parse exception
+	 */
 	public String getConceptInactivationRelationshipValueId(I_GetConceptData concept) throws IOException, TerminologyException, ParseException{
 		String valueId = null;
 		Date PREVIOUSRELEASEDATE = getDateFormat().parse(I_Constants.inactivation_policy_change);
@@ -131,6 +152,9 @@ public class RF2ConceptInactivationImpl extends RF2AbstractImpl implements I_Pro
 
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.rf2.module.impl.RF2AbstractImpl#export(org.dwfa.ace.api.I_GetConceptData, java.lang.String)
+	 */
 	@Override
 	public void export(I_GetConceptData concept, String referencedComponentId) {
 		try {
@@ -193,6 +217,18 @@ public class RF2ConceptInactivationImpl extends RF2AbstractImpl implements I_Pro
 		}
 	}
 
+	/**
+	 * Write r f2 type line.
+	 *
+	 * @param uuid the uuid
+	 * @param effectiveTime the effective time
+	 * @param active the active
+	 * @param moduleId the module id
+	 * @param refsetId the refset id
+	 * @param referencedComponentId the referenced component id
+	 * @param valueId the value id
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	private void WriteRF2TypeLine(UUID uuid, String effectiveTime, String active, String moduleId, String refsetId, String referencedComponentId, String valueId) throws IOException {
 		WriteUtil.write(getConfig(), uuid + "\t" + effectiveTime + "\t" + active + "\t" + moduleId + "\t" + refsetId + "\t" + referencedComponentId + "\t" + valueId);
 		WriteUtil.write(getConfig(), "\r\n");

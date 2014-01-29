@@ -13,10 +13,12 @@ import org.ihtsdo.rf2.module.refset.impl.RF2DescriptionReferencesImpl;
 import org.ihtsdo.rf2.module.refset.impl.RF2HistoricalAssociationImpl;
 import org.ihtsdo.rf2.module.util.Config;
 
+// TODO: Auto-generated Javadoc
 /**
  * Title: RF2HistoricalAssociationRefsetFactory Description: Creating Historical Association Refset Specific methods Copyright: Copyright (c) 2010 Company: IHTSDO
  * 
- * * @author Alejandro Rodriguez
+ * * @author Alejandro Rodriguez.
+ *
  * @version 1.0
  */
 
@@ -25,12 +27,21 @@ import org.ihtsdo.rf2.module.util.Config;
 
 public class RF2HistoricalAssociationRefsetFactory extends RF2AbstractFactory {
 
+	/** The logger. */
 	private static Logger logger = Logger.getLogger(RF2HistoricalAssociationRefsetFactory.class);
 
+	/**
+	 * Instantiates a new r f2 historical association refset factory.
+	 *
+	 * @param config the config
+	 */
 	public RF2HistoricalAssociationRefsetFactory(Config config) {
 		super(config);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.rf2.module.factory.RF2AbstractFactory#export()
+	 */
 	public void export() {
 		
 		try {

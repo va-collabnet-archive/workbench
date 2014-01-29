@@ -8,10 +8,18 @@ import org.dwfa.ace.log.AceLog;
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.DefaultHandler;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class SAXReader.
+ */
 public class SAXReader extends DefaultHandler {
 
+	/** The columns list. */
 	public static ArrayList<Column> columnsList = new ArrayList<Column>();
 
+	/* (non-Javadoc)
+	 * @see org.xml.sax.helpers.DefaultHandler#startElement(java.lang.String, java.lang.String, java.lang.String, org.xml.sax.Attributes)
+	 */
 	public void startElement(String uri, String name, String qName, Attributes atts) {
 
 		if (uri.equals("http://www.cap.org/filters") && name.equals("column")) {
@@ -23,6 +31,12 @@ public class SAXReader extends DefaultHandler {
 
 	}
 
+	/**
+	 * Gets the columns.
+	 *
+	 * @param fileName the file name
+	 * @return the columns
+	 */
 	public ArrayList<Column> getColumns(String fileName) {
 		SAXReader saxreader = new SAXReader();
 		SAXParser parser = new SAXParser();

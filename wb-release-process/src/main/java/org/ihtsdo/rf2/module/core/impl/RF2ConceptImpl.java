@@ -14,17 +14,25 @@ import org.ihtsdo.rf2.module.util.Config;
 import org.ihtsdo.rf2.module.util.WriteUtil;
 import org.ihtsdo.tk.api.Precedence;
 
+// TODO: Auto-generated Javadoc
 /**
  * Title: RF2ConceptImpl Description: Iterating over all the concept in workbench and fetching all the components required by RF2 Concept File Copyright: Copyright (c) 2010 Company: IHTSDO
  * 
- * * @author Alejandro Rodriguez
+ * * @author Alejandro Rodriguez.
+ *
  * @version 1.0
  */
 
 public class RF2ConceptImpl extends RF2AbstractImpl implements I_ProcessConcepts {
 
+	/** The logger. */
 	private static Logger logger = Logger.getLogger(RF2ConceptImpl.class);
 
+	/**
+	 * Instantiates a new r f2 concept impl.
+	 *
+	 * @param config the config
+	 */
 	public RF2ConceptImpl(Config config) {
 		super(config);
 	}
@@ -42,6 +50,9 @@ public class RF2ConceptImpl extends RF2AbstractImpl implements I_ProcessConcepts
 
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.rf2.module.impl.RF2AbstractImpl#export(org.dwfa.ace.api.I_GetConceptData, java.lang.String)
+	 */
 	@Override
 	public void export(I_GetConceptData concept, String conceptid) {
 		String effectiveTime = "";
@@ -115,11 +126,32 @@ public class RF2ConceptImpl extends RF2AbstractImpl implements I_ProcessConcepts
 	}
 
 
+	/**
+	 * Write r f2 type line.
+	 *
+	 * @param conceptid the conceptid
+	 * @param effectiveTime the effective time
+	 * @param active the active
+	 * @param moduleId the module id
+	 * @param definitionStatusId the definition status id
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	public static void writeRF2TypeLine(String conceptid, String effectiveTime, String active, String moduleId, String definitionStatusId) throws IOException {
 		WriteUtil.write(getConfig(), conceptid + "\t" + effectiveTime + "\t" + active + "\t" + moduleId + "\t" + definitionStatusId);
 		WriteUtil.write(getConfig(), "\r\n");
 	}
 
+	/**
+	 * Write r f2 type line.
+	 *
+	 * @param conceptid the conceptid
+	 * @param effectiveTime the effective time
+	 * @param active the active
+	 * @param moduleId the module id
+	 * @param definitionStatusId the definition status id
+	 * @param authorName the author name
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	public static void writeRF2TypeLine(String conceptid, String effectiveTime, String active, String moduleId, String definitionStatusId , String authorName) throws IOException {
 		WriteUtil.write(getConfig(), conceptid + "\t" + effectiveTime + "\t" + active + "\t" + moduleId + "\t" + definitionStatusId + "\t" + authorName);
 		WriteUtil.write(getConfig(), "\r\n");

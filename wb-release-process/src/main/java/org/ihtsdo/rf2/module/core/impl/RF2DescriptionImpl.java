@@ -16,17 +16,25 @@ import org.ihtsdo.rf2.module.util.ExportUtil;
 import org.ihtsdo.rf2.module.util.WriteUtil;
 import org.ihtsdo.tk.api.Precedence;
 
+// TODO: Auto-generated Javadoc
 /**
  * Title: RF2DescriptionImpl Description: Iterating over all the concept in workbench and fetching all the components required by RF2 Description File Copyright: Copyright (c) 2010 Company: IHTSDO
  * 
- * * @author Alejandro Rodriguez
+ * * @author Alejandro Rodriguez.
+ *
  * @version 1.0
  */
 
 public class RF2DescriptionImpl extends RF2AbstractImpl implements I_ProcessConcepts {
 
+	/** The logger. */
 	private static Logger logger = Logger.getLogger(RF2DescriptionImpl.class);
 
+	/**
+	 * Instantiates a new r f2 description impl.
+	 *
+	 * @param config the config
+	 */
 	public RF2DescriptionImpl(Config config) {
 		super(config);
 	}
@@ -43,6 +51,9 @@ public class RF2DescriptionImpl extends RF2AbstractImpl implements I_ProcessConc
 
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.rf2.module.impl.RF2AbstractImpl#export(org.dwfa.ace.api.I_GetConceptData, java.lang.String)
+	 */
 	@Override
 	public void export(I_GetConceptData concept, String conceptid) {
 		String effectiveTime = "";
@@ -142,6 +153,20 @@ public class RF2DescriptionImpl extends RF2AbstractImpl implements I_ProcessConc
 		}
 	}
 
+	/**
+	 * Write r f2 type line.
+	 *
+	 * @param descriptionid the descriptionid
+	 * @param effectiveTime the effective time
+	 * @param active the active
+	 * @param moduleId the module id
+	 * @param conceptid the conceptid
+	 * @param languageCode the language code
+	 * @param typeId the type id
+	 * @param term the term
+	 * @param caseSignificanceId the case significance id
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	public static void writeRF2TypeLine(String descriptionid, String effectiveTime, String active, String moduleId, String conceptid, String languageCode, String typeId, String term,
 			String caseSignificanceId) throws IOException {
 		WriteUtil.write(getConfig(), descriptionid + "\t" + effectiveTime + "\t" + active + "\t" + moduleId + "\t" + conceptid + "\t" + languageCode + "\t" + typeId + "\t" + term + "\t"
@@ -149,6 +174,21 @@ public class RF2DescriptionImpl extends RF2AbstractImpl implements I_ProcessConc
 		WriteUtil.write(getConfig(), "\r\n");
 	}
 
+	/**
+	 * Write r f2 type line.
+	 *
+	 * @param descriptionid the descriptionid
+	 * @param effectiveTime the effective time
+	 * @param active the active
+	 * @param moduleId the module id
+	 * @param conceptid the conceptid
+	 * @param languageCode the language code
+	 * @param typeId the type id
+	 * @param term the term
+	 * @param caseSignificanceId the case significance id
+	 * @param authorName the author name
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	public static void writeRF2TypeLine(String descriptionid, String effectiveTime, String active, String moduleId, String conceptid, String languageCode, String typeId, String term,
 			String caseSignificanceId, String authorName) throws IOException {
 		WriteUtil.write(getConfig(), descriptionid + "\t" + effectiveTime + "\t" + active + "\t" + moduleId + "\t" + conceptid + "\t" + languageCode + "\t" + typeId + "\t" + term + "\t"

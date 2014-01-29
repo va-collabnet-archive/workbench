@@ -19,21 +19,32 @@ import org.ihtsdo.rf2.module.util.ExportUtil;
 import org.ihtsdo.rf2.module.util.WriteUtil;
 import org.ihtsdo.tk.api.Precedence;
 
+// TODO: Auto-generated Javadoc
 /**
- * Title: RF2LanguageImpl Description: Iterating over all the concept in workbench and fetching all the components required by RF2 Language File Copyright: Copyright (c) 2010 Company: IHTSDO
- * 
+ * Title: RF2LanguageImpl Description: Iterating over all the concept in workbench and fetching all the components required by RF2 Language File Copyright: Copyright (c) 2010 Company: IHTSDO.
+ *
  * @author Alejandro Rodriguez
  * @version 1.0
  */
 
 public class RF2LanguageImpl extends RF2AbstractImpl implements I_ProcessConcepts {
 
+	/** The logger. */
 	private static Logger logger = Logger.getLogger(RF2LanguageImpl.class);
 
+	/** The lang refset id. */
 	private int langRefsetId;
 
+	/** The refset sct id. */
 	private String refsetSCTId;
 
+	/**
+	 * Instantiates a new r f2 language impl.
+	 *
+	 * @param config the config
+	 * @param langRefsetId the lang refset id
+	 * @param refsetSCTId the refset sct id
+	 */
 	public RF2LanguageImpl(Config config, int langRefsetId, String refsetSCTId) {
 		super(config);
 		this.langRefsetId=langRefsetId;
@@ -61,6 +72,9 @@ public class RF2LanguageImpl extends RF2AbstractImpl implements I_ProcessConcept
 
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.rf2.module.impl.RF2AbstractImpl#export(org.dwfa.ace.api.I_GetConceptData, java.lang.String)
+	 */
 	@Override
 	public void export(I_GetConceptData concept, String conceptid) throws IOException {
 		String effectiveTime = "";
@@ -190,6 +204,18 @@ public class RF2LanguageImpl extends RF2AbstractImpl implements I_ProcessConcept
 	}
 
 
+	/**
+	 * Write r f2 type line.
+	 *
+	 * @param refsetuuid the refsetuuid
+	 * @param langEffectiveTime the lang effective time
+	 * @param active the active
+	 * @param moduleId the module id
+	 * @param refsetId the refset id
+	 * @param descriptionid the descriptionid
+	 * @param acceptabilityId the acceptability id
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	private void writeRF2TypeLine(UUID refsetuuid, String langEffectiveTime, String active, String moduleId, String refsetId, String descriptionid, String acceptabilityId) throws IOException {
 		WriteUtil.write(getConfig(), refsetuuid + "\t" + langEffectiveTime + "\t" + active + "\t" + moduleId + "\t" + refsetId + "\t" + descriptionid + "\t" + acceptabilityId);
 		WriteUtil.write(getConfig(), "\r\n");

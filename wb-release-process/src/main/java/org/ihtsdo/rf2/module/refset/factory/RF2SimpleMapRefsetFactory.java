@@ -11,10 +11,12 @@ import org.ihtsdo.rf2.module.refset.impl.RF2SnomedIdImpl;
 import org.ihtsdo.rf2.module.util.Config;
 import org.ihtsdo.rf2.module.util.ExportUtil;
 
+// TODO: Auto-generated Javadoc
 /**
  * Title: RF2SimpleMapRefsetFactory Description: Creating SnomedId & Ctv3Id Refset Specific methods Copyright: Copyright (c) 2010 Company: IHTSDO
  * 
- * * @author Alejandro Rodriguez
+ * * @author Alejandro Rodriguez.
+ *
  * @version 1.0
  */
 
@@ -22,12 +24,21 @@ import org.ihtsdo.rf2.module.util.ExportUtil;
 
 public class RF2SimpleMapRefsetFactory extends RF2AbstractFactory {
 
+	/** The logger. */
 	private static Logger logger = Logger.getLogger(RF2SimpleMapRefsetFactory.class);
 
+	/**
+	 * Instantiates a new r f2 simple map refset factory.
+	 *
+	 * @param config the config
+	 */
 	public RF2SimpleMapRefsetFactory(Config config) {
 		super(config);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.rf2.module.factory.RF2AbstractFactory#export()
+	 */
 	public void export() {
 
 		try {

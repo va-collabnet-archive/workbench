@@ -8,21 +8,32 @@ import org.ihtsdo.rf2.module.factory.RF2AbstractFactory;
 import org.ihtsdo.rf2.module.util.Config;
 import org.ihtsdo.rf2.module.util.ExportUtil;
 
+// TODO: Auto-generated Javadoc
 /**
  * Title: RF2StatedRelationshipFactory Description: Creating StatedRelationship Specific methods required by StatedRelationshipIterator Copyright: Copyright (c) 2010 Company: IHTSDO
  * 
- * * @author Alejandro Rodriguez
+ * * @author Alejandro Rodriguez.
+ *
  * @version 1.0
  */
 
 public class RF2StatedRelationshipFactory extends RF2AbstractFactory {
 
+	/** The logger. */
 	private static Logger logger = Logger.getLogger(RF2StatedRelationshipFactory.class);
 
+	/**
+	 * Instantiates a new r f2 stated relationship factory.
+	 *
+	 * @param config the config
+	 */
 	public RF2StatedRelationshipFactory(Config config) {
 		super(config);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.rf2.module.factory.RF2AbstractFactory#export()
+	 */
 	public void export() throws IOException, Exception {
 
 		logger.info("Started Stated Relationship Snapshot Export ...");

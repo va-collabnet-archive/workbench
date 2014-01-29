@@ -26,47 +26,84 @@ import org.ihtsdo.idgeneration.IdAssignmentImpl;
 import org.ihtsdo.rf2.core.dao.ModuleIDDAO;
 import org.ihtsdo.rf2.module.constant.I_Constants;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class IdUtil.
+ */
 public class IdUtil {
 
 	// store the handle for the log files
+	/** The ace config. */
 	private static I_ConfigAceFrame aceConfig;
 
 	// log4j logging
+	/** The logger. */
 	private static Logger logger = Logger.getLogger(IdUtil.class.getName());
 
+	/** The snomed core path nid. */
 	private static int snomedCorePathNid;
+	
+	/** The snomed meta path nid. */
 	private static int snomedMetaPathNid;
+	
+	/** The snomed inferred path nid. */
 	private static int snomedInferredPathNid;
+	
+	/** The snomed stated path nid. */
 	private static int snomedStatedPathNid;
+	
+	/** The snorocket author nid. */
 	private static int snorocketAuthorNid;
+	
+	/** The user author nid. */
 	private static int userAuthorNid;
 
+	/** The paths. */
 	private static UUID paths[] = null;
 
 	//	private static Set<ConceptDescriptor> editPaths = new HashSet<ConceptDescriptor>();
 
+	/** The meta hier. */
 	private static HashSet<String> metaHier;
 
+	/** The meta concept list. */
 	private static Set<I_GetConceptData> metaConceptList;
 
+	/** The timeformat. */
 	public static String TIMEFORMAT = I_Constants.TimeFormat;
+	
+	/** The dateformat. */
 	public static SimpleDateFormat DATEFORMAT = new SimpleDateFormat(TIMEFORMAT);
 
+	/** The module id. */
 	private static String moduleId = "";
 
 	// protected static Logger logger = Logger.getLogger(ExportUtil.class.getName());
 
 
+	/**
+	 * Inits the.
+	 */
 	public static void init() {
 
 
 	}
 
+	/** The meta hier dao. */
 	private static HashSet<ModuleIDDAO> metaHierDAO;
 
 
 
 
+	/**
+	 * Creates the term factory.
+	 *
+	 * @param db the db
+	 * @throws InstantiationException the instantiation exception
+	 * @throws IllegalAccessException the illegal access exception
+	 * @throws ClassNotFoundException the class not found exception
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	public static void createTermFactory(Database db) throws InstantiationException, IllegalAccessException, ClassNotFoundException, IOException {
 
 		File vodbDirectory = new File(db.getLocation());
@@ -75,18 +112,37 @@ public class IdUtil {
 		Terms.createFactory(vodbDirectory, I_Constants.readOnly, I_Constants.cacheSize, dbSetupConfig);
 	}
 
+	/**
+	 * Gets the term factory.
+	 *
+	 * @return the term factory
+	 */
 	public static I_TermFactory getTermFactory() {
 		// since we are using mojo this handles the return of the opened database
 		I_TermFactory termFactory = Terms.get();
 		return termFactory;
 	}
 
+	/**
+	 * Gets the ace config.
+	 *
+	 * @return the ace config
+	 */
 	public static I_ConfigAceFrame getAceConfig() {
 		return aceConfig;
 	}
 
 
 
+	/**
+	 * Gets the snomed id.
+	 *
+	 * @param concept the concept
+	 * @param snomedCorePathNid the snomed core path nid
+	 * @return the snomed id
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws TerminologyException the terminology exception
+	 */
 	public static String getSnomedId(I_GetConceptData concept, int snomedCorePathNid) throws IOException, TerminologyException {
 		String snomedId = "";
 		I_Identify i_Identify = concept.getIdentifier();
@@ -107,6 +163,15 @@ public class IdUtil {
 		return snomedId.toString();
 	}
 
+	/**
+	 * Gets the ctv3 id.
+	 *
+	 * @param concept the concept
+	 * @param snomedCorePathNid the snomed core path nid
+	 * @return the ctv3 id
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws TerminologyException the terminology exception
+	 */
 	public static String getCtv3Id(I_GetConceptData concept, int snomedCorePathNid) throws IOException, TerminologyException {
 		String ctv3Id = ""; // ConceptId
 		I_Identify i_Identify = concept.getIdentifier();
@@ -130,6 +195,14 @@ public class IdUtil {
 
 
 
+	/**
+	 * Gets the nid.
+	 *
+	 * @param struuid the struuid
+	 * @return the nid
+	 * @throws TerminologyException the terminology exception
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	public static int getNid(String struuid) throws TerminologyException, IOException {
 		int nid = 0;
 		ArrayList<UUID> uuidList = new ArrayList<UUID>();
@@ -140,6 +213,11 @@ public class IdUtil {
 		return nid;
 	}
 
+	/**
+	 * Gets the snomed core path nid.
+	 *
+	 * @return the snomed core path nid
+	 */
 	public static int getSnomedCorePathNid() {
 		int snomedCorePathNid = 0;
 		try {
@@ -154,6 +232,11 @@ public class IdUtil {
 
 
 
+	/**
+	 * Gets the snomed inferred path nid.
+	 *
+	 * @return the snomed inferred path nid
+	 */
 	public static int getSnomedInferredPathNid() {
 		int snomedInferredPathNid = 0;
 		try {
@@ -166,6 +249,11 @@ public class IdUtil {
 		return snomedInferredPathNid;
 	}
 
+	/**
+	 * Gets the snomed stated path nid.
+	 *
+	 * @return the snomed stated path nid
+	 */
 	public static int getSnomedStatedPathNid() {
 		int snomedStatedPathNid = 0;
 		try {
@@ -178,6 +266,15 @@ public class IdUtil {
 		return snomedStatedPathNid;
 	}
 
+	/**
+	 * Checks if is on path.
+	 *
+	 * @param onPath the on path
+	 * @param nid the nid
+	 * @return true, if is on path
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws TerminologyException the terminology exception
+	 */
 	public static boolean isOnPath(int onPath, int nid) throws IOException, TerminologyException {
 		boolean snomedPathFlag = false;
 		int pathId = 0;
@@ -194,6 +291,15 @@ public class IdUtil {
 		return snomedPathFlag;
 	}
 
+	/**
+	 * Gets the sct id.
+	 *
+	 * @param nid the nid
+	 * @param pathNid the path nid
+	 * @return the sct id
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws TerminologyException the terminology exception
+	 */
 	public static String getSctId(int nid, int pathNid) throws IOException, TerminologyException {
 		Long sctId = null;
 		I_Identify identify = getTermFactory().getId(nid);
@@ -222,6 +328,18 @@ public class IdUtil {
 
 
 	//Get the sctid for the given UUID
+	/**
+	 * Gets the sCT id.
+	 *
+	 * @param config the config
+	 * @param componentUuid the component uuid
+	 * @param namespaceId the namespace id
+	 * @param partitionId the partition id
+	 * @param releaseId the release id
+	 * @param executionId the execution id
+	 * @param moduleId the module id
+	 * @return the sCT id
+	 */
 	public static String getSCTId(Config config, UUID componentUuid, Integer namespaceId, String partitionId, String releaseId, String executionId, String moduleId) {
 		final IdAssignmentImpl idGen = new IdAssignmentImpl(config.getEndPoint(), config.getUsername(), config.getPassword());
 		long sctId = 0L;
@@ -245,6 +363,13 @@ public class IdUtil {
 
 
 	// get the conceptid for the given UUID (Hardcoded values)
+	/**
+	 * Gets the sCT id.
+	 *
+	 * @param config the config
+	 * @param uuid the uuid
+	 * @return the sCT id
+	 */
 	public static String getSCTId(Config config, UUID uuid) {
 		final IdAssignmentImpl idGen = new IdAssignmentImpl(config.getEndPoint(), config.getUsername(), config.getPassword());
 		long sctId = 0L;
@@ -266,6 +391,15 @@ public class IdUtil {
 		return String.valueOf(sctId);
 	}
 
+	/**
+	 * Gets the concept id.
+	 *
+	 * @param concept the concept
+	 * @param snomedCorePathNid the snomed core path nid
+	 * @return the concept id
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws TerminologyException the terminology exception
+	 */
 	public static String getConceptId(I_GetConceptData concept, int snomedCorePathNid) throws IOException, TerminologyException {
 		Long conceptId = null; // ConceptId
 		I_Identify i_Identify = concept.getIdentifier();
@@ -294,6 +428,12 @@ public class IdUtil {
 		return conceptId.toString();
 	}
 
+	/**
+	 * Gets the partition id.
+	 *
+	 * @param sctId the sct id
+	 * @return the partition id
+	 */
 	public static String getPartitionId(String sctId) {
 		int slength = sctId.length();
 		String partId = sctId.substring(slength - 3, slength - 1);
@@ -301,6 +441,15 @@ public class IdUtil {
 	}
 
 
+	/**
+	 * Gets the description id.
+	 *
+	 * @param descriptionNid the description nid
+	 * @param snomedCorePathNid the snomed core path nid
+	 * @return the description id
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws TerminologyException the terminology exception
+	 */
 	public static String getDescriptionId(int descriptionNid, int snomedCorePathNid) throws IOException, TerminologyException {
 
 		Long descriptionId = null; //If description is new then descriptionid doesn't exist in workbench so use dummy value.
@@ -326,6 +475,18 @@ public class IdUtil {
 		return descriptionId.toString();
 	}
 
+	/**
+	 * Gets the sCT id list.
+	 *
+	 * @param config the config
+	 * @param componentUuidlist the component uuidlist
+	 * @param namespaceId the namespace id
+	 * @param partitionId the partition id
+	 * @param releaseId the release id
+	 * @param executionId the execution id
+	 * @param moduleId2 the module id2
+	 * @return the sCT id list
+	 */
 	public static HashMap<UUID, Long> getSCTIdList(Config config,
 			List<UUID> componentUuidlist, Integer namespaceId,
 			String partitionId, String releaseId, String executionId,

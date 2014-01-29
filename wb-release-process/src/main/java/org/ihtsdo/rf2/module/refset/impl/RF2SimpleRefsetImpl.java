@@ -19,17 +19,24 @@ import org.ihtsdo.rf2.module.util.Config;
 import org.ihtsdo.rf2.module.util.WriteUtil;
 import org.ihtsdo.tk.api.Precedence;
 
+// TODO: Auto-generated Javadoc
 /**
- * Title: RF2SimpleRefsetImpl Refset: Iterating over all the concept in workbench and fetching all the components required by RF2 Simple Refset File Copyright: Copyright (c) 2013 Company: IHTSDO
- * 
+ * Title: RF2SimpleRefsetImpl Refset: Iterating over all the concept in workbench and fetching all the components required by RF2 Simple Refset File Copyright: Copyright (c) 2013 Company: IHTSDO.
+ *
  * @author Alejandro Rodriguez
  * @version 1.0
  */
 
 public class RF2SimpleRefsetImpl extends RF2AbstractImpl implements I_ProcessConcepts {
 
+	/** The logger. */
 	private static Logger logger = Logger.getLogger(RF2SimpleRefsetImpl.class);
 
+	/**
+	 * Instantiates a new r f2 simple refset impl.
+	 *
+	 * @param config the config
+	 */
 	public RF2SimpleRefsetImpl(Config config) {
 		super(config);
 	}
@@ -46,6 +53,9 @@ public class RF2SimpleRefsetImpl extends RF2AbstractImpl implements I_ProcessCon
 
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.rf2.module.impl.RF2AbstractImpl#export(org.dwfa.ace.api.I_GetConceptData, java.lang.String)
+	 */
 	@Override
 	public void export(I_GetConceptData concept, String conceptid) throws IOException {
 		String effectiveTime = "";
@@ -146,6 +156,17 @@ public class RF2SimpleRefsetImpl extends RF2AbstractImpl implements I_ProcessCon
 		}
 	}
 
+	/**
+	 * Write r f2 type line.
+	 *
+	 * @param refsetuuid the refsetuuid
+	 * @param effectiveTime the effective time
+	 * @param active the active
+	 * @param moduleId the module id
+	 * @param refsetId the refset id
+	 * @param conceptid the conceptid
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	private void writeRF2TypeLine(UUID refsetuuid, String effectiveTime, String active, String moduleId, String refsetId, String conceptid) throws IOException {
 
 		WriteUtil.write(getConfig(), refsetuuid + "\t" + effectiveTime + "\t" + active + "\t" + moduleId + "\t" + refsetId + "\t" + conceptid);

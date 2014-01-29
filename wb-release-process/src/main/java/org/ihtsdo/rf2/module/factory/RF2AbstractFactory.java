@@ -12,12 +12,23 @@ import org.ihtsdo.rf2.module.util.Column;
 import org.ihtsdo.rf2.module.util.Config;
 import org.ihtsdo.rf2.module.util.WriteUtil;
 
+// TODO: Auto-generated Javadoc
+/**
+ * A factory for creating RF2Abstract objects.
+ */
 public abstract class RF2AbstractFactory {
 
+	/** The config. */
 	private static Config config;
 
+	/** The logger. */
 	private static Logger logger = Logger.getLogger(RF2AbstractFactory.class);
 
+	/**
+	 * Instantiates a new r f2 abstract factory.
+	 *
+	 * @param config the config
+	 */
 	public RF2AbstractFactory(Config config) {
 		super();
 
@@ -26,11 +37,26 @@ public abstract class RF2AbstractFactory {
 		setBufferedWriter();
 	}
 
+	/**
+	 * Instantiates a new r f2 abstract factory.
+	 */
 	public RF2AbstractFactory() {
 		
 	}
+	
+	/**
+	 * Export.
+	 *
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws Exception the exception
+	 */
 	public abstract void export() throws IOException, Exception;
 
+	/**
+	 * Write header.
+	 *
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	private static void writeHeader() throws IOException {
 
 		ArrayList<Column> columnsList = config.getColumn();
@@ -46,6 +72,9 @@ public abstract class RF2AbstractFactory {
 		WriteUtil.write(config, column.getDelimiter());
 	}
 
+	/**
+	 * Sets the buffered writer.
+	 */
 	public static void setBufferedWriter() {
 
 		try {
@@ -77,14 +106,29 @@ public abstract class RF2AbstractFactory {
 		}
 	}
 
+	/**
+	 * Close export file writer.
+	 *
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	public static void closeExportFileWriter() throws IOException {
 		WriteUtil.closeWriter(getConfig().getBw());
 	}
 
+	/**
+	 * Gets the config.
+	 *
+	 * @return the config
+	 */
 	public static Config getConfig() {
 		return config;
 	}
 
+	/**
+	 * Sets the config.
+	 *
+	 * @param recConfig the new config
+	 */
 	public static void setConfig(Config recConfig) {
 		RF2AbstractFactory.config=recConfig;
 	}

@@ -10,21 +10,32 @@ import org.ihtsdo.rf2.module.refset.impl.RF2DescriptionInactivationImpl;
 import org.ihtsdo.rf2.module.util.Config;
 import org.ihtsdo.rf2.module.util.ExportUtil;
 
+// TODO: Auto-generated Javadoc
 /**
  * Title: RF2AttributeValueRefsetFactory Description: Creating Attribute Value Refset Specific methods Copyright: Copyright (c) 2010 Company: IHTSDO
  * 
- * * @author Alejandro Rodriguez
+ * * @author Alejandro Rodriguez.
+ *
  * @version 1.0
  */
 
 public class RF2AttributeValueRefsetFactory extends RF2AbstractFactory {
 
+	/** The logger. */
 	private static Logger logger = Logger.getLogger(RF2AttributeValueRefsetFactory.class);
 
+	/**
+	 * Instantiates a new r f2 attribute value refset factory.
+	 *
+	 * @param config the config
+	 */
 	public RF2AttributeValueRefsetFactory(Config config) {
 		super(config);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.rf2.module.factory.RF2AbstractFactory#export()
+	 */
 	public void export() {
 
 		logger.info("Started Attribute Value Refset Export ...");

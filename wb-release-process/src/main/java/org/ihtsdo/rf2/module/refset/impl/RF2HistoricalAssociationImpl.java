@@ -20,17 +20,25 @@ import org.ihtsdo.rf2.module.util.WriteUtil;
 import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.RelAssertionType;
 
+// TODO: Auto-generated Javadoc
 /**
  * Title: RF2RelationshipImpl Description: Iterating over all the concept in workbench and fetching all the components required by RF2 Relationship File Copyright: Copyright (c) 2010 Company: IHTSDO
  * 
- * * @author Alejandro Rodriguez
+ * * @author Alejandro Rodriguez.
+ *
  * @version 1.0
  */
 
 public class RF2HistoricalAssociationImpl extends RF2AbstractImpl implements I_ProcessConcepts {
 
+	/** The logger. */
 	private static Logger logger = Logger.getLogger(RF2HistoricalAssociationImpl.class);
 
+	/**
+	 * Instantiates a new r f2 historical association impl.
+	 *
+	 * @param config the config
+	 */
 	public RF2HistoricalAssociationImpl(Config config) {
 		super(config);
 	}
@@ -48,6 +56,9 @@ public class RF2HistoricalAssociationImpl extends RF2AbstractImpl implements I_P
 	}
 
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.rf2.module.impl.RF2AbstractImpl#export(org.dwfa.ace.api.I_GetConceptData, java.lang.String)
+	 */
 	@Override
 	public void export(I_GetConceptData concept, String referencedComponentId) throws IOException {
 		try {
@@ -147,6 +158,18 @@ public class RF2HistoricalAssociationImpl extends RF2AbstractImpl implements I_P
 		}
 	}
 
+	/**
+	 * Write r f2 type line.
+	 *
+	 * @param uuid the uuid
+	 * @param effectiveTime the effective time
+	 * @param active the active
+	 * @param moduleId the module id
+	 * @param refsetId the refset id
+	 * @param referencedComponentId the referenced component id
+	 * @param targetComponent the target component
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	private void writeRF2TypeLine(UUID uuid, String effectiveTime, String active, String moduleId, String refsetId, String referencedComponentId, String targetComponent) throws IOException {
 
 		WriteUtil.write(getConfig(), uuid + "\t" + effectiveTime + "\t" + active + "\t" + moduleId + "\t" + refsetId + "\t" + referencedComponentId + "\t" + targetComponent);

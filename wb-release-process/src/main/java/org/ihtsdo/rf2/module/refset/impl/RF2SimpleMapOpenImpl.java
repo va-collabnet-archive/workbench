@@ -20,17 +20,24 @@ import org.ihtsdo.rf2.module.util.Config;
 import org.ihtsdo.rf2.module.util.WriteUtil;
 import org.ihtsdo.tk.api.Precedence;
 
+// TODO: Auto-generated Javadoc
 /**
- * Title: RF2SimpleMapOpenImpl Refset: Iterating over all the concept in workbench and fetching all the components required by RF2 Map Refset File Copyright: Copyright (c) 2013 Company: IHTSDO
- * 
+ * Title: RF2SimpleMapOpenImpl Refset: Iterating over all the concept in workbench and fetching all the components required by RF2 Map Refset File Copyright: Copyright (c) 2013 Company: IHTSDO.
+ *
  * @author Alejandro Rodriguez
  * @version 1.0
  */
 
 public class RF2SimpleMapOpenImpl extends RF2AbstractImpl implements I_ProcessConcepts {
 
+	/** The logger. */
 	private static Logger logger = Logger.getLogger(RF2SimpleMapOpenImpl.class);
 
+	/**
+	 * Instantiates a new r f2 simple map open impl.
+	 *
+	 * @param config the config
+	 */
 	public RF2SimpleMapOpenImpl(Config config) {
 		super(config);
 	}
@@ -47,6 +54,9 @@ public class RF2SimpleMapOpenImpl extends RF2AbstractImpl implements I_ProcessCo
 
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.rf2.module.impl.RF2AbstractImpl#export(org.dwfa.ace.api.I_GetConceptData, java.lang.String)
+	 */
 	public void export(I_GetConceptData concept, String referencedComponentId) throws IOException {
 		String effectiveTime = "";
 		String active = "";
@@ -151,6 +161,18 @@ public class RF2SimpleMapOpenImpl extends RF2AbstractImpl implements I_ProcessCo
 		}
 	}
 
+	/**
+	 * Write r f2 type line.
+	 *
+	 * @param refsetuuid the refsetuuid
+	 * @param effectiveTime the effective time
+	 * @param active the active
+	 * @param moduleId the module id
+	 * @param refsetId the refset id
+	 * @param referencedComponentId the referenced component id
+	 * @param targetComponent the target component
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	private void writeRF2TypeLine(UUID refsetuuid, String effectiveTime, String active, String moduleId, String refsetId, String referencedComponentId, String targetComponent) throws IOException {
 
 		WriteUtil.write(getConfig(), refsetuuid + "\t" + effectiveTime + "\t" + active + "\t" + moduleId + "\t" + refsetId + "\t" + referencedComponentId + "\t" + targetComponent);

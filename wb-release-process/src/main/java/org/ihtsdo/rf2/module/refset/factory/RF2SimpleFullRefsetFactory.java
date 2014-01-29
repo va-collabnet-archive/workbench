@@ -10,21 +10,32 @@ import org.ihtsdo.rf2.module.refset.impl.RF2VMPImpl;
 import org.ihtsdo.rf2.module.refset.impl.RF2VTMImpl;
 import org.ihtsdo.rf2.module.util.Config;
 
+// TODO: Auto-generated Javadoc
 /**
  * Title: RF2LanguageRefsetFactory Description: Creating SnomedId & Ctv3Id Refset Specific methods Copyright: Copyright (c) 2010 Company: IHTSDO
  * 
- * * @author Alejandro Rodriguez
+ * * @author Alejandro Rodriguez.
+ *
  * @version 1.0
  */
 
 public class RF2SimpleFullRefsetFactory extends RF2AbstractFactory {
 
+	/** The logger. */
 	private static Logger logger = Logger.getLogger(RF2SimpleFullRefsetFactory.class);
 
+	/**
+	 * Instantiates a new r f2 simple full refset factory.
+	 *
+	 * @param config the config
+	 */
 	public RF2SimpleFullRefsetFactory(Config config) {
 		super(config);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.ihtsdo.rf2.module.factory.RF2AbstractFactory#export()
+	 */
 	public void export() {
 
 	

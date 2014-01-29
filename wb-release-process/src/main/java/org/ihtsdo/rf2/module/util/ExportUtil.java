@@ -28,44 +28,85 @@ import org.ihtsdo.idgeneration.IdAssignmentImpl;
 import org.ihtsdo.rf2.module.constant.I_Constants;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 
+// TODO: Auto-generated Javadoc
 //import org.ihtsdo.tk.api.Precedence;
 
+/**
+ * The Class ExportUtil.
+ */
 public class ExportUtil {
 
 
+	/** The Constant META_MODULEID_PARENT. */
 	private static final String META_MODULEID_PARENT = "40d1c869-b509-32f8-b735-836eac577a67";
 
 	// store the handle for the log files
+	/** The ace config. */
 	private static I_ConfigAceFrame aceConfig;
 
 	// log4j logging
+	/** The logger. */
 	private static Logger logger = Logger.getLogger(ExportUtil.class.getName());
+	
+	/** The user author nid. */
 	private static int userAuthorNid;
 
 
+	/** The timeformat. */
 	public static String TIMEFORMAT = I_Constants.TimeFormat;
+	
+	/** The dateformat. */
 	public static SimpleDateFormat DATEFORMAT = new SimpleDateFormat(TIMEFORMAT);
 
+	/** The all module map nid sct id. */
 	private static HashMap<Integer,String> allModuleMapNidSCTId;
 
+	/** The active id. */
 	public static int activeId; 
+	
+	/** The inact id. */
 	public static int inactId; 
+	
+	/** The con ret id. */
 	public static int conRetId;
+	
+	/** The ret id. */
 	public static int retId ;
+	
+	/** The dup id. */
 	public static int dupId ;
+	
+	/** The cur id. */
 	public static int curId ;
+	
+	/** The outdated id. */
 	public static int outdatedId ;
+	
+	/** The ambiguous id. */
 	public static int ambiguousId;
+	
+	/** The err id. */
 	public static int errId ;
+	
+	/** The lim id. */
 	public static int limId;
+	
+	/** The mov id. */
 	public static int movId ;
+	
+	/** The pend id. */
 	public static int pendId ;
+	
+	/** The inappropriate id. */
 	public static int inappropriateId ;
 
+	/** The arc aux snomed integer nid. */
 	private static int arcAuxSnomedIntegerNid;
 
+	/** The arc aux snomed rt nid. */
 	private static int arcAuxSnomedRTNid;
 
+	/** The arc aux ctv3 nid. */
 	private static int arcAuxCtv3Nid;
 	static{
 		try {
@@ -93,11 +134,21 @@ public class ExportUtil {
 		}
 	}
 
+	/**
+	 * Inits the.
+	 *
+	 * @param config the config
+	 */
 	public static void init(Config config) {
 
 		InitializeModuleID(config);		
 	}
 
+	/**
+	 * Initialize module id.
+	 *
+	 * @param config the config
+	 */
 	public static void InitializeModuleID(Config config) {
 		try{
 			if (allModuleMapNidSCTId!=null && allModuleMapNidSCTId.size()>0){
@@ -123,6 +174,12 @@ public class ExportUtil {
 	}
 
 
+	/**
+	 * Complete map scti dto module.
+	 *
+	 * @param config the config
+	 * @param allModuleIds the all module ids
+	 */
 	private static void CompleteMapSCTIDtoModule(Config config,HashMap<UUID, String> allModuleIds) {
 
 		String part="00";
@@ -143,6 +200,13 @@ public class ExportUtil {
 		}
 	}
 
+	/**
+	 * Gets the parent snomed id.
+	 *
+	 * @param concept the concept
+	 * @return the parent snomed id
+	 * @throws Exception the exception
+	 */
 	public static String getParentSnomedId(I_GetConceptData concept) throws Exception{		
 		Set<I_GetConceptData> parents = new HashSet<I_GetConceptData>();
 		parents = getParentLocal(parents, concept); 
@@ -159,6 +223,13 @@ public class ExportUtil {
 	}
 
 
+	/**
+	 * Gets the latest active part.
+	 *
+	 * @param parts the parts
+	 * @return the latest active part
+	 * @throws Exception the exception
+	 */
 	public static Long getLatestActivePart(List<I_RelPart> parts)
 			throws Exception {
 		long latestVersion = Integer.MIN_VALUE;
@@ -174,6 +245,13 @@ public class ExportUtil {
 	}
 
 
+	/**
+	 * Gets the descendants local.
+	 *
+	 * @param descendants the descendants
+	 * @param concept the concept
+	 * @return the descendants local
+	 */
 	public static  Set<I_GetConceptData> getDescendantsLocal(Set<I_GetConceptData> descendants, I_GetConceptData concept) {
 		try {
 			I_TermFactory termFactory = Terms.get();
@@ -199,6 +277,13 @@ public class ExportUtil {
 
 
 	//Add specific parent who has closest snomedid
+	/**
+	 * Gets the parent local.
+	 *
+	 * @param parent the parent
+	 * @param concept the concept
+	 * @return the parent local
+	 */
 	public static  Set<I_GetConceptData> getParentLocal(Set<I_GetConceptData> parent, I_GetConceptData concept) {
 		try {
 			I_TermFactory termFactory = Terms.get();
@@ -239,6 +324,15 @@ public class ExportUtil {
 		return parent;
 	}
 
+	/**
+	 * Creates the term factory.
+	 *
+	 * @param db the db
+	 * @throws InstantiationException the instantiation exception
+	 * @throws IllegalAccessException the illegal access exception
+	 * @throws ClassNotFoundException the class not found exception
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	public static void createTermFactory(Database db) throws InstantiationException, IllegalAccessException, ClassNotFoundException, IOException {
 
 		File vodbDirectory = new File(db.getLocation());
@@ -247,16 +341,34 @@ public class ExportUtil {
 		Terms.createFactory(vodbDirectory, I_Constants.readOnly, I_Constants.cacheSize, dbSetupConfig);
 	}
 
+	/**
+	 * Gets the term factory.
+	 *
+	 * @return the term factory
+	 */
 	public static I_TermFactory getTermFactory() {
 		// since we are using mojo this handles the return of the opened database
 		I_TermFactory termFactory = Terms.get();
 		return termFactory;
 	}
 
+	/**
+	 * Gets the ace config.
+	 *
+	 * @return the ace config
+	 */
 	public static I_ConfigAceFrame getAceConfig() {
 		return aceConfig;
 	}
 
+	/**
+	 * Gets the refinability status type.
+	 *
+	 * @param status the status
+	 * @return the refinability status type
+	 * @throws TerminologyException the terminology exception
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	public static String getRefinabilityStatusType(int status) throws TerminologyException, IOException {
 		String statusType = "99";
 		int curId = ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid();
@@ -325,6 +437,14 @@ public class ExportUtil {
 		return statusType;
 	}
 
+	/**
+	 * Gets the concept inactivation status type.
+	 *
+	 * @param status the status
+	 * @return the concept inactivation status type
+	 * @throws TerminologyException the terminology exception
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	public static String getConceptInactivationStatusType(int status) throws TerminologyException, IOException {
 		String statusType = "99";
 
@@ -399,6 +519,14 @@ public class ExportUtil {
 		return statusType;
 	}
 
+	/**
+	 * Gets the concept inactivation value id.
+	 *
+	 * @param status the status
+	 * @return the concept inactivation value id
+	 * @throws TerminologyException the terminology exception
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	public static String getConceptInactivationValueId(int status) throws TerminologyException, IOException {
 		String valueId = "XXX";
 
@@ -451,6 +579,14 @@ public class ExportUtil {
 	}
 
 
+	/**
+	 * Gets the desc inactivation value id.
+	 *
+	 * @param status the status
+	 * @return the desc inactivation value id
+	 * @throws TerminologyException the terminology exception
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	public static String getDescInactivationValueId(int status) throws TerminologyException, IOException {
 		String valueId = "XXX";
 		int inappropriateId_Term_Aux = ArchitectonicAuxiliary.Concept.INAPPROPRIATE.localize().getNid();
@@ -508,6 +644,14 @@ public class ExportUtil {
 		return valueId;
 	}
 
+	/**
+	 * Gets the desc inactivation status type.
+	 *
+	 * @param status the status
+	 * @return the desc inactivation status type
+	 * @throws TerminologyException the terminology exception
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	public static String getDescInactivationStatusType(int status) throws TerminologyException, IOException {
 		String statusType = "50";
 		int conRetId = ArchitectonicAuxiliary.Concept.CONCEPT_RETIRED.localize().getNid();
@@ -546,6 +690,14 @@ public class ExportUtil {
 		return statusType;
 	}
 
+	/**
+	 * Gets the refinability value id.
+	 *
+	 * @param charType the char type
+	 * @return the refinability value id
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws Exception the exception
+	 */
 	public static String getRefinabilityValueId(int charType) throws IOException, Exception {
 		String refinabilityType = "99";
 		if (charType == 0)
@@ -557,6 +709,14 @@ public class ExportUtil {
 		return refinabilityType;
 	}
 
+	/**
+	 * Gets the refinability type.
+	 *
+	 * @param type the type
+	 * @return the refinability type
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws Exception the exception
+	 */
 	public static String getRefinabilityType(int type) throws IOException, Exception {
 		String charType = "99";
 		int notRefiniableNid_Term_Aux = ArchitectonicAuxiliary.Concept.NOT_REFINABLE.localize().getNid();
@@ -583,6 +743,14 @@ public class ExportUtil {
 
 
 
+	/**
+	 * Gets the status type.
+	 *
+	 * @param status the status
+	 * @return the status type
+	 * @throws TerminologyException the terminology exception
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	public static String getStatusType(int status) throws TerminologyException, IOException {
 		String statusType = "99";		
 
@@ -657,7 +825,16 @@ public class ExportUtil {
 		}
 		return statusType;
 	}
+	
+	/** The st id gen. */
 	private static IdAssignmentImpl stIdGen =null;
+	
+	/**
+	 * Gets the id generator client.
+	 *
+	 * @param config the config
+	 * @return the id generator client
+	 */
 	private static IdAssignmentImpl getIdGeneratorClient(Config config){
 		if (stIdGen==null ){
 			stIdGen = new IdAssignmentImpl(config.getEndPoint(), config.getUsername(), config.getPassword());
@@ -665,6 +842,14 @@ public class ExportUtil {
 		return stIdGen;
 	}
 	// get the snomedID for the given UUID 
+	/**
+	 * Gets the snomedid.
+	 *
+	 * @param config the config
+	 * @param uuid the uuid
+	 * @param parentSnomedId the parent snomed id
+	 * @return the snomedid
+	 */
 	public static String getSNOMEDID(Config config, UUID uuid, String parentSnomedId) {
 		String snomedId = null;
 		try {
@@ -688,6 +873,14 @@ public class ExportUtil {
 
 
 
+	/**
+	 * Gets the snomed id.
+	 *
+	 * @param concept the concept
+	 * @return the snomed id
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws TerminologyException the terminology exception
+	 */
 	public static String getSnomedId(I_GetConceptData concept) throws IOException, TerminologyException {
 		String snomedId = "";
 		I_Identify i_Identify = concept.getIdentifier();
@@ -710,6 +903,14 @@ public class ExportUtil {
 
 
 
+	/**
+	 * Gets the ctv3 id.
+	 *
+	 * @param concept the concept
+	 * @return the ctv3 id
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws TerminologyException the terminology exception
+	 */
 	public static String getCtv3Id(I_GetConceptData concept) throws IOException, TerminologyException {
 		String ctv3Id = ""; // ConceptId
 		I_Identify i_Identify = concept.getIdentifier();
@@ -732,6 +933,13 @@ public class ExportUtil {
 
 
 	// get the Ctv3Id for the given UUID
+	/**
+	 * Gets the cT v3 id.
+	 *
+	 * @param config the config
+	 * @param uuid the uuid
+	 * @return the cT v3 id
+	 */
 	public static String getCTV3ID(Config config, UUID uuid) {
 		String ctv3Id = null;
 
@@ -752,6 +960,14 @@ public class ExportUtil {
 	}
 
 
+	/**
+	 * Gets the refset id.
+	 *
+	 * @param typeId the type id
+	 * @return the refset id
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws Exception the exception
+	 */
 	public static String getRefsetId(String typeId) throws IOException, Exception {
 		String refsetId = "99";
 		if (typeId.equals("149016008"))
@@ -769,6 +985,14 @@ public class ExportUtil {
 		return refsetId;
 	}
 
+	/**
+	 * Gets the nid.
+	 *
+	 * @param struuid the struuid
+	 * @return the nid
+	 * @throws TerminologyException the terminology exception
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	public static int getNid(String struuid) throws TerminologyException, IOException {
 		int nid = 0;
 		ArrayList<UUID> uuidList = new ArrayList<UUID>();
@@ -779,6 +1003,11 @@ public class ExportUtil {
 		return nid;
 	}
 
+	/**
+	 * Gets the snomed core path nid.
+	 *
+	 * @return the snomed core path nid
+	 */
 	public static int getSnomedCorePathNid() {
 		int snomedCorePathNid = 0;
 		try {
@@ -791,6 +1020,11 @@ public class ExportUtil {
 		return snomedCorePathNid;
 	}
 
+	/**
+	 * Gets the snomed meta path nid.
+	 *
+	 * @return the snomed meta path nid
+	 */
 	public static int getSnomedMetaPathNid() {
 		int snomedMetaPathNid = 0;
 		try {
@@ -803,6 +1037,11 @@ public class ExportUtil {
 		return snomedMetaPathNid;
 	}
 
+	/**
+	 * Gets the snorocket author nid.
+	 *
+	 * @return the snorocket author nid
+	 */
 	public static int getSnorocketAuthorNid() {
 		int snorocketAuthorNid = 0;
 		try {
@@ -815,6 +1054,11 @@ public class ExportUtil {
 		return snorocketAuthorNid;
 	}
 
+	/**
+	 * Gets the user author nid.
+	 *
+	 * @return the user author nid
+	 */
 	public static int getUserAuthorNid() {
 		try {
 			userAuthorNid = getNid(I_Constants.USER_AUTHOR_UID); // User Author Nid (Stated Rels)
@@ -826,6 +1070,11 @@ public class ExportUtil {
 		return userAuthorNid;
 	}
 
+	/**
+	 * Gets the snomed inferred path nid.
+	 *
+	 * @return the snomed inferred path nid
+	 */
 	public static int getSnomedInferredPathNid() {
 		int snomedInferredPathNid = 0;
 		try {
@@ -838,6 +1087,11 @@ public class ExportUtil {
 		return snomedInferredPathNid;
 	}
 
+	/**
+	 * Gets the snomed stated path nid.
+	 *
+	 * @return the snomed stated path nid
+	 */
 	public static int getSnomedStatedPathNid() {
 		int snomedStatedPathNid = 0;
 		try {
@@ -850,6 +1104,14 @@ public class ExportUtil {
 		return snomedStatedPathNid;
 	}
 
+	/**
+	 * Gets the sct id.
+	 *
+	 * @param nid the nid
+	 * @return the sct id
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws TerminologyException the terminology exception
+	 */
 	public static String getSctId(int nid) throws IOException, TerminologyException {
 		Long sctId = null;
 		I_Identify identify = getTermFactory().getId(nid);
@@ -869,6 +1131,15 @@ public class ExportUtil {
 		return null;
 	}
 
+	/**
+	 * Gets the relationship id version.
+	 *
+	 * @param denotion the denotion
+	 * @param snomedAuthorityNid the snomed authority nid
+	 * @return the relationship id version
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws TerminologyException the terminology exception
+	 */
 	public static String getRelationshipIdVersion(Object denotion, int snomedAuthorityNid) throws IOException, TerminologyException {
 		Long sctId = null;
 
@@ -887,6 +1158,18 @@ public class ExportUtil {
 	}
 
 	//Get the sctid for the given UUID
+	/**
+	 * Gets the sCT id.
+	 *
+	 * @param config the config
+	 * @param componentUuid the component uuid
+	 * @param namespaceId the namespace id
+	 * @param partitionId the partition id
+	 * @param releaseId the release id
+	 * @param executionId the execution id
+	 * @param moduleId the module id
+	 * @return the sCT id
+	 */
 	public static String getSCTId(Config config, UUID componentUuid, Integer namespaceId, String partitionId, String releaseId, String executionId, String moduleId) {
 
 		IdAssignmentImpl idGen = getIdGeneratorClient( config);
@@ -906,6 +1189,13 @@ public class ExportUtil {
 
 
 	// get the conceptid for the given UUID (Hardcoded values)
+	/**
+	 * Gets the sCT id.
+	 *
+	 * @param config the config
+	 * @param uuid the uuid
+	 * @return the sCT id
+	 */
 	public static String getSCTId(Config config, UUID uuid) {
 		try{
 			String namespaceId = null;
@@ -928,6 +1218,14 @@ public class ExportUtil {
 		return null;
 	}
 
+	/**
+	 * Gets the concept id.
+	 *
+	 * @param concept the concept
+	 * @return the concept id
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws TerminologyException the terminology exception
+	 */
 	public static String getConceptId(I_GetConceptData concept) throws IOException, TerminologyException {
 		Long conceptId = null; // ConceptId
 		I_Identify i_Identify = concept.getIdentifier();
@@ -958,6 +1256,13 @@ public class ExportUtil {
 
 
 	// get the conceptid for the given UUID using Specific namespace and partition values
+	/**
+	 * Gets the concept id.
+	 *
+	 * @param config the config
+	 * @param uuid the uuid
+	 * @return the concept id
+	 */
 	public static String getConceptId(Config config, UUID uuid) {
 		IdAssignmentImpl idGen = getIdGeneratorClient( config);
 		long conceptId = 0L;
@@ -998,6 +1303,13 @@ public class ExportUtil {
 
 
 	// get the descriptionid for the given UUID using Specific namespace and partition values
+	/**
+	 * Gets the description id.
+	 *
+	 * @param config the config
+	 * @param uuid the uuid
+	 * @return the description id
+	 */
 	public static String getDescriptionId(Config config, UUID uuid) {
 		IdAssignmentImpl idGen = getIdGeneratorClient( config);
 		long descriptionId = 0L;
@@ -1036,6 +1348,13 @@ public class ExportUtil {
 
 
 	// get the relationshipId for the given UUID using Specific namespace and partition values
+	/**
+	 * Gets the relationship id.
+	 *
+	 * @param config the config
+	 * @param uuid the uuid
+	 * @return the relationship id
+	 */
 	public static String getRelationshipId(Config config, UUID uuid) {
 		IdAssignmentImpl idGen = getIdGeneratorClient( config);
 
@@ -1068,6 +1387,17 @@ public class ExportUtil {
 		return String.valueOf(relationshipId);
 	}
 
+	/**
+	 * Insert sct id.
+	 *
+	 * @param componentNid the component nid
+	 * @param config the config
+	 * @param wsSctId the ws sct id
+	 * @param pathNid the path nid
+	 * @param statusNid the status nid
+	 * @return true, if successful
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	public static boolean insertSctId(int componentNid , Config config, String wsSctId , int pathNid , int statusNid) throws IOException {
 		boolean flag = false;
 		try {	
@@ -1087,12 +1417,24 @@ public class ExportUtil {
 		return flag;
 	}
 
+	/**
+	 * Gets the partition id.
+	 *
+	 * @param sctId the sct id
+	 * @return the partition id
+	 */
 	public static String getPartitionId(String sctId) {
 		int slength = sctId.length();
 		String partId = sctId.substring(slength - 3, slength - 1);
 		return partId;
 	}
 
+	/**
+	 * Gets the snomed description type.
+	 *
+	 * @param wbDescriptionType the wb description type
+	 * @return the snomed description type
+	 */
 	public static String getSnomedDescriptionType(int wbDescriptionType) {
 		String snomedDescType = "99";
 		try {
@@ -1128,6 +1470,14 @@ public class ExportUtil {
 		return snomedDescType;
 	}
 
+	/**
+	 * Gets the description id.
+	 *
+	 * @param descriptionNid the description nid
+	 * @return the description id
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws TerminologyException the terminology exception
+	 */
 	public static String getDescriptionId(int descriptionNid) throws IOException, TerminologyException {
 
 		Long descriptionId = null; 
@@ -1148,6 +1498,14 @@ public class ExportUtil {
 
 	}
 
+	/**
+	 * Gets the characteristic type.
+	 *
+	 * @param type the type
+	 * @return the characteristic type
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws TerminologyException the terminology exception
+	 */
 	public static String getCharacteristicType(int type) throws IOException, TerminologyException {
 		String charType = "99";
 
@@ -1191,6 +1549,12 @@ public class ExportUtil {
 	}
 
 
+	/**
+	 * Gets the type id.
+	 *
+	 * @param descType the desc type
+	 * @return the type id
+	 */
 	public static String getTypeId(String descType) {
 		String typeId = "";
 
@@ -1206,6 +1570,12 @@ public class ExportUtil {
 	}
 
 
+	/**
+	 * Gets the characteristic type id.
+	 *
+	 * @param characteristicType the characteristic type
+	 * @return the characteristic type id
+	 */
 	public static String getCharacteristicTypeId(String characteristicType) {
 		String characteristicTypeId = "";
 
@@ -1224,6 +1594,12 @@ public class ExportUtil {
 		return characteristicTypeId;
 	}
 
+	/**
+	 * Gets the inferred characteristic type id.
+	 *
+	 * @param characteristicType the characteristic type
+	 * @return the inferred characteristic type id
+	 */
 	public static String getInferredCharacteristicTypeId(String characteristicType) {
 		String characteristicTypeId = "99";
 
@@ -1237,6 +1613,12 @@ public class ExportUtil {
 	}
 
 
+	/**
+	 * Gets the stated characteristic type id.
+	 *
+	 * @param characteristicType the characteristic type
+	 * @return the stated characteristic type id
+	 */
 	public static String getStatedCharacteristicTypeId(String characteristicType) {
 		String characteristicTypeId = "99";
 
@@ -1247,6 +1629,12 @@ public class ExportUtil {
 		return characteristicTypeId;
 	}
 
+	/**
+	 * Gets the module sctid for stamp nid.
+	 *
+	 * @param moduleNid the module nid
+	 * @return the module sctid for stamp nid
+	 */
 	public static String getModuleSCTIDForStampNid(int moduleNid) {
 		return allModuleMapNidSCTId.get(moduleNid);
 	}
