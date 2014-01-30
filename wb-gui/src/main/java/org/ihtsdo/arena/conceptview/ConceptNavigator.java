@@ -181,6 +181,7 @@ public class ConceptNavigator extends JPanel {
 
         taxonomyButton.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 5));
         taxonomyButton.addActionListener(new TaxonomyAction());
+        taxonomyButton.setToolTipText("show taxonomy");
         thePanel.add(taxonomyButton, gbc);
         gbc.gridx++;
 
@@ -189,6 +190,7 @@ public class ConceptNavigator extends JPanel {
 
         historyButton.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 20));
         historyButton.addActionListener(new HistoryAction());
+        historyButton.setToolTipText("show history for concept");
         thePanel.add(historyButton, gbc);
         thePanel.setBackground(ConceptViewTitle.TITLE_COLOR);
         thePanel.setOpaque(true);
