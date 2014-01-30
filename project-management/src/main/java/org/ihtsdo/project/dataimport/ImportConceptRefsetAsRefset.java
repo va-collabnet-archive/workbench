@@ -85,7 +85,7 @@ public class ImportConceptRefsetAsRefset {
     /**
      * The con id hash.
      */
-    private HashSet<Integer> conIdHash;
+    private HashSet<Long> conIdHash;
     /**
      * The incremental.
      */
@@ -215,7 +215,7 @@ public class ImportConceptRefsetAsRefset {
         }
         imported++;
         if (!incremental) {
-            conIdHash.add(conceptMemberId);
+            conIdHash.add(Long.parseLong(String.valueOf(conceptMemberId)));
         }
         return true;
     }
@@ -242,7 +242,7 @@ public class ImportConceptRefsetAsRefset {
         inputFileReader = new BufferedReader(new FileReader(importFile));
 
         this.incremental = incremental;
-        conIdHash = new HashSet<Integer>();
+        conIdHash = new HashSet<Long>();
         String currentLine = inputFileReader.readLine();
         int digits = 0;
         for (int i = 0; i < currentLine.length(); i++) {

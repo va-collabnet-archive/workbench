@@ -85,7 +85,7 @@ public class ImportConceptSubsetAsRefset {
     /**
      * The con id hash.
      */
-    private HashSet<Integer> conIdHash;
+    private HashSet<Long> conIdHash;
     /**
      * The incremental.
      */
@@ -205,7 +205,7 @@ public class ImportConceptSubsetAsRefset {
         }
         imported++;
         if (!incremental) {
-            conIdHash.add(conceptMemberId);
+            conIdHash.add( Long.parseLong(String.valueOf(conceptMemberId)));
         }
 
         return true;
@@ -233,7 +233,7 @@ public class ImportConceptSubsetAsRefset {
         inputFileReader = new BufferedReader(new FileReader(importFile));
 
         this.incremental = incremental;
-        conIdHash = new HashSet<Integer>();
+        conIdHash = new HashSet<Long>();
         String currentLine = inputFileReader.readLine();
 
         int digits = 0;
@@ -292,7 +292,7 @@ public class ImportConceptSubsetAsRefset {
         BufferedReader inputFileReaderCtrl = new BufferedReader(new FileReader(importFile));
 
         boolean ret = true;
-        conIdHash = new HashSet<Integer>();
+        conIdHash = new HashSet<Long>();
         String currentLine = inputFileReaderCtrl.readLine();
         lineCount = 1;
         String memberId;
@@ -301,13 +301,13 @@ public class ImportConceptSubsetAsRefset {
                 if (!currentLine.trim().equals("")) {
                     String[] lineParts = currentLine.split("\t");
                     memberId = lineParts[1];
-                    if (conIdHash.contains(Integer.valueOf(memberId))) {
+                    if (conIdHash.contains(Long.valueOf(memberId))) {
                         ret = false;
                         outputFileWriter.println("Error on line " + lineCount + " : ");
                         outputFileWriter.println("Duplicated component " + memberId);
 
                     } else {
-                        conIdHash.add(Integer.valueOf(memberId));
+                        conIdHash.add(Long.valueOf(memberId));
                     }
 
                 }
