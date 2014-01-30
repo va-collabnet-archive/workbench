@@ -50,6 +50,7 @@ import org.dwfa.cement.ArchitectonicAuxiliary.LANG_CODE;
 import org.dwfa.tapi.I_ConceptualizeUniversally;
 import org.dwfa.tapi.I_StoreUniversalFixedTerminology;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 
 public class SearchReplaceDialog extends JDialog {
 
@@ -67,7 +68,6 @@ public class SearchReplaceDialog extends JDialog {
 	private JComboBox languageCode;
 	private JCheckBox caseSensitiveCheckBox;
 	private JCheckBox fullySpecifiedNameCheckBox;
-	private JCheckBox preferredTermCheckBox;
 	private JCheckBox allCheckBox;
 	private JCheckBox synonymCheckBox;
 
@@ -105,28 +105,23 @@ public class SearchReplaceDialog extends JDialog {
 			}
 		}, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
 
-		int retiredConceptId = -1;
-		I_IntList statusIntList;
-		I_TermFactory termFactory;
 
 		try {
-			termFactory = Terms.get();
-			for (LANG_CODE lCode : ArchitectonicAuxiliary.LANG_CODE.values()) {
-				languageCode.addItem(lCode);
-			}
+                        languageCode.addItem(ArchitectonicAuxiliary.LANG_CODE.EN);
+                        languageCode.addItem(ArchitectonicAuxiliary.LANG_CODE.DA);
+                        languageCode.addItem(ArchitectonicAuxiliary.LANG_CODE.ES);
+                        languageCode.addItem(ArchitectonicAuxiliary.LANG_CODE.FR);
+                        languageCode.addItem(ArchitectonicAuxiliary.LANG_CODE.LIT);
+                        languageCode.addItem(ArchitectonicAuxiliary.LANG_CODE.LT);
+                        languageCode.addItem(ArchitectonicAuxiliary.LANG_CODE.NL);
+                        languageCode.addItem(ArchitectonicAuxiliary.LANG_CODE.PL);
+                        languageCode.addItem(ArchitectonicAuxiliary.LANG_CODE.SV);
+                        languageCode.addItem(ArchitectonicAuxiliary.LANG_CODE.ZH);
 
-			statusIntList = termFactory.getActiveAceFrameConfig().getEditStatusTypePopup();
-			retiredConceptId = termFactory.uuidToNative(ArchitectonicAuxiliary.Concept.RETIRED.getUids().iterator().next());
-
-			ListIterator<Integer> itr = statusIntList.listIterator();
-			while (itr.hasNext()) {
-				Integer integer = itr.next();
-				I_GetConceptData status = termFactory.getConcept(integer);
-				retireAsStatus.addItem(status);
-				if (status.getConceptNid() == retiredConceptId) {
-					retireAsStatus.setSelectedItem(status);
-				}
-			}
+                        
+                        retireAsStatus.addItem(Terms.get().getConcept(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid()));
+                        retireAsStatus.addItem(Terms.get().getConcept(SnomedMetadataRf2.INACTIVE_VALUE_RF2.getLenient().getNid()));
+                        retireAsStatus.setSelectedItem(Terms.get().getConcept(SnomedMetadataRf2.INACTIVE_VALUE_RF2.getLenient().getNid()));
 			if (retireAsStatus.getSelectedItem() == null) {
 				retireAsStatus.setSelectedIndex(0);
 			}
@@ -178,10 +173,6 @@ public class SearchReplaceDialog extends JDialog {
 
 	public boolean isFullySpecifiedName() {
 		return fullySpecifiedNameCheckBox.isSelected();
-	}
-
-	public boolean isPreferredTerm() {
-		return preferredTermCheckBox.isSelected();
 	}
 
 	public boolean isSynonym() {
@@ -352,16 +343,6 @@ public class SearchReplaceDialog extends JDialog {
 		gbc.weighty = 1.0;
 		gbc.anchor = GridBagConstraints.WEST;
 		panel2.add(fullySpecifiedNameCheckBox, gbc);
-		preferredTermCheckBox = new JCheckBox();
-		preferredTermCheckBox.setSelected(true);
-		preferredTermCheckBox.setText("Preferred Term");
-		gbc = new GridBagConstraints();
-		gbc.gridx = 0;
-		gbc.gridy = 2;
-		gbc.weightx = 1.0;
-		gbc.weighty = 1.0;
-		gbc.anchor = GridBagConstraints.WEST;
-		panel2.add(preferredTermCheckBox, gbc);
 		synonymCheckBox = new JCheckBox();
 		synonymCheckBox.setSelected(true);
 		synonymCheckBox.setText("Synonym");

@@ -27,6 +27,8 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.TerminologySnapshotDI;
@@ -69,21 +71,21 @@ public class DialectHelper {
             initLock.lock();
             try {
                 if (variantMap == null) {
-                    HashMap<Integer, Map<String, String>> initialVariantMap =
-                            new HashMap<Integer, Map<String, String>>();
+                    HashMap<Integer, Map<String, String>> initialVariantMap
+                            = new HashMap<Integer, Map<String, String>>();
                     variantSetMap = new HashMap<Integer, Set<String>>();
                     ViewCoordinate vc = Ts.get().getMetadataViewCoordinate();
                     TerminologySnapshotDI ts = Ts.get().getSnapshot(vc);
 
-                    ConceptVersionBI enVariantTextRefsetC =
-                            Language.EN_VARIANT_TEXT.get(Ts.get().getMetadataViewCoordinate());
-                    Collection<? extends RefexChronicleBI<?>> enVariants =
-                            enVariantTextRefsetC.getRefexes();
+                    ConceptVersionBI enVariantTextRefsetC
+                            = Language.EN_VARIANT_TEXT.get(Ts.get().getMetadataViewCoordinate());
+                    Collection<? extends RefexChronicleBI<?>> enVariants
+                            = enVariantTextRefsetC.getRefexes();
                     Set<String> variantSet = new HashSet<String>();
                     for (RefexChronicleBI<?> refex : enVariants) {
                         if (RefexStringVersionBI.class.isAssignableFrom(refex.getClass())) {
-                            RefexStringVersionBI variantText =
-                                    (RefexStringVersionBI) refex.getVersion(vc);
+                            RefexStringVersionBI variantText
+                                    = (RefexStringVersionBI) refex.getVersion(vc);
                             if (variantText != null) {
                                 variantSet.add(variantText.getString1());
                             }
@@ -118,12 +120,17 @@ public class DialectHelper {
     /**
      * Adds a dialect to the <code>initialVariantMap</code>.
      *
-     * @param dialectSpec the <code>ConceptSpec</code> representing the dialect concept
-     * @param viewCoordinate the view coordinate specifying which versions are active or inactive
-     * @param varientsSpec the <code>ConceptSpec</code> representing the dialect refex concept
-     * @param terminologySnapshot the terminologySnapshot to use for getting component versions
+     * @param dialectSpec the <code>ConceptSpec</code> representing the dialect
+     * concept
+     * @param viewCoordinate the view coordinate specifying which versions are
+     * active or inactive
+     * @param varientsSpec the <code>ConceptSpec</code> representing the dialect
+     * refex concept
+     * @param terminologySnapshot the terminologySnapshot to use for getting
+     * component versions
      * @param initialVariantMap the map to udpate
-     * @throws ContradictionException if more than one version is found for a given position or view coordinate
+     * @throws ContradictionException if more than one version is found for a
+     * given position or view coordinate
      * @throws IOException signals that an I/O exception has occurred
      */
     private static void addDialect(ConceptSpec dialectSpec,
@@ -134,8 +141,8 @@ public class DialectHelper {
         ConceptVersionBI dialectC = dialectSpec.get(viewCoordinate);
         ConceptVersionBI variantTextRefsetC = varientsSpec.get(viewCoordinate);
 
-        Collection<? extends RefexChronicleBI<?>> dialectVarients =
-                variantTextRefsetC.getActiveRefsetMembers();
+        Collection<? extends RefexChronicleBI<?>> dialectVarients
+                = variantTextRefsetC.getActiveRefsetMembers();
         Map<String, String> variantDialectMap = new HashMap<String, String>();
         for (RefexChronicleBI<?> refex : dialectVarients) {
             if (RefexStringVersionBI.class.isAssignableFrom(refex.getClass())) {
@@ -150,12 +157,10 @@ public class DialectHelper {
     }
 
     /**
-     * Checks if the enclosing concept of the given
-     * <code>description</code> is has any descriptions in the specified
-     * dialect,
-     * <code>dialectNid</code>. Uses the given
-     * <code>viewCoordinate</code> to determine which version of the
-     * descriptions to use.
+     * Checks if the enclosing concept of the given <code>description</code> is
+     * has any descriptions in the specified dialect, <code>dialectNid</code>.
+     * Uses the given <code>viewCoordinate</code> to determine which version of
+     * the descriptions to use.
      *
      * @param description the description containing the text to check
      * @param dialectNid the dialect nid specifying the desired dialect
@@ -173,7 +178,7 @@ public class DialectHelper {
             int dialectNid, ViewCoordinate viewCoordinate) throws IOException,
             ContradictionException, UnsupportedDialectOrLanguage {
         lazyInit(dialectNid);
-        if(!description.getLang().equals("en")){
+        if (!description.getLang().equals("en")) {
             return false;
         }
         if (isTextForDialect(description.getText(), dialectNid)) {
@@ -191,9 +196,8 @@ public class DialectHelper {
     }
 
     /**
-     * Checks if the given
-     * <code>text</code> has dialect variants in the specified
-     * <code>language</code>.
+     * Checks if the given <code>text</code> has dialect variants in the
+     * specified <code>language</code>.
      *
      * @param text the string to check for variants
      * @param languageNid the nid representing the desired language
@@ -240,21 +244,21 @@ public class DialectHelper {
         String[] tokens = text.split("\\s+");
         Map<String, String> dialectVariants = variantMap.get(dialectNid);
         for (String token : tokens) {
-            if(token.length() >= 1){
-                if(!token.substring(token.length() - 1, token.length()).matches("\\w")){
-                token = token.substring(0, token.length() - 1);
-            }
-            if (dialectVariants.containsKey(token.toLowerCase())) {
-                return false;
-            }
+            if (token.length() >= 1) {
+                if (!token.substring(token.length() - 1, token.length()).matches("\\w")) {
+                    token = token.substring(0, token.length() - 1);
+                }
+                if (dialectVariants.containsKey(token.toLowerCase())) {
+                    return false;
+                }
             }
         }
         return true;
     }
 
     /**
-     * Generates a String representing the given
-     * <code>text</code> re-written in specified dialect.
+     * Generates a String representing the given <code>text</code> re-written in
+     * specified dialect.
      *
      * @param text the string to re-write
      * @param dialectNid the nid representing the desired dialect
@@ -272,17 +276,17 @@ public class DialectHelper {
         for (int i = 0; i < tokens.length; i++) {
             String word = tokens[i];
             String punctuation = null;
-            if(word.length() >= 1){
-                if(!word.substring(word.length() - 1, word.length()).matches("\\w")){
+            if (word.length() >= 1) {
+                if (!word.substring(word.length() - 1, word.length()).matches("\\w")) {
                     punctuation = word.substring(word.length() - 1);
                     word = word.substring(0, word.length() - 1);
                 }
             }
             if (dialectVariants.containsKey(word.toLowerCase())) {
                 boolean upperCase = Character.isUpperCase(word.charAt(0));
-                if(punctuation != null){
+                if (punctuation != null) {
                     tokens[i] = dialectVariants.get(word.toLowerCase()) + punctuation;
-                }else{
+                } else {
                     tokens[i] = dialectVariants.get(word.toLowerCase());
                 }
                 if (upperCase) {
@@ -304,9 +308,8 @@ public class DialectHelper {
     }
 
     /**
-     * Gets a description spec representing the
-     * <code>description</code> in the dialect specified by the
-     * <code>dialectSpec</code>.
+     * Gets a description spec representing the <code>description</code> in the
+     * dialect specified by the <code>dialectSpec</code>.
      *
      * @param description the description to represent
      * @param dialectSpec specifying the dialect of the description spec
@@ -326,9 +329,8 @@ public class DialectHelper {
     }
 
     /**
-     * Gets a description spec representing the
-     * <code>description</code> in the dialect specified by the
-     * <code>dialectNid</code>.
+     * Gets a description spec representing the <code>description</code> in the
+     * dialect specified by the <code>dialectNid</code>.
      *
      * @param description the description to represent
      * @param dialectNid specifying the dialect of the description spec

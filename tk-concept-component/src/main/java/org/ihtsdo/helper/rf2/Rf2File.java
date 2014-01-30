@@ -322,7 +322,7 @@ public class Rf2File {
         /**
          * The refset id field.
          */
-        REFSET_ID("refSetId", "\t"),
+        REFSET_ID("refsetId", "\t"),
         /**
          * The referenced component id field.
          */
@@ -372,7 +372,7 @@ public class Rf2File {
         /**
          * The refset id field.
          */
-        REFSET_ID("refSetId", "\t"),
+        REFSET_ID("refsetId", "\t"),
         /**
          * The referenced component id field.
          */
@@ -426,7 +426,7 @@ public class Rf2File {
         /**
          * The refset id field.
          */
-        REFSET_ID("refSetId", "\t"),
+        REFSET_ID("refsetId", "\t"),
         /**
          * The referenced component id field.
          */
@@ -480,7 +480,7 @@ public class Rf2File {
         /**
          * The refset id field.
          */
-        REFSET_ID("refSetId", "\t"),
+        REFSET_ID("refsetId", "\t"),
         /**
          * The referenced component id field.
          */
@@ -540,7 +540,7 @@ public class Rf2File {
         /**
          * The refset id field.
          */
-        REFSET_ID("refSetId", "\t"),
+        REFSET_ID("refsetId", "\t"),
         /**
          * The referenced component id field.
          */
@@ -588,7 +588,7 @@ public class Rf2File {
         /**
          * The refset id field.
          */
-        REFSET_ID("refSetId", "\t"),
+        REFSET_ID("refsetId", "\t"),
         /**
          * The referenced component id field.
          */
@@ -644,7 +644,7 @@ public class Rf2File {
         /**
          * The refset id field.
          */
-        REFSET_ID("refSetId", "\t"),
+        REFSET_ID("refsetId", "\t"),
         /**
          * The referenced component id field.
          */
@@ -696,7 +696,7 @@ public class Rf2File {
         /**
          * The refset id field.
          */
-        REFSET_ID("refSetId", "\t"),
+        REFSET_ID("refsetId", "\t"),
         /**
          * The referenced component id field.
          */
