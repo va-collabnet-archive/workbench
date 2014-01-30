@@ -3,7 +3,7 @@
     <parent>
         <groupId>org.ihtsdo</groupId>
         <artifactId>wb-mmb</artifactId>
-        <version>2.37-trek-no-jini-SNAPSHOT</version>
+        <version>1.0-silver-swordfish-SNAPSHOT</version>
     </parent>
     <artifactId>translation</artifactId>
     <packaging>jar</packaging>
