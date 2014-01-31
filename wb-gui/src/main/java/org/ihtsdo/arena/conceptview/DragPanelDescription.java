@@ -115,7 +115,6 @@ public class DragPanelDescription extends DragPanelComponentVersion<DescriptionA
             add(descLabel, gbc);
         } else {
             gbc.gridheight = 1;
-            gbc.fill = GridBagConstraints.HORIZONTAL;
             JButton button = getComponentActionMenuButton();
             button.setMinimumSize(new Dimension(20, 16));
             button.setPreferredSize(new Dimension(20, 16));
@@ -123,7 +122,6 @@ public class DragPanelDescription extends DragPanelComponentVersion<DescriptionA
             button.setOpaque(true);
             add(button, gbc);
             gbc.gridy++;
-            gbc.fill = GridBagConstraints.BOTH;
             gbc.gridheight = GridBagConstraints.REMAINDER;
             gbc.weighty = 1;
             JLabel descLabel = getJLabel(" ");
@@ -186,8 +184,33 @@ public class DragPanelDescription extends DragPanelComponentVersion<DescriptionA
                     });
         }
 
+        gbc.gridx++;
+        gbc.anchor = GridBagConstraints.NORTHEAST;
+        // check for case sensitivity
+        String caseStr = "ci";
+        String descText = getDesc().getText();
+        String initialWord = null;
+
+        if (descText.indexOf(" ") != -1) {
+            initialWord = descText.substring(0, descText.indexOf(" "));
+        } else {
+            initialWord = descText;
+        }
+
+        if (CsWordsHelper.isIcTypeSignificant(initialWord,
+                CaseSensitive.MAYBE_IC_SIGNIFICANT.getLenient().getNid()) && (getDesc().isInitialCaseSignificant() == false) && getDesc().isUncommitted()) {
+            caseStr = "<html><font color = 'red'>Cs";
+        } else if (getDesc().isInitialCaseSignificant()) {
+            caseStr = "Cs";
+        }
+
+        JLabel caseLabel = getJLabel(caseStr);
+        add(caseLabel, gbc);
+        
+        gbc.gridx--;
         gbc.gridy++;
         gbc.fill = GridBagConstraints.VERTICAL;
+        gbc.anchor = GridBagConstraints.NORTHWEST;
         String lang = getDesc().getLang();
 
         if ((lang != null) && (lang.length() > 2)) {
@@ -232,34 +255,28 @@ public class DragPanelDescription extends DragPanelComponentVersion<DescriptionA
         if (sb.length() > 0) {
             lang = "<html>" + lang + ":pt" + sb.toString();
         }
+        if(lang.length() == 2){
+            if(getDesc().isUncommitted()){
+                lang = "<html>" + lang + ":pt <font color='yellow'>US GB</font>"; 
+            }else{
+               lang = "<html>" + lang + ":pt <font color='rgb(234,234,234)'>US GB</font>"; 
+            }
+        }else if(lang.length() == 40 || lang.length() == 39){
+            if(getDesc().isUncommitted()){
+                lang = lang + "<font color='yellow'> GB</font>";
+            }else{
+                lang = lang + "<font color=rgb(234,234,234)'> GB</font>";
+            }
+        }
         JLabel langLabel = getJLabel(lang);
         langLabel.setBorder(BorderFactory.createEmptyBorder(0,3,0,2));
         add(langLabel, gbc);
-        gbc.gridx++;
-        // check for case sensitivity
-        String caseStr = "ci";
-        String descText = getDesc().getText();
-        String initialWord = null;
-
-        if (descText.indexOf(" ") != -1) {
-            initialWord = descText.substring(0, descText.indexOf(" "));
-        } else {
-            initialWord = descText;
-        }
-
-        if (CsWordsHelper.isIcTypeSignificant(initialWord,
-                CaseSensitive.MAYBE_IC_SIGNIFICANT.getLenient().getNid()) && (getDesc().isInitialCaseSignificant() == false) && getDesc().isUncommitted()) {
-            caseStr = "<html><font color = 'red'>Cs";
-        } else if (getDesc().isInitialCaseSignificant()) {
-            caseStr = "Cs";
-        }
-
-        JLabel caseLabel = getJLabel(caseStr);
-        add(caseLabel, gbc);
+        //add additional length
         
-        
+
         gbc.gridx++;
-        gbc.gridy = gbc.gridy - 2;
+        gbc.gridx++;
+        gbc.gridy = 0;
         gbc.gridheight = 3;
         
         add(new JSeparator(SwingConstants.VERTICAL), gbc);
