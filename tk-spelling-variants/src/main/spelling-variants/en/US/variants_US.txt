@@ -219,7 +219,6 @@ flavouring|flavoring
 flavours|flavors
 flavour|flavor
 floatation|flotation
-foetal|fetal
 foetoscope|fetoscope
 foetoscopic|fetoscopic
 fraenal|frenal
