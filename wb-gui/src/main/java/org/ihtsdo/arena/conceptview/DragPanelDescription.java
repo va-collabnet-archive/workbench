@@ -187,7 +187,7 @@ public class DragPanelDescription extends DragPanelComponentVersion<DescriptionA
         gbc.gridx++;
         gbc.anchor = GridBagConstraints.NORTHEAST;
         // check for case sensitivity
-        String caseStr = "ci";
+        String caseStr = "ci ";
         String descText = getDesc().getText();
         String initialWord = null;
 

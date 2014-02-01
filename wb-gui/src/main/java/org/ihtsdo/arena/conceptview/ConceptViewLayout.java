@@ -2021,7 +2021,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
                 actionMenuButton.addActionListener(new DoDynamicPopup(actions));
                 
                 if ((actions == null) || actions.isEmpty()) {
-                    actionMenuButton.setVisible(false);
+                    actionMenuButton.setEnabled(false);
                 }
             } catch (InterruptedException | ExecutionException ex) {
                 AceLog.getAppLog().alertAndLogException(ex);

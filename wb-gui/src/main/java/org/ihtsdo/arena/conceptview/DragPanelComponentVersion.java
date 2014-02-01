@@ -505,6 +505,12 @@ public abstract class DragPanelComponentVersion<T extends ComponentVersionBI>
       return getLabel(nid, canDrop, textType.getLabelText());
    }
    
+   protected TermComponentLabel getLabel(int nid, boolean canDrop,
+           DescType textType, int fixedWidth)
+           throws IOException {
+      return getLabel(nid, canDrop, textType.getLabelText(), fixedWidth);
+   }
+   
    protected DynamicWidthTermComponentLabel getDynamicLabel(int nid, boolean canDrop,
            DescType textType)
            throws IOException {
@@ -520,6 +526,28 @@ public abstract class DragPanelComponentVersion<T extends ComponentVersionBI>
          termLabel.setLineWrapEnabled(true);
          termLabel.getDropTarget().setActive(canDrop);
          termLabel.setFixedWidth(150);
+         termLabel.setFont(
+             termLabel.getFont().deriveFont(getSettings().getFontSize()));
+         termLabel.setBorder(BorderFactory.createEmptyBorder(1, 5, 1, 5));
+         termLabel.setTermComponent(Terms.get().getConcept(nid));
+
+         return termLabel;
+      } catch (TerminologyException terminologyException) {
+         throw new IOException(terminologyException);
+      }
+   }
+   
+   protected TermComponentLabel getLabel(int nid, boolean canDrop,
+           LabelText textType, int fixedWidth)
+           throws IOException {
+      try {
+         TermComponentLabel termLabel = new TermComponentLabel(textType);
+
+         termLabel.setLineWrapEnabled(true);
+         termLabel.getDropTarget().setActive(canDrop);
+         if(fixedWidth > 0){
+             termLabel.setFixedWidth(fixedWidth);
+         }
          termLabel.setFont(
              termLabel.getFont().deriveFont(getSettings().getFontSize()));
          termLabel.setBorder(BorderFactory.createEmptyBorder(1, 5, 1, 5));

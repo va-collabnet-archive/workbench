@@ -16,6 +16,7 @@ import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.FontMetrics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.LayoutManager;
@@ -37,6 +38,7 @@ import javax.swing.SwingConstants;
 import javax.swing.TransferHandler;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
+import org.dwfa.ace.DynamicWidthTermComponentLabel;
 import org.ihtsdo.arena.editor.ArenaEditor;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ContradictionException;
@@ -162,10 +164,27 @@ public class DragPanelRel extends DragPanelComponentVersion<RelationshipVersionB
       add(dupLabel, gbc);
       dupLabel.setVisible(false);
       gbc.gridx++;
-      gbc.weightx = 1;
+      gbc.weightx = 0;
+      gbc.weighty = 1;
       gbc.gridx++;
 
-      TermComponentLabel typeLabel = getLabel(getRel().getTypeNid(), canDrop, getSettings().getRelType());
+      TermComponentLabel typeLabel = getLabel(getRel().getTypeNid(), canDrop, getSettings().getRelType(), 100);
+      FontMetrics metrics = typeLabel.getFontMetrics(typeLabel.getFont());
+      int hgt = metrics.getHeight();
+      String[] split = typeLabel.getText().split(" ");
+      String longest = "";
+      for(String s : split){
+          if(s.length() > longest.length()){
+              longest = s;
+          }
+      }
+// START HERE: use this?
+      int adv = metrics.stringWidth(longest);
+      Dimension size = new Dimension(adv+2, hgt+2); 
+      if(size.getWidth() > 70){
+          typeLabel.setFixedWidth(adv+2);
+          typeLabel.setPreferredSize(size);
+      }
 
       if (getRel().isUncommitted()
               && (getRel().getStatusNid() == SnomedMetadataRfx.getSTATUS_RETIRED_NID())) {
@@ -198,8 +217,9 @@ public class DragPanelRel extends DragPanelComponentVersion<RelationshipVersionB
       gbc.weightx = 1;
       gbc.gridx++;
 
-      TermComponentLabel destLabel = getLabel(getRel().getTargetNid(), canDrop,
+      DynamicWidthTermComponentLabel destLabel = getDynamicLabel(getRel().getTargetNid(), canDrop,
                                         getSettings().getRelTarget());
+      destLabel.setBorder(BorderFactory.createEmptyBorder(0,0,0,3));
 
       if (getRel().isUncommitted()
               && (getRel().getStatusNid() == SnomedMetadataRfx.getSTATUS_RETIRED_NID())) {
