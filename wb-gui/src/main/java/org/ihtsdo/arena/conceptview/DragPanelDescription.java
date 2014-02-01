@@ -108,16 +108,16 @@ public class DragPanelDescription extends DragPanelComponentVersion<DescriptionA
                 || !getSettings().getView().getConfig().getAllowedStatus().contains(getDesc().getStatusNid())) {
             JLabel descLabel = getJLabel(" ");
             descLabel.setOpaque(true);
-            descLabel.setMinimumSize(new Dimension(20, 28));
-            descLabel.setPreferredSize(new Dimension(20, 28));
+            descLabel.setMinimumSize(new Dimension(16, 28));
+            descLabel.setPreferredSize(new Dimension(16, 28));
             setDropPopupInset(descLabel.getPreferredSize().width);
             descLabel.setBackground(Color.ORANGE.darker());
             add(descLabel, gbc);
         } else {
             gbc.gridheight = 1;
             JButton button = getComponentActionMenuButton();
-            button.setMinimumSize(new Dimension(20, 16));
-            button.setPreferredSize(new Dimension(20, 16));
+            button.setMinimumSize(new Dimension(16, 16));
+            button.setPreferredSize(new Dimension(16, 16));
             button.setBackground(Color.ORANGE);
             button.setOpaque(true);
             add(button, gbc);
@@ -126,8 +126,8 @@ public class DragPanelDescription extends DragPanelComponentVersion<DescriptionA
             gbc.weighty = 1;
             JLabel descLabel = getJLabel(" ");
             descLabel.setOpaque(true);
-            descLabel.setMinimumSize(new Dimension(20, 12));
-            descLabel.setPreferredSize(new Dimension(20, 12));
+            descLabel.setMinimumSize(new Dimension(16, 12));
+            descLabel.setPreferredSize(new Dimension(16, 12));
             setDropPopupInset(descLabel.getPreferredSize().width);
             descLabel.setBackground(Color.ORANGE);
             add(descLabel, gbc);

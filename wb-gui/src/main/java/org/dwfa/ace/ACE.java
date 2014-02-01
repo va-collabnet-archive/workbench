@@ -2407,11 +2407,11 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         termTree   = treeHelper.getHierarchyPanel();
         treeHelper.addMouseListener(new TaxonomyMouseListenerForAce(this, treeHelper));
         conceptPanels = new ArrayList<ConceptPanel>();
-        c1Panel       = new ConceptPanel(HOST_ENUM.CONCEPT_PANEL_R1, aceFrameConfig, LINK_TYPE.TREE_LINK,
+        c1Panel       = new ConceptPanel(HOST_ENUM.CONCEPT_PANEL_R1, aceFrameConfig, LINK_TYPE.UNLINKED,
                 conceptTabs, 1, this.pluginRoot);
         c1Panel.setAce(this, LINK_TYPE.TREE_LINK);
         conceptPanels.add(c1Panel);
-        c2Panel = new ConceptPanel(HOST_ENUM.CONCEPT_PANEL_R2, aceFrameConfig, LINK_TYPE.SEARCH_LINK,
+        c2Panel = new ConceptPanel(HOST_ENUM.CONCEPT_PANEL_R2, aceFrameConfig, LINK_TYPE.UNLINKED,
                 conceptTabs, 2, this.pluginRoot);
         c2Panel.setAce(this, LINK_TYPE.SEARCH_LINK);
         conceptPanels.add(c2Panel);

@@ -633,7 +633,7 @@ public abstract class DragPanelComponentVersion<T extends ComponentVersionBI>
             actionButton.addActionListener(new DoDynamicPopup(actions));
 
             if ((actions == null) || actions.isEmpty()) {
-               actionButton.setVisible(false);
+               actionButton.setEnabled(false);
             }
          } catch (InterruptedException ex) {
             AceLog.getAppLog().alertAndLogException(ex);

@@ -82,31 +82,50 @@ public class DragPanelConceptAttributes extends DragPanelComponentVersion<Concep
         setupDrag(getAttr());
         setBorder(BorderFactory.createRaisedBevelBorder());
 
-        JLabel attrLabel = getJLabel(" ");
-
-        if ((getParentCollapsePanel() == null)
-                || !getSettings().getView().getConfig().getAllowedStatus().contains(getAttr().getStatusNid())) {
-            attrLabel.setBackground(Color.CYAN.darker());
-        } else {
-            attrLabel.setBackground(Color.CYAN);
-        }
-
-        attrLabel.setOpaque(true);
-        attrLabel.setMinimumSize(new Dimension(20, 28));
-        attrLabel.setPreferredSize(new Dimension(20, 28));
-        setDropPopupInset(attrLabel.getPreferredSize().width);
-
         GridBagConstraints gbc = new GridBagConstraints();
 
         gbc.anchor = GridBagConstraints.NORTHWEST;
         gbc.weightx = 0;
         gbc.weighty = 0;
         gbc.fill = GridBagConstraints.BOTH;
-        gbc.gridheight = 1;
+        gbc.gridheight = 2;
         gbc.gridwidth = 1;
         gbc.gridx = 0;
         gbc.gridy = 0;
-        add(attrLabel, gbc);
+        
+        
+        if ((getParentCollapsePanel() == null)
+                || !getSettings().getView().getConfig().getAllowedStatus().contains(getAttr().getStatusNid())) {
+            JLabel attrLabel = getJLabel(" ");
+            attrLabel.setOpaque(true);
+            attrLabel.setMinimumSize(new Dimension(16, 28));
+            attrLabel.setPreferredSize(new Dimension(16, 28));
+            setDropPopupInset(attrLabel.getPreferredSize().width);
+            attrLabel.setBackground(Color.CYAN.darker());
+            add(attrLabel, gbc);
+        } else {
+            gbc.gridheight = 1;
+            JButton button = getComponentActionMenuButton();
+            button.setMinimumSize(new Dimension(16, 16));
+            button.setPreferredSize(new Dimension(16, 16));
+            button.setBackground(Color.CYAN);
+            button.setOpaque(true);
+            add(button, gbc);
+            gbc.gridy++;
+            gbc.gridheight = GridBagConstraints.REMAINDER;
+            gbc.weighty = 1;
+            JLabel attrLabel = getJLabel(" ");
+            attrLabel.setOpaque(true);
+            attrLabel.setMinimumSize(new Dimension(16, 12));
+            attrLabel.setPreferredSize(new Dimension(16, 12));
+            setDropPopupInset(attrLabel.getPreferredSize().width);
+            attrLabel.setBackground(Color.CYAN);
+            add(attrLabel, gbc);
+            gbc.gridy = 0;
+            gbc.gridheight = 2;
+            gbc.weighty = 0;
+        }
+        
         gbc.gridx++;
         if (!getThingToDrag().isActive(getSettings().getConfig().getAllowedStatus())) {
             add(new JLabel(getGhostIcon()), gbc);
@@ -132,12 +151,12 @@ public class DragPanelConceptAttributes extends DragPanelComponentVersion<Concep
         add(statedDefinedLabel, gbc);
         gbc.weightx = 0;
         gbc.gridx++;
-        add(getComponentActionMenuButton(), gbc);
-        gbc.gridx++;
 
         JButton collapseExpandButton = getCollapseExpandButton();
 
         add(collapseExpandButton, gbc);
+        gbc.gridy = 2;
+        gbc.gridheight = 1;
         addSubPanels(gbc);
     }
 
