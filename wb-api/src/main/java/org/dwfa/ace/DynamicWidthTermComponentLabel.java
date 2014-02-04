@@ -17,11 +17,9 @@
 package org.dwfa.ace;
 
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Point;
-import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.ClipboardOwner;
@@ -49,7 +47,6 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -60,8 +57,6 @@ import javax.swing.KeyStroke;
 import javax.swing.TransferHandler;
 import javax.swing.UIManager;
 import javax.swing.border.Border;
-import javax.swing.plaf.basic.BasicHTML;
-import javax.swing.text.View;
 import org.dwfa.ace.TermComponentLabel.LabelText;
 
 import org.dwfa.ace.api.I_AmTermComponent;
@@ -106,16 +101,6 @@ public class DynamicWidthTermComponentLabel extends JLabel
     }
     private I_AmTermComponent termComponent;
     private I_ConfigAceFrame config;
-//    private boolean lineWrapEnabled = false;
-//    private int fixedWidth = 150;
-
-//    public boolean isLineWrapEnabled() {
-//        return lineWrapEnabled;
-//    }
-//
-//    public void setLineWrapEnabled(boolean lineWrapEnabled) {
-//        this.lineWrapEnabled = lineWrapEnabled;
-//    }
 
     private class TermLabelDragSourceListener implements DragSourceListener {
 
@@ -383,10 +368,6 @@ public class DynamicWidthTermComponentLabel extends JLabel
     private static final long serialVersionUID = 1L;
     CommitListener commitListener = new CommitListener();
 
-//    public enum LabelText {
-//
-//        FULLYSPECIFIED, PREFERRED
-//    };
     private LabelText textType = LabelText.FULLYSPECIFIED;
 
     public LabelText getTextType() {
@@ -588,105 +569,14 @@ public class DynamicWidthTermComponentLabel extends JLabel
     public void setText(String text) {
         setBorder(noFocusBorder);
         if (text.matches(".*Fully specified name.*")) {
-            text = text.replace("Fully specified name", "FSN");
+            text = text.replace("Fully specified name", "<html><b>FSN</b>");
         } else if (text.matches(".*Synonym.*")) {
-            text = text.replace("Synonym", "SYN");
+            text = text.replace("Synonym", "<html><b>SYN</b>");
         } else if (text.matches(".*Definition.*")) {
-            text = text.replace("Definition", "DEF");
+            text = text.replace("Definition", "<html><b>DEF</b>");
         }
-//        if (lineWrapEnabled) {
-//            if (!BasicHTML.isHTMLString(text)) {
-//                text = "<html>" + text;
-//            }
-//            super.setText(text);
-//            View v = BasicHTML.createHTMLView(this, getText());
-//            v.setSize(fixedWidth, 0);
-//            float prefYSpan = v.getPreferredSpan(View.Y_AXIS);
-//            if (prefYSpan > 16) {
-//                wrapSize = new Dimension(fixedWidth, (int) (prefYSpan + 4));
-//                setSize(wrapSize);
-//            } else {
-//                wrapSize = new Dimension(fixedWidth, (int) prefYSpan);
-//                setSize(wrapSize);
-//            }
-//        } else {
             super.setText(text);
-//        }
     }
-
-//    @Override
-//    public void setSize(Dimension d) {
-//        if (lineWrapEnabled) {
-//            if (d.height < wrapSize.height) {
-//                d.height = wrapSize.height;
-//            }
-//            d.width = fixedWidth;
-//            super.setSize(d);
-//        } else {
-//            super.setSize(d);
-//        }
-//    }
-//
-//    @Override
-//    public void setSize(int width, int height) {
-//        if (lineWrapEnabled) {
-//            if (height < wrapSize.height) {
-//                height = wrapSize.height;
-//            }
-//            super.setSize(fixedWidth, height);
-//        } else {
-//            super.setSize(width, height);
-//        }
-//    }
-//
-//    @Override
-//    public void setBounds(int x, int y, int width, int height) {
-//        if (lineWrapEnabled) {
-//            if (height < wrapSize.height) {
-//                height = wrapSize.height;
-//            }
-//            super.setBounds(x, y, fixedWidth, height);
-//        } else {
-//            super.setBounds(x, y, width, height);
-//        }
-//    }
-//
-//    @Override
-//    public void setBounds(Rectangle r) {
-//        if (lineWrapEnabled) {
-//            if (r.height < wrapSize.height) {
-//                r.height = wrapSize.height;
-//            }
-//            setBounds(r.x, r.y, fixedWidth, r.height);
-//        } else {
-//            setBounds(r.x, r.y, r.width, r.height);
-//        }
-//
-//    }
-//
-//    @Override
-//    public Dimension getMaximumSize() {
-//        if (lineWrapEnabled) {
-//            return wrapSize;
-//        }
-//        return super.getMaximumSize();
-//    }
-//
-//    @Override
-//    public Dimension getMinimumSize() {
-//        if (lineWrapEnabled) {
-//            return wrapSize;
-//        }
-//        return super.getMinimumSize();
-//    }
-//
-//    @Override
-//    public Dimension getPreferredSize() {
-//        if (lineWrapEnabled) {
-//            return wrapSize;
-//        }
-//        return super.getPreferredSize();
-//    }
 
     public void addTermChangeListener(PropertyChangeListener l) {
         addPropertyChangeListener("termComponent", l);

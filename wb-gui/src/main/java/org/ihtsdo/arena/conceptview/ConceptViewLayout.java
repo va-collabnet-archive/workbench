@@ -1715,12 +1715,6 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
         relGroupPanel.setupDrag(group);
         relGroupPanel.setBorder(BorderFactory.createRaisedBevelBorder());
         
-//        JLabel relGroupLabel = getJLabel(" ");
-//        
-//        relGroupLabel.setBackground(Color.GREEN);
-//        relGroupLabel.setOpaque(true);
-//        relGroupPanel.setDropPopupInset(relGroupLabel.getPreferredSize().width);
-        
         GridBagConstraints gbc = new GridBagConstraints();
         
         gbc.anchor = GridBagConstraints.NORTHWEST;
@@ -1732,10 +1726,11 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.gridheight = 1;
+        Color color = new Color (86,201,27);
         JButton actionMenuButton = relGroupPanel.getActionMenuButton();
         actionMenuButton.setMinimumSize(new Dimension(16, 16));
         actionMenuButton.setPreferredSize(new Dimension(16, 16));
-        actionMenuButton.setBackground(Color.GREEN);
+        actionMenuButton.setBackground(color);
         actionMenuButton.setOpaque(true);
         relGroupPanel.add(actionMenuButton, gbc);
         gbc.gridy++;
@@ -1746,18 +1741,16 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
         relGroupLabel.setMinimumSize(new Dimension(16, 12));
         relGroupLabel.setPreferredSize(new Dimension(16, 12));
         relGroupPanel.setDropPopupInset(relGroupLabel.getPreferredSize().width);
-        relGroupLabel.setBackground(Color.GREEN);
+        relGroupLabel.setBackground(color);
         relGroupPanel.add(relGroupLabel, gbc);
         gbc.gridy = 0;
         gbc.gridheight = 3;
         gbc.weighty = 0;
-//        relGroupPanel.add(relGroupLabel, gbc);
         gbc.anchor = GridBagConstraints.NORTHWEST;
         gbc.gridx = 1;
         gbc.weightx = 1;
         gbc.gridheight = 1;
         
-//        JButton actionMenuButton = relGroupPanel.getActionMenuButton();
         
         (new GetActionsSwingWorker(actionMenuButton, group)).execute();
         

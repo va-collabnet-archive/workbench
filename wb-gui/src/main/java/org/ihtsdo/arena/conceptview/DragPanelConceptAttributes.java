@@ -93,6 +93,7 @@ public class DragPanelConceptAttributes extends DragPanelComponentVersion<Concep
         gbc.gridx = 0;
         gbc.gridy = 0;
         
+        Color color = new Color(102, 225, 225);
         
         if ((getParentCollapsePanel() == null)
                 || !getSettings().getView().getConfig().getAllowedStatus().contains(getAttr().getStatusNid())) {
@@ -101,14 +102,14 @@ public class DragPanelConceptAttributes extends DragPanelComponentVersion<Concep
             attrLabel.setMinimumSize(new Dimension(16, 28));
             attrLabel.setPreferredSize(new Dimension(16, 28));
             setDropPopupInset(attrLabel.getPreferredSize().width);
-            attrLabel.setBackground(Color.CYAN.darker());
+            attrLabel.setBackground(color.darker());
             add(attrLabel, gbc);
         } else {
             gbc.gridheight = 1;
             JButton button = getComponentActionMenuButton();
             button.setMinimumSize(new Dimension(16, 16));
             button.setPreferredSize(new Dimension(16, 16));
-            button.setBackground(Color.CYAN);
+            button.setBackground(color);
             button.setOpaque(true);
             add(button, gbc);
             gbc.gridy++;
@@ -119,7 +120,7 @@ public class DragPanelConceptAttributes extends DragPanelComponentVersion<Concep
             attrLabel.setMinimumSize(new Dimension(16, 12));
             attrLabel.setPreferredSize(new Dimension(16, 12));
             setDropPopupInset(attrLabel.getPreferredSize().width);
-            attrLabel.setBackground(Color.CYAN);
+            attrLabel.setBackground(color);
             add(attrLabel, gbc);
             gbc.gridy = 0;
             gbc.gridheight = 2;

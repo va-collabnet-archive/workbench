@@ -36,8 +36,6 @@ import javax.swing.JLabel;
 import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
 import javax.swing.TransferHandler;
-import javax.swing.border.Border;
-import javax.swing.border.CompoundBorder;
 import org.dwfa.ace.DynamicWidthTermComponentLabel;
 import org.ihtsdo.arena.editor.ArenaEditor;
 import org.ihtsdo.tk.Ts;
@@ -118,6 +116,7 @@ public class DragPanelRel extends DragPanelComponentVersion<RelationshipVersionB
       gbc.gridx      = 0;
       gbc.gridy      = 0;
       
+      Color color = new Color(135,206,250);
       
       if ((getParentCollapsePanel() == null)
                 || !getSettings().getView().getConfig().getAllowedStatus().contains(getRel().getStatusNid())) {
@@ -126,14 +125,14 @@ public class DragPanelRel extends DragPanelComponentVersion<RelationshipVersionB
             relLabel.setMinimumSize(new Dimension(16, 28));
             relLabel.setPreferredSize(new Dimension(16, 28));
             setDropPopupInset(relLabel.getPreferredSize().width);
-            relLabel.setBackground(Color.BLUE.darker());
+            relLabel.setBackground(color.darker());
             add(relLabel, gbc);
         } else {
             gbc.gridheight = 1;
             JButton button = getComponentActionMenuButton();
             button.setMinimumSize(new Dimension(16, 16));
             button.setPreferredSize(new Dimension(16, 16));
-            button.setBackground(new Color(1,68,250));
+            button.setBackground(color);
             button.setOpaque(true);
             add(button, gbc);
             gbc.gridy++;
@@ -144,7 +143,7 @@ public class DragPanelRel extends DragPanelComponentVersion<RelationshipVersionB
             relLabel.setMinimumSize(new Dimension(16, 12));
             relLabel.setPreferredSize(new Dimension(16, 12));
             setDropPopupInset(relLabel.getPreferredSize().width);
-            relLabel.setBackground(new Color(1,68,250));
+            relLabel.setBackground(color);
             add(relLabel, gbc);
             gbc.gridy = 0;
             gbc.gridheight = 2;
@@ -168,7 +167,7 @@ public class DragPanelRel extends DragPanelComponentVersion<RelationshipVersionB
       gbc.weighty = 1;
       gbc.gridx++;
 
-      TermComponentLabel typeLabel = getLabel(getRel().getTypeNid(), canDrop, getSettings().getRelType(), 100);
+      TermComponentLabel typeLabel = getLabel(getRel().getTypeNid(), canDrop, getSettings().getRelType(), 115);
       FontMetrics metrics = typeLabel.getFontMetrics(typeLabel.getFont());
       int hgt = metrics.getHeight();
       String[] split = typeLabel.getText().split(" ");
@@ -178,7 +177,7 @@ public class DragPanelRel extends DragPanelComponentVersion<RelationshipVersionB
               longest = s;
           }
       }
-// START HERE: use this?
+
       int adv = metrics.stringWidth(longest);
       Dimension size = new Dimension(adv+2, hgt+2); 
       if(size.getWidth() > 70){
@@ -210,6 +209,7 @@ public class DragPanelRel extends DragPanelComponentVersion<RelationshipVersionB
             }
          }
       });
+      typeLabel.setBorder(BorderFactory.createEmptyBorder(0,3,0,2));
       add(typeLabel, gbc);
       gbc.gridx++;
       gbc.weightx = 0;

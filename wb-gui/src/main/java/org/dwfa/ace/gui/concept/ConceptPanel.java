@@ -413,7 +413,7 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins, Proper
 
         config.addPropertyChangeListener("uncommitted", new UncommittedChangeListener());
         label = new TermComponentLabel(config);
-        label.setBackground(Color.RED);
+        label.setBackground(new Color (255, 64, 0));
         fixedToggleChangeActionListener = new FixedToggleChangeActionListener();
         config.addPropertyChangeListener("visibleRefsets", fixedToggleChangeActionListener);
         config.addPropertyChangeListener(this);

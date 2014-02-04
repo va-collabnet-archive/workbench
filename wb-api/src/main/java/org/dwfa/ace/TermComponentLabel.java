@@ -49,7 +49,6 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -602,8 +601,8 @@ public class TermComponentLabel extends JLabel
             View v = BasicHTML.createHTMLView(this, getText());
             v.setSize(fixedWidth, 0);
             float prefYSpan = v.getPreferredSpan(View.Y_AXIS);
-            if (prefYSpan > 16) {
-                wrapSize = new Dimension(fixedWidth, (int) (prefYSpan + 4));
+            if (prefYSpan > 13) {
+                wrapSize = new Dimension(fixedWidth, (int) (prefYSpan + 15));
                 setSize(wrapSize);
             } else {
                 wrapSize = new Dimension(fixedWidth, (int) prefYSpan);

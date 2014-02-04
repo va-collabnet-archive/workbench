@@ -1,7 +1,6 @@
 package org.ihtsdo.arena.conceptview;
 
 //~--- non-JDK imports --------------------------------------------------------
-import org.dwfa.ace.TermComponentLabel;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
@@ -31,16 +30,11 @@ import java.util.Collection;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
-import javax.swing.JEditorPane;
 import javax.swing.JLabel;
-import javax.swing.JLayeredPane;
 import javax.swing.JSeparator;
 import javax.swing.JTextArea;
-import javax.swing.JTextPane;
 import javax.swing.SwingConstants;
 import javax.swing.TransferHandler;
-import javax.swing.plaf.basic.BasicHTML;
-import org.apache.commons.lang.StringEscapeUtils;
 import org.dwfa.ace.DynamicWidthTermComponentLabel;
 import org.ihtsdo.arena.editor.ArenaEditor;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
