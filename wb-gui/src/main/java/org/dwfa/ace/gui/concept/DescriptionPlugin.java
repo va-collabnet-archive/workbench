@@ -32,7 +32,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Level;
-
 import javax.swing.BorderFactory;
 import javax.swing.DefaultCellEditor;
 import javax.swing.ImageIcon;
@@ -47,7 +46,6 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableColumn;
-
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.SmallProgressPanel;
 import org.dwfa.ace.api.I_AmTermComponent;
@@ -59,14 +57,15 @@ import org.dwfa.ace.dnd.TerminologyTransferHandler;
 import org.dwfa.ace.edit.AddDescription;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.table.DescriptionTableModel;
+import org.dwfa.ace.table.DescriptionTableModel.DESC_FIELD;
+import org.dwfa.ace.table.DescriptionTableModel.StringWithDescTuple;
 import org.dwfa.ace.table.DescriptionTableRenderer;
 import org.dwfa.ace.table.DescriptionsForConceptTableModel;
 import org.dwfa.ace.table.JTableWithDragImage;
-import org.dwfa.ace.table.DescriptionTableModel.DESC_FIELD;
-import org.dwfa.ace.table.DescriptionTableModel.StringWithDescTuple;
 import org.dwfa.ace.table.refset.RefsetUtil;
 import org.dwfa.bpa.util.SortClickListener;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.ttk.preferences.gui.PanelLinkingPreferences.LINK_TYPE;
 
 public class DescriptionPlugin extends AbstractPlugin implements TableModelListener, I_HostConceptPlugins {
 

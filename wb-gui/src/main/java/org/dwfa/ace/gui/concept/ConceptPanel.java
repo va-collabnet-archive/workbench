@@ -71,6 +71,7 @@ import org.dwfa.bpa.worker.MasterWorker;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.LogWithAlerts;
 import org.dwfa.vodb.types.IntSet;
+import org.ihtsdo.ttk.preferences.gui.PanelLinkingPreferences.LINK_TYPE;
 
 public class ConceptPanel extends JPanel implements I_HostConceptPlugins, PropertyChangeListener, Scrollable {
 
@@ -353,6 +354,20 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins, Proper
                 }
             }
         }
+        
+        protected void updatePreferences(JSpinner spinner) {
+                LinkListModel myModel = (LinkListModel) (spinner.getModel());
+                Icon value = (Icon) myModel.getValue();
+                if (value == SEARCH_LINK_ICON) {
+                    ACE.linkPref.set(panelId, LINK_TYPE.SEARCH_LINK);
+                } else if (value == TREE_LINK_ICON) {
+                   ACE.linkPref.set(panelId, LINK_TYPE.TREE_LINK);
+                } else if (value == UNLINKED_ICON) {
+                    ACE.linkPref.set(panelId, LINK_TYPE.UNLINKED);
+                } else if (value == DATA_CHECK_LINK_ICON) {
+                    ACE.linkPref.set(panelId, LINK_TYPE.DATA_CHECK_LINK);
+                }
+        }
 
         @Override
         public void stateChanged(ChangeEvent e) {
@@ -360,6 +375,7 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins, Proper
             LinkListModel myModel = (LinkListModel) (mySpinner.getModel());
             setIcon((Icon) myModel.getValue());
             updateToolTipText(mySpinner);
+            updatePreferences(mySpinner);
             updateTab(label.getTermComponent());
         }
     }

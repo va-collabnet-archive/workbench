@@ -77,7 +77,6 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableRowSorter;
 import javax.swing.tree.TreePath;
-
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.TermComponentLabel;
 import org.dwfa.ace.api.I_AmTermComponent;
@@ -87,7 +86,6 @@ import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HostConceptPlugins;
-import org.dwfa.ace.api.I_HostConceptPlugins.LINK_TYPE;
 import org.dwfa.ace.api.I_ModelTerminologyList;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.dnd.TerminologyTransferHandler;
@@ -112,6 +110,7 @@ import org.ihtsdo.taxonomy.nodes.TaxonomyNode;
 import org.ihtsdo.taxonomy.path.PathExpander;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
+import org.ihtsdo.ttk.preferences.gui.PanelLinkingPreferences.LINK_TYPE;
 import org.ihtsdo.util.swing.GuiUtil;
 
 public class SearchPanel extends JPanel implements I_MakeCriterionPanel, I_HostConceptPlugins {

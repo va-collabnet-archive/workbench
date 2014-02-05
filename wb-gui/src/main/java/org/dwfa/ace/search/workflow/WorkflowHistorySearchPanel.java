@@ -36,7 +36,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
 import javax.swing.AbstractAction;
 import javax.swing.AbstractSpinnerModel;
 import javax.swing.BorderFactory;
@@ -63,12 +62,10 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableColumn;
 import javax.swing.tree.TreePath;
-
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_ContainTermComponent;
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_HostConceptPlugins.LINK_TYPE;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.dnd.TerminologyTransferHandler;
 import org.dwfa.ace.gui.concept.ConceptPanel;
@@ -92,6 +89,7 @@ import org.ihtsdo.taxonomy.nodes.RootNode;
 import org.ihtsdo.taxonomy.nodes.TaxonomyNode;
 import org.ihtsdo.taxonomy.path.PathExpander;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
+import org.ihtsdo.ttk.preferences.gui.PanelLinkingPreferences.LINK_TYPE;
 
 public class WorkflowHistorySearchPanel extends JPanel implements I_MakeCriterionPanel {
 

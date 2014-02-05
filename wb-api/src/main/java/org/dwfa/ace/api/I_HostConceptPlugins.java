@@ -18,6 +18,7 @@ package org.dwfa.ace.api;
 
 import java.util.UUID;
 import org.dwfa.ace.api.ebr.*;
+import org.ihtsdo.ttk.preferences.gui.PanelLinkingPreferences.LINK_TYPE;
 
 public interface I_HostConceptPlugins extends I_ContainTermComponent {
 
@@ -110,12 +111,6 @@ public interface I_HostConceptPlugins extends I_ContainTermComponent {
 
     
     }
-
-    public enum LINK_TYPE {
-        UNLINKED, SEARCH_LINK, TREE_LINK, 
-        DATA_CHECK_LINK, LIST_LINK, ARENA_LINK,
-        TABLE_LINK;
-    };
 
     public enum WORKFLOW_USE_CASES {
         NEW, EDIT;

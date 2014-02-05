@@ -73,7 +73,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import javax.naming.ConfigurationException;
-
 import javax.security.auth.login.LoginException;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
@@ -106,7 +105,6 @@ import javax.swing.TransferHandler;
 import javax.swing.border.Border;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
-
 import org.dwfa.ace.CdePalette.TOGGLE_DIRECTION;
 import org.dwfa.ace.actions.Abort;
 import org.dwfa.ace.actions.ChangeFramePassword;
@@ -125,7 +123,6 @@ import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.api.I_HostConceptPlugins.HOST_ENUM;
-import org.dwfa.ace.api.I_HostConceptPlugins.LINK_TYPE;
 import org.dwfa.ace.api.I_HostConceptPlugins.REFSET_TYPES;
 import org.dwfa.ace.api.I_HostConceptPlugins.TOGGLES;
 import org.dwfa.ace.api.I_IntList;
@@ -201,6 +198,8 @@ import org.ihtsdo.tk.workflow.api.ProjectBI;
 import org.ihtsdo.tk.workflow.api.WorkListBI;
 import org.ihtsdo.tk.workflow.api.WorkflowStoreBI;
 import org.ihtsdo.ttk.preferences.TtkPreferences;
+import org.ihtsdo.ttk.preferences.gui.PanelLinkingPreferences;
+import org.ihtsdo.ttk.preferences.gui.PanelLinkingPreferences.LINK_TYPE;
 import org.ihtsdo.ttk.preferences.gui.QueueGuiPreferences;
 import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 
@@ -329,6 +328,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
     private WorkflowStoreBI wfStore;
     private static AtomicBoolean active = new AtomicBoolean(true);
     private static ArrayList<WeakReference<ListenForDataChecks>> dataChecks = new ArrayList<>();
+    public static PanelLinkingPreferences linkPref;
 
     //~--- constructors --------------------------------------------------------
 
@@ -351,7 +351,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
     public ACE(String pluginRoot) {
         super(new GridBagLayout());
         this.pluginRoot = pluginRoot;
-
+        linkPref =  new PanelLinkingPreferences(TtkPreferences.get());
         try {
             menuWorker = new MasterWorker(UUID.randomUUID(), "ACE MasterWorker");
 
@@ -1941,6 +1941,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                 if (option == JOptionPane.YES_OPTION) {
                     try {
                         AceConfig.config.save();
+                        linkPref.exportFields(TtkPreferences.get());
                     } catch (IOException e) {
                         AceLog.getAppLog().alertAndLogException(e);
 
@@ -2407,35 +2408,35 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         termTree   = treeHelper.getHierarchyPanel();
         treeHelper.addMouseListener(new TaxonomyMouseListenerForAce(this, treeHelper));
         conceptPanels = new ArrayList<ConceptPanel>();
-        c1Panel       = new ConceptPanel(HOST_ENUM.CONCEPT_PANEL_R1, aceFrameConfig, LINK_TYPE.UNLINKED,
+        c1Panel       = new ConceptPanel(HOST_ENUM.CONCEPT_PANEL_R1, aceFrameConfig, linkPref.getR1(),
                 conceptTabs, 1, this.pluginRoot);
-        c1Panel.setAce(this, LINK_TYPE.TREE_LINK);
+        c1Panel.setAce(this, linkPref.getR1());
         conceptPanels.add(c1Panel);
-        c2Panel = new ConceptPanel(HOST_ENUM.CONCEPT_PANEL_R2, aceFrameConfig, LINK_TYPE.UNLINKED,
+        c2Panel = new ConceptPanel(HOST_ENUM.CONCEPT_PANEL_R2, aceFrameConfig, linkPref.getR2(),
                 conceptTabs, 2, this.pluginRoot);
-        c2Panel.setAce(this, LINK_TYPE.SEARCH_LINK);
+        c2Panel.setAce(this, linkPref.getR2());
         conceptPanels.add(c2Panel);
         conceptTabs.addComponentListener(new ResizePalettesListener());
 
-        // CONCEPT TAB R-1 (Taxonomy Link)
-        conceptTabs.addTab("tree", ConceptPanel.SMALL_TREE_LINK_ICON, c1Panel, "tree Linked");
+        // CONCEPT TAB R-1
+        conceptTabs.addTab("empty", null, c1Panel, "unlinked");
 
-        // CONCEPT TAB R-2 (Search Link)
-        conceptTabs.addTab("search", ConceptPanel.SMALL_SEARCH_LINK_ICON, c2Panel, "search Linked");
+        // CONCEPT TAB R-2
+        conceptTabs.addTab("empty", null, c2Panel, "unlinked");
 
         // CONCEPT TAB R-3
-        ConceptPanel c3Panel = new ConceptPanel(HOST_ENUM.CONCEPT_PANEL_R3, aceFrameConfig, LINK_TYPE.UNLINKED,
+        ConceptPanel c3Panel = new ConceptPanel(HOST_ENUM.CONCEPT_PANEL_R3, aceFrameConfig, linkPref.getR3(),
                 conceptTabs, 3, this.pluginRoot);
 
-        c3Panel.setAce(this, LINK_TYPE.UNLINKED);
+        c3Panel.setAce(this, linkPref.getR3());
         conceptPanels.add(c3Panel);
         conceptTabs.addTab("empty", null, c3Panel, "Unlinked");
 
         // CONCEPT TAB R-4
-        ConceptPanel c4Panel = new ConceptPanel(HOST_ENUM.CONCEPT_PANEL_R4, aceFrameConfig, LINK_TYPE.UNLINKED,
+        ConceptPanel c4Panel = new ConceptPanel(HOST_ENUM.CONCEPT_PANEL_R4, aceFrameConfig, linkPref.getR4(),
                 conceptTabs, 4, this.pluginRoot);
 
-        c4Panel.setAce(this, LINK_TYPE.UNLINKED);
+        c4Panel.setAce(this, linkPref.getR4());
         conceptPanels.add(c4Panel);
         conceptTabs.addTab("empty", null, c4Panel, "Unlinked");
 
