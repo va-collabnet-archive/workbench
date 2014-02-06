@@ -5,7 +5,7 @@
 	<parent>
 		<artifactId>wb-mmb</artifactId>
 		<groupId>org.ihtsdo</groupId>
-		<version>1.4-dk-SNAPSHOT</version>
+		<version>1.4-dk</version>
 	</parent>
 
 	<artifactId>wb-docs</artifactId>
@@ -27,13 +27,13 @@
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>wb-api</artifactId>
-			<version>1.4-dk-SNAPSHOT</version>
+			<version>1.4-dk</version>
 			<type>java-source</type>
 		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>wb-core</artifactId>
-			<version>1.4-dk-SNAPSHOT</version>
+			<version>1.4-dk</version>
 			<type>java-source</type>
 		</dependency>
 	</dependencies>
