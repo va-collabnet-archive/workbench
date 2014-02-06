@@ -18,11 +18,11 @@
     <parent>
         <groupId>org.ihtsdo</groupId>
         <artifactId>wb-mmb</artifactId>
-        <version>1.3-dk</version>
+        <version>1.4-dk-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>wb-core</artifactId>
-  <version>1.3-dk</version>
+  <version>1.4-dk-SNAPSHOT</version>
     <name>${branch}: Workflow Architecture Components</name>
     <url> https://mgr.servers.aceworkspace.net/pbl/cubitci/pub/core/site/index.html </url>
     <dependencies>
@@ -45,7 +45,7 @@
         <dependency>
             <groupId>org.ihtsdo</groupId>
             <artifactId>tk-concept-component</artifactId>
-            <version>1.3-dk</version>
+            <version>1.4-dk-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.ihtsdo</groupId>

@@ -3,10 +3,10 @@
     <parent>
         <groupId>org.ihtsdo</groupId>
         <artifactId>wb-mmb</artifactId>
-        <version>1.3-dk</version>
+        <version>1.4-dk-SNAPSHOT</version>
     </parent>
     <artifactId>project-management</artifactId>
-  <version>1.3-dk</version>
+  <version>1.4-dk-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>${branch}: Project management</name>
     <url>http://maven.apache.org</url>
@@ -59,7 +59,7 @@
         <dependency>
             <groupId>org.ihtsdo</groupId>
             <artifactId>tk-concept-component</artifactId>
-            <version>1.3-dk</version>
+            <version>1.4-dk-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
