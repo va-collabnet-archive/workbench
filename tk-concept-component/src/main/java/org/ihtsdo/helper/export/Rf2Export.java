@@ -656,7 +656,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                         RefexVersionBI latest = (RefexVersionBI) member.getVersion(viewCoordinateAllStatus);
                         Collection<RefexVersionBI> refexVersions = member.getVersions();
                         for (RefexVersionBI r : refexVersions) {
-                            if (!sameCycleStampNids.contains(r.getStampNid()) || r.getStampNid() == latest.getStampNid()) {
+                            if (!sameCycleStampNids.contains(r.getStampNid()) || (latest != null && r.getStampNid() == latest.getStampNid())) {
                                 versions.add(r);
                             }
                         }
@@ -868,7 +868,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                 }else {
                     ConceptAttributeVersionBI latest = conceptAttributeChronicle.getVersion(viewCoordinateAllStatusTime);//CHANGE FOR DK, before merge back use viewCoordinateAllStatus
                     for (ConceptAttributeVersionBI ca : conceptAttributeChronicle.getVersions()) {
-                        if (!sameCycleStampNids.contains(ca.getStampNid()) || ca.getStampNid() == latest.getStampNid()) {
+                        if (!sameCycleStampNids.contains(ca.getStampNid()) || (latest != null && ca.getStampNid() == latest.getStampNid())) {
                             versions.add(ca);
                         }
                     }
@@ -966,7 +966,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                 } else {
                     DescriptionVersionBI latest = descriptionChronicle.getVersion(viewCoordinateAllStatusTime);
                     for (DescriptionVersionBI d : descriptionChronicle.getVersions()) {
-                        if (!sameCycleStampNids.contains(d.getStampNid()) || d.getStampNid() == latest.getStampNid()) {
+                        if (!sameCycleStampNids.contains(d.getStampNid()) || (latest != null && d.getStampNid() == latest.getStampNid())) {
                             versions.add(d);
                         }
                     }
@@ -1078,7 +1078,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                 }else {
                     RelationshipVersionBI latest = relationshipChronicle.getVersion(viewCoordinateAllStatusTime);
                     for (RelationshipVersionBI r : relationshipChronicle.getVersions()) {
-                        if (!sameCycleStampNids.contains(r.getStampNid()) || r.getStampNid() == latest.getStampNid()) {
+                        if (!sameCycleStampNids.contains(r.getStampNid()) || (latest != null && r.getStampNid() == latest.getStampNid())) {
                             versions.add(r);
                         }
                     }
@@ -1300,7 +1300,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                 RefexVersionBI latest = (RefexVersionBI) refexChronicle.getVersion(viewCoordinateAllStatusTime); //CHANGE FOR DK, before merge back use viewCoordinateAllStatus
                 for(Object o : refexChronicle.getVersions()){
                     RefexVersionBI r = (RefexVersionBI)o;
-                    if(!sameCycleStampNids.contains(r.getStampNid()) || r.getStampNid() == latest.getStampNid()){
+                    if(!sameCycleStampNids.contains(r.getStampNid()) || (latest != null && r.getStampNid() == latest.getStampNid())){
                         versions.add(r);
                     }
                 }
@@ -1367,7 +1367,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                 RefexVersionBI latest = (RefexVersionBI) refexChronicle.getVersion(viewCoordinateAllStatusTime); //CHANGE FOR DK, before merge back use viewCoordinateAllStatus
                 for(Object o : refexChronicle.getVersions()){
                     RefexVersionBI r = (RefexVersionBI)o;
-                    if(!sameCycleStampNids.contains(r.getStampNid()) || r.getStampNid() == latest.getStampNid()){
+                    if(!sameCycleStampNids.contains(r.getStampNid()) || (latest != null && r.getStampNid() == latest.getStampNid())){
                         versions.add(r);
                     }
                 }
@@ -1495,7 +1495,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                     RefexVersionBI latest = (RefexVersionBI) refexChronicle.getVersion(viewCoordinateAllStatusTime); //CHANGE FOR DK, before merge back use viewCoordinateAllStatus
                     for (Object o : refexChronicle.getVersions()) {
                         RefexVersionBI r = (RefexVersionBI) o;
-                        if (!sameCycleStampNids.contains(r.getStampNid()) || r.getStampNid() == latest.getStampNid()) {
+                        if (!sameCycleStampNids.contains(r.getStampNid()) || (latest != null && r.getStampNid() == latest.getStampNid())) {
                             versions.add(r);
                         }
                     }

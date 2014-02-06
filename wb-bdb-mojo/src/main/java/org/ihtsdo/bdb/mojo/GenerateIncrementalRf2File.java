@@ -136,6 +136,15 @@ public class GenerateIncrementalRf2File extends AbstractMojo {
      */
     private String viewPathConceptSpecFsn;
     /**
+     * Text of edit path concept's FSN, to be used when only the FSN is known,
+     * and the path concept was generated with the proper type 5 UUID algorithm
+     * using the Type5UuidFactory.PATH_ID_FROM_FS_DESC namespace.
+     *
+     * @parameter
+     * @required
+     */
+    private String editPathConceptSpecFsn;
+    /**
      * Start date for inclusion in the RF2 files, in yyyy-MM-dd-HH.mm.ss format.
      *
      * @parameter
@@ -360,7 +369,10 @@ public class GenerateIncrementalRf2File extends AbstractMojo {
             
             IntSet sapsToRemove = new IntSet();
             if (previousReleaseDate != null) {
-                sapsToRemove = Bdb.getSapDb().getSpecifiedSapNids(pathIds,
+                IntSet allPaths = new IntSet(pathIds.getSetValues());
+                int nid = Ts.get().getNidForUuids(Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, editPathConceptSpecFsn));
+                allPaths.add(nid);
+                sapsToRemove = Bdb.getSapDb().getSpecifiedSapNids(allPaths,
                         TimeHelper.getTimeFromString(previousReleaseDate, TimeHelper.getFileDateFormat()),
                         TimeHelper.getTimeFromString("latest", TimeHelper.getFileDateFormat()));
             }
