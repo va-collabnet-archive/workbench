@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>org.ihtsdo</groupId>
 		<artifactId>wb-mmb</artifactId>
-		<version>1.6-dk</version>
+		<version>1.7-dk-SNAPSHOT</version>
 	</parent>
 	<artifactId>wb-schema-mojo</artifactId>
 	<packaging>maven-plugin</packaging>
@@ -28,7 +28,7 @@
 		<dependency>
 			<groupId>org.ihtsdo</groupId>
 			<artifactId>wb-gui</artifactId>
-			<version>1.6-dk</version>
+			<version>1.7-dk-SNAPSHOT</version>
 		 <exclusions>
 		  <exclusion>
 		   <artifactId>slf4j-api</artifactId>
@@ -39,22 +39,22 @@
 		<dependency>
 			<groupId>org.ihtsdo</groupId>
 			<artifactId>wb-foundation</artifactId>
-			<version>1.6-dk</version>
+			<version>1.7-dk-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.ihtsdo</groupId>
 			<artifactId>wb-api</artifactId>
-			<version>1.6-dk</version>
+			<version>1.7-dk-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.ihtsdo</groupId>
 			<artifactId>wb-core</artifactId>
-			<version>1.6-dk</version>
+			<version>1.7-dk-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.ihtsdo</groupId>
 			<artifactId>rule-engine-integration</artifactId>
-			<version>1.6-dk</version>
+			<version>1.7-dk-SNAPSHOT</version>
 		 <exclusions>
 		  <exclusion>
 		   <artifactId>slf4j-api</artifactId>
@@ -152,7 +152,7 @@
 		<dependency>
 			<groupId>org.ihtsdo</groupId>
 			<artifactId>wb-bdb</artifactId>
-			<version>1.6-dk</version>
+			<version>1.7-dk-SNAPSHOT</version>
                         <exclusions>
                             <exclusion>
                                 <groupId>org.ihtsdo</groupId>

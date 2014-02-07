@@ -3,7 +3,7 @@
     <parent>
         <groupId>org.ihtsdo</groupId>
         <artifactId>wb-mmb</artifactId>
-        <version>1.6-dk</version>
+        <version>1.7-dk-SNAPSHOT</version>
     </parent>
     <artifactId>translation</artifactId>
     <packaging>jar</packaging>
@@ -13,7 +13,7 @@
         <dependency>
             <groupId>org.ihtsdo</groupId>
             <artifactId>project-management</artifactId>
-            <version>1.6-dk</version>
+            <version>1.7-dk-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -23,28 +23,28 @@
         <dependency>
             <groupId>org.ihtsdo</groupId>
             <artifactId>wb-api</artifactId>
-            <version>1.6-dk</version>
+            <version>1.7-dk-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.ihtsdo</groupId>
             <artifactId>wb-gui</artifactId>
-            <version>1.6-dk</version>
+            <version>1.7-dk-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.ihtsdo</groupId>
             <artifactId>wb-foundation</artifactId>
-            <version>1.6-dk</version>
+            <version>1.7-dk-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.ihtsdo</groupId>
             <artifactId>wb-bdb</artifactId>
-            <version>1.6-dk</version>
+            <version>1.7-dk-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.ihtsdo</groupId>
             <artifactId>wb-core</artifactId>
-            <version>1.6-dk</version>
+            <version>1.7-dk-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.ihtsdo</groupId>
@@ -54,7 +54,7 @@
         <dependency>
             <groupId>org.ihtsdo</groupId>
             <artifactId>rule-engine-integration</artifactId>
-            <version>1.6-dk</version>
+            <version>1.7-dk-SNAPSHOT</version>
         </dependency>
     </dependencies>
     <build>
