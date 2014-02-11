@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>org.ihtsdo</groupId>
         <artifactId>wb-mmb</artifactId>
-        <version>2.6.0-trek-119-SNAPSHOT</version>
+        <version>1.7-trek-refset-SNAPSHOT</version>
 	</parent>
 	<artifactId>id-generation-ws</artifactId>
 	<packaging>jar</packaging>
@@ -173,7 +173,7 @@
 			</plugin>
 		</plugins>
 
-	</build>
+    </build>
 
 	<profiles>
 		<profile>
@@ -236,41 +236,40 @@
 						<artifactId>sql-maven-plugin</artifactId>
 						<version>1.4</version>
 
-						<dependencies>
-							<!-- specify the dependent jdbc driver here -->
-							<dependency>
-								<groupId>mysql</groupId>
-								<artifactId>mysql-connector-java</artifactId>
-								<version>5.1.13</version>
-							</dependency>
-						</dependencies>
+                        <dependencies>
+                            <!-- specify the dependent jdbc driver here -->
+                            <dependency>
+                                <groupId>mysql</groupId>
+                                <artifactId>mysql-connector-java</artifactId>
+                                <version>5.1.13</version>
+                            </dependency>
+                        </dependencies>
 
-						<!-- common configuration shared by all executions -->
-						<configuration>
-							<driver>com.mysql.jdbc.Driver</driver>
-							<url>jdbc:mysql://mgr.servers.aceworkspace.net:50040</url>
-							<username>root</username>
-							<password>snomed11</password>
-						</configuration>
-						<executions>
-							<execution>
-								<id>create-schema</id>
-								<phase>clean</phase>
-								<goals>
-									<goal>execute</goal>
-								</goals>
-								<configuration>
-									<autocommit>true</autocommit>
-									<srcFiles>
-										<srcFile>src/main/sql/id_gen_create.sql</srcFile>
-									</srcFiles>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-
-				</plugins>
-			</build>
-		</profile>
-	</profiles>
+                        <!-- common configuration shared by all executions -->
+                        <configuration>
+                            <driver>com.mysql.jdbc.Driver</driver>
+                            <url>jdbc:mysql://mgr.servers.aceworkspace.net:50040</url>
+                            <username>root</username>
+                            <password>snomed11</password>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>create-schema</id>
+                                <phase>clean</phase>
+                                <goals>
+                                    <goal>execute</goal>
+                                </goals>
+                                <configuration>
+                                    <autocommit>true</autocommit>
+                                    <srcFiles>
+                                        <srcFile>src/main/sql/id_gen_create.sql</srcFile>
+                                    </srcFiles>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>

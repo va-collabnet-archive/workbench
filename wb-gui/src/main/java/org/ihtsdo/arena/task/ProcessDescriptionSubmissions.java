@@ -23,8 +23,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
@@ -125,26 +123,25 @@ public class ProcessDescriptionSubmissions extends AbstractTask {
             Integer langPosition = null;
             Integer dialectPosition = null;
             Integer casePosition = null;
-            
+
             Integer acceptSct = null;
             Integer acceptUuid = null;
 
             String line = iterator.next();
-            if(line.startsWith("<")){
+            if (line.startsWith("<")) {
                 line = iterator.next();
                 count++;
             }
             String[] configParts = line.split("\t");
-            
 
             for (int i = 0; i < configParts.length; i++) {
                 String configPos = configParts[i];
                 configPos = configPos.trim();
                 if (configPos.equalsIgnoreCase("uuid")) {
                     uuidPosition = i;
-                }else if (configPos.equalsIgnoreCase("sctId")) {
+                } else if (configPos.equalsIgnoreCase("sctId")) {
                     sctPosition = i;
-                }else if (configPos.equalsIgnoreCase("description")) {
+                } else if (configPos.equalsIgnoreCase("description")) {
                     descPosition = i;
                 } else if (configPos.equalsIgnoreCase("language")) {
                     langPosition = i;
@@ -152,9 +149,9 @@ public class ProcessDescriptionSubmissions extends AbstractTask {
                     dialectPosition = i;
                 } else if (configPos.equalsIgnoreCase("acceptabilitySct")) {
                     acceptSct = i;
-                }else if (configPos.equalsIgnoreCase("acceptabilityUuid")) {
+                } else if (configPos.equalsIgnoreCase("acceptabilityUuid")) {
                     acceptUuid = i;
-                }else if (configPos.equalsIgnoreCase("caseSensitive")) {
+                } else if (configPos.equalsIgnoreCase("caseSensitive")) {
                     casePosition = i;
                 }
             }
@@ -166,9 +163,9 @@ public class ProcessDescriptionSubmissions extends AbstractTask {
             int secondDialectRefexNid = 0;
             int acceptabilityNid = 0;
             boolean caseSensitive = false;
-            
+
             line = iterator.next();
-            if(line.startsWith("<")){
+            if (line.startsWith("<")) {
                 line = iterator.next();
                 count++;
             }
@@ -184,7 +181,7 @@ public class ProcessDescriptionSubmissions extends AbstractTask {
                 secondDialectRefexNid = 0;
                 acceptabilityNid = 0;
                 caseSensitive = false;
-                
+
                 List<UUID> list = new ArrayList<UUID>();
                 String[] parts = line.split("\t");
                 String part = null;
@@ -204,7 +201,7 @@ public class ProcessDescriptionSubmissions extends AbstractTask {
                     if (!Ts.get().hasUuid(UUID.fromString(part))) {
                         descMissingParentConcept.add(line);
                         add = false;
-                    }else{
+                    } else {
                         conceptNid = Ts.get().getNidForUuids(UUID.fromString(part));
                     }
                 }
@@ -271,6 +268,8 @@ public class ProcessDescriptionSubmissions extends AbstractTask {
                         langRefexNid = RefsetAux.NL_REFEX.getStrict(config.getViewCoordinate()).getNid();
                     } else if (lang == LANG_CODE.SV) {
                         langRefexNid = RefsetAux.SV_REFEX.getStrict(config.getViewCoordinate()).getNid();
+                    } else if (lang == LANG_CODE.DA) {
+                        langRefexNid = RefsetAux.DA_REFEX.getStrict(config.getViewCoordinate()).getNid();
                     } else {
                         throw new TaskFailedException("Cannot determine appropriate language/dialect refset.");
                     }
@@ -309,7 +308,7 @@ public class ProcessDescriptionSubmissions extends AbstractTask {
                 }
                 if (iterator.hasNext()) {
                     line = iterator.next();
-                    if(line.startsWith("<")){
+                    if (line.startsWith("<")) {
                         line = iterator.next();
                         count++;
                     }
@@ -319,7 +318,7 @@ public class ProcessDescriptionSubmissions extends AbstractTask {
             }
             process.setProperty(uuidListListPropName, uuidList);
             ACE.suspendDatacheckDisplay();
-            for(ConceptChronicleBI concept : conceptsToCommit){
+            for (ConceptChronicleBI concept : conceptsToCommit) {
                 Ts.get().addUncommitted(concept);
             }
             Ts.get().waitTillDatachecksFinished();
@@ -343,7 +342,7 @@ public class ProcessDescriptionSubmissions extends AbstractTask {
             returnCondition = Condition.CONTINUE;
         } catch (IndexOutOfBoundsException e) {
             throw new TaskFailedException("<html>Import process is expecting data which is missing.<br>Please review import file. Line: " + count, e);
-        }catch (TerminologyException e) {
+        } catch (TerminologyException e) {
             throw new TaskFailedException(e);
         } catch (UnsupportedDialectOrLanguage e) {
             throw new TaskFailedException(e);
@@ -359,8 +358,8 @@ public class ProcessDescriptionSubmissions extends AbstractTask {
             throw new TaskFailedException(e);
         } catch (IntrospectionException e) {
             throw new TaskFailedException(e);
-        } catch (java.text.ParseException ex) {
-            Logger.getLogger(ProcessDescriptionSubmissions.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (java.text.ParseException e) {
+            throw new TaskFailedException(e);
         }
         return returnCondition;
     }

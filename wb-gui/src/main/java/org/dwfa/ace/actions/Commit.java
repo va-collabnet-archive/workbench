@@ -28,12 +28,21 @@ import org.dwfa.ace.log.AceLog;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import javax.swing.JOptionPane;
+import org.ihtsdo.rules.RulesLibrary;
 
 public class Commit implements ActionListener {
    @Override
    public void actionPerformed(ActionEvent e) {
       try {
-         Terms.get().commit();
+          int response = 100; //some value that is not "yes" or "no" value
+          if (RulesLibrary.rulesDisabled) {
+              response = JOptionPane.showConfirmDialog(null, "QA is disabled. Are you sure you want to commit?",
+                      "QA Disabled!", JOptionPane.YES_NO_OPTION);
+          }
+          if(!RulesLibrary.rulesDisabled || response == JOptionPane.YES_OPTION){
+              Terms.get().commit();
+          }
       } catch (Exception e1) {
          AceLog.getAppLog().alertAndLogException(e1);
       }

@@ -14,14 +14,17 @@ import java.util.List;
 import java.util.UUID;
 
 import java.util.concurrent.ExecutionException;
+import javax.swing.JOptionPane;
 
 import javax.swing.SwingWorker;
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.list.TerminologyList;
 import org.dwfa.ace.list.TerminologyListModel;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.ihtsdo.arena.contradiction.ContradictionEditorFrame;
+import org.ihtsdo.rules.RulesLibrary;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ComponentChronicleBI;
 import org.ihtsdo.tk.api.TerminologyBuilderBI;
@@ -60,8 +63,17 @@ public class CommitActionListener implements ActionListener {
       @Override
       protected Boolean doInBackground() throws Exception {
          I_GetConceptData c = settings.getConcept();
+         boolean okToCommit = false;
+         int response = 100; //some value that is not "yes" or "no" value
+         if (RulesLibrary.rulesDisabled) {
+              response = JOptionPane.showConfirmDialog(null, "QA is disabled. Are you sure you want to commit?",
+                      "QA Disabled!", JOptionPane.YES_NO_OPTION);
+          }
+          if(!RulesLibrary.rulesDisabled || response == JOptionPane.YES_OPTION){
+              okToCommit = true;
+          }
          
-         if(settings.isForAdjudication()){
+         if(settings.isForAdjudication() && okToCommit){
              I_ConfigAceFrame config = settings.getView().getConfig();
              ViewCoordinate vc = config.getViewCoordinate();
              EditCoordinate ec = config.getEditCoordinate();
@@ -88,14 +100,17 @@ public class CommitActionListener implements ActionListener {
                      break;
                  }
              }
+         }else if (okToCommit){
+             ACE.suspendDatacheckDisplay();
+             boolean commit = c.commit(settings.getConfig().getDbConfig().getUserChangesChangeSetPolicy().convert(),
+                     settings.getConfig().getDbConfig().getChangeSetWriterThreading().convert(),
+                     settings.isForAdjudication());
+             Ts.get().waitTillDatachecksFinished();
+             ACE.resumeDatacheckDisplay();
+             return commit;
          }
-         ACE.suspendDatacheckDisplay();
-          boolean commit = c.commit(settings.getConfig().getDbConfig().getUserChangesChangeSetPolicy().convert(),
-                                           settings.getConfig().getDbConfig().getChangeSetWriterThreading().convert(),
-                                           settings.isForAdjudication());
-         Ts.get().waitTillDatachecksFinished();
-         ACE.resumeDatacheckDisplay();
-         return commit;
+         
+         return false;
       }
 
       @Override

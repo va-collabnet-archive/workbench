@@ -142,7 +142,7 @@ public class Rf2RefexComputer implements ProcessUnfetchedConceptDataBI {
                                 rel.getSourceNid(),
                                 refexNid);
                         refexBp.put(RefexCAB.RefexProperty.CNID1, rel.getTargetNid());
-                        RefexChronicleBI<?> member = builder.construct(refexBp);
+                        RefexChronicleBI<?> member = builder.constructIfNotCurrent(refexBp);
                         conceptChronicle.addAnnotation(member);
                         for(int stampNid : member.getAllStampNids()){
                             newStamps.add(stampNid);
@@ -154,7 +154,7 @@ public class Rf2RefexComputer implements ProcessUnfetchedConceptDataBI {
                             refexBp.setRetired();
                             refexBp.setMemberUuid(member.getPrimUuid());
                             builder = Ts.get().getTerminologyBuilder(editCoordinate, viewCoordinate);
-                            RefexChronicleBI<?> retiredMember = builder.construct(refexBp);
+                            RefexChronicleBI<?> retiredMember = builder.constructIfNotCurrent(refexBp);
                             conceptChronicle.addAnnotation(retiredMember);
                             for(int stampNid : retiredMember.getAllStampNids()){
                                 newStamps.add(stampNid);
@@ -177,7 +177,7 @@ public class Rf2RefexComputer implements ProcessUnfetchedConceptDataBI {
                                 cv.getNid(),
                                 conceptInactiveRefexNid);
                         refexBp.put(RefexCAB.RefexProperty.CNID1, getValueForRetirement(cv.getNid()));
-                        RefexChronicleBI<?> member = builder.construct(refexBp);
+                        RefexChronicleBI<?> member = builder.constructIfNotCurrent(refexBp);
                         conceptChronicle.addAnnotation(member);
                         for (int stampNid : member.getAllStampNids()) {
                             newStamps.add(stampNid);

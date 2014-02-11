@@ -231,14 +231,15 @@ public class UuidToSctIdWriter {
             processLangRefsets(langRefLine);
             langRefLine = langRefsetsReader.readLine();
         }
-
-        String otherLangRefLine = otherLangRefsetsReader.readLine();
-        otherLangRefLine = otherLangRefsetsReader.readLine();
-        while (otherLangRefLine != null) {
-            processOtherLangRefsets(otherLangRefLine);
+        if(otherLangRefsetsReader != null){
+            String otherLangRefLine = otherLangRefsetsReader.readLine();
             otherLangRefLine = otherLangRefsetsReader.readLine();
+            while (otherLangRefLine != null) {
+                processOtherLangRefsets(otherLangRefLine);
+                otherLangRefLine = otherLangRefsetsReader.readLine();
+            }
         }
-
+        
         String modDependLine = modDependReader.readLine();
         modDependLine = modDependReader.readLine();
         while (modDependLine != null) {
@@ -328,7 +329,6 @@ public class UuidToSctIdWriter {
         for (File inputFile : uuidFiles) {
             if (inputFile.getName().startsWith("sct2_Concept_UUID_" + this.releaseType.suffix)) {
                 conceptsFileUuid = inputFile;
-
                 conceptsReader = new BufferedReader(new InputStreamReader(new FileInputStream(inputFile), "UTF8"));
             } else if (inputFile.getName().startsWith("sct2_Description_UUID_" + this.releaseType.suffix)) {
                 descriptionsFileUuid = inputFile;
@@ -339,7 +339,7 @@ public class UuidToSctIdWriter {
             } else if (inputFile.getName().startsWith("sct2_Identifier_UUID_" + this.releaseType.suffix)) {
                 identifiersFileUuid = inputFile;
                 identifiersReader = new BufferedReader(new InputStreamReader(new FileInputStream(inputFile), "UTF8"));
-            } else if (inputFile.getName().startsWith("sct2_Identifier_Auxiliary_UUID_" + this.releaseType.suffix)) {
+            } else if (inputFile.getName().startsWith("sct2_IdentifierAuxiliary_UUID_" + this.releaseType.suffix)) {
                 privateIdentifiersFileUuid = inputFile;
                 privateIdentifiersReader = new BufferedReader(new InputStreamReader(new FileInputStream(inputFile), "UTF8"));
             } else if (inputFile.getName().startsWith("sct2_StatedRelationship_UUID_" + this.releaseType.suffix)) {
@@ -382,7 +382,7 @@ public class UuidToSctIdWriter {
         File privateIdentifiersFile = null;
         if (privateIdentifiersFileUuid != null) {
             privateIdentifiersFile = new File(terminology,
-                    privateIdentifiersFileUuid.getName().replace("sct2_Identifier_Auxiliary_UUID_", "sct2_Identifier_Auxiliary_"));
+                    privateIdentifiersFileUuid.getName().replace("sct2_IdentifierAuxiliary_UUID_", "sct2_IdentifierAuxiliary_"));
         }
         File statedRelFile = new File(terminology,
                 statedRelFileUuid.getName().replace("sct2_StatedRelationship_UUID_", "sct2_StatedRelationship_"));
@@ -392,8 +392,11 @@ public class UuidToSctIdWriter {
                 attributeValueFileUuid.getName().replace("der2_cRefset_AttributeValue_UUID", "der2_cRefset_AttributeValue"));
         File langRefsetsFile = new File(languageDir,
                 langRefsetsFileUuid.getName().replace("der2_cRefset_Language_UUID", "der2_cRefset_Language"));
-        File otherLangRefsetsFile = new File(languageDir,
+        File otherLangRefsetsFile = null;
+        if(otherLangRefsetsFileUuid != null){
+            otherLangRefsetsFile = new File(languageDir,
                 otherLangRefsetsFileUuid.getName().replace("der2_cRefset_Language_UUID", "der2_cRefset_Language"));
+        }
         File modDependFile = new File(metadata,
                 modDependFileUuid.getName().replace("der2_ssRefset_ModuleDependency_UUID", "der2_ssRefset_ModuleDependency"));
         File descTypeFile = new File(metadata,
@@ -414,6 +417,9 @@ public class UuidToSctIdWriter {
         if (privateIdentifiersFile != null) {
             FileOutputStream privIdOs = new FileOutputStream(privateIdentifiersFile);
             privateIdentifiersWriter = new BufferedWriter(new OutputStreamWriter(privIdOs, "UTF8"));
+            for (Rf2File.IdentifiersFileFields field : Rf2File.IdentifiersFileFields.values()) {
+                privateIdentifiersWriter.write(field.headerText + field.seperator);
+            }
         }
         FileOutputStream relStatedOs = new FileOutputStream(statedRelFile);
         relationshipsStatedWriter = new BufferedWriter(new OutputStreamWriter(relStatedOs, "UTF8"));
@@ -423,8 +429,10 @@ public class UuidToSctIdWriter {
         attributeValueWriter = new BufferedWriter(new OutputStreamWriter(attributeValueOs, "UTF8"));
         FileOutputStream langRefOs = new FileOutputStream(langRefsetsFile);
         langRefsetsWriter = new BufferedWriter(new OutputStreamWriter(langRefOs, "UTF8"));
-        FileOutputStream langOs = new FileOutputStream(otherLangRefsetsFile);
-        otherLangRefsetsWriter = new BufferedWriter(new OutputStreamWriter(langOs, "UTF8"));
+        if(otherLangRefsetsFile != null){
+            FileOutputStream langOs = new FileOutputStream(otherLangRefsetsFile);
+            otherLangRefsetsWriter = new BufferedWriter(new OutputStreamWriter(langOs, "UTF8"));
+        }
         FileOutputStream modDependOs = new FileOutputStream(modDependFile);
         modDependWriter = new BufferedWriter(new OutputStreamWriter(modDependOs, "UTF8"));
         FileOutputStream descTypeOs = new FileOutputStream(descTypeFile);
@@ -465,9 +473,11 @@ public class UuidToSctIdWriter {
         for (Rf2File.LanguageRefsetFileFields field : Rf2File.LanguageRefsetFileFields.values()) {
             langRefsetsWriter.write(field.headerText + field.seperator);
         }
-
-        for (Rf2File.LanguageRefsetFileFields field : Rf2File.LanguageRefsetFileFields.values()) {
-            otherLangRefsetsWriter.write(field.headerText + field.seperator);
+        
+        if (otherLangRefsetsWriter != null) {
+            for (Rf2File.LanguageRefsetFileFields field : Rf2File.LanguageRefsetFileFields.values()) {
+                otherLangRefsetsWriter.write(field.headerText + field.seperator);
+            }
         }
 
         for (Rf2File.ModuleDependencyFileFields field : Rf2File.ModuleDependencyFileFields.values()) {
@@ -1093,7 +1103,7 @@ private void processIdentifiers(String line, Writer writer) throws IOException {
                     break;
                 case VALUE_ID:
                     //concept
-                   String valueId = parts[Rf2File.AttribValueRefsetFileFields.REFSET_ID.ordinal()];
+                   String valueId = parts[Rf2File.AttribValueRefsetFileFields.VALUE_ID.ordinal()];
                         String valueSctId = getExistingSctId(valueId);
                         if (valueSctId == null) {
                             valueSctId = handler.getWithGeneration(UUID.fromString(valueId), SctIdGenerator.TYPE.CONCEPT).toString(); //TODO akf: subset?
