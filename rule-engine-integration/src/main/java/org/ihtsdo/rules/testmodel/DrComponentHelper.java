@@ -612,18 +612,10 @@ public class DrComponentHelper {
             for (int i = 0; i < i_IdentifyList.size(); i++) {
                 I_IdVersion i_IdVersion = (I_IdVersion) i_IdentifyList.get(i);
                 Object denotation = (Object) i_IdVersion.getDenotation();
-				Long idval = null;
-				Object ido = i_IdVersion.getDenotation();
-				if (ido instanceof String) {
-					idval = new Long((String) ido);
-				} else if (ido instanceof Long) {
-					idval = ((Long) ido);
-				}
-
-				int authorityNid = i_IdVersion.getAuthorityNid();
+                int authorityNid = i_IdVersion.getAuthorityNid();
                 int arcAuxSnomedIntegerNid = ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.localize().getNid();
                 if (authorityNid == arcAuxSnomedIntegerNid) {
-                    descriptionId = idval;
+                    descriptionId = (Long) denotation;
                 }
             }
         }
