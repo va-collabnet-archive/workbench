@@ -251,9 +251,9 @@ public class DragPanelDescription extends DragPanelComponentVersion<DescriptionA
         }
         if(lang.length() == 2){
             if(getDesc().isUncommitted()){
-                lang = "<html>" + lang + ":pt <font color='yellow'>US GB</font>"; 
+                lang = "<html><font color='yellow'>" + lang + ":pt US GB</font>"; 
             }else{
-               lang = "<html>" + lang + ":pt <font color='rgb(234,234,234)'>US GB</font>"; 
+               lang = "<html><font color='rgb(234,234,234)'>" + lang + ":pt US GB</font>"; 
             }
         }else if(lang.length() == 40 || lang.length() == 39){
             if(getDesc().isUncommitted()){
