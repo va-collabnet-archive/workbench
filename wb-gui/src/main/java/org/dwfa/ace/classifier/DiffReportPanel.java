@@ -154,8 +154,8 @@ public class DiffReportPanel extends JPanel {
         // set column widths
         // add drop column
         TableColumn tc = table.getColumnModel().getColumn(0);
-        tc.setMinWidth(32);
-        tc.setPreferredWidth(64);
+        tc.setMinWidth(60);
+        tc.setPreferredWidth(80);
         tc.setMaxWidth(128);
         // c1 source concept
         tc = table.getColumnModel().getColumn(1);
