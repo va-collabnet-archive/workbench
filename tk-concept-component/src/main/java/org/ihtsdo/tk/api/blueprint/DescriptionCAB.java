@@ -189,6 +189,8 @@ public class DescriptionCAB extends CreateOrAmendBlueprint {
      * @param descriptionVersion the description version to use as a pattern
      * @param viewCoordinate the view coordinate specifying which versions are
      * active and inactive
+     * @param idDirective
+     * @param refexDirective
      * @throws IOException signals that an I/O exception has occurred
      * @throws InvalidCAB if the any of the values in blueprint to make are
      * invalid

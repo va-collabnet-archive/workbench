@@ -46,7 +46,7 @@ public class TransformProcessor implements ProcessUnfetchedConceptDataBI{
 	private final Semaphore writeSemaphore = new Semaphore(1);
 
 	/** The watch uuids. */
-	private Set<UUID> watchUuids = new HashSet<>();
+	private Set<UUID> watchUuidSet = new HashSet<>();
 
 	/**
 	 * Instantiates a new transform processor.
@@ -59,10 +59,12 @@ public class TransformProcessor implements ProcessUnfetchedConceptDataBI{
                     allConcepts = Ts.get().getAllConceptNids();
                     this.transformer = transformer;
                     this.eConceptDOS = eConceptDOS;
-                    // <!-- Path origin reference set -->
-                    // watchUuids.add(UUID.fromString("1239b874-41b4-32a1-981f-88b448829b4b"));
-                    // <!-- Path reference set -->
-                    // watchUuids.add(UUID.fromString("fd9d47b7-c0a4-3eea-b3ab-2b5a3f9e888f"));
+                    // RF2 "Ischemia, viscera"
+                    // watchUuidSet.add(UUID.fromString("ae72b717-f028-766d-91ef-0216c2f5b505"));
+                    // RF1 "Ischemia, viscera"
+                    // watchUuidSet.add(UUID.fromString("e245603d-309e-567d-be11-647786e61a08"));                     
+                    // computed? "Ischemia, viscera"
+                    // watchUuidSet.add(UUID.fromString("2ebaaffa-5f6d-346e-8177-5374c8042879"));                     
                                 
                 } catch (IOException e) {
 			e.printStackTrace();
@@ -93,7 +95,7 @@ public class TransformProcessor implements ProcessUnfetchedConceptDataBI{
 		I_GetConceptData c = (I_GetConceptData) fetcher.fetch();
 		TkConcept eC;
 		try {
-			boolean watch = watchUuids.contains(c.getPrimUuid());
+			boolean watch = watchUuidSet.contains(c.getPrimUuid());
 			long ini = Calendar.getInstance().getTimeInMillis();
 
 			if (watch) {

@@ -33,6 +33,8 @@ import com.sleepycat.je.DatabaseException;
 import java.util.UUID;
 import org.ihtsdo.helper.time.TimeHelper;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
+import org.ihtsdo.tk.dto.concept.component.attribute.TkConceptAttributes;
+import org.ihtsdo.tk.dto.concept.component.identifier.TkIdentifier;
 
 public class EConceptChangeSetReader implements I_ReadChangeSet {
 
@@ -74,10 +76,20 @@ public class EConceptChangeSetReader implements I_ReadChangeSet {
 
     private transient List<I_ValidateChangeSetChanges> validators = new ArrayList<>();
 
-	private boolean fileContentMerged = false;
+    private boolean fileContentMerged = false;
+
+    /**
+     * The watch uuids.
+     */
+    private static HashSet<UUID> watchUuidSet;
 
     public EConceptChangeSetReader() {
         super();
+        watchUuidSet = new HashSet<>();
+        // RF2 "Ischemia, viscera"
+        // watchUuidSet.add(UUID.fromString("ae72b717-f028-766d-91ef-0216c2f5b505"));
+        // RF1 "Ischemia, viscera"
+        // watchUuidSet.add(UUID.fromString("e245603d-309e-567d-be11-647786e61a08"));        
     }
 
    @Override
@@ -202,12 +214,26 @@ public class EConceptChangeSetReader implements I_ReadChangeSet {
             return null;
         }
 
-//         if (eConcept.getPrimordialUuid().compareTo(UUID.fromString("9ef4e796-d5b9-538e-b1b4-43b4d9d7815a")) == 0) {
-//             System.out.println(":!!!:DEBUG: EConceptChangeSetReader ....CCC.... EDG Clinical Contextset Member Id\n" + eConcept.toString());
-//         }
-//         if (eConcept.getPrimordialUuid().compareTo(UUID.fromString("9db37d8b-9be4-5e92-8644-35fc12836e7f")) == 0) {
-//             System.out.println(":!!!:DEBUG: EConceptChangeSetReader ....CCC.... Ophthalmology Problem List\n" + eConcept.toString());
-//         }
+        // check concept UUID watch list 
+        if (watchUuidSet.contains(eConcept.getPrimordialUuid())) { // first check Primodial UUID
+            System.out.println("EConceptChangeSetReader.commitEConcept :: watch :: "
+                    + eConcept.getPrimordialUuid()
+                    + " (PRIMODIAL UUID)");
+        } else { // then conditionally check the additional IDs
+            TkConceptAttributes attrib = eConcept.getConceptAttributes();
+            if (attrib != null && attrib.additionalIds != null) {
+                List<TkIdentifier> aIds = attrib.additionalIds;
+                for (TkIdentifier tki : aIds) {
+                    if (tki.getDenotation().getClass().isAssignableFrom(UUID.class)) {
+                        if (watchUuidSet.contains((UUID) tki.getDenotation())) {
+                            System.out.println("EConceptChangeSetReader.commitEConcept :: watch :: "
+                                    + tki.getDenotation().toString()
+                                    + " (ADDITIONAL UUID)");
+                        }
+                    }
+                }
+            }
+        }
 
         try {
             assert time != Long.MAX_VALUE;

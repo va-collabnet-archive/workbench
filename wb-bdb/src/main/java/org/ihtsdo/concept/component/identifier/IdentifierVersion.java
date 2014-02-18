@@ -122,6 +122,8 @@ public abstract class IdentifierVersion
       ConceptComponent.addNidToBuffer(buf, authorityNid);
       buf.append(" path:");
       ConceptComponent.addNidToBuffer(buf, getPathId());
+      buf.append(" module:");
+      ConceptComponent.addNidToBuffer(buf, getModuleNid());
       buf.append(" tm:");
 
       if (getTime() == Long.MAX_VALUE) {

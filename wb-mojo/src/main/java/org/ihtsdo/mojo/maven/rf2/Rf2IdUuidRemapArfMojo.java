@@ -302,7 +302,7 @@ public class Rf2IdUuidRemapArfMojo
                             UuidT3Generator.fromSNOMED(sctIdL).toString());
                     
                     // UUID cUuid = UUID.fromString(Rf2x.convertSctIdToUuidStr(sctIdL));
-                    if (aUuid.compareTo(cUuid) != 0) {
+                    if (identifierScheme == sctUuidSchemeIdL && aUuid.compareTo(cUuid) != 0) {
                         countNonComputedIdsL++;
                         UuidUuidRecord tempIdCompact = new UuidUuidRecord(
                                 cUuid,
@@ -314,16 +314,20 @@ public class Rf2IdUuidRemapArfMojo
                 }
                 StringBuilder sb = new StringBuilder();
                 sb.append("\n::: parseToUuidRemapCacheFile(..) ");
+                sb.append("\n::: SNOMED CT UUID Schema (900000000000002006) cached");
+                if (idSchemeSet.size() > 0) {
+                   sb.append("\n::: Other UUID Schemas (900000000000002006) not cached");
+                }
                 sb.append("\n::: PARSED & WRITTEN TO UUID ID REMAP CACHE: ");
                 sb.append(f.file.toURI().toString());
                 if (idSchemeSet.size() > 0) {
                     Long[] idSchemeArray = idSchemeSet.toArray(new Long[0]);
                     for (Long long1 : idSchemeArray) {
-                        sb.append("\n::: WARNING unsupported id scheme: ");
+                        sb.append("\n::: ID Schema: ");
                         sb.append(long1.toString());
                     }
                 } else {
-                    sb.append("\n::: Schema OK (900000000000002006)");
+                    sb.append("\n::: SNOMED CT UUID Schema (900000000000002006)");
                 }
                 sb.append("\n::: countNonActive=");
                 sb.append(countNonActiveL);

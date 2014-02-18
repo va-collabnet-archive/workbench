@@ -77,9 +77,6 @@ public class FilterRedundantStatedRelsTransformer extends AbstractTransformer {
     private HashSet<UUID> skipPathUuidSet;
     private HashSet<UUID> refsetsToFilter;
     private HashSet<UUID> watchUuidSet;
-    // STATISTICS
-    private transient int totalMembersConverted = 0;
-    private int totalResidual;
     // REPORTS
     private final BufferedWriter reportWriter;
     private final BufferedWriter reportListGroup0AdditionsWriter;
@@ -150,7 +147,11 @@ public class FilterRedundantStatedRelsTransformer extends AbstractTransformer {
             refsetsToFilter.add(UUID.fromString(loopValue));
         }
         watchUuidSet = new HashSet();
-        watchUuidSet.add(UUID.fromString("1adb3f25-66be-47a8-a024-efe8b31146e6")); // KPET CMT Project release candidate path
+        // RF2 "Ischemia, viscera"
+        // watchUuidSet.add(UUID.fromString("ae72b717-f028-766d-91ef-0216c2f5b505"));
+        // RF1 "Ischemia, viscera"
+        // watchUuidSet.add(UUID.fromString("e245603d-309e-567d-be11-647786e61a08"));
+        // watchUuidSet.add(UUID.fromString("1adb3f25-66be-47a8-a024-efe8b31146e6")); // KPET CMT Project release candidate path
         // watchUuidSet.add(UUID.fromString("3770e517-7adc-5a24-a447-77a9daa3eedf")); // KPET CMT Project development path
         // watchUuidSet.add(UUID.fromString("098eed03-204c-5bf0-91c0-3c9610beec6b")); // KPET CMT Project development origin path
         // watchUuidSet.add(UUID.fromString("2bfc4102-f630-5fbe-96b8-625f2a6b3d5a")); // KPET Extension Path
@@ -271,7 +272,6 @@ public class FilterRedundantStatedRelsTransformer extends AbstractTransformer {
             if (logicalRel.relSctIdPath != null
                     && isExtensionSctId(logicalRel.relSctId)
                     && eConcept.getConceptAttributes().pathUuid.compareTo(snomedCorePathUuid) == 0) {
-                totalResidual++;
                 reportWriter.append(toStr("group0 addition to snomed", eConcept, logicalRel));
                 reportListGroup0AdditionsWriter.append(toStrList(eConcept));
             }
@@ -295,11 +295,8 @@ public class FilterRedundantStatedRelsTransformer extends AbstractTransformer {
             return false;
         }
         String nameSpaceIdentifier = sctidStr.substring(length - 10, length - 3);
-        if (nameSpaceIdentifier.equalsIgnoreCase("1000119")) {
-            // :NYI: "1000119" needs to be generalized for broader applications
-            return true;
-        }
-        return false;
+        // :NYI: needs to be generalized.  "1000119" is KP namespace
+        return nameSpaceIdentifier.equalsIgnoreCase("1000119");
     }
 
     private String toStr(String s, TkConcept eConcept, LogicalRel rel) throws IOException {

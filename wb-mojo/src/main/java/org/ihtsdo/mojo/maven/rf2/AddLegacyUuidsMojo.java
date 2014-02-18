@@ -46,8 +46,10 @@ import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 import org.ihtsdo.tk.dto.concept.TkConcept;
 import org.ihtsdo.tk.dto.concept.component.attribute.TkConceptAttributes;
 import org.ihtsdo.tk.dto.concept.component.description.TkDescription;
+import org.ihtsdo.tk.dto.concept.component.identifier.IDENTIFIER_PART_TYPES;
 import org.ihtsdo.tk.dto.concept.component.identifier.TkIdentifier;
 import org.ihtsdo.tk.dto.concept.component.identifier.TkIdentifierUuid;
+import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationship;
 import org.ihtsdo.tk.uuid.UuidT3Generator;
 
 /**
@@ -76,8 +78,8 @@ public class AddLegacyUuidsMojo extends AbstractMojo {
      */
     private final String generatedSourcesDir = "generated-sources";
     /**
-     * Input Directory.<br> The directory array parameter supported extensions
-     * via separate directories in the array.
+     * Input Directory.<br> The directory array parameter supported extensions via separate
+     * directories in the array.
      *
      * @parameter
      */
@@ -103,60 +105,68 @@ public class AddLegacyUuidsMojo extends AbstractMojo {
     private final String authorUuid = "f7495b58-6630-3499-a44e-2052b5fcf06c";
     private UUID aUuid;
     /**
-     * defaults to Module (core metadata concept)
-     *
      * @parameter
      * @required
      */
-    private final String moduleUuid = "40d1c869-b509-32f8-b735-836eac577a67";
-    private UUID mUuid;
+    private final String idSchemeUuid = "a27dce27-22d8-5729-8d3c-10b2708ef366";
+    private UUID schemeIdAuthorityUuid;
     /**
-     * defaults to SNOMED Core
-     *
      * @parameter
      * @required
      */
-    private final String pathUuid = "8c230474-9f11-30ce-9cad-185a96fd03a2";
-    private UUID pUuid;
+    private final String moduleUuid = "815d5052-4fd5-599f-b996-4640eb166eeb";
+    private UUID schemeModuleUuid;
     /**
-     * defaults to SNOMED Core
-     *
+     * @parameter
+     * @required
+     */
+    private final String pathUuid = "2bfc4102-f630-5fbe-96b8-625f2a6b3d5a";
+    private UUID schemePathUuid;
+    /**
      * @parameter
      */
     String addUuidFromDir = "pre";
     /**
-     * defaults to SNOMED Core
-     *
      * @parameter
      */
     String addUuidFromFileName = "eConcepts.jbin";
     /**
-     * defaults to SNOMED Core
-     *
      * @parameter
      */
     String addUuidToDir = "pre";
     /**
-     * defaults to SNOMED Core
-     *
      * @parameter
      */
     String addUuidToFileName = "eConceptsWithLegacyUuids.jbin";
 
+    /**
+     * The watch uuids.
+     */
+    private static HashSet<UUID> watchUuidSet;
+    
+    private final UUID SNOMED_CORE_PATH_UUID = UUID.fromString("8c230474-9f11-30ce-9cad-185a96fd03a2");
+
+
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
+        watchUuidSet = new HashSet<>();
+        // RF2 "Ischemia, viscera" -- SNOMED ASSIGNED
+        // watchUuidSet.add(UUID.fromString("ae72b717-f028-766d-91ef-0216c2f5b505"));
+        // RF1 "Ischemia, viscera" -- KP Created, then submitted ?
+        // watchUuidSet.add(UUID.fromString("e245603d-309e-567d-be11-647786e61a08"));
+        // RF? "Ischemia, viscera" -- Computed ??
+        // watchUuidSet.add(UUID.fromString("2ebaaffa-5f6d-346e-8177-5374c8042879"));
+
         this.aUuid = UUID.fromString(authorUuid);
-        this.mUuid = UUID.fromString(moduleUuid);
-        this.pUuid = UUID.fromString(pathUuid);
+        this.schemeIdAuthorityUuid = UUID.fromString(idSchemeUuid);
+        this.schemeModuleUuid = UUID.fromString(moduleUuid);
+        this.schemePathUuid = UUID.fromString(pathUuid);
         getLog().info("AddLegacyUuidsMojo : adds legacy computed uuids ");
         // SHOW DIRECTORIES
         String wDir = targetDirectory.getAbsolutePath();
-        getLog().info("  POM       Target Directory:           "
-                + targetDirectory.getAbsolutePath());
-        getLog().info("  POM generated-source Directory:       "
-                + generatedSourcesDir);
-        getLog().info("  POM ID SCT/UUID Cache Directory:      "
-                + idCacheDir);
+        getLog().info(":::           Target Dir: " + targetDirectory.getAbsolutePath());
+        getLog().info("::: generated-source Dir: " + generatedSourcesDir);
+        getLog().info(":::   SCT/UUID Cache Dir: " + idCacheDir);
 
         // Setup cache paths
         String cachePath = wDir + FILE_SEPARATOR + idCacheDir + FILE_SEPARATOR;
@@ -165,12 +175,14 @@ public class AddLegacyUuidsMojo extends AbstractMojo {
             getLog().info("::: UUID Remap Cache : " + idCacheFName);
         }
 
+        // create actual to computed SNOMED cUUID/aUUID map cache
         CreateUuidRemapCache(wDir, idCacheFName);
 
         try {
 
+            // load SNOMED cUUID/aUUID map cache into object
             UuidUuidRemapper idLookup = new UuidUuidRemapper(idCacheFName);
-            idLookup.setupReverseLookup();
+            idLookup.setupReverseLookup(); // create aUUID/cUUID
 
             SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             effectiveTimeL = formatter.parse(effectiveTime).getTime();
@@ -192,7 +204,7 @@ public class AddLegacyUuidsMojo extends AbstractMojo {
         getLog().info("::: BEGIN Rf2IdUuidRemapArfMojo");
         try {
 
-            // Parse IHTSDO Terminology Identifiers to Sct_CompactId cache file.
+            // Parse IHTSDO Terminology Identifiers to UuidUuidRecord cache file.
             filesIn = Rf2File.getFiles(wDir, generatedSourcesDir, snomedIdInputDir,
                     "_Identifier_", ".txt");
             parseToUuidRemapCacheFile(filesIn, idCacheFName);
@@ -276,8 +288,15 @@ public class AddLegacyUuidsMojo extends AbstractMojo {
                             UUID cUuid = UUID.fromString(
                                     UuidT3Generator.fromSNOMED(sctIdL).toString());
 
+                            if (watchUuidSet.contains(aUuid)) {
+                                System.out.println("AddLegacyUuid.parseToUuidRemapCacheFile :: watch :: "
+                                        + aUuid.toString()
+                                        + " :: found in :: "
+                                        + f.file.getName());
+                            }
+
                             // UUID cUuid = UUID.fromString(Rf2x.convertSctIdToUuidStr(sctIdL));
-                            if (aUuid.compareTo(cUuid) != 0) {
+                            if (identifierScheme == sctUuidSchemeIdL && aUuid.compareTo(cUuid) != 0) {
                                 countNonComputedIdsL++;
                                 UuidUuidRecord tempIdCompact = new UuidUuidRecord(
                                         cUuid,
@@ -289,16 +308,20 @@ public class AddLegacyUuidsMojo extends AbstractMojo {
                         }
                         StringBuilder sb = new StringBuilder();
                         sb.append("\n::: parseToUuidRemapCacheFile(..) ");
+                        sb.append("\n::: SNOMED CT UUID Scheme (900000000000002006) cached");
+                        if (idSchemeSet.size() > 0) {
+                            sb.append("\n::: Other UUID Schemes (900000000000002006) not cached");
+                        }
                         sb.append("\n::: PARSED & WRITTEN TO UUID ID REMAP CACHE: ");
                         sb.append(f.file.toURI().toString());
                         if (idSchemeSet.size() > 0) {
                             Long[] idSchemeArray = idSchemeSet.toArray(new Long[0]);
                             for (Long long1 : idSchemeArray) {
-                                sb.append("\n::: WARNING unsupported id scheme: ");
+                                sb.append("\n::: ID Scheme: ");
                                 sb.append(long1.toString());
                             }
                         } else {
-                            sb.append("\n::: Schema OK (900000000000002006)");
+                            sb.append("\n::: SNOMED CT UUID Scheme (900000000000002006)");
                         }
                         sb.append("\n::: countNonActive=");
                         sb.append(countNonActiveL);
@@ -365,20 +388,17 @@ public class AddLegacyUuidsMojo extends AbstractMojo {
                 getLog().info("::: AddLegacyUuids: output file closed");
                 break;
             }
-            addLegacyUuidsToEConcept(tkConcept, idLookup);
+            addLegacyUuidsToEConceptWithIdScheme(tkConcept, idLookup);
             tkConcept.writeExternal(dos);
         }
 
     }
 
     /*
-     * if primordial_uuid had remap_uuid
-     * then check for remap_uuid in additional_uuids
-     * if remap_uuid not in additional_uuids
-     * then add remap_uuid to additional_uuids 
+     * if primordial_uuid had remap_uuid then check for remap_uuid in additional_uuids
+     * if remap_uuid not in additional_uuids then add remap_uuid to additional_uuids 
      * ... allocate additional_uuids if needed
      */
-
     private TkConcept addLegacyUuidsToEConcept(TkConcept tkConcept,
             UuidUuidRemapper idLookup) {
         // Concept Attributes
@@ -389,6 +409,27 @@ public class AddLegacyUuidsMojo extends AbstractMojo {
         } else {
             getLog().info("AddLegacyUuidsMojo: warning concept without attributes: "
                     + tkConcept.primordialUuid.toString());
+        }
+
+        // check concept UUID watch list 
+        if (watchUuidSet.contains(tkConcept.getPrimordialUuid())) {
+            System.out.println("AddLegacyUuid.addLegacyUuidsToEConcept :: watch :: "
+                    + tkConcept.getPrimordialUuid()
+                    + " (PRIMODIAL UUID)");
+        } else {
+            TkConceptAttributes attrib = tkConcept.getConceptAttributes();
+            if (attrib != null & attrib.additionalIds != null) {
+                List<TkIdentifier> aIds = attrib.additionalIds;
+                for (TkIdentifier tki : aIds) {
+                    if (tki.getDenotation().getClass().isAssignableFrom(UUID.class)) {
+                        if (watchUuidSet.contains((UUID) tki.getDenotation())) {
+                            System.out.println("AddLegacyUuid.addLegacyUuidsToEConcept :: watch :: "
+                                    + tki.getDenotation().toString()
+                                    + " (ADDITIONAL UUID)");
+                        }
+                    }
+                }
+            }
         }
 
         // Descriptions
@@ -406,15 +447,74 @@ public class AddLegacyUuidsMojo extends AbstractMojo {
 //                processIdList(tkConcept.primordialUuid, tkr.additionalIds, idLookup);
 //            }
 //        }
-
         // Refset Members
 //        List<TkRefexAbstractMember<?>> memberList = tkConcept.getRefsetMembers();
 //        if (memberList != null) {
 //            for (TkRefexAbstractMember<?> tkram : memberList) {
-//                processIdList(tkConcept.primordialUuid, tkram.additionalIds, idLookup);
+        //                processIdList(tkConcept.primordialUuid, tkram.additionalIds, idLookup);
 //            }
 //        }
+        return tkConcept;
+    }
 
+    private TkConcept addLegacyUuidsToEConceptWithIdScheme(TkConcept tkConcept,
+            UuidUuidRemapper idLookup) {
+        // check concept UUID watch list 
+        if (watchUuidSet.contains(tkConcept.getPrimordialUuid())) {
+            System.out.println("AddLegacyUuidsMojo.addLegacyUuidsToEConceptWithIdScheme :: watch :: "
+                    + tkConcept.getPrimordialUuid()
+                    + " (PRIMODIAL UUID)");
+        } else {
+            TkConceptAttributes attrib = tkConcept.getConceptAttributes();
+            if (attrib != null & attrib.additionalIds != null) {
+                List<TkIdentifier> aIds = attrib.additionalIds;
+                for (TkIdentifier tki : aIds) {
+                    if (tki.getDenotation().getClass().isAssignableFrom(UUID.class)) {
+                        if (watchUuidSet.contains((UUID) tki.getDenotation())) {
+                            System.out.println("AddLegacyUuidsMojo.addLegacyUuidsToEConceptWithIdScheme :: watch :: "
+                                    + tki.getDenotation().toString()
+                                    + " (ADDITIONAL UUID)");
+                        }
+                    }
+                }
+            }
+        }
+
+        // Concept Attributes
+        TkConceptAttributes attribs = tkConcept.getConceptAttributes();
+        if (attribs != null) {
+            attribs.additionalIds = processIdListWithIdScheme(tkConcept.primordialUuid,
+                    attribs.pathUuid,
+                    attribs.additionalIds, idLookup, tkConcept.conceptAttributes.time);
+        } else {
+            getLog().info("AddLegacyUuidsMojo: warning concept without attributes: "
+                    + tkConcept.primordialUuid.toString());
+        }
+
+        // Descriptions
+        List<TkDescription> descriptionList = tkConcept.getDescriptions();
+        if (descriptionList != null) {
+            for (TkDescription tkd : descriptionList) {
+                tkd.additionalIds = processIdListWithIdScheme(
+                        tkd.primordialUuid, tkd.pathUuid, 
+                        tkd.additionalIds, idLookup, tkd.time);
+            }
+        }
+        // Relationships
+        List<TkRelationship> relationshipList = tkConcept.getRelationships();
+        if (relationshipList != null) {
+            for (TkRelationship tkr : relationshipList) {
+                processIdListWithIdScheme(tkr.primordialUuid, tkr.pathUuid,
+                        tkr.additionalIds, idLookup, tkr.time);
+            }
+        }
+        // Refset Members
+//        List<TkRefexAbstractMember<?>> memberList = tkConcept.getRefsetMembers();
+//        if (memberList != null) {
+//            for (TkRefexAbstractMember<?> tkram : memberList) {
+//                processIdListWithIdScheme(tkConcept.primordialUuid, tkram.additionalIds, idLookup);
+//            }
+//        }
         return tkConcept;
     }
 
@@ -425,8 +525,21 @@ public class AddLegacyUuidsMojo extends AbstractMojo {
         tmpEIdentifierUuid.statusUuid = SnomedMetadataRf2.ACTIVE_VALUE_RF2.getUuids()[0];
         tmpEIdentifierUuid.time = effectiveTimeL;
         tmpEIdentifierUuid.authorUuid = aUuid;
-        tmpEIdentifierUuid.moduleUuid = this.mUuid;
-        tmpEIdentifierUuid.pathUuid = this.pUuid;
+        tmpEIdentifierUuid.moduleUuid = this.schemeModuleUuid;
+        tmpEIdentifierUuid.pathUuid = this.schemePathUuid;
+        return tmpEIdentifierUuid;
+    }
+
+    private EIdentifierUuid createNewEIdentifierUuidWithIdScheme(UUID uuid, long timeL) {
+        EIdentifierUuid tmpEIdentifierUuid = new EIdentifierUuid();
+        tmpEIdentifierUuid.denotation = uuid;
+        // tmpEIdentifierUuid.authorityUuid = TkIdentifierUuid.generatedUuid;
+        tmpEIdentifierUuid.authorityUuid = this.schemeIdAuthorityUuid;
+        tmpEIdentifierUuid.statusUuid = SnomedMetadataRf2.ACTIVE_VALUE_RF2.getUuids()[0];
+        tmpEIdentifierUuid.time = timeL;
+        tmpEIdentifierUuid.authorUuid = aUuid;
+        tmpEIdentifierUuid.moduleUuid = this.schemeModuleUuid;
+        tmpEIdentifierUuid.pathUuid = this.schemePathUuid;
         return tmpEIdentifierUuid;
     }
 
@@ -444,7 +557,7 @@ public class AddLegacyUuidsMojo extends AbstractMojo {
                 Boolean foundInList = false;
                 for (TkIdentifier tkIdentifier : additionalIds) {
                     if (tkIdentifier.authorityUuid.compareTo(TkIdentifierUuid.generatedUuid) == 0) {
-                        UUID denotation = ((TkIdentifierUuid)tkIdentifier).denotation;
+                        UUID denotation = ((TkIdentifierUuid) tkIdentifier).denotation;
                         if (denotation.compareTo(remapUuid) == 0) {
                             foundInList = true;
                         }
@@ -453,6 +566,54 @@ public class AddLegacyUuidsMojo extends AbstractMojo {
                 if (!foundInList) {
                     additionalIds.add(tmpId);
                 }
+                return additionalIds;
+            }
+        }
+        return additionalIds;
+    }
+
+    private List<TkIdentifier> processIdListWithIdScheme(UUID primordialUuid,
+            UUID primordialPath,
+            List<TkIdentifier> additionalIds,
+            UuidUuidRemapper idLookup,
+            long timeL) {
+
+        ArrayList<TkIdentifier> existingAdditionalUuids = new ArrayList<>();
+        if (additionalIds != null) {
+            for (TkIdentifier tki : additionalIds) {
+                IDENTIFIER_PART_TYPES tkiType = tki.getIdType();
+                if (tkiType.compareTo(IDENTIFIER_PART_TYPES.UUID) == 0) {
+                    existingAdditionalUuids.add(tki);
+                }
+            }
+        }
+        if (existingAdditionalUuids.size() >= 2) {
+            throw new UnsupportedOperationException("AddLegacyUuidsMojo: case not implemented, existingAdditionalUuids.size() >= 2");
+        } else if (existingAdditionalUuids.size() == 1) {
+            existingAdditionalUuids.get(0).authorityUuid = schemeIdAuthorityUuid;
+        } else { // no existing uuid
+            UUID remapUuid = idLookup.getComputedUuid(primordialUuid);
+            EIdentifierUuid tmpId;
+            
+            if(primordialPath.compareTo(SNOMED_CORE_PATH_UUID) != 0 &&
+                    remapUuid != null) {
+                throw new UnsupportedOperationException("AddLegacyUuidsMojo: case not implemented, !SNOMED_CORE_PATH_UUID && remapUuid != null");
+            }
+            
+            if (remapUuid != null) {
+                tmpId = createNewEIdentifierUuidWithIdScheme(remapUuid, timeL);
+            } else {
+                tmpId = createNewEIdentifierUuidWithIdScheme(primordialUuid, timeL);
+            }
+            
+            
+            // create additionalIds list if not present
+            if (additionalIds == null) {
+                ArrayList<TkIdentifier> tmpAdditionalIds = new ArrayList<>();
+                tmpAdditionalIds.add(tmpId);
+                return tmpAdditionalIds;
+            } else {
+                additionalIds.add(tmpId);
                 return additionalIds;
             }
         }
@@ -473,7 +634,7 @@ public class AddLegacyUuidsMojo extends AbstractMojo {
                 Boolean foundInList = false;
                 for (TkIdentifier tkIdentifier : additionalIds) {
                     if (tkIdentifier.authorityUuid.compareTo(TkIdentifierUuid.generatedUuid) == 0) {
-                        UUID denotation = ((TkIdentifierUuid)tkIdentifier).denotation;
+                        UUID denotation = ((TkIdentifierUuid) tkIdentifier).denotation;
                         if (denotation.compareTo(remapUuid) == 0) {
                             foundInList = true;
                         }

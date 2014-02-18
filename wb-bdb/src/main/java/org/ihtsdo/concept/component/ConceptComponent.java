@@ -2308,7 +2308,7 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         @Override
         public int getModuleNid() {
             if ((index >= 0) && (additionalIdVersions != null) && (index < additionalIdVersions.size())) {
-                return getMutableIdPart().getPathNid();
+                return getMutableIdPart().getModuleNid();
             }
 
             return Bdb.getSapDb().getModuleNid(primordialSapNid);

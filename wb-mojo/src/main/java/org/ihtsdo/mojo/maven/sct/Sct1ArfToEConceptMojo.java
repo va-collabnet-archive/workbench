@@ -3298,9 +3298,9 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
 
     // UUID OF INTEREST
     // ICD-0-3 == cff53f1a-1d11-5ae7-801e-d3301cfdbea0
-//    private static final UUID debugUuid01 = UUID.fromString("445d932f-f552-3b4b-a323-3a06f1d26d98");
-    //private static final UUID debugUuid02 = UUID.fromString("daa9598a-2ddb-5527-beda-ee4303a7656c");
-    //private static final UUID debugUuid03 = UUID.fromString("3ca0d065-06b8-596c-8ca0-e4d2a605701c");
+    // private static final UUID debugUuid01 = UUID.fromString("ae72b717-f028-766d-91ef-0216c2f5b505");
+    // private static final UUID debugUuid02 = UUID.fromString("e245603d-309e-567d-be11-647786e61a08");
+    // private static final UUID debugUuid03 = UUID.fromString("2ebaaffa-5f6d-346e-8177-5374c8042879");
     private void createEConcept(ArrayList<Sct1_ConRecord> conList,
             ArrayList<Sct1_DesRecord> desList, ArrayList<Sct1_RelRecord> relList,
             ArrayList<Sct1_RelDestRecord> relDestList, ArrayList<Sct1_RefSetRecord> rsByConList,
@@ -4095,9 +4095,12 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
 
         try {
             ec.writeExternal(dos);
-//            if (theConUUID.compareTo(debugUuid01) == 0) {
-//                getLog().info(":DEBUG: "  + ec);
-//            }
+//             if (theConUUID.compareTo(debugUuid01) == 0 ||
+//                 theConUUID.compareTo(debugUuid02) == 0 ||
+//                 theConUUID.compareTo(debugUuid03) == 0
+//                  ) {
+//                 getLog().info(":DEBUG: "  + ec);
+//             }
 
             countEConWritten++;
             if (countEConWritten % 50000 == 0) {
