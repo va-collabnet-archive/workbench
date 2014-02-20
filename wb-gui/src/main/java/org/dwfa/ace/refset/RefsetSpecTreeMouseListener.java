@@ -500,6 +500,7 @@ public class RefsetSpecTreeMouseListener extends MouseAdapter {
                 } else {
                     // retire only the clause as it has no children to deal with
                     retireClause(thinExtByRefTuple);
+                    Terms.get().addUncommitted(Terms.get().getConcept(clauseBeingRetired.getRefsetId()));
                 }
 
             } catch (IOException e) {
@@ -556,7 +557,6 @@ public class RefsetSpecTreeMouseListener extends MouseAdapter {
                 helper.newLongRefsetExtension(editTimeConcept.getConceptNid(), specConcept.getConceptNid(), System
                     .currentTimeMillis());
     }
-//            Terms.get().addUncommitted(currentExtVersion.getCore());
         }
     }
 
