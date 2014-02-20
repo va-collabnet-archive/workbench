@@ -377,6 +377,8 @@ public class QueryToSpecBuilder implements QueryBuilderBI{
             tokenNid = QUERY_TOKENS.CHANGED_DESCRIPTION_STATUS.nid;
         }else if(t.equals(TOKENS.CHANGED_DEFINED)){
             tokenNid = QUERY_TOKENS.CHANGED_CONCEPT_DEFINED.nid;
+        }else if(t.equals(TOKENS.CHANGED_REL_GROUP)){
+            tokenNid = QUERY_TOKENS.CHANGED_RELATIONSHIP_GROUP.nid;
         }else if(s != null && s.equals(Subsumption.IS)){
             if(t.equals(TOKENS.REL_CHARACTERISTIC)){
                 tokenNid = QUERY_TOKENS.REL_CHARACTERISTIC_IS.nid;

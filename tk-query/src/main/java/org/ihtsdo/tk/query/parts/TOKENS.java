@@ -51,5 +51,9 @@ public enum TOKENS {
     /**
      * Represents changed concept definition.
      */
-    CHANGED_DEFINED;
+    CHANGED_DEFINED,
+    /**
+     * Represented changed relationship group.
+     */
+    CHANGED_REL_GROUP;
 }

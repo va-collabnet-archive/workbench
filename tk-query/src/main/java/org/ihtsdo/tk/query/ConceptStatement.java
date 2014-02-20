@@ -425,7 +425,7 @@ public class ConceptStatement extends RefsetSpecStatement {
 //            ConceptVersionBI a2 = concept.getVersion(v2_is);
             ConceptAttributeVersionBI ca1 = concept.getConceptAttributes().getVersion(v1_is);
             ConceptAttributeVersionBI ca2 = concept.getConceptAttributes().getVersion(v2_is);
-            return (ca1 != null
+            return (ca1 != null && ca2 != null
                     && ca1.isDefined() != ca2.isDefined());
         } catch (Exception e) {
             throw new IOException(e);

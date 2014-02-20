@@ -17,20 +17,31 @@
 package org.ihtsdo.tk.query;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.UUID;
 
 import org.dwfa.tapi.ComputationCanceled;
+import org.dwfa.util.id.Type5UuidFactory;
 import org.ihtsdo.helper.time.TimeHelper;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ComponentChronicleBI;
 import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.NidBitSetBI;
+import org.ihtsdo.tk.api.NidSet;
+import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.TerminologyStoreDI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
+import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf1;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 import org.ihtsdo.tk.query.RefsetSpecQuery.GROUPING_TYPE;
 
 /**
@@ -582,9 +593,88 @@ public class RelationshipStatement extends RefsetSpecStatement {
             ViewCoordinate v1_is, ViewCoordinate v2_is)
             throws IOException {
         try {
+                       //            if v2 has a relationship that is semantically the same as v1, then return false
+            //            only care about active
+            NidSetBI activeNids = new NidSet();
+            activeNids.add(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid());
+            activeNids.add(SnomedMetadataRf1.CURRENT_RF1.getLenient().getNid());
+            ViewCoordinate v1Active = new ViewCoordinate(v1_is);
+            v1Active.setAllowedStatusNids(activeNids);
+            ViewCoordinate v2Active = new ViewCoordinate(v2_is);
+            v2Active.setAllowedStatusNids(activeNids);
             RelationshipVersionBI a1 = relBeingTested.getVersion(v1_is);
             RelationshipVersionBI a2 = relBeingTested.getVersion(v2_is);
-            return (a1 == null && a2 != null);
+            if (a1 == null && a2 != null && a2.getStatusNid() == SnomedMetadataRfx.getSTATUS_CURRENT_NID()) {
+                ConceptChronicleBI enclosingConcept = relBeingTested.getEnclosingConcept();
+
+                UUID v2Hash = null;
+                if (a2.getGroup() == 0) {
+                    v2Hash = Type5UuidFactory.get(Ts.get().getUuidPrimordialForNid(a2.getSourceNid()).toString()
+                            + Ts.get().getUuidPrimordialForNid(a2.getTypeNid()).toString()
+                            + Ts.get().getUuidPrimordialForNid(a2.getTargetNid()).toString()
+                            + Ts.get().getUuidPrimordialForNid(a2.getCharacteristicNid()).toString());
+                } else {
+                    String groupHash = null;
+                    int group = a2.getGroup();
+                    ConceptVersionBI v2Concept = enclosingConcept.getVersion(v2Active);
+                    Collection<? extends RelationshipVersionBI> v2Rels = v2Concept.getRelationshipsOutgoingActive();
+                    ArrayList<String> hashes = new ArrayList<>();
+                    String hash = null;
+                    for (RelationshipVersionBI rel : v2Rels) {
+                        if (rel.getGroup() == group && a2.getCharacteristicNid() == rel.getCharacteristicNid()) {
+                            hash = Ts.get().getUuidPrimordialForNid(rel.getSourceNid()).toString()
+                                    + Ts.get().getUuidPrimordialForNid(rel.getTypeNid()).toString()
+                                    + Ts.get().getUuidPrimordialForNid(rel.getTargetNid()).toString()
+                                    + Ts.get().getUuidPrimordialForNid(rel.getCharacteristicNid()).toString();
+                            hashes.add(hash);
+                        }
+                    }
+                    Collections.sort(hashes);
+                    for (String s : hashes) {
+                        groupHash = groupHash + s;
+                    }
+                    v2Hash = Type5UuidFactory.get(groupHash);
+                }
+
+                ConceptVersionBI v1Concept = enclosingConcept.getVersion(v1Active);
+                Collection<? extends RelationshipVersionBI> v1Rels = v1Concept.getRelationshipsOutgoingActive();
+                HashSet<UUID> v1RelHashes = new HashSet<>();
+                for (RelationshipVersionBI rel : v1Rels) {
+                    if (rel.getGroup() == 0) {
+                        UUID hash = Type5UuidFactory.get(Ts.get().getUuidPrimordialForNid(rel.getSourceNid()).toString()
+                                + Ts.get().getUuidPrimordialForNid(rel.getTypeNid()).toString()
+                                + Ts.get().getUuidPrimordialForNid(rel.getTargetNid()).toString()
+                                + Ts.get().getUuidPrimordialForNid(rel.getCharacteristicNid()).toString());
+                        v1RelHashes.add(hash);
+                    } else {
+                        int group = rel.getGroup();
+                        ArrayList<String> hashes = new ArrayList<>();
+                        String hash = null;
+                        for (RelationshipVersionBI r : v1Rels) {
+                            if (r.getGroup() == group && r.getCharacteristicNid() == rel.getCharacteristicNid()) {
+                                hash = Ts.get().getUuidPrimordialForNid(r.getSourceNid()).toString()
+                                        + Ts.get().getUuidPrimordialForNid(r.getTypeNid()).toString()
+                                        + Ts.get().getUuidPrimordialForNid(r.getTargetNid()).toString()
+                                        + Ts.get().getUuidPrimordialForNid(r.getCharacteristicNid()).toString();
+                                hashes.add(hash);
+                            }
+                        }
+                        Collections.sort(hashes);
+                        String groupHash = null;
+                        for (String s : hashes) {
+                            groupHash = groupHash + s;
+                        }
+                        v1RelHashes.add(Type5UuidFactory.get(groupHash));
+                    }
+                }
+
+                if (v1RelHashes.contains(v2Hash)) {
+                    return false;
+                } else {
+                    return true;
+                }
+            }
+            return false;
         } catch (Exception e) {
             e.printStackTrace();
             throw new IOException(e.getMessage());
@@ -663,11 +753,107 @@ public class RelationshipStatement extends RefsetSpecStatement {
         try {
             RelationshipVersionBI a1 = relBeingTested.getVersion(v1_is);
             RelationshipVersionBI a2 = relBeingTested.getVersion(v2_is);
-            return (a1 != null
+            if (a1 != null
                     && a2 != null
                     && !(a1.getPathNid() == a2.getPathNid()
                     && a1.getTime() == a2.getTime())
-                    && a1.getTypeNid() != a2.getTypeNid());
+                    && a1.getStatusNid() != a2.getStatusNid()) {
+                UUID v1Hash = null;
+                if (a1.getGroup() == 0) {
+                    v1Hash = Type5UuidFactory.get(Ts.get().getUuidPrimordialForNid(a1.getSourceNid()).toString()
+                            + Ts.get().getUuidPrimordialForNid(a1.getTypeNid()).toString()
+                            + Ts.get().getUuidPrimordialForNid(a1.getTargetNid()).toString()
+                            + Ts.get().getUuidPrimordialForNid(a1.getCharacteristicNid()).toString()
+                            + Ts.get().getUuidPrimordialForNid(a1.getStatusNid()).toString());
+                } else {
+                    String groupHash = null;
+                    int group = a1.getGroup();
+                    ConceptVersionBI v1Concept = a1.getEnclosingConcept().getVersion(v1_is);
+                    Collection<? extends RelationshipVersionBI> v1Rels = v1Concept.getRelationshipsOutgoingActive();
+                    ArrayList<String> hashes = new ArrayList<>();
+                    String hash = null;
+                    for (RelationshipVersionBI rel : v1Rels) {
+                        if (rel.getGroup() == group && a1.getCharacteristicNid() == rel.getCharacteristicNid()) {
+                            if(rel.getCharacteristicNid() == SnomedMetadataRfx.getREL_CH_INFERRED_RELATIONSHIP_NID() 
+                                    && rel.getStatusNid() == SnomedMetadataRfx.getSTATUS_CURRENT_NID()){
+                               RelationshipVersionBI mergeVersion = (RelationshipVersionBI) rel.getChronicle().getVersion(v2_is);
+                                if(mergeVersion != null && (mergeVersion.getTime() > rel.getTime())){
+                                    //there has been a classification on the merge path that retired the classificaiton on the target path
+                                    //should use this instead
+                                    rel = mergeVersion;
+                                }
+                            }
+                            hash = Ts.get().getUuidPrimordialForNid(rel.getSourceNid()).toString()
+                                    + Ts.get().getUuidPrimordialForNid(rel.getTypeNid()).toString()
+                                    + Ts.get().getUuidPrimordialForNid(rel.getTargetNid()).toString()
+                                    + Ts.get().getUuidPrimordialForNid(rel.getCharacteristicNid()).toString()
+                                    + Ts.get().getUuidPrimordialForNid(rel.getStatusNid()).toString();
+                            //classifier creates duplicate relationships these should not be considered
+                            if(rel.getCharacteristicNid() == SnomedMetadataRfx.getREL_CH_INFERRED_RELATIONSHIP_NID()){
+                                if(!hashes.contains(hash)){
+                                    hashes.add(hash);
+                                }
+                            }else{
+                                hashes.add(hash);
+                            }
+                        }
+                    }
+                    Collections.sort(hashes);
+                    for (String s : hashes) {
+                        groupHash = groupHash + s;
+                    }
+                    v1Hash = Type5UuidFactory.get(groupHash);
+                }
+
+                HashSet<UUID> v2RelHashes = new HashSet<>();
+                ConceptVersionBI v2Concept = a2.getEnclosingConcept().getVersion(v2_is);
+                Collection<? extends RelationshipVersionBI> v2Rels = v2Concept.getRelationshipsOutgoingActive();
+                for (RelationshipVersionBI rel : v2Rels) {
+                    if (rel.getGroup() == 0) {
+                        UUID hash = Type5UuidFactory.get(Ts.get().getUuidPrimordialForNid(rel.getSourceNid()).toString()
+                                + Ts.get().getUuidPrimordialForNid(rel.getTypeNid()).toString()
+                                + Ts.get().getUuidPrimordialForNid(rel.getTargetNid()).toString()
+                                + Ts.get().getUuidPrimordialForNid(rel.getCharacteristicNid()).toString()
+                                + Ts.get().getUuidPrimordialForNid(rel.getStatusNid()).toString());
+                        v2RelHashes.add(hash);
+                    } else {
+                        int group = rel.getGroup();
+                        ArrayList<String> hashes = new ArrayList<>();
+                        String hash = null;
+                        for (RelationshipVersionBI r : v2Rels) {
+                            if (r.getGroup() == group && r.getCharacteristicNid() == rel.getCharacteristicNid()
+                                    && r.getStatusNid() == rel.getStatusNid()) {
+                                hash = Ts.get().getUuidPrimordialForNid(r.getSourceNid()).toString()
+                                        + Ts.get().getUuidPrimordialForNid(r.getTypeNid()).toString()
+                                        + Ts.get().getUuidPrimordialForNid(r.getTargetNid()).toString()
+                                        + Ts.get().getUuidPrimordialForNid(r.getCharacteristicNid()).toString()
+                                        + Ts.get().getUuidPrimordialForNid(r.getStatusNid()).toString();
+                                
+                                //classifier creates duplicate relationships these should not be considered
+                                if (r.getCharacteristicNid() == SnomedMetadataRfx.getREL_CH_INFERRED_RELATIONSHIP_NID()) {
+                                    if (!hashes.contains(hash)) {
+                                        hashes.add(hash);
+                                    }
+                                } else {
+                                    hashes.add(hash);
+                                }
+                            }
+                        }
+                        Collections.sort(hashes);
+                        String groupHash = null;
+                        for (String s : hashes) {
+                            groupHash = groupHash + s;
+                        }
+                        v2RelHashes.add(Type5UuidFactory.get(groupHash));
+                    }
+                }
+                if (v2RelHashes.contains(v1Hash)) {
+                    return false;
+                } else {
+                    return true;
+                }
+            }
+            return false;
         } catch (Exception e) {
             throw new IOException(e.getMessage());
         }
