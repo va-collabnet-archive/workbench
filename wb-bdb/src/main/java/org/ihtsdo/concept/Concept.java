@@ -115,6 +115,7 @@ import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.logging.Level;
 
 import jsr166y.ConcurrentReferenceHashMap;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 //~--- JDK imports ------------------------------------------------------------
 
 public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI, Comparable<Concept> {
@@ -428,7 +429,6 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
                     StringBuilder sb = new StringBuilder();
                     sb.append("\r\nmergeWithEConcept unable to merge concept attibutes");
                     sb.append(" concept primordial UUID: \t");
-
                     sb.append(c.getPrimUuid());
                     sb.append("\t");
                     sb.append(c.toUserString());
@@ -676,29 +676,34 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
     public void processComponentChronicles(ProcessComponentChronicleBI processor) throws Exception {
         if (getConAttrs() != null) {
             processor.process(getConAttrs());
+            recursiveProcessAnnotations(getConAttrs(), processor);
         }
 
         if (getDescs() != null) {
             for (ComponentChronicleBI cc : getDescs()) {
                 processor.process(cc);
+                recursiveProcessAnnotations(cc, processor);
             }
         }
 
         if (getSourceRels() != null) {
             for (ComponentChronicleBI cc : getSourceRels()) {
                 processor.process(cc);
+                recursiveProcessAnnotations(cc, processor);
             }
         }
 
         if (getImages() != null) {
             for (ComponentChronicleBI cc : getImages()) {
                 processor.process(cc);
+                recursiveProcessAnnotations(cc, processor);
             }
         }
 
         if (getRefsetMembers() != null) {
             for (ComponentChronicleBI cc : getRefsetMembers()) {
                 processor.process(cc);
+                recursiveProcessAnnotations(cc, processor);
             }
         }
     }
@@ -1308,6 +1313,23 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
 
         return Collections.unmodifiableCollection(returnValues);
     }
+    
+    @Override
+    public Collection<Integer> getRefsetMemberNidsActive(ViewCoordinate vc)
+            throws IOException {
+        Collection<? extends RefexChronicleBI<?>> refexes = getRefsetMembers();
+        Set<Integer> returnValues =
+                new HashSet<>(refexes.size());
+
+        for (RefexChronicleBI<?> refex : refexes) {
+            for (RefexVersionBI<?> version : refex.getVersions(vc)) {
+                refex.getNid();
+                break;
+            }
+        }
+
+        return Collections.unmodifiableCollection(returnValues);
+    }
 
     @Override
     public Collection<? extends RefexVersionBI<?>> getRefsetMembersActive(ViewCoordinate vc, Long cuttoffTime)
@@ -1878,15 +1900,10 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
 
         for (I_DescriptionTuple d : descriptions) {
             if (d.getTypeNid() == typePrefNid) {
-                for (RefexVersionBI<?> refex : d.getRefexesActive(vc)) {
-                    if (refex.getRefexNid() == langRefexNid) {
-                        RefexNidVersionBI<?> langRefex = (RefexNidVersionBI<?>) refex;
-
-                        if ((langRefex.getNid1() == ReferenceConcepts.PREFERRED_ACCEPTABILITY_RF1.getNid())
-                                || (langRefex.getNid1()
-                                == ReferenceConcepts.PREFERRED_ACCEPTABILITY_RF2.getNid())) {
-                            return d;
-                        }
+                for (RefexVersionBI<?> refex : d.getRefexMembersActive(vc, langRefexNid)) {
+                    RefexNidVersionBI<?> langRefex = (RefexNidVersionBI<?>) refex;
+                    if (langRefex.getNid1() == SnomedMetadataRfx.getDESC_PREFERRED_NID()) {
+                        return d;
                     }
                 }
             }
@@ -2738,6 +2755,13 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
             ChangeNotifier.touch(r.getTargetNid(), ChangeNotifier.Change.REL_XREF);
 
             c.data.add(r);
+        }
+    }
+
+    private void recursiveProcessAnnotations(ComponentChronicleBI cc, ProcessComponentChronicleBI processor) throws Exception {
+        for (RefexChronicleBI<?> annotation: cc.getAnnotations()) {
+            processor.process(annotation);
+            recursiveProcessAnnotations(annotation, processor);
         }
     }
 

@@ -45,6 +45,7 @@ import org.ihtsdo.rules.context.RulesContextHelper;
 import org.ihtsdo.rules.context.RulesDeploymentPackageReference;
 import org.ihtsdo.rules.context.RulesDeploymentPackageReferenceHelper;
 import org.ihtsdo.tk.api.Precedence;
+import org.ihtsdo.tk.query.helper.RefsetHelper;
 
 /**
  * The Class TestEnums.
@@ -116,25 +117,13 @@ public class TestEnums extends TestCase {
 				ArchitectonicAuxiliary.Concept.GUVNOR_ENUM_PROPERTY_DESC_TYPE.getUids());
 		tf.newDescription(UUID.randomUUID(), refset, "en", "DrConcept.primordialUuid",
 				guvnorType, config);
-		
-		tf.getRefsetHelper(config).newRefsetExtension(
-				refset.getConceptNid(), 
-				pneumonitis.getConceptNid(), 
-				EConcept.REFSET_TYPES.CID, 
-				new RefsetPropertyMap().with(RefsetPropertyMap.REFSET_PROPERTY.CID_ONE, 
-						pneumonitis.getConceptNid()),config);
-		tf.getRefsetHelper(config).newRefsetExtension(
-				refset.getConceptNid(), 
-				procedure.getConceptNid(), 
-				EConcept.REFSET_TYPES.CID, 
-				new RefsetPropertyMap().with(RefsetPropertyMap.REFSET_PROPERTY.CID_ONE, 
-						procedure.getConceptNid()),config);
-		tf.getRefsetHelper(config).newRefsetExtension(
-				refset.getConceptNid(), 
-				colonoscopicPolypectomy.getConceptNid(), 
-				EConcept.REFSET_TYPES.CID, 
-				new RefsetPropertyMap().with(RefsetPropertyMap.REFSET_PROPERTY.CID_ONE, 
-						colonoscopicPolypectomy.getConceptNid()),config);
+		RefsetHelper helper = new RefsetHelper(config.getViewCoordinate(), config.getEditCoordinate());
+                helper.newConceptRefsetExtension(refset.getConceptNid(), 
+				pneumonitis.getConceptNid(), pneumonitis.getConceptNid());
+                helper.newConceptRefsetExtension(refset.getConceptNid(), 
+				procedure.getConceptNid(), procedure.getConceptNid());
+                helper.newConceptRefsetExtension(refset.getConceptNid(), 
+				colonoscopicPolypectomy.getConceptNid(), colonoscopicPolypectomy.getConceptNid());
 		tf.addUncommittedNoChecks(refset);
 		tf.addUncommittedNoChecks(colonoscopicPolypectomy);
 		tf.addUncommittedNoChecks(pneumonitis);

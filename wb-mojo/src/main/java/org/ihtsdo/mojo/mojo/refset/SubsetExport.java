@@ -45,13 +45,16 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
-import org.dwfa.ace.task.refset.spec.RefsetSpec;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.mojo.mojo.refset.spec.RefsetInclusionSpec;
 import org.ihtsdo.mojo.mojo.refset.spec.RefsetPurposeToSubsetTypeMap;
 import org.ihtsdo.mojo.mojo.refset.writers.MemberRefsetHandler;
+import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.PositionBI;
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
+import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.query.RefsetSpec;
 
 /**
  * 
@@ -395,8 +398,16 @@ public class SubsetExport extends AbstractMojo implements I_ProcessConcepts {
     private String getSubsetTypeFromRefsetPurpose(int refsetId) {
         try {
             I_GetConceptData refsetMemberConcept = tf.getConcept(refsetId);
-            RefsetSpec refsetSpec = new RefsetSpec(refsetMemberConcept, true, Terms.get().getActiveAceFrameConfig());
-            I_GetConceptData refsetPurpose = refsetSpec.getRefsetPurposeConcept();
+
+            int purposeNid =
+                    Ts.get().getNidForUuids(RefsetAuxiliary.Concept.REFSET_PURPOSE_REL.getUids());
+            Collection<? extends ConceptVersionBI> promotionConcepts = 
+                    refsetMemberConcept.getVersion(
+                    tf.getActiveAceFrameConfig().getViewCoordinate()).getRelationshipsOutgoingTargetConceptsActive(purposeNid);
+            I_GetConceptData refsetPurpose = null;
+            if(!promotionConcepts.isEmpty()){
+                refsetPurpose = (I_GetConceptData) promotionConcepts.iterator().next();
+            }
             if (refsetPurpose != null) {
                 int subsetTypeId = RefsetPurposeToSubsetTypeMap.convert(refsetPurpose);
 

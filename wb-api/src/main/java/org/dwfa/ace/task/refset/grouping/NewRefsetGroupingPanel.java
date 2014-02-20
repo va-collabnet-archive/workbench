@@ -33,10 +33,10 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.Terms;
-import org.dwfa.ace.refset.spec.I_HelpSpecRefset;
-import org.dwfa.ace.task.refset.spec.RefsetSpec;
 import org.dwfa.ace.task.util.DynamicWidthComboBox;
 import org.dwfa.cement.RefsetAuxiliary;
+import org.ihtsdo.tk.api.NidSetBI;
+import org.ihtsdo.tk.query.RefsetSpec;
 
 /**
  * This panel allows the user to input data required for a new refset grouping
@@ -186,15 +186,18 @@ public class NewRefsetGroupingPanel extends JPanel {
             I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
 
             I_IntSet allowedTypes = Terms.get().getActiveAceFrameConfig().getDestRelTypes();
-            I_HelpSpecRefset helper = Terms.get().getSpecRefsetHelper(Terms.get().getActiveAceFrameConfig());
-            I_IntSet currentStatuses = helper.getCurrentStatusIntSet();
+            NidSetBI allowedStatusNids = Terms.get().getActiveAceFrameConfig().getViewCoordinate().getAllowedStatusNids();
+            I_IntSet currentStatuses = Terms.get().newIntSet();
+            for(int nid : allowedStatusNids.getSetValues()){
+                currentStatuses.add(nid);
+            }
 
             Set<? extends I_GetConceptData> children =
                     parent.getDestRelOrigins(currentStatuses, allowedTypes, Terms.get().getActiveAceFrameConfig()
                         .getViewPositionSetReadOnly(), config.getPrecedence(), config.getConflictResolutionStrategy());
 
             for (I_GetConceptData child : children) {
-                RefsetSpec spec = new RefsetSpec(child, true, config);
+                RefsetSpec spec = new RefsetSpec(child, true, config.getViewCoordinate());
                 if (spec.getRefsetSpecConcept() == null) {
                     // only add the children if this is a grouping concept and
                     // not an actual refset

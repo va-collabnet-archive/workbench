@@ -29,13 +29,13 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidCid;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidCidCid;
-import org.dwfa.ace.task.refset.spec.RefsetSpec;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
+import org.ihtsdo.tk.query.RefsetSpec;
 
 /**
  * Tests if the refset spec contains a negated OR. These aren't allowed due to
@@ -90,7 +90,7 @@ public class TestForNegatedOr extends AbstractExtensionTest {
                 return alertList;
             }
 
-            RefsetSpec specHelper = new RefsetSpec(refsetSpecConcept, configFrame);
+            RefsetSpec specHelper = new RefsetSpec(refsetSpecConcept, configFrame.getViewCoordinate());
             AlertToDataConstraintFailure.ALERT_TYPE alertType = AlertToDataConstraintFailure.ALERT_TYPE.WARNING;
 
             if (extension.getMutableParts().get(0) instanceof I_ExtendByRefPartCidCidCid) {

@@ -327,7 +327,9 @@ public class RelationshipIndexRecord implements Iterable<RelationshipIndexRecord
                return true;
             }
          }
-
+         if(iteratorOffset + RECORD_LENGTH_OFFSET >= data.length){
+             System.out.println("DEBUG");
+         }
          if (iteratorOffset + data[iteratorOffset + RECORD_LENGTH_OFFSET] < relationshipDataEnd) {
             return true;
          }

@@ -103,7 +103,7 @@ public class TaxonomyMouseListener extends MouseAdapter {
 
       popup.add(noActionItem);
       popup.addSeparator();
-      ProcessPopupUtil.addSubmenMenuItems(popup, new File(AceFrame.pluginRoot, "taxonomy"),
+      ProcessPopupUtil.addSubMenuItems(popup, new File(AceFrame.pluginRoot, "taxonomy"),
               ACE.getAceConfig().getActiveConfig().getWorker());
 
       return popup;

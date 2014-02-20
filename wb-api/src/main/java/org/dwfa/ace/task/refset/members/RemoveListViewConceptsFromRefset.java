@@ -40,6 +40,7 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
+import org.ihtsdo.tk.query.helper.RefsetHelper;
 
 @BeanList(specs = { @Spec(directory = "tasks/ide/refset/membership", type = BeanType.TASK_BEAN) })
 public class RemoveListViewConceptsFromRefset extends AbstractTask {
@@ -100,9 +101,11 @@ public class RemoveListViewConceptsFromRefset extends AbstractTask {
             for (int i = 0; i < model.getSize(); i++) {
                 newMembers.add(model.getElementAt(i));
             }
-
-            Terms.get().getMemberRefsetHelper(Terms.get().getActiveAceFrameConfig(), refset.getConceptNid(), value.getConceptNid()).removeAllFromRefset(newMembers,
-                "Removing concepts from list view from refset");
+            RefsetHelper helper = new RefsetHelper(Terms.get().getActiveAceFrameConfig().getViewCoordinate(),
+                    Terms.get().getActiveAceFrameConfig().getEditCoordinate());
+            for(I_GetConceptData c : newMembers){
+                helper.retireRefsetExtension(refset.getConceptNid(), c.getNid(), value.getConceptNid());
+            }
 
             // use commit in business process
 

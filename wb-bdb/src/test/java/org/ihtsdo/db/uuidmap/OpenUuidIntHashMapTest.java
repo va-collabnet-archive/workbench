@@ -23,22 +23,21 @@ public class OpenUuidIntHashMapTest {
 
 	@Test
 	public void testGetAndPut() {
-		int testSize = 10000;
+		int testSize = 100000;
 		int repeats = 10;
 		concurrentHashMapTest(testSize, repeats);
-		openConcurrentUuidIntHashMapTest(testSize, repeats);
-		openReadOnlyUuidIntHashMapTest(testSize, repeats);
+		openUuidIntHashMapTest(testSize, repeats);
 		concurrentHashMapTest(testSize, repeats);
-		openConcurrentUuidIntHashMapTest(testSize, repeats);
-		openReadOnlyUuidIntHashMapTest(testSize, repeats);
+		openUuidIntHashMapTest(testSize, repeats);
 	}
 
-	private void openReadOnlyUuidIntHashMapTest(int testSize, int repeats) {
+
+	private void openUuidIntHashMapTest(int testSize, int repeats) {
 		UuidArrayList list;
-		long start = System.currentTimeMillis();
-		UuidToIntHashMap nativeMap = new UuidToIntHashMap(testSize);
 		List<Long> testResults = new ArrayList<Long>();
 		for (int r = 0; r < repeats; r++) {
+		long start = System.currentTimeMillis();
+                        UuidToIntHashMap nativeMap = new UuidToIntHashMap((int) (testSize/0.81), 0.0, 0.8);
 			list = new UuidArrayList(testSize);
 			for (int i = 0; i < testSize; i++) {
 				UUID key = UUID.randomUUID();
@@ -51,47 +50,19 @@ public class OpenUuidIntHashMapTest {
 			}
 			testResults.add(System.currentTimeMillis() - start);
 		}
-		System.out.println("Test openReadOnlyUuidIntHashMapTest results: " + testResults);
+		System.out.println("Test openUuidIntHashMapTest results: " + testResults);
 		long sum = 0;
 		for (Long result: testResults) {
 			sum = sum + result;
 		}
 		long average = sum / testResults.size();
-		System.out.println("Test openReadOnlyUuidIntHashMapTest average: " + average);
-	}
-
-
-	private void openConcurrentUuidIntHashMapTest(int testSize, int repeats) {
-		UuidArrayList list;
-		long start = System.currentTimeMillis();
-		UuidToIntHashMap nativeMap = new UuidToIntHashMap(testSize);
-		List<Long> testResults = new ArrayList<Long>();
-		for (int r = 0; r < repeats; r++) {
-			list = new UuidArrayList(testSize);
-			for (int i = 0; i < testSize; i++) {
-				UUID key = UUID.randomUUID();
-				nativeMap.put(UuidUtil.convert(key), i);
-				list.add(UuidUtil.convert(key));
-			}
-			for (int i = 0; i < testSize; i++) {
-				int value = nativeMap.get(list.get(i));
-				assertTrue(value == i);
-			}
-			testResults.add(System.currentTimeMillis() - start);
-		}
-		System.out.println("Test openConcurrentUuidIntHashMapTest results: " + testResults);
-		long sum = 0;
-		for (Long result: testResults) {
-			sum = sum + result;
-		}
-		long average = sum / testResults.size();
-		System.out.println("Test openConcurrentUuidIntHashMapTest average: " + average);
+		System.out.println("Test openUuidIntHashMapTest average: " + average);
 	}
 
 	private void concurrentHashMapTest(int testSize, int repeats) {
-		long start = System.currentTimeMillis();
 		List<Long> testResults = new ArrayList<Long>();
 		for (int r = 0; r < repeats; r++) {
+                       long start = System.currentTimeMillis();
 			ConcurrentHashMap<UUID, Integer> ids = new ConcurrentHashMap<UUID, Integer>(
 					testSize);
 			UuidArrayList list = new UuidArrayList(testSize);

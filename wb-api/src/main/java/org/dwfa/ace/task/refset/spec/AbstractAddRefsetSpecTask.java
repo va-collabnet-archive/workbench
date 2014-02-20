@@ -24,7 +24,6 @@ package org.dwfa.ace.task.refset.spec;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_HelpRefsets;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.RefsetPropertyMap;
 import org.dwfa.ace.api.Terms;
@@ -54,6 +53,8 @@ import java.lang.reflect.InvocationTargetException;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import javax.swing.JOptionPane;
@@ -61,6 +62,8 @@ import javax.swing.JTree;
 import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
+import org.ihtsdo.tk.query.RefsetSpec;
+import org.ihtsdo.tk.query.helper.RefsetHelper;
 
 public abstract class AbstractAddRefsetSpecTask extends AbstractTask {
    private static final int dataVersion = 4;
@@ -114,7 +117,7 @@ public abstract class AbstractAddRefsetSpecTask extends AbstractTask {
          }
 
          I_GetConceptData refsetSpec = configFrame.getRefsetSpecInSpecEditor();
-
+         
          if (refsetSpec != null) {
             JTree                  specTree     = configFrame.getTreeInSpecEditor();
             int                    refsetId     = refsetSpec.getConceptNid();
@@ -137,59 +140,76 @@ public abstract class AbstractAddRefsetSpecTask extends AbstractTask {
                }
             }
 
-            if (canAdd) {
-               I_TermFactory     tf           = Terms.get();
-               I_HelpRefsets     refsetHelper = tf.getRefsetHelper(configFrame);
-               RefsetPropertyMap propMap      = getRefsetPropertyMap(tf, configFrame);
-               I_ExtendByRef     ext          = refsetHelper.getOrCreateRefsetExtension(refsetId,
-                                                   componentId, propMap.getMemberType(), propMap,
-                                                   UUID.randomUUID());
-               List<? extends I_ExtendByRefVersion> tuples = ext.getTuples(configFrame.getAllowedStatus(),
-                                                                configFrame.getViewPositionSetReadOnly(),
-                                                                configFrame.getPrecedence(),
-                                                                configFrame.getConflictResolutionStrategy());
-
-               if (tuples.size() > 0) {
-                  boolean added = false;
-
-                  for (I_ExtendByRefVersion t : tuples) {
-                     if (t.getTime() == Long.MAX_VALUE) {
-                        tf.addUncommitted(ext);
-                        added = true;
-                     }
-                  }
-
-                  if (!added) {
-                     String msg = "Unable to add to spec. Equivalent specification already exists.";
-
+             if (canAdd) {
+                 I_TermFactory tf = Terms.get();
+                 RefsetPropertyMap propMap = getRefsetPropertyMap(tf, configFrame);
+                 if (propMap == null) {
+                     String msg = "Unable to add to spec. No concept is selected in taxonomy.";
                      JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null), msg);
-                  }
-               } else {
-                  List<? extends I_ExtendByRefVersion> lastTuple =
-                     ext.getTuples(null, configFrame.getViewPositionSetReadOnly(),
-                                   configFrame.getPrecedence(), configFrame.getConflictResolutionStrategy());
-
-                  for (I_ExtendByRefVersion t : lastTuple) {
-                     for (PathBI p : configFrame.getEditingPathSet()) {
-                        I_ExtendByRefPart analog =
-                           (I_ExtendByRefPart) t.makeAnalog(
-                               ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid(),
-                               Long.MAX_VALUE,
-                               configFrame.getEditCoordinate().getAuthorNid(),
-                               configFrame.getEditCoordinate().getModuleNid(),
-                               p.getConceptNid());
-
-                        ext.addVersion(analog);
-                        tf.addUncommitted(ext);
+                 } else {
+                     RefsetHelper helper = new RefsetHelper(configFrame.getViewCoordinate(), configFrame.getEditCoordinate());
+                     I_ExtendByRef ext = null;
+                     if (propMap.containsKey(RefsetPropertyMap.REFSET_PROPERTY.CID_THREE)) {
+                         ext = (I_ExtendByRef) helper.newConceptConceptConceptRefsetExtension(
+                                 refsetId, componentId, propMap.getInt(RefsetPropertyMap.REFSET_PROPERTY.CID_ONE),
+                                 propMap.getInt(RefsetPropertyMap.REFSET_PROPERTY.CID_TWO),
+                                 propMap.getInt(RefsetPropertyMap.REFSET_PROPERTY.CID_THREE));
+                     } else if (propMap.containsKey(RefsetPropertyMap.REFSET_PROPERTY.CID_TWO)) {
+                         ext = (I_ExtendByRef) helper.newConceptConceptRefsetExtension(
+                                 refsetId, componentId, propMap.getInt(RefsetPropertyMap.REFSET_PROPERTY.CID_ONE),
+                                 propMap.getInt(RefsetPropertyMap.REFSET_PROPERTY.CID_TWO));
+                     } else if (propMap.containsKey(RefsetPropertyMap.REFSET_PROPERTY.CID_ONE)) {
+                         ext = (I_ExtendByRef) helper.newConceptRefsetExtension(
+                                 refsetId, componentId, propMap.getInt(RefsetPropertyMap.REFSET_PROPERTY.CID_ONE));
                      }
-                  }
-               }
 
-               RefsetSpec refsetSpecHelper = new RefsetSpec(refsetSpec, configFrame);
+                     List<? extends I_ExtendByRefVersion> tuples = ext.getTuples(configFrame.getAllowedStatus(),
+                             configFrame.getViewPositionSetReadOnly(),
+                             configFrame.getPrecedence(),
+                             configFrame.getConflictResolutionStrategy());
 
-               refsetSpecHelper.setLastEditTime(System.currentTimeMillis());
-               configFrame.fireRefsetSpecChanged(ext);
-               configFrame.refreshRefsetTab();
+                     if (tuples.size() > 0) {
+                         boolean added = false;
+
+                         for (I_ExtendByRefVersion t : tuples) {
+                             if (t.getTime() == Long.MAX_VALUE) {
+                                 tf.addUncommitted(ext);
+                                 added = true;
+                             }
+                         }
+
+                         if (!added) {
+                             String msg = "Unable to add to spec. Equivalent specification already exists.";
+
+                             JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null), msg);
+                         }
+                     } else {
+                         List<? extends I_ExtendByRefVersion> lastTuple =
+                                 ext.getTuples(null, configFrame.getViewPositionSetReadOnly(),
+                                 configFrame.getPrecedence(), configFrame.getConflictResolutionStrategy());
+
+                         for (I_ExtendByRefVersion t : lastTuple) {
+                             for (PathBI p : configFrame.getEditingPathSet()) {
+                                 I_ExtendByRefPart analog =
+                                         (I_ExtendByRefPart) t.makeAnalog(
+                                         ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid(),
+                                         Long.MAX_VALUE,
+                                         configFrame.getEditCoordinate().getAuthorNid(),
+                                         configFrame.getEditCoordinate().getModuleNid(),
+                                         p.getConceptNid());
+
+                                 ext.addVersion(analog);
+                                 tf.addUncommitted(ext);
+                             }
+                         }
+                     }
+
+                     RefsetSpec refsetSpecHelper = new RefsetSpec(refsetSpec, configFrame.getViewCoordinate());
+
+                     refsetSpecHelper.setLastEditTime(System.currentTimeMillis(), configFrame.getEditCoordinate());
+                     configFrame.fireRefsetSpecChanged(ext);
+                     configFrame.refreshRefsetTab();
+                 }
             } else {
                String msg = "Unable to add to spec. Selected parent must be a branching spec.";
 

@@ -24,7 +24,6 @@ import java.util.Collection;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.task.WorkerAttachmentKeys;
-import org.dwfa.ace.task.refset.spec.RefsetSpec;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
@@ -33,6 +32,7 @@ import org.dwfa.bpa.tasks.AbstractTask;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
+import org.ihtsdo.tk.query.RefsetSpec;
 
 /**
  * Determines if the refset spec currently in the refset spec panel is a concept-based refset for compute purposes.
@@ -73,7 +73,7 @@ public class IsConceptComputeTypeTask extends AbstractTask {
                     (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
             I_GetConceptData refsetSpecConcept = configFrame.getRefsetSpecInSpecEditor();
 
-            RefsetSpec refsetSpecHelper = new RefsetSpec(refsetSpecConcept, configFrame);
+            RefsetSpec refsetSpecHelper = new RefsetSpec(refsetSpecConcept, configFrame.getViewCoordinate());
             if (refsetSpecHelper.isConceptComputeType()) {
                 return Condition.TRUE;
             } else {

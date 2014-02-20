@@ -299,7 +299,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                     + TimeHelper.getShortFileDateFormat().format(effectiveDate) + ".txt");
         } else {
             identifiersFile = new File(directory,
-                    "sct2_Identifier_UUID" + releaseType.suffix + "_"
+                    "sct2_Identifier_UUID_" + releaseType.suffix + "_"
                     + country.getFormatedCountryCode().toUpperCase() + namespace + "_"
                     + TimeHelper.getShortFileDateFormat().format(effectiveDate) + ".txt");
         }
@@ -1582,8 +1582,8 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
      * @throws IOException signals that an I/O exception has occurred
      */
     private void processOtherLang(RefexVersionBI refexVersion) throws IOException {
-        RefexNidVersionBI refexNidVersion = (RefexNidVersionBI) refexVersion;
         if (refexVersion != null) {
+            RefexNidVersionBI refexNidVersion = (RefexNidVersionBI) refexVersion;
             for (Rf2File.LanguageRefsetFileFields field : Rf2File.LanguageRefsetFileFields.values()) {
                 switch (field) {
                     case ID:

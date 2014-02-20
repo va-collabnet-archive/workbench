@@ -44,12 +44,7 @@ public class WfHxLuceneManager extends LuceneManager {
         	} else {
         		wfHxLuceneDir = setupWriter(wfHxLuceneDirFile, wfHxLuceneDir, LuceneSearchType.WORKFLOW_HISTORY);
         	}
-        	
-        	wfHxWriter.setUseCompoundFile(true);
-		    wfHxWriter.setMergeFactor(15);
-		    wfHxWriter.setMaxMergeDocs(Integer.MAX_VALUE);
-		    wfHxWriter.setMaxBufferedDocs(1000);
-		}
+	}
         
         WfHxIndexGenerator.initializeSemTags(viewCoord);
 
@@ -97,13 +92,6 @@ public class WfHxLuceneManager extends LuceneManager {
         }
 
 		AceLog.getAppLog().log(Level.INFO, "Have written " + recordsImported + " workflow history lucene records to " + wfHxWriter.getDirectory());
-		wfHxWriter.commit();
-
-		if (wfHxSearcher != null) {
-		    wfHxSearcher.close();
-		}
-
-		wfHxSearcher = null;
 		beans.clear();
                 return recordsImported;
     }

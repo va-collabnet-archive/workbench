@@ -54,9 +54,9 @@ import org.apache.lucene.index.IndexNotFoundException;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
-import org.apache.lucene.index.ParallelReader;
-import org.apache.lucene.queryParser.ParseException;
-import org.apache.lucene.queryParser.QueryParser;
+import org.apache.lucene.index.ParallelCompositeReader;
+import org.apache.lucene.queryparser.classic.ParseException;
+import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
@@ -95,7 +95,6 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.ComputationCanceled;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.document.DictionaryResultsDialog;
 import org.ihtsdo.helper.time.TimeHelper;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.TerminologyBuilderBI;
@@ -359,7 +358,7 @@ public class DocumentManager {
 			IndexSearcher is = new IndexSearcher(IndexReader.open(fsDir));
 
 			if (term.equals("*")) {
-				for (int i = 0; i < is.maxDoc(); i++) {
+				for (int i = 0; i < is.getIndexReader().maxDoc(); i++) {
 					results.put(is.doc(i).get("source"), is.doc(i).get("translation"));
 				}
 
@@ -412,7 +411,7 @@ public class DocumentManager {
 				}
 			}
 			Directory fsDir = FSDirectory.open(new File("berkeley-db/read-only/lucene"));
-			IndexReader dictionaryReader = ParallelReader.open(fsDir);
+			IndexReader dictionaryReader = ParallelCompositeReader.open(fsDir);
 			Directory spellDir = FSDirectory.open(new File("spellIndexDirectory"));
 			SpellChecker spellchecker = new SpellChecker(spellDir);
 			IndexWriterConfig indexWriterConfig = new IndexWriterConfig(Version.LUCENE_35, new StandardAnalyzer(Version.LUCENE_35));

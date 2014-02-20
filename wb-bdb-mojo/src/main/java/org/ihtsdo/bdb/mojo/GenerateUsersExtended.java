@@ -389,11 +389,10 @@ public class GenerateUsersExtended extends AbstractMojo {
                                    parentConcept.getPrimUuid());
       UUID userUuid = userConceptBp.getComponentUuid();
 
-      if (Ts.get().hasUuid(userUuid)) {
-         setUserConcept(userUuid.toString());
-         addWfRelIfDoesNotExist(userUuid.toString());
-
-         return Ts.get().getConcept(userUuid);
+      if (Ts.get().hasUuid(userUuid) && !Terms.get().getConcept(userUuid).getDescriptions().isEmpty()) {
+              setUserConcept(userUuid.toString());
+              addWfRelIfDoesNotExist(userUuid.toString());
+              return Ts.get().getConcept(userUuid);
       } else {
 
          // Needs a description record...

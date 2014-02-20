@@ -3,7 +3,7 @@
    <parent>
         <groupId>org.ihtsdo</groupId>
         <artifactId>wb-mmb</artifactId>
-        <version>2.37-trek-no-jini-SNAPSHOT</version>
+        <version>1.5-trek-refset-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
    <artifactId>api-test-execution</artifactId>

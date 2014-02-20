@@ -29,12 +29,11 @@ import javax.swing.JLabel;
 import javax.swing.JTextField;
 
 import org.apache.lucene.document.Document;
-import org.apache.lucene.queryParser.QueryParser;
+import org.apache.lucene.queryparser.classic.QueryParser;
 import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.Terms;
-import org.dwfa.ace.refset.spec.I_HelpSpecRefset;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
@@ -42,6 +41,7 @@ import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.swing.SwingWorker;
 import org.ihtsdo.lucene.SearchResult;
+import org.ihtsdo.tk.api.NidSetBI;
 
 public abstract class AbstractSetUserAndPwdPNC extends PreviousNextOrCancel {
 
@@ -106,8 +106,11 @@ public abstract class AbstractSetUserAndPwdPNC extends PreviousNextOrCancel {
     @Override
     public boolean hasValidInput() {
         try {
-            I_HelpSpecRefset helper = Terms.get().getSpecRefsetHelper(Terms.get().getActiveAceFrameConfig());
-            I_IntSet actives = helper.getCurrentStatusIntSet();
+            NidSetBI allowedStatusNids = config.getViewCoordinate().getAllowedStatusNids();
+            I_IntSet actives = Terms.get().newIntSet();
+            for(int nid : allowedStatusNids.getSetValues()){
+                actives.add(nid);
+            }
 
             String userName = fullName.getText();
 

@@ -46,7 +46,7 @@ public class Rf2_RefsetSimpleRecord implements Comparable<Rf2_RefsetSimpleRecord
     String moduleUuidStr;
 
     public Rf2_RefsetSimpleRecord(String id, String dateStr, boolean active, String moduleUuidStr,
-            long refsetIdL, long referencedComponentIdL, String uuid)
+            long refsetIdL, long referencedComponentIdL, String uuid, String pathUuid)
             throws ParseException {
         this.id = id;
         this.effDateStr = dateStr;
@@ -58,12 +58,12 @@ public class Rf2_RefsetSimpleRecord implements Comparable<Rf2_RefsetSimpleRecord
         this.uuidNormalMember = uuid;
 
         // SNOMED Core :NYI: setup path as a POM parameter.
-        this.pathUuidStr = Rf2Defaults.getPathSnomedCoreUuidStr();
+        this.pathUuidStr = pathUuid;
         // this.authorUuidStr = Rf2Defaults.getAuthorUuidStr();
         this.moduleUuidStr = moduleUuidStr;
     }
 
-    static Rf2_RefsetSimpleRecord[] parseRefset(Rf2File f)
+    static Rf2_RefsetSimpleRecord[] parseRefset(Rf2File f, String pathUuid)
             throws IOException, ParseException, IOException, TerminologyException {
         String uuidNormalMember = RefsetAuxiliary.Concept.NORMAL_MEMBER.getPrimoridalUid().toString();
 
@@ -96,7 +96,8 @@ public class Rf2_RefsetSimpleRecord implements Comparable<Rf2_RefsetSimpleRecord
                     Rf2x.convertSctIdToUuidStr(line[MODULE_ID]),
                     Long.parseLong(line[REFSET_ID]),
                     Long.parseLong(line[REFERENCED_COMPONENT_ID]),
-                    uuidNormalMember);
+                    uuidNormalMember,
+                    pathUuid);
             idx++;
         }
 

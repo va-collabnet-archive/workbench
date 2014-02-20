@@ -21,14 +21,13 @@ import java.util.Collection;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
-import org.dwfa.ace.api.RefsetPropertyMap;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
-import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.project.TerminologyProjectDAO;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
+import org.ihtsdo.tk.query.helper.RefsetHelper;
 
 /**
  * The Class RefsetMemberValueMgr.
@@ -102,13 +101,8 @@ public class RefsetMemberValueMgr {
         }
 
         if (!alreadyMember) {
-            RefsetPropertyMap bpm = new RefsetPropertyMap().with(RefsetPropertyMap.REFSET_PROPERTY.CID_ONE, memberType);
-            termFactory.getRefsetHelper(config).newRefsetExtension(
-                    this.refsetId,
-                    conceptMemberId,
-                    EConcept.REFSET_TYPES.CID,
-                    bpm,
-                    config);
+            RefsetHelper helper = new RefsetHelper(config.getViewCoordinate(), config.getEditCoordinate());
+            helper.newConceptRefsetExtension(refsetId, conceptMemberId, memberType);
 
             for (I_ExtendByRef extension : termFactory.getRefsetExtensionMembers(refsetConcept.getConceptNid())) {
                 if (extension.getComponentNid() == conceptMemberId

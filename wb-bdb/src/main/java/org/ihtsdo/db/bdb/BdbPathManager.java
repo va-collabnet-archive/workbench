@@ -23,7 +23,6 @@ package org.ihtsdo.db.bdb;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_Position;
-import org.dwfa.ace.api.RefsetPropertyMap;
 import org.dwfa.ace.api.TerminologyHelper;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
@@ -40,8 +39,6 @@ import org.ihtsdo.concept.component.refset.RefsetMember;
 import org.ihtsdo.concept.component.refsetmember.cid.CidMember;
 import org.ihtsdo.concept.component.refsetmember.cidInt.CidIntMember;
 import org.ihtsdo.db.bdb.computer.ReferenceConcepts;
-import org.ihtsdo.db.bdb.computer.refset.RefsetHelper;
-import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
@@ -54,7 +51,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.Lock;
@@ -62,7 +58,12 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.ihtsdo.concept.component.refsetmember.str.StrMember;
-import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
+import org.ihtsdo.tk.api.TerminologyBuilderBI;
+import org.ihtsdo.tk.api.blueprint.RefexCAB;
+import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.api.refex.RefexChronicleBI;
+import org.ihtsdo.tk.api.refex.RefexVersionBI;
+import org.ihtsdo.tk.dto.concept.component.refex.TK_REFEX_TYPE;
 
 /**
  * Path management.
@@ -81,7 +82,6 @@ public class BdbPathManager implements I_Manage<PathBI> {
 
    //~--- fields --------------------------------------------------------------
 
-   private RefsetHelperGetter       helperGetter = new RefsetHelperGetter();
    protected Path                   editPath;
    ConcurrentHashMap<Integer, Path> pathMap;
    private Concept                  pathRefsetConcept;
@@ -117,25 +117,6 @@ public class BdbPathManager implements I_Manage<PathBI> {
       return false;
    }
 
-   public void removeOrigin(PathBI path, I_Position origin, I_ConfigAceFrame config) throws IOException {
-      assert path.getOrigins().contains(origin) :
-             "Must remove origin: " + origin + " before removing: " + path;
-
-      try {
-         RefsetHelper refsetHelper = helperGetter.get(config);
-
-         refsetHelper.retireRefsetExtension(
-             ReferenceConcepts.REFSET_PATH_ORIGINS.getNid(), path.getConceptNid(),
-             new RefsetPropertyMap().with(
-                RefsetPropertyMap.REFSET_PROPERTY.CID_ONE, origin.getPath().getConceptNid()));
-         path.getOrigins().remove(origin);
-         pathMap.put(path.getConceptNid(), (Path) path);
-         logger.log(Level.INFO, "Removed origin path : {0} from path {1}", new Object[] { origin, path });
-      } catch (Exception e) {
-         throw new IOException("Unable to remove path origin: " + origin + " from path " + path, e);
-      }
-   }
-
    public synchronized void resetPathMap() throws IOException {
       pathMap = null;
       setupPathMap();
@@ -168,16 +149,14 @@ public class BdbPathManager implements I_Manage<PathBI> {
    @Override
    public void write(final PathBI path, I_ConfigAceFrame config) throws IOException {
       try {
-
-         // write path
-         RefsetPropertyMap propMap = new RefsetPropertyMap().with(RefsetPropertyMap.REFSET_PROPERTY.CID_ONE,
-                                        path.getConceptNid());
-
-         propMap.with(RefsetPropertyMap.REFSET_PROPERTY.PATH, ReferenceConcepts.PATH.getNid());
-         propMap.with(RefsetPropertyMap.REFSET_PROPERTY.STATUS, SnomedMetadataRfx.getSTATUS_CURRENT_NID());
-         helperGetter.get(config).newRefsetExtension(ReferenceConcepts.REFSET_PATHS.getNid(),
-                          ReferenceConcepts.PATH.getNid(), EConcept.REFSET_TYPES.CID, propMap, config);
-
+          // write path
+         RefexCAB refexBp = new RefexCAB(TK_REFEX_TYPE.CID,
+                 ReferenceConcepts.PATH.getNid(),
+                 ReferenceConcepts.REFSET_PATHS.getNid());
+         refexBp.put(RefexCAB.RefexProperty.CNID1, path.getConceptNid());
+         refexBp.setMemberUuid(refexBp.computeMemberContentUuid());
+         TerminologyBuilderBI builder = Ts.get().getTerminologyBuilder(config.getEditCoordinate(), config.getViewCoordinate());
+         RefexChronicleBI<?> member = builder.construct(refexBp);
          Concept pathRefConcept = getPathRefsetConcept();
 
          BdbCommitManager.addUncommittedNoChecks(pathRefConcept);
@@ -202,36 +181,27 @@ public class BdbPathManager implements I_Manage<PathBI> {
            throws IOException {
       assert path.getOrigins().contains(origin) : "Must add origin: " + origin + " before writing: " + path;
 
-      RefsetHelper refsetHelper = helperGetter.get(config);
-
       try {
-         RefsetPropertyMap propMap = new RefsetPropertyMap().with(
-                                         RefsetPropertyMap.REFSET_PROPERTY.CID_ONE,
-                                         origin.getPath().getConceptNid()).with(
-                                            RefsetPropertyMap.REFSET_PROPERTY.INTEGER_VALUE,
-                                            origin.getVersion());
-
-         if (refsetHelper.hasCurrentRefsetExtension(ReferenceConcepts.REFSET_PATH_ORIGINS.getNid(),
-                 path.getConceptNid(), propMap)) {
-
-            // Skip already exists
-            return;
-         }
-
-         // Retire any positions that may exist that just have a different
-         // version (time) point
-         propMap = new RefsetPropertyMap().with(RefsetPropertyMap.REFSET_PROPERTY.CID_ONE,
-                 origin.getPath().getConceptNid());
-         refsetHelper.retireRefsetExtension(ReferenceConcepts.REFSET_PATH_ORIGINS.getNid(),
-                                            path.getConceptNid(), propMap);
-         propMap = new RefsetPropertyMap().with(RefsetPropertyMap.REFSET_PROPERTY.CID_ONE,
-                 origin.getPath().getConceptNid()).with(RefsetPropertyMap.REFSET_PROPERTY.INTEGER_VALUE,
-                    origin.getVersion());
-
+          TerminologyBuilderBI builder = Ts.get().getTerminologyBuilder(config.getEditCoordinate(), config.getViewCoordinate());
+          ConceptVersionBI refsetConcept = Ts.get().getConceptVersion(config.getViewCoordinate(), ReferenceConcepts.REFSET_PATH_ORIGINS.getNid());
+          // Retire any positions that may exist that just have a different
+          // version (time) point
+          ConceptVersionBI pathConcept = Ts.get().getConceptVersion(config.getViewCoordinate(), path.getConceptNid());
+          Collection<? extends RefexVersionBI<?>> refexMembersActive = pathConcept.getRefexMembersActive(config.getViewCoordinate(), refsetConcept.getConceptNid());
+          for(RefexVersionBI member : refexMembersActive){
+                  RefexCAB retireBp = member.makeBlueprint(config.getViewCoordinate());
+                  retireBp.setRetired();
+                  retireBp.setComponentUuidNoRecompute(member.getPrimUuid());
+                  builder.construct(retireBp);
+          }
          // Create the new origin/position
-         refsetHelper.newRefsetExtension(ReferenceConcepts.REFSET_PATH_ORIGINS.getNid(),
-                                         path.getConceptNid(), EConcept.REFSET_TYPES.CID_INT, propMap,
-                                         config);
+         RefexCAB memberBp = new RefexCAB(TK_REFEX_TYPE.CID_INT,
+                 path.getConceptNid(),
+                 refsetConcept.getNid());
+         memberBp.put(RefexCAB.RefexProperty.CNID1, origin.getPath().getConceptNid());
+         memberBp.put(RefexCAB.RefexProperty.INTEGER1, origin.getVersion());
+         memberBp.setMemberUuid(memberBp.computeMemberContentUuid());
+         RefexChronicleBI<?> member = builder.construct(memberBp);
 
          Concept pathOriginRefConcept = getRefsetPathOriginsConcept();
 
@@ -459,46 +429,5 @@ public class BdbPathManager implements I_Manage<PathBI> {
       }
 
       return false;
-   }
-
-   //~--- inner classes -------------------------------------------------------
-
-   private class RefsetHelperGetter {
-      ConcurrentHashMap<I_ConfigAceFrame, RefsetHelper> helperMap = new ConcurrentHashMap<I_ConfigAceFrame,
-                                                                       RefsetHelper>(7);
-
-      //~--- get methods ------------------------------------------------------
-
-      private RefsetHelper get(I_ConfigAceFrame frameConfig) throws IOException {
-         assert frameConfig != null : "frameConfig cannot be null";
-
-         RefsetHelper helper = helperMap.get(frameConfig);
-
-         if (helper == null) {
-            Set<Entry<I_ConfigAceFrame, RefsetHelper>> entries = helperMap.entrySet();
-
-            while (entries.size() >= 6) {
-               Entry<I_ConfigAceFrame, RefsetHelper> looser = null;
-
-               for (Entry<I_ConfigAceFrame, RefsetHelper> entry : entries) {
-                  if (looser == null) {
-                     looser = entry;
-                  } else {
-                     if (entry.getValue().getLastAccess() < looser.getValue().getLastAccess()) {
-                        looser = entry;
-                     }
-                  }
-               }
-
-               helperMap.remove(looser.getKey());
-               entries = helperMap.entrySet();
-            }
-
-            helper = new RefsetHelper(frameConfig);
-            helperMap.put(frameConfig, helper);
-         }
-
-         return helper;
-      }
    }
 }

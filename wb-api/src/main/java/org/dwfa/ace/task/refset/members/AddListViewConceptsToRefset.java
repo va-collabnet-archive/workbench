@@ -28,6 +28,7 @@ import javax.swing.JList;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_ModelTerminologyList;
+import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
@@ -40,6 +41,10 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
+import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.NidBitSetBI;
+import org.ihtsdo.tk.api.NidBitSetItrBI;
+import org.ihtsdo.tk.query.helper.RefsetHelper;
 
 @BeanList(specs = { @Spec(directory = "tasks/ide/refset/membership", type = BeanType.TASK_BEAN) })
 public class AddListViewConceptsToRefset extends AbstractTask {
@@ -101,8 +106,11 @@ public class AddListViewConceptsToRefset extends AbstractTask {
                 newMembers.add(model.getElementAt(i));
             }
 
-            Terms.get().getMemberRefsetHelper(config, refset.getConceptNid(), value.getConceptNid()).addAllToRefset(newMembers,
-                "Adding concepts from list view to refset");
+            getLogger().info("Adding concepts from list view to refset");
+            RefsetHelper helper = new RefsetHelper(config.getViewCoordinate(), config.getEditCoordinate());
+            for(I_GetConceptData member : newMembers){
+                helper.newConceptRefsetExtension(refset.getConceptNid(), member.getConceptNid(), value.getConceptNid());
+            }
 
             // use commit in business process
 

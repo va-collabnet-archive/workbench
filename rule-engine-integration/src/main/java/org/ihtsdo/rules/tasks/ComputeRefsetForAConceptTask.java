@@ -33,10 +33,6 @@ import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.WorkerAttachmentKeys;
-import org.dwfa.ace.task.refset.spec.RefsetSpec;
-import org.dwfa.ace.task.refset.spec.compute.RefsetComputeType;
-import org.dwfa.ace.task.refset.spec.compute.RefsetQueryFactory;
-import org.dwfa.ace.task.refset.spec.compute.RefsetSpecQuery;
 import org.dwfa.app.DwfaEnv;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
@@ -48,6 +44,11 @@ import org.dwfa.util.LogWithAlerts;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
+import org.ihtsdo.tk.query.RefsetComputer.ComputeType;
+import org.ihtsdo.tk.query.RefsetSpec;
+import org.ihtsdo.tk.query.RefsetSpecFactory;
+import org.ihtsdo.tk.query.RefsetSpecQuery;
 
 /**
  * Computes the members of a refset given a refset spec. This refset spec is the
@@ -127,13 +128,13 @@ public class ComputeRefsetForAConceptTask extends AbstractTask {
         }
 
         try {
-            RefsetSpec refsetSpecHelper = new RefsetSpec(refset, true, configFrame);
-            I_GetConceptData refsetSpec = refsetSpecHelper.getRefsetSpecConcept();
+            RefsetSpec refsetSpecHelper = new RefsetSpec(refset, true, configFrame.getViewCoordinate());
+            ConceptChronicleBI refsetSpec = refsetSpecHelper.getRefsetSpecConcept();
             AceLog.getAppLog().info("Refset: " + refset.getInitialText() + " " + refset.getUids().get(0));
-            AceLog.getAppLog().info("Refset spec: " + refsetSpec.getInitialText() + " " + refsetSpec.getUids().get(0));
-            RefsetComputeType computeType = RefsetComputeType.CONCEPT; // default
+            AceLog.getAppLog().info("Refset spec: " + refsetSpec.toUserString() + " " + refsetSpec.getPrimUuid());
+            ComputeType computeType = ComputeType.CONCEPT; // default
             if (refsetSpecHelper.isDescriptionComputeType()) {
-                computeType = RefsetComputeType.DESCRIPTION;
+                computeType = ComputeType.DESCRIPTION;
             } else if (refsetSpecHelper.isRelationshipComputeType()) {
                 AceLog.getAppLog().info("Invalid refset spec to compute - relationship compute types not supported.");
                 if (!DwfaEnv.isHeadless()) {
@@ -159,7 +160,7 @@ public class ComputeRefsetForAConceptTask extends AbstractTask {
             }
             // Step 1: create the query object, based on the refset spec
             RefsetSpecQuery query =
-                    RefsetQueryFactory.createQuery(configFrame, Terms.get(), refsetSpec, refset, computeType);
+                    RefsetSpecFactory.createQuery(configFrame.getViewCoordinate(), refsetSpec, refset, computeType);
 
             // check validity of query
             if (!query.isValidQuery() && query.getTotalStatementCount() != 0) {
@@ -179,7 +180,7 @@ public class ComputeRefsetForAConceptTask extends AbstractTask {
             AceLog.getAppLog().info("Concept to test = " + selectedConcept.toString());
             
             List<I_ShowActivity> activities = new ArrayList<I_ShowActivity>();
-            boolean result = query.execute(selectedConcept.getNid(), selectedConcept, activities);
+            boolean result = query.execute(selectedConcept.getNid(), selectedConcept, null, null, null);
             
             AceLog.getAppLog().info("++++++++++++++ Result = " + result);
             AceLog.getAppLog().info("************ Finished test computation *****************");
