@@ -227,7 +227,8 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 	/* (non-Javadoc)
 	 * @see org.ihtsdo.tk.helper.TerminologyHelperDrools#isParentOf(java.lang.String, java.lang.String)
 	 */
-	public boolean isParentOf(String parent, String subtype) throws Exception {		
+	public boolean isParentOf(String parent, String subtype) throws Exception {
+		System.out.println("#-#-#-#-#-# " + subtype.toString() + " isKindOf " + parent.toString() + " #-#-#-#-#-#");
 		boolean result = false;
 		if (!Ts.get().hasUuid(uuidFromString(parent))) {
 			// missing concept
@@ -249,6 +250,7 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 
 		subtypeConceptNid = Terms.get().uuidToNative(uuidFromString(subtype));
 		subtypeConcept = Ts.get().getConceptVersion(config.getViewCoordinate(), subtypeConceptNid);
+		System.out.println("#-#-#-#-#-# " + subtypeConcept.getDescriptionPreferred().getText() + " isKindOf " + parentConcept.getDescriptionPreferred().getText() + " #-#-#-#-#-#");
 
 		if (parentConcept ==  null || subtypeConcept == null) {
 			result = false;
@@ -262,6 +264,7 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 			testViewCoordinate.setRelationshipAssertionType(RelAssertionType.STATED);
 			result =  Ts.get().isKindOf(subtypeConceptNid, parentConceptNid, testViewCoordinate);
 		}
+		System.out.println("Result= " + result);
 		return result;
 	}
 
