@@ -40,16 +40,23 @@ public abstract class BatchActionTask {
 
     public enum BatchActionTaskType {
 
-        PARENT_ADD_NEW,
-        PARENT_REPLACE,
-        PARENT_RETIRE,
-        REFSET_ADD_MEMBER,
-        REFSET_MOVE_MEMBER,
-        REFSET_REPLACE_VALUE,
-        REFSET_RETIRE_MEMBER,
-        ROLE_ADD,
-        ROLE_REPLACE_VALUE,
-        ROLE_RETIRE,
+        CONCEPT_PARENT_ADD_NEW,
+        CONCEPT_PARENT_REPLACE,
+        CONCEPT_PARENT_RETIRE,
+        CONCEPT_REFSET_ADD_MEMBER,
+        CONCEPT_REFSET_MOVE_MEMBER,
+        CONCEPT_REFSET_REPLACE_VALUE,
+        CONCEPT_REFSET_RETIRE_MEMBER,
+        DESCRIPTION_INITIAL_CAPS_CHANGE,
+        DESCRIPTION_RETIRE,
+        DESCRIPTION_TEXT_FIND_REPLACE,
+        DESCRIPTION_TEXT_FIND_CREATE,
+        DESCRIPTION_REFSET_ADD_MEMBER,
+        DESCRIPTION_REFSET_CHANGE_VALUE,
+        DESCRIPTION_REFSET_RETIRE_MEMBER,
+        RELATIONSHIP_ROLE_ADD,
+        RELATIONSHIP_ROLE_REPLACE_VALUE,
+        RELATIONSHIP_ROLE_RETIRE,
         LOGIC_DISJOINT_SET_ADD, // :SNOOWL:ADD:
         LOGIC_DISJOINT_SET_RETIRE, // :SNOOWL:ADD:
         LOGIC_NEGATE_RELATIONSHIP_VALUE, // :SNOOWL:ADD:
@@ -66,7 +73,8 @@ public abstract class BatchActionTask {
 
     /**
      * Call once prior to execution of task to setup common values used to process all tasks.
-     * @param tc
+     * @param ec
+     * @param vc
      * @throws IOException 
      */
     public static void setup(EditCoordinate ec, ViewCoordinate vc) throws IOException {

@@ -28,9 +28,9 @@ import org.dwfa.tapi.impl.MemoryTermServer;
 import org.ihtsdo.batch.BatchActionEventReporter;
 import org.ihtsdo.batch.BatchActionProcessor;
 import org.ihtsdo.batch.BatchActionTask;
-import org.ihtsdo.batch.BatchActionTaskParentAddNew;
-import org.ihtsdo.batch.BatchActionTaskParentReplace;
-import org.ihtsdo.batch.BatchActionTaskParentRetire;
+import org.ihtsdo.batch.BatchActionTaskConceptParentAddNew;
+import org.ihtsdo.batch.BatchActionTaskConceptParentReplace;
+import org.ihtsdo.batch.BatchActionTaskConceptParentRetire;
 import org.ihtsdo.batch.BatchActionTaskSimple;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.db.bdb.Bdb;
@@ -128,9 +128,9 @@ public class BatchActionTaskTest {
 
             // SETUP BatchActionTaskList
             List<BatchActionTask> batl = new ArrayList<>();
-            batl.add(new BatchActionTaskParentAddNew(isaUuid, parentToAddUuid));
-            batl.add(new BatchActionTaskParentRetire(isaUuid, parentToDelUuid));
-            batl.add(new BatchActionTaskParentReplace(isaUuid, parentMoveFromUuid, isaUuid, parentMoveToUuid));
+            batl.add(new BatchActionTaskConceptParentAddNew(isaUuid, parentToAddUuid));
+            batl.add(new BatchActionTaskConceptParentRetire(isaUuid, parentToDelUuid));
+            batl.add(new BatchActionTaskConceptParentReplace(isaUuid, parentMoveFromUuid, isaUuid, parentMoveToUuid));
             batl.add(new BatchActionTaskSimple());
 
             // EXERCISE BATCH ACTION TEST
