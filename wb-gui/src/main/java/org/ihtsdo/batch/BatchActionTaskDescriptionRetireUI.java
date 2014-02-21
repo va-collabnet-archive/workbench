@@ -41,29 +41,21 @@ public class BatchActionTaskDescriptionRetireUI extends javax.swing.JPanel imple
 
     BatchActionTask task;
     boolean useFilter;
-    int currentValueTypeIdx;
 
     /**
-     * Creates new form BatchActionTaskDescriptionRefsetReplaceValueUI
+     * Creates new form BatchActionTaskDescriptionRetireUI
      */
     public BatchActionTaskDescriptionRetireUI() {
         initComponents();
 
         // TASK
-        this.task = new BatchActionTaskDescriptionRefsetReplaceValue();
-
-        // Setup DnD Replace Value Panel
-        ValueDndNidUI tmp = new ValueDndNidUI("Replace Concept With:");
-        GroupLayout layout = (GroupLayout) this.getLayout();
-        layout.replace(jPanelValueReplace, tmp.getPanel());
-        jPanelValueReplace = tmp.getPanel();
+        this.task = new BatchActionTaskDescriptionRetire();
 
         // Setup Filter Value Panel
-        tmp = new ValueDndNidUI("Concept Match Value:");
+        GroupLayout layout = (GroupLayout)jPanelCriteria.getLayout();
+        ValueDndNidUI tmp = new ValueDndNidUI("Member Match Value:");
         layout.replace(jPanelValueMatch, tmp.getPanel());
         jPanelValueMatch = tmp.getPanel();
-
-        currentValueTypeIdx = 1; // concept
 
         useFilter = false;
         jCheckBoxMatch.setSelected(useFilter);
@@ -80,38 +72,61 @@ public class BatchActionTaskDescriptionRetireUI extends javax.swing.JPanel imple
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jLabel1 = new javax.swing.JLabel();
-        jComboBoxExistingRefsets = new javax.swing.JComboBox();
-        jPanelValueReplace = new javax.swing.JPanel();
-        jCheckBoxMatch = new javax.swing.JCheckBox();
-        jPanelValueMatch = new javax.swing.JPanel();
-        jTextFieldSearchText = new javax.swing.JTextField();
-        jCheckBoxSearchIsCaseSensitive = new javax.swing.JCheckBox();
-        jComboBoxSearchByType = new javax.swing.JComboBox();
-        jLabel3 = new javax.swing.JLabel();
+        jPanelCriteria = new javax.swing.JPanel();
         jComboBoxSearchByConstraint = new javax.swing.JComboBox();
+        jCheckBoxSearchIsCaseSensitive = new javax.swing.JCheckBox();
+        jLabel3 = new javax.swing.JLabel();
+        jComboBoxSearchByType = new javax.swing.JComboBox();
         jLabel4 = new javax.swing.JLabel();
         jComboBoxSearchByLanguage = new javax.swing.JComboBox();
+        jLabel1 = new javax.swing.JLabel();
+        jComboBoxExistingRefsets = new javax.swing.JComboBox();
+        jCheckBoxMatch = new javax.swing.JCheckBox();
+        jTextFieldSearchText = new javax.swing.JTextField();
+        jPanelValueMatch = new javax.swing.JPanel();
 
         setPreferredSize(new java.awt.Dimension(218, 120));
 
-        jLabel1.setText("In Refset:");
+        jPanelCriteria.setBorder(javax.swing.BorderFactory.createTitledBorder("Criteria"));
+
+        jComboBoxSearchByConstraint.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Text Does Not Apply", "Contains", "Begins with", "Ends with" }));
+        jComboBoxSearchByConstraint.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jComboBoxSearchByContraintActionPerformed(evt);
+            }
+        });
+
+        jCheckBoxSearchIsCaseSensitive.setText("Case Sensitive Criteria");
+        jCheckBoxSearchIsCaseSensitive.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jCheckBoxSearchIsCaseSensitiveActionPerformed(evt);
+            }
+        });
+
+        jLabel3.setText("Type:");
+
+        jComboBoxSearchByType.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "-------", "FSN", "Synonym", "Definition" }));
+        jComboBoxSearchByType.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jComboBoxSearchByTypeActionPerformed(evt);
+            }
+        });
+
+        jLabel4.setText("Language");
+
+        jComboBoxSearchByLanguage.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "N/A", "EN", "DA", "ES", "FR", "LIT", "LT", "NL", "PL", "SV", "ZH" }));
+        jComboBoxSearchByLanguage.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jComboBoxSearchByLanguageActionPerformed(evt);
+            }
+        });
+
+        jLabel1.setText("Member of Refset:");
 
         jComboBoxExistingRefsets.setModel(jComboBoxExistingRefsets.getModel());
         jComboBoxExistingRefsets.setRenderer(new org.ihtsdo.batch.JComboBoxExistingRefsetsRender());
 
-        javax.swing.GroupLayout jPanelValueReplaceLayout = new javax.swing.GroupLayout(jPanelValueReplace);
-        jPanelValueReplace.setLayout(jPanelValueReplaceLayout);
-        jPanelValueReplaceLayout.setHorizontalGroup(
-            jPanelValueReplaceLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
-        );
-        jPanelValueReplaceLayout.setVerticalGroup(
-            jPanelValueReplaceLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 39, Short.MAX_VALUE)
-        );
-
-        jCheckBoxMatch.setText("Filter On Value:");
+        jCheckBoxMatch.setText("Filter On Refset Member Value:");
         jCheckBoxMatch.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jCheckBoxMatchActionPerformed(evt);
@@ -126,96 +141,80 @@ public class BatchActionTaskDescriptionRetireUI extends javax.swing.JPanel imple
         );
         jPanelValueMatchLayout.setVerticalGroup(
             jPanelValueMatchLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
+            .addGap(0, 31, Short.MAX_VALUE)
         );
 
-        jCheckBoxSearchIsCaseSensitive.setText("Case Sensitive");
-        jCheckBoxSearchIsCaseSensitive.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jCheckBoxSearchIsCaseSensitiveActionPerformed(evt);
-            }
-        });
-
-        jComboBoxSearchByType.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Type Does Not Apply", "FSN", "Synonym", "Definition" }));
-        jComboBoxSearchByType.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jComboBoxSearchByTypeActionPerformed(evt);
-            }
-        });
-
-        jLabel3.setText("Type:");
-
-        jComboBoxSearchByConstraint.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Text Does Not Apply", "Contains", "Begins with", "Ends with" }));
-        jComboBoxSearchByConstraint.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jComboBoxSearchByContraintActionPerformed(evt);
-            }
-        });
-
-        jLabel4.setText("Language");
-
-        jComboBoxSearchByLanguage.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "N/A", "en", "gb" }));
-        jComboBoxSearchByLanguage.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jComboBoxSearchByLanguageActionPerformed(evt);
-            }
-        });
-
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-        this.setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanelValueMatch, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jCheckBoxMatch)
-                    .addGroup(layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
+        javax.swing.GroupLayout jPanelCriteriaLayout = new javax.swing.GroupLayout(jPanelCriteria);
+        jPanelCriteria.setLayout(jPanelCriteriaLayout);
+        jPanelCriteriaLayout.setHorizontalGroup(
+            jPanelCriteriaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanelCriteriaLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanelCriteriaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanelCriteriaLayout.createSequentialGroup()
+                        .addComponent(jLabel1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jComboBoxExistingRefsets, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(jPanelCriteriaLayout.createSequentialGroup()
+                        .addGroup(jPanelCriteriaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanelCriteriaLayout.createSequentialGroup()
                                 .addComponent(jCheckBoxSearchIsCaseSensitive)
                                 .addGap(18, 18, 18)
                                 .addComponent(jLabel3)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addComponent(jComboBoxSearchByType, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(18, 18, 18)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(jLabel4)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(jComboBoxSearchByLanguage, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(layout.createSequentialGroup()
+                            .addGroup(jPanelCriteriaLayout.createSequentialGroup()
                                 .addComponent(jComboBoxSearchByConstraint, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jTextFieldSearchText))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel1)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jComboBoxExistingRefsets, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                            .addComponent(jPanelValueReplace, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
-                .addContainerGap())
+                                .addComponent(jTextFieldSearchText)))
+                        .addContainerGap())))
+            .addGroup(jPanelCriteriaLayout.createSequentialGroup()
+                .addComponent(jCheckBoxMatch)
+                .addGap(0, 0, Short.MAX_VALUE))
+            .addComponent(jPanelValueMatch, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+        jPanelCriteriaLayout.setVerticalGroup(
+            jPanelCriteriaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanelCriteriaLayout.createSequentialGroup()
+                .addGroup(jPanelCriteriaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jComboBoxSearchByConstraint, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jTextFieldSearchText, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanelCriteriaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jCheckBoxSearchIsCaseSensitive)
+                    .addComponent(jLabel3)
+                    .addComponent(jComboBoxSearchByType, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel4)
+                    .addComponent(jComboBoxSearchByLanguage, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanelCriteriaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel1)
+                    .addComponent(jComboBoxExistingRefsets, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jCheckBoxMatch)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanelValueMatch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 15, Short.MAX_VALUE))
+        );
+
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
+        this.setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jPanelCriteria, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(38, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jComboBoxSearchByConstraint, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jTextFieldSearchText, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
-                    .addComponent(jComboBoxSearchByLanguage, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel4)
-                    .addComponent(jComboBoxSearchByType, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel3)
-                    .addComponent(jCheckBoxSearchIsCaseSensitive))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
-                    .addComponent(jLabel1)
-                    .addComponent(jComboBoxExistingRefsets, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanelValueReplace, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jCheckBoxMatch)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 69, Short.MAX_VALUE)
-                .addComponent(jPanelValueMatch, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(jPanelCriteria, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 42, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -227,22 +226,22 @@ public class BatchActionTaskDescriptionRetireUI extends javax.swing.JPanel imple
 
     private void jCheckBoxSearchIsCaseSensitiveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBoxSearchIsCaseSensitiveActionPerformed
         boolean checkboxState = ((JCheckBox) evt.getSource()).isSelected();
-        ((BatchActionTaskDescriptionRefsetReplaceValue) task).setIsSearchCaseSensitive(checkboxState);
+        ((BatchActionTaskDescriptionRetire) task).setIsSearchCaseSensitive(checkboxState);
     }//GEN-LAST:event_jCheckBoxSearchIsCaseSensitiveActionPerformed
 
     private void jComboBoxSearchByContraintActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBoxSearchByContraintActionPerformed
         int idx = ((JComboBox) evt.getSource()).getSelectedIndex();
-        ((BatchActionTaskDescriptionRefsetReplaceValue) task).setSearchByTextConstraint(idx);
+        ((BatchActionTaskDescriptionRetire) task).setSearchByTextConstraint(idx);
     }//GEN-LAST:event_jComboBoxSearchByContraintActionPerformed
 
     private void jComboBoxSearchByTypeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBoxSearchByTypeActionPerformed
         int idx = ((JComboBox) evt.getSource()).getSelectedIndex();
-        ((BatchActionTaskDescriptionRefsetReplaceValue) task).setSearchByType(idx);
+        ((BatchActionTaskDescriptionRetire) task).setSearchByType(idx);
     }//GEN-LAST:event_jComboBoxSearchByTypeActionPerformed
 
     private void jComboBoxSearchByLanguageActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBoxSearchByLanguageActionPerformed
         int idx = ((JComboBox) evt.getSource()).getSelectedIndex();
-        ((BatchActionTaskDescriptionRefsetReplaceValue) task).setSearchByLanguage(idx);
+        ((BatchActionTaskDescriptionRetire) task).setSearchByLanguage(idx);
     }//GEN-LAST:event_jComboBoxSearchByLanguageActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -255,8 +254,8 @@ public class BatchActionTaskDescriptionRetireUI extends javax.swing.JPanel imple
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
+    private javax.swing.JPanel jPanelCriteria;
     private javax.swing.JPanel jPanelValueMatch;
-    private javax.swing.JPanel jPanelValueReplace;
     private javax.swing.JTextField jTextFieldSearchText;
     // End of variables declaration//GEN-END:variables
 
@@ -324,45 +323,31 @@ public class BatchActionTaskDescriptionRetireUI extends javax.swing.JPanel imple
         if (valStr.equalsIgnoreCase("")) {
             valStr = null;
         }
-        ((BatchActionTaskDescriptionRefsetReplaceValue) task).setSearchText(valStr);
-
-        
-        // 
-        
-
+        ((BatchActionTaskDescriptionRetire) task).setSearchText(valStr);
+  
         // SET REFSET EXITING COLLECTION NID
         DefaultComboBoxModel dcbm = (DefaultComboBoxModel) jComboBoxExistingRefsets.getModel();
         ComponentVersionBI refsetBI = (ComponentVersionBI) dcbm.getSelectedItem();
         if (refsetBI != null) {
             int refsetNid = refsetBI.getNid();
-            ((BatchActionTaskDescriptionRefsetReplaceValue) task).setCollectionNid(refsetNid);
+            ((BatchActionTaskDescriptionRetire) task).setCollectionNid(refsetNid);
         } else {
             BatchActionEventReporter.add(new BatchActionEvent(null, BatchActionTaskType.DESCRIPTION_REFSET_CHANGE_VALUE,
                     BatchActionEventType.TASK_INVALID, "no selected refset"));
             return null;
         }
 
-        // SET VALUE TYPE
-        ((BatchActionTaskDescriptionRefsetReplaceValue) task).setRefsetType(TK_REFEX_TYPE.CID);
-        Integer valConcept = ((ValueDndNidUI) jPanelValueReplace).getValue();
-        if (valConcept != null) {
-            ((BatchActionTaskDescriptionRefsetReplaceValue) task).setRefsetValue(valConcept);
-        } else {
-            BatchActionEventReporter.add(new BatchActionEvent(null, BatchActionTaskType.DESCRIPTION_REFSET_CHANGE_VALUE,
-                    BatchActionEventType.TASK_INVALID, "replace value not set"));
-            return null;
-        }
-
         // CHECK MATCH FILTER
         if (jCheckBoxMatch.isSelected() == false) {
-            ((BatchActionTaskDescriptionRefsetReplaceValue) task).setMatchValue(null);
+            ((BatchActionTaskDescriptionRetire) task).setMatchValue(null);
             return task;
         }
 
         // SET MATCH VALUE
-        valConcept = ((ValueDndNidUI) jPanelValueMatch).getValue();
+        ((BatchActionTaskDescriptionRetire) task).setRefsetType(TK_REFEX_TYPE.CID);
+        Integer valConcept = ((ValueDndNidUI) jPanelValueMatch).getValue();
         if (valConcept != null) {
-            ((BatchActionTaskDescriptionRefsetReplaceValue) task).setMatchValue(valConcept);
+            ((BatchActionTaskDescriptionRetire) task).setMatchValue(valConcept);
             return task;
         }
 

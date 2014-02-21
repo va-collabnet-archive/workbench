@@ -43,12 +43,12 @@ public class BatchActionTaskConceptRefsetReplaceValueUI extends javax.swing.JPan
     boolean useFilter;
     int currentValueTypeIdx;
 
-    /** Creates new form BatchActionTaskDescriptionRefsetReplaceValueUI */
+    /** Creates new form BatchActionTaskConceptRefsetReplaceValueUI */
     public BatchActionTaskConceptRefsetReplaceValueUI() {
         initComponents();
 
         // TASK
-        this.task = new BatchActionTaskDescriptionRefsetReplaceValue();
+        this.task = new BatchActionTaskConceptRefsetReplaceValue();
 
         // Setup DnD Replace Value Panel
         ValueDndNidUI tmp = new ValueDndNidUI("Replace Concept With:");
@@ -297,7 +297,7 @@ public class BatchActionTaskConceptRefsetReplaceValueUI extends javax.swing.JPan
         ComponentVersionBI refsetBI = (ComponentVersionBI) dcbm.getSelectedItem();
         if (refsetBI != null) {
             int refsetNid = refsetBI.getNid();
-            ((BatchActionTaskDescriptionRefsetReplaceValue) task).setCollectionNid(refsetNid);
+            ((BatchActionTaskConceptRefsetReplaceValue) task).setCollectionNid(refsetNid);
         } else {
             BatchActionEventReporter.add(new BatchActionEvent(null, BatchActionTaskType.CONCEPT_REFSET_REPLACE_VALUE,
                     BatchActionEventType.TASK_INVALID, "no selected refset"));
@@ -307,10 +307,10 @@ public class BatchActionTaskConceptRefsetReplaceValueUI extends javax.swing.JPan
         // SET VALUE TYPE
         switch (jComboBoxType.getSelectedIndex()) {
             case 0:
-                ((BatchActionTaskDescriptionRefsetReplaceValue) task).setRefsetType(TK_REFEX_TYPE.BOOLEAN);
+                ((BatchActionTaskConceptRefsetReplaceValue) task).setRefsetType(TK_REFEX_TYPE.BOOLEAN);
                 Boolean valBoolean = ((ValueBooleanUI) jPanelValueReplace).getValue();
                 if (valBoolean != null) {
-                    ((BatchActionTaskDescriptionRefsetReplaceValue) task).setRefsetValue(valBoolean);
+                    ((BatchActionTaskConceptRefsetReplaceValue) task).setRefsetValue(valBoolean);
                 } else {
                     BatchActionEventReporter.add(new BatchActionEvent(null, BatchActionTaskType.CONCEPT_REFSET_REPLACE_VALUE,
                             BatchActionEventType.TASK_INVALID, "replace value not set"));
@@ -318,10 +318,10 @@ public class BatchActionTaskConceptRefsetReplaceValueUI extends javax.swing.JPan
                 }
                 break;
             case 1:
-                ((BatchActionTaskDescriptionRefsetReplaceValue) task).setRefsetType(TK_REFEX_TYPE.CID);
+                ((BatchActionTaskConceptRefsetReplaceValue) task).setRefsetType(TK_REFEX_TYPE.CID);
                 Integer valConcept = ((ValueDndNidUI) jPanelValueReplace).getValue();
                 if (valConcept != null) {
-                    ((BatchActionTaskDescriptionRefsetReplaceValue) task).setRefsetValue(valConcept);
+                    ((BatchActionTaskConceptRefsetReplaceValue) task).setRefsetValue(valConcept);
                 } else {
                     BatchActionEventReporter.add(new BatchActionEvent(null, BatchActionTaskType.CONCEPT_REFSET_REPLACE_VALUE,
                             BatchActionEventType.TASK_INVALID, "replace value not set"));
@@ -329,10 +329,10 @@ public class BatchActionTaskConceptRefsetReplaceValueUI extends javax.swing.JPan
                 }
                 break;
             case 2:
-                ((BatchActionTaskDescriptionRefsetReplaceValue) task).setRefsetType(TK_REFEX_TYPE.INT);
+                ((BatchActionTaskConceptRefsetReplaceValue) task).setRefsetType(TK_REFEX_TYPE.INT);
                 Integer valInt = ((ValueIntUI) jPanelValueReplace).getValue();
                 if (valInt != null) {
-                    ((BatchActionTaskDescriptionRefsetReplaceValue) task).setRefsetValue(valInt);
+                    ((BatchActionTaskConceptRefsetReplaceValue) task).setRefsetValue(valInt);
                 } else {
                     BatchActionEventReporter.add(new BatchActionEvent(null, BatchActionTaskType.CONCEPT_REFSET_REPLACE_VALUE,
                             BatchActionEventType.TASK_INVALID, "replace value not set"));
@@ -340,10 +340,10 @@ public class BatchActionTaskConceptRefsetReplaceValueUI extends javax.swing.JPan
                 }
                 break;
             case 3:
-                ((BatchActionTaskDescriptionRefsetReplaceValue) task).setRefsetType(TK_REFEX_TYPE.STR);
+                ((BatchActionTaskConceptRefsetReplaceValue) task).setRefsetType(TK_REFEX_TYPE.STR);
                 String valStr = ((ValueStringUI) jPanelValueReplace).getValue();
                 if (valStr != null) {
-                    ((BatchActionTaskDescriptionRefsetReplaceValue) task).setRefsetValue(valStr);
+                    ((BatchActionTaskConceptRefsetReplaceValue) task).setRefsetValue(valStr);
                 } else {
                     BatchActionEventReporter.add(new BatchActionEvent(null, BatchActionTaskType.CONCEPT_REFSET_REPLACE_VALUE,
                             BatchActionEventType.TASK_INVALID, "replace value not set"));
@@ -356,7 +356,7 @@ public class BatchActionTaskConceptRefsetReplaceValueUI extends javax.swing.JPan
 
         // CHECK MATCH FILTER
         if (jCheckBoxMatch.isSelected() == false) {
-            ((BatchActionTaskDescriptionRefsetReplaceValue) task).setMatchValue(null);
+            ((BatchActionTaskConceptRefsetReplaceValue) task).setMatchValue(null);
             return task;
         }
 
@@ -365,28 +365,28 @@ public class BatchActionTaskConceptRefsetReplaceValueUI extends javax.swing.JPan
             case 0:
                 Boolean valBoolean = ((ValueBooleanUI) jPanelValueMatch).getValue();
                 if (valBoolean != null) {
-                    ((BatchActionTaskDescriptionRefsetReplaceValue) task).setMatchValue(valBoolean);
+                    ((BatchActionTaskConceptRefsetReplaceValue) task).setMatchValue(valBoolean);
                     return task;
                 }
                 break;
             case 1:
                 Integer valConcept = ((ValueDndNidUI) jPanelValueMatch).getValue();
                 if (valConcept != null) {
-                    ((BatchActionTaskDescriptionRefsetReplaceValue) task).setMatchValue(valConcept);
+                    ((BatchActionTaskConceptRefsetReplaceValue) task).setMatchValue(valConcept);
                     return task;
                 }
                 break;
             case 2:
                 Integer valInt = ((ValueIntUI) jPanelValueMatch).getValue();
                 if (valInt != null) {
-                    ((BatchActionTaskDescriptionRefsetReplaceValue) task).setMatchValue(valInt);
+                    ((BatchActionTaskConceptRefsetReplaceValue) task).setMatchValue(valInt);
                     return task;
                 }
                 break;
             case 3:
                 String valStr = ((ValueStringUI) jPanelValueMatch).getValue();
                 if (valStr != null) {
-                    ((BatchActionTaskDescriptionRefsetReplaceValue) task).setMatchValue(valStr);
+                    ((BatchActionTaskConceptRefsetReplaceValue) task).setMatchValue(valStr);
                     return task;
                 }
                 break;

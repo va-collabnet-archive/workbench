@@ -265,7 +265,7 @@ public class BatchActionTaskBase extends javax.swing.JPanel {
                     case DESCRIPTION_TEXT_FIND_CREATE:
                         if (actionTaskType.compareTo(BatchActionTaskType.DESCRIPTION_TEXT_FIND_CREATE) != 0) {
                             actionTaskType = BatchActionTaskType.DESCRIPTION_TEXT_FIND_CREATE;
-                            taskDetailUI = new BatchActionTaskDescriptionTextFindReplaceUI();
+                            taskDetailUI = new BatchActionTaskDescriptionTextFindCreateUI();
                         }
                         break;
                     case DESCRIPTION_REFSET_ADD_MEMBER:

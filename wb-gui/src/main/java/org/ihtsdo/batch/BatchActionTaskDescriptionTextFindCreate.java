@@ -31,7 +31,7 @@ import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.dto.concept.component.refex.TK_REFEX_TYPE;
 
 /**
- * BatchActionTaskDescriptionRefsetReplaceValue
+ * BatchActionTaskDescriptionTextFindCreate
  * 
  */
 public class BatchActionTaskDescriptionTextFindCreate extends BatchActionTask {

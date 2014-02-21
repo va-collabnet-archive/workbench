@@ -99,14 +99,14 @@ public class BatchActionTaskConceptRefsetMoveMemberUI extends javax.swing.JPanel
         jPanelDndRefsetMoveTo.setLayout(jPanelDndRefsetMoveToLayout);
         jPanelDndRefsetMoveToLayout.setHorizontalGroup(
             jPanelDndRefsetMoveToLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 218, Short.MAX_VALUE)
+            .addGap(0, 408, Short.MAX_VALUE)
         );
         jPanelDndRefsetMoveToLayout.setVerticalGroup(
             jPanelDndRefsetMoveToLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 28, Short.MAX_VALUE)
         );
 
-        jCheckBoxMatch.setText("If Matches Value 2:");
+        jCheckBoxMatch.setText("If Matches Value:");
         jCheckBoxMatch.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jCheckBoxMatchActionPerformed(evt);
@@ -126,11 +126,11 @@ public class BatchActionTaskConceptRefsetMoveMemberUI extends javax.swing.JPanel
         jPanelValueMatch.setLayout(jPanelValueMatchLayout);
         jPanelValueMatchLayout.setHorizontalGroup(
             jPanelValueMatchLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 218, Short.MAX_VALUE)
+            .addGap(0, 408, Short.MAX_VALUE)
         );
         jPanelValueMatchLayout.setVerticalGroup(
             jPanelValueMatchLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
+            .addGap(0, 132, Short.MAX_VALUE)
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -140,7 +140,7 @@ public class BatchActionTaskConceptRefsetMoveMemberUI extends javax.swing.JPanel
             .addGroup(layout.createSequentialGroup()
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jComboBoxExistingRefsets, 0, 140, Short.MAX_VALUE))
+                .addComponent(jComboBoxExistingRefsets, 0, 329, Short.MAX_VALUE))
             .addComponent(jPanelDndRefsetMoveTo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(jPanelValueMatch, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()

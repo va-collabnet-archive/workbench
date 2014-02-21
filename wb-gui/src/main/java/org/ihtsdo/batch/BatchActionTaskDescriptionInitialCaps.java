@@ -26,12 +26,11 @@ import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
-import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.dto.concept.component.refex.TK_REFEX_TYPE;
 
 /**
- * BatchActionTaskDescriptionRefsetReplaceValue
+ * BatchActionTaskDescriptionInitialCaps
  * 
  */
 public class BatchActionTaskDescriptionInitialCaps extends BatchActionTask {
