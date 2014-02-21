@@ -510,7 +510,7 @@ public class ReportBatchQACheck extends AbstractMavenReport {
 					log.info("1000 line file");
 					int startline = lines - 1000;
 					if (startline <= 0) {
-						startline = 1;
+						startline = 0;
 					}
 					findingFile.renameTo(new File(findingFolder, ruleLineSplit[0]+ "("+  startline + "-" + lines + ").html"));
 					result.put(ruleLineSplit[0]+ "("+  startline + "-" + lines + ").html", lines - startline);
@@ -518,7 +518,7 @@ public class ReportBatchQACheck extends AbstractMavenReport {
 					log.info("LAST FILE");
 					int startline = lines - 1000;
 					if (startline <= 0) {
-						startline = 1;
+						startline = 0;
 					}
 					findingFile.renameTo(new File(findingFolder, ruleLineSplit[0] + "("+ startline + "-" + lines + ").html"));
 					result.put(ruleLineSplit[0] + "("+  startline + "-" + lines + ").html", lines - startline);
