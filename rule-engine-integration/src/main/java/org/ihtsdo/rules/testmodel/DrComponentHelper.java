@@ -373,6 +373,7 @@ public class DrComponentHelper {
 				}
 
 				if (relTuple.getCharacteristicNid() == inferred) {
+					//System.out.println(loopRel.toString());
 					inferredRolesSet.getRelationships().add(loopRel);
 				}
 			}
