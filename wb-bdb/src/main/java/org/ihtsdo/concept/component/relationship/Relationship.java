@@ -3,9 +3,11 @@ package org.ihtsdo.concept.component.relationship;
 //~--- non-JDK imports --------------------------------------------------------
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
+import java.beans.PropertyVetoException;
+import java.io.IOException;
 
+import java.util.*;
 import org.apache.commons.collections.primitives.ArrayIntList;
-
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_MapNativeToNative;
 import org.dwfa.ace.api.I_RelPart;
@@ -17,36 +19,28 @@ import org.dwfa.ace.utypes.UniversalAceRelationship;
 import org.dwfa.ace.utypes.UniversalAceRelationshipPart;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.HashFunction;
-
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.concept.component.RevisionSet;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.computer.version.VersionComputer;
-import org.ihtsdo.tk.api.ContradictionManagerBI;
+import org.ihtsdo.db.change.ChangeNotifier;
 import org.ihtsdo.tk.api.ContradictionException;
+import org.ihtsdo.tk.api.ContradictionManagerBI;
 import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.PositionSetBI;
 import org.ihtsdo.tk.api.Precedence;
-import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
-import org.ihtsdo.tk.api.relationship.RelationshipAnalogBI;
-import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationship;
-import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationshipRevision;
-
-//~--- JDK imports ------------------------------------------------------------
-
-import java.beans.PropertyVetoException;
-
-import java.io.IOException;
-
-import java.util.*;
-import org.ihtsdo.db.change.ChangeNotifier;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.blueprint.RelationshipCAB;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.api.relationship.RelationshipAnalogBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf1;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
+import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationship;
+import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationshipRevision;
 import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationshipType;
 
 public class Relationship extends ConceptComponent<RelationshipRevision, Relationship>
@@ -54,6 +48,7 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
         RelationshipAnalogBI<RelationshipRevision> {
 
     private static int classifierAuthorNid = Integer.MIN_VALUE;
+    private static int inferredCharacteristicNid = Integer.MIN_VALUE;
     private static VersionComputer<Relationship.Version> computer =
             new VersionComputer<>();
     //~--- fields --------------------------------------------------------------
@@ -454,6 +449,19 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 
         return classifierAuthorNid;
     }
+    
+    public static int getInferredCharacteristicNid() {
+        if (inferredCharacteristicNid == Integer.MIN_VALUE) {
+            try {
+                inferredCharacteristicNid =
+                        SnomedMetadataRfx.getREL_CH_INFERRED_RELATIONSHIP_NID();
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+        }
+
+        return inferredCharacteristicNid;
+    }
 
     @Override
     public int getTargetNid() {
@@ -704,7 +712,7 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
 
     @Override
     public boolean isInferred() {
-        return getAuthorNid() == Relationship.getClassifierAuthorNid();
+        return getCharacteristicNid() == Relationship.getInferredCharacteristicNid();
     }
 
     @Override
