@@ -29,7 +29,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.lucene.document.Document;
-import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
@@ -434,8 +433,6 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 			}
 		} catch (IOException e) {
 			AceLog.getAppLog().alertAndLogException(e);
-		} catch (ParseException e) {
-			AceLog.getAppLog().alertAndLogException(e);
 		} catch (TerminologyException e) {
 			AceLog.getAppLog().alertAndLogException(e);
 		}
@@ -526,9 +523,7 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 			}
 		} catch (IOException e) {
 			AceLog.getAppLog().alertAndLogException(e);
-		} catch (ParseException e) {
-			AceLog.getAppLog().alertAndLogException(e);
-		}
+		} 
 
 		return result;
 	}
