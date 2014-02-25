@@ -3,7 +3,7 @@
     <parent>
         <groupId>org.ihtsdo</groupId>
         <artifactId>wb-mmb</artifactId>
-        <version>1.0-dk3.2wb-SNAPSHOT</version>
+        <version>1.0-dk3.2wb</version>
     </parent>
     <artifactId>translation</artifactId>
     <packaging>jar</packaging>
