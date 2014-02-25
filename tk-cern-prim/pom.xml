@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.ihtsdo</groupId>
         <artifactId>wb-mmb</artifactId>
-        <version>2.38-trek-no-jini</version>
+        <version>dk-3.2wb-1.0-SNAPSHOT</version>
     </parent>
     <artifactId>tk-cern-prim</artifactId>
     <packaging>jar</packaging>
