@@ -68,14 +68,19 @@ public class EditPanelKb {
             Collection<Object> facts = new ArrayList<Object>();
             ViewCoordinate coordinate = config.getViewCoordinate();
             
-            View viewType;
+            View viewType = null;
             if (settings.getRelAssertionType() == RelAssertionType.STATED) {
                 viewType = View.STATED;
             } else if (settings.getRelAssertionType() == RelAssertionType.INFERRED) {
                 viewType = View.INFERRED;
-            } else {
+            } else if (settings.getRelAssertionType() == RelAssertionType.INFERRED_THEN_STATED) {
                 viewType = View.STATED_AND_INFERRED;
+            } else if (settings.getRelAssertionType() == RelAssertionType.LONG_NORMAL_FORM) {
+                viewType = View.LONG_NORMAL_FORM;
+            } else if (settings.getRelAssertionType() == RelAssertionType.SHORT_NORMAL_FORM) {
+                viewType = View.SHORT_NORMAL_FORM;
             }
+            
             facts.add(FactFactory.get(viewType));
             facts.add(Ts.get().getConceptVersion(coordinate, c.getNid()));
             boolean executed = DroolsExecutionManager.fireAllRules(kbKey, kbFiles,

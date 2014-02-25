@@ -360,13 +360,11 @@ public class DrComponentHelper {
 					loopRel.getIdentifiers().add(drId);
 				}
 
-				if (relTuple.getCharacteristicNid() == historical && 
-						config.getAllowedStatus().contains(relTuple.getStatusNid())) {
+				if (relTuple.getCharacteristicNid() == historical) {
 					concept.getOutgoingRelationships().add(loopRel);
 				}
 
-				if (relTuple.getCharacteristicNid() == stated && 
-						config.getAllowedStatus().contains(relTuple.getStatusNid())) {
+				if (relTuple.getCharacteristicNid() == stated) {
 					statedRolesSet.getRelationships().add(loopRel);
 				}
 
@@ -374,8 +372,8 @@ public class DrComponentHelper {
 					modelersRolesSet.getRelationships().add(loopRel);
 				}
 
-				if (relTuple.getCharacteristicNid() == inferred && 
-						config.getAllowedStatus().contains(relTuple.getStatusNid())) {
+				if (relTuple.getCharacteristicNid() == inferred) {
+					//System.out.println(loopRel.toString());
 					inferredRolesSet.getRelationships().add(loopRel);
 				}
 			}
