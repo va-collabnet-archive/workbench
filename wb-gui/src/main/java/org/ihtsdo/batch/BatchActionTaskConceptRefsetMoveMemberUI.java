@@ -228,7 +228,12 @@ public class BatchActionTaskConceptRefsetMoveMemberUI extends javax.swing.JPanel
     }
 
     @Override // I_BatchActionTask
-    public void updateExisting(List<RelationshipVersionBI> existingParents, List<ComponentVersionBI> existingRefsets, List<RelationshipVersionBI> existingRoles, List<ComponentVersionBI> parentLinkages) {
+    public void updateExisting(
+            List<RelationshipVersionBI> existingParents, 
+            List<ComponentVersionBI> existingConceptRefsets, 
+            List<ComponentVersionBI> existingDescriptionRefsets, 
+            List<RelationshipVersionBI> existingRoles, 
+            List<ComponentVersionBI> parentLinkages) {
         DefaultComboBoxModel dcbm = (DefaultComboBoxModel) jComboBoxExistingRefsets.getModel();
         ComponentVersionBI selectedItem = (ComponentVersionBI) dcbm.getSelectedItem();
 
@@ -242,9 +247,9 @@ public class BatchActionTaskConceptRefsetMoveMemberUI extends javax.swing.JPanel
         };
 
         // Add exitings parents to JComboBox model.
-        Collections.sort(existingRefsets, cmp);
+        Collections.sort(existingConceptRefsets, cmp);
         dcbm.removeAllElements();
-        for (ComponentVersionBI componentVersionBI : existingRefsets) {
+        for (ComponentVersionBI componentVersionBI : existingConceptRefsets) {
             dcbm.addElement(componentVersionBI);
         }
 

@@ -18,6 +18,7 @@ package org.ihtsdo.batch;
 
 import java.io.IOException;
 import java.util.UUID;
+import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.Terms;
 import org.ihtsdo.tk.Ts;
@@ -37,6 +38,7 @@ public abstract class BatchActionTask {
     public static I_IntSet HISTORIC_ROLE_TYPES = null;
     public static TerminologyStoreDI ts;
     public static TerminologyBuilderBI tsSnapshot;
+    public static I_ConfigAceFrame config;
 
     public enum BatchActionTaskType {
 
@@ -47,7 +49,7 @@ public abstract class BatchActionTask {
         CONCEPT_REFSET_MOVE_MEMBER,
         CONCEPT_REFSET_REPLACE_VALUE,
         CONCEPT_REFSET_RETIRE_MEMBER,
-        DESCRIPTION_INITIAL_CAPS_CHANGE,
+        DESCRIPTION_INITIAL_CHAR_CASE_SENSITIVITY,
         DESCRIPTION_RETIRE,
         DESCRIPTION_TEXT_FIND_REPLACE,
         DESCRIPTION_TEXT_FIND_CREATE,
@@ -75,13 +77,15 @@ public abstract class BatchActionTask {
      * Call once prior to execution of task to setup common values used to process all tasks.
      * @param ec
      * @param vc
+     * @param aceConfig
      * @throws IOException 
      */
-    public static void setup(EditCoordinate ec, ViewCoordinate vc) throws IOException {
+    public static void setup(EditCoordinate ec, ViewCoordinate vc, I_ConfigAceFrame aceConfig) throws IOException {
         RETIRED_NID = SnomedMetadataRfx.getSTATUS_RETIRED_NID();
         CURRENT_NID = SnomedMetadataRfx.getSTATUS_CURRENT_NID();
         ts = Ts.get();
         tsSnapshot = ts.getTerminologyBuilder(ec, vc);
+        config = aceConfig;
 
         // SETUP HISTORIC ROLE TYPES
         ConceptSpec[] historicalTypes = HistoricalRelType.getHistoricalTypes();

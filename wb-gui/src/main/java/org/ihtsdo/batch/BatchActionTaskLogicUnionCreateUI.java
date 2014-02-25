@@ -144,10 +144,7 @@ public class BatchActionTaskLogicUnionCreateUI extends javax.swing.JPanel
     }
 
     @Override // I_BatchActionTask
-    public void updateExisting(List<RelationshipVersionBI> existingParents,
-            List<ComponentVersionBI> existingRefsets,
-            List<RelationshipVersionBI> existingRoles,
-            List<ComponentVersionBI> parentLinkages) {
+    public void updateExisting(List<RelationshipVersionBI> existingParents, List<ComponentVersionBI> existingRefsets, List<ComponentVersionBI> existingDescriptionRefsets, List<RelationshipVersionBI> existingRoles, List<ComponentVersionBI> parentLinkages) {
         // nothing to do
     }
 

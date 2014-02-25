@@ -46,7 +46,7 @@ public class BatchActionTaskConceptRefsetAddMemberUI extends javax.swing.JPanel 
         // TASK
         this.task = new BatchActionTaskConceptRefsetAddMember();
 
-        // Setup DnD Add Value Panel
+        // Setup DnD Add Refset Panel
         ValueDndNidUI tmp = new ValueDndNidUI("To Refset:");
         GroupLayout layout = (GroupLayout) this.getLayout();
         layout.replace(jPanelDndRefsetAddTo, tmp.getPanel());
@@ -182,7 +182,7 @@ public class BatchActionTaskConceptRefsetAddMemberUI extends javax.swing.JPanel 
     }
 
     @Override // I_BatchActionTask
-    public void updateExisting(List<RelationshipVersionBI> existingParents, List<ComponentVersionBI> existingRefsets, List<RelationshipVersionBI> existingRoles, List<ComponentVersionBI> parentLinkages) {
+    public void updateExisting(List<RelationshipVersionBI> existingParents, List<ComponentVersionBI> existingRefsets, List<ComponentVersionBI> existingDescriptionRefsets, List<RelationshipVersionBI> existingRoles, List<ComponentVersionBI> parentLinkages) {
         // nothing to do
     }
 

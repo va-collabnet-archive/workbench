@@ -1,24 +1,24 @@
 /**
- * Copyright (c) 2009 International Health Terminology Standards Development
- * Organisation
+ * Copyright (c) 2009 International Health Terminology Standards Development Organisation
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
  *
  * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 package org.ihtsdo.batch;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import org.ihtsdo.batch.BatchActionEvent.BatchActionEventType;
+import static org.ihtsdo.batch.BatchActionTask.nidToName;
+import static org.ihtsdo.batch.BatchActionTask.tsSnapshot;
 import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
@@ -26,124 +26,101 @@ import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
-import org.ihtsdo.tk.api.refex.RefexChronicleBI;
+import org.ihtsdo.tk.api.description.DescriptionChronicleBI;
+import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.dto.concept.component.refex.TK_REFEX_TYPE;
 
 /**
  * BatchActionTaskDescriptionRefsetAddMember
- * 
+ *
  */
-public class BatchActionTaskDescriptionRefsetAddMember extends BatchActionTask {
-
-    // DESCRIPTION CRITERIA
-    private int searchByTextConstraint; // NA | Contains | Begins With | Ends With
-    private String searchText;
-    private boolean isSearchCaseSensitive;
-    private int searchByType; // NA | FSN | Synomym | Description
-    private int searchByLanguage;
+public class BatchActionTaskDescriptionRefsetAddMember
+        extends AbstractBatchActionTaskDescription {
 
     // REFSET MEMBER
-    private TK_REFEX_TYPE refsetType;
-    private int collectionNid;
-    private Object refsetValue;
+    private Object refsetSetValue;
 
     public BatchActionTaskDescriptionRefsetAddMember() {
-        this.searchByTextConstraint = 0; // Does Not Apply
-        this.searchText = null;
-        this.isSearchCaseSensitive = false;
-        this.searchByType = 0; // Does Not Apply
-        this.searchByLanguage = 0;
-        
-        this.collectionNid = Integer.MAX_VALUE;
+        super();
+        refsetSetValue = null;
     }
 
-    public void setSearchByTextConstraint(int searchByTextConstraint) {
-        this.searchByTextConstraint = searchByTextConstraint;
-    }
-
-    public void setSearchText(String searchText) {
-        this.searchText = searchText;
-    }
-
-    public void setIsSearchCaseSensitive(boolean isSearchCaseSensitive) {
-        this.isSearchCaseSensitive = isSearchCaseSensitive;
-    }
-
-    public void setSearchByType(int searchByType) {
-        this.searchByType = searchByType;
-    }
-
-    public void setSearchByLanguage(int searchByLanguage) {
-        this.searchByLanguage = searchByLanguage;
-    }
-
-    public void setCollectionNid(int collectionNid) {
-        this.collectionNid = collectionNid;
-    }
-
-    public void setRefsetType(TK_REFEX_TYPE refsetType) {
-        this.refsetType = refsetType;
-    }
-
-    public void setRefsetValue(Object refsetValue) {
-        this.refsetValue = refsetValue;
+    public void setRefsetSetValue(Object refsetValue) {
+        this.refsetSetValue = refsetValue;
     }
 
     // BatchActionTask
     @Override
     public boolean execute(ConceptVersionBI c, EditCoordinate ec, ViewCoordinate vc)
             throws IOException, InvalidCAB, ContradictionException {
-        int rcNid = c.getNid(); // referenced component
-        Collection<? extends RefexVersionBI<?>> currentRefexes = c.getRefexesActive(vc);
         boolean changed = false;
-        boolean changedReferencedConcept = false;
-        ConceptChronicleBI collectionConcept = ts.getConcept(collectionNid);
-        for (RefexVersionBI rvbi : currentRefexes) {
-            if (rvbi.getRefexNid() == collectionNid) {
-                    RefexCAB blueprint = rvbi.makeBlueprint(vc);
-                    blueprint.setMemberUuid(rvbi.getPrimUuid());
-                    TK_REFEX_TYPE memberType = blueprint.getMemberType();
+        Collection<? extends DescriptionChronicleBI> descriptions = c.getDescriptions();
+        ArrayList<DescriptionChronicleBI> descList = new ArrayList<>();
+        for (DescriptionChronicleBI dcbi : descriptions) {
+            boolean criteriaPass;
+            DescriptionVersionBI dvbi = null;
+            try {
+                dvbi = dcbi.getVersion(vc);
+            } catch (ContradictionException ex) {
+                BatchActionEventReporter.add(new BatchActionEvent(c,
+                        BatchActionTaskType.DESCRIPTION_INITIAL_CHAR_CASE_SENSITIVITY,
+                        BatchActionEventType.EVENT_ERROR,
+                        "ERROR: multiple active versions"));
+            }
 
-                    // CHANGE value
-                    if (refsetType == TK_REFEX_TYPE.BOOLEAN) {
-                        blueprint.with(RefexCAB.RefexProperty.BOOLEAN1, (Boolean) refsetValue);
-                    } else if (refsetType == TK_REFEX_TYPE.CID) {  // int nid
-                        blueprint.with(RefexCAB.RefexProperty.CNID1, ((Integer) refsetValue).intValue());
-                    } else if (refsetType == TK_REFEX_TYPE.INT) {
-                        blueprint.with(RefexCAB.RefexProperty.INTEGER1, (Integer) refsetValue);
-                    } else if (refsetType == TK_REFEX_TYPE.STR) {
-                        blueprint.with(RefexCAB.RefexProperty.STRING1, (String) refsetValue);
+            if (dvbi == null) {
+                continue; // nothing to change
+            }
+
+            criteriaPass = testCriteria(dvbi, vc);
+
+            // DO EDIT
+            if (criteriaPass) {
+                Collection<? extends RefexVersionBI<?>> currentRefexes = dvbi.getRefexMembersActive(vc, collectionNid);
+
+                if (currentRefexes != null) {
+                    for (RefexVersionBI rvbi : currentRefexes) {
+                        if (rvbi.getRefexNid() == collectionNid) {
+                            BatchActionEventReporter.add(new BatchActionEvent(c, BatchActionTaskType.DESCRIPTION_REFSET_ADD_MEMBER,
+                                    BatchActionEventType.EVENT_NOOP, "already member of: " + nidToName(collectionNid)));
+                            return false;
+                        }
                     }
-                    RefexChronicleBI<?> annot = tsSnapshot.constructIfNotCurrent(blueprint);
+                }
 
-                    if (collectionConcept.isAnnotationStyleRefex()) {
-                        // Ts.get().addUncommitted(c); <-- done in BatchActionProcessor for concept
-                        changedReferencedConcept = true; // pass to BatchActionProcessor
-                        c.addAnnotation(annot);
-                        ts.addUncommitted(c);
-                    } else {
-                        changedReferencedConcept = true; //... pass to BatchActionProcessor
-                        ts.addUncommitted(collectionConcept);
-                        ts.addUncommitted(c);
-                    }
+                RefexCAB refexSpec;
+                if (refsetSetValue == null) {
+                    refexSpec = new RefexCAB(TK_REFEX_TYPE.MEMBER, dvbi.getNid(), collectionNid);
+                } else {
+                    refexSpec = new RefexCAB(TK_REFEX_TYPE.CID, dvbi.getNid(), collectionNid);
+                }
 
-                    BatchActionEventReporter.add(new BatchActionEvent(c,
-                            BatchActionTaskType.DESCRIPTION_REFSET_ADD_MEMBER,
-                            BatchActionEventType.EVENT_SUCCESS,
-                            "member value changed: " + nidToName(collectionNid)));
+                refexSpec.setMemberContentUuid();
+                tsSnapshot.constructIfNotCurrent(refexSpec);
 
-                    changed = true;
+                BatchActionEventReporter.add(new BatchActionEvent(c, BatchActionTaskType.DESCRIPTION_REFSET_ADD_MEMBER,
+                        BatchActionEventType.EVENT_SUCCESS, "member added to: " + nidToName(collectionNid)));
+
+                ConceptChronicleBI collectionConcept = ts.getConcept(collectionNid);
+                if (collectionConcept.isAnnotationStyleRefex()) {
+                    // Ts.get().addUncommitted(c); <-- done in BatchActionProcessor for concept
+                    return true; // pass to BatchActionProcessor
+                } else {
+                    ts.addUncommitted(collectionConcept);
+                    return false;
+                }
             }
         }
 
         if (!changed) {
             BatchActionEventReporter.add(new BatchActionEvent(c,
-                    BatchActionTaskType.DESCRIPTION_REFSET_ADD_MEMBER,
+                    BatchActionTaskType.DESCRIPTION_INITIAL_CHAR_CASE_SENSITIVITY,
                     BatchActionEventType.EVENT_NOOP,
-                    "was not member of: " + nidToName(collectionNid)));
+                    "description initial caps not changed on concept : "
+                    + nidToName(c.getConceptNid())));
         }
 
-        return changedReferencedConcept;
+        return changed;
     }
 }

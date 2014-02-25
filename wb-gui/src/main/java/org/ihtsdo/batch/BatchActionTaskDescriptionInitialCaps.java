@@ -1,174 +1,117 @@
 /**
- * Copyright (c) 2009 International Health Terminology Standards Development
- * Organisation
+ * Copyright (c) 2009 International Health Terminology Standards Development Organisation
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
  *
  * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 package org.ihtsdo.batch;
 
+import java.beans.PropertyVetoException;
 import java.io.IOException;
 import java.util.Collection;
 import org.ihtsdo.batch.BatchActionEvent.BatchActionEventType;
 import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
-import org.ihtsdo.tk.api.blueprint.RefexCAB;
-import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
-import org.ihtsdo.tk.api.refex.RefexVersionBI;
-import org.ihtsdo.tk.dto.concept.component.refex.TK_REFEX_TYPE;
+import org.ihtsdo.tk.api.description.DescriptionAnalogBI;
+import org.ihtsdo.tk.api.description.DescriptionChronicleBI;
+import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 
 /**
  * BatchActionTaskDescriptionInitialCaps
- * 
+ *
  */
-public class BatchActionTaskDescriptionInitialCaps extends BatchActionTask {
+public class BatchActionTaskDescriptionInitialCaps
+        extends AbstractBatchActionTaskDescription {
 
-    // DESCRIPTION CRITERIA
-    private int searchByTextConstraint; // NA | Contains | Begins With | Ends With
-    private String searchText;
-    private boolean isSearchCaseSensitive;
-    private int searchByType; // NA | FSN | Synomym | Description
-    private int searchByLanguage;
-
-    // REFSET MEMBER
-    private TK_REFEX_TYPE refsetType;
-    private int collectionNid;
-    // FILTER
-    private Object matchValue;
+    boolean targetCaseSensitivity;
 
     public BatchActionTaskDescriptionInitialCaps() {
-        this.searchByTextConstraint = 0; // Does Not Apply
-        this.searchText = null;
-        this.isSearchCaseSensitive = false;
-        this.searchByType = 0; // Does Not Apply
-        this.searchByLanguage = 0;
-        
-        this.collectionNid = Integer.MAX_VALUE;
-        this.matchValue = null;
+        super();
+        targetCaseSensitivity = false;
     }
 
-    public void setSearchByTextConstraint(int searchByTextConstraint) {
-        this.searchByTextConstraint = searchByTextConstraint;
-    }
-
-    public void setSearchText(String searchText) {
-        this.searchText = searchText;
-    }
-
-    public void setIsSearchCaseSensitive(boolean isSearchCaseSensitive) {
-        this.isSearchCaseSensitive = isSearchCaseSensitive;
-    }
-
-    public void setSearchByType(int searchByType) {
-        this.searchByType = searchByType;
-    }
-
-    public void setSearchByLanguage(int searchByLanguage) {
-        this.searchByLanguage = searchByLanguage;
-    }
-
-    public void setCollectionNid(int collectionNid) {
-        this.collectionNid = collectionNid;
-    }
-
-    public void setMatchValue(Object matchValue) {
-        this.matchValue = matchValue;
-    }
-
-    public void setRefsetType(TK_REFEX_TYPE refsetType) {
-        this.refsetType = refsetType;
+    public void setTargetCaseSensitivity(boolean cs) {
+        this.targetCaseSensitivity = cs;
     }
 
     // BatchActionTask
     @Override
     public boolean execute(ConceptVersionBI c, EditCoordinate ec, ViewCoordinate vc)
             throws IOException, InvalidCAB, ContradictionException {
-        int rcNid = c.getNid(); // referenced component
-        Collection<? extends RefexVersionBI<?>> currentRefexes = c.getRefexesActive(vc);
+
         boolean changed = false;
-        boolean changedReferencedConcept = false;
-        ConceptChronicleBI collectionConcept = ts.getConcept(collectionNid);
-        for (RefexVersionBI rvbi : currentRefexes) {
-            if (rvbi.getRefexNid() == collectionNid) {
-                if (matchValue == null) {
-                    RefexCAB blueprint = rvbi.makeBlueprint(vc);
-                    blueprint.setMemberUuid(rvbi.getPrimUuid());
-                    TK_REFEX_TYPE memberType = blueprint.getMemberType();
+        Collection<? extends DescriptionChronicleBI> descriptions = c.getDescriptions();
+        for (DescriptionChronicleBI dcbi : descriptions) {
+            boolean criteriaPass;
+            DescriptionVersionBI dvbi = null;
+            try {
+                dvbi = dcbi.getVersion(vc);
+            } catch (ContradictionException ex) {
+                BatchActionEventReporter.add(new BatchActionEvent(c,
+                        BatchActionTaskType.DESCRIPTION_INITIAL_CHAR_CASE_SENSITIVITY,
+                        BatchActionEventType.EVENT_ERROR,
+                        "ERROR: multiple active versions"));
+            }
+
+            if (dvbi == null) {
+                continue; // nothing to change
+            }
+
+            criteriaPass = testCriteria(dvbi, vc);
+
+            // DO EDIT
+            if (criteriaPass) {
+                boolean currentCaseSensitivity = dvbi.isInitialCaseSignificant();
+                if (currentCaseSensitivity != targetCaseSensitivity) {
+                    changed = true;
+
+                    DescriptionAnalogBI analog;
+                    for (int editPath : ec.getEditPaths()) {
+                        // similar approach as arena SetICSignificantAction
+                        analog = (DescriptionAnalogBI) dvbi.makeAnalog(
+                                CURRENT_NID,
+                                Long.MAX_VALUE,
+                                ec.getAuthorNid(),
+                                ec.getModuleNid(),
+                                editPath);
+                        try {
+                            analog.setInitialCaseSignificant(targetCaseSensitivity);
+                        } catch (PropertyVetoException ex) {
+                            BatchActionEventReporter.add(new BatchActionEvent(c,
+                                    BatchActionTaskType.DESCRIPTION_INITIAL_CHAR_CASE_SENSITIVITY,
+                                    BatchActionEventType.EVENT_ERROR,
+                                    "description initial char sensitivity not updated: " + dvbi.getText()));
+                            return false;
+                        }
+                    }
 
                     BatchActionEventReporter.add(new BatchActionEvent(c,
-                            BatchActionTaskType.DESCRIPTION_INITIAL_CAPS_CHANGE,
+                            BatchActionTaskType.DESCRIPTION_INITIAL_CHAR_CASE_SENSITIVITY,
                             BatchActionEventType.EVENT_SUCCESS,
-                            "member value changed: " + nidToName(collectionNid)));
-
-                    changed = true;
-                } else {
-                    // CHECK FILTER
-                    RefexCAB spec = rvbi.makeBlueprint(vc);
-                    boolean matched = false;
-                    switch (refsetType) {
-                        case BOOLEAN:
-                            if ((Boolean) matchValue == spec.getBoolean(RefexCAB.RefexProperty.BOOLEAN1)) {
-                                matched = true;
-                            }
-                            break;
-                        case CID:
-                            if ((Integer) matchValue == spec.getInt(RefexCAB.RefexProperty.CNID1)) {
-                                matched = true;
-                            }
-                            break;
-                        case INT:
-                            if ((Integer) matchValue == spec.getInt(RefexCAB.RefexProperty.INTEGER1)) {
-                                matched = true;
-                            }
-                            break;
-                        case STR:
-                            String valStr = spec.getString(RefexCAB.RefexProperty.STRING1);
-                            if (valStr != null && valStr.equalsIgnoreCase((String) matchValue)) {
-                                matched = true;
-                            }
-                            break;
-                        default:
-                    }
-
-                    if (matched) {
-                        RefexCAB blueprint = rvbi.makeBlueprint(vc);
-                        TK_REFEX_TYPE memberType = blueprint.getMemberType();
-
-                        BatchActionEventReporter.add(new BatchActionEvent(c,
-                                BatchActionTaskType.DESCRIPTION_INITIAL_CAPS_CHANGE,
-                                BatchActionEventType.EVENT_SUCCESS,
-                                "(matched) member value changed: " + nidToName(collectionNid)));
-
-                        changed = true;
-                    }
+                            "description initial char sensitivity updated: " + dvbi.getText()));
                 }
             }
         }
 
-        if (!changed && matchValue == null) {
+        if (!changed) {
             BatchActionEventReporter.add(new BatchActionEvent(c,
-                    BatchActionTaskType.DESCRIPTION_INITIAL_CAPS_CHANGE,
+                    BatchActionTaskType.DESCRIPTION_INITIAL_CHAR_CASE_SENSITIVITY,
                     BatchActionEventType.EVENT_NOOP,
-                    "was not member of: " + nidToName(collectionNid)));
-        } else if (!changed) {
-            BatchActionEventReporter.add(new BatchActionEvent(c,
-                    BatchActionTaskType.DESCRIPTION_INITIAL_CAPS_CHANGE,
-                    BatchActionEventType.EVENT_NOOP,
-                    "member value not changed (not matched): " + nidToName(collectionNid)));
+                    "description initial caps not changed on concept : "
+                    + nidToName(c.getConceptNid())));
         }
 
-        return changedReferencedConcept;
+        return changed;
     }
+
 }

@@ -41,6 +41,7 @@ public class BatchActionTaskConceptRefsetAddMember extends BatchActionTask {
      * Batch Action adds refset member.
      */
     public BatchActionTaskConceptRefsetAddMember() {
+        super();
     }
 
     public void setCollectionNid(int collectionNid) {
