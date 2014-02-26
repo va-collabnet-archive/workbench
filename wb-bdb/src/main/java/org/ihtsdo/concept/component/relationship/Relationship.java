@@ -38,7 +38,6 @@ import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.relationship.RelationshipAnalogBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf1;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
-import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationship;
 import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationshipRevision;
 import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationshipType;
@@ -452,12 +451,8 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
     
     public static int getInferredCharacteristicNid() {
         if (inferredCharacteristicNid == Integer.MIN_VALUE) {
-            try {
-                inferredCharacteristicNid =
-                        SnomedMetadataRfx.getREL_CH_INFERRED_RELATIONSHIP_NID();
-            } catch (IOException ex) {
-                throw new RuntimeException(ex);
-            }
+                inferredCharacteristicNid
+                        = Bdb.uuidToNid(SnomedMetadataRf2.INFERRED_RELATIONSHIP_RF2.getUuids());
         }
 
         return inferredCharacteristicNid;
