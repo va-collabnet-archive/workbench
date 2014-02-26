@@ -452,12 +452,8 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
     
     public static int getInferredCharacteristicNid() {
         if (inferredCharacteristicNid == Integer.MIN_VALUE) {
-            try {
                 inferredCharacteristicNid
                         = Bdb.uuidToNid(SnomedMetadataRf2.INFERRED_RELATIONSHIP_RF2.getUuids());
-            } catch (IOException ex) {
-                throw new RuntimeException(ex);
-            }
         }
 
         return inferredCharacteristicNid;
