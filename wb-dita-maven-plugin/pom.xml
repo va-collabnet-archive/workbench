@@ -4,7 +4,7 @@
   <parent>
     <artifactId>wb-mmb</artifactId>
     <groupId>org.ihtsdo</groupId>
-    <version>1.7-july-id-SNAPSHOT</version>
+    <version>1.7-july-id</version>
   </parent>
   <artifactId>wb-dita-maven-plugin</artifactId>
   <packaging>maven-plugin</packaging>
