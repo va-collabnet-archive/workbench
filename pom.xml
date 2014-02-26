@@ -17,7 +17,7 @@ the specific language governing permissions and limitations under the License. -
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.ihtsdo</groupId>
     <artifactId>wb-mmb</artifactId>
-    <version>1.7-july-id-SNAPSHOT</version>
+    <version>1.7-july-id</version>
     <packaging>pom</packaging>
     <name>${branch}: (MMP) Workbench Toolkit</name>
     <description>The IHTSDO Workbench provides two software frameworks for
@@ -28,9 +28,9 @@ the specific language governing permissions and limitations under the License. -
         needs of their end users.
     </description>
     <scm>
-        <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/branches/trek-no-jini-2.33-id-july</connection>
-        <developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/branches/trek-no-jini-2.33-id-july</developerConnection>
-        <url>https://csfe.aceworkspace.net/integration/viewvc/viewvc.cgi/tags/branches/trek-no-jini-2.33-id-july?root=workbench&amp;system=exsy1002/wb-mmb-2.33-trek-no-jini</url>
+        <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/tags/wb-mmb-1.7-july-id</connection>
+        <developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/tags/wb-mmb-1.7-july-id</developerConnection>
+        <url>https://csfe.aceworkspace.net/integration/viewvc/viewvc.cgi/tags/tags?root=workbench&amp;system=exsy1002/wb-mmb-2.33-trek-no-jini/wb-mmb-1.7-july-id</url>
     </scm>
     <properties>
         <branch>id-july</branch>
