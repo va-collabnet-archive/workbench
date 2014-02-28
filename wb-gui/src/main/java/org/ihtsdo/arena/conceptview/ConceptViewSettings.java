@@ -788,8 +788,6 @@ public class ConceptViewSettings extends ArenaComponentSettings {
 					ConceptVersionBI cv = Ts.get().getConceptVersion(config.getViewCoordinate(), cc.getConceptNid());
                                         for(DescriptionVersionBI dv : cv.getDescriptionsPreferredActive()){
                                             if(!dv.getLang().equalsIgnoreCase(LANG_CODE.EN.toString())){
-                                                System.out.println("DESC LANG: " + dv.getLang() + ".");
-                                                System.out.println("LANG CODE: " + LANG_CODE.EN.toString() + ".");
                                                 return dv.getText();
                                             }
                                         }
