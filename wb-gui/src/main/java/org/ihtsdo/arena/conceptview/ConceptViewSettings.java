@@ -47,6 +47,7 @@ import org.ihtsdo.arena.contradiction.ContradictionConfig;
 import org.ihtsdo.arena.promotion.PromotionConfig;
 import org.ihtsdo.arena.promotion.PromotionSourceConfig;
 import org.ihtsdo.arena.promotion.PromotionTargetConfig;
+import org.ihtsdo.lang.LANG_CODE;
 import org.ihtsdo.taxonomy.TaxonomyHelper;
 import org.ihtsdo.taxonomy.TaxonomyMouseListener;
 import org.ihtsdo.taxonomy.TaxonomyTree;
@@ -785,6 +786,13 @@ public class ConceptViewSettings extends ArenaComponentSettings {
 				try {
 					ConceptChronicleBI cc = (ConceptChronicleBI) getHost().getTermComponent();
 					ConceptVersionBI cv = Ts.get().getConceptVersion(config.getViewCoordinate(), cc.getConceptNid());
+                                        for(DescriptionVersionBI dv : cv.getDescriptionsPreferredActive()){
+                                            if(!dv.getLang().equalsIgnoreCase(LANG_CODE.EN.toString())){
+                                                System.out.println("DESC LANG: " + dv.getLang() + ".");
+                                                System.out.println("LANG CODE: " + LANG_CODE.EN.toString() + ".");
+                                                return dv.getText();
+                                            }
+                                        }
 					if (!cv.getDescriptionsFullySpecifiedActive().isEmpty()) {
 						DescriptionVersionBI fsn = cv.getDescriptionsFullySpecifiedActive().iterator().next();
 						return fsn.getText();
