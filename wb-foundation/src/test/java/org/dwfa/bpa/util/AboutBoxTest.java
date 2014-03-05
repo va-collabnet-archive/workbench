@@ -15,6 +15,7 @@ import java.util.Properties;
 import static org.dwfa.bpa.util.AppInfoProperties.BASELINE_DATA_ARTIFACT_ID;
 import static org.dwfa.bpa.util.AppInfoProperties.BASELINE_DATA_GROUP_ID;
 import static org.dwfa.bpa.util.AppInfoProperties.BASELINE_DATA_VERSION;
+import static org.dwfa.bpa.util.AppInfoProperties.BUNDLE_TYPE;
 import static org.dwfa.bpa.util.AppInfoProperties.PROJECT_DESCRIPTION;
 import static org.dwfa.bpa.util.AppInfoProperties.PROJECT_NAME;
 import static org.dwfa.bpa.util.AppInfoProperties.SNOMED_CORE_RELEASE_DATE;
@@ -35,6 +36,7 @@ public class AboutBoxTest {
     private final String baselineDataVersion = "baselineVersion";
     private final String tkVersion = "1.0-SNAPSHOT";
     private final String snomedCTVersion = "00-00-00-00.00.00";
+    private final String type = "UAT";
 
     private Properties appInfoProperties;
 
@@ -54,7 +56,8 @@ public class AboutBoxTest {
         appInfoProperties.setProperty(BASELINE_DATA_GROUP_ID, baselineDataGroupId);
         appInfoProperties.setProperty(BASELINE_DATA_VERSION, baselineDataVersion);
         appInfoProperties.setProperty(TOOLKIT_VERSION, tkVersion);
-                appInfoProperties.setProperty(SNOMED_CORE_RELEASE_DATE, snomedCTVersion);
+        appInfoProperties.setProperty(SNOMED_CORE_RELEASE_DATE, snomedCTVersion);
+        appInfoProperties.setProperty(BUNDLE_TYPE, type);
     }
 
     @Test
@@ -112,12 +115,14 @@ public class AboutBoxTest {
         String dataId = AboutBox.buildDataId(appInfoProperties);
         String toolkitVersion = AboutBox.buildToolkitVersion(appInfoProperties);
         String snomedCoreReleaseDate = AboutBox.buildSnomedCoreReleaseDate(appInfoProperties);
-        String linkLabelText = AboutBox.buildLabelText(href, name, projectDescription, projectId, archetypeId,
+        String type = AboutBox.buildType(appInfoProperties);
+        String linkLabelText = AboutBox.buildLabelText(href, name, projectDescription, projectId, type, archetypeId,
                 dataId, toolkitVersion, snomedCoreReleaseDate);
 
         String expectedValue = "<html><blockquote>"
                 + "<br><b>Workbench name: </b>" + this.projectName
                 + "<br><b>Workbench description: </b>" + this.projectDesc
+                + "<br><b>Workbench type: </b>" + this.type
                 + "<br><b>Workbench version: </b><a href=\"\">abc:def:1.1</a>"
                 + "<br><b>SNOMED CT version: </b>" + this.snomedCTVersion
                 + "<br><br><b>Built from: </b>" + this.archetypeGroupId + ":"
@@ -126,7 +131,7 @@ public class AboutBoxTest {
                 + ":" + this.baselineDataArtifactId + ":" + this.baselineDataVersion
                 + "<br><b>Software version: </b>" + this.tkVersion
                 + "</blockquote></html>";
-        
+
         System.out.println(expectedValue);
         System.out.println(linkLabelText);
         assertEquals(expectedValue, linkLabelText);

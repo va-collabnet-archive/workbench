@@ -21,7 +21,7 @@ public final class AppInfoProperties {
 
     public static final String PROJECT_NAME = "project.name";
     public static final String PROJECT_DESCRIPTION = "project.description";
-    
+
     public static final String GROUP_ID = "groupId";
     public static final String ARTIFACT_ID = "artifactId";
     public static final String VERSION = "version";
@@ -37,8 +37,10 @@ public final class AppInfoProperties {
     public static final String BASELINE_DATA_VERSION = "baselineDataVersion";
 
     public static final String TOOLKIT_VERSION = "org.ihtsdo.wb-toolkit.version";
-    
+
     public static final String SNOMED_CORE_RELEASE_DATE = "snomedCoreReleaseDate";
+
+    public static final String BUNDLE_TYPE = "bundle-type";
 
     private static final Properties APP_INFO = new Properties();
 

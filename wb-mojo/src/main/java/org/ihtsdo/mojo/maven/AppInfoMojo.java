@@ -36,6 +36,7 @@ import org.apache.maven.plugin.MojoFailureException;
 import static org.dwfa.bpa.util.AppInfoProperties.BASELINE_DATA_ARTIFACT_ID;
 import static org.dwfa.bpa.util.AppInfoProperties.BASELINE_DATA_GROUP_ID;
 import static org.dwfa.bpa.util.AppInfoProperties.BASELINE_DATA_VERSION;
+import static org.dwfa.bpa.util.AppInfoProperties.BUNDLE_TYPE;
 import static org.dwfa.bpa.util.AppInfoProperties.PROJECT_DESCRIPTION;
 import static org.dwfa.bpa.util.AppInfoProperties.PROJECT_NAME;
 import static org.dwfa.bpa.util.AppInfoProperties.SNOMED_CORE_RELEASE_DATE;
@@ -77,15 +78,14 @@ public class AppInfoMojo extends AbstractMojo {
      */
     private String projectDescription;
 
-    
     /**
      * SNOMED Core Release Date.
-     * 
+     *
      * @parameter expression="${snomedCoreReleaseDate}"
      * @required
      */
     private String releaseDate;
-    
+
     /**
      * The project groupId.
      *
@@ -177,6 +177,15 @@ public class AppInfoMojo extends AbstractMojo {
      */
     private String toolkitVersion;
 
+    /**
+     * The bundle type, either UAT or Prod.
+     *
+     * @required
+     *
+     * @parameter expression="${bundle-type}"
+     */
+    private String bundleType;
+
     public void execute() throws MojoExecutionException, MojoFailureException {
         try {
             Properties appInfoProperties = exportAppInfoProperties();
@@ -200,6 +209,7 @@ public class AppInfoMojo extends AbstractMojo {
         appInfoProperties.setProperty(BASELINE_DATA_VERSION, baselineDataVersion);
         appInfoProperties.setProperty(TOOLKIT_VERSION, toolkitVersion);
         appInfoProperties.setProperty(SNOMED_CORE_RELEASE_DATE, releaseDate);
+        appInfoProperties.setProperty(BUNDLE_TYPE, bundleType);
 
         // Set workbench site properties, if specified.
         if (siteURL != null) {
