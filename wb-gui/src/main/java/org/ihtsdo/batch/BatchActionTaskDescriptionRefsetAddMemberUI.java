@@ -293,7 +293,7 @@ public class BatchActionTaskDescriptionRefsetAddMemberUI extends javax.swing.JPa
         // SET REFSET DND COLLECTION NID
         I_AmTermComponent refsetAddToCB = ((ValueDndNidUI) jPanelDndAddToRefset).getTermComponent();
         if (refsetAddToCB != null) {
-            ((BatchActionTaskConceptRefsetAddMember) task).setCollectionNid(refsetAddToCB.getConceptNid());
+            ((BatchActionTaskDescriptionRefsetAddMember) task).setCollectionNid(refsetAddToCB.getConceptNid());
         } else {
             BatchActionEventReporter.add(new BatchActionEvent(null, BatchActionTaskType.CONCEPT_REFSET_ADD_MEMBER,
                     BatchActionEventType.TASK_INVALID, "missing refset to add to"));
