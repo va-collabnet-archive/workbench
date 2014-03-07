@@ -16,7 +16,7 @@
     <parent>
         <groupId>org.ihtsdo</groupId>
         <artifactId>wb-mmb</artifactId>
-        <version>1.3-silver-swordfish</version>
+        <version>1.4-silver-swordfish-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>tk-arena-spec</artifactId>
