@@ -116,6 +116,11 @@ public class BatchActionTaskDescriptionTextFindReplaceUI extends javax.swing.JPa
 
         jComboBoxExistingRefsets.setModel(jComboBoxExistingRefsets.getModel());
         jComboBoxExistingRefsets.setRenderer(new org.ihtsdo.batch.JComboBoxExistingRefsetsRender());
+        jComboBoxExistingRefsets.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jComboBoxExistingRefsetsActionPerformed(evt);
+            }
+        });
 
         jCheckBoxMatch.setText("Filter On Refset Member Value:");
         jCheckBoxMatch.addActionListener(new java.awt.event.ActionListener() {
@@ -253,6 +258,17 @@ public class BatchActionTaskDescriptionTextFindReplaceUI extends javax.swing.JPa
         int idx = ((JComboBox) evt.getSource()).getSelectedIndex();
         ((BatchActionTaskDescriptionTextFindReplace) task).setSearchByTextConstraint(idx);
     }//GEN-LAST:event_jComboBoxSearchByConstraintActionPerformed
+
+    private void jComboBoxExistingRefsetsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBoxExistingRefsetsActionPerformed
+        int idx = ((JComboBox) evt.getSource()).getSelectedIndex();
+        if (idx > 0) {
+            jCheckBoxMatch.setEnabled(true);
+            jPanelValueMatch.setEnabled(true);
+        } else {
+            jCheckBoxMatch.setEnabled(false);
+            jPanelValueMatch.setEnabled(false);
+        }
+    }//GEN-LAST:event_jComboBoxExistingRefsetsActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox jCheckBoxMatch;

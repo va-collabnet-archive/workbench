@@ -117,7 +117,7 @@ public class BatchActionTaskDescriptionTextFindCreate
                     // similar to CloneAction
                     I_GetConceptData concept = Terms.get().getConceptForNid(dvbi.getConceptNid());
                     DescriptionVersionBI desc = (DescriptionVersionBI) dvbi;
-                    I_GetConceptData typeConcept = Terms.get().getConcept(SnomedMetadataRfx.getDES_SYNONYM_NID());
+                    I_GetConceptData typeConcept = Terms.get().getConcept(desc.getTypeNid());
                     I_GetConceptData statusConcept = Terms.get().getConcept(desc.getStatusNid());
                     Collection<? extends RefexVersionBI<?>> oldRefexes = desc.getRefexesActive(vc);
                     I_DescriptionVersioned newDesc = Terms.get().newDescription(

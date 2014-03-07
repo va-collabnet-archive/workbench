@@ -121,6 +121,11 @@ public class BatchActionTaskDescriptionRetireUI extends javax.swing.JPanel imple
 
         jComboBoxExistingRefsets.setModel(jComboBoxExistingRefsets.getModel());
         jComboBoxExistingRefsets.setRenderer(new org.ihtsdo.batch.JComboBoxExistingRefsetsRender());
+        jComboBoxExistingRefsets.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jComboBoxExistingRefsetsActionPerformed(evt);
+            }
+        });
 
         jCheckBoxMatch.setText("Filter On Refset Member Value:");
         jCheckBoxMatch.addActionListener(new java.awt.event.ActionListener() {
@@ -210,7 +215,7 @@ public class BatchActionTaskDescriptionRetireUI extends javax.swing.JPanel imple
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addComponent(jPanelCriteria, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 95, Short.MAX_VALUE))
+                .addGap(0, 8, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -239,6 +244,17 @@ public class BatchActionTaskDescriptionRetireUI extends javax.swing.JPanel imple
         int idx = ((JComboBox) evt.getSource()).getSelectedIndex();
         ((BatchActionTaskDescriptionRetire) task).setSearchByLanguage(idx);
     }//GEN-LAST:event_jComboBoxSearchByLanguageActionPerformed
+
+    private void jComboBoxExistingRefsetsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBoxExistingRefsetsActionPerformed
+        int idx = ((JComboBox) evt.getSource()).getSelectedIndex();
+        if (idx > 0) {
+            jCheckBoxMatch.setEnabled(true);
+            jPanelValueMatch.setEnabled(true);
+        } else {
+            jCheckBoxMatch.setEnabled(false);
+            jPanelValueMatch.setEnabled(false);
+        }
+    }//GEN-LAST:event_jComboBoxExistingRefsetsActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox jCheckBoxMatch;

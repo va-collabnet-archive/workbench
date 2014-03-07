@@ -96,7 +96,7 @@ public class BatchActionTaskDescriptionRefsetReplaceValue
 
                             if (collectionConcept.isAnnotationStyleRefex()) {
                                 // Ts.get().addUncommitted(c); <-- done in BatchActionProcessor for concept
-                                c.addAnnotation(annot);
+                                dvbi.addAnnotation(annot);
                                 ts.addUncommitted(c);
                             } else {
                                 ts.addUncommitted(collectionConcept);
@@ -106,25 +106,23 @@ public class BatchActionTaskDescriptionRefsetReplaceValue
                             BatchActionEventReporter.add(new BatchActionEvent(c,
                                     BatchActionTaskType.DESCRIPTION_REFSET_CHANGE_VALUE,
                                     BatchActionEventType.EVENT_SUCCESS,
-                                    "member value changed: " + nidToName(collectionNid)));
+                                    "member value changed - " + nidToName(collectionNid)));
 
                             changed = true;
                         }
                     }
                 }
 
-                RefexCAB refexSpec;
-                if (refsetSetValue == null) {
-                    refexSpec = new RefexCAB(TK_REFEX_TYPE.MEMBER, dvbi.getNid(), collectionNid);
-                } else {
-                    refexSpec = new RefexCAB(TK_REFEX_TYPE.CID, dvbi.getNid(), collectionNid);
-                }
-
-                refexSpec.setMemberContentUuid();
-                tsSnapshot.constructIfNotCurrent(refexSpec);
-
-                BatchActionEventReporter.add(new BatchActionEvent(c, BatchActionTaskType.DESCRIPTION_REFSET_ADD_MEMBER,
-                        BatchActionEventType.EVENT_SUCCESS, "member value changed: " + nidToName(collectionNid)));
+//                RefexCAB refexSpec;
+//                if (refsetSetValue == null) {
+//                    refexSpec = new RefexCAB(TK_REFEX_TYPE.MEMBER, dvbi.getNid(), collectionNid);
+//                } else {
+//                    refexSpec = new RefexCAB(TK_REFEX_TYPE.CID, dvbi.getNid(), collectionNid);
+//                }
+//                refexSpec.setMemberContentUuid();
+//                tsSnapshot.constructIfNotCurrent(refexSpec);
+//                BatchActionEventReporter.add(new BatchActionEvent(c, BatchActionTaskType.DESCRIPTION_REFSET_CHANGE_VALUE,
+//                        BatchActionEventType.EVENT_SUCCESS, "member value changed :: " + nidToName(collectionNid)));
 
                 if (collectionConcept.isAnnotationStyleRefex()) {
                     // Ts.get().addUncommitted(c); <-- done in BatchActionProcessor for concept

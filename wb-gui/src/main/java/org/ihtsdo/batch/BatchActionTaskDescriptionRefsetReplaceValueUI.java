@@ -130,6 +130,11 @@ public class BatchActionTaskDescriptionRefsetReplaceValueUI extends javax.swing.
 
         jComboBoxExistingRefsets.setModel(jComboBoxExistingRefsets.getModel());
         jComboBoxExistingRefsets.setRenderer(new org.ihtsdo.batch.JComboBoxExistingRefsetsRender());
+        jComboBoxExistingRefsets.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jComboBoxExistingRefsetsActionPerformed(evt);
+            }
+        });
 
         jCheckBoxMatch.setText("Filter On Refset Member Value:");
         jCheckBoxMatch.addActionListener(new java.awt.event.ActionListener() {
@@ -166,7 +171,7 @@ public class BatchActionTaskDescriptionRefsetReplaceValueUI extends javax.swing.
                                 .addComponent(jCheckBoxSearchIsCaseSensitive)
                                 .addGap(18, 18, 18)
                                 .addComponent(jLabel3)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 81, Short.MAX_VALUE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 113, Short.MAX_VALUE)
                                 .addComponent(jComboBoxSearchByType, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(jLabel4)
@@ -234,7 +239,7 @@ public class BatchActionTaskDescriptionRefsetReplaceValueUI extends javax.swing.
                 .addComponent(jPanelSetValue, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(jPanelCriteria, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(61, Short.MAX_VALUE))
+                .addContainerGap(30, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -263,6 +268,17 @@ public class BatchActionTaskDescriptionRefsetReplaceValueUI extends javax.swing.
         int idx = ((JComboBox) evt.getSource()).getSelectedIndex();
         ((BatchActionTaskDescriptionRefsetReplaceValue) task).setSearchByLanguage(idx);
     }//GEN-LAST:event_jComboBoxSearchByLanguageActionPerformed
+
+    private void jComboBoxExistingRefsetsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBoxExistingRefsetsActionPerformed
+        int idx = ((JComboBox) evt.getSource()).getSelectedIndex();
+        if (idx > 0) {
+            jCheckBoxMatch.setEnabled(true);
+            jPanelValueMatch.setEnabled(true);
+        } else {
+            jCheckBoxMatch.setEnabled(false);
+            jPanelValueMatch.setEnabled(false);
+        }
+    }//GEN-LAST:event_jComboBoxExistingRefsetsActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox jCheckBoxMatch;
@@ -361,6 +377,14 @@ public class BatchActionTaskDescriptionRefsetReplaceValueUI extends javax.swing.
             if (refsetBI != null) {
                 int refsetNid = refsetBI.getNid();
                 ((BatchActionTaskDescriptionRefsetReplaceValue) task).setCollectionNid(refsetNid);
+                Integer valConcept = ((ValueDndNidUI) jPanelSetValue).getValue();
+                if (valConcept != null) {
+                    ((BatchActionTaskDescriptionRefsetReplaceValue) task).setRefsetSetValue(valConcept);
+                } else {
+                    BatchActionEventReporter.add(new BatchActionEvent(null, BatchActionTaskType.DESCRIPTION_REFSET_CHANGE_VALUE,
+                            BatchActionEventType.TASK_INVALID, "replacement value not set"));
+                    return null;
+                }
             } else {
                 BatchActionEventReporter.add(new BatchActionEvent(null, BatchActionTaskType.DESCRIPTION_REFSET_CHANGE_VALUE,
                         BatchActionEventType.TASK_INVALID, "no selected refset"));
