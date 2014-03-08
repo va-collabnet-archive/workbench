@@ -238,6 +238,10 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
         return true;
     }
     
+    public static boolean isIsReleaseFormatSetup() {
+        return isReleaseFormatSetup;
+    }
+    
     @Override
     public boolean usesRf2Metadata() throws IOException {
         if (isReleaseFormatSetup == false) {

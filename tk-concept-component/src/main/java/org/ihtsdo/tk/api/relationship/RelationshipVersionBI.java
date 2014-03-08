@@ -63,14 +63,14 @@ public interface RelationshipVersionBI<A extends RelationshipAnalogBI>
      *
      * @return <code>true</code>, if the relationship version is inferred
      */
-    public boolean isInferred();
+    public boolean isInferred() throws IOException;
 
     /**
      * Checks if this relationship version is stated.
      *
      * @return <code>true</code>, if the relationship version is stated
      */
-    public boolean isStated();
+    public boolean isStated() throws IOException;
 
     /**
      * @param viewCoordinate the view coordinate specifying which version of the
