@@ -54,7 +54,7 @@ public class BatchActionTaskDescriptionRefsetRetireMember
                 dvbi = dcbi.getVersion(vc);
             } catch (ContradictionException ex) {
                 BatchActionEventReporter.add(new BatchActionEvent(c,
-                        BatchActionTaskType.DESCRIPTION_INITIAL_CHAR_CASE_SENSITIVITY,
+                        BatchActionTaskType.DESCRIPTION_REFSET_RETIRE_MEMBER,
                         BatchActionEventType.EVENT_ERROR,
                         "ERROR: multiple active versions"));
             }

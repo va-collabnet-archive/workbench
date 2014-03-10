@@ -21,6 +21,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import org.ihtsdo.batch.BatchActionEvent.BatchActionEventType;
 import org.ihtsdo.batch.BatchActionTask.BatchActionTaskType;
@@ -37,10 +38,15 @@ import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 public class BatchActionTaskConceptParentRetireUI extends javax.swing.JPanel implements I_BatchActionTask {
 
     BatchActionTask task;
+    int jComboBoxExistingParentsIdxCache;
 
     /** Creates new form BatchActionTaskConceptParentRetireUI */
     public BatchActionTaskConceptParentRetireUI() {
         initComponents();
+
+        // Existing Refsets Menu Setup
+        jComboBoxExistingParentsIdxCache = jComboBoxExistingParents.getSelectedIndex();
+
         this.task = new BatchActionTaskConceptParentRetire();
     }
 
@@ -58,6 +64,11 @@ public class BatchActionTaskConceptParentRetireUI extends javax.swing.JPanel imp
 
         jComboBoxExistingParents.setModel(jComboBoxExistingParents.getModel());
         jComboBoxExistingParents.setRenderer(new org.ihtsdo.batch.JComboBoxExistingParentsRender());
+        jComboBoxExistingParents.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jComboBoxExistingParentsActionPerformed(evt);
+            }
+        });
 
         jLabel1.setText("Retire As Parent:");
 
@@ -77,6 +88,21 @@ public class BatchActionTaskConceptParentRetireUI extends javax.swing.JPanel imp
                 .addComponent(jLabel1))
         );
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jComboBoxExistingParentsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBoxExistingParentsActionPerformed
+        int idx = ((JComboBox) evt.getSource()).getSelectedIndex();
+        if (idx >= 0) {
+            jComboBoxExistingParentsIdxCache = idx;
+        } else if (jComboBoxExistingParents.getItemCount()== 0) {
+            jComboBoxExistingParentsIdxCache = -1;
+        } else if (jComboBoxExistingParents.getItemCount() > jComboBoxExistingParentsIdxCache) {
+            jComboBoxExistingParents.setSelectedIndex(jComboBoxExistingParentsIdxCache);
+        } else {
+            jComboBoxExistingParents.setSelectedIndex(0);
+            jComboBoxExistingParentsIdxCache = 0;
+        }
+    }//GEN-LAST:event_jComboBoxExistingParentsActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox jComboBoxExistingParents;
     private javax.swing.JLabel jLabel1;
@@ -129,10 +155,15 @@ public class BatchActionTaskConceptParentRetireUI extends javax.swing.JPanel imp
                 // prior selection exists in new list
                 dcbm.setSelectedItem(selectedItem);
                 jComboBoxExistingParents.setSelectedIndex(selectedIdx);
-            } else {
+                jComboBoxExistingParentsIdxCache = selectedIdx;
+            } else if (jComboBoxExistingParents.getItemCount() > 0 ) {
                 // prior selection does not exist in new list
                 dcbm.setSelectedItem(dcbm.getElementAt(0));
                 jComboBoxExistingParents.setSelectedIndex(0);
+                jComboBoxExistingParentsIdxCache = 0;
+            } else {
+                jComboBoxExistingParents.setSelectedIndex(-1);
+                jComboBoxExistingParentsIdxCache = -1;
             }
         }
     }

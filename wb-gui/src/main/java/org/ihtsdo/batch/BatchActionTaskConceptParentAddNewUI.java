@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.UUID;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.GroupLayout;
+import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import org.dwfa.ace.api.I_AmTermComponent;
 import org.ihtsdo.batch.BatchActionEvent.BatchActionEventType;
@@ -39,6 +40,7 @@ import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 public class BatchActionTaskConceptParentAddNewUI extends javax.swing.JPanel implements I_BatchActionTask {
 
     BatchActionTask task;
+    int jComboBoxLinkageIdxCache;
 
     /** Creates new form BatchActionTaskConceptParentAddNewUI */
     public BatchActionTaskConceptParentAddNewUI() {
@@ -46,6 +48,7 @@ public class BatchActionTaskConceptParentAddNewUI extends javax.swing.JPanel imp
         this.task = new BatchActionTaskConceptParentAddNew();
 
         // Setup Linkage Types
+        jComboBoxLinkageIdxCache = -1;
 
         // Setup DnD Panel
         ValueDndNidUI tmp = new ValueDndNidUI("New Parent:");
@@ -104,7 +107,17 @@ public class BatchActionTaskConceptParentAddNewUI extends javax.swing.JPanel imp
     }// </editor-fold>//GEN-END:initComponents
 
     private void jComboBoxLinkageActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBoxLinkageActionPerformed
-        // TODO add your handling code here:
+        int idx = ((JComboBox) evt.getSource()).getSelectedIndex();
+        if (idx >= 0) {
+            jComboBoxLinkageIdxCache = idx;
+        } else if (jComboBoxLinkage.getItemCount()== 0) {
+            jComboBoxLinkageIdxCache = -1;
+        } else if (jComboBoxLinkage.getItemCount() > jComboBoxLinkageIdxCache) {
+            jComboBoxLinkage.setSelectedIndex(jComboBoxLinkageIdxCache);
+        } else {
+            jComboBoxLinkage.setSelectedIndex(0);
+            jComboBoxLinkageIdxCache = 0;
+        }
     }//GEN-LAST:event_jComboBoxLinkageActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -147,11 +160,16 @@ public class BatchActionTaskConceptParentAddNewUI extends javax.swing.JPanel imp
             if (selectedIdx >= 0) {
                 // prior selection exists in new list
                 dcbm.setSelectedItem(selectedItem);
-                jComboBoxLinkage.setSelectedIndex(selectedIdx);
-            } else {
+                jComboBoxLinkageIdxCache = selectedIdx;
+                jComboBoxLinkage.setSelectedIndex(jComboBoxLinkageIdxCache);
+            } else if (jComboBoxLinkage.getItemCount() > 0) {
                 // prior selection does not exist in new list
                 dcbm.setSelectedItem(dcbm.getElementAt(0));
-                jComboBoxLinkage.setSelectedIndex(0);
+                jComboBoxLinkageIdxCache = 0;
+                jComboBoxLinkage.setSelectedIndex(jComboBoxLinkageIdxCache);
+            } else {
+                jComboBoxLinkageIdxCache = -1;
+                jComboBoxLinkage.setSelectedIndex(-1);
             }
         }
     }
@@ -160,7 +178,7 @@ public class BatchActionTaskConceptParentAddNewUI extends javax.swing.JPanel imp
     public BatchActionTask getTask(EditCoordinate ec, ViewCoordinate vc, List<ConceptChronicleBI> concepts) throws IOException {
 
         DefaultComboBoxModel dcbm = (DefaultComboBoxModel) jComboBoxLinkage.getModel();
-        ConceptVersionBI fromParentLinkageBI = (ConceptVersionBI) dcbm.getSelectedItem();
+        ConceptVersionBI fromParentLinkageBI = (ConceptVersionBI) dcbm.getElementAt(jComboBoxLinkageIdxCache);
         UUID uuidParentLinkage = fromParentLinkageBI.getPrimUuid(); // 'Is a', 'is a'
 
         I_AmTermComponent termNewParentDest = ((ValueDndNidUI) jPanelDndNewParent).getTermComponent();

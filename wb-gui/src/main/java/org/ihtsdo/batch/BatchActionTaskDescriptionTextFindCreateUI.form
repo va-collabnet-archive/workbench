@@ -27,7 +27,7 @@
                   <Component id="jPanelCriteria" max="32767" attributes="0"/>
                   <Group type="102" alignment="0" attributes="0">
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="jComboBoxSearchByContraint" min="-2" max="-2" attributes="0"/>
+                          <Component id="jComboBoxSearchByConstraint" min="-2" max="-2" attributes="0"/>
                           <Group type="102" attributes="0">
                               <EmptySpace min="6" pref="6" max="-2" attributes="0"/>
                               <Component id="jLabel5" min="-2" pref="128" max="-2" attributes="0"/>
@@ -50,9 +50,9 @@
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="jTextFieldSearchText" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="jComboBoxSearchByContraint" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="jComboBoxSearchByConstraint" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace pref="35" max="32767" attributes="0"/>
+              <EmptySpace max="32767" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="jLabel5" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="jTextFieldCreateNew" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -91,7 +91,7 @@
                           <Component id="jLabel3" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="jComboBoxSearchByType" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="164" max="32767" attributes="0"/>
+                          <EmptySpace pref="71" max="32767" attributes="0"/>
                           <Component id="jLabel4" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="jComboBoxSearchByLanguage" min="-2" max="-2" attributes="0"/>
@@ -238,7 +238,7 @@
     </Component>
     <Component class="javax.swing.JTextField" name="jTextFieldCreateNew">
     </Component>
-    <Component class="javax.swing.JComboBox" name="jComboBoxSearchByContraint">
+    <Component class="javax.swing.JComboBox" name="jComboBoxSearchByConstraint">
       <Properties>
         <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
           <StringArray count="3">

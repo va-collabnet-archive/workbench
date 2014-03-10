@@ -42,6 +42,7 @@ public class BatchActionTaskConceptRefsetRetireMemberUI extends javax.swing.JPan
     BatchActionTask task;
     boolean useFilter;
     int currentValueTypeIdx;
+    int jComboBoxExistingRefsetsIdxCache;
 
     /** Creates new form BatchActionTaskConceptRefsetRetireMemberUI */
     public BatchActionTaskConceptRefsetRetireMemberUI() {
@@ -50,6 +51,9 @@ public class BatchActionTaskConceptRefsetRetireMemberUI extends javax.swing.JPan
         // TASK
         this.task = new BatchActionTaskConceptRefsetRetireMember();
 
+        // Existing Refsets Menu Setup
+        jComboBoxExistingRefsetsIdxCache = jComboBoxExistingRefsets.getSelectedIndex();
+        
         // Setup Filter Value Panel
         ValueDndNidUI tmp = new ValueDndNidUI("Concept Match Value:");
         GroupLayout layout = (GroupLayout) this.getLayout();
@@ -151,7 +155,17 @@ public class BatchActionTaskConceptRefsetRetireMemberUI extends javax.swing.JPan
     }// </editor-fold>//GEN-END:initComponents
 
     private void jComboBoxExistingRefsetsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBoxExistingRefsetsActionPerformed
-        // TODO add your handling code here:
+        int idx = ((JComboBox) evt.getSource()).getSelectedIndex();
+        if (idx >= 0) {
+            jComboBoxExistingRefsetsIdxCache = idx;
+        } else if (jComboBoxExistingRefsets.getItemCount() == 0) {
+            jComboBoxExistingRefsetsIdxCache = -1;
+        } else if (jComboBoxExistingRefsets.getItemCount() > jComboBoxExistingRefsetsIdxCache) {
+            jComboBoxExistingRefsets.setSelectedIndex(jComboBoxExistingRefsetsIdxCache);
+        } else {
+            jComboBoxExistingRefsets.setSelectedIndex(0);
+            jComboBoxExistingRefsetsIdxCache = 0;
+        }
     }//GEN-LAST:event_jComboBoxExistingRefsetsActionPerformed
 
     private void jCheckBoxMatchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBoxMatchActionPerformed
@@ -164,7 +178,7 @@ public class BatchActionTaskConceptRefsetRetireMemberUI extends javax.swing.JPan
 
     private void jComboBoxTypeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBoxTypeActionPerformed
         int idx = ((JComboBox) evt.getSource()).getSelectedIndex();
-        if (idx != currentValueTypeIdx) {
+        if (idx != currentValueTypeIdx && idx >= 0) { // idx == -1 can occur with no menu selection change
             currentValueTypeIdx = idx;
             GroupLayout layout = (GroupLayout) this.getLayout();
             switch (idx) {
@@ -255,10 +269,14 @@ public class BatchActionTaskConceptRefsetRetireMemberUI extends javax.swing.JPan
                 // prior selection exists in new list
                 dcbm.setSelectedItem(selectedItem);
                 jComboBoxExistingRefsets.setSelectedIndex(selectedIdx);
-            } else {
+            } else if (jComboBoxExistingRefsets.getItemCount() > 0) {
                 // prior selection does not exist in new list
                 dcbm.setSelectedItem(dcbm.getElementAt(0));
                 jComboBoxExistingRefsets.setSelectedIndex(0);
+                jComboBoxExistingRefsetsIdxCache = 0;
+            } else {
+                jComboBoxExistingRefsets.setSelectedIndex(-1);
+                jComboBoxExistingRefsetsIdxCache = -1;
             }
         }
     }
@@ -288,7 +306,7 @@ public class BatchActionTaskConceptRefsetRetireMemberUI extends javax.swing.JPan
         }
 
         // SET MATCH TYPE AND VALUE
-        switch (jComboBoxType.getSelectedIndex()) {
+        switch (currentValueTypeIdx) {
             case 0:
                 ((BatchActionTaskConceptRefsetRetireMember) task).setRefsetType(TK_REFEX_TYPE.BOOLEAN);
                 Boolean valBoolean = ((ValueBooleanUI) jPanelValueMatch).getValue();

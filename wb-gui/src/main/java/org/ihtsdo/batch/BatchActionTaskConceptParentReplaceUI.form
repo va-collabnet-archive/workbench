@@ -48,6 +48,9 @@
           <Connection code="new org.ihtsdo.batch.JComboBoxExistingParentsRender()" type="code"/>
         </Property>
       </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jComboBoxExistingParentsActionPerformed"/>
+      </Events>
     </Component>
     <Container class="javax.swing.JPanel" name="jPanelDndParentReplace">
       <Properties>

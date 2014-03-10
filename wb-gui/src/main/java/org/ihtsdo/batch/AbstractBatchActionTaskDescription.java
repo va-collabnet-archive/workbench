@@ -56,8 +56,10 @@ public abstract class AbstractBatchActionTaskDescription
         this.useFilter = false;
         this.matchValue = null;
     }
-    
-    
+
+    public int getSearchByTextConstraint() {
+        return searchByTextConstraint;
+    }
 
     public void setSearchByTextConstraint(int searchByTextConstraint) {
         this.searchByTextConstraint = searchByTextConstraint;
@@ -71,8 +73,16 @@ public abstract class AbstractBatchActionTaskDescription
         this.isSearchCaseSensitive = isSearchCaseSensitive;
     }
 
+    public int getSearchByType() {
+        return searchByType;
+    }
+    
     public void setSearchByType(int searchByType) {
         this.searchByType = searchByType;
+    }
+
+    public int getSearchByLanguage() {
+        return searchByLanguage;
     }
 
     public void setSearchByLanguage(int searchByLanguage) {

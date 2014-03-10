@@ -39,6 +39,7 @@ public class BatchActionTaskBase extends javax.swing.JPanel {
     }
     private I_BatchActionTask taskDetailUI;
     private BatchActionTaskType actionTaskType;
+    private int batchActionTypeIdxCache;
 
     // LEVELS
     private int batchActionLevel;
@@ -97,7 +98,8 @@ public class BatchActionTaskBase extends javax.swing.JPanel {
         jPanelTaskDetail = taskDetailUI.getPanel();
         this.invalidate();
 
-        batchActionLevel = 0; // Concept level
+        batchActionLevel = 0; // Initial Concept Level
+        batchActionTypeIdxCache = 0; // Initial Task
     }
 
     /**
@@ -194,45 +196,56 @@ public class BatchActionTaskBase extends javax.swing.JPanel {
                         if (actionTaskType.compareTo(BatchActionTaskType.CONCEPT_PARENT_ADD_NEW) != 0) {
                             actionTaskType = BatchActionTaskType.CONCEPT_PARENT_ADD_NEW;
                             taskDetailUI = new BatchActionTaskConceptParentAddNewUI();
+                            batchActionTypeIdxCache = idx;
                         }
                         break;
                     case CONCEPT_PARENT_REPLACE: // PARENT_REPLACE
                         if (actionTaskType.compareTo(BatchActionTaskType.CONCEPT_PARENT_REPLACE) != 0) {
                             actionTaskType = BatchActionTaskType.CONCEPT_PARENT_REPLACE;
                             taskDetailUI = new BatchActionTaskConceptParentReplaceUI();
+                            batchActionTypeIdxCache = idx;
                         }
                         break;
                     case CONCEPT_PARENT_RETIRE: // CONCEPT_PARENT_RETIRE
                         if (actionTaskType.compareTo(BatchActionTaskType.CONCEPT_PARENT_RETIRE) != 0) {
                             actionTaskType = BatchActionTaskType.CONCEPT_PARENT_RETIRE;
                             taskDetailUI = new BatchActionTaskConceptParentRetireUI();
+                            batchActionTypeIdxCache = idx;
                         }
                         break;
                     case CONCEPT_REFSET_ADD_MEMBER: // CONCEPT_REFSET_ADD_MEMBER
                         if (actionTaskType.compareTo(BatchActionTaskType.CONCEPT_REFSET_ADD_MEMBER) != 0) {
                             actionTaskType = BatchActionTaskType.CONCEPT_REFSET_ADD_MEMBER;
                             taskDetailUI = new BatchActionTaskConceptRefsetAddMemberUI();
+                            batchActionTypeIdxCache = idx;
                         }
                         break;
                     case CONCEPT_REFSET_MOVE_MEMBER: // CONCEPT_REFSET_MOVE_MEMBER
                         if (actionTaskType.compareTo(BatchActionTaskType.CONCEPT_REFSET_MOVE_MEMBER) != 0) {
                             actionTaskType = BatchActionTaskType.CONCEPT_REFSET_MOVE_MEMBER;
                             taskDetailUI = new BatchActionTaskConceptRefsetMoveMemberUI();
+                            batchActionTypeIdxCache = idx;
                         }
                         break;
                     case CONCEPT_REFSET_REPLACE_VALUE: // CONCEPT_REFSET_REPLACE_VALUE
                         if (actionTaskType.compareTo(BatchActionTaskType.CONCEPT_REFSET_REPLACE_VALUE) != 0) {
                             actionTaskType = BatchActionTaskType.CONCEPT_REFSET_REPLACE_VALUE;
                             taskDetailUI = new BatchActionTaskConceptRefsetReplaceValueUI();
+                            batchActionTypeIdxCache = idx;
                         }
                         break;
                     case CONCEPT_REFSET_RETIRE_MEMBER: // CONCEPT_REFSET_RETIRE_MEMBER
                         if (actionTaskType.compareTo(BatchActionTaskType.CONCEPT_REFSET_RETIRE_MEMBER) != 0) {
                             actionTaskType = BatchActionTaskType.CONCEPT_REFSET_RETIRE_MEMBER;
                             taskDetailUI = new BatchActionTaskConceptRefsetRetireMemberUI();
+                            batchActionTypeIdxCache = idx;
                         }
                         break;
                     default:
+                        if (batchActionTypeIdxCache >= 0
+                                && batchActionTypeIdxCache < jComboTaskType.getItemCount()) {
+                            jComboTaskType.setSelectedIndex(batchActionTypeIdxCache);
+                        }
                         break;
                 }
                 break;
@@ -243,45 +256,56 @@ public class BatchActionTaskBase extends javax.swing.JPanel {
                         if (actionTaskType.compareTo(BatchActionTaskType.DESCRIPTION_INITIAL_CHAR_CASE_SENSITIVITY) != 0) {
                             actionTaskType = BatchActionTaskType.DESCRIPTION_INITIAL_CHAR_CASE_SENSITIVITY;
                             taskDetailUI = new BatchActionTaskDescriptionInitialCapsUI();
+                            batchActionTypeIdxCache = idx;
                         }
                         break;
                     case DESCRIPTION_RETIRE:
                         if (actionTaskType.compareTo(BatchActionTaskType.DESCRIPTION_RETIRE) != 0) {
                             actionTaskType = BatchActionTaskType.DESCRIPTION_RETIRE;
                             taskDetailUI = new BatchActionTaskDescriptionRetireUI();
+                            batchActionTypeIdxCache = idx;
                         }
                         break;
                     case DESCRIPTION_TEXT_FIND_REPLACE:
                         if (actionTaskType.compareTo(BatchActionTaskType.DESCRIPTION_TEXT_FIND_REPLACE) != 0) {
                             actionTaskType = BatchActionTaskType.DESCRIPTION_TEXT_FIND_REPLACE;
                             taskDetailUI = new BatchActionTaskDescriptionTextFindReplaceUI();
+                            batchActionTypeIdxCache = idx;
                         }
                         break;
                     case DESCRIPTION_TEXT_FIND_CREATE:
                         if (actionTaskType.compareTo(BatchActionTaskType.DESCRIPTION_TEXT_FIND_CREATE) != 0) {
                             actionTaskType = BatchActionTaskType.DESCRIPTION_TEXT_FIND_CREATE;
                             taskDetailUI = new BatchActionTaskDescriptionTextFindCreateUI();
+                            batchActionTypeIdxCache = idx;
                         }
                         break;
                     case DESCRIPTION_REFSET_ADD_MEMBER:
                         if (actionTaskType.compareTo(BatchActionTaskType.DESCRIPTION_REFSET_ADD_MEMBER) != 0) {
                             actionTaskType = BatchActionTaskType.DESCRIPTION_REFSET_ADD_MEMBER;
                             taskDetailUI = new BatchActionTaskDescriptionRefsetAddMemberUI();
+                            batchActionTypeIdxCache = idx;
                         }
                         break;
                     case DESCRIPTION_REFSET_CHANGE_VALUE:
                         if (actionTaskType.compareTo(BatchActionTaskType.DESCRIPTION_REFSET_CHANGE_VALUE) != 0) {
                             actionTaskType = BatchActionTaskType.DESCRIPTION_REFSET_CHANGE_VALUE;
                             taskDetailUI = new BatchActionTaskDescriptionRefsetReplaceValueUI();
+                            batchActionTypeIdxCache = idx;
                         }
                         break;
                     case DESCRIPTION_REFSET_RETIRE_MEMBER:
                         if (actionTaskType.compareTo(BatchActionTaskType.DESCRIPTION_REFSET_RETIRE_MEMBER) != 0) {
                             actionTaskType = BatchActionTaskType.DESCRIPTION_REFSET_RETIRE_MEMBER;
                             taskDetailUI = new BatchActionTaskDescriptionRefsetRetireMemberUI();
+                            batchActionTypeIdxCache = idx;
                         }
                         break;
                     default:
+                        if (batchActionTypeIdxCache >= 0
+                                && batchActionTypeIdxCache < jComboTaskType.getItemCount()) {
+                            jComboTaskType.setSelectedIndex(batchActionTypeIdxCache);
+                        }
                         break;
                 }
                 break;
@@ -293,21 +317,28 @@ public class BatchActionTaskBase extends javax.swing.JPanel {
                         if (actionTaskType.compareTo(BatchActionTaskType.RELATIONSHIP_ROLE_ADD) != 0) {
                             actionTaskType = BatchActionTaskType.RELATIONSHIP_ROLE_ADD;
                             taskDetailUI = new BatchActionTaskRelationshipRoleAddUI();
+                            batchActionTypeIdxCache = idx;
                         }
                         break;
                     case RELATIONSHIP_ROLE_REPLACE_VALUE: // RELATIONSHIP_ROLE_REPLACE_VALUE
                         if (actionTaskType.compareTo(BatchActionTaskType.RELATIONSHIP_ROLE_REPLACE_VALUE) != 0) {
                             actionTaskType = BatchActionTaskType.RELATIONSHIP_ROLE_REPLACE_VALUE;
                             taskDetailUI = new BatchActionTaskRelationshipRoleReplaceValueUI();
+                            batchActionTypeIdxCache = idx;
                         }
                         break;
                     case RELATIONSHIP_ROLE_RETIRE: // RELATIONSHIP_ROLE_RETIRE
                         if (actionTaskType.compareTo(BatchActionTaskType.RELATIONSHIP_ROLE_RETIRE) != 0) {
                             actionTaskType = BatchActionTaskType.RELATIONSHIP_ROLE_RETIRE;
                             taskDetailUI = new BatchActionTaskRelationshipRoleRetireUI();
+                            batchActionTypeIdxCache = idx;
                         }
                         break;
                     default:
+                        if (batchActionTypeIdxCache >= 0
+                                && batchActionTypeIdxCache < jComboTaskType.getItemCount()) {
+                            jComboTaskType.setSelectedIndex(batchActionTypeIdxCache);
+                        }
                         break;
                 }
                 break;
@@ -318,37 +349,46 @@ public class BatchActionTaskBase extends javax.swing.JPanel {
                         if (actionTaskType.compareTo(BatchActionTaskType.LOGIC_DISJOINT_SET_ADD) != 0) {
                             actionTaskType = BatchActionTaskType.LOGIC_DISJOINT_SET_ADD;
                             taskDetailUI = new BatchActionTaskLogicDisjointAddUI(editor.ace.aceFrameConfig);
+                            batchActionTypeIdxCache = idx;
                         }
                         break;
                     case LOGIC_DISJOINT_SET_RETIRE: // LOGIC_DISJOINT_SET_RETIRE :SNOOWL:
                         if (actionTaskType.compareTo(BatchActionTaskType.LOGIC_DISJOINT_SET_RETIRE) != 0) {
                             actionTaskType = BatchActionTaskType.LOGIC_DISJOINT_SET_RETIRE;
                             taskDetailUI = new BatchActionTaskLogicDisjointRetireUI();
+                            batchActionTypeIdxCache = idx;
                         }
                         break;
                     case LOGIC_NEGATE_RELATIONSHIP_VALUE: // LOGIC_NEGATE_RELATIONSHIP_VALUE :SNOOWL:
                         if (actionTaskType.compareTo(BatchActionTaskType.LOGIC_NEGATE_RELATIONSHIP_VALUE) != 0) {
                             actionTaskType = BatchActionTaskType.LOGIC_NEGATE_RELATIONSHIP_VALUE;
                             taskDetailUI = new BatchActionTaskLogicNegateRelValueUI();
+                            batchActionTypeIdxCache = idx;
                         }
                         break;
                     case LOGIC_UNION_SET_CREATE: // LOGIC_UNION_SET_CREATE :SNOOWL:
                         if (actionTaskType.compareTo(BatchActionTaskType.LOGIC_UNION_SET_CREATE) != 0) {
                             actionTaskType = BatchActionTaskType.LOGIC_UNION_SET_CREATE;
                             taskDetailUI = new BatchActionTaskLogicUnionCreateUI(editor.ace.aceFrameConfig);
+                            batchActionTypeIdxCache = idx;
                         }
                         break;
                     case LOGIC_UNION_SET_RETIRE: // LOGIC_UNION_SET_RETIRE :SNOOWL:
                         if (actionTaskType.compareTo(BatchActionTaskType.LOGIC_UNION_SET_RETIRE) != 0) {
                             actionTaskType = BatchActionTaskType.LOGIC_UNION_SET_RETIRE;
                             taskDetailUI = new BatchActionTaskLogicUnionRetireUI();
+                            batchActionTypeIdxCache = idx;
                         }
                         break;
                     default:
+                        if (batchActionTypeIdxCache >= 0
+                                && batchActionTypeIdxCache < jComboTaskType.getItemCount()) {
+                            jComboTaskType.setSelectedIndex(batchActionTypeIdxCache);
+                        }
                         break;
                 }
         }
-
+        
         // INITIALIZE DETAIL PANEL
         taskDetailUI.updateExisting(editor.getExistingParents(), editor.getExistingRefsets(),
                 editor.getExistingDescriptionRefsets(),
@@ -376,17 +416,24 @@ public class BatchActionTaskBase extends javax.swing.JPanel {
     private void actionSelectTaskLevel(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_actionSelectTaskLevel
         int idx = ((JComboBox) evt.getSource()).getSelectedIndex();
         switch (idx) {
-            case CONCEPT_LEVEL:
+            case CONCEPT_LEVEL: // 0
                 batchActionLevel = CONCEPT_LEVEL;
                 break;
-            case DESCRIPTION_LEVEL:
+            case DESCRIPTION_LEVEL: // 1
                 batchActionLevel = DESCRIPTION_LEVEL;
                 break;
-            case RELATIONSHIP_LEVEL:
+            case RELATIONSHIP_LEVEL: // 2
                 batchActionLevel = RELATIONSHIP_LEVEL;
                 break;
-            case LOGIC_LEVEL:
+            case LOGIC_LEVEL: // 3
                 batchActionLevel = LOGIC_LEVEL;
+                break;
+            default:
+                if (batchActionLevel < jComboTaskLevel.getItemCount()) {
+                    // reselect what was unselected
+                    jComboTaskLevel.setSelectedIndex(batchActionLevel);
+                    return;
+                }
                 break;
         }
         jComboTaskType.setModel(newBatchActionTypeComboBoxModel());

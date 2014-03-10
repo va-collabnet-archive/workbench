@@ -66,7 +66,7 @@ public class BatchActionTaskDescriptionRefsetReplaceValue
                 dvbi = dcbi.getVersion(vc);
             } catch (ContradictionException ex) {
                 BatchActionEventReporter.add(new BatchActionEvent(c,
-                        BatchActionTaskType.DESCRIPTION_INITIAL_CHAR_CASE_SENSITIVITY,
+                        BatchActionTaskType.DESCRIPTION_REFSET_CHANGE_VALUE,
                         BatchActionEventType.EVENT_ERROR,
                         "ERROR: multiple active versions"));
             }
@@ -136,7 +136,7 @@ public class BatchActionTaskDescriptionRefsetReplaceValue
 
         if (!changed) {
             BatchActionEventReporter.add(new BatchActionEvent(c,
-                    BatchActionTaskType.DESCRIPTION_INITIAL_CHAR_CASE_SENSITIVITY,
+                    BatchActionTaskType.DESCRIPTION_REFSET_CHANGE_VALUE,
                     BatchActionEventType.EVENT_NOOP,
                     "member value not changed : "
                     + nidToName(c.getConceptNid())));

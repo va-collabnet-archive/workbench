@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.UUID;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.GroupLayout;
+import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import org.dwfa.ace.api.I_AmTermComponent;
 import org.ihtsdo.batch.BatchActionEvent.BatchActionEventType;
@@ -38,6 +39,7 @@ import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 public class BatchActionTaskConceptParentReplaceUI extends javax.swing.JPanel implements I_BatchActionTask {
 
     BatchActionTask task;
+    int jComboBoxExistingParentsIdxCache;
 
     /**
      * Creates new form BatchActionTaskConceptParentReplaceUI
@@ -45,6 +47,9 @@ public class BatchActionTaskConceptParentReplaceUI extends javax.swing.JPanel im
     public BatchActionTaskConceptParentReplaceUI() {
         initComponents();
         this.task = new BatchActionTaskConceptParentReplace();
+
+        // Existing Refsets Menu Setup
+        jComboBoxExistingParentsIdxCache = jComboBoxExistingParents.getSelectedIndex();
 
         // Setup DnD Panel
         ValueDndNidUI tmp = new ValueDndNidUI("With Parent:");
@@ -67,6 +72,11 @@ public class BatchActionTaskConceptParentReplaceUI extends javax.swing.JPanel im
 
         jComboBoxExistingParents.setModel(jComboBoxExistingParents.getModel());
         jComboBoxExistingParents.setRenderer(new org.ihtsdo.batch.JComboBoxExistingParentsRender());
+        jComboBoxExistingParents.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jComboBoxExistingParentsActionPerformed(evt);
+            }
+        });
 
         jPanelDndParentReplace.setBorder(javax.swing.BorderFactory.createTitledBorder("With Parent:"));
 
@@ -104,6 +114,21 @@ public class BatchActionTaskConceptParentReplaceUI extends javax.swing.JPanel im
                 .addComponent(jPanelDndParentReplace, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jComboBoxExistingParentsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBoxExistingParentsActionPerformed
+        int idx = ((JComboBox) evt.getSource()).getSelectedIndex();
+        if (idx >= 0) {
+            jComboBoxExistingParentsIdxCache = idx;
+        } else if (jComboBoxExistingParents.getItemCount()== 0) {
+            jComboBoxExistingParentsIdxCache = -1;
+        } else if (jComboBoxExistingParents.getItemCount() > jComboBoxExistingParentsIdxCache) {
+            jComboBoxExistingParents.setSelectedIndex(jComboBoxExistingParentsIdxCache);
+        } else {
+            jComboBoxExistingParents.setSelectedIndex(0);
+            jComboBoxExistingParentsIdxCache = 0;
+        }
+    }//GEN-LAST:event_jComboBoxExistingParentsActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox jComboBoxExistingParents;
     private javax.swing.JLabel jLabel1;
@@ -156,11 +181,16 @@ public class BatchActionTaskConceptParentReplaceUI extends javax.swing.JPanel im
             if (selectedIdx >= 0) {
                 // prior selection exists in new list
                 dcbm.setSelectedItem(selectedItem);
+                jComboBoxExistingParentsIdxCache = selectedIdx;
                 jComboBoxExistingParents.setSelectedIndex(selectedIdx);
-            } else {
+            } else if (jComboBoxExistingParents.getItemCount() > 0) {
                 // prior selection does not exist in new list
                 dcbm.setSelectedItem(dcbm.getElementAt(0));
                 jComboBoxExistingParents.setSelectedIndex(0);
+                jComboBoxExistingParentsIdxCache = 0;
+            } else {
+                jComboBoxExistingParentsIdxCache = -1;
+                jComboBoxExistingParents.setSelectedIndex(-1);
             }
         }
 

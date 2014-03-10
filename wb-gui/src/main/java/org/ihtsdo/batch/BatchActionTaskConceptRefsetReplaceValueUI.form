@@ -71,6 +71,9 @@
           <Connection code="new org.ihtsdo.batch.JComboBoxExistingRefsetsRender()" type="code"/>
         </Property>
       </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jComboBoxExistingRefsetsActionPerformed"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JComboBox" name="jComboBoxType">
       <Properties>

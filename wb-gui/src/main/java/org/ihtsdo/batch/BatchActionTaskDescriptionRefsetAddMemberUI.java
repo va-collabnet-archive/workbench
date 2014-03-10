@@ -93,7 +93,7 @@ public class BatchActionTaskDescriptionRefsetAddMemberUI extends javax.swing.JPa
         jComboBoxSearchByConstraint.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Text Does Not Apply", "Contains", "Begins with", "Ends with" }));
         jComboBoxSearchByConstraint.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jComboBoxSearchByContraintActionPerformed(evt);
+                jComboBoxSearchByConstraintActionPerformed(evt);
             }
         });
 
@@ -133,7 +133,7 @@ public class BatchActionTaskDescriptionRefsetAddMemberUI extends javax.swing.JPa
                         .addComponent(jCheckBoxSearchIsCaseSensitive)
                         .addGap(18, 18, 18)
                         .addComponent(jLabel3)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 18, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jComboBoxSearchByType, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jLabel4)
@@ -216,7 +216,7 @@ public class BatchActionTaskDescriptionRefsetAddMemberUI extends javax.swing.JPa
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jPanelAction, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 32, Short.MAX_VALUE)
                 .addComponent(jPanelCriteria, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
@@ -224,12 +224,23 @@ public class BatchActionTaskDescriptionRefsetAddMemberUI extends javax.swing.JPa
 
     private void jComboBoxSearchByLanguageActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBoxSearchByLanguageActionPerformed
         int idx = ((JComboBox) evt.getSource()).getSelectedIndex();
-        ((BatchActionTaskDescriptionRefsetAddMember) task).setSearchByLanguage(idx);
+        if (idx >= 0) {
+            ((BatchActionTaskDescriptionRefsetAddMember) task).setSearchByLanguage(idx);
+        } else {
+            // -1 occurs if menu item becomes "unselected"
+            idx = ((BatchActionTaskDescriptionRefsetAddMember) task).getSearchByLanguage();
+            jComboBoxSearchByLanguage.setSelectedIndex(idx);
+        }
     }//GEN-LAST:event_jComboBoxSearchByLanguageActionPerformed
 
     private void jComboBoxSearchByTypeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBoxSearchByTypeActionPerformed
         int idx = ((JComboBox) evt.getSource()).getSelectedIndex();
-        ((BatchActionTaskDescriptionRefsetAddMember) task).setSearchByType(idx);
+        if (idx >= 0) {
+            ((BatchActionTaskDescriptionRefsetAddMember) task).setSearchByType(idx);
+        } else {
+            idx = ((BatchActionTaskDescriptionRefsetAddMember) task).getSearchByType();
+            jComboBoxSearchByType.setSelectedIndex(idx);
+        }
     }//GEN-LAST:event_jComboBoxSearchByTypeActionPerformed
 
     private void jCheckBoxSearchIsCaseSensitiveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBoxSearchIsCaseSensitiveActionPerformed
@@ -237,10 +248,15 @@ public class BatchActionTaskDescriptionRefsetAddMemberUI extends javax.swing.JPa
         ((BatchActionTaskDescriptionRefsetAddMember) task).setIsSearchCaseSensitive(checkboxState);
     }//GEN-LAST:event_jCheckBoxSearchIsCaseSensitiveActionPerformed
 
-    private void jComboBoxSearchByContraintActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBoxSearchByContraintActionPerformed
+    private void jComboBoxSearchByConstraintActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBoxSearchByConstraintActionPerformed
         int idx = ((JComboBox) evt.getSource()).getSelectedIndex();
-        ((BatchActionTaskDescriptionRefsetAddMember) task).setSearchByTextConstraint(idx);
-    }//GEN-LAST:event_jComboBoxSearchByContraintActionPerformed
+        if (idx >= 0) {
+            ((BatchActionTaskDescriptionRefsetAddMember) task).setSearchByTextConstraint(idx);
+        } else {
+            idx = ((BatchActionTaskDescriptionRefsetAddMember) task).getSearchByTextConstraint();
+            jComboBoxSearchByConstraint.setSelectedIndex(idx);
+        }
+    }//GEN-LAST:event_jComboBoxSearchByConstraintActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox jCheckBoxSearchIsCaseSensitive;

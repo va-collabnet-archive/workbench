@@ -38,6 +38,7 @@ public class BatchActionTaskDescriptionTextFindReplaceUI extends javax.swing.JPa
 
     BatchActionTask task;
     boolean useFilter;
+    int jComboBoxExistingRefsetsIdxCache;
 
     /**
      * Creates new form BatchActionTaskDescriptionTextFindReplaceUI
@@ -47,6 +48,9 @@ public class BatchActionTaskDescriptionTextFindReplaceUI extends javax.swing.JPa
 
         // TASK
         this.task = new BatchActionTaskDescriptionTextFindReplace();
+
+        // Existing Refsets Menu Setup
+        jComboBoxExistingRefsetsIdxCache = jComboBoxExistingRefsets.getSelectedIndex();
 
         // Setup Filter Value Panel
         GroupLayout layout = (GroupLayout) jPanelCriteria.getLayout();
@@ -246,27 +250,53 @@ public class BatchActionTaskDescriptionTextFindReplaceUI extends javax.swing.JPa
 
     private void jComboBoxSearchByTypeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBoxSearchByTypeActionPerformed
         int idx = ((JComboBox) evt.getSource()).getSelectedIndex();
-        ((BatchActionTaskDescriptionTextFindReplace) task).setSearchByType(idx);
+        if (idx >= 0) {
+            ((BatchActionTaskDescriptionTextFindReplace) task).setSearchByType(idx);
+        } else {
+            idx = ((BatchActionTaskDescriptionTextFindReplace) task).getSearchByType();
+            jComboBoxSearchByType.setSelectedIndex(idx);
+        }
     }//GEN-LAST:event_jComboBoxSearchByTypeActionPerformed
 
     private void jComboBoxSearchByLanguageActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBoxSearchByLanguageActionPerformed
         int idx = ((JComboBox) evt.getSource()).getSelectedIndex();
-        ((BatchActionTaskDescriptionTextFindReplace) task).setSearchByLanguage(idx);
+        if (idx >= 0) {
+            ((BatchActionTaskDescriptionTextFindReplace) task).setSearchByLanguage(idx);
+        } else {
+            // -1 occurs if menu item becomes "unselected"
+            idx = ((BatchActionTaskDescriptionTextFindReplace) task).getSearchByLanguage();
+            jComboBoxSearchByLanguage.setSelectedIndex(idx);
+        }
     }//GEN-LAST:event_jComboBoxSearchByLanguageActionPerformed
 
     private void jComboBoxSearchByConstraintActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBoxSearchByConstraintActionPerformed
         int idx = ((JComboBox) evt.getSource()).getSelectedIndex();
-        ((BatchActionTaskDescriptionTextFindReplace) task).setSearchByTextConstraint(idx);
+        if (idx >= 0) {
+            ((BatchActionTaskDescriptionTextFindReplace) task).setSearchByTextConstraint(idx);
+        } else {
+            idx = ((BatchActionTaskDescriptionTextFindReplace) task).getSearchByTextConstraint();
+            jComboBoxSearchByConstraint.setSelectedIndex(idx);
+        }
     }//GEN-LAST:event_jComboBoxSearchByConstraintActionPerformed
 
     private void jComboBoxExistingRefsetsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBoxExistingRefsetsActionPerformed
         int idx = ((JComboBox) evt.getSource()).getSelectedIndex();
-        if (idx > 0) {
-            jCheckBoxMatch.setEnabled(true);
-            jPanelValueMatch.setEnabled(true);
-        } else {
+        if (idx == 0) {
             jCheckBoxMatch.setEnabled(false);
             jPanelValueMatch.setEnabled(false);
+            jComboBoxExistingRefsetsIdxCache = 0;
+        } else if (idx > 0) {
+            jCheckBoxMatch.setEnabled(true);
+            jPanelValueMatch.setEnabled(true);
+            jComboBoxExistingRefsetsIdxCache = idx;
+        } else if (jComboBoxExistingRefsets.getItemCount() == 0) {
+            jComboBoxExistingRefsetsIdxCache = -1;
+        } else if (jComboBoxExistingRefsets.getItemCount() > jComboBoxExistingRefsetsIdxCache) {
+            // idx == -1 can occur which the user did not select any change on the menu
+            jComboBoxExistingRefsets.setSelectedIndex(jComboBoxExistingRefsetsIdxCache);
+        } else {
+            jComboBoxExistingRefsets.setSelectedIndex(0);
+            jComboBoxExistingRefsetsIdxCache = 0;
         }
     }//GEN-LAST:event_jComboBoxExistingRefsetsActionPerformed
 
@@ -354,7 +384,7 @@ public class BatchActionTaskDescriptionTextFindReplaceUI extends javax.swing.JPa
     public BatchActionTask getTask(EditCoordinate ec, ViewCoordinate vc, List<ConceptChronicleBI> concepts) {
         // referenced component provided at execution time
 
-        // add 1 to jComboBoxSearchByContraint for execution
+        // add 1 to jComboBoxSearchByConstraint for execution
         int idx = jComboBoxSearchByConstraint.getSelectedIndex();
         ((BatchActionTaskDescriptionTextFindReplace) task).setSearchByTextConstraint(idx + 1);
 

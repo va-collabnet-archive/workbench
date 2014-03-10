@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
@@ -45,6 +46,7 @@ import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 public class BatchActionTaskLogicDisjointRetireUI extends javax.swing.JPanel implements I_BatchActionTask {
 
     BatchActionTask task;
+    int jComboBoxExistingRefsetsIdxCache;
 
     /**
      * Creates new form BatchActionTaskLogicDisjoinRetireUI
@@ -54,6 +56,9 @@ public class BatchActionTaskLogicDisjointRetireUI extends javax.swing.JPanel imp
 
         // TASK
         this.task = new BatchActionTaskLogicDisjointRetire();
+
+        // Existing Refsets Menu Setup
+        jComboBoxExistingRefsetsIdxCache = jComboBoxExistingRefsets.getSelectedIndex();
     }
 
     /**
@@ -98,7 +103,17 @@ public class BatchActionTaskLogicDisjointRetireUI extends javax.swing.JPanel imp
     }// </editor-fold>//GEN-END:initComponents
 
     private void jComboBoxExistingRefsetsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBoxExistingRefsetsActionPerformed
-        // TODO add your handling code here:
+        int idx = ((JComboBox) evt.getSource()).getSelectedIndex();
+        if (idx >= 0) {
+            jComboBoxExistingRefsetsIdxCache = idx;
+        } else if (jComboBoxExistingRefsets.getItemCount() == 0) {
+            jComboBoxExistingRefsetsIdxCache = -1;
+        } else if (jComboBoxExistingRefsets.getItemCount() > jComboBoxExistingRefsetsIdxCache) {
+            jComboBoxExistingRefsets.setSelectedIndex(jComboBoxExistingRefsetsIdxCache);
+        } else {
+            jComboBoxExistingRefsets.setSelectedIndex(0);
+            jComboBoxExistingRefsetsIdxCache = 0;
+        }
     }//GEN-LAST:event_jComboBoxExistingRefsetsActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox jComboBoxExistingRefsets;

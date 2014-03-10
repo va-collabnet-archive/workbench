@@ -64,7 +64,7 @@ public class BatchActionTaskDescriptionRefsetAddMember
                 dvbi = dcbi.getVersion(vc);
             } catch (ContradictionException ex) {
                 BatchActionEventReporter.add(new BatchActionEvent(c,
-                        BatchActionTaskType.DESCRIPTION_INITIAL_CHAR_CASE_SENSITIVITY,
+                        BatchActionTaskType.DESCRIPTION_REFSET_ADD_MEMBER,
                         BatchActionEventType.EVENT_ERROR,
                         "ERROR: multiple active versions"));
             }
@@ -115,9 +115,9 @@ public class BatchActionTaskDescriptionRefsetAddMember
 
         if (!changed) {
             BatchActionEventReporter.add(new BatchActionEvent(c,
-                    BatchActionTaskType.DESCRIPTION_INITIAL_CHAR_CASE_SENSITIVITY,
+                    BatchActionTaskType.DESCRIPTION_REFSET_ADD_MEMBER,
                     BatchActionEventType.EVENT_NOOP,
-                    "description initial caps not changed on concept : "
+                    "description refset add member not changed on concept : "
                     + nidToName(c.getConceptNid())));
         }
 

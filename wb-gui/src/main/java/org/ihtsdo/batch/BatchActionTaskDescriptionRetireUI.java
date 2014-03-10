@@ -38,6 +38,7 @@ public class BatchActionTaskDescriptionRetireUI extends javax.swing.JPanel imple
 
     BatchActionTask task;
     boolean useFilter;
+    int jComboBoxExistingRefsetsIdxCache;
 
     /**
      * Creates new form BatchActionTaskDescriptionRetireUI
@@ -47,6 +48,9 @@ public class BatchActionTaskDescriptionRetireUI extends javax.swing.JPanel imple
 
         // TASK
         this.task = new BatchActionTaskDescriptionRetire();
+        
+        // Existing Refsets Menu Setup
+        jComboBoxExistingRefsetsIdxCache = jComboBoxExistingRefsets.getSelectedIndex();
 
         // Setup Filter Value Panel
         GroupLayout layout = (GroupLayout) jPanelCriteria.getLayout();
@@ -88,7 +92,7 @@ public class BatchActionTaskDescriptionRetireUI extends javax.swing.JPanel imple
         jComboBoxSearchByConstraint.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Text Does Not Apply", "Contains", "Begins with", "Ends with" }));
         jComboBoxSearchByConstraint.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jComboBoxSearchByContraintActionPerformed(evt);
+                jComboBoxSearchByConstraintActionPerformed(evt);
             }
         });
 
@@ -215,12 +219,13 @@ public class BatchActionTaskDescriptionRetireUI extends javax.swing.JPanel imple
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addComponent(jPanelCriteria, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 8, Short.MAX_VALUE))
+                .addGap(0, 0, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
     private void jCheckBoxMatchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBoxMatchActionPerformed
         useFilter = ((JCheckBox) evt.getSource()).getModel().isSelected();
+        System.out.println(":!!!:DEBUG: jCheckBoxMatchActionPerformed useFilter===" + useFilter);
         jPanelValueMatch.setEnabled(useFilter);
         jPanelValueMatch.setVisible(useFilter);
     }//GEN-LAST:event_jCheckBoxMatchActionPerformed
@@ -230,29 +235,66 @@ public class BatchActionTaskDescriptionRetireUI extends javax.swing.JPanel imple
         ((BatchActionTaskDescriptionRetire) task).setIsSearchCaseSensitive(checkboxState);
     }//GEN-LAST:event_jCheckBoxSearchIsCaseSensitiveActionPerformed
 
-    private void jComboBoxSearchByContraintActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBoxSearchByContraintActionPerformed
+    private void jComboBoxSearchByConstraintActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBoxSearchByConstraintActionPerformed
         int idx = ((JComboBox) evt.getSource()).getSelectedIndex();
-        ((BatchActionTaskDescriptionRetire) task).setSearchByTextConstraint(idx);
-    }//GEN-LAST:event_jComboBoxSearchByContraintActionPerformed
+        if (idx >= 0) {
+            ((BatchActionTaskDescriptionRetire) task).setSearchByTextConstraint(idx);
+        } else {
+            idx = ((BatchActionTaskDescriptionRetire) task).getSearchByTextConstraint();
+            jComboBoxSearchByConstraint.setSelectedIndex(idx);
+        }
+    }//GEN-LAST:event_jComboBoxSearchByConstraintActionPerformed
 
     private void jComboBoxSearchByTypeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBoxSearchByTypeActionPerformed
         int idx = ((JComboBox) evt.getSource()).getSelectedIndex();
-        ((BatchActionTaskDescriptionRetire) task).setSearchByType(idx);
+        if (idx >= 0) {
+            ((BatchActionTaskDescriptionRetire) task).setSearchByType(idx);
+        } else {
+            idx = ((BatchActionTaskDescriptionRetire) task).getSearchByType();
+            jComboBoxSearchByType.setSelectedIndex(idx);
+        }
     }//GEN-LAST:event_jComboBoxSearchByTypeActionPerformed
 
     private void jComboBoxSearchByLanguageActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBoxSearchByLanguageActionPerformed
         int idx = ((JComboBox) evt.getSource()).getSelectedIndex();
-        ((BatchActionTaskDescriptionRetire) task).setSearchByLanguage(idx);
+        if (idx >= 0) {
+            ((BatchActionTaskDescriptionRetire) task).setSearchByLanguage(idx);
+        } else {
+            // -1 occurs if menu item becomes "unselected"
+            idx = ((BatchActionTaskDescriptionRetire) task).getSearchByLanguage();
+            jComboBoxSearchByLanguage.setSelectedIndex(idx);
+        }
     }//GEN-LAST:event_jComboBoxSearchByLanguageActionPerformed
 
     private void jComboBoxExistingRefsetsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBoxExistingRefsetsActionPerformed
+//        long time = System.currentTimeMillis();
+//        StringBuilder sb = new StringBuilder();
+//        sb.append(":!!!:DEBUG: action performed");
+//        sb.append("\n | (").append(Long.toString(time)).append(")");
+//        sb.append("\n | getWhen==").append(evt.getWhen());
+//        sb.append("\n | getSource.getSelectedIndex==").append(Integer.toString(((JComboBox) evt.getSource()).getSelectedIndex()));
+//        sb.append("\n | j...getSelectedIndex==").append(Integer.toString(jComboBoxExistingRefsets.getSelectedIndex()));
+//        sb.append("\n | getActionCommand==").append(evt.getActionCommand());
+//        sb.append("\n | paramString==").append(evt.paramString());
+//        System.out.println(sb.toString());
+//        System.out.flush();
         int idx = ((JComboBox) evt.getSource()).getSelectedIndex();
-        if (idx > 0) {
-            jCheckBoxMatch.setEnabled(true);
-            jPanelValueMatch.setEnabled(true);
-        } else {
+        if (idx == 0) {
             jCheckBoxMatch.setEnabled(false);
             jPanelValueMatch.setEnabled(false);
+            jComboBoxExistingRefsetsIdxCache = 0;
+        } else if (idx > 0) {
+            jCheckBoxMatch.setEnabled(true);
+            jPanelValueMatch.setEnabled(true);
+            jComboBoxExistingRefsetsIdxCache = idx;
+        } else if (jComboBoxExistingRefsets.getItemCount() == 0) {
+            jComboBoxExistingRefsetsIdxCache = -1;
+        } else if (jComboBoxExistingRefsets.getItemCount() > jComboBoxExistingRefsetsIdxCache) {
+            // idx == -1 can occur which the user did not select any change on the menu
+            jComboBoxExistingRefsets.setSelectedIndex(jComboBoxExistingRefsetsIdxCache);
+        } else {
+            jComboBoxExistingRefsets.setSelectedIndex(0);
+            jComboBoxExistingRefsetsIdxCache = 0;
         }
     }//GEN-LAST:event_jComboBoxExistingRefsetsActionPerformed
 
@@ -336,6 +378,9 @@ public class BatchActionTaskDescriptionRetireUI extends javax.swing.JPanel imple
 
     @Override // I_BatchActionTask
     public BatchActionTask getTask(EditCoordinate ec, ViewCoordinate vc, List<ConceptChronicleBI> concepts) {
+        System.out.print(" :!!!:DEBUG: getTask jComboBoxExistingRefsets.getSelectedIndex==");
+        System.out.println(Integer.toString(jComboBoxExistingRefsets.getSelectedIndex()));
+
         // referenced component provided at execution time
 
         // Description Search Text

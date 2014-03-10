@@ -38,6 +38,7 @@ public class BatchActionTaskDescriptionTextFindCreateUI extends javax.swing.JPan
 
     BatchActionTask task;
     boolean useFilter;
+    int jComboBoxExistingRefsetsIdxCache;
 
     /**
      * Creates new form BatchActionTaskDescriptionTextFindCreateUI
@@ -47,6 +48,9 @@ public class BatchActionTaskDescriptionTextFindCreateUI extends javax.swing.JPan
 
         // TASK
         this.task = new BatchActionTaskDescriptionTextFindCreate();
+
+        // Existing Refsets Menu Setup
+        jComboBoxExistingRefsetsIdxCache = jComboBoxExistingRefsets.getSelectedIndex();
 
         // Setup Filter Value Panel
         GroupLayout layout = (GroupLayout) jPanelCriteria.getLayout();
@@ -81,7 +85,7 @@ public class BatchActionTaskDescriptionTextFindCreateUI extends javax.swing.JPan
         jTextFieldSearchText = new javax.swing.JTextField();
         jLabel5 = new javax.swing.JLabel();
         jTextFieldCreateNew = new javax.swing.JTextField();
-        jComboBoxSearchByContraint = new javax.swing.JComboBox();
+        jComboBoxSearchByConstraint = new javax.swing.JComboBox();
 
         setPreferredSize(new java.awt.Dimension(218, 120));
 
@@ -157,7 +161,7 @@ public class BatchActionTaskDescriptionTextFindCreateUI extends javax.swing.JPan
                         .addComponent(jLabel3)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jComboBoxSearchByType, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 164, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 71, Short.MAX_VALUE)
                         .addComponent(jLabel4)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jComboBoxSearchByLanguage, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -189,8 +193,8 @@ public class BatchActionTaskDescriptionTextFindCreateUI extends javax.swing.JPan
 
         jLabel5.setText("Create new with:");
 
-        jComboBoxSearchByContraint.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Contains", "Begins with", "Ends with" }));
-        jComboBoxSearchByContraint.addActionListener(new java.awt.event.ActionListener() {
+        jComboBoxSearchByConstraint.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Contains", "Begins with", "Ends with" }));
+        jComboBoxSearchByConstraint.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jComboBoxSearchByConstraintActionPerformed(evt);
             }
@@ -206,7 +210,7 @@ public class BatchActionTaskDescriptionTextFindCreateUI extends javax.swing.JPan
                     .addComponent(jPanelCriteria, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jComboBoxSearchByContraint, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jComboBoxSearchByConstraint, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(layout.createSequentialGroup()
                                 .addGap(6, 6, 6)
                                 .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 128, javax.swing.GroupLayout.PREFERRED_SIZE)))
@@ -222,8 +226,8 @@ public class BatchActionTaskDescriptionTextFindCreateUI extends javax.swing.JPan
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jTextFieldSearchText, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jComboBoxSearchByContraint, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 35, Short.MAX_VALUE)
+                    .addComponent(jComboBoxSearchByConstraint, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel5)
                     .addComponent(jTextFieldCreateNew, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -246,27 +250,53 @@ public class BatchActionTaskDescriptionTextFindCreateUI extends javax.swing.JPan
 
     private void jComboBoxSearchByTypeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBoxSearchByTypeActionPerformed
         int idx = ((JComboBox) evt.getSource()).getSelectedIndex();
-        ((BatchActionTaskDescriptionTextFindCreate) task).setSearchByType(idx);
+        if (idx >= 0) {
+            ((BatchActionTaskDescriptionTextFindCreate) task).setSearchByType(idx);
+        } else {
+            idx = ((BatchActionTaskDescriptionTextFindCreate) task).getSearchByType();
+            jComboBoxSearchByType.setSelectedIndex(idx);
+        }
     }//GEN-LAST:event_jComboBoxSearchByTypeActionPerformed
 
     private void jComboBoxSearchByLanguageActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBoxSearchByLanguageActionPerformed
         int idx = ((JComboBox) evt.getSource()).getSelectedIndex();
-        ((BatchActionTaskDescriptionTextFindCreate) task).setSearchByLanguage(idx);
+        if (idx >= 0) {
+            ((BatchActionTaskDescriptionTextFindCreate) task).setSearchByLanguage(idx);
+        } else {
+            // -1 occurs if menu item becomes "unselected"
+            idx = ((BatchActionTaskDescriptionTextFindCreate) task).getSearchByLanguage();
+            jComboBoxSearchByLanguage.setSelectedIndex(idx);
+        }
     }//GEN-LAST:event_jComboBoxSearchByLanguageActionPerformed
 
     private void jComboBoxSearchByConstraintActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBoxSearchByConstraintActionPerformed
         int idx = ((JComboBox) evt.getSource()).getSelectedIndex();
-        ((BatchActionTaskDescriptionTextFindCreate) task).setSearchByTextConstraint(idx);
+        if (idx >= 0) {
+            ((BatchActionTaskDescriptionTextFindCreate) task).setSearchByTextConstraint(idx);
+        } else {
+            idx = ((BatchActionTaskDescriptionTextFindCreate) task).getSearchByTextConstraint();
+            jComboBoxSearchByConstraint.setSelectedIndex(idx);
+        }
     }//GEN-LAST:event_jComboBoxSearchByConstraintActionPerformed
 
     private void jComboBoxExistingRefsetsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBoxExistingRefsetsActionPerformed
         int idx = ((JComboBox) evt.getSource()).getSelectedIndex();
-        if (idx > 0) {
-            jCheckBoxMatch.setEnabled(true);
-            jPanelValueMatch.setEnabled(true);
-        } else {
+        if (idx == 0) {
             jCheckBoxMatch.setEnabled(false);
             jPanelValueMatch.setEnabled(false);
+            jComboBoxExistingRefsetsIdxCache = 0;
+        } else if (idx > 0) {
+            jCheckBoxMatch.setEnabled(true);
+            jPanelValueMatch.setEnabled(true);
+            jComboBoxExistingRefsetsIdxCache = idx;
+        } else if (jComboBoxExistingRefsets.getItemCount() == 0) {
+            jComboBoxExistingRefsetsIdxCache = -1;
+        } else if (jComboBoxExistingRefsets.getItemCount() > jComboBoxExistingRefsetsIdxCache) {
+            // idx == -1 can occur which the user did not select any change on the menu
+            jComboBoxExistingRefsets.setSelectedIndex(jComboBoxExistingRefsetsIdxCache);
+        } else {
+            jComboBoxExistingRefsets.setSelectedIndex(0);
+            jComboBoxExistingRefsetsIdxCache = 0;
         }
     }//GEN-LAST:event_jComboBoxExistingRefsetsActionPerformed
 
@@ -274,7 +304,7 @@ public class BatchActionTaskDescriptionTextFindCreateUI extends javax.swing.JPan
     private javax.swing.JCheckBox jCheckBoxMatch;
     private javax.swing.JCheckBox jCheckBoxSearchIsCaseSensitive;
     private javax.swing.JComboBox jComboBoxExistingRefsets;
-    private javax.swing.JComboBox jComboBoxSearchByContraint;
+    private javax.swing.JComboBox jComboBoxSearchByConstraint;
     private javax.swing.JComboBox jComboBoxSearchByLanguage;
     private javax.swing.JComboBox jComboBoxSearchByType;
     private javax.swing.JLabel jLabel1;
@@ -354,8 +384,8 @@ public class BatchActionTaskDescriptionTextFindCreateUI extends javax.swing.JPan
     public BatchActionTask getTask(EditCoordinate ec, ViewCoordinate vc, List<ConceptChronicleBI> concepts) {
         // referenced component provided at execution time
 
-        // add 1 to jComboBoxSearchByContraint for execution
-        int idx = jComboBoxSearchByContraint.getSelectedIndex();
+        // add 1 to jComboBoxSearchByConstraint for execution
+        int idx = jComboBoxSearchByConstraint.getSelectedIndex();
         ((BatchActionTaskDescriptionTextFindCreate) task).setSearchByTextConstraint(idx + 1);
 
         // Description Search Text

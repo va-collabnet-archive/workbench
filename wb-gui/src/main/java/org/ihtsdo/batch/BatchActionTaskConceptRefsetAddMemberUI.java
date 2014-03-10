@@ -133,7 +133,7 @@ public class BatchActionTaskConceptRefsetAddMemberUI extends javax.swing.JPanel 
 
     private void jComboBoxTypeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBoxTypeActionPerformed
         int idx = ((JComboBox) evt.getSource()).getSelectedIndex();
-        if (idx != currentValueTypeIdx) {
+        if (idx != currentValueTypeIdx && idx >= 0) { // idx == -1 can occur with no menu selection change
             currentValueTypeIdx = idx;
             GroupLayout layout = (GroupLayout) this.getLayout();
             switch (idx) {
@@ -201,7 +201,7 @@ public class BatchActionTaskConceptRefsetAddMemberUI extends javax.swing.JPanel 
         }
 
         // SET VALUE TYPE
-        switch (jComboBoxType.getSelectedIndex()) {
+        switch (currentValueTypeIdx) {
             case 0:
                 ((BatchActionTaskConceptRefsetAddMember) task).setRefsetType(TK_REFEX_TYPE.BOOLEAN);
                 Boolean b = ((ValueBooleanUI) jPanelValueNew).getValue();

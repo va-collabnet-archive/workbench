@@ -43,6 +43,7 @@ public class BatchActionTaskConceptRefsetMoveMemberUI extends javax.swing.JPanel
     BatchActionTask task;
     boolean useFilter;
     int currentValueTypeIdx;
+    int jComboBoxExistingRefsetsIdxCache;
 
     /** Creates new form BatchActionTaskConceptRefsetMoveMemberUI */
     public BatchActionTaskConceptRefsetMoveMemberUI() {
@@ -51,6 +52,9 @@ public class BatchActionTaskConceptRefsetMoveMemberUI extends javax.swing.JPanel
         // TASK
         this.task = new BatchActionTaskConceptRefsetMoveMember();
 
+        // ExistingRefsets Menu Setup
+        jComboBoxExistingRefsetsIdxCache = jComboBoxExistingRefsets.getSelectedIndex();
+        
         // Setup DnD Move To Panel
         ValueDndNidUI tmp = new ValueDndNidUI("Move To:");
         GroupLayout layout = (GroupLayout) this.getLayout();
@@ -94,6 +98,11 @@ public class BatchActionTaskConceptRefsetMoveMemberUI extends javax.swing.JPanel
 
         jComboBoxExistingRefsets.setModel(jComboBoxExistingRefsets.getModel());
         jComboBoxExistingRefsets.setRenderer(new org.ihtsdo.batch.JComboBoxExistingRefsetsRender());
+        jComboBoxExistingRefsets.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jComboBoxExistingRefsetsActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanelDndRefsetMoveToLayout = new javax.swing.GroupLayout(jPanelDndRefsetMoveTo);
         jPanelDndRefsetMoveTo.setLayout(jPanelDndRefsetMoveToLayout);
@@ -130,7 +139,7 @@ public class BatchActionTaskConceptRefsetMoveMemberUI extends javax.swing.JPanel
         );
         jPanelValueMatchLayout.setVerticalGroup(
             jPanelValueMatchLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 132, Short.MAX_VALUE)
+            .addGap(0, 0, Short.MAX_VALUE)
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -176,7 +185,7 @@ public class BatchActionTaskConceptRefsetMoveMemberUI extends javax.swing.JPanel
 
     private void jComboBoxTypeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBoxTypeActionPerformed
         int idx = ((JComboBox) evt.getSource()).getSelectedIndex();
-        if (idx != currentValueTypeIdx) {
+        if (idx != currentValueTypeIdx && idx >= 0) { // idx == -1 can occur with no menu selection change
             currentValueTypeIdx = idx;
             GroupLayout layout = (GroupLayout) this.getLayout();
             switch (idx) {
@@ -213,6 +222,21 @@ public class BatchActionTaskConceptRefsetMoveMemberUI extends javax.swing.JPanel
             this.doLayout();
         }
     }//GEN-LAST:event_jComboBoxTypeActionPerformed
+
+    private void jComboBoxExistingRefsetsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBoxExistingRefsetsActionPerformed
+        int idx = ((JComboBox) evt.getSource()).getSelectedIndex();
+        if (idx >= 0) {
+            jComboBoxExistingRefsetsIdxCache = idx;
+        } else if (jComboBoxExistingRefsets.getItemCount() == 0) {
+            jComboBoxExistingRefsetsIdxCache = -1;
+        } else if (jComboBoxExistingRefsets.getItemCount() > jComboBoxExistingRefsetsIdxCache) {
+            jComboBoxExistingRefsets.setSelectedIndex(jComboBoxExistingRefsetsIdxCache);
+        } else {
+            jComboBoxExistingRefsets.setSelectedIndex(0);
+            jComboBoxExistingRefsetsIdxCache = 0;
+        }
+    }//GEN-LAST:event_jComboBoxExistingRefsetsActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox jCheckBoxMatch;
     private javax.swing.JComboBox jComboBoxExistingRefsets;
@@ -274,11 +298,17 @@ public class BatchActionTaskConceptRefsetMoveMemberUI extends javax.swing.JPanel
                 // prior selection exists in new list
                 dcbm.setSelectedItem(selectedItem);
                 jComboBoxExistingRefsets.setSelectedIndex(selectedIdx);
-            } else {
+                jComboBoxExistingRefsetsIdxCache = selectedIdx;
+            } else if (jComboBoxExistingRefsets.getItemCount() > 0) {
                 // prior selection does not exist in new list
                 dcbm.setSelectedItem(dcbm.getElementAt(0));
                 jComboBoxExistingRefsets.setSelectedIndex(0);
+                jComboBoxExistingRefsetsIdxCache = 0;
+            } else {
+                jComboBoxExistingRefsets.setSelectedIndex(-1);
+                jComboBoxExistingRefsetsIdxCache = -1;
             }
+            
         }
 
     }
@@ -317,7 +347,7 @@ public class BatchActionTaskConceptRefsetMoveMemberUI extends javax.swing.JPanel
         }
 
         // SET MATCH TYPE AND VALUE
-        switch (jComboBoxType.getSelectedIndex()) {
+        switch (currentValueTypeIdx) {
             case 0:
                 ((BatchActionTaskConceptRefsetMoveMember) task).setRefsetType(TK_REFEX_TYPE.BOOLEAN);
                 Boolean valBoolean = ((ValueBooleanUI) jPanelValueMatch).getValue();
