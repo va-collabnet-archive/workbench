@@ -62,13 +62,6 @@ public class PromptSearchReplaceCriteriaBeanInfo extends SimpleBeanInfo {
             searchFsnPropName.setDisplayName("<html><font color='green'>Include FSN's Prop Name");
             searchFsnPropName.setShortDescription("");
 
-            PropertyDescriptor searchPftPropName = new PropertyDescriptor("searchPftPropName",
-                PromptSearchReplaceCriteria.class);
-            searchPftPropName.setBound(true);
-            searchPftPropName.setPropertyEditorClass(PropertyNameLabelEditor.class);
-            searchPftPropName.setDisplayName("<html><font color='green'>Include PT's Prop Name");
-            searchPftPropName.setShortDescription("");
-
             PropertyDescriptor searchSynonymPropName = new PropertyDescriptor("searchSynonymPropName",
                 PromptSearchReplaceCriteria.class);
             searchSynonymPropName.setBound(true);
@@ -98,7 +91,7 @@ public class PromptSearchReplaceCriteriaBeanInfo extends SimpleBeanInfo {
             languageCodePropName.setShortDescription("");
 
             PropertyDescriptor rv[] = { searchStringPropName, replaceStringPropName, caseSensitivePropName,
-                                       searchAllPropName, searchFsnPropName, searchPftPropName, searchSynonymPropName,
+                                       searchAllPropName, searchFsnPropName, searchSynonymPropName,
                                        retireAsStatusPropName,languageCodePropName };
             return rv;
         } catch (IntrospectionException e) {

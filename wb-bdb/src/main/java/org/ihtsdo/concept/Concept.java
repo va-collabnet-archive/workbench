@@ -622,6 +622,7 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
                             r = RefsetMemberFactory.create(er,
                                     Bdb.getConceptNid(cc.getNid()));
                             cc.addAnnotation(r);
+                            BdbCommitManager.addUncommittedNoChecks(cc.getEnclosingConcept());
                         } else {
                             r.merge((RefsetMember) RefsetMemberFactory.create(er,
                                     Bdb.getConceptNid(cc.getNid())), indexedAnnotationConcepts);

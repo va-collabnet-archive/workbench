@@ -30,4 +30,31 @@
                 <Env.MAVEN_OPTS>-ea -XX:MaxPermSize=256M -d64 -XX:+UseCompressedOops -Xmx4g -Xms2g</Env.MAVEN_OPTS>
             </properties>
         </action>
+        <action>
+            <actionName>CUSTOM-offline</actionName>
+            <displayName>offline</displayName>
+            <goals>
+                <goal>clean</goal>
+                <goal>install</goal>
+                <goal>-o</goal>
+            </goals>
+            <properties>
+                <Env.MAVEN_OPTS>-ea -XX:MaxPermSize=256M -d64 -XX:+UseCompressedOops -Xmx4g -Xms2g</Env.MAVEN_OPTS>
+            </properties>
+        </action>
+        <action>
+            <actionName>CUSTOM-integration tests</actionName>
+            <displayName>integration tests</displayName>
+            <goals>
+                <goal>clean</goal>
+                <goal>install</goal>
+                <goal>-e</goal>
+            </goals>
+            <properties>
+                <Env.MAVEN_OPTS>-ea -d64 -XX:+UseCompressedOops -Xmx4g -Xms4g -XX:MaxPermSize=384m</Env.MAVEN_OPTS>
+            </properties>
+            <activatedProfiles>
+                <activatedProfile>integration-tests</activatedProfile>
+            </activatedProfiles>
+        </action>
     </actions>

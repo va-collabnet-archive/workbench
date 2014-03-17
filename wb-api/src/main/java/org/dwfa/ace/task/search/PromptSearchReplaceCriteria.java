@@ -40,7 +40,7 @@ public class PromptSearchReplaceCriteria extends AbstractTask {
 
     private static final long serialVersionUID = 1L;
 
-    private static final int dataVersion = 2;
+    private static final int dataVersion = 3;
 
     private static int objDataVersion = -1;
 
@@ -53,7 +53,6 @@ public class PromptSearchReplaceCriteria extends AbstractTask {
     private String caseSensitivePropName = ProcessAttachmentKeys.CASE_SENSITIVITY.getAttachmentKey();
     private String searchAllPropName = ProcessAttachmentKeys.SEARCH_ALL.getAttachmentKey();
     private String searchFsnPropName = ProcessAttachmentKeys.SEARCH_FSN.getAttachmentKey();
-    private String searchPftPropName = ProcessAttachmentKeys.SEARCH_PT.getAttachmentKey();
     private String searchSynonymPropName = ProcessAttachmentKeys.SEARCH_SYNONYM.getAttachmentKey();
     private String retireAsStatusPropName = ProcessAttachmentKeys.RETIRE_AS_STATUS.getAttachmentKey();
     private String languageCodePropName = ProcessAttachmentKeys.LANGUAGE_CODE.getAttachmentKey();
@@ -65,7 +64,6 @@ public class PromptSearchReplaceCriteria extends AbstractTask {
         out.writeObject(caseSensitivePropName);
         out.writeObject(searchAllPropName);
         out.writeObject(searchFsnPropName);
-        out.writeObject(searchPftPropName);
         out.writeObject(searchSynonymPropName);
         out.writeObject(retireAsStatusPropName);
         out.writeObject(languageCodePropName);
@@ -79,7 +77,7 @@ public class PromptSearchReplaceCriteria extends AbstractTask {
             caseSensitivePropName = (String) in.readObject();
             searchAllPropName = (String) in.readObject();
             searchFsnPropName = (String) in.readObject();
-            searchPftPropName = (String) in.readObject();
+            String searchPftPropName = (String) in.readObject();
             searchSynonymPropName = (String) in.readObject();
             retireAsStatusPropName = ProcessAttachmentKeys.RETIRE_AS_STATUS.getAttachmentKey();
             languageCodePropName = (String) in.readObject();
@@ -89,7 +87,16 @@ public class PromptSearchReplaceCriteria extends AbstractTask {
             caseSensitivePropName = (String) in.readObject();
             searchAllPropName = (String) in.readObject();
             searchFsnPropName = (String) in.readObject();
-            searchPftPropName = (String) in.readObject();
+            String searchPftPropName = (String) in.readObject();
+            searchSynonymPropName = (String) in.readObject();
+            retireAsStatusPropName = (String) in.readObject();
+            languageCodePropName = (String) in.readObject();
+        } else if (objDataVersion == 3) {
+            searchStringPropName = (String) in.readObject();
+            replaceStringPropName = (String) in.readObject();
+            caseSensitivePropName = (String) in.readObject();
+            searchAllPropName = (String) in.readObject();
+            searchFsnPropName = (String) in.readObject();
             searchSynonymPropName = (String) in.readObject();
             retireAsStatusPropName = (String) in.readObject();
             languageCodePropName = (String) in.readObject();
@@ -135,7 +142,6 @@ public class PromptSearchReplaceCriteria extends AbstractTask {
         boolean caseSensitive = dialog.isCaseSensitive();
         boolean searchAll = dialog.isAll();
         boolean searchFsn = dialog.isFullySpecifiedName();
-        boolean searchPft = dialog.isPreferredTerm();
         boolean searchSynonym = dialog.isSynonym();
         int retireAsStatus = dialog.getRetireAsStatus();
 
@@ -150,7 +156,6 @@ public class PromptSearchReplaceCriteria extends AbstractTask {
             process.setProperty(caseSensitivePropName, caseSensitive);
             process.setProperty(searchAllPropName, searchAll);
             process.setProperty(searchFsnPropName, searchFsn);
-            process.setProperty(searchPftPropName, searchPft);
             process.setProperty(searchSynonymPropName, searchSynonym);
             process.setProperty(retireAsStatusPropName, retireAsStatus);
             process.setProperty(languageCodePropName, selectedLanguageCode);
@@ -205,14 +210,6 @@ public class PromptSearchReplaceCriteria extends AbstractTask {
 
     public void setSearchFsnPropName(String searchFsnPropName) {
         this.searchFsnPropName = searchFsnPropName;
-    }
-
-    public String getSearchPftPropName() {
-        return searchPftPropName;
-    }
-
-    public void setSearchPftPropName(String searchPftPropName) {
-        this.searchPftPropName = searchPftPropName;
     }
 
     public String getSearchSynonymPropName() {

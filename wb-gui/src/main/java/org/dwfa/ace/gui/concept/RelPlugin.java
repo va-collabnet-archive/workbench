@@ -20,6 +20,8 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.IOException;
@@ -27,10 +29,14 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
@@ -46,8 +52,11 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_ContainTermComponent;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HostConceptPlugins;
+import org.dwfa.ace.api.I_ModelTerminologyList;
+import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.dnd.TerminologyTransferHandler;
 import org.dwfa.ace.edit.AddRelationship;
+import org.dwfa.ace.table.DestRelTableModel;
 import org.dwfa.ace.table.JTableWithDragImage;
 import org.dwfa.ace.table.RelTableModel;
 import org.dwfa.ace.table.RelationshipTableRenderer;
@@ -57,6 +66,9 @@ import org.dwfa.ace.table.RelTableModel.StringWithRelTuple;
 import org.dwfa.ace.table.refset.RefsetUtil;
 import org.dwfa.bpa.util.SortClickListener;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
+import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
 
 public abstract class RelPlugin extends AbstractPlugin implements TableModelListener, I_HostConceptPlugins {
 
@@ -131,18 +143,11 @@ public abstract class RelPlugin extends AbstractPlugin implements TableModelList
             rowAddAfter.addActionListener(new AddRelationship(host, host.getConfig()));
             rowAddAfter.setTransferHandler(new TerminologyTransferHandler(rowAddAfter));
             rowAddAfter.setToolTipText("add a new relationship (the concept selected in the taxonomy view will be the default destination)");
-        } else {
-            JPanel filler = new JPanel();
-            filler.setMaximumSize(new Dimension(40, 32));
-            filler.setMinimumSize(new Dimension(40, 32));
-            filler.setPreferredSize(new Dimension(40, 32));
-            relPanel.add(filler, c);
-
-        }
+        } 
         c.gridheight = 1;
         c.gridx++;
         c.gridwidth = 1;
-
+        
         relTable = new JTableWithDragImage(model);
         SortClickListener.setupSorter(relTable);
         relTable.getSelectionModel().addListSelectionListener(this);
@@ -157,7 +162,7 @@ public abstract class RelPlugin extends AbstractPlugin implements TableModelList
             column.setMaxWidth(columnDesc.getMax());
             column.setMinWidth(columnDesc.getMin());
         }
-
+        
         setupEditors(host);
         if (ACE.editMode) {
             relTable.addMouseListener(model.makePopupListener(relTable, host.getConfig()));
@@ -173,7 +178,18 @@ public abstract class RelPlugin extends AbstractPlugin implements TableModelList
         c.gridheight = 5;
         relTable.setDefaultRenderer(StringWithRelTuple.class, new RelationshipTableRenderer());
         relPanel.add(relTable, c);
+        c.gridx = 0;
         c.weightx = 0.0;
+        c.fill = GridBagConstraints.NONE;
+        if(enableEdit){
+            c.gridy++;
+        }else{
+            c.anchor = GridBagConstraints.NORTH;
+        }
+        JButton addToList = new JButton(new ImageIcon(ACE.class.getResource("/24x24/plain/notebook_add.png")));
+        addToList.setToolTipText("add to list view");
+        addToList.addActionListener(new AddToList(model));
+        relPanel.add(addToList, c);
         c.weighty = 0.0;
         c.gridy = c.gridy + c.gridheight;
         c.gridheight = 1;
@@ -186,12 +202,45 @@ public abstract class RelPlugin extends AbstractPlugin implements TableModelList
             relPanel.add(idPlugin.getComponent(this), c);
             c.gridy++;
         }
-
+        
         visibleExtensions.clear();
         RefsetUtil.addRefsetTables(host, this, toggle, c, visibleExtensions, relPanel);
         relPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(1, 1, 1, 3),
             BorderFactory.createLineBorder(Color.GRAY)));
         return relPanel;
+    }
+    
+    private class AddToList implements ActionListener {
+        RelTableModel model;
+
+        public AddToList(RelTableModel model) {
+            this.model = model;
+        }
+        
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            try {
+                JList conceptList = getHost().getConfig().getBatchConceptList();
+                I_ModelTerminologyList conceptListModel = (I_ModelTerminologyList) conceptList.getModel();
+                HashSet<Integer> conceptsAdded = new HashSet<Integer>();
+                for (int i = 0; i < model.getRowCount(); i++) {
+                    StringWithRelTuple row = (StringWithRelTuple) model.getValueAt(i, 1); //TODO: okay?
+                    I_RelTuple tuple = row.getTuple();
+                    ConceptChronicleBI concept = null;
+                    if(model instanceof DestRelTableModel){
+                        concept = Ts.get().getConcept(tuple.getC1Id());
+                    }else{
+                        concept = Ts.get().getConcept(tuple.getC2Id());
+                    }
+                    if (conceptsAdded.contains(concept.getConceptNid()) == false) {
+                        conceptsAdded.add(concept.getConceptNid());
+                        conceptListModel.addElement((I_GetConceptData) concept);
+                    }
+                }
+            } catch (IOException ex) {
+                Logger.getLogger(RelPlugin.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
     }
 
     protected void setupEditors(I_HostConceptPlugins host) throws TerminologyException, IOException {

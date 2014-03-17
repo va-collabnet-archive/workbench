@@ -236,8 +236,7 @@ public class UuidToSctIdWriter {
             }
         }
 
-        if (otherLangRefsetsReader != null)
-        {
+        if(otherLangRefsetsReader != null){
             String otherLangRefLine = otherLangRefsetsReader.readLine();
             otherLangRefLine = otherLangRefsetsReader.readLine();
             while (otherLangRefLine != null) {
@@ -245,7 +244,7 @@ public class UuidToSctIdWriter {
                 otherLangRefLine = otherLangRefsetsReader.readLine();
             }
         }
-
+        
         String modDependLine = modDependReader.readLine();
         modDependLine = modDependReader.readLine();
         while (modDependLine != null) {
@@ -335,7 +334,6 @@ public class UuidToSctIdWriter {
         for (File inputFile : uuidFiles) {
             if (inputFile.getName().startsWith("sct2_Concept_UUID_" + this.releaseType.suffix)) {
                 conceptsFileUuid = inputFile;
-
                 conceptsReader = new BufferedReader(new InputStreamReader(new FileInputStream(inputFile), "UTF8"));
             } else if (inputFile.getName().startsWith("sct2_Description_UUID_" + this.releaseType.suffix)) {
                 descriptionsFileUuid = inputFile;
@@ -346,7 +344,7 @@ public class UuidToSctIdWriter {
             } else if (inputFile.getName().startsWith("sct2_Identifier_UUID_" + this.releaseType.suffix)) {
                 identifiersFileUuid = inputFile;
                 identifiersReader = new BufferedReader(new InputStreamReader(new FileInputStream(inputFile), "UTF8"));
-            } else if (inputFile.getName().startsWith("sct2_Identifier_Auxiliary_UUID_" + this.releaseType.suffix)) {
+            } else if (inputFile.getName().startsWith("sct2_IdentifierAuxiliary_UUID_" + this.releaseType.suffix)) {
                 privateIdentifiersFileUuid = inputFile;
                 privateIdentifiersReader = new BufferedReader(new InputStreamReader(new FileInputStream(inputFile), "UTF8"));
             } else if (inputFile.getName().startsWith("sct2_StatedRelationship_UUID_" + this.releaseType.suffix)) {
@@ -389,7 +387,7 @@ public class UuidToSctIdWriter {
         File privateIdentifiersFile = null;
         if (privateIdentifiersFileUuid != null) {
             privateIdentifiersFile = new File(terminology,
-                    privateIdentifiersFileUuid.getName().replace("sct2_Identifier_Auxiliary_UUID_", "sct2_Identifier_Auxiliary_"));
+                    privateIdentifiersFileUuid.getName().replace("sct2_IdentifierAuxiliary_UUID_", "sct2_IdentifierAuxiliary_"));
         }
         File statedRelFile = new File(terminology,
                 statedRelFileUuid.getName().replace("sct2_StatedRelationship_UUID_", "sct2_StatedRelationship_"));
@@ -402,10 +400,8 @@ public class UuidToSctIdWriter {
         {
             langRefsetsFile = new File(languageDir,
                 langRefsetsFileUuid.getName().replace("der2_cRefset_Language_UUID", "der2_cRefset_Language"));
-        }
         File otherLangRefsetsFile = null;
-        if (otherLangRefsetsFileUuid != null)
-        {
+        if(otherLangRefsetsFileUuid != null){
             otherLangRefsetsFile = new File(languageDir,
                 otherLangRefsetsFileUuid.getName().replace("der2_cRefset_Language_UUID", "der2_cRefset_Language"));
         }
@@ -429,6 +425,9 @@ public class UuidToSctIdWriter {
         if (privateIdentifiersFile != null) {
             FileOutputStream privIdOs = new FileOutputStream(privateIdentifiersFile);
             privateIdentifiersWriter = new BufferedWriter(new OutputStreamWriter(privIdOs, "UTF8"));
+            for (Rf2File.IdentifiersFileFields field : Rf2File.IdentifiersFileFields.values()) {
+                privateIdentifiersWriter.write(field.headerText + field.seperator);
+            }
         }
         FileOutputStream relStatedOs = new FileOutputStream(statedRelFile);
         relationshipsStatedWriter = new BufferedWriter(new OutputStreamWriter(relStatedOs, "UTF8"));
@@ -436,13 +435,9 @@ public class UuidToSctIdWriter {
         associationWriter = new BufferedWriter(new OutputStreamWriter(associationOs, "UTF8"));
         FileOutputStream attributeValueOs = new FileOutputStream(attributeValueFile);
         attributeValueWriter = new BufferedWriter(new OutputStreamWriter(attributeValueOs, "UTF8"));
-        if (langRefsetsFile != null)
-        {
-            FileOutputStream langRefOs = new FileOutputStream(langRefsetsFile);
-            langRefsetsWriter = new BufferedWriter(new OutputStreamWriter(langRefOs, "UTF8"));
-        }
-        if (otherLangRefsetsFile != null)
-        {
+        FileOutputStream langRefOs = new FileOutputStream(langRefsetsFile);
+        langRefsetsWriter = new BufferedWriter(new OutputStreamWriter(langRefOs, "UTF8"));
+        if(otherLangRefsetsFile != null){
             FileOutputStream langOs = new FileOutputStream(otherLangRefsetsFile);
             otherLangRefsetsWriter = new BufferedWriter(new OutputStreamWriter(langOs, "UTF8"));
         }
@@ -489,9 +484,8 @@ public class UuidToSctIdWriter {
                 langRefsetsWriter.write(field.headerText + field.seperator);
             }
         }
-
-        if (otherLangRefsetsWriter != null)
-        {
+        
+        if (otherLangRefsetsWriter != null) {
             for (Rf2File.LanguageRefsetFileFields field : Rf2File.LanguageRefsetFileFields.values()) {
                 otherLangRefsetsWriter.write(field.headerText + field.seperator);
             }
@@ -1120,7 +1114,7 @@ private void processIdentifiers(String line, Writer writer) throws IOException {
                     break;
                 case VALUE_ID:
                     //concept
-                   String valueId = parts[Rf2File.AttribValueRefsetFileFields.REFSET_ID.ordinal()];
+                   String valueId = parts[Rf2File.AttribValueRefsetFileFields.VALUE_ID.ordinal()];
                         String valueSctId = getExistingSctId(valueId);
                         if (valueSctId == null) {
                             valueSctId = handler.getWithGeneration(UUID.fromString(valueId), SctIdGenerator.TYPE.CONCEPT).toString(); //TODO akf: subset?
