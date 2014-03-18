@@ -303,7 +303,7 @@ public class RelationshipRevision extends Revision<RelationshipRevision, Relatio
 
     @Override
     public boolean isInferred() {
-        return getAuthorNid() == Relationship.getClassifierAuthorNid();
+        return getCharacteristicNid() == Relationship.getInferredCharacteristicNid();
     }
 
     @Override
