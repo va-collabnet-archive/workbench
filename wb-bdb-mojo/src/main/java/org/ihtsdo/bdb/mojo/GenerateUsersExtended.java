@@ -397,7 +397,7 @@ public class GenerateUsersExtended extends AbstractMojo {
       if (Ts.get().hasUuid(userUuid) && !Terms.get().getConcept(userUuid).getDescriptions().isEmpty()) {
               setUserConcept(userUuid.toString());
               //TODO Jesse commented this following line out, but the logic is different now, not sure if it still should be commented out
-              addWfRelIfDoesNotExist(userUuid.toString());
+              //addWfRelIfDoesNotExist(userUuid.toString());
               return Ts.get().getConcept(userUuid);
       } else {
 

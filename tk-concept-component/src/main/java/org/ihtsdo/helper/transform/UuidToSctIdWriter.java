@@ -225,16 +225,12 @@ public class UuidToSctIdWriter {
             attribValueLine = attributeValueReader.readLine();
         }
 
-        if (langRefsetsReader != null)
-        {
-            String langRefLine = langRefsetsReader.readLine();
+        String langRefLine = langRefsetsReader.readLine();
+        langRefLine = langRefsetsReader.readLine();
+        while (langRefLine != null) {
+            processLangRefsets(langRefLine);
             langRefLine = langRefsetsReader.readLine();
-            while (langRefLine != null) {
-                processLangRefsets(langRefLine);
-                langRefLine = langRefsetsReader.readLine();
-            }
         }
-
         if(otherLangRefsetsReader != null){
             String otherLangRefLine = otherLangRefsetsReader.readLine();
             otherLangRefLine = otherLangRefsetsReader.readLine();
@@ -394,10 +390,7 @@ public class UuidToSctIdWriter {
                 associationFileUuid.getName().replace("der2_cRefset_AssociationReference_UUID", "der2_cRefset_AssociationReference"));
         File attributeValueFile = new File(content,
                 attributeValueFileUuid.getName().replace("der2_cRefset_AttributeValue_UUID", "der2_cRefset_AttributeValue"));
-        File langRefsetsFile = null;
-        if (langRefsetsFileUuid != null)
-        {
-            langRefsetsFile = new File(languageDir,
+        File langRefsetsFile = new File(languageDir,
                 langRefsetsFileUuid.getName().replace("der2_cRefset_Language_UUID", "der2_cRefset_Language"));
         File otherLangRefsetsFile = null;
         if(otherLangRefsetsFileUuid != null){
@@ -477,11 +470,8 @@ public class UuidToSctIdWriter {
             attributeValueWriter.write(field.headerText + field.seperator);
         }
 
-        if (langRefsetsWriter != null)
-        {
-            for (Rf2File.LanguageRefsetFileFields field : Rf2File.LanguageRefsetFileFields.values()) {
-                langRefsetsWriter.write(field.headerText + field.seperator);
-            }
+        for (Rf2File.LanguageRefsetFileFields field : Rf2File.LanguageRefsetFileFields.values()) {
+            langRefsetsWriter.write(field.headerText + field.seperator);
         }
         
         if (otherLangRefsetsWriter != null) {
@@ -489,7 +479,7 @@ public class UuidToSctIdWriter {
                 otherLangRefsetsWriter.write(field.headerText + field.seperator);
             }
         }
-        
+
         for (Rf2File.ModuleDependencyFileFields field : Rf2File.ModuleDependencyFileFields.values()) {
             modDependWriter.write(field.headerText + field.seperator);
         }
