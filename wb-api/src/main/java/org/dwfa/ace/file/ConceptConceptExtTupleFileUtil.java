@@ -152,7 +152,7 @@ public class ConceptConceptExtTupleFileUtil {
 
             try {
                 RefsetHelper refsetHelper = new RefsetHelper(importConfig.getViewCoordinate(), importConfig.getEditCoordinate());
-                refsetHelper.newConceptConceptRefsetExtension(termFactory.uuidToNative(refsetUuid), termFactory
+                refsetHelper.newConceptConceptRefsetExtension(memberUuid, termFactory.uuidToNative(refsetUuid), termFactory
                     .uuidToNative(componentUuid), termFactory.uuidToNative(c1Uuid), termFactory.uuidToNative(c2Uuid));
             } catch (Exception e) {
                 String errorMessage = "CidCid: Exception thrown while creating new concept-concept refset extension";

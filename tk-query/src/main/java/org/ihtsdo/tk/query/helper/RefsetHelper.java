@@ -1,9 +1,9 @@
 package org.ihtsdo.tk.query.helper;
 
 import java.util.Set;
+import java.util.UUID;
 import java.util.logging.Logger;
 import org.dwfa.cement.RefsetAuxiliary;
-
 import org.dwfa.tapi.AllowDataCheckSuppression;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.PathBI;
@@ -58,6 +58,18 @@ public class RefsetHelper {
         memberBp.put(RefexProperty.CNID1, c1Nid);
         memberBp.put(RefexProperty.CNID2, c2Nid);
         memberBp.setMemberUuid(memberBp.computeMemberContentUuid());
+        return builder.constructIfNotCurrent(memberBp);
+    }
+    
+    public RefexChronicleBI newConceptConceptRefsetExtension(UUID memberUuid, int refsetNid,
+            int componentNid, int c1Nid, int c2Nid)
+            throws Exception {
+        RefexCAB memberBp = new RefexCAB(TK_REFEX_TYPE.CID_CID,
+                componentNid,
+                refsetNid);
+        memberBp.put(RefexProperty.CNID1, c1Nid);
+        memberBp.put(RefexProperty.CNID2, c2Nid);
+        memberBp.setMemberUuid(memberUuid);
         return builder.constructIfNotCurrent(memberBp);
     }
 

@@ -3,9 +3,11 @@ package org.ihtsdo.concept.component.relationship;
 //~--- non-JDK imports --------------------------------------------------------
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
-
+import java.beans.PropertyVetoException;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.Set;
 import org.apache.commons.collections.primitives.ArrayIntList;
-
 import org.dwfa.ace.api.I_MapNativeToNative;
 import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.Terms;
@@ -13,24 +15,19 @@ import org.dwfa.ace.api.Terms;
 import org.ihtsdo.concept.component.ConceptComponent;
 import org.ihtsdo.concept.component.Revision;
 import org.ihtsdo.db.bdb.Bdb;
+import org.ihtsdo.db.bdb.BdbTerminologyStore;
+import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ContradictionException;
-import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
-import org.ihtsdo.tk.api.relationship.RelationshipAnalogBI;
-import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationshipRevision;
-
-//~--- JDK imports ------------------------------------------------------------
-
-import java.beans.PropertyVetoException;
-
-import java.io.IOException;
-import java.util.Collection;
-import java.util.Set;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.blueprint.RelationshipCAB;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.api.relationship.RelationshipAnalogBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf1;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 import org.ihtsdo.tk.binding.snomed.TermAux;
 import org.ihtsdo.tk.dto.concept.component.TkRevision;
+import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationshipRevision;
 import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationshipType;
 
 public class RelationshipRevision extends Revision<RelationshipRevision, Relationship>
@@ -302,12 +299,17 @@ public class RelationshipRevision extends Revision<RelationshipRevision, Relatio
     }
 
     @Override
-    public boolean isInferred() {
-        return getCharacteristicNid() == Relationship.getInferredCharacteristicNid();
+    public boolean isInferred() throws IOException {
+        if(getAuthorNid() == Relationship.getClassifierAuthorNid()){
+            return true;
+        }else if(BdbTerminologyStore.isIsReleaseFormatSetup()){
+            return getCharacteristicNid() == SnomedMetadataRfx.getREL_CH_INFERRED_RELATIONSHIP_NID();
+        }
+        return false;
     }
 
     @Override
-    public boolean isStated() {
+    public boolean isStated() throws IOException {
         return !isInferred();
     }
 

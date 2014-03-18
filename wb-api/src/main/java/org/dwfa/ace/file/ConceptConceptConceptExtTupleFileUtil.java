@@ -141,7 +141,7 @@ public class ConceptConceptConceptExtTupleFileUtil {
             }
             if (!termFactory.hasId(componentUuid)) {
                 writeWarning(outputFileWriter, lineCount,
-                    "CidCidCid: Component UUID matches no identifier in database.");
+                    "CidCidCid: Component UUID matches no identifier in database. UUID: " + componentUuid);
             }
             if (!termFactory.hasId(c1Uuid)) {
                 writeWarning(outputFileWriter, lineCount, "CidCidCid: c1Uuid UUID matches no identifier in database: " + c1Uuid);
