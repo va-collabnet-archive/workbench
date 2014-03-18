@@ -39,7 +39,6 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
-import org.ihtsdo.tk.api.NidSetBI;
 
 /**
  * Sets a string property derived from the inputted UUID's PT.
@@ -98,11 +97,7 @@ public class SetPTStringPropertyFromUuid extends AbstractTask {
 
     private String getLatestPreferredTerm(I_GetConceptData concept) throws Exception {
         I_TermFactory termFactory = Terms.get();
-        NidSetBI allowedStatusNids = Terms.get().getActiveAceFrameConfig().getViewCoordinate().getAllowedStatusNids();
-        I_IntSet actives = Terms.get().newIntSet();
-        for(int nid : allowedStatusNids.getSetValues()){
-            actives.add(nid);
-        }
+        I_HelpSpecRefset helper = Terms.get().getSpecRefsetHelper(Terms.get().getActiveAceFrameConfig());
 
         I_IntSet allowedTypes = termFactory.newIntSet();
         allowedTypes.add(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.localize().getNid());
@@ -111,7 +106,7 @@ public class SetPTStringPropertyFromUuid extends AbstractTask {
         int latestVersion = Integer.MIN_VALUE;
 
         List<? extends I_DescriptionTuple> descriptionResults =
-                concept.getDescriptionTuples(actives, allowedTypes, termFactory
+                concept.getDescriptionTuples(helper.getCurrentStatusIntSet(), allowedTypes, termFactory
                     .getActiveAceFrameConfig().getViewPositionSetReadOnly(), 
                     Terms.get().getActiveAceFrameConfig().getPrecedence(),
                     Terms.get().getActiveAceFrameConfig().getConflictResolutionStrategy());

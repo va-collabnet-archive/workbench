@@ -20,7 +20,7 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.*;
 import org.apache.lucene.document.Document;
-import org.apache.lucene.queryparser.classic.QueryParser;
+import org.apache.lucene.queryParser.QueryParser;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.Terms;

@@ -41,12 +41,15 @@ import javax.swing.JOptionPane;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.lucene.document.Document;
+import org.apache.lucene.queryParser.ParseException;
+import org.apache.lucene.queryParser.QueryParser;
 import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_HelpRefsets;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelTuple;
@@ -54,6 +57,8 @@ import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.PathSetReadOnly;
+import org.dwfa.ace.api.RefsetPropertyMap;
+import org.dwfa.ace.api.RefsetPropertyMap.REFSET_PROPERTY;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
@@ -69,6 +74,7 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.cement.SNOMED;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.helper.promote.TerminologyPromoterBI;
 import org.ihtsdo.lucene.SearchResult;
 import org.ihtsdo.project.model.I_TerminologyProject;
@@ -122,9 +128,6 @@ import org.ihtsdo.tk.workflow.api.WfFilterBI;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.json.JettisonMappedXmlDriver;
-import java.util.logging.Logger;
-import org.apache.lucene.queryparser.classic.QueryParser;
-import org.ihtsdo.tk.query.helper.RefsetHelper;
 
 /**
  * The Class TerminologyProjectDAO.
@@ -2543,9 +2546,9 @@ public class TerminologyProjectDAO {
 
 			if (!alreadyMember) {
 				if (refsetHelper == null) {
-					refsetHelper = new RefsetHelper(config.getViewCoordinate(), config.getEditCoordinate());
+					refsetHelper = termFactory.getRefsetHelper(config);
 				}
-                                refsetHelper.newStringRefsetExtension(workSetConcept.getConceptNid(), newMemberConcept.getConceptNid(), "");
+				refsetHelper.newRefsetExtension(workSetConcept.getConceptNid(), newMemberConcept.getConceptNid(), EConcept.REFSET_TYPES.STR, new RefsetPropertyMap().with(REFSET_PROPERTY.STRING_VALUE, ""), config);
 				// WorkSet workset =
 				// TerminologyProjectDAO.getWorkSet(workSetConcept, config);
 				termFactory.addUncommittedNoChecks(workSetConcept);
@@ -3498,8 +3501,8 @@ public class TerminologyProjectDAO {
 		// termFactory.addUncommittedNoChecks(newCommentsConcept);
 		// termFactory.addUncommittedNoChecks(newPromotionConcept);
 		// termFactory.commit();
-		RefsetHelper helper = new RefsetHelper(config.getViewCoordinate(), config.getEditCoordinate());
-                helper.newStringRefsetExtension(workListRefset.getConceptNid(), newConcept.getConceptNid(), metadata);
+
+		termFactory.getRefsetHelper(config).newRefsetExtension(workListRefset.getConceptNid(), newConcept.getConceptNid(), EConcept.REFSET_TYPES.STR, new RefsetPropertyMap().with(REFSET_PROPERTY.STRING_VALUE, metadata), config);
 
 		for (I_ExtendByRef extension : termFactory.getRefsetExtensionMembers(workListRefset.getConceptNid())) {
 			if (extension.getComponentNid() == newConcept.getConceptNid() && extension.getMutableParts().iterator().next().getTime() == Long.MAX_VALUE) {
@@ -3639,7 +3642,6 @@ public class TerminologyProjectDAO {
 			I_ConfigAceFrame config = tf.getActiveAceFrameConfig();
 			String escapedDescription = QueryParser.escape(description);
 			SearchResult results = tf.doLuceneSearch(escapedDescription);
-                    
 			for (int i = 0; i < results.topDocs.scoreDocs.length; i++) {
 				try {
 					Document doc = results.searcher.doc(results.topDocs.scoreDocs[i].doc);
@@ -3658,11 +3660,11 @@ public class TerminologyProjectDAO {
 			}
 		} catch (IOException e) {
 			AceLog.getAppLog().alertAndLogException(e);
+		} catch (ParseException e) {
+			AceLog.getAppLog().alertAndLogException(e);
 		} catch (TerminologyException e) {
 			AceLog.getAppLog().alertAndLogException(e);
-		} catch (java.text.ParseException ex) {
-                        Logger.getLogger(TerminologyProjectDAO.class.getName()).log(Level.SEVERE, null, ex);
-                    }
+		}
 		return result;
 	}
 
@@ -3683,11 +3685,11 @@ public class TerminologyProjectDAO {
 	 * @throws IOException
 	 *             Signals that an I/O exception has occurred.
 	 */
-	public static Partition createNewPartitionAndMembersFromWorkSet(String name, WorkSet workSet, I_ConfigAceFrame config, I_ShowActivity activity) throws TerminologyException, IOException, Exception {
+	public static Partition createNewPartitionAndMembersFromWorkSet(String name, WorkSet workSet, I_ConfigAceFrame config, I_ShowActivity activity) throws TerminologyException, IOException {
 
 		Partition newPartition = null;
 		ActivityUpdater updater = new ActivityUpdater(activity, "Creating partition");
-		refsetHelper = new RefsetHelper(config.getViewCoordinate(), config.getEditCoordinate());
+		refsetHelper = Terms.get().getRefsetHelper(config);
 		updater.startActivity();
 		try {
 			if (isConceptDuplicate(name + " (partition)")) {
@@ -3893,9 +3895,10 @@ public class TerminologyProjectDAO {
 				WorkList workList = getWorkList(workListConcept, config);
 				PromotionAndAssignmentRefset promotionRefset = workList.getPromotionRefset(config);
 				if (refsetHelper == null) {
-					refsetHelper = new RefsetHelper(config.getViewCoordinate(), config.getEditCoordinate());
+					refsetHelper = termFactory.getRefsetHelper(config);
 				}
-                                refsetHelper.newStringRefsetExtension(workListConcept.getConceptNid(), newMemberConcept.getConceptNid(), "");
+				refsetHelper.newRefsetExtension(workListConcept.getConceptNid(), newMemberConcept.getConceptNid(), EConcept.REFSET_TYPES.STR, new RefsetPropertyMap().with(REFSET_PROPERTY.STRING_VALUE, ""), // metadata
+						config);
 				termFactory.addUncommittedNoChecks(workListConcept);
 				I_GetConceptData activityStatusConcept = member.getActivityStatus();
 				promotionRefset.setDestinationAndPromotionStatus(member.getId(), assignedUserId, activityStatusConcept.getConceptNid());
@@ -3943,7 +3946,7 @@ public class TerminologyProjectDAO {
 	/**
 	 * The refset helper.
 	 */
-	private static RefsetHelper refsetHelper = null;
+	private static I_HelpRefsets refsetHelper = null;
 
 	/**
 	 * Adds the concept as partition member.
@@ -3982,10 +3985,10 @@ public class TerminologyProjectDAO {
 			}
 
 			if (!alreadyMember) {
-                            if (refsetHelper == null) {
-					refsetHelper = new RefsetHelper(config.getViewCoordinate(), config.getEditCoordinate());
+				if (refsetHelper == null) {
+					refsetHelper = termFactory.getRefsetHelper(config);
 				}
-                                refsetHelper.newStringRefsetExtension(partitionConcept.getConceptNid(), newMemberConcept.getConceptNid(), "");
+				refsetHelper.newRefsetExtension(partitionConcept.getConceptNid(), newMemberConcept.getConceptNid(), EConcept.REFSET_TYPES.STR, new RefsetPropertyMap().with(REFSET_PROPERTY.STRING_VALUE, ""), config);
 			}
 		} catch (TerminologyException e1) {
 			e1.printStackTrace();
@@ -5018,7 +5021,7 @@ public class TerminologyProjectDAO {
 
 		ActivityUpdater updater = new ActivityUpdater(activity, "Synchronizing WorkSet");
 		updater.startActivity();
-		refsetHelper = new RefsetHelper(config.getViewCoordinate(), config.getEditCoordinate());
+		refsetHelper = Terms.get().getRefsetHelper(config);
 		initializeWorkSet(workSet, config, updater);
 		Terms.get().addUncommittedNoChecks(workSet.getConcept());
 		workSet.getConcept().commit(ChangeSetGenerationPolicy.INCREMENTAL, ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);

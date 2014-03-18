@@ -1,6 +1,6 @@
 package org.ihtsdo.db.uuidmap;
 
-import org.apache.mahout.math.map.PrimeFinder;
+import org.ihtsdo.cern.colt.map.PrimeFinder;
 
 public abstract class UuidHashMap {
 	// public static boolean debug = false; // debug only

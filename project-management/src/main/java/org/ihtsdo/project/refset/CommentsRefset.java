@@ -49,13 +49,11 @@ import org.dwfa.cement.ArchitectonicAuxiliary.Concept;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.project.TerminologyProjectDAO;
-import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
 import org.ihtsdo.tk.api.changeset.ChangeSetGenerationThreadingPolicy;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
-import org.ihtsdo.tk.query.helper.RefsetHelper;
 
 /**
  * The Class CommentsRefset.
@@ -307,6 +305,8 @@ public class CommentsRefset extends Refset {
         // TODO: move config to parameter
         I_ConfigAceFrame config = termFactory.getActiveAceFrameConfig();
 
+        I_HelpRefsets refsetHelper = termFactory.getRefsetHelper(config);
+
         RefsetPropertyMap rfPropMap = new RefsetPropertyMap();
         rfPropMap.put(REFSET_PROPERTY.CID_ONE, commentType);
         rfPropMap.put(REFSET_PROPERTY.CID_TWO, commentSubType);
@@ -314,7 +314,7 @@ public class CommentsRefset extends Refset {
 
         // hack for easy solution of duplicated comment text preventing a new comment add
         int count = 0;
-        while (Ts.get().hasExtension(refsetId, componentId)) {
+        while (refsetHelper.hasRefsetExtension(this.refsetId, componentId, rfPropMap)) {
             rfPropMap.put(REFSET_PROPERTY.STRING_VALUE, comment + ".");
             if (count > 20) {
                 // Security check: there is some problem here, exiting loop
@@ -327,8 +327,9 @@ public class CommentsRefset extends Refset {
         //refsetHelper.newRefsetExtension(this.refsetId, componentId, EConcept.REFSET_TYPES.CID_CID_STR, rfPropMap, config);
 		//        BdbTermFactory.createMember(UUID.randomUUID(), componentId, EConcept.REFSET_TYPES.CID_CID_STR, org.ihtsdo.concept.Concept.get(refsetId),
 		//                config, rfPropMap);
-                RefsetHelper helper = new RefsetHelper(config.getViewCoordinate(), config.getEditCoordinate());
-                helper.newConceptConceptStringRefsetExtension(refsetId, componentId, commentType, commentSubType, comment);
+        
+		refsetHelper.newRefsetExtension(refsetId, componentId, EConcept.REFSET_TYPES.CID_CID_STR, rfPropMap, // metadata
+				config);
 		termFactory.addUncommittedNoChecks(Terms.get().getConcept(refsetId));
         refsetConcept.commit(ChangeSetGenerationPolicy.INCREMENTAL, ChangeSetGenerationThreadingPolicy.SINGLE_THREAD);
     }

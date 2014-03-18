@@ -32,7 +32,6 @@ import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import org.drools.compiler.xml.rules.QueryHandler;
 
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_ConfigAceFrame;
@@ -59,13 +58,12 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.id.Type5UuidFactory;
 import org.ihtsdo.arena.Arena;
 import org.ihtsdo.helper.promote.TerminologyPromoterBI;
-import org.ihtsdo.tk.query.helper.ConceptDefinedChangedQuery;
-import org.ihtsdo.tk.query.helper.DescriptionChangedQuery;
-import org.ihtsdo.tk.query.parts.Query;
-import org.ihtsdo.tk.query.helper.QueryBuilderBI;
-import org.ihtsdo.tk.query.parts.QueryResultBinder;
-import org.ihtsdo.tk.query.helper.RelationshipInferredChangedQuery;
-import org.ihtsdo.tk.query.helper.RelationshipStatedChangedQuery;
+import org.ihtsdo.helper.query.ConceptDefinedChangedQuery;
+import org.ihtsdo.helper.query.DescriptionChangedQuery;
+import org.ihtsdo.helper.query.Query;
+import org.ihtsdo.helper.query.QueryBuilderBI;
+import org.ihtsdo.helper.query.RelationshipInferredChangedQuery;
+import org.ihtsdo.helper.query.RelationshipStatedChangedQuery;
 import org.ihtsdo.helper.time.TimeHelper;
 import org.ihtsdo.lang.LANG_CODE;
 import org.ihtsdo.tk.Ts;
@@ -91,7 +89,6 @@ import org.ihtsdo.tk.binding.snomed.RefsetAux;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 import org.ihtsdo.tk.binding.snomed.TermAux;
 import org.ihtsdo.tk.dto.concept.component.refex.TK_REFEX_TYPE;
-import org.ihtsdo.tk.query.helper.QueryHelper;
 
 /**
  *
@@ -914,30 +911,33 @@ public class PromotionEditorFrame extends ComponentFrame implements PropertyChan
         //query: added stated rel, retired stated rel
         //query: added inferred rel, retired inferred rel
         long startTime = System.currentTimeMillis();
-        QueryBuilderBI builder = QueryHelper.getQueryBuilder(mergeConfig.getViewCoordinate());
+        QueryBuilderBI builder = Ts.get().getQueryBuilder(mergeConfig.getViewCoordinate());
         Query q1 = new DescriptionChangedQuery(vcTarget, vcSource).getQuery();
         Query q2 = new RelationshipInferredChangedQuery(vcTarget, vcSource).getQuery();
         Query q3 = new RelationshipStatedChangedQuery(vcTarget, vcSource).getQuery();
         Query q4 = new ConceptDefinedChangedQuery(vcTarget, vcSource).getQuery();
 
         //results
-        ArrayList<QueryResultBinder> results = builder.getResults(q1, q2, q3, q4);
-        for (QueryResultBinder binder : results) {
-            Query query = binder.getQuery();
-            if(query.equals(q1)){
-                descChange = binder.getResults();
-                allChange.or(binder.getResults());
-            }else if(query.equals(q2)){
-                infChange = binder.getResults();
-                allChange.or(binder.getResults());
-            }else if(query.equals(q3)){
-                statedChange = binder.getResults();
-                allChange.or(binder.getResults());
-            }else if(query.equals(q4)){
+        ArrayList<NidBitSetBI> results = builder.getResults(q1, q2, q3, q4);        
+           
+        int count = 0;
+        for (NidBitSetBI result : results) {
+            System.out.println(result);
+            if (count == 0) {
+                descChange = result;
+                allChange.or(result);
+            } else if (count == 1) {
+                infChange = result;
+                allChange.or(result);
+            } else if (count == 2) {
+                statedChange = result;
+                allChange.or(result);
+            } else if (count == 3) {
                 //need to combine stated rel changes with concept defined change
-                statedChange.or(binder.getResults());
-                allChange.or(binder.getResults());
+                statedChange.or(result);
+                allChange.or(result);
             }
+            count++;
         }
 
         long elapsedTime = System.currentTimeMillis() - startTime;

@@ -148,7 +148,7 @@ public class InstanceActivitiesPanel extends JPanel {
 
 		@Override
 		public void propertyChange(PropertyChangeEvent pce) {
-			if (concept != null && pce.getNewValue() != null) {
+			if (concept != null) {
 				if (!pce.getNewValue().equals(concept)) {
 					concept = (I_GetConceptData) pce.getNewValue();
 					updateActivityInstances(concept);

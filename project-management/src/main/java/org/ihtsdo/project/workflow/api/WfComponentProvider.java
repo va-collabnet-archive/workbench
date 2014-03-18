@@ -33,6 +33,7 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
+import org.dwfa.ace.refset.spec.I_HelpSpecRefset;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.project.ProjectPermissionsAPI;
@@ -87,6 +88,8 @@ public class WfComponentProvider {
 			I_GetConceptData roleParent = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.USER.getUids());
 
 			I_IntSet allowedTypes = Terms.get().getActiveAceFrameConfig().getDestRelTypes();
+			I_HelpSpecRefset helper = Terms.get().getSpecRefsetHelper(Terms.get().getActiveAceFrameConfig());
+			Set<Integer> currentStatuses = helper.getCurrentStatusIds();
 
 			Set<? extends I_GetConceptData> allUsers = roleParent.getDestRelOrigins(Terms.get().getActiveAceFrameConfig().getAllowedStatus(), allowedTypes, Terms.get().getActiveAceFrameConfig().getViewPositionSetReadOnly(), Precedence.TIME, Terms.get().getActiveAceFrameConfig()
 					.getConflictResolutionStrategy());

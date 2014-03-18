@@ -570,7 +570,7 @@ public class LoadBdbMulti extends AbstractMojo {
             Concept.enableComponentsCRHM();
             getLog().info("Testing for Null Components Finished.");
          }
-         
+
          Concept.enableComponentsCRHM();
          getLog().info("Starting close.");
          Bdb.close();

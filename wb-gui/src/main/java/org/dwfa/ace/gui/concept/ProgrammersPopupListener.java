@@ -25,6 +25,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 
+import org.apache.lucene.queryParser.ParseException;
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_ConceptAttributeVersioned;
@@ -761,11 +762,11 @@ public class ProgrammersPopupListener extends MouseAdapter implements ActionList
 
         try {
             Terms.get().doLuceneSearch("something");
-        } catch (IOException ex) {
-            Logger.getLogger(ProgrammersPopupListener.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (java.text.ParseException ex) {
-            Logger.getLogger(ProgrammersPopupListener.class.getName()).log(Level.SEVERE, null, ex);
-        } 
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
 
         JOptionPane.showMessageDialog(null, "Descriptions Lucene indexes removed! Please restart Workbench.",
                 "Warning", JOptionPane.WARNING_MESSAGE);

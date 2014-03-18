@@ -236,17 +236,6 @@ public interface ConceptVersionBI extends ComponentVersionBI, ConceptChronicleBI
      * this version
      */
     Collection<? extends RefexVersionBI<?>> getRefsetMembersActive() throws IOException, ContradictionException;
-    
-    /**
-     * Gets any nids of any active refset members which have this concept or its components as
-     * a referenced component.
-     *
-     * @return the nids of any active refset members which have this concept, or concept's
-     * components, as a referenced component, an empty <code>Collection</code>
-     * if none are found
-     * @throws IOException signals that an I/O exception has occurred
-     */
-    Collection<Integer> getRefsetMemberNidsActive() throws IOException, ContradictionException;
 
     /**
      * Gets all the relationship groups for this version regardless of status.

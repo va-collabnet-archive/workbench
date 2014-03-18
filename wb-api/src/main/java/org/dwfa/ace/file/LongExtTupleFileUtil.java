@@ -26,10 +26,10 @@ import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartLong;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
+import org.dwfa.ace.refset.spec.I_HelpSpecRefset;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.tk.query.helper.RefsetHelper;
 
 public class LongExtTupleFileUtil {
 
@@ -124,6 +124,8 @@ public class LongExtTupleFileUtil {
                 return null;
             }
 
+            I_HelpSpecRefset refsetHelper = Terms.get().getSpecRefsetHelper(importConfig);
+            refsetHelper.setAutocommitActive(false);
             I_TermFactory termFactory = Terms.get();
 
             if (!termFactory.hasId(refsetUuid)) {
@@ -140,9 +142,9 @@ public class LongExtTupleFileUtil {
             }
 
             try {
-                RefsetHelper refsetHelper = new RefsetHelper(importConfig.getViewCoordinate(), importConfig.getEditCoordinate());
                 refsetHelper.newLongRefsetExtension(termFactory.uuidToNative(refsetUuid), termFactory
-                    .uuidToNative(componentUuid), extLong);
+                    .uuidToNative(componentUuid), extLong, memberUuid, (UUID) importConfig.getProperty("pathUuid"),
+                    statusUuid, effectiveDate);
             } catch (Exception e) {
                 String errorMessage = "Str: Exception thrown while creating new long refset extension";
                 outputFileWriter.write("Error on line " + lineCount + " : ");

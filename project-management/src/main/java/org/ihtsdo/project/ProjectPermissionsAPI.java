@@ -566,6 +566,8 @@ public class ProjectPermissionsAPI {
                     Terms.get().getConcept(ArchitectonicAuxiliary.Concept.TRANSLATOR_ROLE.getUids());
 
             I_IntSet allowedTypes = Terms.get().getActiveAceFrameConfig().getDestRelTypes();
+            I_HelpSpecRefset helper = Terms.get().getSpecRefsetHelper(Terms.get().getActiveAceFrameConfig());
+            Set<Integer> currentStatuses = helper.getCurrentStatusIds();
 
             Set<? extends I_GetConceptData> allRoles = roleParent.getDestRelOrigins(config.getAllowedStatus(),
                     allowedTypes, config.getViewPositionSetReadOnly(), Precedence.TIME,
@@ -590,7 +592,7 @@ public class ProjectPermissionsAPI {
                     }
                 }
                 if (latestTuple != null) {
-                    for (int currentStatusId : Terms.get().getActiveAceFrameConfig().getViewCoordinate().getAllowedStatusNids().getSetValues()) {
+                    for (int currentStatusId : currentStatuses) {
                         if (latestTuple.getStatusNid() == currentStatusId) {
                             validUsers.add(user);
                         }
@@ -616,6 +618,8 @@ public class ProjectPermissionsAPI {
                     Terms.get().getConcept(ArchitectonicAuxiliary.Concept.USER.getUids());
 
             I_IntSet allowedTypes = Terms.get().getActiveAceFrameConfig().getDestRelTypes();
+            I_HelpSpecRefset helper = Terms.get().getSpecRefsetHelper(Terms.get().getActiveAceFrameConfig());
+            Set<Integer> currentStatuses = helper.getCurrentStatusIds();
 
             Set<? extends I_GetConceptData> allUsers = userParent.getDestRelOrigins(config.getAllowedStatus(),
                     allowedTypes, config.getViewPositionSetReadOnly(), Precedence.TIME,
@@ -641,7 +645,7 @@ public class ProjectPermissionsAPI {
                     }
                 }
                 if (latestTuple != null) {
-                    for (int currentStatusId : Terms.get().getActiveAceFrameConfig().getViewCoordinate().getAllowedStatusNids().getSetValues()) {
+                    for (int currentStatusId : currentStatuses) {
                         if (latestTuple.getStatusNid() == currentStatusId) {
                             inboxes.add(latestTuple.getText());
                         }
@@ -669,6 +673,8 @@ public class ProjectPermissionsAPI {
                     Terms.get().getConcept(ArchitectonicAuxiliary.Concept.USER.getUids());
 
             I_IntSet allowedTypes = Terms.get().getActiveAceFrameConfig().getDestRelTypes();
+            I_HelpSpecRefset helper = Terms.get().getSpecRefsetHelper(Terms.get().getActiveAceFrameConfig());
+            Set<Integer> currentStatuses = helper.getCurrentStatusIds();
 
             Set<? extends I_GetConceptData> allUsers = userParent.getDestRelOrigins(config.getAllowedStatus(),
                     allowedTypes, config.getViewPositionSetReadOnly(), Precedence.TIME,
@@ -694,7 +700,7 @@ public class ProjectPermissionsAPI {
                         }
                     }
                     if (latestTuple != null) {
-                        for (int currentStatusId : Terms.get().getActiveAceFrameConfig().getViewCoordinate().getAllowedStatusNids().getSetValues()) {
+                        for (int currentStatusId : currentStatuses) {
                             if (latestTuple.getStatusNid() == currentStatusId) {
                                 inboxes.add(latestTuple.getText());
                             }

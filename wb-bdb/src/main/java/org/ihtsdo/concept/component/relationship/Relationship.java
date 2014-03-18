@@ -42,15 +42,11 @@ import java.beans.PropertyVetoException;
 import java.io.IOException;
 
 import java.util.*;
-import org.ihtsdo.db.bdb.BdbTerminologySnapshot;
-import org.ihtsdo.db.bdb.BdbTerminologyStore;
 import org.ihtsdo.db.change.ChangeNotifier;
-import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.blueprint.RelationshipCAB;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf1;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
-import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationshipType;
 
 public class Relationship extends ConceptComponent<RelationshipRevision, Relationship>
@@ -707,17 +703,12 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
     }
 
     @Override
-    public boolean isInferred() throws IOException{
-        if(getAuthorNid() == Relationship.getClassifierAuthorNid()){
-            return true;
-        }else if(BdbTerminologyStore.isIsReleaseFormatSetup()){
-            return getCharacteristicNid() == SnomedMetadataRfx.getREL_CH_INFERRED_RELATIONSHIP_NID();
-        }
-        return false;
+    public boolean isInferred() {
+        return getAuthorNid() == Relationship.getClassifierAuthorNid();
     }
 
     @Override
-    public boolean isStated() throws IOException{
+    public boolean isStated() {
         return !isInferred();
     }
 
@@ -986,12 +977,12 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
         }
 
         @Override
-        public boolean isInferred() throws IOException {
+        public boolean isInferred() {
             return getCv().isInferred();
         }
 
         @Override
-        public boolean isStated() throws IOException {
+        public boolean isStated() {
             return !isInferred();
         }
 

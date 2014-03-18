@@ -42,7 +42,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JTree;
 
 @BeanList(specs = { @Spec(
    directory = "tasks/refset/spec",
@@ -108,9 +107,7 @@ public class AddStructuralQueryToRefsetSpec extends AbstractAddRefsetSpecTask {
                if (c3Description == null) {
                   ConceptContainerBI node =
                      (ConceptContainerBI) configFrame.getTreeInTaxonomyPanel().getLastSelectedPathComponent();
-                  if(node == null){
-                      return null;
-                  }
+
                   refsetMap.put(REFSET_PROPERTY.CID_THREE, node.getConceptNid());
                } else {
                   refsetMap.put(REFSET_PROPERTY.CID_THREE, c3Description.getConceptNid());

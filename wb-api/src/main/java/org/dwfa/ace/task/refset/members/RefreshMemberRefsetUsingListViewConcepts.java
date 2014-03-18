@@ -43,7 +43,6 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
-import org.ihtsdo.tk.query.helper.RefsetHelper;
 
 @BeanList(specs = { @Spec(directory = "tasks/ide/refset/membership", type = BeanType.TASK_BEAN) })
 public class RefreshMemberRefsetUsingListViewConcepts extends AbstractTask {
@@ -123,10 +122,8 @@ public class RefreshMemberRefsetUsingListViewConcepts extends AbstractTask {
                 newMembers.add(model.getElementAt(i));
             }
 
-            RefsetHelper helper = new RefsetHelper(config.getViewCoordinate(), config.getEditCoordinate());
-            for(I_GetConceptData c : newMembers){
-                helper.newConceptRefsetExtension(refset.getConceptNid(), c.getNid(), value.getConceptNid());    
-            }
+            I_HelpMemberRefsets helper = Terms.get().getMemberRefsetHelper(config, refset.getConceptNid(), value.getConceptNid());
+            helper.addAllToRefset(newMembers, "Adding new members to member refset");
 
             computeRefsetActivityPanel.setProgressInfoLower("<html>" + "1) Creating refset spec query.   "
                 + "<font color='red'>COMPLETE.<br><font color='black'>"
@@ -179,9 +176,7 @@ public class RefreshMemberRefsetUsingListViewConcepts extends AbstractTask {
                     }
                 }
 
-                for(I_GetConceptData c : oldMembers){
-                    helper.retireRefsetExtension(refset.getConceptNid(), c.getNid(), value.getConceptNid());
-                }
+                helper.removeAllFromRefset(oldMembers, "Cleaning up old members from member refset");
                 oldMembers = new HashSet<I_GetConceptData>();
                 cleanupCount++;
             }

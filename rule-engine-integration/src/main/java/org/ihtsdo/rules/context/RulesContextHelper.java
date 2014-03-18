@@ -46,12 +46,15 @@ import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_HelpRefsets;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_RelVersioned;
 import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.I_TermFactory;
+import org.dwfa.ace.api.RefsetPropertyMap;
+import org.dwfa.ace.api.RefsetPropertyMap.REFSET_PROPERTY;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
@@ -62,6 +65,7 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.ComputationCanceled;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 import org.ihtsdo.helper.time.TimeHelper;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.Precedence;
@@ -70,7 +74,6 @@ import org.ihtsdo.tk.api.changeset.ChangeSetGenerationThreadingPolicy;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.conceptattribute.ConceptAttributeVersionBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
-import org.ihtsdo.tk.query.helper.RefsetHelper;
 
 /**
  * The Class RulesContextHelper.
@@ -402,13 +405,14 @@ public class RulesContextHelper {
 			I_TermFactory tf = Terms.get();
 			I_GetConceptData currentStatus = tf.getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
 			I_GetConceptData contextRefset = tf.getConcept(RefsetAuxiliary.Concept.RULES_CONTEXT_METADATA_REFSET.getUids());
-//			refsetHelper.setAutocommitActive(true);
+			I_HelpRefsets refsetHelper = tf.getRefsetHelper(config);
+			refsetHelper.setAutocommitActive(true);
 
 			if (currentRolePart == null && newRole != null) {
 				// new member in context refset
-                                RefsetHelper helper = new RefsetHelper(config.getViewCoordinate(), config.getEditCoordinate());
-                                helper.newConceptStringRefsetExtension(contextRefset.getConceptNid(), context.getConceptNid(),
-                                        newRole.getConceptNid(), ruleUid);
+				RefsetPropertyMap propertyMap = new RefsetPropertyMap().with(REFSET_PROPERTY.STRING_VALUE, ruleUid);
+				propertyMap.put(REFSET_PROPERTY.CID_ONE, newRole.getConceptNid());
+				refsetHelper.newRefsetExtension(contextRefset.getConceptNid(), context.getConceptNid(), REFSET_TYPES.CID_STR, propertyMap, config);
 				tf.addUncommittedNoChecks(contextRefset);
 				tf.addUncommittedNoChecks(context);
 				contextRefset.commit(ChangeSetGenerationPolicy.INCREMENTAL, ChangeSetGenerationThreadingPolicy.MULTI_THREAD);

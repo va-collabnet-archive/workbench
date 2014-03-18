@@ -26,10 +26,10 @@ import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidCidCid;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
+import org.dwfa.ace.refset.spec.I_HelpSpecRefset;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.tk.query.helper.RefsetHelper;
 
 public class ConceptConceptConceptExtTupleFileUtil {
 
@@ -132,8 +132,8 @@ public class ConceptConceptConceptExtTupleFileUtil {
                 return null;
             }
 
-//            I_HelpSpecRefset refsetHelper = Terms.get().getSpecRefsetHelper(importConfig);
-//            refsetHelper.setAutocommitActive(false);
+            I_HelpSpecRefset refsetHelper = Terms.get().getSpecRefsetHelper(importConfig);
+            refsetHelper.setAutocommitActive(false);
             I_TermFactory termFactory = Terms.get();
 
             if (!termFactory.hasId(refsetUuid)) {
@@ -141,7 +141,7 @@ public class ConceptConceptConceptExtTupleFileUtil {
             }
             if (!termFactory.hasId(componentUuid)) {
                 writeWarning(outputFileWriter, lineCount,
-                    "CidCidCid: Component UUID matches no identifier in database. UUID: " + componentUuid);
+                    "CidCidCid: Component UUID matches no identifier in database.");
             }
             if (!termFactory.hasId(c1Uuid)) {
                 writeWarning(outputFileWriter, lineCount, "CidCidCid: c1Uuid UUID matches no identifier in database: " + c1Uuid);
@@ -158,10 +158,10 @@ public class ConceptConceptConceptExtTupleFileUtil {
             }
 
             try {
-                RefsetHelper refsetHelper = new RefsetHelper(importConfig.getViewCoordinate(), importConfig.getEditCoordinate());
                 refsetHelper.newConceptConceptConceptRefsetExtension(termFactory.uuidToNative(refsetUuid), termFactory
                     .uuidToNative(componentUuid), termFactory.uuidToNative(c1Uuid), termFactory.uuidToNative(c2Uuid),
-                    termFactory.uuidToNative(c3Uuid));
+                    termFactory.uuidToNative(c3Uuid), memberUuid, (UUID) importConfig.getProperty("pathUuid"),
+                    statusUuid, effectiveDate);
             } catch (Exception e) {
                 String errorMessage =
                         "CidCidCid: Exception thrown while creating new concept-concept-concept refset extension : "

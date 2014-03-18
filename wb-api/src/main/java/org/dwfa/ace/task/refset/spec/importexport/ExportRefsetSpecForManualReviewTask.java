@@ -22,11 +22,11 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.text.ParseException;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
+import org.apache.lucene.queryParser.ParseException;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_DescriptionVersioned;
@@ -41,8 +41,10 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
+import org.dwfa.ace.refset.spec.I_HelpSpecRefset;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.ace.task.WorkerAttachmentKeys;
+import org.dwfa.ace.task.refset.spec.RefsetSpec;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
@@ -57,9 +59,7 @@ import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 import org.ihtsdo.tk.Ts;
-import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
-import org.ihtsdo.tk.query.RefsetSpec;
 
 /**
  * Exports the refset currently in the refset spec panel to the specified file,
@@ -172,8 +172,8 @@ public class ExportRefsetSpecForManualReviewTask extends AbstractTask {
         // TODO replace with passed in config...
         I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
 
-        RefsetSpec refsetSpecHelper = new RefsetSpec(refsetSpec, config.getViewCoordinate());
-        I_GetConceptData memberRefset = (I_GetConceptData) refsetSpecHelper.getMemberRefsetConcept();
+        RefsetSpec refsetSpecHelper = new RefsetSpec(refsetSpec, config);
+        I_GetConceptData memberRefset = refsetSpecHelper.getMemberRefsetConcept();
         BufferedWriter exportFileWriter = new BufferedWriter(new FileWriter(outputFile, false));
 
         if (memberRefset == null) {
@@ -187,6 +187,7 @@ public class ExportRefsetSpecForManualReviewTask extends AbstractTask {
         writeRefsetName(exportFileWriter, memberRefset);
         writeHeader(exportFileWriter);
 
+        I_HelpSpecRefset helper = Terms.get().getSpecRefsetHelper(Terms.get().getActiveAceFrameConfig());
         int lineCount = 2; // refset name, header
         int fileNumber = 0;
 
@@ -206,12 +207,7 @@ public class ExportRefsetSpecForManualReviewTask extends AbstractTask {
             if (latestTuple != null) {
                 if (latestTuple.getMutablePart() instanceof I_ExtendByRefPartCid) {
                     if (latestTuple.getRefsetId() == memberRefset.getConceptNid()) {
-                        NidSetBI allowedStatusNids = config.getViewCoordinate().getAllowedStatusNids();
-                        I_IntSet currentStatuses = Terms.get().newIntSet();
-                        for(int nid : allowedStatusNids.getSetValues()){
-                            currentStatuses.add(nid);
-                        }
-                        if (currentStatuses.contains(latestTuple.getStatusNid())) {
+                        if (helper.getCurrentStatusIntSet().contains(latestTuple.getStatusNid())) {
                             I_ExtendByRefPartCid part = (I_ExtendByRefPartCid) latestTuple.getMutablePart();
                             if (part.getC1id() == termFactory.getConcept(
                                 RefsetAuxiliary.Concept.NORMAL_MEMBER.getUids()).getConceptNid()) {

@@ -38,6 +38,7 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
+import org.dwfa.ace.refset.spec.I_HelpSpecRefset;
 import org.dwfa.ace.task.refset.members.RefsetUtilImpl;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.ihtsdo.project.TerminologyProjectDAO;
@@ -158,6 +159,7 @@ public class ExportConceptMemberRefsetToRefset {
 
             refsetSCTID = refsetId;
         }
+        I_HelpSpecRefset helper = termFactory.getSpecRefsetHelper(config);
         for (I_ExtendByRef ext : extensions) {
 
             I_ExtendByRefPart lastPart = TerminologyProjectDAO.getLastExtensionPart(ext);

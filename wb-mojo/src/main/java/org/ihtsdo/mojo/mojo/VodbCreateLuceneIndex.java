@@ -24,9 +24,7 @@ import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.index.IndexWriter;
-import org.apache.lucene.index.IndexWriterConfig;
-import org.apache.lucene.index.LogByteSizeMergePolicy;
-import org.apache.lucene.index.MergePolicy;
+import org.apache.lucene.index.IndexWriter.MaxFieldLength;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.SimpleFSDirectory;
 import org.apache.maven.plugin.AbstractMojo;
@@ -78,23 +76,20 @@ public class VodbCreateLuceneIndex extends AbstractMojo {
             luceneDirFile.mkdirs();
 			Directory luceneDir = new SimpleFSDirectory(luceneDirFile);
 			
-        IndexWriterConfig config = new IndexWriterConfig(LuceneManager.version, new StandardAnalyzer(LuceneManager.version));
-        MergePolicy mergePolicy = new LogByteSizeMergePolicy();
-
-        config.setMergePolicy(mergePolicy);
-        config.setSimilarity(new LuceneManager.ShortTextSimilarity());
-
-        switch (indexType) {
+            switch (indexType) {
             case Standard:
             case Fuzzy:
-
-                writer = new IndexWriter(luceneDir, config);
+                writer = new IndexWriter(luceneDir, new StandardAnalyzer(LuceneManager.version), false, 
+	            		MaxFieldLength.UNLIMITED);
                 break;
             case Snowball:
-                writer = new IndexWriter(luceneDir, config);
+                writer = new IndexWriter(luceneDir, new StandardAnalyzer(LuceneManager.version), false, 
+	            		MaxFieldLength.UNLIMITED);
                 break;
             }
 
+            writer.setUseCompoundFile(true);
+            writer.setMergeFactor(10000);
         }
 
         public void processDescription(I_DescriptionVersioned<?> desc) throws Exception {
@@ -114,7 +109,7 @@ public class VodbCreateLuceneIndex extends AbstractMojo {
         }
 
         public void close() throws IOException {
-            writer.close();
+            writer.optimize();
             writer.close();
         }
 

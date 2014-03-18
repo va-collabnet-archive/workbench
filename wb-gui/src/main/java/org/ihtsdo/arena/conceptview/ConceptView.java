@@ -411,7 +411,7 @@ public class ConceptView extends JPanel {
                 globals.put("config", config);
                 globals.put("cvSettings", getSettings());
 
-                View viewType = null;
+                View viewType;
 
                 if (getSettings().getRelAssertionType() == RelAssertionType.STATED) {
                     viewType = View.STATED;
@@ -419,10 +419,8 @@ public class ConceptView extends JPanel {
                     viewType = View.INFERRED;
                 } else if (getSettings().getRelAssertionType() == RelAssertionType.INFERRED_THEN_STATED) {
                     viewType = View.STATED_AND_INFERRED;
-                } else if (settings.getRelAssertionType() == RelAssertionType.LONG_NORMAL_FORM) {
-                    viewType = View.LONG_NORMAL_FORM;
-                }else if (settings.getRelAssertionType() == RelAssertionType.SHORT_NORMAL_FORM) {
-                    viewType = View.SHORT_NORMAL_FORM;
+                } else {
+                    viewType = View.STATED;
                 }
 
                 Collection<Object> facts = new ArrayList<Object>();

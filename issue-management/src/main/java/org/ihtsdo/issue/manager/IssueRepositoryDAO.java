@@ -28,14 +28,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 
 import org.apache.axis.encoding.Base64;
 import org.apache.lucene.document.Document;
+import org.apache.lucene.queryParser.ParseException;
 import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_ConfigAceDb;
 import org.dwfa.ace.api.I_ConfigAceFrame;
@@ -44,7 +43,9 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HelpRefsets;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_TermFactory;
+import org.dwfa.ace.api.RefsetPropertyMap;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.api.RefsetPropertyMap.REFSET_PROPERTY;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartStr;
@@ -52,16 +53,14 @@ import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 import org.ihtsdo.issue.IssueRepoRegistration;
 import org.ihtsdo.issue.issuerepository.IssueRepository;
 import org.ihtsdo.lucene.SearchResult;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.Precedence;
-import org.ihtsdo.tk.api.refex.RefexVersionBI;
-import org.ihtsdo.tk.api.refex.type_string.RefexStringVersionBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
-import org.ihtsdo.tk.query.helper.RefsetHelper;
 
 
 
@@ -123,7 +122,9 @@ public class IssueRepositoryDAO {
 	public static I_GetConceptData addIssueRepoToMetahier(IssueRepository issueRepoWithMetadata, I_ConfigAceFrame config) {
 		I_GetConceptData newConcept = null;
 		I_TermFactory termFactory = Terms.get();
-//		refsetHelper.setAutocommitActive(true);
+		I_HelpRefsets refsetHelper;
+		refsetHelper = termFactory.getRefsetHelper(config);
+		refsetHelper.setAutocommitActive(true);
 
 		//		try {
 		//			termFactory.setActiveAceFrameConfig(config);
@@ -177,8 +178,10 @@ public class IssueRepositoryDAO {
 			termFactory.addUncommitted(newConcept);
 			termFactory.addUncommitted(issueReposRefset);
 			termFactory.commit();
-                        RefsetHelper refsetHelper = new RefsetHelper(config.getViewCoordinate(), config.getEditCoordinate());
-                        refsetHelper.newStringRefsetExtension(issueReposRefset.getConceptNid(), newConcept.getConceptNid(), metadata);
+
+			refsetHelper.newRefsetExtension(issueReposRefset.getConceptNid(), newConcept.getConceptNid(), 
+					REFSET_TYPES.STR, 
+					new RefsetPropertyMap().with(REFSET_PROPERTY.STRING_VALUE, metadata), config); 
 
 			for (I_ExtendByRef extension : termFactory.getRefsetExtensionMembers(issueReposRefset.getConceptNid())) {
 				if (extension.getComponentNid() == newConcept.getConceptNid() &&
@@ -218,7 +221,8 @@ public static IssueRepository getIssueRepository(I_GetConceptData issueRepoConce
 	I_TermFactory termFactory = Terms.get();
 	I_ConfigAceFrame config = termFactory.getActiveAceFrameConfig();
 	I_HelpRefsets refsetHelper;
-//	refsetHelper.setAutocommitActive(true);
+	refsetHelper = termFactory.getRefsetHelper(config);
+	refsetHelper.setAutocommitActive(true);
 
 	try {
 		I_GetConceptData issueReposRefset = termFactory.getConcept(
@@ -229,11 +233,14 @@ public static IssueRepository getIssueRepository(I_GetConceptData issueRepoConce
 		descriptionTypes.add(termFactory.uuidToNative(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids()));
 
 		//List<I_ExtendByRef> extensions = new ArrayList<I_ExtendByRef>();
-            Collection<? extends RefexVersionBI<?>> refexMembersActive = issueRepoConcept.getRefexMembersActive(config.getViewCoordinate(), issueReposRefset.getConceptNid());
 
-		for (RefexVersionBI loopPart : refexMembersActive) {
-			RefexStringVersionBI strPart = (RefexStringVersionBI) loopPart;
-			String metadata = strPart.getString1();
+		List<I_ExtendByRefPart> currentExtensionParts = 
+			refsetHelper.getAllCurrentRefsetExtensions(issueReposRefset.getConceptNid(), 
+					issueRepoConcept.getConceptNid());
+
+		for (I_ExtendByRefPart loopPart : currentExtensionParts) {
+			I_ExtendByRefPartStr strPart = (I_ExtendByRefPartStr) loopPart;
+			String metadata = strPart.getStringValue();
 			deserializedIssueRepoWithMetadata = (IssueRepository) deserialize(metadata);
 		}
 
@@ -331,8 +338,8 @@ public static IssueRepository updateRepositoryMetadata(IssueRepository issueRepo
 		}
 
 		if (!foundPreviousExtension) {
-                        RefsetHelper refsetHelper = new RefsetHelper(config.getViewCoordinate(), config.getEditCoordinate());
-                        refsetHelper.newStringRefsetExtension(issueReposRefset.getConceptNid(), issueRepoConcept.getConceptNid(), metadata);
+			termFactory.getRefsetHelper(config).newRefsetExtension(issueReposRefset.getConceptNid(), issueRepoConcept.getConceptNid(), REFSET_TYPES.STR, 
+					new RefsetPropertyMap().with(REFSET_PROPERTY.STRING_VALUE, metadata), config);
 			termFactory.addUncommitted(issueRepoConcept);
 			termFactory.addUncommitted(issueReposRefset);
 			for (I_ExtendByRef extension : termFactory.getRefsetExtensionMembers(issueReposRefset.getConceptNid())) {
@@ -623,11 +630,11 @@ private static boolean isConceptDuplicate(String descriptionText) {
 		}
 	} catch (IOException e) {
 		e.printStackTrace();
+	} catch (ParseException e) {
+		e.printStackTrace();
 	} catch (TerminologyException e) {
 		e.printStackTrace();
-	}   catch (java.text.ParseException ex) {
-                Logger.getLogger(IssueRepositoryDAO.class.getName()).log(Level.SEVERE, null, ex);
-            }
+	}
 	return result;
 }
 

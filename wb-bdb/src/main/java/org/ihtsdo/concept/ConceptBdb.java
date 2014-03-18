@@ -29,7 +29,6 @@ import com.sleepycat.je.DatabaseEntry;
 import com.sleepycat.je.LockMode;
 import com.sleepycat.je.OperationStatus;
 import java.util.concurrent.Semaphore;
-import org.ihtsdo.lucene.LuceneManager;
 import org.ihtsdo.tk.api.ProcessUnfetchedConceptDataBI;
 
 public class ConceptBdb extends ComponentBdb {
@@ -261,11 +260,4 @@ public class ConceptBdb extends ComponentBdb {
         }
         conceptIdSet.setNotMember(cNid);
     }
-    
-   @Override
-    public void sync() throws IOException {
-        super.sync(); 
-        LuceneManager.commit();
-    }
-
 }

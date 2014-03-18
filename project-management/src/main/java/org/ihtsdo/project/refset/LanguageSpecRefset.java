@@ -37,7 +37,6 @@ import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
-import org.ihtsdo.tk.query.helper.RefsetHelper;
 
 /**
  * The Class LanguageSpecRefset.
@@ -229,6 +228,7 @@ public class LanguageSpecRefset extends WorkflowRefset {
             I_GetConceptData notAcceptable = tf.getConcept(SnomedMetadataRf2.ACCEPTABLE_RF2.getLenient().getNid());
             I_GetConceptData enumeratedOriginConcept = getEnumeratedOriginRefsetConcept(config);
             I_GetConceptData languageMembershipConcept = getLanguageMembershipRefsetConcept(config);
+            I_HelpRefsets refsetHelper = tf.getRefsetHelper(config);
             HashMap<Integer, Integer> descIdAcceptabilityMap = new HashMap<Integer, Integer>();
 
             // adding enumerated members to map
@@ -321,8 +321,9 @@ public class LanguageSpecRefset extends WorkflowRefset {
                         tf.addUncommittedNoChecks(currentMember);
                         tf.commit();
                     } else {
-                        RefsetHelper helper = new RefsetHelper(config.getViewCoordinate(), config.getEditCoordinate());
-                        helper.newConceptRefsetExtension(languageMembershipConcept.getConceptNid(), loopDescId, descIdAcceptabilityMap.get(loopDescId));
+                        refsetHelper.newRefsetExtension(languageMembershipConcept.getConceptNid(),
+                                loopDescId, EConcept.REFSET_TYPES.CID,
+                                new RefsetPropertyMap().with(RefsetPropertyMap.REFSET_PROPERTY.CID_ONE, descIdAcceptabilityMap.get(loopDescId)), config);
                         for (I_ExtendByRef extension : tf.getAllExtensionsForComponent(loopDescId)) {
                             if (extension.getMutableParts().iterator().next().getTime() == Long.MAX_VALUE) {
                                 termFactory.addUncommittedNoChecks(extension);

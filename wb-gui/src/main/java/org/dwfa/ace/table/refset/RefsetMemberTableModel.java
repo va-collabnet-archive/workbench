@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TimerTask;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.ExecutionException;
@@ -54,6 +55,7 @@ import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_ContainTermComponent;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_HelpRefsets;
 import org.dwfa.ace.api.I_HoldRefsetData;
 import org.dwfa.ace.api.I_HoldRefsetPreferences;
 import org.dwfa.ace.api.I_HostConceptPlugins;
@@ -79,6 +81,7 @@ import org.dwfa.ace.refset.I_RefsetDefaults;
 import org.dwfa.ace.refset.I_RefsetDefaultsBoolean;
 import org.dwfa.ace.refset.I_RefsetDefaultsConInt;
 import org.dwfa.ace.refset.I_RefsetDefaultsConcept;
+import org.dwfa.ace.refset.I_RefsetDefaultsInteger;
 import org.dwfa.ace.refset.I_RefsetDefaultsString;
 import org.dwfa.ace.refset.I_RefsetsDefaultsConConCon;
 import org.dwfa.ace.timer.UpdateAlertsTimer;
@@ -87,9 +90,6 @@ import org.dwfa.swing.SwingWorker;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.bind.ThinVersionHelper;
 import org.dwfa.vodb.types.IntList;
-import org.ihtsdo.tk.Ts;
-import org.ihtsdo.tk.api.refex.RefexChronicleBI;
-import org.ihtsdo.tk.query.helper.RefsetHelper;
 
 public class RefsetMemberTableModel extends AbstractTableModel implements PropertyChangeListener, I_HoldRefsetData,
         ActionListener {
@@ -855,10 +855,8 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
                 case INTEGER_VALUE:
                     if (I_ExtendByRefPartCidInt.class.isAssignableFrom(tuple.getMutablePart().getClass())) {
                         int value = ((I_ExtendByRefPartCidInt) tuple.getMutablePart()).getIntValue();
-                        RefsetHelper helper = new RefsetHelper(host.getConfig().getViewCoordinate(),
-                                host.getConfig().getEditCoordinate());
-                        if (helper.hasPurpose(tuple.getRefsetId(),
-                                Ts.get().getNidForUuids(RefsetAuxiliary.Concept.REFSET_PURPOSE_POSITION.getPrimoridalUid()))) {
+                        if (Terms.get().getRefsetHelper(host.getConfig()).hasPurpose(tuple.getRefsetId(),
+                                RefsetAuxiliary.Concept.REFSET_PURPOSE_POSITION)) {
                             return new StringWithExtTuple((value == Integer.MAX_VALUE) ? "latest" : ThinVersionHelper.format(value), tuple, tuple.getMemberId(), inConflict);
                         } else {
                             return new StringWithExtTuple(Integer.toString(value), tuple, tuple.getMemberId(), inConflict);
@@ -911,26 +909,25 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
             I_HoldRefsetPreferences preferences = host.getConfig().getRefsetPreferencesForToggle(toggle);
             I_RefsetDefaults refsetDefaults = null;
             RefsetPropertyMap extProps = new RefsetPropertyMap();
-            RefsetHelper helper = new RefsetHelper(host.getConfig().getViewCoordinate(), host.getConfig().getEditCoordinate());
-            RefexChronicleBI extension = null;
-;            switch (refsetType) {
+            I_HelpRefsets refsetHelper = Terms.get().getRefsetHelper(host.getConfig());
+            switch (refsetType) {
                 case BOOLEAN:
+                    extProps.setMemberType(org.ihtsdo.etypes.EConcept.REFSET_TYPES.BOOLEAN);
                     refsetDefaults = preferences.getBooleanPreferences();
-                    extension = helper.newBooleanRefsetExtension(refsetDefaults.getDefaultRefset().getConceptNid(),
-                            tableComponentId,
-                            ((I_RefsetDefaultsBoolean) refsetDefaults).getDefaultForBooleanRefset());
+                    extProps.put(REFSET_PROPERTY.STATUS, refsetDefaults.getDefaultStatusForRefset().getConceptNid());
+                    extProps.put(REFSET_PROPERTY.BOOLEAN_VALUE, ((I_RefsetDefaultsBoolean) refsetDefaults).getDefaultForBooleanRefset());
                     break;
                 case STRING:
+                    extProps.setMemberType(org.ihtsdo.etypes.EConcept.REFSET_TYPES.STR);
                     refsetDefaults = preferences.getStringPreferences();
-                    extension = helper.newStringRefsetExtension(refsetDefaults.getDefaultRefset().getConceptNid(),
-                            tableComponentId,
-                            ((I_RefsetDefaultsString) refsetDefaults).getDefaultForStringRefset());
+                    extProps.put(REFSET_PROPERTY.STATUS, refsetDefaults.getDefaultStatusForRefset().getConceptNid());
+                    extProps.put(REFSET_PROPERTY.STRING_VALUE, ((I_RefsetDefaultsString) refsetDefaults).getDefaultForStringRefset());
                     break;
                 case CONCEPT:
+                    extProps.setMemberType(org.ihtsdo.etypes.EConcept.REFSET_TYPES.CID);
                     refsetDefaults = preferences.getConceptPreferences();
-                    extension = helper.newConceptRefsetExtension(refsetDefaults.getDefaultRefset().getConceptNid(),
-                            tableComponentId,
-                            ((I_RefsetDefaultsConcept) refsetDefaults).getDefaultForConceptRefset().getConceptNid());
+                    extProps.put(REFSET_PROPERTY.STATUS, refsetDefaults.getDefaultStatusForRefset().getConceptNid());
+                    extProps.put(REFSET_PROPERTY.CID_ONE, ((I_RefsetDefaultsConcept) refsetDefaults).getDefaultForConceptRefset().getConceptNid());
                     break;
                 case CON_INT:
                     extProps.setMemberType(org.ihtsdo.etypes.EConcept.REFSET_TYPES.CID_INT);
@@ -940,24 +937,31 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
                     extProps.put(REFSET_PROPERTY.INTEGER_VALUE, ((I_RefsetDefaultsConInt) refsetDefaults).getDefaultForIntegerValue());
                     break;
                 case CID_CID_CID:
+                    extProps.setMemberType(org.ihtsdo.etypes.EConcept.REFSET_TYPES.CID_CID_CID);
                     refsetDefaults = preferences.getCidCidCidPreferences();
-                    extension = helper.newConceptConceptConceptRefsetExtension(refsetDefaults.getDefaultRefset().getConceptNid(),
-                            tableComponentId,
-                            ((I_RefsetsDefaultsConConCon) refsetDefaults).getDefaultForCnid1().getConceptNid(),
-                            ((I_RefsetsDefaultsConConCon) refsetDefaults).getDefaultForCnid1().getConceptNid(),
-                            ((I_RefsetsDefaultsConConCon) refsetDefaults).getDefaultForCnid1().getConceptNid());
+                    extProps.put(REFSET_PROPERTY.STATUS, refsetDefaults.getDefaultStatusForRefset().getConceptNid());
+                    extProps.put(REFSET_PROPERTY.CID_ONE, ((I_RefsetsDefaultsConConCon) refsetDefaults).getDefaultForCnid1().getConceptNid());
+                    extProps.put(REFSET_PROPERTY.CID_TWO, ((I_RefsetsDefaultsConConCon) refsetDefaults).getDefaultForCnid1().getConceptNid());
+                    extProps.put(REFSET_PROPERTY.CID_THREE, ((I_RefsetsDefaultsConConCon) refsetDefaults).getDefaultForCnid1().getConceptNid());
                     break;
                 case INTEGER:
+                    extProps.setMemberType(org.ihtsdo.etypes.EConcept.REFSET_TYPES.INT);
                     refsetDefaults = preferences.getIntegerPreferences();
                     refsetDefaults = preferences.getConIntPreferences();
-                    extension = helper.newIntRefsetExtension(refsetDefaults.getDefaultRefset().getConceptNid(),
-                            tableComponentId,
-                            ((I_RefsetDefaultsConInt) refsetDefaults).getDefaultForIntegerValue());
+                    extProps.put(REFSET_PROPERTY.STATUS, refsetDefaults.getDefaultStatusForRefset().getConceptNid());
+                    if (I_RefsetDefaultsInteger.class.isAssignableFrom(refsetDefaults.getClass())) {
+                        extProps.put(REFSET_PROPERTY.INTEGER_VALUE, ((I_RefsetDefaultsInteger) refsetDefaults).getDefaultForIntegerRefset());
+                    } else if (I_RefsetDefaultsConInt.class.isAssignableFrom(refsetDefaults.getClass())) {
+                        extProps.put(REFSET_PROPERTY.INTEGER_VALUE, ((I_RefsetDefaultsConInt) refsetDefaults).getDefaultForIntegerValue());
+                    }
                     break;
                 default:
                     throw new UnsupportedOperationException("Can't handle ref set type: " + refsetType);
             }
-            Ts.get().addUncommitted(Ts.get().getConcept(refsetDefaults.getDefaultRefset().getConceptNid()));
+            I_ExtendByRef extension =
+                    refsetHelper.getOrCreateRefsetExtension(refsetDefaults.getDefaultRefset().getConceptNid(),
+                    tableComponentId, extProps.getMemberType(), extProps, UUID.randomUUID());
+            Terms.get().addUncommitted(extension);
             propertyChange(null);
         } catch (TerminologyException e) {
             AceLog.getAppLog().alertAndLogException(e);

@@ -30,7 +30,7 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.task.WorkerAttachmentKeys;
-//import org.dwfa.ace.task.refset.spec.RefsetSpec;
+import org.dwfa.ace.task.refset.spec.RefsetSpec;
 import org.dwfa.app.DwfaEnv;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
@@ -42,16 +42,6 @@ import org.dwfa.util.LogWithAlerts;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
-import org.ihtsdo.tk.Ts;
-import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
-import org.ihtsdo.tk.api.coordinate.EditCoordinate;
-import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
-import org.ihtsdo.tk.api.cs.ChangeSetPolicy;
-import org.ihtsdo.tk.query.RefsetSpec;
-import org.ihtsdo.tk.query.ComputeFromSpec;
-import org.ihtsdo.tk.query.RefsetSpecFactory;
-import org.ihtsdo.tk.query.RefsetSpecQuery;
-import org.ihtsdo.tk.query.RefsetComputer.ComputeType;
 
 /**
  * Computes the members of a refset given a refset spec. This refset spec is the
@@ -74,8 +64,6 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
     private boolean cancelComputation = false;
     private Set<Integer> nestedRefsets;
     private Set<Integer> excludedRefsets;
-    private ViewCoordinate vc;
-    private EditCoordinate ec;
 
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
@@ -94,9 +82,8 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
         // Nothing to do
     }
 
-    public Condition computeRefset(I_ConfigAceFrame configFrame, ConceptChronicleBI refset, boolean showActivityPanel) {
-        this.ec = configFrame.getEditCoordinate();
-        this.vc = configFrame.getViewCoordinate();
+    public Condition computeRefset(I_ConfigAceFrame configFrame, I_GetConceptData refset, boolean showActivityPanel) {
+
         if (refset == null) {
             AceLog.getAppLog().info("No refset in refset spec panel to compute.");
             if (!DwfaEnv.isHeadless()) {
@@ -105,25 +92,24 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
             }
             return Condition.ITEM_CANCELED;
         }
-        
+
         try {
-            ChangeSetPolicy csPolicy = configFrame.getDbConfig().getRefsetChangesChangeSetPolicy();
-            RefsetSpec refsetSpecHelper = new RefsetSpec(refset, true, vc);
-            ConceptChronicleBI refsetSpec = refsetSpecHelper.getRefsetSpecConcept();
-            AceLog.getAppLog().info("Refset: " + refset.toUserString() + " " + refset.getPrimUuid());
+            RefsetSpec refsetSpecHelper = new RefsetSpec(refset, true, configFrame);
+            I_GetConceptData refsetSpec = refsetSpecHelper.getRefsetSpecConcept();
+            AceLog.getAppLog().info("Refset: " + refset.getInitialText() + " " + refset.getUids().get(0));
             if (refsetSpec == null) {
-                AceLog.getAppLog().info("Refset not a spec refset: " + refset.toUserString());
+                AceLog.getAppLog().info("Refset not a spec refset: " + refset.getInitialText());
                 if (!refset.getRefsetMembers().isEmpty()) {
                     AceLog.getAppLog().info("Refset has members. Will compute marked parents for members.");
-                    ComputeFromSpec.computeRefset(null, vc, ec, refset.getNid(), csPolicy);
+                    Terms.get().computeRefset(refset.getNid(), null, configFrame);
                 }
                 return Condition.ITEM_COMPLETE;
             }else{
-                AceLog.getAppLog().info("Refset spec: " + refsetSpec.toUserString()+ " " + refsetSpec.getPrimUuid());
+                AceLog.getAppLog().info("Refset spec: " + refsetSpec.getInitialText() + " " + refsetSpec.getUids().get(0));
             }
-            ComputeType computeType = ComputeType.CONCEPT; // default
+            RefsetComputeType computeType = RefsetComputeType.CONCEPT; // default
             if (refsetSpecHelper.isDescriptionComputeType()) {
-                computeType = ComputeType.DESCRIPTION;
+                computeType = RefsetComputeType.DESCRIPTION;
             } else if (refsetSpecHelper.isRelationshipComputeType()) {
                 AceLog.getAppLog().info("Invalid refset spec to compute - relationship compute types not supported.");
                 if (!DwfaEnv.isHeadless()) {
@@ -136,12 +122,12 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
 
             // verify a valid refset spec construction
             if (refsetSpec == null) {
-                AceLog.getAppLog().info("Nested refset not a spec refset: " + refset.toUserString());
+                AceLog.getAppLog().info("Nested refset not a spec refset: " + refset.getInitialText());
                 return Condition.ITEM_COMPLETE;
             }
             // Step 1: create the query object, based on the refset spec
             RefsetSpecQuery query =
-                    RefsetSpecFactory.createQuery(vc, refsetSpec, refset, computeType);
+                    RefsetQueryFactory.createQuery(configFrame, Terms.get(), refsetSpec, refset, computeType);
 
             // check validity of query
             if (!query.isValidQuery() && query.getTotalStatementCount() != 0) {
@@ -154,9 +140,9 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
 
             computeNestedRefsets(configFrame, showActivityPanel, query);
 
-            AceLog.getAppLog().info("Start execution of refset spec : " + refsetSpec.toUserString());
-            
-            Condition condition = ComputeFromSpec.computeRefset(query, vc, ec, refset.getNid(), csPolicy);
+            AceLog.getAppLog().info("Start execution of refset spec : " + refsetSpec.getInitialText());
+
+            Condition condition = Terms.get().computeRefset(refset.getNid(), query, configFrame);
             if (!DwfaEnv.isHeadless()) {
                 Terms.get().getActiveAceFrameConfig().refreshRefsetTab();
             }
@@ -172,7 +158,7 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
             }
 
             if (!DwfaEnv.isHeadless()) {
-                JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null), "Refset compute complete. Refset: " + refset.toUserString(), "",
+                JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null), "Refset compute complete.", "",
                         JOptionPane.INFORMATION_MESSAGE);
             }
             return Condition.ITEM_COMPLETE;
@@ -190,8 +176,8 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
             return Condition.ITEM_CANCELED;
         }
     }
-    
-    private void computeNestedRefsets(I_ConfigAceFrame configFrame,boolean showActivityPanel, RefsetSpecQuery query)
+
+    private void computeNestedRefsets(I_ConfigAceFrame configFrame, boolean showActivityPanel, RefsetSpecQuery query)
             throws TerminologyException, IOException, Exception {
         // compute any nested refsets (e.g. if this spec uses
         // "Concept is member of : refset2", then the members of
@@ -201,11 +187,11 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
         for (Integer nestedRefsetId : nestedRefsets) {
             if (excludedRefsets == null || !excludedRefsets.contains(nestedRefsetId)) {
 
-                Condition condition = computeRefset(configFrame, Ts.get().getConcept(nestedRefsetId), showActivityPanel);
+                Condition condition = computeRefset(configFrame, Terms.get().getConcept(nestedRefsetId), showActivityPanel);
                 if (condition == Condition.ITEM_CANCELED) {
                     if (!DwfaEnv.isHeadless()) {
                         JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
-                                "Error computing dependant refset: " + Ts.get().getConcept(nestedRefsetId).toUserString()
+                                "Error computing dependant refset: " + Terms.get().getConcept(nestedRefsetId).getInitialText()
                                 + ". Re-run separately.", "", JOptionPane.ERROR_MESSAGE);
                     }
                     getNestedRefsets().addAll(nestedRefsets);
@@ -218,11 +204,9 @@ public class ComputeRefsetFromSpecTask extends AbstractTask {
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         I_ConfigAceFrame configFrame =
                 (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
-        this.ec = configFrame.getEditCoordinate();
-        this.vc = configFrame.getViewCoordinate();
         assert configFrame != null;
         try {
-            ConceptChronicleBI refset = configFrame.getRefsetInSpecEditor();
+            I_GetConceptData refset = configFrame.getRefsetInSpecEditor();
             boolean showActivityPanel = true;
             excludedRefsets = new HashSet<Integer>(); // no excluded refsets when running as part of a task
             nestedRefsets = new HashSet<Integer>();

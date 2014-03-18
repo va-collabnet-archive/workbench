@@ -53,7 +53,6 @@ import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
-import org.ihtsdo.tk.query.RefsetSpec;
 
 /**
  * The RefreshRefsetSpecCompareTask uses the information
@@ -180,8 +179,12 @@ public class RefreshRefsetSpecCompareTask extends AbstractTask {
 
             I_GetConceptData refsetSpecConcept = null;
             if (refsetConcept != null) {
-                RefsetSpec refsetSpec = new RefsetSpec(refsetConcept, true, config.getViewCoordinate());
-                refsetSpecConcept = (I_GetConceptData) refsetSpec.getRefsetSpecConcept();
+                Set<? extends I_GetConceptData> specs =
+                        Terms.get().getRefsetHelper(Terms.get().getActiveAceFrameConfig())
+                            .getSpecificationRefsetForRefset(refsetConcept, config);
+                if (specs.size() > 0) {
+                    refsetSpecConcept = specs.iterator().next();
+                }
             }
             assert refsetSpecConcept != null;
 

@@ -21,6 +21,7 @@ package org.dwfa.ace.api;
 
 //~--- non-JDK imports --------------------------------------------------------
 
+import org.apache.lucene.queryParser.ParseException;
 
 import org.drools.KnowledgeBase;
 
@@ -30,8 +31,11 @@ import org.dwfa.ace.api.cs.I_ReadChangeSet;
 import org.dwfa.ace.api.cs.I_WriteChangeSet;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
+import org.dwfa.ace.refset.spec.I_HelpSpecRefset;
 import org.dwfa.ace.task.commit.AlertToDataConstraintFailure;
+import org.dwfa.ace.task.refset.spec.compute.RefsetSpecQuery;
 import org.dwfa.ace.task.search.I_TestSearchResults;
+import org.dwfa.bpa.process.Condition;
 import org.dwfa.tapi.AllowDataCheckSuppression;
 import org.dwfa.tapi.I_ConceptualizeLocally;
 import org.dwfa.tapi.SuppressDataChecks;
@@ -47,7 +51,6 @@ import org.ihtsdo.tk.api.changeset.ChangeSetGeneratorBI;
 
 import java.io.File;
 import java.io.IOException;
-import java.text.ParseException;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -101,6 +104,9 @@ public interface I_TermFactory {
            throws Exception;
 
    void commitTransaction() throws IOException;
+
+   public Condition computeRefset(int nid, RefsetSpecQuery query, I_ConfigAceFrame frameConfig)
+           throws TerminologyException, IOException, Exception;
 
    long convertToThickVersion(int version);
 
@@ -213,6 +219,18 @@ public interface I_TermFactory {
     */
    I_DescriptionPart newDescriptionPart();
 
+   /**
+    * @deprecated use form with <code>UUID memberPrimUuid</code>
+    * @param refsetId
+    * @param memberId
+    * @param componentId
+    * @param partType
+    * @return
+    * @throws IOException
+    */
+   I_ExtendByRef newExtension(int refsetId, int memberId, int componentId,
+                              Class<? extends I_ExtendByRefPart> partType)
+           throws IOException;
 
    I_ExtendByRef newExtension(int refsetId, UUID memberPrimUuid, int componentId,
                               Class<? extends I_ExtendByRefPart> partType)
@@ -350,6 +368,8 @@ public interface I_TermFactory {
    void removeFromCacheAndRollbackTransaction(int memberId) throws IOException;
 
    void removeFromWatchList(I_GetConceptData c);
+
+   public void removeOrigin(PathBI path, I_Position origin, I_ConfigAceFrame config) throws IOException;
 
    public void resetViewPositions();
 
@@ -583,7 +603,17 @@ public interface I_TermFactory {
    public I_ImageVersioned getImage(UUID fromString) throws IOException;
 
    public HashMap<Integer, KnowledgeBase> getKnowledgeBaseCache();
-   
+
+   I_HelpMarkedParentRefsets getMarkedParentRefsetHelper(I_ConfigAceFrame config, int memberRefsetId,
+           int memberTypeId)
+           throws Exception;
+
+   I_HelpMemberRefsetsCalculateConflicts getMemberRefsetConflictCalculator(I_ConfigAceFrame config)
+           throws Exception;
+
+   I_HelpMemberRefsets getMemberRefsetHelper(I_ConfigAceFrame config, int memberRefsetId, int memberTypeId)
+           throws Exception;
+
    PathBI getPath(Collection<UUID> uids) throws TerminologyException, IOException;
 
    PathBI getPath(int nid) throws TerminologyException, IOException;
@@ -619,6 +649,8 @@ public interface I_TermFactory {
 
    List<? extends I_ExtendByRef> getRefsetExtensionsForComponent(int refsetNid, int nid) throws IOException;
 
+   I_HelpRefsets getRefsetHelper(I_ConfigAceFrame config);
+
    I_RelVersioned getRelationship(int rNid) throws IOException;
 
    /**
@@ -627,6 +659,8 @@ public interface I_TermFactory {
     * @throws IOException
     */
    public I_RepresentIdSet getRelationshipIdSet() throws IOException;
+
+   I_HelpSpecRefset getSpecRefsetHelper(I_ConfigAceFrame config) throws Exception;
 
    String getStats() throws IOException;
 

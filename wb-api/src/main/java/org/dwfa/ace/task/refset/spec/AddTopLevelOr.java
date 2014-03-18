@@ -5,6 +5,7 @@ package org.dwfa.ace.task.refset.spec;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_HelpRefsets;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.RefsetPropertyMap;
 import org.dwfa.ace.api.RefsetPropertyMap.REFSET_PROPERTY;
@@ -42,8 +43,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultMutableTreeNode;
-import org.ihtsdo.tk.query.RefsetSpec;
-import org.ihtsdo.tk.query.helper.RefsetHelper;
 
 @BeanList(specs = { @Spec(
    directory = "tasks/refset/spec",
@@ -88,20 +87,22 @@ public class AddTopLevelOr extends AbstractTask {
          DefaultMutableTreeNode rootNode = (DefaultMutableTreeNode) specTree.getModel().getRoot();
 
          if (rootNode.getChildCount() == 0) {
-             RefsetSpec specHelper = new RefsetSpec(refsetConcept, true, configFrame.getViewCoordinate());
-            int specRefsetId = specHelper.getRefsetSpecConcept().getConceptNid();
+            int specRefsetId =
+               Terms.get().getRefsetHelper(configFrame).getSpecificationRefsetForRefset(refsetConcept,
+                                           configFrame).iterator().next().getConceptNid();
             int               componentId  = specRefsetId;
             I_TermFactory     tf           = Terms.get();
+            I_HelpRefsets     refsetHelper = tf.getRefsetHelper(configFrame);
             RefsetPropertyMap propMap      = getRefsetPropertyMap(tf, configFrame);
-            RefsetHelper helper = new RefsetHelper(configFrame.getViewCoordinate(), configFrame.getEditCoordinate());
-            I_ExtendByRef     ext = (I_ExtendByRef) helper.newConceptRefsetExtension(
-                       specRefsetId, componentId, propMap.getMemberType().getTypeNid());
+            I_ExtendByRef     ext          = refsetHelper.getOrCreateRefsetExtension(specRefsetId,
+                                                componentId, propMap.getMemberType(), propMap,
+                                                UUID.randomUUID());
 
             tf.addUncommitted(ext);
 
-            RefsetSpec refsetSpecHelper = new RefsetSpec(Terms.get().getConcept(specRefsetId), configFrame.getViewCoordinate());
+            RefsetSpec refsetSpecHelper = new RefsetSpec(Terms.get().getConcept(specRefsetId), configFrame);
 
-            refsetSpecHelper.setLastEditTime(System.currentTimeMillis(), configFrame.getEditCoordinate());
+            refsetSpecHelper.setLastEditTime(System.currentTimeMillis());
             configFrame.fireRefsetSpecChanged(ext);
             configFrame.refreshRefsetTab();
          }

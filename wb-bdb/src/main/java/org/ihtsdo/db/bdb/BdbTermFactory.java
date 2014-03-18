@@ -26,8 +26,10 @@ import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
 import javax.swing.TransferHandler;
 
+import org.apache.lucene.analysis.WhitespaceAnalyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
+import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.Query;
 import org.drools.KnowledgeBase;
 import org.dwfa.ace.ACE;
@@ -45,11 +47,16 @@ import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HandleSubversion;
+import org.dwfa.ace.api.I_HelpMarkedParentRefsets;
+import org.dwfa.ace.api.I_HelpMemberRefsets;
+import org.dwfa.ace.api.I_HelpMemberRefsetsCalculateConflicts;
+import org.dwfa.ace.api.I_HelpRefsets;
 import org.dwfa.ace.api.I_Identify;
 import org.dwfa.ace.api.I_ImageVersioned;
 import org.dwfa.ace.api.I_ImplementTermFactory;
 import org.dwfa.ace.api.I_IntList;
 import org.dwfa.ace.api.I_IntSet;
+import org.dwfa.ace.api.I_Position;
 import org.dwfa.ace.api.I_ProcessConcepts;
 import org.dwfa.ace.api.I_ProcessDescriptions;
 import org.dwfa.ace.api.I_ProcessExtByRef;
@@ -72,19 +79,26 @@ import org.dwfa.ace.api.cs.I_ReadChangeSet;
 import org.dwfa.ace.api.cs.I_WriteChangeSet;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.config.AceFrame;
 import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.ace.dnd.TerminologyTransferHandler;
 import org.dwfa.ace.log.AceLog;
+import org.dwfa.ace.refset.spec.I_HelpSpecRefset;
 import org.dwfa.ace.search.I_Search;
 import org.dwfa.ace.search.LuceneMatch;
 import org.dwfa.ace.search.SearchStringWorker.LuceneProgressUpdator;
 import org.dwfa.ace.search.workflow.SearchWfHxWorker.LuceneWfHxProgressUpdator;
 import org.dwfa.ace.task.commit.AlertToDataConstraintFailure;
+import org.dwfa.ace.task.refset.spec.RefsetSpec;
+import org.dwfa.ace.task.refset.spec.compute.RefsetQueryFactory;
+import org.dwfa.ace.task.refset.spec.compute.RefsetSpecQuery;
 import org.dwfa.ace.task.search.I_TestSearchResults;
 import org.dwfa.app.DwfaEnv;
+import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.util.Stopwatch;
+import org.dwfa.tapi.ComputationCanceled;
 import org.dwfa.tapi.I_ConceptualizeLocally;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.LogWithAlerts;
@@ -126,6 +140,13 @@ import org.ihtsdo.cs.econcept.EConceptChangeSetReader;
 import org.ihtsdo.cs.econcept.EConceptChangeSetWriter;
 import org.ihtsdo.cs.econcept.workflow.WfRefsetChangeSetReader;
 import org.ihtsdo.db.bdb.computer.ReferenceConcepts;
+import org.ihtsdo.db.bdb.computer.refset.MarkedParentComputer;
+import org.ihtsdo.db.bdb.computer.refset.MarkedParentRefsetHelper;
+import org.ihtsdo.db.bdb.computer.refset.MemberRefsetConflictCalculator;
+import org.ihtsdo.db.bdb.computer.refset.MemberRefsetHelper;
+import org.ihtsdo.db.bdb.computer.refset.RefsetComputer;
+import org.ihtsdo.db.bdb.computer.refset.RefsetHelper;
+import org.ihtsdo.db.bdb.computer.refset.SpecRefsetHelper;
 import org.ihtsdo.db.runner.WorkbenchRunner;
 import org.ihtsdo.db.util.NidPairForRefex;
 import org.ihtsdo.etypes.EConcept;
@@ -141,6 +162,7 @@ import org.ihtsdo.tk.api.ComponentBI;
 import org.ihtsdo.tk.api.ComponentChronicleBI;
 import org.ihtsdo.tk.api.NidBitSetBI;
 import org.ihtsdo.tk.api.NidBitSetItrBI;
+import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
@@ -151,13 +173,10 @@ import org.ihtsdo.tk.dto.concept.component.TkRevision;
 
 import com.sleepycat.je.DatabaseException;
 import java.util.logging.Logger;
-import org.apache.lucene.analysis.core.WhitespaceAnalyzer;
-import org.apache.lucene.queryparser.classic.QueryParser;
-import org.apache.lucene.util.Version;
 import org.ihtsdo.db.change.ChangeNotifier;
+import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
-import org.ihtsdo.tk.query.helper.RefsetHelper;
 
 public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_Search {
 
@@ -167,7 +186,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     private File envHome;
     private HashMap<Integer, KnowledgeBase> knowledgeBaseCache;
     private BdbPathManager pathManager;
-    RefsetHelper specRefsetHelper;
+    SpecRefsetHelper specRefsetHelper;
 
     //~--- methods -------------------------------------------------------------
     @Override
@@ -274,7 +293,160 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     public void compress(int minUtilization) throws IOException {
         Bdb.compress(minUtilization);
     }
-    
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public Condition computeRefset(int refsetNid, RefsetSpecQuery query, I_ConfigAceFrame frameConfig)
+            throws Exception {
+        Concept refsetConcept = Concept.get(refsetNid);
+        Collection<RefsetMember<?, ?>> members = refsetConcept.getData().getRefsetMembers();
+        HashSet<Integer> currentMembersList = new HashSet<Integer>();
+        NidSetBI allowedStatus = frameConfig.getAllowedStatus();
+        int cidTypeNid = REFSET_TYPES.CID.getTypeNid();
+        int normalMemberNid = ReferenceConcepts.NORMAL_MEMBER.getNid();
+        for (RefsetMember<?, ?> m : members) {
+            for (RefsetMember.Version v : m.getVersions(frameConfig.getViewCoordinate())) {
+                if (allowedStatus.contains(v.getStatusNid()) && (v.getTypeNid() == cidTypeNid)) {
+                    if (((I_ExtendByRefPartCid) v).getC1id() == normalMemberNid) {
+                        if (Terms.get().hasConcept(m.getComponentId())) {
+                            currentMembersList.add(m.getComponentId());
+                        } else {    // assume it is a description member
+                            I_DescriptionVersioned desc = Terms.get().getDescription(m.getComponentId());
+
+                            if (desc != null) {
+                                currentMembersList.add(desc.getConceptNid());
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        HashSet<I_ShowActivity> activities = new HashSet<I_ShowActivity>();
+
+        if (query == null) {
+            MarkedParentComputer mpc = new MarkedParentComputer(refsetConcept, members, frameConfig, activities);
+            mpc.addUncommitted();
+            Ts.get().commit();
+            return Condition.ITEM_COMPLETE;
+        }
+        AceLog.getAppLog().info(">>>>>>>>>> Computing RefsetSpecQuery: " + query);
+
+        List<String> dangleWarnings = RefsetQueryFactory.removeDangles(query);
+
+        for (String warning : dangleWarnings) {
+            AceLog.getAppLog().info(warning + "\nClause removed from computation: ");
+        }
+
+        RefsetSpec specHelper = new RefsetSpec(refsetConcept, true, frameConfig);
+
+
+        RefsetComputer computer;
+        Ts.get().suspendChangeNotifications();
+
+        try {
+            I_RepresentIdSet possibleIds;
+
+            if (specHelper.isConceptComputeType()) {
+                AceLog.getAppLog().info(">>>>>>>>>> Computing possible concepts for concept spec: " + query);
+                possibleIds = query.getPossibleConceptsInterruptable(null, activities);
+                if (!possibleIds.isMember(-2146856933)) {
+                    possibleIds = query.getPossibleConceptsInterruptable(null, activities);
+                }
+            } else if (specHelper.isDescriptionComputeType()) {
+                AceLog.getAppLog().info(">>>>>>>>>> Computing possible concepts for description spec: " + query);
+                possibleIds = query.getPossibleDescriptionsInterruptable(null, activities);
+            } else {
+                throw new Exception("Relationship compute type not supported.");
+            }
+
+            // add the current members to the list of possible concepts to check (in case some need to be retired)
+            possibleIds.or(getIdSetFromIntCollection(currentMembersList));
+            AceLog.getAppLog().info(">>>>>>>>>> Search space (concept count): " + possibleIds.cardinality());
+            computer = new RefsetComputer(refsetNid, query, frameConfig, possibleIds, activities);
+
+
+            if (possibleIds.cardinality() > 500) {
+                AceLog.getAppLog().info(">>>>>>>>> Iterating concepts in parallel.");
+                Bdb.getConceptDb().iterateConceptDataInParallel(computer);
+            } else {
+                AceLog.getAppLog().info(">>>>>>>>> Iterating concepts in sequence.");
+
+                NidBitSetItrBI possibleItr = possibleIds.iterator();
+                ConceptFetcher fetcher = new ConceptFetcher();
+
+                while (possibleItr.next()) {
+                    fetcher.setConcept(Concept.get(possibleItr.nid()));
+                    computer.processUnfetchedConceptData(possibleItr.nid(), fetcher);
+                }
+            }
+
+            if (!computer.continueWork()) {
+                throw new ComputationCanceled("Computation cancelled");
+            }
+
+            AceLog.getAppLog().info(">>>>>>>>> Finished computing spec - adding uncommitted.");
+            specHelper.setLastComputeTime(System.currentTimeMillis());
+            computer.addUncommitted();
+
+            if (frameConfig.getDbConfig().getRefsetChangesChangeSetPolicy() == null) {
+                frameConfig.getDbConfig().setRefsetChangesChangeSetPolicy(ChangeSetPolicy.OFF);
+                frameConfig.getDbConfig().setChangeSetWriterThreading(ChangeSetWriterThreading.SINGLE_THREAD);
+            }
+
+            if (!computer.continueWork()) {
+                throw new ComputationCanceled("Computation cancelled");
+            }
+
+            AceLog.getAppLog().info(">>>>>>>>> Finished computing spec - committing.");
+            BdbCommitManager.commit(frameConfig.getDbConfig().getRefsetChangesChangeSetPolicy(),
+                    frameConfig.getDbConfig().getChangeSetWriterThreading());
+
+            if (!computer.continueWork()) {
+                for (I_ShowActivity a : activities) {
+                    a.cancel();
+                    a.setProgressInfoLower("Cancelled.");
+                }
+
+                return Condition.ITEM_CANCELED;
+            } else {
+                return Condition.ITEM_COMPLETE;
+            }
+
+        } catch (ComputationCanceled e) {
+            for (I_ShowActivity a : activities) {
+                a.cancel();
+                a.setProgressInfoLower("Cancelled.");
+            }
+        } catch (InterruptedException e) {
+            for (I_ShowActivity a : activities) {
+                a.cancel();
+                a.setProgressInfoLower("Cancelled.");
+            }
+        } catch (ExecutionException e) {
+            for (I_ShowActivity a : activities) {
+                a.cancel();
+                a.setProgressInfoLower("Cancelled.");
+            }
+
+            if (getRootCause(e) instanceof TerminologyException) {
+                throw new TerminologyException(e.getMessage());
+            } else if (getRootCause(e) instanceof IOException) {
+                throw new IOException(e.getMessage());
+            } else if (getRootCause(e) instanceof ComputationCanceled) {
+                // Nothing to do
+            } else if (getRootCause(e) instanceof InterruptedException) {
+                // Nothing to do
+            } else {
+                throw new TerminologyException(e);
+            }
+        } finally {
+            Ts.get().resumeChangeNotifications();
+        }
+
+        // Clean up any sub-activities...
+        return Condition.ITEM_CANCELED;
+    }
+
     @Override
     public long convertToThickVersion(int version) {
         return ThinVersionHelper.convert(version);
@@ -416,15 +588,11 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
 
     @Override
     public SearchResult doLuceneSearch(String query)
-            throws IOException, ParseException {
-        try {
-            Query q = new QueryParser(LuceneManager.version, "desc",
-                    new StandardAnalyzer(LuceneManager.version)).parse(query);
+            throws IOException, org.apache.lucene.queryParser.ParseException {
+        Query q = new QueryParser(LuceneManager.version, "desc",
+                new StandardAnalyzer(LuceneManager.version)).parse(query);
 
-            return LuceneManager.search(q, LuceneSearchType.DESCRIPTION);
-        } catch (org.apache.lucene.queryparser.classic.ParseException ex) {
-            throw new IOException(ex);
-        }
+        return LuceneManager.search(q, LuceneSearchType.DESCRIPTION);
     }
 
     @Override
@@ -701,6 +869,24 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     @Override
     public I_DescriptionPart newDescriptionPart() {
         throw new UnsupportedOperationException();
+    }
+
+    @Override
+    @Deprecated
+    public I_ExtendByRef newExtension(int refsetId, int memberId, int componentId,
+            Class<? extends I_ExtendByRefPart> partType)
+            throws IOException {
+        Concept refsetConcept = Concept.get(refsetId);
+        I_ConfigAceFrame config = getActiveAceFrameConfig();
+
+        Bdb.getNidCNidMap().setCNidForNid(refsetId, memberId);
+
+        RefsetMember<?, ?> member = createMember(memberId, componentId,
+                EConcept.REFSET_TYPES.classToType(partType), refsetConcept, config);
+
+        addUncommitted(refsetConcept);
+
+        return member;
     }
 
     @Override
@@ -1064,6 +1250,11 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     }
 
     @Override
+    public void removeOrigin(PathBI path, I_Position origin, I_ConfigAceFrame config) throws IOException {
+        pathManager.removeOrigin(path, origin, config);
+    }
+
+    @Override
     public void resetViewPositions() {
         //
     }
@@ -1076,7 +1267,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     @Override
     public void searchConcepts(I_TrackContinuation tracker, I_RepresentIdSet matches, CountDownLatch latch,
             List<I_TestSearchResults> checkList, I_ConfigAceFrame config)
-            throws DatabaseException, IOException, ParseException {
+            throws DatabaseException, IOException, org.apache.lucene.queryParser.ParseException {
         ConceptSearcher searcher = new ConceptSearcher(latch, tracker, checkList, config, matches);
 
         try {
@@ -1099,7 +1290,6 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         timer.start();
 
         try {
-            query = query.replace("/","//");
             Query q = new QueryParser(LuceneManager.version, "desc",
                     new StandardAnalyzer(LuceneManager.version)).parse(query);
 
@@ -1124,7 +1314,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
                 stringUpdater.setProgressInfo("Starting WhitespaceAnalyzer lucene query...");
                 AceLog.getAppLog().info(
                         "StandardAnalyzer query returned no results. Now trying WhitespaceAnalyzer query");
-                q = new QueryParser(LuceneManager.version, "desc", new WhitespaceAnalyzer(Version.LUCENE_43)).parse(query);
+                q = new QueryParser(LuceneManager.version, "desc", new WhitespaceAnalyzer()).parse(query);
                 result = LuceneManager.search(q, LuceneSearchType.DESCRIPTION);
             }
 
@@ -1266,7 +1456,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
             Set<String> conceptList = new HashSet<String>();
             for (int i = 0; i < result.topDocs.totalHits; i++) {
                 Document doc = result.searcher.doc(result.topDocs.scoreDocs[i].doc);
-                conceptList.add(doc.getField("conceptId").stringValue());
+                conceptList.add(doc.getFieldable("conceptId").stringValue());
             }
 
             wfHxUpdater.setHits(conceptList.size());
@@ -1603,25 +1793,21 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
 
     @Override
     public Set<I_GetConceptData> getConcept(String conceptIdStr)
-            throws TerminologyException, IOException {
-        try {
-            Set<I_GetConceptData> matchingConcepts = new HashSet<I_GetConceptData>();
-            Query q =
-                    new QueryParser(LuceneManager.version, "desc",
-                    new StandardAnalyzer(LuceneManager.version)).parse(conceptIdStr);
-            SearchResult result = LuceneManager.search(q, LuceneSearchType.DESCRIPTION);
+            throws TerminologyException, org.apache.lucene.queryParser.ParseException, IOException {
+        Set<I_GetConceptData> matchingConcepts = new HashSet<I_GetConceptData>();
+        Query q =
+                new QueryParser(LuceneManager.version, "desc",
+                new StandardAnalyzer(LuceneManager.version)).parse(conceptIdStr);
+        SearchResult result = LuceneManager.search(q, LuceneSearchType.DESCRIPTION);
 
-            for (int i = 0; i < result.topDocs.totalHits; i++) {
-                Document doc = result.searcher.doc(result.topDocs.scoreDocs[i].doc);
-                int cnid = Integer.parseInt(doc.get("cnid"));
+        for (int i = 0; i < result.topDocs.totalHits; i++) {
+            Document doc = result.searcher.doc(result.topDocs.scoreDocs[i].doc);
+            int cnid = Integer.parseInt(doc.get("cnid"));
 
-                matchingConcepts.add(Concept.get(cnid));
-            }
-
-            return matchingConcepts;
-        } catch (org.apache.lucene.queryparser.classic.ParseException ex) {
-            throw new IOException(ex);
+            matchingConcepts.add(Concept.get(cnid));
         }
+
+        return matchingConcepts;
     }
 
     @Override
@@ -1641,8 +1827,8 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
 
                 matchingConcepts.add(Concept.get(cnid));
             }
-        } catch (org.apache.lucene.queryparser.classic.ParseException ex) {
-            Logger.getLogger(BdbTermFactory.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (org.apache.lucene.queryParser.ParseException ex) {
+            throw new ParseException(q.toString(), 0);
         }
 
         return matchingConcepts;
@@ -1655,7 +1841,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
 
     @Override
     public I_GetConceptData getConcept(String conceptId, int sourceId)
-            throws TerminologyException, ParseException, IOException {
+            throws TerminologyException, org.apache.lucene.queryParser.ParseException, IOException {
         throw new UnsupportedOperationException();
     }
 
@@ -1799,6 +1985,26 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     }
 
     @Override
+    public I_HelpMarkedParentRefsets getMarkedParentRefsetHelper(I_ConfigAceFrame config, int memberRefsetId,
+            int memberTypeId)
+            throws Exception {
+        return new MarkedParentRefsetHelper(config, memberRefsetId, memberTypeId);
+    }
+
+    @Override
+    public I_HelpMemberRefsetsCalculateConflicts getMemberRefsetConflictCalculator(I_ConfigAceFrame config)
+            throws Exception {
+        return new MemberRefsetConflictCalculator(config);
+    }
+
+    @Override
+    public I_HelpMemberRefsets getMemberRefsetHelper(I_ConfigAceFrame config, int memberRefsetId,
+            int memberTypeId)
+            throws Exception {
+        return new MemberRefsetHelper(config, memberRefsetId, memberTypeId);
+    }
+
+    @Override
     public PathBI getPath(Collection<UUID> uids) throws TerminologyException, IOException {
         return pathManager.get(uuidToNative(uids));
     }
@@ -1875,6 +2081,15 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     }
 
     @Override
+    public I_HelpRefsets getRefsetHelper(I_ConfigAceFrame config) {
+        try {
+            return new RefsetHelper(config);
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+
+    @Override
     public I_RelVersioned getRelationship(int rNid) throws IOException {
         if (Bdb.getNidCNidMap().hasMap(rNid)) {
             return Bdb.getConcept(Bdb.getConceptNid(rNid)).getSourceRel(rNid);
@@ -1899,7 +2114,16 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
 
         return prevCause;
     }
-    
+
+    @Override
+    public I_HelpSpecRefset getSpecRefsetHelper(I_ConfigAceFrame config) throws Exception {
+        if ((specRefsetHelper == null) || (specRefsetHelper.getConfig() != config)) {
+            specRefsetHelper = new SpecRefsetHelper(config);
+        }
+
+        return specRefsetHelper;
+    }
+
     @Override
     public String getStats() throws IOException {
         return Bdb.getStats();

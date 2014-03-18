@@ -41,7 +41,6 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
-import org.ihtsdo.tk.query.helper.RefsetHelper;
 
 /**
  * Adds a single concept as a member of the working refset
@@ -120,27 +119,19 @@ public class ImportRefsetFromFile extends AbstractTask {
                 importConcepts.put(concept.getConceptNid(), concept);
             }
 
-//            I_HelpMemberRefsets refsetHelper = Terms.get().getMemberRefsetHelper(Terms.get().getActiveAceFrameConfig(),
-//                    refset.getConceptNid(), value.getConceptNid());
-            RefsetHelper refsetHelper = new RefsetHelper(Terms.get().getActiveAceFrameConfig().getViewCoordinate(),
-                    Terms.get().getActiveAceFrameConfig().getEditCoordinate());
+            I_HelpMemberRefsets refsetHelper = Terms.get().getMemberRefsetHelper(Terms.get().getActiveAceFrameConfig(), refset.getConceptNid(), value.getConceptNid());
 
             // Find existing members of the refset that are not in the import
             // set. These need to be retired.
-            HashSet<Integer> membersToRemove = new HashSet<Integer>();
-            for (Integer existingMemberId : refset.getRefsetMemberNidsActive(Terms.get().getActiveAceFrameConfig().getViewCoordinate())) {
+            HashSet<I_GetConceptData> membersToRemove = new HashSet<I_GetConceptData>();
+            for (Integer existingMemberId : refsetHelper.getExistingMembers()) {
                 if (!importConcepts.containsKey(existingMemberId)) {
-                    membersToRemove.add(existingMemberId);
+                    membersToRemove.add(termFactory.getConcept(existingMemberId));
                 }
             }
-            getLogger().info("Importing new refset members from file");
-            for(I_GetConceptData c : importConcepts.values()){
-                refsetHelper.newRefsetExtension(refset.getConceptNid(), c.getNid(), value.getConceptNid());
-            }
-            getLogger().info("Removing existing members absent from file");
-            for(int nid : membersToRemove){
-                refsetHelper.retireRefsetExtension(refset.getConceptNid(), nid, value.getConceptNid());
-            }
+
+            refsetHelper.addAllToRefset(importConcepts.values(), "Importing new refset members from file");
+            refsetHelper.removeAllFromRefset(membersToRemove, "Removing existing members absent from file");
 
             return Condition.CONTINUE;
 

@@ -48,16 +48,20 @@ import javax.swing.JTabbedPane;
 import javax.swing.SwingWorker;
 
 import org.apache.lucene.document.Document;
+import org.apache.lucene.queryParser.ParseException;
+import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.store.AlreadyClosedException;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_HelpRefsets;
 import org.dwfa.ace.api.I_Identify;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.PositionSetReadOnly;
+import org.dwfa.ace.api.RefsetPropertyMap;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
@@ -67,6 +71,7 @@ import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.lucene.SearchResult;
 import org.ihtsdo.project.ContextualizedDescription;
 import org.ihtsdo.project.I_ContextualizeDescription;
@@ -85,11 +90,6 @@ import org.ihtsdo.translation.ui.SimpleTranslationConceptEditor;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
-import java.text.ParseException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.apache.lucene.queryparser.classic.QueryParser;
-import org.ihtsdo.tk.query.helper.RefsetHelper;
 
 /**
  * The Class LanguageUtil.
@@ -232,6 +232,8 @@ public class LanguageUtil {
 
 			I_ConfigAceFrame config = tf.getActiveAceFrameConfig();
 
+			I_HelpRefsets refsetHelper = tf.getRefsetHelper(config);
+
 			Set<PathBI> savedEditPaths = config.getEditingPathSet();
 
 			for (PathBI editPath : savedEditPaths) {
@@ -327,9 +329,8 @@ public class LanguageUtil {
 							acceptabilityConcept = tf.getConcept(SnomedMetadataRf2.PREFERRED_RF2.getLenient().getNid());
 						}
 						I_GetConceptData languagerefsetConcept = tf.getConcept(languageRefset.getConceptNid());
-                                                RefsetHelper helper = new RefsetHelper(config.getViewCoordinate(), config.getEditCoordinate());
-                                                helper.newConceptRefsetExtension(languageRefset.getConceptNid(), newDescription.getDescId(), acceptabilityConcept.getConceptNid());
-                                                helper.newConceptRefsetExtension(dnid, cnid, cnid);
+
+						refsetHelper.newRefsetExtension(languageRefset.getConceptNid(), newDescription.getDescId(), EConcept.REFSET_TYPES.CID, new RefsetPropertyMap().with(RefsetPropertyMap.REFSET_PROPERTY.CID_ONE, acceptabilityConcept.getConceptNid()), config);
 
 						tf.addUncommittedNoChecks(concept);
 						tf.addUncommittedNoChecks(languagerefsetConcept);
@@ -375,7 +376,7 @@ public class LanguageUtil {
 	 * @return the similarity results
 	 */
 	@Deprecated
-	public static List<SimilarityMatchedItem> getSimilarityResults(String query, String sourceLangCode, String targetLangCode, I_ConfigAceFrame config)  {
+	public static List<SimilarityMatchedItem> getSimilarityResults(String query, String sourceLangCode, String targetLangCode, I_ConfigAceFrame config) {
 		if (query.contains("(")) {
 			query = query.substring(0, query.indexOf("(") - 1).trim();
 		}
@@ -429,11 +430,11 @@ public class LanguageUtil {
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
-		} catch (TerminologyException e) {
-			e.printStackTrace();
 		} catch (ParseException e) {
 			e.printStackTrace();
-            }
+		} catch (TerminologyException e) {
+			e.printStackTrace();
+		}
 
 		return matches;
 	}
@@ -570,6 +571,8 @@ public class LanguageUtil {
 				}
 			}
 		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (ParseException e) {
 			e.printStackTrace();
 		} catch (TerminologyException e) {
 			e.printStackTrace();
@@ -890,6 +893,7 @@ public class LanguageUtil {
 	 */
 	public static void persistEditedDescription(I_GetConceptData concept, I_DescriptionTuple descriptionTuple, String text, int acceptabilityId, int descType, String langCode, int languageRefsetId, I_ConfigAceFrame config, boolean isCaseSignificant, int statusId) {
 		I_TermFactory tf = Terms.get();
+		I_HelpRefsets refsetHelper = tf.getRefsetHelper(config);
 		try {
 
 			// Cleaning uncommitted changes, remove in production
@@ -905,8 +909,9 @@ public class LanguageUtil {
 				tf.addUncommitted(concept);
 
 				I_GetConceptData acceptabilityConcept = tf.getConcept(acceptabilityId);
-                                RefsetHelper helper = new RefsetHelper(config.getViewCoordinate(), config.getEditCoordinate());
-                                helper.newConceptRefsetExtension(languageRefsetId, newDescription.getDescId(), acceptabilityConcept.getConceptNid());
+
+				refsetHelper.newRefsetExtension(languageRefsetId, newDescription.getDescId(), EConcept.REFSET_TYPES.CID, new RefsetPropertyMap().with(RefsetPropertyMap.REFSET_PROPERTY.CID_ONE, acceptabilityConcept.getConceptNid()), config);
+
 				tf.commit();
 				return;
 			} else {
@@ -954,8 +959,9 @@ public class LanguageUtil {
 					tf.commit();
 				} else {
 					I_GetConceptData acceptabilityConcept = tf.getConcept(acceptabilityId);
-                                        RefsetHelper helper = new RefsetHelper(config.getViewCoordinate(), config.getEditCoordinate());
-                                        helper.newConceptRefsetExtension(languageRefsetId, description.getDescId(), acceptabilityConcept.getConceptNid());
+
+					refsetHelper.newRefsetExtension(languageRefsetId, description.getDescId(), EConcept.REFSET_TYPES.CID, new RefsetPropertyMap().with(RefsetPropertyMap.REFSET_PROPERTY.CID_ONE, acceptabilityConcept.getConceptNid()), config);
+
 					tf.commit();
 				}
 			}
@@ -1137,6 +1143,7 @@ public class LanguageUtil {
 			LanguageSpecRefset languageSpec = new LanguageSpecRefset(languageSpecConcept);
 			I_GetConceptData enumeratedOriginConcept = languageSpec.getEnumeratedOriginRefsetConcept(tf.getActiveAceFrameConfig());
 			I_GetConceptData languageMembershipConcept = null;// languageSpec.getLanguageMembershipRefsetConcept();
+			I_HelpRefsets refsetHelper = tf.getRefsetHelper(config);
 			HashMap<Integer, Integer> descIdAcceptabilityMap = new HashMap<Integer, Integer>();
 
 			// adding enumerated members to map
@@ -1212,8 +1219,7 @@ public class LanguageUtil {
 					}
 					tf.addUncommitted(currentMember);
 				} else {
-                                        RefsetHelper helper = new RefsetHelper(config.getViewCoordinate(), config.getEditCoordinate());
-                                        helper.newConceptRefsetExtension(languageMembershipConcept.getConceptNid(), loopDescId, descIdAcceptabilityMap.get(loopDescId));
+					refsetHelper.newRefsetExtension(languageMembershipConcept.getConceptNid(), loopDescId, EConcept.REFSET_TYPES.CID, new RefsetPropertyMap().with(RefsetPropertyMap.REFSET_PROPERTY.CID_ONE, descIdAcceptabilityMap.get(loopDescId)), config);
 				}
 				// }
 			}

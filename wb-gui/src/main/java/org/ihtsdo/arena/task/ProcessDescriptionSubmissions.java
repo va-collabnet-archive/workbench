@@ -23,6 +23,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
+import org.apache.lucene.queryParser.ParseException;
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
@@ -344,6 +345,8 @@ public class ProcessDescriptionSubmissions extends AbstractTask {
             throw new TaskFailedException("<html>Import process is expecting data which is missing.<br>Please review import file. Line: " + count, e);
         } catch (TerminologyException e) {
             throw new TaskFailedException(e);
+        } catch (ParseException e) {
+            throw new TaskFailedException(e);
         } catch (UnsupportedDialectOrLanguage e) {
             throw new TaskFailedException(e);
         } catch (InvalidCAB e) {
@@ -357,8 +360,6 @@ public class ProcessDescriptionSubmissions extends AbstractTask {
         } catch (IOException e) {
             throw new TaskFailedException(e);
         } catch (IntrospectionException e) {
-            throw new TaskFailedException(e);
-        } catch (java.text.ParseException e) {
             throw new TaskFailedException(e);
         }
         return returnCondition;

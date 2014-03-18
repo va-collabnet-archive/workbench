@@ -22,6 +22,7 @@ package org.dwfa.ace.task.refset.spec;
 //~--- non-JDK imports --------------------------------------------------------
 
 import org.apache.lucene.document.Document;
+import org.apache.lucene.queryParser.QueryParser;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionPart;
@@ -31,6 +32,7 @@ import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
+import org.dwfa.ace.refset.spec.I_HelpSpecRefset;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
@@ -59,9 +61,6 @@ import java.util.UUID;
 
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
-import org.apache.lucene.queryparser.classic.QueryParser;
-import org.ihtsdo.tk.api.NidSetBI;
-import org.ihtsdo.tk.query.RefsetSpec;
 
 /**
  * Creates meta data required for a new refset.
@@ -300,8 +299,9 @@ public class CreateRefsetMetaDataTask extends AbstractTask {
          newRelationship(computeTimeRefset, purposeRel, ancillaryDataAnnotation, aceConfig);
 
          // set the overall refset status to the specified status
-         RefsetSpec spec = new RefsetSpec(refsetSpec, aceConfig.getViewCoordinate());
+         RefsetSpec spec = new RefsetSpec(refsetSpec, aceConfig);
 
+         spec.modifyOverallSpecStatus(status);
          process.setProperty(ProcessAttachmentKeys.REFSET_UUID.getAttachmentKey(),
                              memberRefset.getUids().iterator().next());
          process.setProperty(ProcessAttachmentKeys.REFSET_SPEC_UUID.getAttachmentKey(),
@@ -382,11 +382,8 @@ public class CreateRefsetMetaDataTask extends AbstractTask {
    public void newDescription(I_GetConceptData concept, I_GetConceptData descriptionType, String description,
                               I_ConfigAceFrame aceConfig)
            throws TerminologyException, Exception {
-       NidSetBI allowedStatusNids = Terms.get().getActiveAceFrameConfig().getViewCoordinate().getAllowedStatusNids();
-      I_IntSet         actives = Terms.get().newIntSet();
-      for(int nid : allowedStatusNids.getSetValues()){
-          actives.add(nid);
-      }
+      I_HelpSpecRefset helper  = Terms.get().getSpecRefsetHelper(Terms.get().getActiveAceFrameConfig());
+      I_IntSet         actives = helper.getCurrentStatusIntSet();
 
       if (descriptionType.getNid()
               == ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.localize().getNid()) {

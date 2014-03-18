@@ -13,20 +13,27 @@
 package org.dwfa.ace.refset;
 
 //~--- non-JDK imports --------------------------------------------------------
+import org.apache.lucene.document.Document;
+import org.apache.lucene.queryParser.QueryParser;
 
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.TermComponentLabel;
 import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_DescriptionPart;
+import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_PluginToConceptPanel;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
+import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.ace.gui.concept.ConceptPanel;
 import org.dwfa.ace.log.AceLog;
+import org.dwfa.ace.refset.spec.I_HelpSpecRefset;
 import org.dwfa.ace.table.JTableWithDragImage;
 import org.dwfa.ace.table.refset.ReflexiveRefsetCommentTableModel;
 import org.dwfa.ace.table.refset.ReflexiveRefsetFieldData;
@@ -36,6 +43,8 @@ import org.dwfa.ace.table.refset.ReflexiveRefsetMemberTableModel;
 import org.dwfa.ace.table.refset.ReflexiveRefsetUtil;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.ace.task.WorkerAttachmentKeys;
+import org.dwfa.ace.task.refset.spec.RefsetSpec;
+import org.dwfa.ace.tree.TermTreeHelper;
 import org.dwfa.bpa.BusinessProcess;
 import org.dwfa.bpa.ExecutionRecord;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
@@ -47,6 +56,7 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.LogWithAlerts;
 
 import org.ihtsdo.etypes.EConcept;
+import org.ihtsdo.lucene.SearchResult;
 import org.ihtsdo.taxonomy.TaxonomyHelper;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
@@ -84,7 +94,6 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.EnumSet;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -109,19 +118,12 @@ import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JToggleButton;
 import javax.swing.JTree;
-import javax.swing.RowSorter;
-import javax.swing.RowSorter.SortKey;
 import javax.swing.SwingUtilities;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
-import javax.swing.table.TableModel;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
-import org.ihtsdo.tk.api.PathBI;
-import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
-import org.ihtsdo.tk.binding.snomed.TermAux;
-import org.ihtsdo.tk.query.RefsetSpec;
 
 public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeListener {
 
@@ -343,11 +345,12 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
     }
 
     public void updatePanel() {
-        ConceptChronicleBI refset = (ConceptChronicleBI) getLabel().getTermComponent();
+        I_GetConceptData refset = (I_GetConceptData) getLabel().getTermComponent();
 
         if (refset != null) {
-            RefsetSpec spec = new RefsetSpec(refset, true, ace.getAceFrameConfig().getViewCoordinate());
-            refsetStatusValueLabel.setText("none");
+            RefsetSpec spec = new RefsetSpec(refset, true, ace.getAceFrameConfig());
+
+            refsetStatusValueLabel.setText(spec.getOverallSpecStatusString());
             computeTypeValueLabel.setText(spec.getComputeTypeString());
 
             try {
@@ -590,8 +593,13 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
         I_GetConceptData refsetConcept = (I_GetConceptData) getLabel().getTermComponent();
 
         if (refsetConcept != null) {
-            RefsetSpec helper = new RefsetSpec(refsetConcept, true, ace.getAceFrameConfig().getViewCoordinate());
-            refsetSpecConcept = (I_GetConceptData) helper.getRefsetSpecConcept();
+            Set<? extends I_GetConceptData> specs = Terms.get().getRefsetHelper(
+                    ace.getAceFrameConfig()).getSpecificationRefsetForRefset(
+                    refsetConcept, ace.getAceFrameConfig());
+
+            if (specs.size() > 0) {
+                refsetSpecConcept = specs.iterator().next();
+            }
         }
 
         return refsetSpecConcept;
@@ -902,6 +910,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
 
     public void setTermComponent(final I_AmTermComponent termComponent) {
         tempComponent = termComponent;
+
         if (SwingUtilities.isEventDispatchThread()) {
             label.setTermComponent(termComponent);
         } else {
@@ -927,74 +936,56 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
     public static boolean addRefsetMetadata(boolean markedParentOnly, I_GetConceptData memberRefset) {
         try {
             if (memberRefset == null) {
-                JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
-                        "No refset has been added to the refset spec panel.", "",
-                        JOptionPane.INFORMATION_MESSAGE);
                 return false;
             }
             I_ConfigAceFrame aceConfig = Terms.get().getActiveAceFrameConfig();
-            I_GetConceptData markedParentRel =
-                    (I_GetConceptData) Ts.get().getConcept(RefsetAuxiliary.Concept.MARKED_PARENT_REFSET.getUids());
-            
-            //check if already added
-            ConceptVersionBI cv =  ((ConceptChronicleBI) memberRefset).getVersion(aceConfig.getViewCoordinate());
-            Collection<? extends ConceptVersionBI> markedParentRels = cv.getRelationshipsOutgoingTargetConcepts(markedParentRel.getConceptNid());
-            if(!markedParentRels.isEmpty()){
-                JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
-                        "Refset metadata already added.", "",
-                        JOptionPane.INFORMATION_MESSAGE);
-                return false;
-            }
-            
-            Set<PathBI> originalPathSet = new HashSet<>();
-            originalPathSet.addAll(aceConfig.getEditingPathSet());
-            aceConfig.getEditingPathSet().clear();
-            aceConfig.addEditingPath(Ts.get().getPath(TermAux.WB_AUX_PATH.getLenient().getConceptNid()));
             String name = Ts.get().getConceptVersion(aceConfig.getViewCoordinate(),
                     memberRefset.getConceptNid()).getDescriptionPreferred().getText();
             if (name.endsWith(" refset")) {
                 name = name.replace(" refset", "");
             }
             I_GetConceptData status =
-                   (I_GetConceptData) Ts.get().getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
+                    Terms.get().getConcept(ArchitectonicAuxiliary.Concept.CURRENT.getUids());
             if (Ts.get().hasUuid(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getUuids()[0])) {
                 status = (I_GetConceptData) SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient();
             }
             I_GetConceptData refsetComputeType =
-                    (I_GetConceptData) Ts.get().getConcept(RefsetAuxiliary.Concept.CONCEPT_COMPUTE_TYPE.getUids());
+                    Terms.get().getConcept(RefsetAuxiliary.Concept.CONCEPT_COMPUTE_TYPE.getUids());
             I_GetConceptData fsnConcept =
-                    (I_GetConceptData) Ts.get().getConcept(
+                    Terms.get().getConcept(
                     ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids());
             I_GetConceptData ptConcept =
-                    (I_GetConceptData) Ts.get().getConcept(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids());
+                    Terms.get().getConcept(ArchitectonicAuxiliary.Concept.PREFERRED_DESCRIPTION_TYPE.getUids());
             I_GetConceptData isA =
-                    (I_GetConceptData) Ts.get().getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids());
+                    Terms.get().getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids());
             I_GetConceptData supportingRefset =
-                    (I_GetConceptData) Ts.get().getConcept(RefsetAuxiliary.Concept.SUPPORTING_REFSETS.getUids());
+                    Terms.get().getConcept(RefsetAuxiliary.Concept.SUPPORTING_REFSETS.getUids());
+            I_GetConceptData markedParentRel =
+                    Terms.get().getConcept(RefsetAuxiliary.Concept.MARKED_PARENT_REFSET.getUids());
             I_GetConceptData markedParentIsATypeRel =
-                    (I_GetConceptData) Ts.get().getConcept(RefsetAuxiliary.Concept.MARKED_PARENT_IS_A_TYPE.getUids());
+                    Terms.get().getConcept(RefsetAuxiliary.Concept.MARKED_PARENT_IS_A_TYPE.getUids());
             I_GetConceptData specifiesRefsetRel =
-                    (I_GetConceptData) Ts.get().getConcept(RefsetAuxiliary.Concept.SPECIFIES_REFSET.getUids());
+                    Terms.get().getConcept(RefsetAuxiliary.Concept.SPECIFIES_REFSET.getUids());
             I_GetConceptData commentsRel =
-                    (I_GetConceptData) Ts.get().getConcept(RefsetAuxiliary.Concept.COMMENTS_REL.getUids());
+                    Terms.get().getConcept(RefsetAuxiliary.Concept.COMMENTS_REL.getUids());
             I_GetConceptData editTimeRel =
-                    (I_GetConceptData) Ts.get().getConcept(RefsetAuxiliary.Concept.EDIT_TIME_REL.getUids());
+                    Terms.get().getConcept(RefsetAuxiliary.Concept.EDIT_TIME_REL.getUids());
             I_GetConceptData computeTimeRel =
-                    (I_GetConceptData) Ts.get().getConcept(RefsetAuxiliary.Concept.COMPUTE_TIME_REL.getUids());
+                    Terms.get().getConcept(RefsetAuxiliary.Concept.COMPUTE_TIME_REL.getUids());
             I_GetConceptData purposeRel =
-                    (I_GetConceptData) Ts.get().getConcept(RefsetAuxiliary.Concept.REFSET_PURPOSE_REL.getUids());
+                    Terms.get().getConcept(RefsetAuxiliary.Concept.REFSET_PURPOSE_REL.getUids());
             I_GetConceptData refsetComputeTypeRel =
-                    (I_GetConceptData) Ts.get().getConcept(RefsetAuxiliary.Concept.REFSET_COMPUTE_TYPE_REL.getUids());
+                    Terms.get().getConcept(RefsetAuxiliary.Concept.REFSET_COMPUTE_TYPE_REL.getUids());
             I_GetConceptData stringAnnotation =
-                    (I_GetConceptData) Ts.get().getConcept(RefsetAuxiliary.Concept.STRING_ANNOTATION_PURPOSE.getUids());
+                    Terms.get().getConcept(RefsetAuxiliary.Concept.STRING_ANNOTATION_PURPOSE.getUids());
             I_GetConceptData markedParentAnnotation =
-                    (I_GetConceptData) Ts.get().getConcept(RefsetAuxiliary.Concept.REFSET_PARENT_MEMBER_PURPOSE.getUids());
+                    Terms.get().getConcept(RefsetAuxiliary.Concept.REFSET_PARENT_MEMBER_PURPOSE.getUids());
             I_GetConceptData enumeratedAnnotation =
-                    (I_GetConceptData) Ts.get().getConcept(RefsetAuxiliary.Concept.ENUMERATED_ANNOTATION_PURPOSE.getUids());
+                    Terms.get().getConcept(RefsetAuxiliary.Concept.ENUMERATED_ANNOTATION_PURPOSE.getUids());
             I_GetConceptData specAnnotation =
-                    (I_GetConceptData) Ts.get().getConcept(RefsetAuxiliary.Concept.REFSET_SPECIFICATION.getUids());
+                    Terms.get().getConcept(RefsetAuxiliary.Concept.REFSET_SPECIFICATION.getUids());
             I_GetConceptData ancillaryDataAnnotation =
-                    (I_GetConceptData) Ts.get().getConcept(RefsetAuxiliary.Concept.ANCILLARY_DATA.getUids());
+                    Terms.get().getConcept(RefsetAuxiliary.Concept.ANCILLARY_DATA.getUids());
             // check that the name isn't null or empty etc
             if ((name == null) || name.trim().equals("")) {
                 throw new TaskFailedException("Refset name cannot be empty.");
@@ -1030,7 +1021,8 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
                     newRelationship(refsetSpec, refsetComputeTypeRel, refsetComputeType, aceConfig);
                     // supporting refsets purpose relationships
                     newRelationship(refsetSpec, purposeRel, specAnnotation, aceConfig);
-                    RefsetSpec spec = new RefsetSpec(refsetSpec, aceConfig.getViewCoordinate());
+                    RefsetSpec spec = new RefsetSpec(refsetSpec, aceConfig);
+                    spec.modifyOverallSpecStatus(status);
                 }
                 newRelationship(markedParent, isA, supportingRefset, aceConfig);
                 newRelationship(commentsRefset, purposeRel, stringAnnotation, aceConfig);
@@ -1065,8 +1057,6 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
                 JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
                         "Refset wizard cannot be completed. " + ex.getMessage(), "",
                         JOptionPane.ERROR_MESSAGE);
-                aceConfig.getEditingPathSet().clear();
-                aceConfig.getEditingPathSet().addAll(originalPathSet);
                 return false;
             }
             I_IntSet availableIsATypes = aceConfig.getDestRelTypes();
@@ -1076,14 +1066,9 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
             }
             Terms.get().addUncommittedNoChecks(memberRefset);
             Ts.get().commit(memberRefset);
-            aceConfig.getEditingPathSet().clear();
-            aceConfig.getEditingPathSet().addAll(originalPathSet);
         } catch (Exception exception) {
             AceLog.getAppLog().alertAndLogException(exception);
         }
-        JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
-                        "Refset metadata added.", "",
-                        JOptionPane.INFORMATION_MESSAGE);
         return true;
     }
 
@@ -1097,17 +1082,58 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
         return newConcept;
     }
 
-    private static void newDescription(I_GetConceptData concept, I_GetConceptData descriptionType,
+    public static void newDescription(I_GetConceptData concept, I_GetConceptData descriptionType,
             String description, I_ConfigAceFrame aceConfig, I_GetConceptData status)
             throws TerminologyException, Exception {
+        I_HelpSpecRefset helper = Terms.get().getSpecRefsetHelper(Terms.get().getActiveAceFrameConfig());
+        I_IntSet actives = helper.getCurrentStatusIntSet();
+
+        if (descriptionType.getNid()
+                == ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.localize().getNid()) {
+            String filteredDescription = description;
+
+            filteredDescription = filteredDescription.trim();
+
+            // new removal using native lucene escaping
+            filteredDescription = QueryParser.escape(filteredDescription);
+
+            SearchResult result = Terms.get().doLuceneSearch(filteredDescription);
+
+            for (int i = 0; i < result.topDocs.totalHits; i++) {
+                Document doc = result.searcher.doc(result.topDocs.scoreDocs[i].doc);
+                int cnid = Integer.parseInt(doc.get("cnid"));
+                int dnid = Integer.parseInt(doc.get("dnid"));
+
+                if (cnid == concept.getConceptNid()) {
+                    continue;
+                }
+
+                try {
+                    I_DescriptionVersioned<?> potential_fsn = Terms.get().getDescription(dnid, cnid);
+                    if (potential_fsn != null && potential_fsn.getMutableParts() != null) {
+                        for (I_DescriptionPart part_search : potential_fsn.getMutableParts()) {
+                            if (actives.contains(part_search.getStatusNid())
+                                    && (part_search.getTypeNid()
+                                    == ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.localize().getNid()) && part_search.getText().equals(description)) {
+                                throw new TerminologyException("Concept already exists in database with FSN: "
+                                        + description);
+                            }
+                        }
+                    }
+                } catch (IOException ioe) {
+                    AceLog.getAppLog().warning("unique fsn check. Doc: \n" + doc + "\nex:\n" + ioe.toString());
+                }
+            }
+        }
 
         UUID descUuid = UUID.randomUUID();
 
         Terms.get().newDescription(descUuid, concept, "en", description, descriptionType,
                 Terms.get().getActiveAceFrameConfig(), status.getNid());
+        Terms.get().addUncommittedNoChecks(concept);
     }
 
-    private static void newRelationship(I_GetConceptData concept, I_GetConceptData relationshipType,
+    public static void newRelationship(I_GetConceptData concept, I_GetConceptData relationshipType,
             I_GetConceptData destination, I_ConfigAceFrame aceConfig)
             throws Exception {
         int statusId =
@@ -1122,6 +1148,7 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
         Terms.get().newRelationship(relUuid, concept, relationshipType, destination, charConcept,
                 refConcept, Terms.get().getConcept(statusId), group,
                 Terms.get().getActiveAceFrameConfig());
+        Terms.get().addUncommittedNoChecks(concept);
     }
     //~--- inner classes -------------------------------------------------------
 
@@ -1168,15 +1195,10 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
 
         @Override
         public void propertyChange(PropertyChangeEvent evt) {
-            if(refsetSpecPanel.getRefsetTable() != null){
-                RowSorter<? extends TableModel> rowSorter = refsetSpecPanel.getRefsetTable().getRowSorter();
-                List<SortKey> emptyList = new ArrayList<SortKey>();
-                rowSorter.setSortKeys(emptyList);
-                updatePanel();
-                firePropertyChange(evt.getPropertyName(), evt.getOldValue(), evt.getNewValue());
-            }
-            }
+            updatePanel();
+            firePropertyChange(evt.getPropertyName(), evt.getOldValue(), evt.getNewValue());
         }
+    }
 
     private class PluginListener implements ActionListener {
 
@@ -1395,7 +1417,6 @@ public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeLis
                 } catch (Exception e) {
                     AceLog.getAppLog().alertAndLogException(e);
                 }
-                specTree.expandPath(selectionPath);
             } else {
                 try {
                     List<ReflexiveRefsetFieldData> columns = new ArrayList<ReflexiveRefsetFieldData>();

@@ -16,7 +16,7 @@ import java.util.logging.Level;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
-import org.apache.lucene.document.LongField;
+import org.apache.lucene.document.NumericField;
 import org.apache.lucene.index.IndexWriter;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_ProcessConcepts;
@@ -195,7 +195,7 @@ public class WfHxIndexGenerator extends IndexGenerator {
 		doc.add(new Field("semTag", parsePotentialSemTag(bean.getFullySpecifiedName()), Field.Store.YES, Field.Index.NOT_ANALYZED));
 		
 		// Keep Time
-		doc.add(new LongField("time", bean.getWorkflowTime(), Field.Store.YES));
+		doc.add(new NumericField("time").setLongValue(bean.getWorkflowTime()));
 
 		// Last Action, State, Path, Modeler in Workflow
 		doc.add(new Field("lastAction", lastBeanInWf.action, Field.Store.YES, Field.Index.NOT_ANALYZED));

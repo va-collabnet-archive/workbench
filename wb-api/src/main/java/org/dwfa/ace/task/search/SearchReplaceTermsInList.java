@@ -35,6 +35,8 @@ import javax.swing.JScrollPane;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionPart;
+import org.dwfa.ace.api.I_DescriptionTuple;
+import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_ModelTerminologyList;
@@ -61,8 +63,6 @@ import org.ihtsdo.tk.api.TerminologyBuilderBI;
 import org.ihtsdo.tk.api.blueprint.DescriptionCAB;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
-import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
-import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 
@@ -193,18 +193,21 @@ public class SearchReplaceTermsInList extends AbstractTask {
                 for (int i = 0; i < model.getSize(); i++) {
 
                     // Get the current concept
-                    ConceptChronicleBI child = model.getElementAt(i);
+                    I_GetConceptData child = model.getElementAt(i);
 
                     PositionSetReadOnly positionsToCheck = config.getViewPositionSetReadOnly();
+
                     // get latest descriptions
-                    Collection<? extends DescriptionVersionBI> descriptionsActive = child.getVersion(config.getViewCoordinate()).getDescriptionsActive();
+                    List<? extends I_DescriptionTuple> descriptionTuples = child.getDescriptionTuples(config.getAllowedStatus(),
+                        (searchAll ? null : descriptionTypesToCheck), positionsToCheck, config.getPrecedence(), 
+                        config.getConflictResolutionStrategy());
 
                     // For the current description of this concept
-                    for (DescriptionVersionBI description : descriptionsActive) {
+                    for (I_DescriptionTuple description : descriptionTuples) {
                     	if(!selectedLangCode.getFormatedLanguageCode().equals(description.getLang())){
                     		continue;
                     	}
-                        if (!processedDescriptions.contains(":" + description.getNid() + ":")) {
+                        if (!processedDescriptions.contains(":" + description.getDescId() + ":")) {
                             // If it contains the search string
                             if ((caseSensitive && description.getText().contains(searchString))
                                 || (!caseSensitive && description.getText().toUpperCase().contains(
@@ -226,7 +229,7 @@ public class SearchReplaceTermsInList extends AbstractTask {
                                 String finalDescHtml = description.getText().replaceAll(searchPrepend + searchString,
                                     "<font color='green'>" + replaceString + "</font>");
 
-                                String descType = termFactory.getConcept(description.getTypeNid()).getInitialText();
+                                String descType = termFactory.getConcept(description.getTypeId()).getInitialText();
 
                                 // Add to our list of descriptions that will
                                 // require change
@@ -241,23 +244,13 @@ public class SearchReplaceTermsInList extends AbstractTask {
                                     DescriptionCAB descriptionBlueprint = description.makeBlueprint(config.getViewCoordinate());
                                     descriptionBlueprint.setText(finalDesc);
                                     descriptionBlueprint.setComponentUuid(UUID.randomUUID());
-                                    descriptionBlueprint.getAnnotationBlueprints().clear();
                                     builder.construct(descriptionBlueprint);
-                                    
                                     for (RefexVersionBI refex : description.getRefexesActive(config.getViewCoordinate())) {
-                                        RefexCAB bpToAdd = refex.makeBlueprint(config.getViewCoordinate());
-                                        bpToAdd.setReferencedComponentUuid(descriptionBlueprint.getComponentUuid());
-                                        bpToAdd.setMemberUuid(UUID.randomUUID());
-                                        builder.construct(bpToAdd);
-                                        
-                                        RefexCAB bpToRetire = refex.makeBlueprint(config.getViewCoordinate());
-                                        bpToRetire.setMemberUuid(refex.getPrimUuid());
-                                        bpToRetire.setRetired();
-                                        builder.construct(bpToRetire);
+                                        RefexCAB refexBlueprint = refex.makeBlueprint(config.getViewCoordinate());
+                                        refexBlueprint.setMemberUuid(refex.getPrimUuid());
+                                        refexBlueprint.setRetired();
+                                        builder.construct(refexBlueprint);
                                     }
-                                    
-                                    
-                                    
                                 }catch(InvalidCAB e){
                                     throw new TaskFailedException(e);
                                 }
@@ -280,10 +273,11 @@ public class SearchReplaceTermsInList extends AbstractTask {
                                                 config.getEditCoordinate().getModuleNid(),
                                                 path.getConceptNid());
                                     }
-                                    Ts.get().addUncommitted(child);
+                                    description.getDescVersioned().addVersion(newRetiredPart);
+                                    termFactory.addUncommitted(child);
                                 }
                             }
-                            processedDescriptions += ":" + description.getNid() + ":";
+                            processedDescriptions += ":" + description.getDescId() + ":";
                         }
                     }
                 }

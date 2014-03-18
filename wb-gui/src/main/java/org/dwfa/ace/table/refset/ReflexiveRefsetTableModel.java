@@ -47,7 +47,6 @@ import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.swing.SwingWorker;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.types.IntSet;
-import org.ihtsdo.tk.Ts;
 
 public class ReflexiveRefsetTableModel extends ReflexiveTableModel {
     I_ChangeTableInSwing tableChangedSwingWorker;
@@ -165,14 +164,14 @@ public class ReflexiveRefsetTableModel extends ReflexiveTableModel {
                                 if (col.readParamaters != null) {
                                     Object readValue =
                                             col.getReadMethod().invoke(
-                                                Ts.get().getConcept(extension.getComponentNid()), col.readParamaters);
+                                                Terms.get().getConcept(extension.getComponentNid()), col.readParamaters);
                                     if (readValue != null && Integer.class.isAssignableFrom(readValue.getClass())) {
                                         conceptsToFetch.add((Integer) readValue);
                                     }
                                 } else {
                                     Object readValue =
                                             col.getReadMethod().invoke(
-                                                Ts.get().getConcept(extension.getComponentNid()));
+                                                Terms.get().getConcept(extension.getComponentNid()));
                                     if (readValue != null && Integer.class.isAssignableFrom(readValue.getClass())) {
                                         conceptsToFetch.add((Integer) readValue);
                                     }
@@ -300,12 +299,12 @@ public class ReflexiveRefsetTableModel extends ReflexiveTableModel {
             } catch (ExecutionException ex) {
                 AceLog.getAppLog().alertAndLogException(ex);
             }
-
+            
             try {
-                fireTableDataChanged();
-            } catch (Exception e) {
-                AceLog.getAppLog().log(Level.WARNING, e.toString(), e);
-            }
+				fireTableDataChanged();
+			} catch (Exception e) {
+				AceLog.getAppLog().log(Level.WARNING, e.toString(), e);
+			}
 
         }
 
@@ -382,7 +381,7 @@ public class ReflexiveRefsetTableModel extends ReflexiveTableModel {
                 } catch (InterruptedException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
-                }
+    }
             }
             tableChangedSwingWorker = new TableChangedSwingWorker(tableComponentId2, promotionFilterId);
         }

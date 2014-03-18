@@ -22,7 +22,7 @@ public abstract class ComponentBdb {
     public ComponentBdb(Bdb readOnlyBdbEnv, Bdb mutableBdbEnv)
             throws IOException {
         try {
-            readOnly = Bdb.setupDatabase(false,
+            readOnly = Bdb.setupDatabase(readOnlyBdbEnv.bdbEnv.getConfig().getReadOnly(),
                     getDbName(), readOnlyBdbEnv);
         } catch (DatabaseException e) {
             AceLog.getAppLog().warning(e.getLocalizedMessage());

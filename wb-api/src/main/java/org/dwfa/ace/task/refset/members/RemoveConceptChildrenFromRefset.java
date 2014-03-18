@@ -20,8 +20,10 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Collection;
+import java.util.Set;
 
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_HelpMemberRefsets;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
@@ -34,12 +36,6 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
-import org.ihtsdo.tk.Ts;
-import org.ihtsdo.tk.api.NidBitSetBI;
-import org.ihtsdo.tk.api.NidBitSetItrBI;
-import org.ihtsdo.tk.query.helper.RefsetHelper;
-
-//REFSET PERFORMANCE CHANGE, NEEDS TESTING
 
 @BeanList(specs = { @Spec(directory = "tasks/ide/refset/membership", type = BeanType.TASK_BEAN) })
 public class RemoveConceptChildrenFromRefset extends AbstractTask {
@@ -103,16 +99,10 @@ public class RemoveConceptChildrenFromRefset extends AbstractTask {
                 "Removing children of concept '" + member.getInitialText() + "' as '" + value.getInitialText()
                     + "' members from refset '" + refset.getInitialText() + "'.");
 
-            RefsetHelper helper = new RefsetHelper(Terms.get().getActiveAceFrameConfig().getViewCoordinate(),
-                    Terms.get().getActiveAceFrameConfig().getEditCoordinate());
-            NidBitSetBI kindOfNids = Ts.get().getKindOf(member.getNid(),
-                    Terms.get().getActiveAceFrameConfig().getViewCoordinate());
-            NidBitSetItrBI itr = kindOfNids.iterator();
-            while(itr.next()){
-                if(itr.nid() != member.getNid()){
-                    helper.newConceptRefsetExtension(refset.getConceptNid(), itr.nid(), value.getConceptNid());
-                }
-            }
+            I_HelpMemberRefsets helper = Terms.get().getMemberRefsetHelper(Terms.get().getActiveAceFrameConfig(), refset.getConceptNid(), value.getConceptNid());
+            Set<I_GetConceptData> newMembers = helper.getAllDescendants(member);
+
+            helper.removeAllFromRefset(newMembers, "Removing children of concept " + member.getInitialText());
 
             return Condition.CONTINUE;
 

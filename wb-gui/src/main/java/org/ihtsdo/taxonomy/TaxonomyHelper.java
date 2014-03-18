@@ -199,7 +199,7 @@ public class TaxonomyHelper extends TermChangeListener implements PropertyChange
    }
 
    private void handleRelTypeChange() {
-      ViewCoordinate vc = new ViewCoordinate(model.getTs().getViewCoordinate());
+      ViewCoordinate vc = model.getTs().getViewCoordinate();
 
       switch (assertionType) {
       case INFERRED :

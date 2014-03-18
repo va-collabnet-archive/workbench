@@ -157,7 +157,7 @@ public class ProcessPopupUtil {
                         if (processFile.isDirectory()) {
                             JMenu submenu = new JMenu(processFile.getName());
                             newMenu.add(submenu);
-                            addSubMenuItems(submenu, processFile, menuWorker);
+                            addSubmenMenuItems(submenu, processFile, menuWorker);
                         } else if (processFile.getName().toLowerCase().endsWith(".bp")) {
                             try {
                                 ActionListener processMenuListener =
@@ -211,41 +211,23 @@ public class ProcessPopupUtil {
         }
     }
 
-    public static void addSubMenuItems(JComponent subMenu, File menuDir, MasterWorker menuWorker)
+    public static void addSubmenMenuItems(JComponent subMenu, File menuDir, MasterWorker menuWorker)
             throws IOException, FileNotFoundException, ClassNotFoundException {
-        int count = 0;
-        JMenu moreMenu = null;
         if ((menuDir != null) && menuDir.exists() && (menuDir.listFiles() != null)) {
             for (File f : getSortedFiles(menuDir)) {
                 if (f.isDirectory()) {
                     JMenu newSubMenu = new JMenu(f.getName());
                     subMenu.add(newSubMenu);
-                    addSubMenuItems(newSubMenu, f, menuWorker);
+                    addSubmenMenuItems(newSubMenu, f, menuWorker);
                 } else {
                     if (f.getName().toLowerCase().endsWith(".bp")) {
-                        if(count == 25){
-                            moreMenu = new JMenu("More");
-                            subMenu.add(moreMenu);
-                        }
-                        if(count >= 25){
-                            ActionListener processMenuListener = new ProcessMenuActionListener(f, menuWorker);
-                            ObjectInputStream ois = new ObjectInputStream(new BufferedInputStream(new FileInputStream(f)));
-                            I_EncodeBusinessProcess process = (I_EncodeBusinessProcess) ois.readObject();
-                            ois.close();
-                            JMenuItem processMenuItem = new JMenuItem(process.getName());
-                            processMenuItem.addActionListener(processMenuListener);
-                            moreMenu.add(processMenuItem);
-                            count++;
-                        }else{
-                            ActionListener processMenuListener = new ProcessMenuActionListener(f, menuWorker);
-                            ObjectInputStream ois = new ObjectInputStream(new BufferedInputStream(new FileInputStream(f)));
-                            I_EncodeBusinessProcess process = (I_EncodeBusinessProcess) ois.readObject();
-                            ois.close();
-                            JMenuItem processMenuItem = new JMenuItem(process.getName());
-                            processMenuItem.addActionListener(processMenuListener);
-                            subMenu.add(processMenuItem);
-                            count++;
-                        }
+                        ActionListener processMenuListener = new ProcessMenuActionListener(f, menuWorker);
+                        ObjectInputStream ois = new ObjectInputStream(new BufferedInputStream(new FileInputStream(f)));
+                        I_EncodeBusinessProcess process = (I_EncodeBusinessProcess) ois.readObject();
+                        ois.close();
+                        JMenuItem processMenuItem = new JMenuItem(process.getName());
+                        processMenuItem.addActionListener(processMenuListener);
+                        subMenu.add(processMenuItem);
                     }
                 }
             }

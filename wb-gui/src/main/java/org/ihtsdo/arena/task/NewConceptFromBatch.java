@@ -35,7 +35,8 @@ import javax.swing.SwingWorker;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import org.apache.lucene.document.Document;
-import org.apache.lucene.queryparser.classic.QueryParser;
+import org.apache.lucene.queryParser.ParseException;
+import org.apache.lucene.queryParser.QueryParser;
 
 import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_ConfigAceFrame;
@@ -1200,12 +1201,12 @@ public class NewConceptFromBatch extends PreviousNextOrCancel {
                             "<html>The parent concpet has not been created."
                             + "<br>Fsn: " + parentFsn, "",
                             JOptionPane.ERROR_MESSAGE);
-                } catch (java.text.ParseException ex) {
+                } catch (ParseException ex) {
                     JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
                             "<html>The parent concpet has not been created."
                             + "<br>Fsn: " + parentFsn, "",
                             JOptionPane.ERROR_MESSAGE);
-                } 
+                }
 
             } else if (fsn.extractText().length() == 0) {
                 //please enter the fsn
@@ -1286,9 +1287,9 @@ public class NewConceptFromBatch extends PreviousNextOrCancel {
                     AceLog.getAppLog().alertAndLogException(ex);
                 } catch (TerminologyException ex) {
                     AceLog.getAppLog().alertAndLogException(ex);
-                } catch (java.text.ParseException ex) {
-                    Logger.getLogger(NewConceptFromBatch.class.getName()).log(Level.SEVERE, null, ex);
-                } 
+                } catch (ParseException ex) {
+                    AceLog.getAppLog().alertAndLogException(ex);
+                }
             }
         }
     }

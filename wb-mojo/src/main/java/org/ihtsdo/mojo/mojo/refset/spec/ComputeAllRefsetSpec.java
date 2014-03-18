@@ -29,13 +29,12 @@ import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.refset.spec.I_HelpSpecRefset;
+import org.dwfa.ace.task.refset.spec.RefsetSpec;
 import org.dwfa.ace.task.refset.spec.compute.ComputeRefsetFromSpecTask;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.ihtsdo.mojo.maven.MojoUtil;
 import org.ihtsdo.mojo.mojo.ConceptDescriptor;
-import org.ihtsdo.tk.api.NidSetBI;
-import org.ihtsdo.tk.query.RefsetSpec;
 
 /**
  * Computes the membership of the specified refset spec.
@@ -82,7 +81,7 @@ public class ComputeAllRefsetSpec extends AbstractMojo {
             Set<Integer> excludedRefsets = new HashSet<Integer>();
             if (excludedRefsetSpecDescriptors != null) {
                 for (ConceptDescriptor refsetSpecDescriptor : excludedRefsetSpecDescriptors) {
-                    RefsetSpec spec = new RefsetSpec(refsetSpecDescriptor.getVerifiedConcept(), config.getViewCoordinate());
+                    RefsetSpec spec = new RefsetSpec(refsetSpecDescriptor.getVerifiedConcept(), config);
                     excludedRefsets.add(spec.getMemberRefsetConcept().getConceptNid());
                 }
             }
@@ -92,12 +91,9 @@ public class ComputeAllRefsetSpec extends AbstractMojo {
                     termFactory.getConcept(RefsetAuxiliary.Concept.SUPPORTING_REFSETS.getUids());
             I_IntSet isA = termFactory.newIntSet();
             isA.add(termFactory.getConcept(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()).getConceptNid());
+            I_HelpSpecRefset helper = termFactory.getSpecRefsetHelper(config);
 
-            NidSetBI allowedStatusNids = config.getViewCoordinate().getAllowedStatusNids();
-            I_IntSet currentStatuses = Terms.get().newIntSet();
-            for (int nid : allowedStatusNids.getSetValues()) {
-                currentStatuses.add(nid);
-            }
+            I_IntSet currentStatuses = helper.getCurrentStatusIntSet();
 
             Set<? extends I_GetConceptData> children =
                     supportingRefsetConcept.getDestRelOrigins(currentStatuses, isA,
@@ -109,8 +105,8 @@ public class ComputeAllRefsetSpec extends AbstractMojo {
                 if (conceptIsRefsetSpec(child)) {
 
                     // TODO use other than termFactory.getActiveAceFrameConfig();
-                    RefsetSpec refsetSpecHelper = new RefsetSpec(child, Terms.get().getActiveAceFrameConfig().getViewCoordinate());
-                    I_GetConceptData memberRefset = (I_GetConceptData) refsetSpecHelper.getMemberRefsetConcept();
+                    RefsetSpec refsetSpecHelper = new RefsetSpec(child, Terms.get().getActiveAceFrameConfig());
+                    I_GetConceptData memberRefset = refsetSpecHelper.getMemberRefsetConcept();
                     boolean showActivityPanel = false;
                     if (!computedRefsets.contains(memberRefset.getConceptNid())) {
 
@@ -155,13 +151,10 @@ public class ComputeAllRefsetSpec extends AbstractMojo {
                 termFactory.getConcept(RefsetAuxiliary.Concept.SPECIFIES_REFSET.getUids());
         I_IntSet relType = termFactory.newIntSet();
         relType.add(specifiesRefsetRel.getConceptNid());
-        
-        NidSetBI allowedStatusNids = config.getViewCoordinate().getAllowedStatusNids();
-        I_IntSet currentStatuses = Terms.get().newIntSet();
-        for(int nid : allowedStatusNids.getSetValues()){
-            currentStatuses.add(nid);
-        }
-                
+
+        I_HelpSpecRefset helper = Terms.get().getSpecRefsetHelper(config);
+        I_IntSet currentStatuses = helper.getCurrentStatusIntSet();
+
         if ((concept.getSourceRelTargets(currentStatuses, relType, config.getViewPositionSetReadOnly(), config
             .getPrecedence(), config.getConflictResolutionStrategy())).size() > 0) {
             return true;

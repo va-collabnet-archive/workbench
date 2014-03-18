@@ -32,9 +32,8 @@ import org.ihtsdo.db.bdb.computer.ReferenceConcepts;
 import org.ihtsdo.db.bdb.id.NidCNidMapBdb;
 import org.ihtsdo.db.bdb.nidmaps.UuidToNidMapBdb;
 import org.ihtsdo.db.bdb.sap.StatusAtPositionBdb;
-import org.ihtsdo.db.bdb.uuid.PimitiveUuidNidMapGenerator;
-import org.ihtsdo.db.bdb.uuid.UuidRetriever;
 import org.ihtsdo.db.util.ConsoleActivityViewer;
+import org.ihtsdo.db.util.NidPair;
 import org.ihtsdo.db.util.NidPairForRefex;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 import org.ihtsdo.helper.io.FileIO;
@@ -367,7 +366,6 @@ public class Bdb {
     }
 
     public static Database setupDatabase(boolean readOnly, String dbName, Bdb bdb) throws IOException, DatabaseException {
-        readOnly = false;
         DatabaseConfig dbConfig = new DatabaseConfig();
         dbConfig.setReadOnly(readOnly);
         dbConfig.setAllowCreate(!readOnly);
@@ -380,7 +378,6 @@ public class Bdb {
 
     private Bdb(boolean readOnly, File directory) throws IOException {
         try {
-            readOnly = false;
             directory.mkdirs();
             EnvironmentConfig envConfig = new EnvironmentConfig();
             envConfig.setSharedCache(true);

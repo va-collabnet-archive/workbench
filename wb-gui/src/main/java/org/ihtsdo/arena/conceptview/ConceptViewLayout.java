@@ -15,6 +15,7 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
 
@@ -622,7 +623,11 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
                                 }
                                 
                                 int refsetNid = extn.getRefexNid();
-                                for (RefexVersionBI cr : layoutConcept.getRefexMembersActive(statedCoordinate, refsetNid)) {
+                                List<? extends I_ExtendByRefPart> currentRefsets =
+                                        tf.getRefsetHelper(config).getAllCurrentRefsetExtensions(refsetNid,
+                                        layoutConcept.getConceptNid());
+                                
+                                for (I_ExtendByRefPart cr : currentRefsets) {
                                     DragPanelExtension ce = new DragPanelExtension(this, cpe, extn);
                                     setShowConflicts(ce.getComponentVersion(), ce);
                                     seperatorComponents.add(ce);

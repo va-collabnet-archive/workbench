@@ -30,6 +30,7 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.refset.spec.I_HelpSpecRefset;
 import org.dwfa.ace.task.AceTaskUtil;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
+import org.dwfa.ace.task.refset.spec.RefsetSpec;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
 import org.dwfa.bpa.process.I_Work;
@@ -40,10 +41,6 @@ import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 import org.ihtsdo.tk.api.PathBI;
-import org.ihtsdo.tk.api.concept.ConceptVersionBI;
-import org.ihtsdo.tk.api.refex.RefexChronicleBI;
-import org.ihtsdo.tk.query.RefsetSpec;
-import org.ihtsdo.tk.query.helper.RefsetHelper;
 
 /**
  * Creates a comment extension on the refset currently in the refset spec panel,
@@ -103,27 +100,34 @@ public class CreateCommentExtTask extends AbstractTask {
                 UUID currentUuid = ArchitectonicAuxiliary.Concept.CURRENT.getUids().iterator().next();
                 if (refsetSpecConcept != null) {
                     //TODO use other than termFactory.getActiveAceFrameConfig();
-                    RefsetSpec refsetSpec = new RefsetSpec(refsetSpecConcept, Terms.get().getActiveAceFrameConfig().getViewCoordinate());
-                    Collection<? extends ConceptVersionBI> commentsRefsetConcepts = refsetSpec.getCommentsRefsetConcepts();
-                    I_GetConceptData commentsRefset = null;
-                    if(!commentsRefsetConcepts.isEmpty()){
-                        commentsRefset = (I_GetConceptData) commentsRefsetConcepts.iterator().next().getChronicle();
-                    }
-                    I_GetConceptData memberRefset = (I_GetConceptData) refsetSpec.getMemberRefsetConcept();
+                    RefsetSpec refsetSpec = new RefsetSpec(refsetSpecConcept, Terms.get().getActiveAceFrameConfig());
+                    I_GetConceptData commentsRefset = refsetSpec.getCommentsRefsetConcept();
+                    I_GetConceptData memberRefset = refsetSpec.getMemberRefsetConcept();
                     if (commentsRefset == null) {
+                    	// Try again, and assume the wrong thing was passed in...
+                    	Set<? extends I_GetConceptData> commentRefsetSet  = 
+                    		Terms.get().getRefsetHelper(Terms.get().getActiveAceFrameConfig()).
+                    			getCommentsRefsetForRefset(refsetSpecConcept, Terms.get().getActiveAceFrameConfig());
+                    	if (commentRefsetSet != null && commentRefsetSet.size() > 0) {
+                    		commentsRefset = commentRefsetSet.iterator().next();
+                    		memberRefset = refsetSpecConcept;
+                    	} else {
                         	AceLog.getAppLog().info("commentsRefset is null");
+                    	}
                     }
                     if (commentsRefset != null && memberRefset != null) {
-                        RefsetHelper specRefsetHelper = new RefsetHelper(Terms.get().getActiveAceFrameConfig().getViewCoordinate(),
-                                Terms.get().getActiveAceFrameConfig().getEditCoordinate());
-                        //                        specRefsetHelper.setAutocommitActive(true);
-                        RefexChronicleBI newExt = specRefsetHelper.newStringRefsetExtension(commentsRefset.getConceptNid(),
-                                                                        memberRefset.getConceptNid(), comments);
-                            if (newExt != null) {
+                        I_HelpSpecRefset specRefsetHelper = Terms.get().getSpecRefsetHelper(Terms.get().getActiveAceFrameConfig());
+                        specRefsetHelper.setAutocommitActive(true);
+                        for (PathBI path : termFactory.getActiveAceFrameConfig().getEditingPathSet()) {
+                            boolean added = specRefsetHelper.newStringRefsetExtension(commentsRefset.getConceptNid(),
+                                memberRefset.getConceptNid(), comments, UUID.randomUUID(), termFactory.getConcept(
+                                    path.getConceptNid()).getUids().iterator().next(), currentUuid, Integer.MAX_VALUE);
+                            if (added) {
                             	AceLog.getAppLog().info("added comment: " + comments);
                             } else {
                             	AceLog.getAppLog().info("failed to add comment: " + comments);
                             }
+                        }
                     }
                 } else {
                 	AceLog.getAppLog().info("refsetSpecConcept is null for: " + process.getProperty(refsetSpecUuidPropName));

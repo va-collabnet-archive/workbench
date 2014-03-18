@@ -591,14 +591,12 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
                         id = (Integer) value;
                         int conceptId = (Integer) value;
                         if (referencedConcepts.containsKey(conceptId)) {
-                            addToValueCache(rowIndex, columnIndex, new StringWithExtTuple(getPrefText(conceptId), tuple, id));
-                            return values.get(rowColumnToLong(rowIndex, columnIndex));
+                            return new StringWithExtTuple(getPrefText(conceptId), tuple, id);
                         }
                         return new StringWithExtTuple(Integer.toString(conceptId), tuple, id);
                     } else if (I_DescriptionTuple.class.isAssignableFrom(value.getClass())) {
                         I_DescriptionTuple descTuple = (I_DescriptionTuple) value;
-                        addToValueCache(rowIndex, columnIndex, new StringWithExtTuple(descTuple.getText(), tuple, descTuple.getConceptNid()));
-                        return values.get(rowColumnToLong(rowIndex, columnIndex));
+                        return new StringWithExtTuple(descTuple.getText(), tuple, descTuple.getConceptNid());
                     }
                     addToValueCache(rowIndex, columnIndex, new StringWithExtTuple(value.toString(), tuple, id));
                     return values.get(rowColumnToLong(rowIndex, columnIndex));

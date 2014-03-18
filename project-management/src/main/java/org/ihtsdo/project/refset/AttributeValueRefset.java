@@ -30,7 +30,6 @@ import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
-import org.ihtsdo.tk.query.helper.RefsetHelper;
 
 /**
  * The Class AttributeValueRefset.
@@ -126,8 +125,12 @@ public class AttributeValueRefset extends Refset {
         }
 
         if (!keyAlreadyPresent) {
-            RefsetHelper helper = new RefsetHelper(config.getViewCoordinate(), config.getEditCoordinate());
-            helper.newConceptConceptRefsetExtension(refsetId, componentId, key, value);
+            I_HelpRefsets refsetHelper = termFactory.getRefsetHelper(config);
+            refsetHelper.newRefsetExtension(this.refsetId,
+                    componentId, EConcept.REFSET_TYPES.CID_CID,
+                    new RefsetPropertyMap().with(RefsetPropertyMap.REFSET_PROPERTY.CID_ONE, key).with(
+                    RefsetPropertyMap.REFSET_PROPERTY.CID_TWO, value), config);
+
             //termFactory.commit();
         }
 

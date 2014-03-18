@@ -21,8 +21,9 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
-import java.util.Collection;
 import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
@@ -32,14 +33,15 @@ import javax.swing.JTable;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_HelpRefsets;
+import org.dwfa.ace.api.RefsetPropertyMap;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.api.RefsetPropertyMap.REFSET_PROPERTY;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.table.refset.ReflexiveTableModel;
 import org.dwfa.ace.table.refset.StringWithExtTuple;
-import org.ihtsdo.tk.api.concept.ConceptVersionBI;
-import org.ihtsdo.tk.query.RefsetSpec;
-import org.ihtsdo.tk.query.helper.RefsetHelper;
+import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 
 public class MemberTablePopupListener extends MouseAdapter {
 
@@ -58,16 +60,17 @@ public class MemberTablePopupListener extends MouseAdapter {
             if (commentText != null && commentText.length() > 2) {
                 try {
                     I_GetConceptData refsetIdentityConcept = config.getRefsetInSpecEditor();
-                    RefsetHelper refsetHelper = new RefsetHelper(config.getViewCoordinate(), config.getEditCoordinate());
-                    RefsetSpec specHelper = new RefsetSpec(refsetIdentityConcept, true, config.getViewCoordinate());
-                    Collection<? extends ConceptVersionBI> commentRefsets = 
-                    	specHelper.getCommentsRefsetConcepts();
+                    I_HelpRefsets refsetHelper = Terms.get().getRefsetHelper(config);
+                    Set<? extends I_GetConceptData> commentRefsets = 
+                    	refsetHelper.getCommentsRefsetForRefset(refsetIdentityConcept, config);
                     if (commentRefsets.size() > 0) {
-                    	for (ConceptVersionBI commentRefsetIdentityConcept: commentRefsets) {
+                    	for (I_GetConceptData commentRefsetIdentityConcept: commentRefsets) {
+                	    	RefsetPropertyMap refsetMap = 
+                	    		new RefsetPropertyMap(REFSET_TYPES.STR);
+                	    	refsetMap.put(REFSET_PROPERTY.STRING_VALUE, commentText);
                 	    	I_ExtendByRef newExtension = 
-                	    		(I_ExtendByRef) refsetHelper.newStringRefsetExtension(commentRefsetIdentityConcept.getNid(),
-                                                selectedObject.getTuple().getComponentId(),
-                                                commentText);
+                	    		refsetHelper.getOrCreateRefsetExtension(commentRefsetIdentityConcept.getNid(), 
+                	    				selectedObject.getTuple().getComponentId(), REFSET_TYPES.STR, refsetMap, UUID.randomUUID());
                 			Terms.get().addUncommitted(newExtension);
                     	}
                         for (ReflexiveTableModel m : commentTableModels) {

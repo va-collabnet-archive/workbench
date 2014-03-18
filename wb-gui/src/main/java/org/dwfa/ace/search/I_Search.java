@@ -1,17 +1,18 @@
 package org.dwfa.ace.search;
 
 import java.io.IOException;
-import java.text.ParseException;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.regex.Pattern;
 
+import org.apache.lucene.queryParser.ParseException;
 import org.dwfa.ace.I_UpdateProgress;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_RepresentIdSet;
 import org.dwfa.ace.api.I_TrackContinuation;
+import org.dwfa.ace.task.search.AbstractSearchTest;
 import org.dwfa.ace.task.search.I_TestSearchResults;
 
 public interface I_Search {

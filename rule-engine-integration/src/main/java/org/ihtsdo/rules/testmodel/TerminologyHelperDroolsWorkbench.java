@@ -27,8 +27,10 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import org.apache.lucene.document.Document;
-import org.apache.lucene.queryparser.classic.QueryParser;
+import org.apache.lucene.queryParser.ParseException;
+import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
 import org.dwfa.ace.api.I_ConfigAceFrame;
@@ -54,6 +56,7 @@ import org.ihtsdo.tk.api.PositionSet;
 import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.RelAssertionType;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
@@ -250,7 +253,14 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 		if (parentConcept ==  null || subtypeConcept == null) {
 			result = false;
 		} else {
-			result = subtypeConcept.isKindOf(parentConcept);
+			// OLD Implementation 
+			//result = subtypeConcept.isKindOf(parentConcept);
+			
+			// NEW Implementation
+			ViewCoordinate testViewCoordinate = new ViewCoordinate(config.getViewCoordinate());
+
+			testViewCoordinate.setRelationshipAssertionType(RelAssertionType.STATED);
+			result =  Ts.get().isKindOf(subtypeConceptNid, parentConceptNid, testViewCoordinate);
 		}
 		return result;
 	}
@@ -282,7 +292,7 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 					int dnid = Integer.parseInt(doc.get("dnid"));
 					if (cnid != conceptNid) {
 						I_DescriptionVersioned<?> potential_match = Terms.get().getDescription(dnid, cnid);
-						
+
 						int pfdn = Integer.MAX_VALUE;
 
 						try {
@@ -432,6 +442,8 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 			}
 		} catch (IOException e) {
 			AceLog.getAppLog().alertAndLogException(e);
+		} catch (ParseException e) {
+			AceLog.getAppLog().alertAndLogException(e);
 		} catch (TerminologyException e) {
 			AceLog.getAppLog().alertAndLogException(e);
 		}
@@ -522,7 +534,9 @@ public class TerminologyHelperDroolsWorkbench extends TerminologyHelperDrools {
 			}
 		} catch (IOException e) {
 			AceLog.getAppLog().alertAndLogException(e);
-		} 
+		} catch (ParseException e) {
+			AceLog.getAppLog().alertAndLogException(e);
+		}
 
 		return result;
 	}

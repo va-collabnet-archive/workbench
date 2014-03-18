@@ -29,9 +29,11 @@ import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_HelpRefsets;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.PositionSetReadOnly;
+import org.dwfa.ace.api.RefsetPropertyMap;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
@@ -41,10 +43,10 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
-import org.ihtsdo.tk.query.helper.RefsetHelper;
 
 /**
  * The Class ContextualizedDescription.
@@ -406,6 +408,7 @@ public class ContextualizedDescription implements I_ContextualizeDescription {
         I_TermFactory tf = Terms.get();
         // TODO move config to parameter
         I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
+        I_HelpRefsets refsetHelper = tf.getRefsetHelper(config);
 
         // TODO: decide how to validate refsets
         // validateRefsetAsSpec(refsetId);
@@ -417,9 +420,8 @@ public class ContextualizedDescription implements I_ContextualizeDescription {
 
         I_GetConceptData acceptabilityConcept = tf.getConcept(SnomedMetadataRf2.ACCEPTABLE_RF2.getLenient().getNid());
         I_GetConceptData languagerefsetConcept = tf.getConcept(languageRefsetId);
-        
-        RefsetHelper refsetHelper = new RefsetHelper(config.getViewCoordinate(), config.getEditCoordinate());
-        refsetHelper.newConceptRefsetExtension(languageRefsetId, newDescription.getDescId(), acceptabilityConcept.getConceptNid());
+
+        refsetHelper.newRefsetExtension(languageRefsetId, newDescription.getDescId(), EConcept.REFSET_TYPES.CID, new RefsetPropertyMap().with(RefsetPropertyMap.REFSET_PROPERTY.CID_ONE, acceptabilityConcept.getConceptNid()), config);
 
         AceLog.getAppLog().info("addUncommittedNoChecks fired");
         tf.addUncommittedNoChecks(concept);
@@ -449,6 +451,7 @@ public class ContextualizedDescription implements I_ContextualizeDescription {
         I_TermFactory tf = Terms.get();
         // TODO move config to parameter
         I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
+        I_HelpRefsets refsetHelper = tf.getRefsetHelper(config);
 
         I_ContextualizeDescription newContextualizedDescription = new ContextualizedDescription(descId, conceptId, newLanguageRefsetId);
 
@@ -459,8 +462,7 @@ public class ContextualizedDescription implements I_ContextualizeDescription {
             }
             return newContextualizedDescription;
         } else {
-            RefsetHelper refsetHelper = new RefsetHelper(config.getViewCoordinate(), config.getEditCoordinate());
-            refsetHelper.newConceptRefsetExtension(newLanguageRefsetId, descId, acceptabilityId);
+            refsetHelper.newRefsetExtension(newLanguageRefsetId, descId, EConcept.REFSET_TYPES.CID, new RefsetPropertyMap().with(RefsetPropertyMap.REFSET_PROPERTY.CID_ONE, acceptabilityId), config);
 
             for (I_ExtendByRef extension : tf.getAllExtensionsForComponent(descId, true)) {
                 if (extension.getRefsetId() == newLanguageRefsetId && extension.getMutableParts().iterator().next().getTime() == Long.MAX_VALUE) {
