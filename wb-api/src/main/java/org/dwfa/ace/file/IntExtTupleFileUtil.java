@@ -26,10 +26,10 @@ import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartInt;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
-import org.dwfa.ace.refset.spec.I_HelpSpecRefset;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.tk.query.helper.RefsetHelper;
 
 public class IntExtTupleFileUtil {
 
@@ -132,8 +132,6 @@ public class IntExtTupleFileUtil {
                 return null;
             }
 
-            I_HelpSpecRefset refsetHelper = Terms.get().getSpecRefsetHelper(importConfig);
-            refsetHelper.setAutocommitActive(false);
             I_TermFactory termFactory = Terms.get();
 
             if (!termFactory.hasId(refsetUuid)) {
@@ -150,9 +148,9 @@ public class IntExtTupleFileUtil {
             }
 
             try {
+                RefsetHelper refsetHelper = new RefsetHelper(importConfig.getViewCoordinate(), importConfig.getEditCoordinate());
                 refsetHelper.newIntRefsetExtension(termFactory.uuidToNative(refsetUuid), termFactory
-                    .uuidToNative(componentUuid), value, memberUuid, (UUID) importConfig.getProperty("pathUuid"),
-                    statusUuid, effectiveDate);
+                    .uuidToNative(componentUuid), value);
             } catch (Exception e) {
                 String errorMessage = "Int: Exception thrown while creating new int refset extension";
                 outputFileWriter.write("Error on line " + lineCount + " : ");

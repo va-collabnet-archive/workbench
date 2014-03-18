@@ -60,6 +60,7 @@ import org.ihtsdo.project.refset.partition.IsDescendantOfPartitioner;
 import org.ihtsdo.project.refset.partition.QuantityPartitioner;
 import org.ihtsdo.project.refset.partition.RefsetSplitter;
 import org.ihtsdo.tk.api.Precedence;
+import org.ihtsdo.tk.query.helper.RefsetHelper;
 
 /**
  * The Class TestContextualizedDescriptions.
@@ -141,22 +142,14 @@ public class TestWorksetsAndWorklistsCRUD extends TestCase {
 					allowedTypes, config.getViewPositionSetReadOnly(), Precedence.TIME, config.getConflictResolutionStrategy());
 			
 			I_GetConceptData refset = tf.getConcept(RefsetAuxiliary.Concept.DESCRIPTION_TYPE_PURPOSE.getUids());
+                        RefsetHelper helper = new RefsetHelper(config.getViewCoordinate(), config.getEditCoordinate());
 			for (I_RelTuple rel : relationships) {
 				I_GetConceptData member = tf.getConcept(rel.getC1Id());
-				tf.getRefsetHelper(config).newRefsetExtension(
-						refset.getConceptNid(), 
-						member.getConceptNid(), 
-						EConcept.REFSET_TYPES.CID, 
-						new RefsetPropertyMap().with(RefsetPropertyMap.REFSET_PROPERTY.CID_ONE, member.getConceptNid()),config); 
+                                helper.newConceptRefsetExtension(refset.getConceptNid(), member.getConceptNid(), member.getConceptNid());
 				tf.addUncommittedNoChecks(refset);
 				tf.addUncommittedNoChecks(member);
 			}
-			tf.getRefsetHelper(config).newRefsetExtension(
-					refset.getConceptNid(), 
-					pneumonitis.getConceptNid(), 
-					EConcept.REFSET_TYPES.CID, 
-					new RefsetPropertyMap().with(RefsetPropertyMap.REFSET_PROPERTY.CID_ONE, 
-							pneumonitis.getConceptNid()),config);
+                        helper.newConceptRefsetExtension(refset.getConceptNid(), pneumonitis.getConceptNid(), pneumonitis.getConceptNid());
 			tf.addUncommittedNoChecks(refset);
 			tf.addUncommittedNoChecks(pneumonitis);
 			tf.commit();
@@ -289,12 +282,7 @@ public class TestWorksetsAndWorklistsCRUD extends TestCase {
 			assertEquals(19, workSet1.getWorkSetMembers().size());
 
 			I_GetConceptData additionalMember = tf.getConcept(UUID.fromString("ee9ac5d2-a07c-3981-a57a-f7f26baf38d8"));
-
-			tf.getRefsetHelper(config).newRefsetExtension(
-					refset.getConceptNid(), 
-					colonoscopicPolypectomy.getConceptNid(), 
-					EConcept.REFSET_TYPES.CID, 
-					new RefsetPropertyMap().with(RefsetPropertyMap.REFSET_PROPERTY.CID_ONE, additionalMember.getConceptNid()),config);
+                        helper.newConceptRefsetExtension(refset.getConceptNid(), colonoscopicPolypectomy.getConceptNid(), additionalMember.getConceptNid());
 			tf.addUncommittedNoChecks(refset);
 			tf.addUncommittedNoChecks(colonoscopicPolypectomy);
 			tf.commit();

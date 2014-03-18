@@ -40,12 +40,10 @@ import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_HelpRefsets;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_ModelTerminologyList;
 import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.I_TermFactory;
-import org.dwfa.ace.api.RefsetPropertyMap;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
@@ -63,11 +61,11 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
-import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.lucene.SearchResult;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
+import org.ihtsdo.tk.query.helper.RefsetHelper;
 
 @BeanList(specs = { @Spec(directory = "tasks/ide/file", type = BeanType.TASK_BEAN) })
 public class UpdateDescriptionsBasedOnFileSpec extends AbstractTask {
@@ -125,7 +123,7 @@ public class UpdateDescriptionsBasedOnFileSpec extends AbstractTask {
             for (PathBI loopPath : config.getPromotionPathSetReadOnly()) {
             	config.addEditingPath(loopPath);
             }
-			I_HelpRefsets refsetHelper = tf.getRefsetHelper(config);
+                        RefsetHelper refsetHelper = new RefsetHelper(config.getViewCoordinate(), config.getEditCoordinate());
 			JList conceptList = config.getBatchConceptList();
 			I_ModelTerminologyList model = (I_ModelTerminologyList) conceptList.getModel();
 			model.clear();
@@ -208,11 +206,9 @@ public class UpdateDescriptionsBasedOnFileSpec extends AbstractTask {
                                                                                         config.getEditCoordinate().getAuthorNid(),
                                                                                         config.getEditCoordinate().getModuleNid(),
                                                                                         config.getEditingPathSet().iterator().next().getConceptNid());
-
-										refsetHelper.newRefsetExtension(extension.getRefsetId(), 
-												newDescription.getDescId(), EConcept.REFSET_TYPES.CID, 
-												new RefsetPropertyMap().with(RefsetPropertyMap.REFSET_PROPERTY.CID_ONE, 
-														newExtConceptPart.getC1id()), config);
+									
+                                                                                refsetHelper.newConceptRefsetExtension(extension.getRefsetId(), newDescription.getDescId(),
+                                                                                        newExtConceptPart.getC1id());
 									} catch (NoSuchElementException e) {
 										AceLog.getAppLog().info("No refset data in line: " + lines);
 									}
@@ -267,10 +263,9 @@ public class UpdateDescriptionsBasedOnFileSpec extends AbstractTask {
 								for (I_ExtendByRef extension : extensions) {
 									if (extension.getRefsetId() == SnomedMetadataRfx.getUS_DIALECT_REFEX_NID() ||
 											extension.getRefsetId() == SnomedMetadataRfx.getGB_DIALECT_REFEX_NID()) {
-										refsetHelper.newRefsetExtension(extension.getRefsetId(), 
-												newSynonym.getDescId(), EConcept.REFSET_TYPES.CID, 
-												new RefsetPropertyMap().with(RefsetPropertyMap.REFSET_PROPERTY.CID_ONE, 
-														SnomedMetadataRfx.getDESC_ACCEPTABLE_NID()), config);
+                                                                                refsetHelper.newConceptRefsetExtension(extension.getRefsetId(),
+                                                                                        newSynonym.getDescId(),
+                                                                                        SnomedMetadataRfx.getDESC_ACCEPTABLE_NID());
 									}
 								}
 

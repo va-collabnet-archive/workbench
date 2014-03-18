@@ -18,6 +18,7 @@ package org.ihtsdo.rules.context;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -47,6 +48,10 @@ import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
+import org.ihtsdo.tk.api.refex.RefexVersionBI;
+import org.ihtsdo.tk.api.refex.type_string.RefexStringVersionBI;
+import org.ihtsdo.tk.query.helper.MarkedParentRefsetHelper;
+import org.ihtsdo.tk.query.helper.RefsetHelper;
 
 /**
  * The Class RulesDeploymentPackageReferenceHelper.
@@ -81,8 +86,7 @@ public class RulesDeploymentPackageReferenceHelper {
 
 			I_TermFactory termFactory = Terms.get();
 			I_HelpRefsets refsetHelper;
-			refsetHelper = termFactory.getRefsetHelper(config);
-			refsetHelper.setAutocommitActive(true);
+//			refsetHelper.setAutocommitActive(true);
 
 			I_GetConceptData newConcept = null;
 
@@ -116,9 +120,8 @@ public class RulesDeploymentPackageReferenceHelper {
 
 			rulesPackage.setUuids(newConcept.getUids());
 			String stringExtValue = url;
-			refsetHelper.newRefsetExtension(rulesPackagesRefset.getConceptNid(), newConcept.getConceptNid(), 
-					REFSET_TYPES.STR, 
-					new RefsetPropertyMap().with(REFSET_PROPERTY.STRING_VALUE, stringExtValue), config); 
+                        RefsetHelper helper = new RefsetHelper(config.getViewCoordinate(), config.getEditCoordinate());
+                        helper.newStringRefsetExtension(rulesPackagesRefset.getConceptNid(), newConcept.getConceptNid(), stringExtValue);
 
 			termFactory.addUncommittedNoChecks(newConcept);
 			termFactory.addUncommittedNoChecks(rulesPackagesRefset);
@@ -174,8 +177,7 @@ public class RulesDeploymentPackageReferenceHelper {
 			I_TermFactory termFactory = Terms.get();
 			I_ConfigAceFrame config = termFactory.getActiveAceFrameConfig();
 			I_HelpRefsets refsetHelper;
-			refsetHelper = termFactory.getRefsetHelper(config);
-			refsetHelper.setAutocommitActive(true);
+//			refsetHelper.setAutocommitActive(true);
 
 
 			I_GetConceptData rulesPackageRefset = termFactory.getConcept(
@@ -184,14 +186,11 @@ public class RulesDeploymentPackageReferenceHelper {
 			allowedDestRelTypes.add(termFactory.uuidToNative(ArchitectonicAuxiliary.Concept.IS_A_REL.getUids()));
 			I_IntSet descriptionTypes =  termFactory.newIntSet();
 			descriptionTypes.add(termFactory.uuidToNative(ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids()));
-
-			List<I_ExtendByRefPart> currentExtensionParts = 
-				refsetHelper.getAllCurrentRefsetExtensions(rulesPackageRefset.getConceptNid(), 
-						rulesPackageConcept.getConceptNid());
-
-			for (I_ExtendByRefPart loopPart : currentExtensionParts) {
-				I_ExtendByRefPartStr strPart = (I_ExtendByRefPartStr) loopPart;
-				String metadata = strPart.getStringValue();
+                        
+                    Collection<? extends RefexVersionBI<?>> activeMembers = rulesPackageConcept.getRefexMembersActive(config.getViewCoordinate(), rulesPackageRefset.getConceptNid());
+			for (RefexVersionBI loopPart : activeMembers) {
+				RefexStringVersionBI strPart = (RefexStringVersionBI) loopPart;
+				String metadata = strPart.getString1();
 				rulesPackage.setUrl(metadata);
 			}
 

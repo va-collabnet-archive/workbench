@@ -27,6 +27,7 @@ import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.component.relationship.Relationship;
 import org.ihtsdo.cern.colt.map.OpenIntIntHashMap;
 import org.ihtsdo.concurrency.ConcurrentReentrantLocks;
+import org.ihtsdo.concurrency.ConcurrentReentrantReadWriteLocks;
 import org.ihtsdo.db.bdb.BdbCommitManager;
 import org.ihtsdo.helper.version.RelativePositionComputer;
 import org.ihtsdo.helper.version.RelativePositionComputerBI;
@@ -35,6 +36,8 @@ import org.ihtsdo.tk.api.NidBitSetBI;
 import org.ihtsdo.tk.api.NidSetBI;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.binding.snomed.Snomed;
+import org.ihtsdo.tk.spec.ValidationException;
 
 /**
  * <h2>Implementation Details</h2> The
@@ -55,7 +58,7 @@ public class NidCNidMapBdb extends ComponentBdb {
     private static final int NID_CNID_MAP_SIZE = 12800;
     //~--- fields --------------------------------------------------------------
     private ReentrantReadWriteLock rwl = new ReentrantReadWriteLock();
-    ConcurrentReentrantLocks locks = new ConcurrentReentrantLocks();
+    ConcurrentReentrantReadWriteLocks locks = new ConcurrentReentrantReadWriteLocks();
     private AtomicReference<int[][][]> indexCacheRecords;
     private boolean[] mapChanged;
     private AtomicReference<int[][]> nidCNidMaps;
@@ -80,13 +83,13 @@ public class NidCNidMapBdb extends ComponentBdb {
         IndexCacheRecord record = new IndexCacheRecord(indexCacheRecords.get()[mapIndex][nidIndexInMap]);
 
         if (!record.refexAlreadyThere(pair.getMemberNid())) {
-            locks.lock(nid);
+            locks.writeLock(nid);
             try {
                 record.addNidPairForRefex(pair.getRefexNid(), pair.getMemberNid());
                 indexCacheRecords.get()[mapIndex][nidIndexInMap] = record.getData();
                 mapChanged[mapIndex] = true;
             } finally {
-                locks.unlock(nid);
+                locks.unlockWrite(nid);
             }
         }
     }
@@ -103,13 +106,13 @@ public class NidCNidMapBdb extends ComponentBdb {
         }
         IndexCacheRecord record = new IndexCacheRecord(indexCacheRecords.get()[mapIndex][nidIndexInMap]);
         if (!record.destinationRelOriginAlreadyThere(originCNid)) {
-            locks.lock(destinationCNid);
+            locks.writeLock(destinationCNid);
             try {
                 record.addDestinationOriginNid(originCNid);
                 indexCacheRecords.get()[mapIndex][nidIndexInMap] = record.getData();
                 mapChanged[mapIndex] = true;
             } finally {
-                locks.unlock(destinationCNid);
+                locks.unlockWrite(destinationCNid);
             }
         }
     }
@@ -190,7 +193,7 @@ public class NidCNidMapBdb extends ComponentBdb {
             throw new NoSuchElementException("nid: " + nid);
         }
 
-        locks.lock(nid);
+        locks.writeLock(nid);
 
         try {
             IndexCacheRecord record = new IndexCacheRecord(indexCacheRecords.get()[mapIndex][nidIndexInMap]);
@@ -199,7 +202,7 @@ public class NidCNidMapBdb extends ComponentBdb {
             indexCacheRecords.get()[mapIndex][nidIndexInMap] = record.getData();
             mapChanged[mapIndex] = true;
         } finally {
-            locks.unlock(nid);
+            locks.unlockWrite(nid);
         }
     }
 
@@ -350,7 +353,7 @@ public class NidCNidMapBdb extends ComponentBdb {
             ensureCapacity(cNid);
         }
 
-        locks.lock(concept.getNid());
+        locks.writeLock(concept.getNid());
 
         try {
             IndexCacheRecord record = new IndexCacheRecord(indexCacheRecords.get()[mapIndex][nidIndexInMap]);
@@ -361,7 +364,7 @@ public class NidCNidMapBdb extends ComponentBdb {
             indexCacheRecords.get()[mapIndex][nidIndexInMap] = record.getData();
             mapChanged[mapIndex] = true;
         } finally {
-            locks.unlock(concept.getNid());
+            locks.unlockWrite(concept.getNid());
         }
     }
 
@@ -518,12 +521,12 @@ public class NidCNidMapBdb extends ComponentBdb {
         if (mapIndex >= nidCNidMaps.get().length) {
             throw new NoSuchElementException("nid: " + cNid);
         }
-        locks.lock(cNid);
+        locks.readLock(cNid);
 
         try {
             return new IndexCacheRecord(indexCacheRecords.get()[mapIndex][nidIndexInMap]);
         } finally {
-            locks.unlock(cNid);
+            locks.unlockRead(cNid);
         }
     }
 
@@ -680,6 +683,24 @@ public class NidCNidMapBdb extends ComponentBdb {
                 }
             }
         }
+    }
+    
+    public Set<Integer> getChildNids(int parentNid, ViewCoordinate vc) throws ValidationException, IOException, ContradictionException{
+        Set<Integer> childSet = new HashSet<>();
+        Iterator<PositionBI> viewPositionItr = vc.getPositionSet().iterator();
+        PositionBI position = viewPositionItr.next();
+        RelativePositionComputerBI computer = RelativePositionComputer.getComputer(position);
+        int isaNid = Snomed.IS_A.getLenient().getConceptNid();
+        
+        IndexCacheRecord parentRecord = getIndexCacheRecord(parentNid);
+        for(int childNid : parentRecord.getDestinationOriginNids()){
+            for(RelationshipIndexRecord r :  getIndexCacheRecord(childNid).getRelationshipsRecord()){
+                if(r.isActiveTaxonomyRelationship(vc, computer) && r.getTypeNid() == isaNid){
+                    childSet.add(childNid);
+                }
+            }
+        }
+        return childSet;
     }
 
     public Set<Integer> getAncestorNids(int childNid, ViewCoordinate vc) throws IOException, ContradictionException {

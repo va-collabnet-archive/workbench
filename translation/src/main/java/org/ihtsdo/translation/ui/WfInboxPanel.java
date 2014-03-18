@@ -909,6 +909,7 @@ public class WfInboxPanel extends JPanel {
 			}
 		} else if (type.equals(ActionType.SEND_TO_OUTBOX_LAUNCHED)) {
 			try {
+
 				if (!newWfInstance.isCompleted() && newWfInstance.isActive()) {
 					tagManager.sendToOutbox(TagManager.getTagWorklistConceptUuids((WfInstance) currentRow[InboxColumn.values().length]));
 				}

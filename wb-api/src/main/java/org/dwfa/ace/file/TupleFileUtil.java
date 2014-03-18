@@ -54,13 +54,15 @@ import org.dwfa.ace.api.ebr.I_ExtendByRefPartLong;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartStr;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 import org.dwfa.ace.log.AceLog;
-import org.dwfa.ace.refset.spec.I_HelpSpecRefset;
-import org.dwfa.ace.task.refset.spec.RefsetSpec;
-import org.dwfa.ace.task.refset.spec.compute.RefsetQueryFactory;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.time.TimeUtil;
+import org.ihtsdo.tk.api.NidSetBI;
+import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.api.refex.RefexChronicleBI;
+import org.ihtsdo.tk.query.RefsetSpec;
+import org.ihtsdo.tk.query.RefsetSpecFactory;
 
 public class TupleFileUtil {
 
@@ -356,13 +358,17 @@ public class TupleFileUtil {
         I_TermFactory termFactory = Terms.get();
         // TODO replace with passed in config...
         I_ConfigAceFrame config = Terms.get().getActiveAceFrameConfig();
-        RefsetSpec refsetSpecHelper = new RefsetSpec(refsetSpec, config);
-        I_GetConceptData memberRefset = refsetSpecHelper.getMemberRefsetConcept();
-        I_GetConceptData markedParentRefset = refsetSpecHelper.getMarkedParentRefsetConcept();
-        I_GetConceptData commentsRefset = refsetSpecHelper.getCommentsRefsetConcept();
-        I_GetConceptData promotionRefset = refsetSpecHelper.getPromotionRefsetConcept();
-        I_GetConceptData editTimeRefset = refsetSpecHelper.getEditConcept();
-        I_GetConceptData computeTimeRefset = refsetSpecHelper.getComputeConcept();
+        RefsetSpec refsetSpecHelper = new RefsetSpec(refsetSpec, config.getViewCoordinate());
+        I_GetConceptData memberRefset = (I_GetConceptData) refsetSpecHelper.getMemberRefsetConcept();
+        I_GetConceptData markedParentRefset = (I_GetConceptData) refsetSpecHelper.getMarkedParentRefsetConcept();
+        Collection<? extends ConceptVersionBI> commentsRefsetConcepts = refsetSpecHelper.getCommentsRefsetConcepts();
+        I_GetConceptData commentsRefset = null;
+        if(!commentsRefsetConcepts.isEmpty()){
+            commentsRefset = (I_GetConceptData) commentsRefsetConcepts.iterator().next().getChronicle();
+        }
+        I_GetConceptData promotionRefset = (I_GetConceptData) refsetSpecHelper.getPromotionRefsetConcept();
+        I_GetConceptData editTimeRefset = (I_GetConceptData) refsetSpecHelper.getEditConcept();
+        I_GetConceptData computeTimeRefset = (I_GetConceptData) refsetSpecHelper.getComputeConcept();
         if (memberRefset == null) {
             throw new TerminologyException(
                     "No member spec found. Please put the refset to be exported in the refset spec panel.");
@@ -529,7 +535,7 @@ public class TupleFileUtil {
         HashMap<Integer, DefaultMutableTreeNode> extensionMap = new HashMap<Integer, DefaultMutableTreeNode>();
         HashSet<Integer> fetchedComponents = new HashSet<Integer>();
         fetchedComponents.add(refsetSpec.getConceptNid());
-        RefsetQueryFactory.addExtensionsToMap((List<? extends I_ExtendByRef>) extensions, extensionMap,
+        RefsetSpecFactory.addExtensionsToMap((Collection<? extends RefexChronicleBI>) extensions, extensionMap,
                 fetchedComponents, refsetSpec.getConceptNid());
 
         DefaultMutableTreeNode root = new DefaultMutableTreeNode(refsetSpec);
@@ -625,11 +631,14 @@ public class TupleFileUtil {
     private void exportRefsetMembers(I_GetConceptData refset, I_ConfigAceFrame configFrame,
             BufferedWriter exportFileWriter, TupleCounter tupleCounter) throws Exception {
         Collection<? extends I_ExtendByRef> extensions = Terms.get().getRefsetExtensionMembers(refset.getConceptNid());
-
-        I_HelpSpecRefset helper = Terms.get().getSpecRefsetHelper(Terms.get().getActiveAceFrameConfig());
+        NidSetBI allowedStatusNids = configFrame.getViewCoordinate().getAllowedStatusNids();
+        I_IntSet actives = Terms.get().newIntSet();
+        for(int nid : allowedStatusNids.getSetValues()){
+            actives.add(nid);
+        }
         for (I_ExtendByRef ext : extensions) {
             List<? extends I_ExtendByRefVersion> tuples =
-                    ext.getTuples(helper.getCurrentStatusIntSet(), null, configFrame.getPrecedence(), configFrame
+                    ext.getTuples(actives, null, configFrame.getPrecedence(), configFrame
                     .getConflictResolutionStrategy());
 
             if (tuples.size() > 0) {
@@ -703,8 +712,8 @@ public class TupleFileUtil {
                             || clause.getConceptNid() == Terms.get().uuidToNative(
                             RefsetAuxiliary.Concept.REL_IS_MEMBER_OF.getUids())) {
                         if (isMemberRefset(potentialRefset)) {
-                            RefsetSpec refsetSpecHelper = new RefsetSpec(potentialRefset, true, configFrame);
-                            exportRefsetSpecToFile(outputFileWriter, refsetSpecHelper.getRefsetSpecConcept(),
+                            RefsetSpec refsetSpecHelper = new RefsetSpec(potentialRefset, true, configFrame.getViewCoordinate());
+                            exportRefsetSpecToFile(outputFileWriter, (I_GetConceptData) refsetSpecHelper.getRefsetSpecConcept(),
                                     tupleCounter);
                         }
                     }

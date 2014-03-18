@@ -99,7 +99,12 @@ public class SctRf2RefsetSimpleToArfMojo extends AbstractMojo implements Seriali
 
         String pathStr = null;
         try {
-        	pathStr = pathConcept.getUuid();
+            pathStr = pathConcept.getUuid();
+            // If either pathUuid is not the default and pathStr is, override with pathUuid
+            if (!pathUuid.equals("8c230474-9f11-30ce-9cad-185a96fd03a2")
+                    && pathStr.equals("8c230474-9f11-30ce-9cad-185a96fd03a2")) {
+                pathStr = pathUuid;
+            }
                 // If either pathUuid is not the default and pathStr is, override with pathUuid
         	if (!pathUuid.equals("8c230474-9f11-30ce-9cad-185a96fd03a2") &&
         			pathStr.equals("8c230474-9f11-30ce-9cad-185a96fd03a2"))
@@ -132,9 +137,9 @@ public class SctRf2RefsetSimpleToArfMojo extends AbstractMojo implements Seriali
             BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(
                     outDir + "concept_simple_rf2.refset"), "UTF-8"));
             getLog().info("::: SIMPLE REFSET FILE: " + outDir + "concept_simple_rf2.refset");
-            filesIn = Rf2File.getFiles(wDir, targetSubDir, inputDir, "Simple", ".txt");
+            filesIn = Rf2File.getFiles(wDir, targetSubDir, inputDir, "der2_cRefset_", ".txt");
             for (Rf2File rf2File : filesIn) {
-                Rf2_RefsetSimpleRecord[] members = Rf2_RefsetSimpleRecord.parseRefset(rf2File);
+                Rf2_RefsetSimpleRecord[] members = Rf2_RefsetSimpleRecord.parseRefset(rf2File, pathUuid);
                 for (Rf2_RefsetSimpleRecord m : members) {
                 	m.setPath(pathStr);
                     m.writeArf(bw);

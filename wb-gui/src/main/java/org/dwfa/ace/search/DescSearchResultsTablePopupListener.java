@@ -35,7 +35,6 @@ import org.dwfa.ace.config.AceFrameConfig;
 import org.dwfa.ace.gui.popup.ProcessPopupUtil;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.table.DescriptionTableModel.StringWithDescTuple;
-import org.dwfa.ace.task.refset.spec.RefsetSpec;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 
@@ -72,6 +71,7 @@ import org.ihtsdo.taxonomy.model.NodePath;
 import org.ihtsdo.taxonomy.model.TaxonomyModel;
 import org.ihtsdo.taxonomy.nodes.RootNode;
 import org.ihtsdo.taxonomy.nodes.TaxonomyNode;
+import org.ihtsdo.tk.query.RefsetSpec;
 
 public class DescSearchResultsTablePopupListener extends MouseAdapter implements ActionListener {
    private ACE                ace;
@@ -143,7 +143,7 @@ public class DescSearchResultsTablePopupListener extends MouseAdapter implements
 
    private void addProcessItems(JPopupMenu popup, File directory) {
       try {
-         ProcessPopupUtil.addSubmenMenuItems(popup, directory, config.getWorker());
+         ProcessPopupUtil.addSubMenuItems(popup, directory, config.getWorker());
       } catch (FileNotFoundException e) {
          AceLog.getAppLog().alertAndLogException(e);
       } catch (IOException e) {
@@ -303,7 +303,7 @@ public class DescSearchResultsTablePopupListener extends MouseAdapter implements
 
                      memberIdBasedExtensionMap = populateMemberIdBasedExtensionMap(extensions);
 
-                     RefsetSpec refsetSpecHelper = new RefsetSpec(config.getRefsetSpecInSpecEditor(), config);
+                     RefsetSpec refsetSpecHelper = new RefsetSpec(config.getRefsetSpecInSpecEditor(), config.getViewCoordinate());
                      boolean    excludeDesc      = true;
                      boolean    excludeConcept   = true;
                      boolean    excludeRel       = true;

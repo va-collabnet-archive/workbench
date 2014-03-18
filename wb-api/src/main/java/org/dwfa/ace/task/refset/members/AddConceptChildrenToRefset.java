@@ -20,10 +20,11 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Set;
 
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_HelpMemberRefsets;
+import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
@@ -36,10 +37,15 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
+import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.NidBitSetBI;
+import org.ihtsdo.tk.api.NidBitSetItrBI;
+import org.ihtsdo.tk.query.helper.RefsetHelper;
 
 /**
  * Adds a single concept as a member of the working refset
  */
+//REFSET PERFORMANCE CHANGE, NEEDS TESTING
 @BeanList(specs = { @Spec(directory = "tasks/ide/refset/membership", type = BeanType.TASK_BEAN) })
 public class AddConceptChildrenToRefset extends AbstractTask {
 
@@ -102,11 +108,19 @@ public class AddConceptChildrenToRefset extends AbstractTask {
                 "Adding children of concept '" + member.getInitialText() + "' as member of refset '"
                     + refset.getInitialText() + "' with a value '" + value.getInitialText() + "'.");
 
-            I_HelpMemberRefsets helper = 
-            	Terms.get().getMemberRefsetHelper(Terms.get().getActiveAceFrameConfig(), refset.getConceptNid(), value.getConceptNid());
-            Set<I_GetConceptData> newMembers = helper.getAllDescendants(member);
-
-            helper.addAllToRefset(newMembers, "Adding children of concept " + member.getInitialText());
+            NidBitSetBI kindOfNids = Ts.get().getKindOf(member.getConceptNid(), Terms.get().getActiveAceFrameConfig().getViewCoordinate());
+            Set<I_GetConceptData> newMembers = new HashSet<I_GetConceptData>();
+            NidBitSetItrBI itr = kindOfNids.iterator();
+            I_TermFactory termFactory = Terms.get();
+            I_ShowActivity activity = termFactory.newActivityPanel(false, termFactory.getActiveAceFrameConfig(),
+            "Adding children of concept " + member.getInitialText(), true);
+            RefsetHelper helper = new RefsetHelper(Terms.get().getActiveAceFrameConfig().getViewCoordinate(),
+                    Terms.get().getActiveAceFrameConfig().getEditCoordinate());
+            while(itr.next()){
+                if(itr.nid() != member.getConceptNid()){
+                    helper.newConceptRefsetExtension(refset.getConceptNid(), itr.nid(), value.getConceptNid());
+                }
+            }
 
             return Condition.CONTINUE;
 

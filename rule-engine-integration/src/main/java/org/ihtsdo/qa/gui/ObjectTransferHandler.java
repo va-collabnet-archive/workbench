@@ -20,7 +20,10 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JComboBox;
@@ -34,9 +37,6 @@ import javax.swing.TransferHandler;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.TreeNode;
-
-import org.apache.lucene.queryParser.ParseException;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
@@ -309,11 +309,11 @@ public class ObjectTransferHandler extends TransferHandler {
 				concept = Terms.get().getConcept(conceptUuid.toString()).iterator().next();
 			} catch (TerminologyException e) {
 				AceLog.getAppLog().alertAndLogException(e);
-			} catch (ParseException e) {
-				AceLog.getAppLog().alertAndLogException(e);
 			} catch (IOException e) {
 				AceLog.getAppLog().alertAndLogException(e);
-			}
+			} catch (ParseException ex) {
+                        Logger.getLogger(ObjectTransferHandler.class.getName()).log(Level.SEVERE, null, ex);
+                    } 
 		} else if (c instanceof JTree) {
 			JTree tree = (JTree) c;
 			DefaultMutableTreeNode tn = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();

@@ -29,16 +29,16 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
-import org.dwfa.ace.task.refset.spec.RefsetSpec;
-import org.dwfa.ace.task.refset.spec.compute.RefsetComputeType;
-import org.dwfa.ace.task.refset.spec.compute.RefsetQueryFactory;
-import org.dwfa.ace.task.refset.spec.compute.RefsetSpecQuery;
 import org.dwfa.bpa.process.TaskFailedException;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
+import org.ihtsdo.tk.query.RefsetComputer.ComputeType;
+import org.ihtsdo.tk.query.RefsetSpec;
+import org.ihtsdo.tk.query.RefsetSpecFactory;
+import org.ihtsdo.tk.query.RefsetSpecQuery;
 
 /**
  * Tests if the refset spec is valid.
@@ -98,7 +98,7 @@ public class TestForValidRefsetSpec extends AbstractExtensionTest {
                 return alertList;
             }
 
-            RefsetSpec specHelper = new RefsetSpec(refsetSpecConcept, configFrame);
+            RefsetSpec specHelper = new RefsetSpec(refsetSpecConcept, configFrame.getViewCoordinate());
 
             alertList = verifyRefsetSpec(specHelper, alertList);
 
@@ -112,20 +112,20 @@ public class TestForValidRefsetSpec extends AbstractExtensionTest {
     private ArrayList<AlertToDataConstraintFailure> verifyRefsetSpec(RefsetSpec specHelper,
             ArrayList<AlertToDataConstraintFailure> alertList) {
         I_TermFactory termFactory = Terms.get();
-        RefsetComputeType computeType;
+        ComputeType computeType;
         if (specHelper.isConceptComputeType()) {
-            computeType = RefsetComputeType.CONCEPT;
+            computeType = ComputeType.CONCEPT;
         } else if (specHelper.isDescriptionComputeType()) {
-            computeType = RefsetComputeType.DESCRIPTION;
+            computeType = ComputeType.DESCRIPTION;
         } else {
-            computeType = RefsetComputeType.CONCEPT; // default to concept
+            computeType = ComputeType.CONCEPT; // default to concept
         }
 
         try {
             RefsetSpecQuery q =
-                    RefsetQueryFactory.createQuery(termFactory.getActiveAceFrameConfig(), termFactory, specHelper
+                    RefsetSpecFactory.createQuery(termFactory.getActiveAceFrameConfig().getViewCoordinate(), specHelper
                 .getRefsetSpecConcept(), specHelper.getMemberRefsetConcept(), computeType);
-            Set<String> dangleWarnings = new HashSet<String>(RefsetQueryFactory.removeDangles(q));
+            Set<String> dangleWarnings = new HashSet<String>(RefsetSpecFactory.removeDangles(q));
             for (String warning: dangleWarnings) {
                 alertList.add(new AlertToDataConstraintFailure(AlertToDataConstraintFailure.ALERT_TYPE.ERROR,
                     formatAlertMessage(warning), specHelper.getRefsetSpecConcept()));

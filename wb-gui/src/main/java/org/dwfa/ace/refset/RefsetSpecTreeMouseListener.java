@@ -27,8 +27,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-import java.util.UUID;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -41,10 +39,7 @@ import javax.swing.tree.TreePath;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_HelpRefsets;
-import org.dwfa.ace.api.RefsetPropertyMap;
 import org.dwfa.ace.api.Terms;
-import org.dwfa.ace.api.RefsetPropertyMap.REFSET_PROPERTY;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidCid;
@@ -52,14 +47,17 @@ import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 import org.dwfa.ace.config.AceFrame;
 import org.dwfa.ace.gui.popup.ProcessPopupUtil;
 import org.dwfa.ace.log.AceLog;
-import org.dwfa.ace.refset.spec.I_HelpSpecRefset;
-import org.dwfa.ace.task.refset.spec.RefsetSpec;
 import org.dwfa.bpa.util.OpenFrames;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.etypes.EConcept;
-import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
+import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
+import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.api.refex.RefexChronicleBI;
+import org.ihtsdo.tk.query.RefsetSpec;
+import org.ihtsdo.tk.query.helper.RefsetHelper;
 
 public class RefsetSpecTreeMouseListener extends MouseAdapter {
 
@@ -95,7 +93,7 @@ public class RefsetSpecTreeMouseListener extends MouseAdapter {
     private void makeAndShowPopup(MouseEvent e) throws TerminologyException {
         try {
             I_GetConceptData spec = specEditor.getRefsetSpecInSpecEditor();
-            RefsetSpec refsetSpecHelper = new RefsetSpec(spec, aceConfig);
+            RefsetSpec refsetSpecHelper = new RefsetSpec(spec, aceConfig.getViewCoordinate());
 
             JPopupMenu popup = null;
             if (e.isPopupTrigger()) {
@@ -243,14 +241,14 @@ public class RefsetSpecTreeMouseListener extends MouseAdapter {
         File groupingFile = new File(AceFrame.pluginRoot, "refsetspec/branch-popup/grouping");
         JMenu newSubMenuGrouping = new JMenu(groupingFile.getName());
         popup.add(newSubMenuGrouping);
-        ProcessPopupUtil.addSubmenMenuItems(newSubMenuGrouping, groupingFile, this.aceConfig.getWorker());
+        ProcessPopupUtil.addSubMenuItems(newSubMenuGrouping, groupingFile, this.aceConfig.getWorker());
 
         // sub-menu for "concept-contains-desc" and "concept-contains-rel"
         if (!excludesContains) {
             File containsFile = new File(AceFrame.pluginRoot, "refsetspec/branch-popup/contains");
             JMenu newSubMenuContains = new JMenu(containsFile.getName());
             popup.add(newSubMenuContains);
-            ProcessPopupUtil.addSubmenMenuItems(newSubMenuContains, containsFile, this.aceConfig.getWorker());
+            ProcessPopupUtil.addSubMenuItems(newSubMenuContains, containsFile, this.aceConfig.getWorker());
         }
 
         // sub-menu for concept based clauses e.g. concept is, concept is child of
@@ -258,12 +256,12 @@ public class RefsetSpecTreeMouseListener extends MouseAdapter {
             File conceptFile = new File(AceFrame.pluginRoot, "refsetspec/branch-popup/concept");
             JMenu newSubMenuConcept = new JMenu(conceptFile.getName());
             popup.add(newSubMenuConcept);
-            ProcessPopupUtil.addSubmenMenuItems(newSubMenuConcept, conceptFile, this.aceConfig.getWorker());
+            ProcessPopupUtil.addSubMenuItems(newSubMenuConcept, conceptFile, this.aceConfig.getWorker());
             // sub-menu for diff
             conceptFile = new File(AceFrame.pluginRoot, "refsetspec/branch-popup/diff");
             newSubMenuConcept = new JMenu(conceptFile.getName());
             popup.add(newSubMenuConcept);
-            ProcessPopupUtil.addSubmenMenuItems(newSubMenuConcept, conceptFile, this.aceConfig.getWorker());
+            ProcessPopupUtil.addSubMenuItems(newSubMenuConcept, conceptFile, this.aceConfig.getWorker());
         }
 
         // sub-menu for desc based clauses e.g. desc is, desc is child of
@@ -271,7 +269,7 @@ public class RefsetSpecTreeMouseListener extends MouseAdapter {
             File descFile = new File(AceFrame.pluginRoot, "refsetspec/branch-popup/desc");
             JMenu newSubMenuDesc = new JMenu(descFile.getName());
             popup.add(newSubMenuDesc);
-            ProcessPopupUtil.addSubmenMenuItems(newSubMenuDesc, descFile, this.aceConfig.getWorker());
+            ProcessPopupUtil.addSubMenuItems(newSubMenuDesc, descFile, this.aceConfig.getWorker());
         }
 
         // sub-menu for rel based clauses e.g. rel is
@@ -279,7 +277,7 @@ public class RefsetSpecTreeMouseListener extends MouseAdapter {
             File relFile = new File(AceFrame.pluginRoot, "refsetspec/branch-popup/rel");
             JMenu newSubMenuRel = new JMenu(relFile.getName());
             popup.add(newSubMenuRel);
-            ProcessPopupUtil.addSubmenMenuItems(newSubMenuRel, relFile, this.aceConfig.getWorker());
+            ProcessPopupUtil.addSubMenuItems(newSubMenuRel, relFile, this.aceConfig.getWorker());
         }
 
         if (specPart != null) {
@@ -336,7 +334,7 @@ public class RefsetSpecTreeMouseListener extends MouseAdapter {
         JPopupMenu popup = new JPopupMenu();
         JMenuItem noActionItem = new JMenuItem("");
         popup.add(noActionItem);
-        ProcessPopupUtil.addSubmenMenuItems(popup, directory, this.aceConfig.getWorker());
+        ProcessPopupUtil.addSubMenuItems(popup, directory, this.aceConfig.getWorker());
         if (specPart != null) {
             popup.addSeparator();
 
@@ -403,17 +401,15 @@ public class RefsetSpecTreeMouseListener extends MouseAdapter {
             if (commentText != null && commentText.length() > 2) {
                 try {
                     I_GetConceptData refsetIdentityConcept = aceConfig.getRefsetInSpecEditor();
-                    I_HelpRefsets refsetHelper = Terms.get().getRefsetHelper(aceConfig);
-                    Set<? extends I_GetConceptData> commentRefsets =
-                            refsetHelper.getCommentsRefsetForRefset(refsetIdentityConcept, aceConfig);
+                    RefsetSpec refsetSpecHelper = new RefsetSpec(refsetIdentityConcept, true, aceConfig.getViewCoordinate());
+                    RefsetHelper refsetHelper = new RefsetHelper(aceConfig.getViewCoordinate(), aceConfig.getEditCoordinate());
+                    Collection<? extends ConceptVersionBI> commentRefsets = refsetSpecHelper.getCommentsRefsetConcepts();
                     if (commentRefsets.size() > 0) {
-                        for (I_GetConceptData commentRefsetIdentityConcept : commentRefsets) {
-                            RefsetPropertyMap refsetMap = new RefsetPropertyMap(REFSET_TYPES.STR);
-                            refsetMap.put(REFSET_PROPERTY.STRING_VALUE, commentText);
-                            I_ExtendByRef newExtension =
-                                    refsetHelper.getOrCreateRefsetExtension(commentRefsetIdentityConcept.getNid(),
-                                        thinExtByRefTuple.getMemberId(), REFSET_TYPES.STR, refsetMap, UUID.randomUUID());
-                            Terms.get().addUncommitted(newExtension);
+                        for (ConceptChronicleBI commentRefsetIdentityConcept : commentRefsets) {
+                            RefexChronicleBI newExtension = refsetHelper.newStringRefsetExtension(refsetIdentityConcept.getNid(),
+                                                                                thinExtByRefTuple.getMemberId(),
+                                                                                commentText);
+                            Ts.get().addUncommitted(refsetIdentityConcept);
                         }
                     }
                 } catch (Exception e) {
@@ -490,10 +486,10 @@ public class RefsetSpecTreeMouseListener extends MouseAdapter {
                     if (n == JOptionPane.YES_OPTION) {
                         try {
                             // retire all children as well as the selected/current clause
+                            retireAllDescendants(selectedRoot);
                             retireClause(thinExtByRefTuple);
 
-                            retireAllDescendants(selectedRoot);
-
+                            Terms.get().addUncommitted(Terms.get().getConcept(clauseBeingRetired.getRefsetId()));
                         } catch (Exception e) {
                             AceLog.getAppLog().alertAndLogException(e);
                         }
@@ -504,6 +500,7 @@ public class RefsetSpecTreeMouseListener extends MouseAdapter {
                 } else {
                     // retire only the clause as it has no children to deal with
                     retireClause(thinExtByRefTuple);
+                    Terms.get().addUncommitted(Terms.get().getConcept(clauseBeingRetired.getRefsetId()));
                 }
 
             } catch (IOException e) {
@@ -548,21 +545,18 @@ public class RefsetSpecTreeMouseListener extends MouseAdapter {
                         aceConfig.getEditCoordinate().getModuleNid(),
                         currentPart.getPathNid());
             currentExtVersion.getCore().addVersion(newPart);
-
-            I_HelpSpecRefset helper = Terms.get().getSpecRefsetHelper(Terms.get().getActiveAceFrameConfig());
-            boolean prevAutoCommit = helper.isAutocommitActive();
-            helper.setAutocommitActive(false);
+            
             I_GetConceptData refsetIdentityConcept = aceConfig.getRefsetInSpecEditor();
-            RefsetSpec refsetSpec = new RefsetSpec(refsetIdentityConcept, true, aceConfig);
-            I_GetConceptData specConcept = refsetSpec.getRefsetSpecConcept();
-            I_GetConceptData editTimeConcept = refsetSpec.getEditConcept();
+            RefsetSpec specHelper = new RefsetSpec(refsetIdentityConcept, true, aceConfig.getViewCoordinate());
+            RefsetSpec refsetSpec = new RefsetSpec(refsetIdentityConcept, true, aceConfig.getViewCoordinate());
+            I_GetConceptData specConcept = (I_GetConceptData) refsetSpec.getRefsetSpecConcept();
+            I_GetConceptData editTimeConcept = (I_GetConceptData) refsetSpec.getEditConcept();
 
             if (specConcept != null && editTimeConcept != null) {
+                RefsetHelper helper = new RefsetHelper(aceConfig.getViewCoordinate(), aceConfig.getEditCoordinate());
                 helper.newLongRefsetExtension(editTimeConcept.getConceptNid(), specConcept.getConceptNid(), System
                     .currentTimeMillis());
     }
-            helper.setAutocommitActive(prevAutoCommit);
-            Terms.get().addUncommitted(currentExtVersion.getCore());
         }
     }
 
@@ -615,9 +609,8 @@ public class RefsetSpecTreeMouseListener extends MouseAdapter {
                     if (n == JOptionPane.YES_OPTION) {
                         try {
                             // cancel all children as well as the selected/current clause
-                            forgetClause(specPart);
-
                             forgetAllDescendants(selectedRoot);
+                            forgetClause(specPart);
 
                         } catch (Exception e) {
                             AceLog.getAppLog().alertAndLogException(e);
@@ -664,15 +657,17 @@ public class RefsetSpecTreeMouseListener extends MouseAdapter {
         }
 
         private void forgetClause(I_ExtendByRef specPart) throws Exception {
-            specPart.cancel();
             try {
                 if (specPart.isUncommitted()) {
                     Terms.get().forget(specPart);
 
                     I_GetConceptData refsetIdentityConcept = aceConfig.getRefsetInSpecEditor();
-                    RefsetSpec refsetSpec = new RefsetSpec(refsetIdentityConcept, true, aceConfig);
-                    refsetSpec.setLastEditTime(System.currentTimeMillis());
+                    RefsetSpec refsetSpec = new RefsetSpec(refsetIdentityConcept, true, aceConfig.getViewCoordinate());
+                    refsetSpec.setLastEditTime(System.currentTimeMillis(), aceConfig.getEditCoordinate());
+                }else{
+                    specPart.cancel();
                 }
+                
                 Terms.get().addUncommitted(Terms.get().getConcept(specPart.getRefsetId()));
             } catch (IOException e) {
                 AceLog.getAppLog().alertAndLogException(e);
@@ -703,7 +698,7 @@ public class RefsetSpecTreeMouseListener extends MouseAdapter {
                         current.getPathNid());
 
             thinExtByRefTuple.getCore().addVersion(newPart);
-            Terms.get().addUncommitted(thinExtByRefTuple.getCore());
+//            Terms.get().addUncommitted(thinExtByRefTuple.getCore());
             specEditor.updateSpecTree(false);
             aceConfig.refreshRefsetTab();
         }

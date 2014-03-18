@@ -48,6 +48,7 @@ import org.dwfa.cement.RefsetAuxiliary;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
+import org.ihtsdo.tk.query.helper.RefsetHelper;
 
 /**
  * Compare two version of SNOMED
@@ -217,15 +218,13 @@ public class VersionDiff extends DiffBase {
     private void addToRefset(int concept_id, int change_id, String comment)
             throws Exception {
         I_TermFactory tf = Terms.get();
-        I_HelpRefsets refsetHelper = tf.getRefsetHelper(config_ace_frame);
+        RefsetHelper helper = new RefsetHelper(tf.getActiveAceFrameConfig().getViewCoordinate(), tf.getActiveAceFrameConfig().getEditCoordinate());
         if (!noop) {
             // refset_map.put(REFSET_PROPERTY.CID_ONE, concept_id);
             // refset_map.put(REFSET_PROPERTY.CID_TWO, change_id);
             refset_map.put(REFSET_PROPERTY.CID_ONE, change_id);
             refset_map.put(REFSET_PROPERTY.STRING_VALUE, comment);
-            refsetHelper.getOrCreateRefsetExtension(refset.getConceptNid(),
-                    concept_id, REFSET_TYPES.CID_STR, refset_map,
-                    UUID.randomUUID());
+            helper.newConceptStringRefsetExtension(refset.getConceptNid(), concept_id, change_id, comment);
         }
         //
         if (change_id == this.config || change_id == this.stats) {
@@ -238,9 +237,7 @@ public class VersionDiff extends DiffBase {
                 return;
             }
             refset_map_member.put(REFSET_PROPERTY.CID_ONE, concept_id);
-            refsetHelper.getOrCreateRefsetExtension(
-                    member_refset.getConceptNid(), concept_id,
-                    REFSET_TYPES.CID, refset_map_member, UUID.randomUUID());
+            helper.newConceptStringRefsetExtension(refset.getConceptNid(), concept_id, concept_id, comment);
         }
     }
 

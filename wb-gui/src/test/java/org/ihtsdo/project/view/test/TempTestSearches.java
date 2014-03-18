@@ -34,7 +34,6 @@ import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_RelTuple;
 import org.dwfa.ace.api.I_TermFactory;
-import org.dwfa.ace.api.RefsetPropertyMap;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
@@ -42,16 +41,16 @@ import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidCid;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidCidCid;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
 import org.dwfa.ace.log.AceLog;
-import org.dwfa.ace.task.refset.spec.compute.RefsetComputeType;
-import org.dwfa.ace.task.refset.spec.compute.RefsetQueryFactory;
-import org.dwfa.ace.task.refset.spec.compute.RefsetSpecQuery;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.etypes.EConcept;
 import org.ihtsdo.project.refset.LanguageMembershipRefset;
 import org.ihtsdo.project.refset.LanguageSpecRefset;
 import org.ihtsdo.tk.api.PathBI;
+import org.ihtsdo.tk.query.RefsetComputer.ComputeType;
+import org.ihtsdo.tk.query.RefsetSpecFactory;
+import org.ihtsdo.tk.query.RefsetSpecQuery;
+import org.ihtsdo.tk.query.helper.RefsetHelper;
 
 /**
  * The Class TestContextualizedDescriptions.
@@ -128,31 +127,16 @@ public class TempTestSearches extends TestCase {
             List<? extends I_RelTuple> relationships = rootConcept.getDestRelTuples(config.getAllowedStatus(),
                     allowedTypes, config.getViewPositionSetReadOnly(), config.getPrecedence(), config.getConflictResolutionStrategy());
             I_GetConceptData refset = tf.getConcept(RefsetAuxiliary.Concept.GB_UKTC_CAB.getUids());
+            RefsetHelper helper = new RefsetHelper(config.getViewCoordinate(), config.getEditCoordinate());
             for (I_RelTuple rel : relationships) {
                 I_GetConceptData member = tf.getConcept(rel.getC1Id());
-                tf.getRefsetHelper(config).newRefsetExtension(
-                        refset.getConceptNid(),
-                        member.getConceptNid(),
-                        EConcept.REFSET_TYPES.CID,
-                        new RefsetPropertyMap().with(RefsetPropertyMap.REFSET_PROPERTY.CID_ONE, member.getConceptNid()), config);
+                helper.newConceptRefsetExtension(refset.getConceptNid(), member.getConceptNid(), member.getConceptNid());
             }
-            tf.getRefsetHelper(config).newRefsetExtension(
-                    refset.getConceptNid(),
-                    colonoscopicPolypectomy.getConceptNid(),
-                    EConcept.REFSET_TYPES.CID,
-                    new RefsetPropertyMap().with(RefsetPropertyMap.REFSET_PROPERTY.CID_ONE, colonoscopicPolypectomy.getConceptNid()), config);
+            helper.newConceptRefsetExtension(refset.getConceptNid(), colonoscopicPolypectomy.getConceptNid(), colonoscopicPolypectomy.getConceptNid());
 
-            tf.getRefsetHelper(config).newRefsetExtension(
-                    refset.getConceptNid(),
-                    pneumonitis.getConceptNid(),
-                    EConcept.REFSET_TYPES.CID,
-                    new RefsetPropertyMap().with(RefsetPropertyMap.REFSET_PROPERTY.CID_ONE, pneumonitis.getConceptNid()), config);
+            helper.newConceptRefsetExtension(refset.getConceptNid(), pneumonitis.getConceptNid(), pneumonitis.getConceptNid());
 
-            tf.getRefsetHelper(config).newRefsetExtension(
-                    refset.getConceptNid(),
-                    allergicAsthma.getConceptNid(),
-                    EConcept.REFSET_TYPES.CID,
-                    new RefsetPropertyMap().with(RefsetPropertyMap.REFSET_PROPERTY.CID_ONE, allergicAsthma.getConceptNid()), config);
+            helper.newConceptRefsetExtension(refset.getConceptNid(), allergicAsthma.getConceptNid(), allergicAsthma.getConceptNid());
 
 
             tf.commit();
@@ -237,10 +221,10 @@ public class TempTestSearches extends TestCase {
             System.out.println(spec);
 
             RefsetSpecQuery query =
-                    RefsetQueryFactory.createQuery(config, tf,
+                    RefsetSpecFactory.createQuery(config.getViewCoordinate(),
                     spec,
                     null,
-                    RefsetComputeType.CONCEPT);
+                    ComputeType.CONCEPT);
 
 //			System.out.println("colonoscopicPolypectomy: " + query.execute(colonoscopicPolypectomy, config));
 //			System.out.println("administrativeProcedure: " + query.execute(administrativeProcedure, config));

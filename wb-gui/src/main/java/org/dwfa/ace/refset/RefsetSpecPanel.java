@@ -48,7 +48,6 @@ import org.dwfa.ace.table.refset.ReflexiveRefsetFieldData.REFSET_FIELD_TYPE;
 import org.dwfa.ace.table.refset.ReflexiveRefsetTableModel;
 import org.dwfa.ace.table.refset.ReflexiveTableModel;
 import org.dwfa.ace.table.refset.StringWithExtTuple;
-import org.dwfa.ace.task.refset.spec.RefsetSpec;
 import org.dwfa.ace.tree.TreeMouseListener;
 import org.dwfa.bpa.util.SortClickListener;
 import org.dwfa.cement.ArchitectonicAuxiliary;
@@ -99,6 +98,8 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableColumnModelEvent;
 import javax.swing.event.TableColumnModelListener;
 import javax.swing.table.TableColumn;
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
+import org.ihtsdo.tk.query.RefsetSpec;
 import org.ihtsdo.util.swing.GuiUtil;
 
 public class RefsetSpecPanel extends JPanel {
@@ -175,7 +176,9 @@ public class RefsetSpecPanel extends JPanel {
       bottomTabs.addChangeListener(new TabChangeListener());
       commentTableModel = setupCommentTable();
       setupRefsetMemberTable(commentTableModel);
-      editor.getLabel().setTermComponent(editor.getTermComponent());
+      I_AmTermComponent termComponent = editor.getTermComponent();
+      editor.getLabel().setTermComponent(null);
+      editor.getLabel().setTermComponent(termComponent);
       editor.addHistoryActionListener(new HistoryActionListener());
       editor.getLabel().addTermChangeListener(new PropertyChangeListener() {
 
@@ -1237,49 +1240,52 @@ public class RefsetSpecPanel extends JPanel {
 
             refsetConcepts.add(Terms.get().getConcept(tupleVersioned.getRefsetId()));
 
-            for (I_ExtendByRef extForMember : Terms.get().getAllExtensionsForComponent(tupleMemberId)) {
-               RefsetSpec helper            = new RefsetSpec(getRefsetSpecInSpecEditor(), aceFrameConfig);
-               int        promotionRefsetId = helper.getPromotionRefsetConcept().getConceptNid();
+             for (I_ExtendByRef extForMember : Terms.get().getAllExtensionsForComponent(tupleMemberId)) {
+                 RefsetSpec helper = new RefsetSpec(getRefsetSpecInSpecEditor(), aceFrameConfig.getViewCoordinate());
+                 ConceptChronicleBI promotionRefsetConcept = helper.getPromotionRefsetConcept();
+                 if (promotionRefsetConcept != null) {
+                     int promotionRefsetId = helper.getPromotionRefsetConcept().getConceptNid();
 
-               if (promotionRefsetId == extForMember.getRefsetId()) {
-                  List<? extends I_ExtendByRefVersion> promotionTuples =
-                     extForMember.getTuples(aceFrameConfig.getAllowedStatus(),
-                                            aceFrameConfig.getViewPositionSetReadOnly(),
-                                            aceFrameConfig.getPrecedence(),
-                                            aceFrameConfig.getConflictResolutionStrategy());
+                     if (promotionRefsetId == extForMember.getRefsetId()) {
+                         List<? extends I_ExtendByRefVersion> promotionTuples =
+                                 extForMember.getTuples(aceFrameConfig.getAllowedStatus(),
+                                 aceFrameConfig.getViewPositionSetReadOnly(),
+                                 aceFrameConfig.getPrecedence(),
+                                 aceFrameConfig.getConflictResolutionStrategy());
 
-                  if (promotionTuples.size() > 0) {
-                     I_ExtendByRefPart promotionPart = promotionTuples.get(0).getMutablePart();
+                         if (promotionTuples.size() > 0) {
+                             I_ExtendByRefPart promotionPart = promotionTuples.get(0).getMutablePart();
 
-                     if (promotionPart instanceof I_ExtendByRefPartCid) {
-                        for (PathBI p : aceFrameConfig.getEditingPathSet()) {
-                           I_ExtendByRefPartCid partToPromote = (I_ExtendByRefPartCid) promotionPart;
-                           PROMOTION_STATUS     oldStatus     = PROMOTION_STATUS.get(partToPromote.getC1id());
-                           PROMOTION_STATUS     newStatus;
+                             if (promotionPart instanceof I_ExtendByRefPartCid) {
+                                 for (PathBI p : aceFrameConfig.getEditingPathSet()) {
+                                     I_ExtendByRefPartCid partToPromote = (I_ExtendByRefPartCid) promotionPart;
+                                     PROMOTION_STATUS oldStatus = PROMOTION_STATUS.get(partToPromote.getC1id());
+                                     PROMOTION_STATUS newStatus;
 
-                           if (forApproval) {
-                              newStatus = getNewStatusForApproval(oldStatus);
-                           } else {
-                              newStatus = getNewStatusForDisapproval(oldStatus);
-                           }
+                                     if (forApproval) {
+                                         newStatus = getNewStatusForApproval(oldStatus);
+                                     } else {
+                                         newStatus = getNewStatusForDisapproval(oldStatus);
+                                     }
 
-                           if (newStatus != null) {
-                              I_ExtendByRefPartCid analog = (I_ExtendByRefPartCid) partToPromote.makeAnalog(
-                                                                promotionPart.getStatusNid(),
-                                                                Long.MAX_VALUE,
-                                                                aceFrameConfig.getEditCoordinate().getAuthorNid(),
-                                                                aceFrameConfig.getEditCoordinate().getModuleNid(),
-                                                                p.getConceptNid());
+                                     if (newStatus != null) {
+                                         I_ExtendByRefPartCid analog = (I_ExtendByRefPartCid) partToPromote.makeAnalog(
+                                                 promotionPart.getStatusNid(),
+                                                 Long.MAX_VALUE,
+                                                 aceFrameConfig.getEditCoordinate().getAuthorNid(),
+                                                 aceFrameConfig.getEditCoordinate().getModuleNid(),
+                                                 p.getConceptNid());
 
-                              analog.setC1id(newStatus.getNid());
-                              extForMember.addVersion(analog);
-                              extForMember.promote(new Position(Long.MAX_VALUE, p), promotionPath,
-                                                   currentSet, aceFrameConfig.getPrecedence(), aceFrameConfig.getEditCoordinate().getAuthorNid());
-                           }
-                        }
+                                         analog.setC1id(newStatus.getNid());
+                                         extForMember.addVersion(analog);
+                                         extForMember.promote(new Position(Long.MAX_VALUE, p), promotionPath,
+                                                 currentSet, aceFrameConfig.getPrecedence(), aceFrameConfig.getEditCoordinate().getAuthorNid());
+                                     }
+                                 }
+                             }
+                         }
                      }
-                  }
-               }
+                 }
             }
          }
 

@@ -24,7 +24,6 @@ import java.io.OutputStreamWriter;
 import java.text.SimpleDateFormat;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
@@ -39,7 +38,9 @@ import org.dwfa.ace.task.refset.members.RefsetUtilImpl;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.project.ContextualizedDescription;
 import org.ihtsdo.project.TerminologyProjectDAO;
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
+import org.ihtsdo.tk.query.RefsetSpec;
 //import org.ihtsdo.rf2.util.ExportUtil;
 
 /**
@@ -146,7 +147,7 @@ public class ExportDescriptionAndLanguageSubset implements I_ProcessConcepts {
     /**
      * The promo refset.
      */
-    private I_GetConceptData promoRefset;
+    private ConceptChronicleBI promoRefset;
     /**
      * The config.
      */
@@ -198,9 +199,9 @@ public class ExportDescriptionAndLanguageSubset implements I_ProcessConcepts {
             reportFileWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(reportFile), "UTF8"));
             outputDescFileWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(exportDescFile), "UTF8"));
             outputSubsFileWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(exportSubsFile), "UTF8"));
-
-            Set<? extends I_GetConceptData> promRefsets = termFactory.getRefsetHelper(config).getPromotionRefsetForRefset(refsetConcept, config);
-            promoRefset = promRefsets.iterator().next();
+            
+            RefsetSpec refsetSpec = new RefsetSpec(refsetConcept, true, config.getViewCoordinate());
+            promoRefset = refsetSpec.getPromotionRefsetConcept();
             if (promoRefset == null) {
                 reportFileWriter.append("The promotion refset concept for target language refset " + refsetConcept + " doesn't exists." + "\r\n");
                 throw new Exception("The promotion refset concept for target language refset " + refsetConcept + " doesn't exists.");

@@ -910,4 +910,10 @@ public class ConceptBeanForTree implements I_GetConceptDataForTree, Comparable<C
     public Set<Integer> getAllNidsForStamps(Set<Integer> sapNids) throws IOException {
         return bean.getAllNidsForStamps(sapNids);
     }
+    
+    @Override
+    public Collection<Integer> getRefsetMemberNidsActive(ViewCoordinate vc)
+            throws IOException{
+        return bean.getRefsetMemberNidsActive(vc);
+    }
 }

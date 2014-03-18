@@ -581,7 +581,7 @@ public class TaxonomyNodeRenderer extends JLabel
             throws IOException {
         Collection<RefexChronicleBI> extensions = new ArrayList<RefexChronicleBI>();
 
-        extensions.addAll(cv.getRefexes());
+        extensions.addAll(cv.getRefexesActive(cv.getViewCoordinate()));
 
         HashSet<Integer> refexAlreadyHandled = new HashSet<Integer>();
 
