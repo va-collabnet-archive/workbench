@@ -35,7 +35,6 @@ import org.dwfa.ace.api.I_HelpRefsets;
 import org.dwfa.ace.api.I_Identify;
 import org.dwfa.ace.api.I_ProcessConcepts;
 import org.dwfa.ace.api.I_TermFactory;
-import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
@@ -46,13 +45,7 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.ihtsdo.project.TerminologyProjectDAO;
 import org.ihtsdo.project.refset.ConceptMembershipRefset;
 import org.ihtsdo.tk.Ts;
-import org.ihtsdo.tk.api.PathBI;
-import org.ihtsdo.tk.api.PositionBI;
-import org.ihtsdo.tk.api.PositionSet;
-import org.ihtsdo.tk.api.PositionSetBI;
-import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
-import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 
 /**
@@ -170,24 +163,9 @@ public class ExportConceptMemberRefsetToRefset {
         I_HelpSpecRefset helper = termFactory.getSpecRefsetHelper(config);
         for (I_ExtendByRef ext : extensions) {
 
-            long lastVersionTime = 0;
-            I_ExtendByRefPart lastPart = null;
-            for (I_ExtendByRefPart<?> loopTuple : ext.getTuples()) {
-    			if (loopTuple.getTime() > lastVersionTime) {
-    				lastVersionTime = loopTuple.getTime();
-    				lastPart = loopTuple;
-    			}
-    		}
-
-    		if (lastPart == null) {
-    			continue;
-    		}
-
-            if (lastPart.getStatusNid() == ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid() || 
-        		lastPart.getStatusNid() == SnomedMetadataRf2.INACTIVE_VALUE_RF2.getLenient().getNid()) {
-            	continue;
-        	} else {
-            	
+            I_ExtendByRefPart lastPart = TerminologyProjectDAO.getLastExtensionPart(ext);
+            if (lastPart.getStatusNid() != ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid()
+                    && lastPart.getStatusNid() != SnomedMetadataRf2.INACTIVE_VALUE_RF2.getLenient().getNid()) {
 //
 //			List<? extends I_ExtendByRefVersion> tuples = ext.getTuples(helper.getCurrentStatusIntSet(), null, 
 //					config.getPrecedence(),
@@ -218,7 +196,7 @@ public class ExportConceptMemberRefsetToRefset {
 
                     bSkip = true;
                 }
-//                if (!bSkip) {
+                if (!bSkip) {
                 	String sctId_id = null;
                     try {
                         sctId_id = rUtil.getSnomedId(ext.getNid(), termFactory);
@@ -236,13 +214,9 @@ public class ExportConceptMemberRefsetToRefset {
                     } catch (NumberFormatException e) {
                         sctId_moduleId = moduleId;
                     }
-                    if (!bSkip) {
-                    	outputFileWriter2.append(begEnd + sctId_id + sep + effectiveTime + sep + "1" + sep + sctId_moduleId + sep + refsetSCTID + sep + conceptId + begEnd
-                    			+ "\r\n");
-                    } else {
-                    	outputFileWriter2.append(begEnd + sctId_id + sep + effectiveTime + sep + "1" + sep + sctId_moduleId + sep + refsetSCTID + sep + compoID + begEnd
-                    			+ "\r\n");
-                    }
+                    outputFileWriter2.append(begEnd + sctId_id + sep + effectiveTime + sep + "1" + sep + sctId_moduleId + sep + refsetSCTID + sep + conceptId + begEnd
+                            + "\r\n");
+
                     if (refsetConcept.getInitialText().contains("JIF Reactants")) {
                     	I_ExtendByRefPartCid concExt = (I_ExtendByRefPartCid)ext;
                     	
@@ -250,11 +224,10 @@ public class ExportConceptMemberRefsetToRefset {
                     } else {
                     	outputFileWriter3.append(begEnd + conceptId + sep + getDescForCon(conceptId, compoID, bSkip) + sep + reportTime + begEnd + "\r\n");
                     }
-                    
-                    outputFileWriter3.flush();
+
                     SCTIDlineCount++;
 
-//                }
+                }
             }
         }
         reportFileWriter.append("Exported to UUID file " + exportFile.getName() + " : " + UUIDlineCount + " lines" + "\r\n");
@@ -320,26 +293,7 @@ public class ExportConceptMemberRefsetToRefset {
         public void processConcept(I_GetConceptData concept) throws Exception {
         	if (Ts.get().isKindOf(concept.getConceptNid(), rootNid, Terms.get().getActiveAceFrameConfig().getViewCoordinate())) {
 	            for (RefexChronicleBI<?> annotation : concept.getAnnotations()) {
-					if (annotation.getRefexNid() == refsetNid) {
-	                    long lastVersionTime = 0;
-	                    RefexVersionBI lastVersion = null;
-	                    for (RefexVersionBI<?> loopTuple : annotation.getVersions()) {
-	            			if (loopTuple.getTime() > lastVersionTime) {
-	            				lastVersionTime = loopTuple.getTime();
-	            				lastVersion = loopTuple;
-	            			}
-	            		}
-
-	            		if (lastVersion == null) {
-	            			continue;
-	            		}
-
-	                    if (lastVersion.getStatusNid() == ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid() || 
-                    		lastVersion.getStatusNid() == SnomedMetadataRf2.INACTIVE_VALUE_RF2.getLenient().getNid()) {
-	                    	continue;
-                    	}
-	                    	
-	                    
+	        		if (annotation.getRefexNid() == refsetNid) {
 	                	extensions.add((I_ExtendByRef) annotation);
 	        		}
 	        	}
