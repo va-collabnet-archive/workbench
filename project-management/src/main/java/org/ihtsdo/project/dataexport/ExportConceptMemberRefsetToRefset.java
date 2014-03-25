@@ -24,6 +24,7 @@ import java.io.OutputStreamWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -34,6 +35,7 @@ import org.dwfa.ace.api.I_HelpRefsets;
 import org.dwfa.ace.api.I_Identify;
 import org.dwfa.ace.api.I_ProcessConcepts;
 import org.dwfa.ace.api.I_TermFactory;
+import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
@@ -44,7 +46,13 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.ihtsdo.project.TerminologyProjectDAO;
 import org.ihtsdo.project.refset.ConceptMembershipRefset;
 import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.PathBI;
+import org.ihtsdo.tk.api.PositionBI;
+import org.ihtsdo.tk.api.PositionSet;
+import org.ihtsdo.tk.api.PositionSetBI;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
+import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 
 /**
@@ -162,9 +170,24 @@ public class ExportConceptMemberRefsetToRefset {
         I_HelpSpecRefset helper = termFactory.getSpecRefsetHelper(config);
         for (I_ExtendByRef ext : extensions) {
 
-            I_ExtendByRefPart lastPart = TerminologyProjectDAO.getLastExtensionPart(ext);
-            if (lastPart.getStatusNid() != ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid()
-                    && lastPart.getStatusNid() != SnomedMetadataRf2.INACTIVE_VALUE_RF2.getLenient().getNid()) {
+            long lastVersionTime = 0;
+            I_ExtendByRefPart lastPart = null;
+            for (I_ExtendByRefPart<?> loopTuple : ext.getTuples()) {
+    			if (loopTuple.getTime() > lastVersionTime) {
+    				lastVersionTime = loopTuple.getTime();
+    				lastPart = loopTuple;
+    			}
+    		}
+
+    		if (lastPart == null) {
+    			continue;
+    		}
+
+            if (lastPart.getStatusNid() == ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid() || 
+        		lastPart.getStatusNid() == SnomedMetadataRf2.INACTIVE_VALUE_RF2.getLenient().getNid()) {
+            	continue;
+        	} else {
+            	
 //
 //			List<? extends I_ExtendByRefVersion> tuples = ext.getTuples(helper.getCurrentStatusIntSet(), null, 
 //					config.getPrecedence(),
@@ -195,7 +218,7 @@ public class ExportConceptMemberRefsetToRefset {
 
                     bSkip = true;
                 }
-                if (!bSkip) {
+//                if (!bSkip) {
                 	String sctId_id = null;
                     try {
                         sctId_id = rUtil.getSnomedId(ext.getNid(), termFactory);
@@ -213,20 +236,25 @@ public class ExportConceptMemberRefsetToRefset {
                     } catch (NumberFormatException e) {
                         sctId_moduleId = moduleId;
                     }
-                    outputFileWriter2.append(begEnd + sctId_id + sep + effectiveTime + sep + "1" + sep + sctId_moduleId + sep + refsetSCTID + sep + conceptId + begEnd
-                            + "\r\n");
-
+                    if (!bSkip) {
+                    	outputFileWriter2.append(begEnd + sctId_id + sep + effectiveTime + sep + "1" + sep + sctId_moduleId + sep + refsetSCTID + sep + conceptId + begEnd
+                    			+ "\r\n");
+                    } else {
+                    	outputFileWriter2.append(begEnd + sctId_id + sep + effectiveTime + sep + "1" + sep + sctId_moduleId + sep + refsetSCTID + sep + compoID + begEnd
+                    			+ "\r\n");
+                    }
                     if (refsetConcept.getInitialText().contains("JIF Reactants")) {
                     	I_ExtendByRefPartCid concExt = (I_ExtendByRefPartCid)ext;
                     	
-                    	outputFileWriter3.append(begEnd +  getDescForCon(conceptId) + sep + getDescForCon(concExt.getC1id()) + sep + reportTime + begEnd + "\r\n");
+                	outputFileWriter3.append(begEnd + conceptId + sep + getDescForCon(conceptId, compoID, bSkip) + sep + getDescForCon(concExt.getC1id()) + sep + reportTime + begEnd + "\r\n");
                     } else {
-                    	outputFileWriter3.append(begEnd +  getDescForCon(conceptId) + sep + reportTime + begEnd + "\r\n");
+                    	outputFileWriter3.append(begEnd + conceptId + sep + getDescForCon(conceptId, compoID, bSkip) + sep + reportTime + begEnd + "\r\n");
                     }
-
+                    
+                    outputFileWriter3.flush();
                     SCTIDlineCount++;
 
-                }
+//                }
             }
         }
         reportFileWriter.append("Exported to UUID file " + exportFile.getName() + " : " + UUIDlineCount + " lines" + "\r\n");
@@ -253,9 +281,16 @@ public class ExportConceptMemberRefsetToRefset {
     	}
 	}
 
-	private String getDescForCon(String sctId_id) {
+	private String getDescForCon(String sctId_id, String compoID, boolean bSkip) {
     	try {
-	        Set<I_GetConceptData> cons = Terms.get().getConcept(sctId_id);
+    		Set<I_GetConceptData> cons = null;
+    		if (!bSkip) {
+    			cons = Terms.get().getConcept(sctId_id);
+    		} else {
+    			I_GetConceptData con = Terms.get().getConcept(UUID.fromString(compoID));
+    			cons = new HashSet();
+    			cons.add(con);
+    		}
 	        if (cons.size() != 1) {
 	        	throw new Exception("Id: " + sctId_id + " could not be found");
 	        } else {
@@ -285,7 +320,26 @@ public class ExportConceptMemberRefsetToRefset {
         public void processConcept(I_GetConceptData concept) throws Exception {
         	if (Ts.get().isKindOf(concept.getConceptNid(), rootNid, Terms.get().getActiveAceFrameConfig().getViewCoordinate())) {
 	            for (RefexChronicleBI<?> annotation : concept.getAnnotations()) {
-	        		if (annotation.getRefexNid() == refsetNid) {
+					if (annotation.getRefexNid() == refsetNid) {
+	                    long lastVersionTime = 0;
+	                    RefexVersionBI lastVersion = null;
+	                    for (RefexVersionBI<?> loopTuple : annotation.getVersions()) {
+	            			if (loopTuple.getTime() > lastVersionTime) {
+	            				lastVersionTime = loopTuple.getTime();
+	            				lastVersion = loopTuple;
+	            			}
+	            		}
+
+	            		if (lastVersion == null) {
+	            			continue;
+	            		}
+
+	                    if (lastVersion.getStatusNid() == ArchitectonicAuxiliary.Concept.RETIRED.localize().getNid() || 
+                    		lastVersion.getStatusNid() == SnomedMetadataRf2.INACTIVE_VALUE_RF2.getLenient().getNid()) {
+	                    	continue;
+                    	}
+	                    	
+	                    
 	                	extensions.add((I_ExtendByRef) annotation);
 	        		}
 	        	}
