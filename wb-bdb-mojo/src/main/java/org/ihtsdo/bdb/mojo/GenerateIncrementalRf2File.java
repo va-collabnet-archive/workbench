@@ -411,13 +411,12 @@ public class GenerateIncrementalRf2File extends AbstractMojo {
             TaxonomyFilter filter = new TaxonomyFilter();
             Ts.get().iterateConceptDataInParallel(filter);
             NidBitSetBI nidsToRelease = filter.getResults();
-            for(UUID moduleId : moduleUuids){
                 Rf2Export exporter = new Rf2Export(output,
                     releaseType,
                     LANG_CODE.valueOf(languageCode),
                     COUNTRY_CODE.valueOf(countryCode),
                     namespace,
-                    moduleId.toString(),
+                    moduleConcepts[0].getUuid(),
                     new Date(TimeHelper.getTimeFromString(effectiveDate,
                     TimeHelper.getAltFileDateFormat())),
                     new Date(TimeHelper.getTimeFromString(snomedCoreReleaseDate,
@@ -436,13 +435,12 @@ public class GenerateIncrementalRf2File extends AbstractMojo {
             Ts.get().iterateConceptDataInSequence(exporter);
             exporter.writeOneTimeFiles();
             exporter.close();
-            UuidToSctIdWriter writer = new UuidToSctIdWriter(namespace, moduleId.toString(),
+            UuidToSctIdWriter writer = new UuidToSctIdWriter(namespace, moduleConcepts[0].getUuid(),
                     output, handler, releaseType, COUNTRY_CODE.valueOf(countryCode),
                     new Date(TimeHelper.getTimeFromString(effectiveDate,
                     TimeHelper.getAltFileDateFormat())), vc);
             writer.write();
             writer.close();
-            }
             handler.writeMaps();
         } catch (Exception e) {
             throw new MojoExecutionException(e.getLocalizedMessage(), e);

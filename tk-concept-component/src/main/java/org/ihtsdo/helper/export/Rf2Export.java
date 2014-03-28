@@ -554,6 +554,9 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
 
             if (concept.getDescriptions() != null) {
                 for (DescriptionChronicleBI d : concept.getDescriptions()) {
+                    if(d.getPrimUuid().equals(UUID.fromString("61126b69-06ae-300f-84b3-4dd02a2fe455"))){ // antikolinergiskt medel
+                        System.out.println("DEBUG");
+                    }
                     processDescription(d);
                     if (d.getAnnotations() != null) {
                         for (RefexChronicleBI annot : d.getAnnotations()) {
@@ -669,7 +672,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                 boolean write = true;
                     for (RefexVersionBI refexVersion : versions) {
                         RefexChronicleBI chronicle = (RefexChronicleBI) refexVersion.getChronicle();
-                        if (sameCycleStampNids.contains(refexVersion.getStampNid())) {
+                        if (sameCycleStampNids.contains(refexVersion.getPrimordialVersion().getStampNid())) {
                             RefexVersionBI version = (RefexVersionBI) chronicle.getVersion(viewCoordinateAllStatus);
                             if (!version.isActive(viewCoordinate)) {
                                 write = false;
@@ -785,7 +788,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                     for (RefexVersionBI refexVersion : versions) {
                         RefexNidFloatVersionBI nfVersion = (RefexNidFloatVersionBI) refexVersion;
                         RefexChronicleBI chronicle = (RefexChronicleBI) nfVersion.getChronicle();
-                        if (sameCycleStampNids.contains(refexVersion.getStampNid())) {
+                        if (sameCycleStampNids.contains(refexVersion.getPrimordialVersion().getStampNid())) {
                             RefexVersionBI version = (RefexVersionBI) chronicle.getVersion(viewCoordinateAllStatus);
                             if (!version.isActive(viewCoordinate)) {
                                 write = false;
@@ -1467,7 +1470,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                 Collection<RefexVersionBI> versions = new HashSet<>();
                 if (releaseType.equals(ReleaseType.FULL)) {
                     //if not previously released or latest version remove
-                    RefexVersionBI latest = (RefexVersionBI) refexChronicle.getVersion(viewCoordinateAllStatusTime); //CHANGE FOR DK, before merge back use viewCoordinateAllStatus
+                    RefexVersionBI latest = (RefexVersionBI) refexChronicle.getVersion(viewCoordinateAllStatus); //CHANGE FOR DK, before merge back use viewCoordinateAllStatus
                     for (Object o : refexChronicle.getVersions()) {
                         RefexVersionBI r = (RefexVersionBI) o;
                         if (!sameCycleStampNids.contains(r.getStampNid()) || r.getStampNid() == latest.getStampNid()) {
@@ -1483,14 +1486,17 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                 boolean write = true;
                 for (RefexVersionBI rv : versions) {
                     if (!rv.isActive(viewCoordinate)) {
-                        if (sameCycleStampNids.contains(rv.getStampNid())) {
+                        if (sameCycleStampNids.contains(rv.getPrimordialVersion().getStampNid())) {
                             write = false;
                         }
                     }
-                    if(rv.isActive(viewCoordinate)){ //CHANGE FOR DK, source data incorrect, retired descriptions should also have retired lang refsets
+                    //need to compare same version of refex with same verison of referenced component
+                    if(rv.isActive(viewCoordinate)){ //accounting for active refset members where referenced component is inactive
                         ComponentVersionBI rc = Ts.get().getComponentVersion(viewCoordinate, rv.getReferencedComponentNid());
-                        if(rc == null || !rc.isActive(viewCoordinate)){
-                            write = false;
+                        if((rc == null || !rc.isActive(viewCoordinate))){
+                            if(refexChronicle.getVersion(viewCoordinate) != null && refexChronicle.getVersion(viewCoordinate).equals(rv)){
+                               write = false; 
+                            }
                         }
                     }
                     if (stampNids.contains(rv.getStampNid()) && write) {
@@ -1502,7 +1508,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                             processOtherLang(rv);
                         }
                     }
-
+                    write = true;
                 }
             }
         }
