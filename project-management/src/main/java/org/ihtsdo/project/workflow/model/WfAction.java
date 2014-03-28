@@ -142,7 +142,33 @@ public class WfAction implements Serializable {
 	 * @return the business process
 	 */
 	public File getBusinessProcess() {
-		return businessProcess;
+		return correctPathForPlatform(businessProcess);
+	}
+	
+	private File correctPathForPlatform(File file)
+	{
+		//The WFAction is defined on one computer (say windows) then the path is stored in here like  
+		//sampleProcesses\CommentActionWithoutDestination.bp
+		//Then, the WFAction is serialized, and synced - say to a linux computer.
+		//And it fails.  Must correct the path, if necessary.
+		
+		String s = file.getName();
+		if (File.separatorChar == '/')
+		{
+			s = s.replaceAll("\\\\", "/");
+		}
+		else if (File.separatorChar == '\\')
+		{
+			s = s.replaceAll("/", "\\");
+		}
+		if (file.getName().equals(s))
+		{
+			return file;
+		}
+		else
+		{
+			return new File(s);
+		}
 	}
 
 	/**
