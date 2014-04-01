@@ -277,7 +277,9 @@ public class Sct2_IdRecord implements Serializable {
                 // module uuid
                 UUID moduleUuid = idLookUp.getUuid(line[MODULE_ID]);
                 if (moduleUuid == null) {
-                    throw new Exception("MODULE_ID not in id cache");
+                    // throw new Exception("MODULE_ID not in id cache");
+                    long id = Long.parseLong(line[MODULE_ID]);
+                    moduleUuid = Type3UuidFactory.fromSNOMED(id);
                 }
 
                 // Write to ARF file
