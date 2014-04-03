@@ -47,9 +47,11 @@ import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationshipRevision;
  * Sct1ArfToEConceptMojo is a maven mojo which converts SNOMED concepts, descriptions, stated
  * relationships and inferred relationships (Distribution Normal Form) RF1 release files to IHTSDO
  * Workbench versioned import eConcepts format. ARF formatted files can also be combined with the
- * SCT 1 files. <p> <b>Relationship uuids are generated based on the algorithm below. Note that
- * changing the role group in terms of relationship members or an non-mutable part any role group
- * member will cause that role group to be retired and a new role group to be created.</b>
+ * SCT 1 files.
+ * <p>
+ * <b>Relationship uuids are generated based on the algorithm below. Note that changing the role
+ * group in terms of relationship members or an non-mutable part any role group member will cause
+ * that role group to be retired and a new role group to be created.</b>
  * <pre>
  * relGroupList = in concept1-type-concept2 sorted order
  *              {triplet_A(concept1-type-concept2),
@@ -89,53 +91,52 @@ import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationshipRevision;
  * &lt;arfInputDirs&gt;
  *       &lt;param&gt;/cement/&lt;/param&gt;
  * </pre> The POM needs to specify mutually exclusive extensions in separate directories in the
- * array
- * <code>sctInputDirArray</code> parameter. Each directory entry will be parsed to locate SNOMED
- * formated text files in any sub-directories. <br> <br>
+ * array <code>sctInputDirArray</code> parameter. Each directory entry will be parsed to locate
+ * SNOMED formated text files in any sub-directories. <br> <br>
  *
  * Each SNOMED file should contain a version date in the file name
  * <code>"sct1_*yyyyMMdd.txt"</code>. If a valid date is not found in the file name then the parent
- * directory name will be checked for a date in the format
- * <code>"yyyy-MM-dd"</code>.
+ * directory name will be checked for a date in the format <code>"yyyy-MM-dd"</code>.
  *
- * Versioning is performed for the files under the SAME
- * <code>sctInputDirArray[a]</code> directory. Records of the same primary ids are compared in
- * historical sequence to other records of the same primary ids for all applicable files under
- * directory
- * <code>sctInputDirArray[a]</code>. <p>
+ * Versioning is performed for the files under the SAME <code>sctInputDirArray[a]</code> directory.
+ * Records of the same primary ids are compared in historical sequence to other records of the same
+ * primary ids for all applicable files under directory <code>sctInputDirArray[a]</code>.
+ * <p>
  *
- * Set
- * <code>includeCTV3ID</code> and/or
- * <code>includeSNOMEDRTID</code> to true to have the corresponding CTV3 IDs and SNOMED RT IDs to be
- * included in
- * <code>ids.txt</code> output file. The default value is false to not include the CTV3 IDs and
- * SNOMED RT IDs. <p> <b>OUTPUTS:</b> EConcept jbin file. (default name: sctSiEConcept.jbin) <br>
- * <p> <b>REQUIRMENTS:</b><br>
+ * Set <code>includeCTV3ID</code> and/or <code>includeSNOMEDRTID</code> to true to have the
+ * corresponding CTV3 IDs and SNOMED RT IDs to be included in <code>ids.txt</code> output file. The
+ * default value is false to not include the CTV3 IDs and SNOMED RT IDs.
+ * <p>
+ * <b>OUTPUTS:</b> EConcept jbin file. (default name: sctSiEConcept.jbin) <br>
+ * <p>
+ * <b>REQUIRMENTS:</b><br>
  *
  * 1. RELEASE DATE must be in either the SNOMED file name. The preferred date format in
  * <code>yyyyMMdd</code>. <br> <br> 2. SNOMED EXTENSIONS must be mutually exclusive from SNOMED CORE
- * and each other; and, placed under separate
- * <code>sctInputDirArray</code> directories.<br> <br> 3. STATED & INFERRED. Stated relationship
- * files names must begin with "sct1_relationships_stated". Inferred relationship file names must
- * begin with "sct1_relationships_inferred". Relationship file names without "_stated" or
- * "_inferred" are not supported. <p> <b>PROCESSING:</b><br> Step #1. Versioning & Relationship
- * Generated IDs. Merge time series of releases into a versioned intermediate concept, description,
- * and relationship files. This step also adds an algorithmically computed relationship ids. Ids are
- * kept directly with each primary (concept, description & relationship) component. <br> <br> Step
- * #2. ARF files. Append arf files to sct binary records files.<br> <br> Step #3. Destination Rels.
- * Build file for destination rels. Non-required fields are dropped.<br> <br> Step #4. Match IDs.
- * Associate ids with each specific component.<br> <br> Step #5. Refset. Refset preparation.<br>
+ * and each other; and, placed under separate <code>sctInputDirArray</code> directories.<br> <br> 3.
+ * STATED & INFERRED. Stated relationship files names must begin with "sct1_relationships_stated".
+ * Inferred relationship file names must begin with "sct1_relationships_inferred". Relationship file
+ * names without "_stated" or "_inferred" are not supported.
+ * <p>
+ * <b>PROCESSING:</b><br> Step #1. Versioning & Relationship Generated IDs. Merge time series of
+ * releases into a versioned intermediate concept, description, and relationship files. This step
+ * also adds an algorithmically computed relationship ids. Ids are kept directly with each primary
+ * (concept, description & relationship) component. <br> <br> Step #2. ARF files. Append arf files
+ * to sct binary records files.<br> <br> Step #3. Destination Rels. Build file for destination rels.
+ * Non-required fields are dropped.<br> <br> Step #4. Match IDs. Associate ids with each specific
+ * component.<br> <br> Step #5. Refset. Refset preparation.<br>
  * <br> Step #6. Sort. Sort into concept order for merging the prepared files to create eConcepts in
  * the next step.<br> <br> Step #7. Create EConcepts. Concurrently read pre-sorted concept,
  * description, source relationship and destination relationship files and creates eConcepts.<br>
- * <p> <b>NOTES:</b><br> <b>Records are NOT VERSIONED between files under DIFFERENT
+ * <p>
+ * <b>NOTES:</b><br> <b>Records are NOT VERSIONED between files under DIFFERENT
  * <code>sctInputDirArray</code> directories. The versioned output from
  * <code>sctInputDirArray[a+1]</code> is appended to the versioned output from
  * <code>sctInputDirArray[a]</code>. </b><br>
  *
  * @userIdx Marc E. Campbell
  *
- * @goal sct1-arf-to-econcepts 
+ * @goal sct1-arf-to-econcepts
  * @requiresDependencyResolution compile
  * @requiresProject false
  */
@@ -281,7 +282,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
     }
     /**
      *
-     * @parameter
+     * @parameter 
      * @required
      */
     private UUID uuidUser;
@@ -290,7 +291,8 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
         uuidUser = UUID.fromString(uuidStr);
     }
     /**
-     * Snorocket "User" UUID 
+     * Snorocket "User" UUID
+     *
      * @parameter
      * @required
      */
@@ -1037,6 +1039,11 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
             executeMojoStep2(tDir, tSubDir, arfDirs, oosCon, oosDes, oosRel, oosIds, oosRefSet);
 
             // stateSave(wDir);
+            oosCon.flush();
+            oosDes.flush();
+            oosRel.flush();
+            oosIds.flush();
+            oosRefSet.flush();
             oosCon.close();
             oosDes.close();
             oosRel.close();
@@ -1366,7 +1373,6 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
             //                getLog().info(":DEBUG: ... termText   = " + tmpDesRec.termText);
             //            }
             // :DEBUG:END 
-
             try {
                 oos.writeUnshared(tmpDesRec);
             } catch (Exception e) {
@@ -1564,7 +1570,6 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
             // :DEBUG:
             //            if (uuidComponent.equals(UUID.fromString("7c57f6b4-4a63-52ad-b762-73acc15f23de"))) 
             //                getLog().info("FOUND IT");
-
             Sct1_RefSetRecord tmpRsRec = new Sct1_RefSetRecord(uuidRefset, uuidMember,
                     uuidComponent, status,
                     revTime, pathIdx, authorIdx, moduleIdx,
@@ -1868,6 +1873,96 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
         getLog().info("*** Sct1ArfToEConcept STEP #3 COMPLETED -- GATHER DESTINATION RELs ***\r\n");
     }
 
+    private ArrayList<Sct1_IdRecord> filterDuplicateSctId(ArrayList<Sct1_IdRecord> aId) throws MojoFailureException {
+        ArrayList<Sct1_IdRecord> tmpSctIdArrayList = new ArrayList();
+        ArrayList<Sct1_IdRecord> tmpOtherIdArrayList = new ArrayList();
+        Comparator<Sct1_IdRecord> compRsByRs = new Comparator<Sct1_IdRecord>() {
+            @Override
+            public int compare(Sct1_IdRecord o1, Sct1_IdRecord o2) {
+                int thisMore = 1;
+                int thisLess = -1;
+                // CONCEPTID
+                if (o1.primaryUuidMsb > o2.primaryUuidMsb) {
+                    return thisMore;
+                } else if (o1.primaryUuidMsb < o2.primaryUuidMsb) {
+                    return thisLess;
+                } else {
+                    if (o1.primaryUuidLsb > o2.primaryUuidLsb) {
+                        return thisMore;
+                    } else if (o1.primaryUuidLsb < o2.primaryUuidLsb) {
+                        return thisLess;
+                    } else {
+                        // Path
+                        if (o1.srcSystemIdx > o2.srcSystemIdx) {
+                            return thisMore;
+                        } else if (o1.srcSystemIdx < o2.srcSystemIdx) {
+                            return thisLess;
+                        } else {
+                            // Revision
+                            if (o1.revTime > o2.revTime) {
+                                return thisMore;
+                            } else if (o1.revTime < o2.revTime) {
+                                return thisLess;
+                            } else {
+                                return 0; // EQUAL
+                            }
+                        }
+                    }
+                }
+            } // compare()
+        };
+        Collections.sort(aId, compRsByRs);
+
+        for (int i = 0; i < aId.size() - 1; i++) {
+            Sct1_IdRecord thisId = aId.get(i);
+            Sct1_IdRecord nextId = aId.get(i+1);
+            if (thisId.srcSystemIdx == 0
+                    && (thisId.denotationLong == 459921000119122L
+                    || thisId.denotationLong == 459911000119126L
+                    || thisId.denotationLong == 461051000119120L
+                    || thisId.denotationLong == 457931000119125L
+                    || thisId.denotationLong == 459851000119122L
+                    || thisId.denotationLong == 457331000119126L
+                    || thisId.denotationLong == 460991000119120L)) {
+                // drop this
+                System.out.println(":FILTERED OUT: " + thisId.denotationLong);
+            } else if (thisId.primaryUuidMsb == nextId.primaryUuidMsb
+                    && thisId.primaryUuidLsb == nextId.primaryUuidLsb
+                    && thisId.srcSystemIdx == nextId.srcSystemIdx
+                    && thisId.srcSystemIdx == 0) {
+                if (thisId.denotationLong == nextId.denotationLong) {
+                    // skip duplicate id statement
+                    // System.out.println(":DUPLICATE ID SKIPPED: " + Long.toString(thisId.denotationLong) + " :: " + Long.toString(nextId.denotationLong));
+                } else {
+                    tmpSctIdArrayList.add(thisId);
+                }
+            } else {
+                tmpOtherIdArrayList.add(thisId);
+            }
+        }
+        Sct1_IdRecord lastId = aId.get(aId.size()-1);
+        
+        if (lastId.srcSystemIdx == 0) {
+            tmpSctIdArrayList.add(lastId); // Add the last one
+        } else {
+            tmpOtherIdArrayList.add(lastId); // Add the last one
+        }
+        
+        // any given UUID *must* be associated with only-one SCTID
+        for (int i = 0; i < tmpSctIdArrayList.size() - 1; i++) {
+            Sct1_IdRecord thisId = tmpSctIdArrayList.get(i);
+            Sct1_IdRecord nextId = tmpSctIdArrayList.get(i + 1);
+            if (thisId.primaryUuidMsb == nextId.primaryUuidMsb
+                    && thisId.primaryUuidLsb == nextId.primaryUuidLsb) {
+                getLog().error(":AMBIGIOUS UUID ALARM: " + Long.toString(thisId.denotationLong) + " :: " + Long.toString(nextId.denotationLong));
+                throw new MojoFailureException(":AMBIGIOUS UUID ALARM:");
+            }
+        }
+
+        tmpOtherIdArrayList.addAll(tmpSctIdArrayList);
+        return tmpOtherIdArrayList;
+    }
+
     private void executeMojoStep4_MatchIds()
             throws MojoFailureException {
         getLog().info("*** Sct1ArfToEConcept STEP #4 BEGINNING -- MATCH IDs ***");
@@ -1899,6 +1994,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
             ois.close();
 
             // SORT BY [PRIMARYID, Path, Revision]
+            aId = filterDuplicateSctId(aId);
             Collections.sort(aId);
 
             // Read in con.  Sort by con uuid.
@@ -2567,7 +2663,6 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
             oos.close();
 
             // :NYI: check to see if any refset member remained unassigned. 
-
             aRs = null;
             System.gc();
 
@@ -3043,7 +3138,6 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
         //            bugCount++;
         //        } 
         // :DEBUG:END 
-
         int countCon = 0;
         int countDes = 0;
         int countRel = 0;
@@ -3116,7 +3210,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
                                 + relList.get(0).relSnoId
                                 + " c2=="
                                 + new UUID(relDestList.get(0).c2UuidMsb,
-                                relDestList.get(0).c2UuidLsb));
+                                        relDestList.get(0).c2UuidLsb));
                     }
                 }
             }
@@ -3134,7 +3228,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
                         getLog().info(
                                 "ORPHAN REFSET MEMBER RECORD_A :: "
                                 + new UUID(rsByConList.get(0).refsetMemberUuidMsb,
-                                rsByConList.get(0).refsetMemberUuidLsb));
+                                        rsByConList.get(0).refsetMemberUuidLsb));
                     }
                 }
             }
@@ -3154,7 +3248,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
                         getLog().info(
                                 "ORPHAN REFSET MEMBER RECORD_B :: "
                                 + new UUID(rsByRsList.get(0).refsetMemberUuidMsb,
-                                rsByRsList.get(0).refsetMemberUuidLsb));
+                                        rsByRsList.get(0).refsetMemberUuidLsb));
                     }
                 }
             }
@@ -3238,7 +3332,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
                 getLog().info("!!! --- concept SNOMED id =" + conList.get(0).conSnoId);
 
                 getLog().info("!!! --- concept counter   #" + countCon);
-                if(!desList.isEmpty()){
+                if (!desList.isEmpty()) {
                     getLog().info("!!! --- description       \"" + desList.get(0).termText + "\"");
                 }
                 getLog().info("!!! \r\n");
@@ -3298,9 +3392,10 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
 
     // UUID OF INTEREST
     // ICD-0-3 == cff53f1a-1d11-5ae7-801e-d3301cfdbea0
-    // private static final UUID debugUuid01 = UUID.fromString("ae72b717-f028-766d-91ef-0216c2f5b505");
-    // private static final UUID debugUuid02 = UUID.fromString("e245603d-309e-567d-be11-647786e61a08");
-    // private static final UUID debugUuid03 = UUID.fromString("2ebaaffa-5f6d-346e-8177-5374c8042879");
+//     private static final UUID debugUuid01 = UUID.fromString("aedae877-2d36-576c-a1e7-c6ab6334c322");
+//     private static final UUID debugUuid02 = UUID.fromString("54dbfcdb-9c77-36a2-985f-efdfb6394216");
+//     private static final UUID debugUuid03 = UUID.fromString("00dcd31f-1d0a-5b60-8ee8-d28d7c874de3");
+
     private void createEConcept(ArrayList<Sct1_ConRecord> conList,
             ArrayList<Sct1_DesRecord> desList, ArrayList<Sct1_RelRecord> relList,
             ArrayList<Sct1_RelDestRecord> relDestList, ArrayList<Sct1_RefSetRecord> rsByConList,
@@ -3334,7 +3429,6 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
 //        if (theConUUID.compareTo(debugUuid01) == 0) {
 //            System.out.println(":!!!:DEBUG:");
 //        }
-
         EConcept ec = new EConcept();
         ec.setPrimordialUuid(theConUUID);
 
@@ -4095,11 +4189,10 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
 
         try {
             ec.writeExternal(dos);
-//             if (theConUUID.compareTo(debugUuid01) == 0 ||
-//                 theConUUID.compareTo(debugUuid02) == 0 ||
-//                 theConUUID.compareTo(debugUuid03) == 0
-//                  ) {
-//                 getLog().info(":DEBUG: "  + ec);
+//             if (theConUUID.compareTo(debugUuid01) == 0
+//                     || theConUUID.compareTo(debugUuid02) == 0
+//                     || theConUUID.compareTo(debugUuid03) == 0) {
+//                 getLog().info(":DEBUG: " + ec);
 //             }
 
             countEConWritten++;
@@ -4581,7 +4674,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
 
             getLog().info(
                     String.format("%1$s (%2$s%3$s%4$s) ", prefix.toUpperCase(), wDir, subDir,
-                    sctDir.getDirectoryName()));
+                            sctDir.getDirectoryName()));
 
             File f1 = new File(new File(wDir, subDir), sctDir.getDirectoryName());
             ArrayList<File> fv = new ArrayList<File>();
@@ -5046,7 +5139,6 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
                     //                                    + a2[r2].toString());
                     //                            getLog().info("!!! ");
                     //                        }
-
                     switch (compareRelationship(a1[r1], a2[r2])) {
                         case 1: // SAME RELATIONSHIP, SAME SNOMED_ID skip to next
                             r1++;
@@ -5778,7 +5870,6 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
             // if (a[i].c1SnoId == 391181005 && a[i].roleTypeSnoId == 116680003 && a[i].c2SnoId == 6254007) {
             //     getLog().info(":DEBUG: found 391181005-116680003-6254007 (compute uuids)");
             // }
-
             // UPDATE SNOMED ID
             if (doCrossMap) {
                 if (hasSnomedId) // relUuidMap.put(a[i].relUuidMsb, a[i].relUuidLsb, a[i].relSnoId);
@@ -6037,7 +6128,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
         return lineCount - 1;
     }
 
-    private int countFileObjects(String fName) 
+    private int countFileObjects(String fName)
             throws FileNotFoundException, IOException, ClassNotFoundException {
         int objCount = 0;
 

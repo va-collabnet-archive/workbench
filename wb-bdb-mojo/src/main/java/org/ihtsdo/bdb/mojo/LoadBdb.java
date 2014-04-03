@@ -57,7 +57,7 @@ public class LoadBdb extends AbstractMojo {
     /**
      * concepts file name.
      *
-     * @parameter default-value="eConcepts.jbin"
+     * @parameter default-value="sctSiEConcepts.jbin"
      * @required
      */
     private String conceptsFileName;

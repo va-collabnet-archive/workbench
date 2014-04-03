@@ -49,6 +49,7 @@ import org.ihtsdo.tk.dto.concept.component.attribute.TkConceptAttributes;
 import org.ihtsdo.tk.dto.concept.component.attribute.TkConceptAttributesRevision;
 import org.ihtsdo.tk.dto.concept.component.description.TkDescription;
 import org.ihtsdo.tk.dto.concept.component.description.TkDescriptionRevision;
+import org.ihtsdo.tk.dto.concept.component.identifier.IDENTIFIER_PART_TYPES;
 import org.ihtsdo.tk.dto.concept.component.identifier.TkIdentifier;
 import org.ihtsdo.tk.dto.concept.component.refex.TkRefexAbstractMember;
 import org.ihtsdo.tk.dto.concept.component.refex.type_uuid.TkRefexUuidRevision;
@@ -726,7 +727,7 @@ public class BinaryChangeSetResolveIds {
             return idList; // do not filter list
         }
         if (resolution.compareTo(SctIdResolution.FILTER_DESCRIPTION_SCTIDS) == 0) {
-            return idList; // do not filter list of non-descriptions
+            return filterStatedRelSctIds(idList); // do not filter list of non-descriptions
         }
         ArrayList<TkIdentifier> filteredIdList = new ArrayList<>();
         for (TkIdentifier tki : idList) {
@@ -769,6 +770,28 @@ public class BinaryChangeSetResolveIds {
         return filteredIdList;
     }
 
+    private List<TkIdentifier> filterStatedRelSctIds(List<TkIdentifier> idList) {
+        ArrayList<TkIdentifier> tmpIdArrayList = new ArrayList();
+
+        for (TkIdentifier tki : idList) {
+            if (tki.getIdType().compareTo(IDENTIFIER_PART_TYPES.LONG) == 0
+                    && (((long)tki.getDenotation()) == 459921000119122L
+                    || ((long)tki.getDenotation()) == 459911000119126L
+                    || ((long)tki.getDenotation()) == 461051000119120L
+                    || ((long)tki.getDenotation()) == 457931000119125L
+                    || ((long)tki.getDenotation()) == 459851000119122L
+                    || ((long)tki.getDenotation()) == 457331000119126L
+                    || ((long)tki.getDenotation()) == 460991000119120L)) {
+                // drop this
+                System.out.println(":ECCS FILTERED OUT: " + tki.getDenotation());
+            } else {
+                tmpIdArrayList.add(tki);
+            }
+        }
+        return tmpIdArrayList;        
+    }
+
+
     private List<TkIdentifier> processIdListWithFilterDesc(UUID enclosingConceptUuid, TkDescription tkd, List<TkIdentifier> idList)
             throws IOException {
         if (resolution.compareTo(SctIdResolution.KEEP_ALL_SCTID) == 0) {
@@ -789,9 +812,14 @@ public class BinaryChangeSetResolveIds {
             }
             // Process additional ids
             if (tki.authorityUuid.compareTo(snomedIntUuid) == 0) {
+                // FILTER SCTIDs
                 if (resolution.compareTo(SctIdResolution.FILTER_DESCRIPTION_SCTIDS) == 0) {
                     if (tki.pathUuid.compareTo(extensionPath) == 0
                             || tki.pathUuid.compareTo(snomedCorePath) == 0) {
+                        if (String.class.isAssignableFrom(tki.getDenotation().getClass())) {
+                            System.out.println(":ERROR: found as String : " + tki.getDenotation());
+                            throw new IOException("SCTID as String not support\n");
+                        }
                         // only keep SCTID on extension path or SNOMED Core path
                         filteredIdList.add(tki);
                         countSctIdsAsLong++;
@@ -805,7 +833,7 @@ public class BinaryChangeSetResolveIds {
                         descriptionsKept.append("\tKEEP\n");
                     } else {
                         if (String.class.isAssignableFrom(tki.getDenotation().getClass())) {
-                            System.out.println(":WARNING: found as String : " + tki.getDenotation());
+                            System.out.println(":WARNING: found as String : (not on Extension | Core) " + tki.getDenotation());
                             countSctIdsAsString++;
                             instancesNotKept.append(tki.getDenotation());
                         } else {
@@ -822,6 +850,7 @@ public class BinaryChangeSetResolveIds {
                         writeSctIdHistory(tkd, tki);
                     }
                 } else if (resolution.compareTo(SctIdResolution.KEEP_NO_ECCS_SCTID) != 0) {
+                    // NO ECCS SCTIDs are keep
                     if (keepMap.containsKey((Long) tki.getDenotation())) {
                         UUID keepUuid = keepMap.get((Long) tki.getDenotation());
                         if (enclosingConceptUuid.compareTo(keepUuid) == 0) {
@@ -837,7 +866,9 @@ public class BinaryChangeSetResolveIds {
                     }
                 }
             } else {
-                filteredIdList.add(tki); // not a filtered authority
+                // not a filtered authority
+                // in particular, any non-SCT ID are just passed through
+                filteredIdList.add(tki);
             }
         }
         return filteredIdList;
