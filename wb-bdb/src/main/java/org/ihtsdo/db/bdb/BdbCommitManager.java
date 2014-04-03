@@ -1458,7 +1458,10 @@ public class BdbCommitManager {
         } catch (IOException e) {
             AceLog.getAppLog().alertAndLogException(e);
         }finally{
-            datacheckWriteLock.unlock();
+            if (datacheckWriteLock.isHeldByCurrentThread())
+            {
+                datacheckWriteLock.unlock();
+            }
         }
 
         List<AlertToDataConstraintFailure> warningsAndErrorsList =
