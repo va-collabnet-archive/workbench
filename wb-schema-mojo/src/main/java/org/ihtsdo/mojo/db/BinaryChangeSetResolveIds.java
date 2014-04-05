@@ -1355,6 +1355,8 @@ public class BinaryChangeSetResolveIds {
         this.pathsToNotChange.add(UUID.fromString("2bfc4102-f630-5fbe-96b8-625f2a6b3d5a"));
         // 7b6ace72-4604-5ff1-b8c0-48e8f6204e3d source baseline
         this.pathsToNotChange.add(UUID.fromString("7b6ace72-4604-5ff1-b8c0-48e8f6204e3d"));
+        // 43409306-c304-559b-9440-de06ece1eda7 US Extension path
+        this.pathsToNotChange.add(UUID.fromString("43409306-c304-559b-9440-de06ece1eda7"));
         // 8c230474-9f11-30ce-9cad-185a96fd03a2 SNOMED Core
         this.pathsToNotChange.add(UUID.fromString("8c230474-9f11-30ce-9cad-185a96fd03a2"));
         // Workbench Auxiliary
@@ -1436,6 +1438,17 @@ public class BinaryChangeSetResolveIds {
         pathToAuthorMap.put(UUID.fromString("8a6447b8-4a57-56b0-960f-075f430cd02f"), UUID.fromString("f7495b58-6630-3499-a44e-2052b5fcf06c"));
         /////
         developmentPath = UUID.fromString("3770e517-7adc-5a24-a447-77a9daa3eedf"); // destination development path :: KPET CMT Project development path
+        ////
+        // Bouchta Irbouh dev path
+        pathToAuthorMap.put(UUID.fromString("1d3ab899-e2a2-5542-a3b9-ab02a9be3aa1"), UUID.fromString("8a22c054-c969-5259-a8df-66066074c860"));
+        // Frank Novak dev path
+        pathToAuthorMap.put(UUID.fromString("f1664454-19f5-5ea6-a5f2-5c7ef02b7670"), UUID.fromString("312dfc5d-6158-5a25-a0e9-4c6f50194ed4"));
+        // Steven Neiner dev path
+        pathToAuthorMap.put(UUID.fromString("48795013-1c68-5693-a09b-3c64d255445b"), UUID.fromString("4b7b510d-eb13-5564-99ab-db9d8ea26a9d"));
+        // Tyler Goodwin dev path
+        pathToAuthorMap.put(UUID.fromString("2f3db75b-df1e-5eeb-ada7-5d6aaf3cd610"), UUID.fromString("26af6406-1bb8-5c8e-b7d3-3175c51b3112"));
+        // Viji Janakiraman dev path
+        pathToAuthorMap.put(UUID.fromString("71d0aaf3-9893-50f4-bed5-809c6c98ea9a"), UUID.fromString("ebb23d31-2c84-5062-ad2a-318447308fff"));
     }
     
     private class TimeStamp implements Comparable<TimeStamp> {

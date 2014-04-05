@@ -28,6 +28,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.maven.plugin.MojoFailureException;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 
 class Sct2_ConRecord implements Comparable<Sct2_ConRecord>, Serializable {
 
@@ -241,13 +242,21 @@ class Sct2_ConRecord implements Comparable<Sct2_ConRecord>, Serializable {
             while (br.ready()) {
                 String[] line = br.readLine().split(TAB_CHARACTER);
 
+                // 731000124108  US National Library of Medicine maintained module
+                // 5991000124107 SNOMED CT to ICD-10-CM rule-based mapping module
+                String thisRecordPathUuid = pathUuid;
+                if (Long.parseLong(line[MODULE_ID]) == 731000124108L
+                        || Long.parseLong(line[MODULE_ID]) == 5991000124107L) {
+                    thisRecordPathUuid = SnomedMetadataRf2.US_EXTENSION_PATH.getUuidStrings()[0];
+                }
+                
                 a[idx] = new Sct2_ConRecord(Long.parseLong(line[ID]),
                         Rf2x.convertEffectiveTimeToDate(line[EFFECTIVE_TIME]),
                         Rf2x.convertStringToBoolean(line[ACTIVE]),
                         Rf2x.convertSctIdToUuidStr(line[MODULE_ID]),
                         Rf2x.convertDefinitionStatusToIsPrimitive(line[DEFINITION_STATUS_ID]),
                         Long.MAX_VALUE,
-                        pathUuid);
+                        thisRecordPathUuid);
                 idx++;
             }
 

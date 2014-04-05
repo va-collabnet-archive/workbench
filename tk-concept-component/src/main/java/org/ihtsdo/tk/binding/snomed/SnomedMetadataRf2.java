@@ -377,4 +377,23 @@ public class SnomedMetadataRf2 {
     public static ConceptSpec DESC_INACTIVE_REFSET =
             new ConceptSpec("Description inactivation indicator attribute value reference set (foundation metadata concept)",
             UUID.fromString("d40e6d5c-6a93-34ab-b6e1-11f24e350380"));
+
+    /**
+     * Represents the SNOMED RF2 concept: US Extension path.
+     */
+    public static ConceptSpec US_EXTENSION_PATH
+            = new ConceptSpec("US Extension path",
+                    UUID.fromString("43409306-c304-559b-9440-de06ece1eda7"));
+    /**
+     * Represents the SNOMED RF2 concept: Description US National Library of Medicine maintained module.
+     */
+    public static ConceptSpec US_EXTENSION_MODULE
+            = new ConceptSpec("US National Library of Medicine maintained module (core metadata concept)",
+                    UUID.fromString("bf291637-8f18-38a3-8cc9-fc28927d68ad"));
+    /**
+     * Represents the SNOMED US Extension RF2 concept: SNOMED CT to ICD-10-CM rule-based mapping module.
+     */
+    public static ConceptSpec US_EXTENSION_ICD10_MAPPING_MODULE
+            = new ConceptSpec("SNOMED CT to ICD-10-CM rule-based mapping module",
+                    UUID.fromString("c38fffa2-5801-3794-a442-f80109651cac"));
 }
