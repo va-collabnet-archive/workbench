@@ -97,6 +97,16 @@ public class DragPanelConceptAttributes extends DragPanelComponentVersion<Concep
         
         if ((getParentCollapsePanel() == null)
                 || !getSettings().getView().getConfig().getAllowedStatus().contains(getAttr().getStatusNid())) {
+            gbc.gridheight = 1;
+            JButton button = getComponentActionMenuButton();
+            button.setMinimumSize(new Dimension(16, 16));
+            button.setPreferredSize(new Dimension(16, 16));
+            button.setBackground(color.darker());
+            button.setOpaque(true);
+            add(button, gbc);
+            gbc.gridy++;
+            gbc.gridheight = GridBagConstraints.REMAINDER;
+            gbc.weighty = 1;
             JLabel attrLabel = getJLabel(" ");
             attrLabel.setOpaque(true);
             attrLabel.setMinimumSize(new Dimension(16, 28));

@@ -100,6 +100,16 @@ public class DragPanelDescription extends DragPanelComponentVersion<DescriptionA
         gbc.gridy = 0;
         if ((getParentCollapsePanel() == null)
                 || !getSettings().getView().getConfig().getAllowedStatus().contains(getDesc().getStatusNid())) {
+            gbc.gridheight = 1;
+            JButton button = getComponentActionMenuButton();
+            button.setMinimumSize(new Dimension(16, 16));
+            button.setPreferredSize(new Dimension(16, 16));
+            button.setBackground(Color.ORANGE.darker());
+            button.setOpaque(true);
+            add(button, gbc);
+            gbc.gridy++;
+            gbc.gridheight = GridBagConstraints.REMAINDER;
+            gbc.weighty = 1;
             JLabel descLabel = getJLabel(" ");
             descLabel.setOpaque(true);
             descLabel.setMinimumSize(new Dimension(16, 28));

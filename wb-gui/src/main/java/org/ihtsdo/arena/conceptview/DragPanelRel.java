@@ -120,6 +120,16 @@ public class DragPanelRel extends DragPanelComponentVersion<RelationshipVersionB
       
       if ((getParentCollapsePanel() == null)
                 || !getSettings().getView().getConfig().getAllowedStatus().contains(getRel().getStatusNid())) {
+          gbc.gridheight = 1;
+            JButton button = getComponentActionMenuButton();
+            button.setMinimumSize(new Dimension(16, 16));
+            button.setPreferredSize(new Dimension(16, 16));
+            button.setBackground(color.darker());
+            button.setOpaque(true);
+            add(button, gbc);
+            gbc.gridy++;
+            gbc.gridheight = GridBagConstraints.REMAINDER;
+            gbc.weighty = 1;
             relLabel = getJLabel(" ");
             relLabel.setOpaque(true);
             relLabel.setMinimumSize(new Dimension(16, 28));
