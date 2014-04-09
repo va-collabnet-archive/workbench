@@ -143,6 +143,7 @@ public class GenerateIncrementalRf2File extends AbstractMojo {
      *
      * @parameter
      */
+    private String startDate;
     /**
      * Text of edit path concept's FSN, to be used when only the FSN is known,
      * and the path concept was generated with the proper type 5 UUID algorithm
@@ -152,7 +153,6 @@ public class GenerateIncrementalRf2File extends AbstractMojo {
      * @required
      */
     private String editPathConceptSpecFsn;
-    private String startDate;
     /**
      * End date for inclusion in the RF2 files, in yyyy-MM-dd-HH.mm.ss format.
      *
