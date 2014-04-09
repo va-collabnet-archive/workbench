@@ -5,7 +5,7 @@
 	<parent>
 		<artifactId>wb-mmb</artifactId>
 		<groupId>org.ihtsdo</groupId>
-		<version>1.5-silver-swordfish</version>
+		<version>1.6-silver-swordfish-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>wb-docs</artifactId>
