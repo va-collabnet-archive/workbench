@@ -54,14 +54,14 @@ class Sct2_ConRecord implements Comparable<Sct2_ConRecord>, Serializable {
         this.timeL = Rf2x.convertDateToTime(dateStr);
         this.isActive = active; // column 2 - active
 
-
         // column 4 - defintionStatusId converted to isPrimative
         this.isPrimitiveB = isPrim;
 
         this.statusConceptL = statusConceptL;
 
-        // POM parameter.
-        this.pathUuidStr = pathUuid;
+        // POM parameter default with US Extension path override
+        this.pathUuidStr = Rf2x.moduleStrToPathStrRemapper(moduleUuidStr, pathUuid);
+
         // this.authorUuidStr = Rf2Defaults.getAuthorUuidStr();
         this.moduleUuidStr = moduleUuidStr;
     }
@@ -75,7 +75,8 @@ class Sct2_ConRecord implements Comparable<Sct2_ConRecord>, Serializable {
 
         this.statusConceptL = status;
 
-        this.pathUuidStr = in.pathUuidStr;
+        this.pathUuidStr = Rf2x.moduleStrToPathStrRemapper(in.moduleUuidStr, in.pathUuidStr);
+
         // this.authorUuidStr = in.authorUuidStr;
         this.moduleUuidStr = in.moduleUuidStr;
     }
@@ -242,21 +243,13 @@ class Sct2_ConRecord implements Comparable<Sct2_ConRecord>, Serializable {
             while (br.ready()) {
                 String[] line = br.readLine().split(TAB_CHARACTER);
 
-                // 731000124108  US National Library of Medicine maintained module
-                // 5991000124107 SNOMED CT to ICD-10-CM rule-based mapping module
-                String thisRecordPathUuid = pathUuid;
-                if (Long.parseLong(line[MODULE_ID]) == 731000124108L
-                        || Long.parseLong(line[MODULE_ID]) == 5991000124107L) {
-                    thisRecordPathUuid = SnomedMetadataRf2.US_EXTENSION_PATH.getUuidStrings()[0];
-                }
-                
                 a[idx] = new Sct2_ConRecord(Long.parseLong(line[ID]),
                         Rf2x.convertEffectiveTimeToDate(line[EFFECTIVE_TIME]),
                         Rf2x.convertStringToBoolean(line[ACTIVE]),
                         Rf2x.convertSctIdToUuidStr(line[MODULE_ID]),
                         Rf2x.convertDefinitionStatusToIsPrimitive(line[DEFINITION_STATUS_ID]),
                         Long.MAX_VALUE,
-                        thisRecordPathUuid);
+                        pathUuid);
                 idx++;
             }
 
@@ -276,7 +269,7 @@ class Sct2_ConRecord implements Comparable<Sct2_ConRecord>, Serializable {
     }
 
     public void setPath(String pathStr) {
-    	this.pathUuidStr = pathStr;
+        this.pathUuidStr = Rf2x.moduleStrToPathStrRemapper(this.moduleUuidStr, pathStr);
     }
     
     public void writeArf(BufferedWriter writer)
@@ -302,7 +295,7 @@ class Sct2_ConRecord implements Comparable<Sct2_ConRecord>, Serializable {
         writer.append(Rf2x.convertTimeToDate(timeL) + TAB_CHARACTER);
 
         // Path UUID String
-        writer.append(this.pathUuidStr + TAB_CHARACTER);
+        writer.append(Rf2x.moduleStrToPathStrRemapper(moduleUuidStr, pathUuidStr) + TAB_CHARACTER);
 
         // Author UUID String --> user
         writer.append(Rf2Defaults.getAuthorUuidStr() + TAB_CHARACTER);

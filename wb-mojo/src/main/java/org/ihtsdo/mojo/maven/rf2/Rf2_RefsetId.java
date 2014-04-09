@@ -47,14 +47,14 @@ public class Rf2_RefsetId {
     public static final String SUBSETPATH_ID_NAMESPACE_UUID_TYPE1 = "e1cff9e0-e395-11df-bccf-0800200c9a66";
     public static final String HISTORY_TABLE_REFERENCES_NAMESPACE_UUID_TYPE1 =
             "22928260-08d8-11e0-81e0-0800200c9a66";
-    private long refsetSctIdOriginal;
-    private String refsetUuidStr;
-    private String refsetDate;
-    private String refsetPathUuidStr;
-    private String refsetPrefTerm;
-    private String refsetFsName;
-    private String refsetParentUuid;
-    private boolean isSnomedRefset; // Use SNOMED 'Is a'
+    private final long refsetSctIdOriginal;
+    private final String refsetUuidStr;
+    private final String refsetDate;
+    private final String refsetPathUuidStr;
+    private final String refsetPrefTerm;
+    private final String refsetFsName;
+    private final String refsetParentUuid;
+    private final boolean isSnomedRefset; // Use SNOMED 'Is a'
 
     public Rf2_RefsetId(long refsetSctIdOriginal, String refsetDate,
             String refsetPathUuidStr, String refsetPrefTerm,
@@ -121,13 +121,14 @@ public class Rf2_RefsetId {
             Writer concepts;
             concepts = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(
                     arfDir, "concepts_" + infix + ".txt")), "UTF-8"));
-            Writer descriptions = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(
-                    new File(arfDir, "descriptions_" + infix + ".txt")), "UTF-8"));
-            Writer relationships = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(
+            Writer relationships;
+            Writer ids;
+            try (Writer descriptions = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(
+                    new File(arfDir, "descriptions_" + infix + ".txt")), "UTF-8"))) {
+                relationships = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(
                     new File(arfDir, "relationships_" + infix + ".txt")), "UTF-8"));
-            Writer ids = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(
+                ids = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(
                     arfDir, "ids_" + infix + ".txt")), "UTF-8"));
-
             for (Rf2_RefsetId sid : subsetIds) {
                 SimpleDateFormat format = new SimpleDateFormat("yyyy.MM.dd");
                 Date d = format.parse(sid.refsetDate);
@@ -240,10 +241,8 @@ public class Rf2_RefsetId {
                 relationships.append("\t");
                 relationships.append(sid.refsetPathUuidStr); // path uuid
                 relationships.append("\n");
+                }   concepts.close();
             }
-
-            concepts.close();
-            descriptions.close();
             relationships.close();
             ids.close();
 

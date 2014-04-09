@@ -23,6 +23,7 @@ import java.util.Set;
 import java.util.logging.Logger;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 
 public class Rf2_RefsetCUuidRecord implements Comparable<Rf2_RefsetCUuidRecord> {
 
@@ -52,8 +53,9 @@ public class Rf2_RefsetCUuidRecord implements Comparable<Rf2_RefsetCUuidRecord> 
         this.referencedComponentIdL = referencedComponentIdL;
         this.valueUuid = valueUuid;
 
-        // SNOMED Core :NYI: setup path as a POM parameter.
-        this.pathUuidStr = Rf2Defaults.getPathSnomedCoreUuidStr();
+        // SNOMED Core default, otherwise override
+        this.pathUuidStr = Rf2x.moduleStrToPathStrRemapper(moduleUuidStr, Rf2Defaults.getPathSnomedCoreUuidStr());
+
         // this.authorUuidStr = Rf2Defaults.getAuthorUuidStr();
         this.moduleUuidStr = moduleUuidStr;
     }
@@ -191,7 +193,7 @@ public class Rf2_RefsetCUuidRecord implements Comparable<Rf2_RefsetCUuidRecord> 
         writer.append(effDateStr + TAB_CHARACTER);
 
         // Path UUID
-        writer.append(pathUuidStr + TAB_CHARACTER);
+        writer.append(this.pathUuidStr + TAB_CHARACTER);
 
         // Concept Extension Value UUID
         writer.append(valueUuid + TAB_CHARACTER);
@@ -214,6 +216,6 @@ public class Rf2_RefsetCUuidRecord implements Comparable<Rf2_RefsetCUuidRecord> 
     }
     
     public void setPath(String pathStr) {
-    	this.pathUuidStr = pathStr;
+        this.pathUuidStr = Rf2x.moduleStrToPathStrRemapper(this.moduleUuidStr, pathStr);
     }
 }

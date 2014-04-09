@@ -783,7 +783,7 @@ public class BinaryChangeSetResolveIds {
                     || ((long)tki.getDenotation()) == 457331000119126L
                     || ((long)tki.getDenotation()) == 460991000119120L)) {
                 // drop this
-                System.out.println(":ECCS FILTERED OUT: " + tki.getDenotation());
+                System.out.println(":ECCS FILTERED OUT: " + tki.getDenotation() + " PATH:" + tki.pathUuid);
             } else {
                 tmpIdArrayList.add(tki);
             }

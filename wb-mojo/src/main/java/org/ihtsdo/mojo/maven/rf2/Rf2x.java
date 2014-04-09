@@ -24,6 +24,7 @@ import java.util.Date;
 import java.util.UUID;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.id.Type3UuidFactory;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 
 public class Rf2x {
 
@@ -210,6 +211,16 @@ public class Rf2x {
             return false;
         } 
         return true;
+    }
+
+    static String moduleStrToPathStrRemapper(String moduleUuidStr, String pathUuidStr) {
+        if (moduleUuidStr != null) {
+            if (moduleUuidStr.compareToIgnoreCase(SnomedMetadataRf2.US_EXTENSION_MODULE.getUuidStrings()[0]) == 0
+                    || moduleUuidStr.compareToIgnoreCase(SnomedMetadataRf2.US_EXTENSION_ICD10_MAPPING_MODULE.getUuidStrings()[0]) == 0) {
+                return SnomedMetadataRf2.US_EXTENSION_PATH.getUuidStrings()[0];
+            }
+        }
+        return pathUuidStr;
     }
 
 }

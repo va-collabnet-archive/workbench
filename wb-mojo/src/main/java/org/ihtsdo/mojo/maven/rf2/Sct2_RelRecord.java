@@ -80,7 +80,8 @@ class Sct2_RelRecord implements Comparable<Sct2_RelRecord>, Serializable {
         this.statusConceptL = statusConceptL;
 
         // POM parameter.
-        this.pathUuidStr = pathUuid;
+        this.pathUuidStr = Rf2x.moduleStrToPathStrRemapper(moduleUuidStr, pathUuid);
+
         // this.authorUuidStr = Rf2Defaults.getAuthorUuidStr();
         this.moduleUuidStr = moduleUuidStr;
     }
@@ -106,7 +107,8 @@ class Sct2_RelRecord implements Comparable<Sct2_RelRecord>, Serializable {
 
         this.statusConceptL = status;
 
-        this.pathUuidStr = in.pathUuidStr;
+        this.pathUuidStr = Rf2x.moduleStrToPathStrRemapper(in.moduleUuidStr, in.pathUuidStr);
+
         // this.authorUuidStr = in.authorUuidStr;
         this.moduleUuidStr = in.moduleUuidStr;
     }
@@ -407,7 +409,7 @@ class Sct2_RelRecord implements Comparable<Sct2_RelRecord>, Serializable {
         writer.append(Rf2x.convertTimeToDate(timeL) + TAB_CHARACTER);
 
         // Path UUID String
-        writer.append(pathUuidStr + TAB_CHARACTER);
+        writer.append(Rf2x.moduleStrToPathStrRemapper(moduleUuidStr, pathUuidStr) + TAB_CHARACTER);
 
         // Author UUID String
         // SCT ID Is-a == 116680003L
@@ -422,7 +424,7 @@ class Sct2_RelRecord implements Comparable<Sct2_RelRecord>, Serializable {
     }
 
     public void setPath(String pathStr) {
-    	this.pathUuidStr = pathStr;
+        this.pathUuidStr = Rf2x.moduleStrToPathStrRemapper(this.moduleUuidStr, pathStr);
     }
     
     @Override

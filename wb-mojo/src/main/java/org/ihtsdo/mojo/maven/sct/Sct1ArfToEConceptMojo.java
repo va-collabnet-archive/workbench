@@ -1924,8 +1924,13 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
                     || thisId.denotationLong == 459851000119122L
                     || thisId.denotationLong == 457331000119126L
                     || thisId.denotationLong == 460991000119120L)) {
+                if (zModuleArray[thisId.moduleIdx].compareTo(SnomedMetadataRf2.US_EXTENSION_MODULE.getUuids()[0]) == 0
+                        || zModuleArray[thisId.moduleIdx].compareTo(SnomedMetadataRf2.US_EXTENSION_ICD10_MAPPING_MODULE.getUuids()[0]) == 0) {
+                    tmpSctIdArrayList.add(thisId);
+                } else {
                 // drop this
-                System.out.println(":FILTERED OUT: " + thisId.denotationLong);
+                    System.out.println(":FILTERED OUT: " + thisId.denotationLong + " PATH:" + zPathArray[thisId.pathIdx]);
+                }
             } else if (thisId.primaryUuidMsb == nextId.primaryUuidMsb
                     && thisId.primaryUuidLsb == nextId.primaryUuidLsb
                     && thisId.srcSystemIdx == nextId.srcSystemIdx

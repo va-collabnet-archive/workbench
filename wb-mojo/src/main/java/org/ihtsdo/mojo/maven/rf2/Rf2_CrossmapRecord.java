@@ -25,6 +25,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Logger;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 
 /**
  *
@@ -62,8 +63,9 @@ public class Rf2_CrossmapRecord {
         this.referencedComponentIdL = referencedComponentIdL;
         this.mapValueStr = valueIdL;
 
-        // SNOMED Core :NYI: setup path as a POM parameter.
-        this.pathUuidStr = Rf2Defaults.getPathSnomedCoreUuidStr();
+        // SNOMED Core default, otherwise override
+        this.pathUuidStr = Rf2x.moduleStrToPathStrRemapper(moduleUuidStr, Rf2Defaults.getPathSnomedCoreUuidStr());
+
         // this.authorUuidStr = Rf2Defaults.getAuthorUuidStr();
         this.moduleUuidStr = moduleUuidStr;
     }
@@ -148,7 +150,7 @@ public class Rf2_CrossmapRecord {
         writer.append(Rf2Defaults.getAuthorUuidStr() + TAB_CHARACTER);
 
         // Module UUID String
-        writer.append(this.moduleUuidStr + LINE_TERMINATOR);
+        writer.append(moduleUuidStr + LINE_TERMINATOR);
     }
 
     public void writeArfId(BufferedWriter writer)
@@ -181,6 +183,6 @@ public class Rf2_CrossmapRecord {
     }
     
     public void setPath(String pathStr) {
-    	this.pathUuidStr = pathStr;
+        this.pathUuidStr = Rf2x.moduleStrToPathStrRemapper(this.moduleUuidStr, pathStr);
     }
 }

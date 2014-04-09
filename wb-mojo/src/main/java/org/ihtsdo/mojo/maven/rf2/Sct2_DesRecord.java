@@ -71,8 +71,9 @@ class Sct2_DesRecord implements Comparable<Sct2_DesRecord>, Serializable {
 
         this.statusConceptL = statusConceptL;
 
-        // POM parameter.
-        this.pathUuidStr = pathUuid;
+        // POM parameter default with override
+        this.pathUuidStr = Rf2x.moduleStrToPathStrRemapper(moduleUuidStr, pathUuid);
+
         // this.authorUuidStr = Rf2Defaults.getAuthorUuidStr();
         this.moduleUuidStr = moduleUuidStr;
     }
@@ -92,7 +93,8 @@ class Sct2_DesRecord implements Comparable<Sct2_DesRecord>, Serializable {
         this.descriptionTypeStr = in.descriptionTypeStr; // DESCRIPTIONTYPE
         this.languageCodeStr = in.languageCodeStr; // LANGUAGECODE
 
-        this.pathUuidStr = in.pathUuidStr;
+        this.pathUuidStr = Rf2x.moduleStrToPathStrRemapper(in.moduleUuidStr, in.pathUuidStr);
+
         // this.authorUuidStr = in.authorUuidStr;
         this.moduleUuidStr = in.moduleUuidStr;
 
@@ -268,14 +270,6 @@ class Sct2_DesRecord implements Comparable<Sct2_DesRecord>, Serializable {
         while (r.ready()) {
             String[] line = r.readLine().split(TAB_CHARACTER);
 
-            // 731000124108  US National Library of Medicine maintained module
-            // 5991000124107 SNOMED CT to ICD-10-CM rule-based mapping module
-            String thisRecordPathUuid = pathUuid;
-            if (Long.parseLong(line[MODULE_ID]) == 731000124108L
-                    || Long.parseLong(line[MODULE_ID]) == 5991000124107L) {
-                thisRecordPathUuid = SnomedMetadataRf2.US_EXTENSION_PATH.getUuidStrings()[0];
-            }
-            
             a[idx] = new Sct2_DesRecord(Long.parseLong(line[ID]),
                     Rf2x.convertEffectiveTimeToDate(line[EFFECTIVE_TIME]),
                     Rf2x.convertStringToBoolean(line[ACTIVE]),
@@ -286,7 +280,7 @@ class Sct2_DesRecord implements Comparable<Sct2_DesRecord>, Serializable {
                     Rf2x.convertSctIdToUuidStr(line[TYPE_ID]),
                     line[LANGUAGE_CODE],
                     Long.MAX_VALUE,
-                    thisRecordPathUuid);
+                    pathUuid);
             idx++;
         }
 
@@ -318,7 +312,7 @@ class Sct2_DesRecord implements Comparable<Sct2_DesRecord>, Serializable {
     }
 
     public void setPath(String pathStr) {
-    	this.pathUuidStr = pathStr;
+        this.pathUuidStr = Rf2x.moduleStrToPathStrRemapper(this.moduleUuidStr, pathStr);
     }
     
     public void writeArf(BufferedWriter writer)
@@ -357,7 +351,7 @@ class Sct2_DesRecord implements Comparable<Sct2_DesRecord>, Serializable {
         writer.append(Rf2x.convertTimeToDate(timeL) + TAB_CHARACTER);
 
         // Path UUID String
-        writer.append(this.pathUuidStr + TAB_CHARACTER);
+        writer.append(Rf2x.moduleStrToPathStrRemapper(moduleUuidStr, pathUuidStr) + TAB_CHARACTER);
 
         // Author UUID String --> user
         writer.append(Rf2Defaults.getAuthorUuidStr() + TAB_CHARACTER);

@@ -34,6 +34,7 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.id.Type3UuidFactory;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 
 /**
  * Simple case: single date (no versioning). all active. one id schema. Handle
@@ -48,11 +49,11 @@ public class Sct2_IdRecord implements Serializable {
     private static final String TAB_CHARACTER = "\t";
     // RECORD FILES
     // long identifierScheme; // IDENTIFIER_SCHEME_ID column 0;
-    private UUID primordialUuid; // ALTERNATE_IDENTIFIER column 1;
-    private long revTimeL; // EFFECTIVE_TIME column 2; e.g. date time of "20020131"
-    private int active; // ACTIVE column 3; value 1 is active
-    private long moduleSctId; // MODULE_ID column 4; value 900000000000207008
-    private long referencedComponentSctId; // REFERENCED_COMPONENT_ID column 5 SCTID
+    private final UUID primordialUuid; // ALTERNATE_IDENTIFIER column 1;
+    private final long revTimeL; // EFFECTIVE_TIME column 2; e.g. date time of "20020131"
+    private final int active; // ACTIVE column 3; value 1 is active
+    private final long moduleSctId; // MODULE_ID column 4; value 900000000000207008
+    private final long referencedComponentSctId; // REFERENCED_COMPONENT_ID column 5 SCTID
     // PATH
     // int pathIdx;
     // USER
@@ -90,7 +91,7 @@ public class Sct2_IdRecord implements Serializable {
                         new FileOutputStream(idCacheOutputPathFnameStr)))) {
                     // open searchable text file
                     File txtFile = new File(idCacheOutputPathFnameStr + ".txt");
-                    BufferedWriter bw = new BufferedWriter(new FileWriter(txtFile));
+            try (BufferedWriter bw = new BufferedWriter(new FileWriter(txtFile))) {
                     bw.append("SCT");
                     bw.append(TAB_CHARACTER);
                     bw.append("COMPUTED");
@@ -217,7 +218,7 @@ public class Sct2_IdRecord implements Serializable {
                     oos.flush();
                     oos.close();
                     bw.flush();
-                    bw.close();
+            }
                 }
     }
 
@@ -282,6 +283,14 @@ public class Sct2_IdRecord implements Serializable {
                     moduleUuid = Type3UuidFactory.fromSNOMED(id);
                 }
 
+                // 731000124108  US National Library of Medicine maintained module
+                // 5991000124107 SNOMED CT to ICD-10-CM rule-based mapping module
+                UUID thisRecordPathUuid = pathUuid;
+                if (Long.parseLong(line[MODULE_ID]) == 731000124108L
+                        || Long.parseLong(line[MODULE_ID]) == 5991000124107L) {
+                    thisRecordPathUuid = SnomedMetadataRf2.US_EXTENSION_PATH.getUuids()[0];
+                }
+
                 // Write to ARF file
                 writeArf(arfWriter,
                         pUuid, // PRIMARY_UUID = 0
@@ -289,7 +298,7 @@ public class Sct2_IdRecord implements Serializable {
                         line[REFERENCED_COMPONENT_ID], // ID_FROM_SOURCE_SYSTEM
                         line[ACTIVE], // STATUS_UUID = 3
                         dateStr, // EFFECTIVE_DATE = 4; yyyy-MM-dd HH:mm:ss
-                        pathUuid, // PATH_UUID = 5;
+                        thisRecordPathUuid, // PATH_UUID = 5;
                         authorUuid, // AUTHOR_UUID = 6;
                         moduleUuid); // MODULE_UUID = 7;
             }
@@ -324,7 +333,7 @@ public class Sct2_IdRecord implements Serializable {
         // writer.append(date + TAB_CHARACTER);
         writer.append(dateStr + TAB_CHARACTER);
         // PATH_UUID = 5;
-        writer.append(pathUuid.toString() + TAB_CHARACTER);
+        writer.append(Rf2x.moduleStrToPathStrRemapper(moduleUuid.toString(), pathUuid.toString()) + TAB_CHARACTER);
         // AUTHOR_UUID = 6;
         writer.append(authorUuid.toString() + TAB_CHARACTER);
         // MODULE_UUID = 7;
