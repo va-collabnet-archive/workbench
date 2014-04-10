@@ -15,7 +15,9 @@
  */
 package org.ihtsdo.mojo.maven.classifier;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.text.DateFormat;
@@ -357,10 +359,14 @@ public class SnorocketMojo extends AbstractMojo {
             }
 
             // ADD RELATIONSHIPS
+            File logFile = new File(outputDir, "Snorocket_Relationship_Errors.log");
+            BufferedWriter bw = new BufferedWriter(new FileWriter(logFile));
+            int errorCount = 0;
             Collections.sort(cEditSnoRels);
             for (SnoRel sr : cEditSnoRels) {
                 int err = rocket_123.addRelationship(sr.c1Id, sr.typeId, sr.c2Id, sr.group);
                 if (err > 0) {
+                    errorCount++;
                     StringBuilder sb = new StringBuilder();
                     if ((err & 1) == 1) {
                         sb.append(" --UNDEFINED_C1-- ");
@@ -371,8 +377,14 @@ public class SnorocketMojo extends AbstractMojo {
                     if ((err & 4) == 4) {
                         sb.append(" --UNDEFINED_C2-- ");
                     }
-                    logger.info("\r\n::: " + sb /* :!!!: + dumpSnoRelStr(sr) */);
+                    bw.append("\r\n" + sb + ":!!!:" + sr.toString());
                 }
+            }
+            bw.close();
+            if (errorCount > 0)
+            {
+                logger.info("\r\n::: There were " + errorCount + " instances of UNDEFINED C1 / Role / C2 produced by the classifier.  See " 
+                    + logFile.getAbsolutePath());
             }
 
             /* ****************
