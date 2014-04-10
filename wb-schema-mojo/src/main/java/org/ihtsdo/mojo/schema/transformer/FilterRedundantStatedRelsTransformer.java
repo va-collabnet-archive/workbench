@@ -220,7 +220,7 @@ public class FilterRedundantStatedRelsTransformer extends AbstractTransformer {
 
     private void filterMembersByComponentUuid(TkConcept eConcept) {
         ArrayList<TkRefexAbstractMember<?>> keepMemberList = new ArrayList<>();
-        // Path origin reference set
+        // "Path origin reference set" 1239b874-41b4-32a1-981f-88b448829b4b
         if (eConcept.primordialUuid.compareTo(UUID.fromString("1239b874-41b4-32a1-981f-88b448829b4b")) == 0) {
             for (TkRefexAbstractMember<?> member : eConcept.refsetMembers) {
                 UUID uuid = member.componentUuid;
@@ -230,7 +230,7 @@ public class FilterRedundantStatedRelsTransformer extends AbstractTransformer {
                 }
             }
         }
-        // Path reference set
+        // "Path reference set" fd9d47b7-c0a4-3eea-b3ab-2b5a3f9e888f
         if (eConcept.primordialUuid.compareTo(UUID.fromString("fd9d47b7-c0a4-3eea-b3ab-2b5a3f9e888f")) == 0) {
             for (TkRefexAbstractMember<?> member : eConcept.refsetMembers) {
                 if (ERefsetCidMember.class.isAssignableFrom(member.getClass())) {
@@ -254,15 +254,17 @@ public class FilterRedundantStatedRelsTransformer extends AbstractTransformer {
         ArrayList<LogicalRel> statedGroup0LogicalRels = new ArrayList<>();
         List<TkRelationship> rels = eConcept.getRelationships();
 
+        // Separate Stated Group "0", Stated Role Groups and Inferrred Rels
         for (TkRelationship tkr : rels) {
-            if (tkr.characteristicUuid.compareTo(statedUuid) == 0) {
-                if (tkr.relGroup == 0) {
-                    statedGroup0LogicalRels.add(new LogicalRel(tkr));
+            LogicalRel tmpTkr = new LogicalRel(tkr);
+            if (tmpTkr.characteristicUuid.compareTo(statedUuid) == 0) {
+                if (tmpTkr.group == 0) {
+                    statedGroup0LogicalRels.add(tmpTkr);
                 } else {
-                    statedNonGroup0LogicalRels.add(new LogicalRel(tkr));
+                    statedNonGroup0LogicalRels.add(tmpTkr);
                 }
             } else {
-                finalRelList.add(tkr);
+                finalRelList.add(tkr); // Keep all inferred
             }
         }
 
@@ -270,10 +272,12 @@ public class FilterRedundantStatedRelsTransformer extends AbstractTransformer {
         ArrayList<LogicalRel> list = logicalRelComputer.processRelsGroup0(statedGroup0LogicalRels);
         for (LogicalRel logicalRel : list) {
             finalRelList.add(logicalRel.tkr);
+            // Report relationships of interest
+            // ... Reports stated extension relationships added to SNOMED Concept
             if (logicalRel.relSctIdPath != null
                     && isExtensionSctId(logicalRel.relSctId)
                     && eConcept.getConceptAttributes().pathUuid.compareTo(snomedCorePathUuid) == 0) {
-                reportWriter.append(toStr("group0 addition to snomed", eConcept, logicalRel));
+                reportWriter.append(toStr("FYI: group0 extension rel added to snomed concept", eConcept, logicalRel));
                 reportListGroup0AdditionsWriter.append(toStrList(eConcept));
             }
         }
@@ -396,24 +400,4 @@ public class FilterRedundantStatedRelsTransformer extends AbstractTransformer {
         return postProcessList;
     }
 
-    private int findOnPathCount(ArrayList<LogicalRel> rels, UUID path) {
-        int count = 0;
-        for (LogicalRel rel : rels) {
-            if (rel.relSctIdPath != null
-                    && rel.relSctIdPath.compareTo(path) == 0) {
-                count++;
-            }
-        }
-        return count;
-    }
-
-    private int findOnPathIdx(ArrayList<LogicalRel> rels, UUID path) {
-        for (int i = 0; i < rels.size(); i++) {
-            if (rels.get(i).relSctIdPath != null
-                    && rels.get(i).relSctIdPath.compareTo(path) == 0) {
-                return i;
-            }
-        }
-        return -1; // not found
-    }
 }

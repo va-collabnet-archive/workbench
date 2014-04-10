@@ -52,31 +52,25 @@ public class LogicalRel implements Comparable<LogicalRel> {
     private final static UUID SNOMED_RF2_ACTIVE_UUID = SnomedMetadataRf2.ACTIVE_VALUE_RF2.getUuids()[0];
 
     public LogicalRel(TkRelationship tkr) {
+        if (tkr.primordialUuid.compareTo(UUID.fromString("89e125a8-a318-3c5f-b1cd-29c26e9cb2b4")) == 0) {
+            System.out.println(":DEBUG: found tkr of interest");
+        }
         this.tkr = tkr;
         this.logicalRelUuid = null; // not assigned on initial creation
         this.c1SnoId = tkr.c1Uuid; // not versioned
         this.c2SnoId = tkr.c2Uuid; // not versioned
 
+        this.typeSnoId = tkr.typeUuid;  // versioned
+        this.group = tkr.relGroup;  // versioned
+        this.statusUuid = tkr.statusUuid;  // versioned
+        this.time = tkr.time;  // versioned
+        this.pathLastRevisionUuid = tkr.getPathUuid();  // versioned
+        this.characteristicUuid = tkr.characteristicUuid;  // versioned
+        this.refinabilityUuid = tkr.refinabilityUuid;  // versioned
+
         List<TkRelationshipRevision> revisions = tkr.revisions;
-        if (revisions == null) {
-            this.typeSnoId = tkr.typeUuid;
-            this.group = tkr.relGroup;
-            this.statusUuid = tkr.statusUuid;
-            this.time = tkr.time;
-            this.pathLastRevisionUuid = tkr.getPathUuid();
-            this.characteristicUuid = tkr.characteristicUuid;
-            this.refinabilityUuid = tkr.refinabilityUuid;
-        } else {
-            int i = 0;
-            TkRelationshipRevision rev = revisions.get(i);
-            this.typeSnoId = rev.typeUuid;
-            this.group = rev.group;
-            this.statusUuid = rev.statusUuid;
-            this.time = rev.time;
-            this.pathLastRevisionUuid = rev.getPathUuid();
-            for (; i < revisions.size(); i++) {
-                // get the most recent snapshot
-                rev = revisions.get(i);
+        if (revisions != null && !revisions.isEmpty()) {
+            for (TkRelationshipRevision rev : revisions) {
                 if (rev.time > this.time) {
                     this.typeSnoId = rev.typeUuid;
                     this.group = rev.group;

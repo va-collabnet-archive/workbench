@@ -87,6 +87,9 @@ public class LogicalRelGroup {
         StringBuilder sb = new StringBuilder();
         
         for (LogicalRel r : logicalRels) {
+            if (r.statusUuid.compareTo(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getUuids()[0]) != 0) {
+                continue;
+            }
             sb.append(r.c1SnoId.toString());
             sb.append(" :: ");
             sb.append(r.typeSnoId.toString());
