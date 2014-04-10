@@ -46,7 +46,7 @@ the specific language governing permissions and limitations under the License. -
         <svnusername>${relusername}</svnusername>
         <svnpassword>${relpassword}</svnpassword>
         <svnkit.version>1.3.5</svnkit.version>
-        <juint.version>4.11</juint.version>
+        <junit.version>4.11</junit.version>
         <doxia.version>1.3</doxia.version>
         <maven-release-plugin.version>2.0</maven-release-plugin.version>
         <maven-jxr-plugin.version>2.2</maven-jxr-plugin.version>
@@ -69,7 +69,7 @@ the specific language governing permissions and limitations under the License. -
             <dependency>
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
-                <version>${juint.version}</version>
+                <version>${junit.version}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>

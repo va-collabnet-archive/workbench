@@ -106,8 +106,6 @@ cephalhaematoma|cephalhematoma
 cephalohaematoma|cephalohematoma
 characterised|characterized
 chequebook|checkbook
-cheques|checks
-cheque|check
 chilli|chili
 chloridorrhoea|chloridorrhea
 cholaemia|cholemia
@@ -221,7 +219,6 @@ flavouring|flavoring
 flavours|flavors
 flavour|flavor
 floatation|flotation
-foetal|fetal
 foetoscope|fetoscope
 foetoscopic|fetoscopic
 fraenal|frenal

@@ -20,10 +20,12 @@ import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import org.dwfa.ace.ACE;
 
 import org.dwfa.ace.config.AceConfig;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.fd.FileDialogUtil;
+import org.ihtsdo.ttk.preferences.TtkPreferences;
 
 public class SaveProfile implements ActionListener {
 
@@ -40,6 +42,7 @@ public class SaveProfile implements ActionListener {
                 File outFile = FileDialogUtil.getNewFile("Save to profile...", new File("profiles/profile.ace"),
                     parentFrame);
                 AceConfig.config.setProfileFile(outFile);
+                ACE.linkPref.exportFields(TtkPreferences.get());
             }
             AceConfig.config.save();
         } catch (Exception e1) {

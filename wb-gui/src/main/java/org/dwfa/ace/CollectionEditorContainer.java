@@ -29,7 +29,6 @@ import javax.swing.*;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_HostConceptPlugins.HOST_ENUM;
-import org.dwfa.ace.api.I_HostConceptPlugins.LINK_TYPE;
 import org.dwfa.ace.api.I_ModelTerminologyList;
 import org.dwfa.ace.file.ConceptListReader;
 import org.dwfa.ace.file.ConceptListWriter;
@@ -53,6 +52,7 @@ import org.ihtsdo.arena.Arena;
 import org.ihtsdo.batch.BatchActionEditorPanel;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
+import org.ihtsdo.ttk.preferences.gui.PanelLinkingPreferences.LINK_TYPE;
 
 public class CollectionEditorContainer extends JPanel {
     public JButton addUncommittedToListButton;

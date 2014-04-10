@@ -198,7 +198,7 @@ public class CollapsePanel extends JPanel {
         toolBar2.setLayout(new FlowLayout(FlowLayout.LEFT, 1, 2));
         toolBar2.setOpaque(false);
         if (menuButton != null) {
-            toolBar2.add(menuButton);
+//            toolBar2.add(menuButton);
         } else if (!noMenuSections.contains(sectionType)) {
             toolBar2.add(getDynamicPopupMenuButton());
         } else {

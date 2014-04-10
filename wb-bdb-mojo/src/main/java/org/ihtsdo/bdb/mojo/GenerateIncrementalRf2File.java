@@ -93,22 +93,25 @@ import org.ihtsdo.tk.spec.ConceptSpec;
  * the work required to include the proposed modification in the SNOMED CT
  * Core.<p>
  *
- * There are guidelines around what can and cannot be done within an extension:<p>
+ * There are guidelines around what can and cannot be done within an extension:
+ * <p>
  * - Relationships within the stated view of the International release should
- * not be amended or retired within an extension. <p>
- * - Stated relationships (IS_A
- * or other) from concepts in the International release to concepts in an
- * extension are not allowed (in either an extension or in the International
- * release). <p>
- * - Stated relationships from concepts in an extension to concepts in
- * the International release are allowed.<p>
+ * not be amended or retired within an extension.
+ * <p>
+ * - Stated relationships (IS_A or other) from concepts in the International
+ * release to concepts in an extension are not allowed (in either an extension
+ * or in the International release).
+ * <p>
+ * - Stated relationships from concepts in an extension to concepts in the
+ * International release are allowed.<p>
  *
  * Given the above, adding content to an extension (by adding relationships to
  * the stated view of an extension and then classifying) may result in
  * retirement (within the extension) of redundant relationships in the
  * International release. There is not an issue with this as long as the stated
  * view and the transitive closure associated with the International release is
- * not changed (which it shouldn't be, given the above guidelines).<p>
+ * not changed (which it shouldn't be, given the above guidelines)
+ * .<p>
  *
  * @goal generate-irf2-file
  *
@@ -143,11 +146,6 @@ public class GenerateIncrementalRf2File extends AbstractMojo {
      */
     private String viewPathConceptSpecFsn;
     /**
-     * Start date for inclusion in the RF2 files, in yyyy-MM-dd-HH.mm.ss format.
-     *
-     * @parameter
-     */
-    /**
      * Text of edit path concept's FSN, to be used when only the FSN is known,
      * and the path concept was generated with the proper type 5 UUID algorithm
      * using the Type5UuidFactory.PATH_ID_FROM_FS_DESC namespace.
@@ -156,6 +154,11 @@ public class GenerateIncrementalRf2File extends AbstractMojo {
      * @required
      */
     private String editPathConceptSpecFsn;
+    /**
+     * Start date for inclusion in the RF2 files, in yyyy-MM-dd-HH.mm.ss format.
+     *
+     * @parameter
+     */
     private String startDate;
     /**
      * End date for inclusion in the RF2 files, in yyyy-MM-dd-HH.mm.ss format.
@@ -313,11 +316,11 @@ public class GenerateIncrementalRf2File extends AbstractMojo {
                 }
             }
             HashSet<UUID> moduleUuids = new HashSet<>();
-            if(moduleConcepts != null|| moduleConcepts.length > 0){
-                for(ConceptDescriptor cd : moduleConcepts){
+            if (moduleConcepts != null || moduleConcepts.length > 0) {
+                for (ConceptDescriptor cd : moduleConcepts) {
                     moduleUuids.add(UUID.fromString(cd.getUuid()));
                 }
-            }else{
+            } else {
                 throw new MojoExecutionException("No module specified.");
             }
             moduleUuids.add(Snomed.UNSPECIFIED_MODULE.getLenient().getPrimUuid()); //classifier written on this module
@@ -346,10 +349,10 @@ public class GenerateIncrementalRf2File extends AbstractMojo {
                 endDate = "latest";
             }
             taxonomyParentNids = new HashSet<>();
-            for(ConceptDescriptor cd : taxonomyParentConcepts){
+            for (ConceptDescriptor cd : taxonomyParentConcepts) {
                 taxonomyParentNids.add(Ts.get().getNidForUuids(UUID.fromString(cd.getUuid())));
             }
-            
+
             vc = new ViewCoordinate(Ts.get().getMetadataViewCoordinate());
             vc.getIsaTypeNids().add(Snomed.IS_A.getLenient().getConceptNid());
             PathBI path = Ts.get().getPath(viewPathNid);
@@ -357,7 +360,7 @@ public class GenerateIncrementalRf2File extends AbstractMojo {
                     TimeHelper.getTimeFromString(endDate, TimeHelper.getFileDateFormat()));
             vc.setPositionSet(new PositionSet(position));
             IntSet moduleIds = new IntSet();
-            for(UUID uuid : moduleUuids){
+            for (UUID uuid : moduleUuids) {
                 moduleIds.add(Ts.get().getNidForUuids(uuid));
             }
             File metaDir = new File(output.getParentFile(), "refset-econcept");
@@ -373,7 +376,7 @@ public class GenerateIncrementalRf2File extends AbstractMojo {
                 ReleaseSpecProcessor refsetSpecComputer = new ReleaseSpecProcessor(ec,
                         vc, ChangeSetPolicy.OFF, refsetParentConceptNid);
                 refsetSpecComputer.process();
-                if(releaseType == ReleaseType.FULL){
+                if (releaseType == ReleaseType.FULL) {
                     refsetSpecComputer.writeRefsetSpecMetadata(metaDir); //only care about FULL for import
                 }
             }
@@ -381,7 +384,7 @@ public class GenerateIncrementalRf2File extends AbstractMojo {
                     TimeHelper.getTimeFromString(startDate, TimeHelper.getFileDateFormat()),
                     TimeHelper.getTimeFromString(endDate, TimeHelper.getFileDateFormat()),
                     null, moduleIds, pathIds);
-            
+
             File refsetCs = new File(output.getParentFile(), "changesets");
             refsetCs.mkdir();
 //            get stamps after refset computations
@@ -389,7 +392,7 @@ public class GenerateIncrementalRf2File extends AbstractMojo {
                     TimeHelper.getTimeFromString(startDate, TimeHelper.getFileDateFormat()),
                     TimeHelper.getTimeFromString(endDate, TimeHelper.getFileDateFormat()),
                     null, moduleIds, pathIds);
-            
+
 //          write RF2 specific metadata refsets  
             if (makeRf2Refsets) {
                 Rf2RefexComputer rf2RefexComputer = new Rf2RefexComputer(vc, Ts.get().getMetadataEditCoordinate(),
@@ -403,7 +406,7 @@ public class GenerateIncrementalRf2File extends AbstractMojo {
                     stampsToWrite.add(stamp);
                 }
             }
-            
+
             IntSet sapsToRemove = new IntSet();
             if (previousReleaseDate != null) {
                 IntSet allPaths = new IntSet(pathIds.getSetValues());
@@ -430,7 +433,7 @@ public class GenerateIncrementalRf2File extends AbstractMojo {
                 }
                 reader.close();
             }
-            if(initMapper){
+            if (initMapper) {
                 UuidToSctIdMapper mapper = new UuidToSctIdMapper(Ts.get().getAllConceptNids(), namespace, mappingFileDir);
                 Ts.get().iterateConceptDataInSequence(mapper); //why sequence?
                 mapper.close();
@@ -449,16 +452,16 @@ public class GenerateIncrementalRf2File extends AbstractMojo {
             TaxonomyFilter filter = new TaxonomyFilter();
             Ts.get().iterateConceptDataInParallel(filter);
             NidBitSetBI nidsToRelease = filter.getResults();
-                Rf2Export exporter = new Rf2Export(output,
+            Rf2Export exporter = new Rf2Export(output,
                     releaseType,
                     LANG_CODE.valueOf(languageCode),
                     COUNTRY_CODE.valueOf(countryCode),
                     namespace,
                     moduleConcepts[0].getUuid(),
                     new Date(TimeHelper.getTimeFromString(effectiveDate,
-                    TimeHelper.getAltFileDateFormat())),
+                                    TimeHelper.getAltFileDateFormat())),
                     new Date(TimeHelper.getTimeFromString(snomedCoreReleaseDate,
-                    TimeHelper.getAltFileDateFormat())),
+                                    TimeHelper.getAltFileDateFormat())),
                     stampsToWrite.getAsSet(),
                     vc,
                     excludedRefsetIds.getAsSet(),
@@ -466,7 +469,7 @@ public class GenerateIncrementalRf2File extends AbstractMojo {
                     makePrivateAltIdsFile,
                     refsetParentConceptNid,
                     new Date(TimeHelper.getTimeFromString(this.previousReleaseDate,
-                        TimeHelper.getFileDateFormat())),
+                                    TimeHelper.getFileDateFormat())),
                     sapsToRemove.getAsSet(),
                     taxonomyParentNids,
                     conNumRefsetParentConceptNid);
@@ -476,7 +479,7 @@ public class GenerateIncrementalRf2File extends AbstractMojo {
             UuidToSctIdWriter writer = new UuidToSctIdWriter(namespace, moduleConcepts[0].getUuid(),
                     output, handler, releaseType, COUNTRY_CODE.valueOf(countryCode),
                     new Date(TimeHelper.getTimeFromString(effectiveDate,
-                    TimeHelper.getAltFileDateFormat())), vc);
+                                    TimeHelper.getAltFileDateFormat())), vc);
             writer.write();
             writer.close();
             handler.writeMaps();
@@ -484,15 +487,15 @@ public class GenerateIncrementalRf2File extends AbstractMojo {
             throw new MojoExecutionException(e.getLocalizedMessage(), e);
         }
     }
-    
-    private class TaxonomyFilter implements ProcessUnfetchedConceptDataBI{
-        
+
+    private class TaxonomyFilter implements ProcessUnfetchedConceptDataBI {
+
         ConcurrentSkipListSet<Integer> results = new ConcurrentSkipListSet<>();
 
         @Override
         public void processUnfetchedConceptData(int conceptNid, ConceptFetcherBI conceptFetcher) throws Exception {
-            for(int parentNid : taxonomyParentNids){
-                if(Ts.get().wasEverKindOf(conceptNid, parentNid, vc)){
+            for (int parentNid : taxonomyParentNids) {
+                if (Ts.get().wasEverKindOf(conceptNid, parentNid, vc)) {
                     results.add(conceptNid);
                 }
             }
@@ -507,10 +510,10 @@ public class GenerateIncrementalRf2File extends AbstractMojo {
         public boolean continueWork() {
             return true;
         }
-        
-        public NidBitSetBI getResults() throws IOException{
+
+        public NidBitSetBI getResults() throws IOException {
             NidBitSetBI resultSet = Ts.get().getEmptyNidSet();
-            for(Integer nid : results){
+            for (Integer nid : results) {
                 resultSet.setMember(nid);
             }
             return resultSet;

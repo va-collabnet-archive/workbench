@@ -13,46 +13,6 @@
 package org.dwfa.ace.refset;
 
 //~--- non-JDK imports --------------------------------------------------------
-
-import org.dwfa.ace.ACE;
-import org.dwfa.ace.TermComponentLabel;
-import org.dwfa.ace.api.I_AmTermComponent;
-import org.dwfa.ace.api.I_ConfigAceFrame;
-import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_HostConceptPlugins;
-import org.dwfa.ace.api.I_IntSet;
-import org.dwfa.ace.api.I_PluginToConceptPanel;
-import org.dwfa.ace.api.Terms;
-import org.dwfa.ace.api.ebr.I_ExtendByRef;
-import org.dwfa.ace.config.AceFrameConfig;
-import org.dwfa.ace.gui.concept.ConceptPanel;
-import org.dwfa.ace.log.AceLog;
-import org.dwfa.ace.table.JTableWithDragImage;
-import org.dwfa.ace.table.refset.ReflexiveRefsetCommentTableModel;
-import org.dwfa.ace.table.refset.ReflexiveRefsetFieldData;
-import org.dwfa.ace.table.refset.ReflexiveRefsetFieldData.INVOKE_ON_OBJECT_TYPE;
-import org.dwfa.ace.table.refset.ReflexiveRefsetFieldData.REFSET_FIELD_TYPE;
-import org.dwfa.ace.table.refset.ReflexiveRefsetMemberTableModel;
-import org.dwfa.ace.table.refset.ReflexiveRefsetUtil;
-import org.dwfa.ace.task.ProcessAttachmentKeys;
-import org.dwfa.ace.task.WorkerAttachmentKeys;
-import org.dwfa.bpa.BusinessProcess;
-import org.dwfa.bpa.ExecutionRecord;
-import org.dwfa.bpa.process.I_EncodeBusinessProcess;
-import org.dwfa.bpa.process.I_Work;
-import org.dwfa.bpa.process.TaskFailedException;
-import org.dwfa.cement.ArchitectonicAuxiliary;
-import org.dwfa.cement.RefsetAuxiliary;
-import org.dwfa.tapi.TerminologyException;
-import org.dwfa.util.LogWithAlerts;
-
-import org.ihtsdo.etypes.EConcept;
-import org.ihtsdo.taxonomy.TaxonomyHelper;
-import org.ihtsdo.tk.Ts;
-import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
-
-//~--- JDK imports ------------------------------------------------------------
-
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -64,20 +24,16 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
-
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
-
 import java.lang.reflect.InvocationTargetException;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -94,7 +50,6 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.UUID;
 import java.util.logging.Level;
-
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -117,11 +72,47 @@ import javax.swing.event.TreeSelectionListener;
 import javax.swing.table.TableModel;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
+import org.dwfa.ace.ACE;
+import org.dwfa.ace.TermComponentLabel;
+import org.dwfa.ace.api.I_AmTermComponent;
+import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_HostConceptPlugins;
+import org.dwfa.ace.api.I_IntSet;
+import org.dwfa.ace.api.I_PluginToConceptPanel;
+import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.api.ebr.I_ExtendByRef;
+import org.dwfa.ace.config.AceFrameConfig;
+import org.dwfa.ace.gui.concept.ConceptPanel;
+import org.dwfa.ace.log.AceLog;
+import org.dwfa.ace.table.JTableWithDragImage;
+import org.dwfa.ace.table.refset.ReflexiveRefsetCommentTableModel;
+import org.dwfa.ace.table.refset.ReflexiveRefsetFieldData;
+import org.dwfa.ace.table.refset.ReflexiveRefsetFieldData.INVOKE_ON_OBJECT_TYPE;
+import org.dwfa.ace.table.refset.ReflexiveRefsetFieldData.REFSET_FIELD_TYPE;
+import org.dwfa.ace.table.refset.ReflexiveRefsetMemberTableModel;
+import org.dwfa.ace.table.refset.ReflexiveRefsetUtil;
+import org.dwfa.ace.task.ProcessAttachmentKeys;
+import org.dwfa.ace.task.WorkerAttachmentKeys;
+import org.ihtsdo.tk.query.RefsetSpec;
+import org.dwfa.bpa.BusinessProcess;
+import org.dwfa.bpa.ExecutionRecord;
+import org.dwfa.bpa.process.I_EncodeBusinessProcess;
+import org.dwfa.bpa.process.I_Work;
+import org.dwfa.bpa.process.TaskFailedException;
+import org.dwfa.cement.ArchitectonicAuxiliary;
+import org.dwfa.cement.RefsetAuxiliary;
+import org.dwfa.tapi.TerminologyException;
+import org.dwfa.util.LogWithAlerts;
+import org.ihtsdo.etypes.EConcept;
+import org.ihtsdo.taxonomy.TaxonomyHelper;
+import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 import org.ihtsdo.tk.binding.snomed.TermAux;
-import org.ihtsdo.tk.query.RefsetSpec;
+import org.ihtsdo.ttk.preferences.gui.PanelLinkingPreferences.LINK_TYPE;
 
 public class RefsetSpecEditor implements I_HostConceptPlugins, PropertyChangeListener {
 

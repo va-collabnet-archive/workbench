@@ -42,6 +42,7 @@ import org.ihtsdo.util.swing.GuiUtil;
 //~--- JDK imports ------------------------------------------------------------
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
@@ -1709,29 +1710,42 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
         relGroupPanel.setupDrag(group);
         relGroupPanel.setBorder(BorderFactory.createRaisedBevelBorder());
         
-        JLabel relGroupLabel = getJLabel(" ");
-        
-        relGroupLabel.setBackground(Color.GREEN);
-        relGroupLabel.setOpaque(true);
-//        relGroupPanel.setDropPopupInset(relGroupLabel.getPreferredSize().width);
-        
         GridBagConstraints gbc = new GridBagConstraints();
         
         gbc.anchor = GridBagConstraints.NORTHWEST;
         gbc.weightx = 0;
         gbc.weighty = 1;
         gbc.fill = GridBagConstraints.BOTH;
-        gbc.gridheight = group.getRelationships().size() + 1;
+        gbc.gridheight = group.getRelationships().size() + 2;
         gbc.gridwidth = 1;
         gbc.gridx = 0;
         gbc.gridy = 0;
+        gbc.gridheight = 1;
+        Color color = new Color (86,201,27);
+        JButton actionMenuButton = relGroupPanel.getActionMenuButton();
+        actionMenuButton.setMinimumSize(new Dimension(16, 16));
+        actionMenuButton.setPreferredSize(new Dimension(16, 16));
+        actionMenuButton.setBackground(color);
+        actionMenuButton.setOpaque(true);
+        relGroupPanel.add(actionMenuButton, gbc);
+        gbc.gridy++;
+        gbc.gridheight = GridBagConstraints.REMAINDER;
+        gbc.weighty = 1;
+        JLabel relGroupLabel = getJLabel(" ");
+        relGroupLabel.setOpaque(true);
+        relGroupLabel.setMinimumSize(new Dimension(16, 12));
+        relGroupLabel.setPreferredSize(new Dimension(16, 12));
+        relGroupPanel.setDropPopupInset(relGroupLabel.getPreferredSize().width);
+        relGroupLabel.setBackground(color);
         relGroupPanel.add(relGroupLabel, gbc);
+        gbc.gridy = 0;
+        gbc.gridheight = 3;
+        gbc.weighty = 0;
         gbc.anchor = GridBagConstraints.NORTHWEST;
         gbc.gridx = 1;
         gbc.weightx = 1;
         gbc.gridheight = 1;
         
-        JButton actionMenuButton = relGroupPanel.getActionMenuButton();
         
         (new GetActionsSwingWorker(actionMenuButton, group)).execute();
         
@@ -1995,7 +2009,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
                 actionMenuButton.addActionListener(new DoDynamicPopup(actions));
                 
                 if ((actions == null) || actions.isEmpty()) {
-                    actionMenuButton.setVisible(false);
+                    actionMenuButton.setEnabled(false);
                 }
             } catch (InterruptedException | ExecutionException ex) {
                 AceLog.getAppLog().alertAndLogException(ex);

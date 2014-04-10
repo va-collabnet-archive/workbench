@@ -1277,6 +1277,11 @@ public class ConceptVersion implements ConceptVersionBI, Comparable<ConceptVersi
     }
 
     @Override
+    public boolean isCanceled() throws IOException{
+        return concept.isCanceled();
+    }
+    
+    @Override
     public boolean isKindOf(ConceptVersionBI possibleKind) throws IOException, ContradictionException {
         return Ts.get().isKindOf(getNid(), possibleKind.getNid(), vc);
     }

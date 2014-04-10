@@ -102,6 +102,7 @@ import org.intsdo.tk.drools.manager.DroolsExecutionManager;
 import com.mxgraph.model.mxCell;
 import com.mxgraph.swing.mxGraphComponent;
 import com.mxgraph.view.mxGraph;
+import java.util.logging.Logger;
 
 /**
  * @author Administrator
@@ -175,6 +176,13 @@ public class ConceptViewRenderer extends JLayeredPane {
 				});
 			}
 			setDividerLocation();
+                    try {
+                        if(conceptViewPanel.isShowing()){
+                            settings.getView().redoConceptViewLayout();
+                        }
+                    } catch (IOException ex) {
+                        Logger.getLogger(ConceptViewRenderer.class.getName()).log(Level.SEVERE, null, ex);
+                    }
 		}
 
 		@Override

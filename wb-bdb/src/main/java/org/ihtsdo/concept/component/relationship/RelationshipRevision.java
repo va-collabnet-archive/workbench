@@ -18,6 +18,19 @@ import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.db.bdb.BdbTerminologyStore;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ContradictionException;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.api.relationship.RelationshipAnalogBI;
+import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationshipRevision;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
+
+//~--- JDK imports ------------------------------------------------------------
+
+import java.beans.PropertyVetoException;
+
+import java.io.IOException;
+import java.util.Collection;
+import java.util.Set;
+import org.ihtsdo.db.bdb.BdbTerminologyStore;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.blueprint.RelationshipCAB;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;

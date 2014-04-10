@@ -1,7 +1,6 @@
 package org.ihtsdo.arena.conceptview;
 
 //~--- non-JDK imports --------------------------------------------------------
-import org.dwfa.ace.TermComponentLabel;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
@@ -33,9 +32,10 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JSeparator;
+import javax.swing.JTextArea;
 import javax.swing.SwingConstants;
 import javax.swing.TransferHandler;
-import org.apache.commons.lang.StringEscapeUtils;
+import org.dwfa.ace.DynamicWidthTermComponentLabel;
 import org.ihtsdo.arena.editor.ArenaEditor;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
@@ -48,7 +48,7 @@ public class DragPanelDescription extends DragPanelComponentVersion<DescriptionA
      */
     private static final long serialVersionUID = 1L;
     private ConceptViewLayout viewLayout;
-    private FixedWidthJEditorPane textPane;
+    private JTextArea textPane;
 
     //~--- constructors --------------------------------------------------------
     public DragPanelDescription(ConceptViewLayout viewLayout, CollapsePanel parentCollapsePanel,
@@ -88,47 +88,77 @@ public class DragPanelDescription extends DragPanelComponentVersion<DescriptionA
         setupDrag(getDesc());
         setBorder(BorderFactory.createRaisedBevelBorder());
 
-        JLabel descLabel = getJLabel(" ");
-
-        if ((getParentCollapsePanel() == null)
-                || !getSettings().getView().getConfig().getAllowedStatus().contains(getDesc().getStatusNid())) {
-            descLabel.setBackground(Color.ORANGE.darker());
-        } else {
-            descLabel.setBackground(Color.ORANGE);
-        }
-
-        descLabel.setOpaque(true);
-        descLabel.setMinimumSize(new Dimension(20, 28));
-        descLabel.setPreferredSize(new Dimension(20, 28));
-        setDropPopupInset(descLabel.getPreferredSize().width);
-
         GridBagConstraints gbc = new GridBagConstraints();
 
         gbc.anchor = GridBagConstraints.NORTHWEST;
         gbc.weightx = 0;
         gbc.weighty = 0;
         gbc.fill = GridBagConstraints.BOTH;
-        gbc.gridheight = 1;
+        gbc.gridheight = 3;
         gbc.gridwidth = 1;
         gbc.gridx = 0;
         gbc.gridy = 0;
-        add(descLabel, gbc);
+        if ((getParentCollapsePanel() == null)
+                || !getSettings().getView().getConfig().getAllowedStatus().contains(getDesc().getStatusNid())) {
+            gbc.gridheight = 1;
+            JButton button = getComponentActionMenuButton();
+            button.setMinimumSize(new Dimension(16, 16));
+            button.setPreferredSize(new Dimension(16, 16));
+            button.setBackground(Color.ORANGE.darker());
+            button.setOpaque(true);
+            add(button, gbc);
+            gbc.gridy++;
+            gbc.gridheight = GridBagConstraints.REMAINDER;
+            gbc.weighty = 1;
+            JLabel descLabel = getJLabel(" ");
+            descLabel.setOpaque(true);
+            descLabel.setMinimumSize(new Dimension(16, 28));
+            descLabel.setPreferredSize(new Dimension(16, 28));
+            setDropPopupInset(descLabel.getPreferredSize().width);
+            descLabel.setBackground(Color.ORANGE.darker());
+            add(descLabel, gbc);
+        } else {
+            gbc.gridheight = 1;
+            JButton button = getComponentActionMenuButton();
+            button.setMinimumSize(new Dimension(16, 16));
+            button.setPreferredSize(new Dimension(16, 16));
+            button.setBackground(Color.ORANGE);
+            button.setOpaque(true);
+            add(button, gbc);
+            gbc.gridy++;
+            gbc.gridheight = GridBagConstraints.REMAINDER;
+            gbc.weighty = 1;
+            JLabel descLabel = getJLabel(" ");
+            descLabel.setOpaque(true);
+            descLabel.setMinimumSize(new Dimension(16, 12));
+            descLabel.setPreferredSize(new Dimension(16, 12));
+            setDropPopupInset(descLabel.getPreferredSize().width);
+            descLabel.setBackground(Color.ORANGE);
+            add(descLabel, gbc);
+            gbc.gridy = 0;
+            gbc.gridheight = 3;
+            gbc.weighty = 0;
+        }
         gbc.gridx++;
         if (!getDesc().isActive(getSettings().getConfig().getAllowedStatus())) {
+            gbc.gridheight = 1;
             add(new JLabel(getGhostIcon()), gbc);
+            gbc.gridheight = 3;
             gbc.gridx++;
         }
 
         add(conflictLabel, gbc);
         conflictLabel.setVisible(false);
         gbc.gridx++;
-        gbc.anchor = GridBagConstraints.NORTHWEST;
-        gbc.gridx++;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.gridheight = 1;
+        gbc.gridwidth = 1;
 
-        TermComponentLabel typeLabel = getLabel(getDesc().getTypeNid(), canDrop, getSettings().getDescType());
-
+        DynamicWidthTermComponentLabel typeLabel = getDynamicLabel(getDesc().getTypeNid(), canDrop, getSettings().getDescType());
+        typeLabel.setSize(new Dimension(5,5));
+        typeLabel.setBorder(BorderFactory.createEmptyBorder(0,3,0,0));
         add(typeLabel, gbc);
-
+        
         if (getDesc().isUncommitted()
                 && (getDesc().getStatusNid() == SnomedMetadataRfx.getSTATUS_RETIRED_NID())) {
             typeLabel.setFrozen(true);
@@ -159,24 +189,32 @@ public class DragPanelDescription extends DragPanelComponentVersion<DescriptionA
         }
 
         gbc.gridx++;
-        add(new JSeparator(SwingConstants.VERTICAL), gbc);
-        gbc.weightx = 1;
-        gbc.gridx++;
+        gbc.anchor = GridBagConstraints.NORTHEAST;
+        // check for case sensitivity
+        String caseStr = "ci ";
+        String descText = getDesc().getText();
+        String initialWord = null;
 
-        textPane = new FixedWidthJEditorPane();
-
-        textPane.setEditable(canDrop);
-        textPane.setOpaque(false);
-        textPane.setFont(textPane.getFont().deriveFont(getSettings().getFontSize()));
-        textPane.setText(StringEscapeUtils.escapeHtml(getDesc().getText()));
-        textPane.setToolTipText(textPane.extractText());
-        if(canDrop && viewLayout.cView.focus){
-            textPane.selectAll();
+        if (descText.indexOf(" ") != -1) {
+            initialWord = descText.substring(0, descText.indexOf(" "));
+        } else {
+            initialWord = descText;
         }
-        add(textPane, gbc);
-        gbc.weightx = 0;
-        gbc.gridx++;
 
+        if (CsWordsHelper.isIcTypeSignificant(initialWord,
+                CaseSensitive.MAYBE_IC_SIGNIFICANT.getLenient().getNid()) && (getDesc().isInitialCaseSignificant() == false) && getDesc().isUncommitted()) {
+            caseStr = "<html><font color = 'red'>Cs";
+        } else if (getDesc().isInitialCaseSignificant()) {
+            caseStr = "Cs";
+        }
+
+        JLabel caseLabel = getJLabel(caseStr);
+        add(caseLabel, gbc);
+        
+        gbc.gridx--;
+        gbc.gridy++;
+        gbc.fill = GridBagConstraints.VERTICAL;
+        gbc.anchor = GridBagConstraints.NORTHWEST;
         String lang = getDesc().getLang();
 
         if ((lang != null) && (lang.length() > 2)) {
@@ -221,40 +259,59 @@ public class DragPanelDescription extends DragPanelComponentVersion<DescriptionA
         if (sb.length() > 0) {
             lang = "<html>" + lang + ":pt" + sb.toString();
         }
+        if(lang.length() == 2){
+            if(getDesc().isUncommitted()){
+                lang = "<html><font color='yellow'>" + lang + ":pt US GB</font>"; 
+            }else{
+               lang = "<html><font color='rgb(234,234,234)'>" + lang + ":pt US GB</font>"; 
+            }
+        }else if(lang.length() == 40 || lang.length() == 39){
+            if(getDesc().isUncommitted()){
+                lang = lang + "<font color='yellow'> GB</font>";
+            }else{
+                lang = lang + "<font color=rgb(234,234,234)'> GB</font>";
+            }
+        }
         JLabel langLabel = getJLabel(lang);
-
+        langLabel.setBorder(BorderFactory.createEmptyBorder(0,3,0,2));
         add(langLabel, gbc);
+        //add additional length
+        
+
         gbc.gridx++;
-
-        // check for case sensitivity
-        String caseStr = "ci";
-        String descText = getDesc().getText();
-        String initialWord = null;
-
-        if (descText.indexOf(" ") != -1) {
-            initialWord = descText.substring(0, descText.indexOf(" "));
-        } else {
-            initialWord = descText;
+        gbc.gridx++;
+        gbc.gridy = 0;
+        gbc.gridheight = 3;
+        
+        add(new JSeparator(SwingConstants.VERTICAL), gbc);
+        gbc.gridx++;
+        gbc.weightx = 1;
+        gbc.weighty = 1;
+        gbc.fill = GridBagConstraints.BOTH;
+        
+        textPane = new JTextArea();
+        textPane.setLineWrap(true);
+        textPane.setWrapStyleWord(true);
+        textPane.setEditable(canDrop);
+        textPane.setOpaque(false);
+        textPane.setFont(textPane.getFont().deriveFont(getSettings().getFontSize()));
+        textPane.setText(getDesc().getText());
+        textPane.setToolTipText(textPane.getText());
+        if(canDrop && viewLayout.cView.focus){
+            textPane.selectAll();
         }
 
-        if (CsWordsHelper.isIcTypeSignificant(initialWord,
-                CaseSensitive.MAYBE_IC_SIGNIFICANT.getLenient().getNid()) && (getDesc().isInitialCaseSignificant() == false) && getDesc().isUncommitted()) {
-            caseStr = "<html><font color = 'red'>Cs";
-        } else if (getDesc().isInitialCaseSignificant()) {
-            caseStr = "Cs";
-        }
-
-        JLabel caseLabel = getJLabel(caseStr);
-
-        add(caseLabel, gbc);
-        gbc.gridx++;
-        add(getComponentActionMenuButton(), gbc);
+        add(textPane, gbc);
+        gbc.weightx = 0;
+        gbc.weighty = 1;
+        gbc.gridwidth = 1;
+        gbc.gridheight = 1;
         gbc.gridx++;
 
         JButton collapseExpandButton = getCollapseExpandButton();
-
+        gbc.gridheight = 2;
         add(collapseExpandButton, gbc);
-
+             
         if (getDesc().isUncommitted()
                 && (getDesc().getStatusNid() == SnomedMetadataRfx.getSTATUS_RETIRED_NID())) {
             textPane.setEditable(false);
@@ -264,7 +321,9 @@ public class DragPanelDescription extends DragPanelComponentVersion<DescriptionA
                 && (getDesc().getStatusNid() != SnomedMetadataRfx.getSTATUS_RETIRED_NID())) {
             textPane.getDocument().addDocumentListener(new UpdateTextDocumentListener(textPane, getDesc()));
         }
-
+        gbc.gridy = 3;
+        gbc.gridheight = 1;
+        gbc.fill = GridBagConstraints.BOTH;
         addSubPanels(gbc);
     }
 
@@ -282,7 +341,7 @@ public class DragPanelDescription extends DragPanelComponentVersion<DescriptionA
         return DragPanelDataFlavors.descVersionFlavor;
     }
 
-    public FixedWidthJEditorPane getTextPane() {
+    public JTextArea getTextPane() {
         return textPane;
     }
     

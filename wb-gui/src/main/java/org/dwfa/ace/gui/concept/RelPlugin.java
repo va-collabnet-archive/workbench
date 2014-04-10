@@ -31,7 +31,6 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -43,7 +42,6 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableColumn;
-
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.DropButton;
 import org.dwfa.ace.SmallProgressPanel;
@@ -59,16 +57,17 @@ import org.dwfa.ace.edit.AddRelationship;
 import org.dwfa.ace.table.DestRelTableModel;
 import org.dwfa.ace.table.JTableWithDragImage;
 import org.dwfa.ace.table.RelTableModel;
-import org.dwfa.ace.table.RelationshipTableRenderer;
 import org.dwfa.ace.table.RelTableModel.REL_FIELD;
 import org.dwfa.ace.table.RelTableModel.RelGroupFieldEditor;
 import org.dwfa.ace.table.RelTableModel.StringWithRelTuple;
+import org.dwfa.ace.table.RelationshipTableRenderer;
 import org.dwfa.ace.table.refset.RefsetUtil;
 import org.dwfa.bpa.util.SortClickListener;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
+import org.ihtsdo.ttk.preferences.gui.PanelLinkingPreferences.LINK_TYPE;
 
 public abstract class RelPlugin extends AbstractPlugin implements TableModelListener, I_HostConceptPlugins {
 

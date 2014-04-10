@@ -16,6 +16,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JTextArea;
 
 import javax.swing.Timer;
 import javax.swing.event.DocumentEvent;
@@ -57,7 +58,7 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
             new ThreadGroup("updateTextThreadGroup");
     private static ExecutorService updateDocListenrService = Executors.newFixedThreadPool(1,
             new NamedThreadFactory(updateTextThreadGroup, "updateTextThread"));
-    FixedWidthJEditorPane editorPane;
+    JTextArea editorPane;
     DescriptionAnalogBI desc;
     Timer t;
     I_GetConceptData c;
@@ -71,7 +72,7 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
     TerminologyBuilderBI tc;
     String text;
 
-    public UpdateTextDocumentListener(FixedWidthJEditorPane editorPane,
+    public UpdateTextDocumentListener(JTextArea editorPane,
             DescriptionAnalogBI desc) throws TerminologyException, IOException {
         super();
         this.editorPane = editorPane;
@@ -85,7 +86,7 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
     @Override
     public void insertUpdate(DocumentEvent e) {
         lastChange++;
-        text = editorPane.extractText();
+        text = editorPane.getText();
         text = text.replaceAll("[\\s]", " ");
         text = text.replaceAll("   *", " ");
         try {
@@ -104,7 +105,7 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
     @Override
     public void removeUpdate(DocumentEvent e) {
         lastChange++;
-        text = editorPane.extractText();
+        text = editorPane.getText();
         text = text.replaceAll("[\\s]", " ");
         text = text.replaceAll("   *", " ");
         try {
@@ -123,7 +124,7 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
     @Override
     public void changedUpdate(DocumentEvent e) {
         lastChange++;
-        text = editorPane.extractText();
+        text = editorPane.getText();
         text = text.replaceAll("[\\s]", " ");
         text = text.replaceAll("   *", " ");
         try {
