@@ -306,7 +306,6 @@ public class PerformQA implements I_ProcessConcepts {
 					writeOutputFile(tmpResults2, duplicateConcept);
 					duplicatesSet.add(duplicateConcept.getNid());
 				}
-				System.out.println("* Found FSN duplication: " + fsn);
 			} else {
 				uniqueFsnMap.put(Type5UuidFactory.get(fsn), loopConcept.getNid());
 			}
