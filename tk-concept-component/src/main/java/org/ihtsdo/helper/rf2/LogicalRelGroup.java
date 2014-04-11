@@ -34,7 +34,7 @@ public class LogicalRelGroup {
 
     private static final String REL_ID_NAMESPACE_UUID_TYPE1 = "84fd0460-2270-11df-8a39-0800200c9a66";
     private final static UUID SNOMED_RF2_ACTIVE_UUID = SnomedMetadataRf2.ACTIVE_VALUE_RF2.getUuids()[0];
-    private String groupListStr;
+    String groupListStr;
     UUID groupListStrHash;
     public ArrayList<LogicalRel> logicalRels;
 

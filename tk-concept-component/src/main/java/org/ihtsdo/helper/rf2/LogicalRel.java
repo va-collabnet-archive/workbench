@@ -15,11 +15,14 @@
  */
 package org.ihtsdo.helper.rf2;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
+import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.TerminologyStoreDI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 import org.ihtsdo.tk.dto.concept.component.identifier.TkIdentifier;
 import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationship;
@@ -52,9 +55,6 @@ public class LogicalRel implements Comparable<LogicalRel> {
     private final static UUID SNOMED_RF2_ACTIVE_UUID = SnomedMetadataRf2.ACTIVE_VALUE_RF2.getUuids()[0];
 
     public LogicalRel(TkRelationship tkr) {
-        if (tkr.primordialUuid.compareTo(UUID.fromString("89e125a8-a318-3c5f-b1cd-29c26e9cb2b4")) == 0) {
-            System.out.println(":DEBUG: found tkr of interest");
-        }
         this.tkr = tkr;
         this.logicalRelUuid = null; // not assigned on initial creation
         this.c1SnoId = tkr.c1Uuid; // not versioned
@@ -175,5 +175,40 @@ public class LogicalRel implements Comparable<LogicalRel> {
             }
         }
         latestRev.group = group;
+    }
+
+    public String toStringUser() {
+        TerminologyStoreDI ts = Ts.get();
+
+        StringBuilder sb = new StringBuilder();
+
+        sb.append(c1SnoId.toString());
+        sb.append(" :: ");
+        sb.append(typeSnoId.toString());
+        sb.append(" :: ");
+        sb.append(c2SnoId.toString());
+        sb.append(" :: (");
+        sb.append(group);
+        sb.append(") || ");
+        try {
+            sb.append(ts.getConcept(c1SnoId).toUserString());
+        } catch (IOException ex) {
+            sb.append("ERROR");
+        }
+        sb.append(" || ");
+        try {
+            sb.append(ts.getConcept(typeSnoId).toUserString());
+        } catch (IOException ex) {
+            sb.append("ERROR");
+        }
+        sb.append(" || ");
+        try {
+            sb.append(ts.getConcept(c2SnoId).toUserString());
+        } catch (IOException ex) {
+            sb.append("ERROR");
+        }
+        sb.append("\n");
+
+        return sb.toString();
     }
 }
