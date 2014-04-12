@@ -770,8 +770,8 @@ public class RF1ToRF2Transformer extends AbstractTransformer {
                 sb.append(fsnCount);
                 sb.append(" UUID: ");
                 sb.append(eConcept.primordialUuid.toString());
-                sb.append(" Concept: ");
-                sb.append(eConcept.toString());
+                // sb.append(" Concept: ");
+                // sb.append(eConcept.toString());
                 AceLog.getAppLog().log(Level.INFO, sb.toString());
             }
         }
