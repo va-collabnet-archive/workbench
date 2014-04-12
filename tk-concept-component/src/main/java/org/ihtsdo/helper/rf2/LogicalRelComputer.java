@@ -160,6 +160,7 @@ public class LogicalRelComputer {
                 } else {
                     sbType0Verbose.append(" (null) ");
                 }
+                sbType0Verbose.append(" ");
                 sbType0Verbose.append(processRelFlavor(logicalRel).toString());
                 if (logicalRel.statusUuid != null
                         && logicalRel.statusUuid.compareTo(SNOMED_RF2_ACTIVE_UUID) == 0) {
@@ -178,14 +179,10 @@ public class LogicalRelComputer {
                 sbType0Verbose.append("  Relationship: ");
                 if (logicalRel.tkr != null) {
                     sbType0Verbose.append(logicalRel.tkr.primordialUuid.toString());
-                }
-                if (logicalRel.logicalRelUuid != null) {
-                    sbType0Verbose.append(logicalRel.logicalRelUuid.toString());
-                    sbType0Verbose.append(" (logical) ");
-                }
-                if (logicalRel.tkr == null && logicalRel.logicalRelUuid == null) {
+                } else {
                     sbType0Verbose.append(" (null) ");
                 }
+                sbType0Verbose.append(" ");
                 sbType0Verbose.append(processRelFlavor(logicalRel).toString());
                 sbType0Verbose.append("\n");
             }
@@ -193,72 +190,17 @@ public class LogicalRelComputer {
             keepList.addAll(equivalentRelList);
         } else if (tempList.size() == 1) {
             keepList.addAll(tempList);
-        } else if (tempList.size() == 2) {
-            // REPORT CONCEPT LIST FOR WORKBENCH LIST VIEW
-            sbType2List.append(equivalentRelList.get(0).c1SnoId.toString());
-            sbType2List.append("\t");
-            ConceptChronicleBI cb = ts.getConcept(equivalentRelList.get(0).c1SnoId);
-            if (cb != null) {
-                sbType2List.append(cb.toUserString());
-            } else {
-                sbType2List.append("NULL CONCEPT");
+        } else { // tempList.size() > 1
+            int activeCount = 0;
+            for (LogicalRel lr : tempList) {
+                if (lr.statusUuid.compareTo(SNOMED_RF2_ACTIVE_UUID) == 0) {
+                    activeCount++;
+                }
             }
-            sbType2List.append("\n");
-
-            // EXPANDED REPORT
-            sbType2Verbose.append("###  tempList.size()==2\n");
-            sbType2Verbose.append("Concept: ");
-            sbType2Verbose.append(equivalentRelList.get(0).c1SnoId.toString());
-            sbType2Verbose.append("\n");
-            sbType2Verbose.append("  ## equivalentRelList ... processed ##\n");
-            for (LogicalRel logicalRel : equivalentRelList) {
-                sbType2Verbose.append("  Relationship: ");
-                if (logicalRel.tkr != null) {
-                    sbType2Verbose.append(logicalRel.tkr.primordialUuid.toString());
-                } else {
-                    sbType2Verbose.append(" (null) ");
-                }
-
-                sbType2Verbose.append(processRelFlavor(logicalRel).toString());
-
-                if (logicalRel.statusUuid != null
-                        && logicalRel.statusUuid.compareTo(SNOMED_RF2_ACTIVE_UUID) == 0) {
-                    sbType2Verbose.append(" Active  ");
-                } else {
-                    sbType2Verbose.append(" Inactive");
-                }
-                sbType2Verbose.append(" time:");
-                sbType2Verbose.append(logicalRel.time);
-                sbType2Verbose.append(" ");
-                sbType2Verbose.append(logicalRel.toStringUser());
-
-                sbType2Verbose.append("\n");
+            if (activeCount < 2) {
+                keepList.addAll(tempList);
+                return;
             }
-            sbType2Verbose.append("  ## tempList ... kept ##\n");
-            for (LogicalRel logicalRel : tempList) {
-                sbType2Verbose.append("  Relationship: ");
-                if (logicalRel.tkr != null) {
-                    sbType2Verbose.append(logicalRel.tkr.primordialUuid.toString());
-                } else {
-                    sbType2Verbose.append(" (null) ");
-                }
-                sbType2Verbose.append(processRelFlavor(logicalRel).toString());
-                if (logicalRel.statusUuid != null
-                        && logicalRel.statusUuid.compareTo(SNOMED_RF2_ACTIVE_UUID) == 0) {
-                    sbType2Verbose.append(" Active  ");
-                } else {
-                    sbType2Verbose.append(" Inactive");
-                }
-                sbType2Verbose.append(" time:");
-                sbType2Verbose.append(logicalRel.time);
-                sbType2Verbose.append(" ");
-                sbType2Verbose.append(logicalRel.toStringUser());
-                sbType2Verbose.append("\n");
-            }
-
-            // KEEP ORIGINAL LIST MINUS REL_FROM_SNOMED_WITH_LEGACY_FILLER_SCTID
-            keepList.addAll(tempList);
-        } else { // tempList.size() > 2
             // REPORT CONCEPT LIST FOR WORKBENCH LIST VIEW
             sbType3List.append(equivalentRelList.get(0).c1SnoId.toString());
             sbType3List.append("\t");
@@ -271,27 +213,26 @@ public class LogicalRelComputer {
             sbType3List.append("\n");
 
             // EXPANDED REPORT
-            sbType3Verbose.append("###  tempList.size()==");
-            sbType3Verbose.append(tempList.size());
+            sbType3Verbose.append("###  ACTIVE tempList.size()==");
+            sbType3Verbose.append(activeCount);
             sbType3Verbose.append("\n");
             sbType3Verbose.append("Concept: ");
             sbType3Verbose.append(equivalentRelList.get(0).c1SnoId.toString());
             sbType3Verbose.append("\n");
             sbType3Verbose.append("  ## equivalentRelList ... processed ##\n");
             for (LogicalRel logicalRel : equivalentRelList) {
+                if (logicalRel.statusUuid != null
+                        && logicalRel.statusUuid.compareTo(SNOMED_RF2_ACTIVE_UUID) != 0) {
+                    continue; // do not report Inactive
+                }
                 sbType3Verbose.append("  Relationship: ");
                 if (logicalRel.tkr != null) {
                     sbType3Verbose.append(logicalRel.tkr.primordialUuid.toString());
                 } else {
                     sbType3Verbose.append(" (null) ");
                 }
+                sbType3Verbose.append(" ");
                 sbType3Verbose.append(processRelFlavor(logicalRel).toString());
-                if (logicalRel.statusUuid != null
-                        && logicalRel.statusUuid.compareTo(SNOMED_RF2_ACTIVE_UUID) == 0) {
-                    sbType3Verbose.append(" Active  ");
-                } else {
-                    sbType3Verbose.append(" Inactive");
-                }
                 sbType3Verbose.append(" time:");
                 sbType3Verbose.append(logicalRel.time);
                 sbType3Verbose.append(" ");
@@ -300,19 +241,18 @@ public class LogicalRelComputer {
             }
             sbType3Verbose.append("  ## tempList ... kept ##\n");
             for (LogicalRel logicalRel : tempList) {
+                if (logicalRel.statusUuid != null
+                        && logicalRel.statusUuid.compareTo(SNOMED_RF2_ACTIVE_UUID) != 0) {
+                    continue; // do not report Inactive
+                }
                 sbType3Verbose.append("  Relationship: ");
                 if (logicalRel.tkr != null) {
                     sbType3Verbose.append(logicalRel.tkr.primordialUuid.toString());
                 } else {
                     sbType3Verbose.append(" (null) ");
                 }
+                sbType3Verbose.append(" ");
                 sbType3Verbose.append(processRelFlavor(logicalRel).toString());
-                if (logicalRel.statusUuid != null
-                        && logicalRel.statusUuid.compareTo(SNOMED_RF2_ACTIVE_UUID) == 0) {
-                    sbType3Verbose.append(" Active  ");
-                } else {
-                    sbType3Verbose.append(" Inactive");
-                }
                 sbType3Verbose.append(" time:");
                 sbType3Verbose.append(logicalRel.time);
                 sbType3Verbose.append(" ");
@@ -464,7 +404,7 @@ public class LogicalRelComputer {
             }
             for (LogicalRelGroup rg : groupsUsReleaseList) {
                 if (groupsSnomedReleaseSet.contains(rg.groupListStrHash)) {
-                    reportGroupAdditionsWriter.append("\n######_# SCT/US CONTAINS LOGICALLY REDUNDANT ROLE GROUP ");
+                    reportGroupAdditionsWriter.append("\n######_# SCT/US CONTAINS LOGICALLY REDUNDANT ROLE GROUP \n");
                     for (LogicalRel r : rg.logicalRels) {
                         r.group += 80;
                         r.setGroup(r.group);
