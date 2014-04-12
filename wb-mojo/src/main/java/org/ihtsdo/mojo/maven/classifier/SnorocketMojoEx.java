@@ -13,7 +13,9 @@
  */
 package org.ihtsdo.mojo.maven.classifier;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
@@ -26,7 +28,6 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.UUID;
-
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -72,7 +73,6 @@ import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.cs.ChangeSetPolicy;
 import org.ihtsdo.tk.api.cs.ChangeSetWriterThreading;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
-
 import au.csiro.snorocket.core.IFactory_123;
 import au.csiro.snorocket.snapi.I_Snorocket_123.I_Callback;
 import au.csiro.snorocket.snapi.I_Snorocket_123.I_EquivalentCallback;
@@ -358,10 +358,14 @@ public class SnorocketMojoEx extends AbstractMojo {
             }
 
             // ADD RELATIONSHIPS
+            File logFile = new File(outputDir, "SnorocketEX_Relationship_Errors.log");
+            BufferedWriter bw = new BufferedWriter(new FileWriter(logFile));
+            int errorCount = 0;
             Collections.sort(cEditSnoRels);
             for (SnoRel sr : cEditSnoRels) {
                 int err = rocket_123.addRelationship(sr.c1Id, sr.typeId, sr.c2Id, sr.group);
                 if (err > 0) {
+                    errorCount++;
                     StringBuilder sb = new StringBuilder();
                     if ((err & 1) == 1) {
                         sb.append(" --UNDEFINED_C1-- ");
@@ -372,10 +376,14 @@ public class SnorocketMojoEx extends AbstractMojo {
                     if ((err & 4) == 4) {
                         sb.append(" --UNDEFINED_C2-- ");
                     }
-                    logger.info("\r\n::: " + sb /*
-                             * :!!!: + dumpSnoRelStr(sr)
-                             */);
+                    bw.append("\r\n" + sb + ":!!!:" + sr.toString());
                 }
+            }
+            bw.close();
+            if (errorCount > 0)
+            {
+                logger.info("\r\n::: There were " + errorCount + " instances of UNDEFINED C1 / Role / C2 produced by the classifier.  See " 
+                    + logFile.getAbsolutePath());
             }
 
             /*
