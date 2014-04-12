@@ -20,7 +20,9 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -38,7 +40,11 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
+import org.ihtsdo.tk.api.Precedence;
+import org.ihtsdo.tk.api.conceptattribute.ConceptAttributeChronicleBI;
+import org.ihtsdo.tk.api.conceptattribute.ConceptAttributeVersionBI;
 import org.ihtsdo.tk.binding.snomed.Snomed;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 
 /**
  * Goal which finds all concepts that have no parents.
@@ -114,6 +120,20 @@ public class VodbFindOrphans extends AbstractMojo {
 
         @Override
         public void processConcept(I_GetConceptData concept) throws Exception {
+            int conceptStatusNid = concept.getConceptAttributes().getPrimordialVersion().getStatusNid();
+            long conceptTime = concept.getConceptAttributes().getPrimordialVersion().getTime();
+            Collection<? extends ConceptAttributeVersionBI> cav = concept.getConceptAttributes().getVersions();
+            for (ConceptAttributeVersionBI cavbi : cav) {
+                if (cavbi.getTime() > conceptTime) {
+                    conceptStatusNid = cavbi.getStatusNid();
+                    conceptTime = cavbi.getTime();
+                }
+            }
+            
+            if (conceptStatusNid != SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid()) {
+                return; // only interested in Active orphans
+            } 
+
             // get origins
             PathBI architectonicPath = tf.getPath(ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getUids());
 
@@ -147,7 +167,7 @@ public class VodbFindOrphans extends AbstractMojo {
                     allowStatuses.add(status.getVerifiedConcept().getNid());
                 }
             }
-
+            
             List<? extends I_RelTuple> results = concept.getSourceRelTuples(allowStatuses, isARel, new PositionSetReadOnly(branchPositions), 
                 config.getPrecedence(), config.getConflictResolutionStrategy());
             if (results.isEmpty()) {
