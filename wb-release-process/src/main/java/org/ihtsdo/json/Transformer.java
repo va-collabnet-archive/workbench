@@ -500,7 +500,12 @@ public class Transformer {
 
     public void createConceptsJsonFile(String fileName) throws FileNotFoundException, UnsupportedEncodingException, IOException {
         System.out.println("Starting creation of " + fileName);
-        FileOutputStream fos = new FileOutputStream(fileName);
+        File ofile=new File(fileName);
+        if (!ofile.getParentFile().exists()){
+        	ofile.getParentFile().mkdirs();
+        }
+        
+        FileOutputStream fos = new FileOutputStream(ofile);
         OutputStreamWriter osw = new OutputStreamWriter(fos, "UTF-8");
         BufferedWriter bw = new BufferedWriter(osw);
         Gson gson = new Gson();
@@ -803,7 +808,11 @@ public class Transformer {
 	public void createTextIndexFile(String fileName) throws FileNotFoundException, UnsupportedEncodingException, IOException {
 		getCharConvTable();
         System.out.println("Starting creation of " + fileName);
-        FileOutputStream fos = new FileOutputStream(fileName);
+        File ofile=new File(fileName);
+        if (!ofile.getParentFile().exists()){
+        	ofile.getParentFile().mkdirs();
+        }
+        FileOutputStream fos = new FileOutputStream(ofile);
         OutputStreamWriter osw = new OutputStreamWriter(fos, "UTF-8");
         BufferedWriter bw = new BufferedWriter(osw);
         Gson gson = new Gson();
