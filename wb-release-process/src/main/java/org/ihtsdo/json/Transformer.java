@@ -12,6 +12,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
@@ -872,8 +873,8 @@ public class Transformer {
 
 	private void getCharConvTable() throws IOException {
 
-        String charconvtable="src/main/resources/org/ihtsdo/util/char_conversion_table.txt";
-		BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(charconvtable), "UTF8"));	
+        InputStream charconvtable= getClass().getResourceAsStream("/org/ihtsdo/util/char_conversion_table.txt");
+		BufferedReader br = new BufferedReader(new InputStreamReader(charconvtable, "UTF8"));	
 		br.readLine();
 		String line=null;
 		charConv=new HashMap<String,String>();
