@@ -190,7 +190,7 @@ public class ReleaseFilesReportPlugin extends AbstractMojo {
 
 	private void saveSummary() throws IOException {
 		
-		changeSummary.setTitle("Changes report");
+		changeSummary.setTitle("Changes in International Edition " +  endDate + " Development Path since " + startDate + " International Release");
 		Date now=new Date();
 		changeSummary.setExecutionTime(now.toString());
 		changeSummary.setFrom(startDate);
