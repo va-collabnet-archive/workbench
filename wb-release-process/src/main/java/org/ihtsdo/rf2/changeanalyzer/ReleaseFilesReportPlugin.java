@@ -414,7 +414,7 @@ public class ReleaseFilesReportPlugin extends AbstractMojo {
 		logger.info("Generating old_concepts_new_descriptions.json");
 		osw = new OutputStreamWriter(fos, "UTF-8");
 		bw = new BufferedWriter(osw);
-		ArrayList<Long> existingDescriptios = rf2DescFile.getExistingComponentIds(startDate);
+		ArrayList<Long> existingDescriptios = rf2DescFile.getNewComponentIds(startDate);
 		int count=0;
 		boolean bPrim=true;
 		bw.append("[");
