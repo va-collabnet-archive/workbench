@@ -41,13 +41,12 @@ import com.google.gson.Gson;
  * Reporting all the differences.
  * 
  * @see <code>org.apache.maven.plugin.AbstractMojo</code>
- * @author Vahram
  * @goal report-differences
  * @phase install
  */
 public class ReleaseFilesReportPlugin extends AbstractMojo {
 
-	private static final String SUMMARY_FILE = "diff-index.json";
+	private static final String SUMMARY_FILE = "diff_index.json";
 
 	private static final String REACTIVATED_CONCEPTS_REPORT = "reactivated_concepts.json";
 
@@ -200,7 +199,7 @@ public class ReleaseFilesReportPlugin extends AbstractMojo {
 		OutputStreamWriter osw;
 		BufferedWriter bw;
 		fos = new FileOutputStream(new File(outputDirectory, SUMMARY_FILE));
-		logger.info("Generating diff-index.json");
+		logger.info("Generating diff_index.json");
 		osw = new OutputStreamWriter(fos, "UTF-8");
 		bw = new BufferedWriter(osw);	
 		

@@ -6,16 +6,16 @@ public class Relationship {
 		super();
 		this.rId = rId;
 		this.active = active;
-		this.source = source;
-		this.sourceId = sourceId;
+		this.term = source;
+		this.cId = sourceId;
 		this.destination = destination;
 		this.type = type;
 		this.charType = charType;
 	}
 	String rId;
 	String active;
-	String source;
-	String sourceId;
+	String term;
+	String cId;
 	String destination;
 	String type;
 	String charType;
@@ -32,16 +32,16 @@ public class Relationship {
 		this.active = active;
 	}
 	public String getSource() {
-		return source;
+		return term;
 	}
 	public void setSource(String source) {
-		this.source = source;
+		this.term = source;
 	}
 	public String getSourceId() {
-		return sourceId;
+		return cId;
 	}
 	public void setSourceId(String sourceId) {
-		this.sourceId = sourceId;
+		this.cId = sourceId;
 	}
 	public String getDestination() {
 		return destination;
