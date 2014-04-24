@@ -266,7 +266,14 @@ public class ReleaseFilesReportPlugin extends AbstractMojo {
 		osw = new OutputStreamWriter(fos, "UTF-8");
 		bw = new BufferedWriter(osw);
 		int count=0;
+		boolean bPrim=true;
+		bw.append("[");
 		for (Long long1 : newRels) {
+			if (!bPrim){
+				bw.append(",");
+			}else{
+				bPrim=false;
+			}
 			Rf2RelationshipRow row = relFile.getById(long1, startDate);
 			Relationship rel=new Relationship(row.getId().toString() , String.valueOf(row.getActive()) , rf2DescFile.getFsn(row.getSourceId()),row.getSourceId().toString(), rf2DescFile.getFsn(row.getDestinationId()) ,
 					 rf2DescFile.getFsn(row.getTypeId()) , rf2DescFile.getFsn(row.getCharacteristicTypeId()));
@@ -275,6 +282,7 @@ public class ReleaseFilesReportPlugin extends AbstractMojo {
 				bw.append(sep);
 				count++;
 		}
+		bw.append("]");
 		bw.close();
 
 		addFileChangeReport(REL_GROUP_CHANGED_FILE,count,"Relationships group number changed");
@@ -294,7 +302,14 @@ public class ReleaseFilesReportPlugin extends AbstractMojo {
 	}
 
 	private void generateConceptReport(Rf2DescriptionFile rf2DescFile, Rf2ConceptFile conceptFile, BufferedWriter bw, ArrayList<Long> newInactive) throws IOException {
+		boolean bPrim=true;
+		bw.append("[");
 		for (Long long1 : newInactive) {
+			if (!bPrim){
+				bw.append(",");
+			}else{
+				bPrim=false;
+			}
 			String fsn = rf2DescFile.getFsn(long1);
 			Pattern p = Pattern.compile("\\((.*?)\\)", Pattern.DOTALL);
 			String semanticTag = "";
@@ -309,6 +324,7 @@ public class ReleaseFilesReportPlugin extends AbstractMojo {
 			concept=null;
 			bw.append(sep);
 		}
+		bw.append("]");
 		bw.close();
 	}
 
@@ -363,10 +379,17 @@ public class ReleaseFilesReportPlugin extends AbstractMojo {
 		bw = new BufferedWriter(osw);
 		ArrayList<Long> existingRels = relFile.getExistingComponentIds(startDate);
 		int count=0;
+		boolean bPrim=true;
+		bw.append("[");
 		for (Long long1 : existingRels) {
 			ArrayList<Rf2RelationshipRow> rf2RelRows = relFile.getAllRows(startDate, long1);
 			for (Rf2RelationshipRow row : rf2RelRows) {
 				if (!newcomponents.contains(Long.parseLong(row.getSourceId().toString()))) {
+					if (!bPrim){
+						bw.append(",");
+					}else{
+						bPrim=false;
+					}
 					Relationship rel=new Relationship(row.getId().toString() , String.valueOf(row.getActive()) , rf2DescFile.getFsn(row.getSourceId()),row.getSourceId().toString(), rf2DescFile.getFsn(row.getDestinationId()) ,
 							 rf2DescFile.getFsn(row.getTypeId()) , rf2DescFile.getFsn(row.getCharacteristicTypeId()));
 						bw.append(gson.toJson(rel).toString());
@@ -376,6 +399,7 @@ public class ReleaseFilesReportPlugin extends AbstractMojo {
 				}
 			}
 		}
+		bw.append("]");
 		bw.close();
 
 		addFileChangeReport(OLD_CONCEPTS_NEW_RELATIONSHIPS_FILE,count,"New relationships in existing concepts");
@@ -392,10 +416,17 @@ public class ReleaseFilesReportPlugin extends AbstractMojo {
 		bw = new BufferedWriter(osw);
 		ArrayList<Long> existingDescriptios = rf2DescFile.getExistingComponentIds(startDate);
 		int count=0;
+		boolean bPrim=true;
+		bw.append("[");
 		for (Long long1 : existingDescriptios) {
 			ArrayList<Rf2DescriptionRow> rf2DescRows = rf2DescFile.getAllRows(startDate, long1);
 			for (Rf2DescriptionRow rf2DescRow : rf2DescRows) {
 				if (!newcomponents.contains(rf2DescRow.getConceptId())) {
+					if (!bPrim){
+						bw.append(",");
+					}else{
+						bPrim=false;
+					}
 					Description desc=new Description(long1.toString() , rf2DescRow.getEffectiveTime() , String.valueOf(rf2DescRow.getActive()) , rf2DescRow.getConceptId().toString() ,
 							rf2DescRow.getLanguageCode() , rf2DescFile.getFsn(rf2DescRow.getTypeId()) , rf2DescRow.getTerm() ,
 						    rf2DescFile.getFsn(rf2DescRow.getCaseSignificanceId()));
@@ -406,6 +437,7 @@ public class ReleaseFilesReportPlugin extends AbstractMojo {
 				}
 			}
 		}
+		bw.append("]");
 		bw.close();
 
 		addFileChangeReport(OLD_CONCEPTS_NEW_DESCRIPTIONS_FILE,count,"New descriptions in existing concepts");
@@ -455,9 +487,16 @@ public class ReleaseFilesReportPlugin extends AbstractMojo {
 
 	private int writeDescriptionsFile(Rf2DescriptionFile rf2DescFile, ArrayList<Long> newcomponents, BufferedWriter bw, ArrayList<Long> retiredDescriptions) throws IOException {
 		int count=0;
+		boolean bPrim=true;
+		bw.append("[");
 		for (Long long1 : retiredDescriptions) {
 			Rf2DescriptionRow rf2DescRow = rf2DescFile.getLastActiveRow(startDate, long1);
 			if (!newcomponents.contains(rf2DescRow.getConceptId())) {
+				if (!bPrim){
+					bw.append(",");
+				}else{
+					bPrim=false;
+				}
 				Description desc=new Description(long1.toString() , rf2DescRow.getEffectiveTime() , String.valueOf(rf2DescRow.getActive()) , rf2DescRow.getConceptId().toString() ,
 						rf2DescRow.getLanguageCode() , rf2DescFile.getFsn(rf2DescRow.getTypeId()) , rf2DescRow.getTerm() ,
 					    rf2DescFile.getFsn(rf2DescRow.getCaseSignificanceId()));
@@ -467,6 +506,7 @@ public class ReleaseFilesReportPlugin extends AbstractMojo {
 				count++;
 			}
 		}
+		bw.append("]");
 		bw.close();
 		return count;
 	}
@@ -482,6 +522,8 @@ public class ReleaseFilesReportPlugin extends AbstractMojo {
 		osw = new OutputStreamWriter(fos, "UTF-8");
 		bw = new BufferedWriter(osw);
 		int count=0;
+		boolean bPrim=true;
+		bw.append("[");
 		for (Long long1 : retiredConcepts) {
 			Rf2AttributeValueRefsetRow refsetRow = attrValue.getRowByReferencedComponentId(long1);
 			ArrayList<Rf2AssociationRefsetRow> associationRow = associationFile.getRowByReferencedComponentId(long1);
@@ -498,6 +540,11 @@ public class ReleaseFilesReportPlugin extends AbstractMojo {
 			if (!associationRow.isEmpty()) {
 				for (Rf2AssociationRefsetRow rf2AssociationRefsetRow : associationRow) {
 					String assValue = rf2AssociationRefsetRow.getTargetComponent();
+					if (!bPrim){
+						bw.append(",");
+					}else{
+						bPrim=false;
+					}
 					if (refsetRow != null) {
 						String value = refsetRow.getValueId();
 						RetiredConcept concept=new RetiredConcept(long1.toString() ,rf2DescFile.getFsn(conceptFile.getDefinitionStatusId(long1)) , fsn , semanticTag,
@@ -517,6 +564,11 @@ public class ReleaseFilesReportPlugin extends AbstractMojo {
 					count++;
 				}
 			} else {
+				if (!bPrim){
+					bw.append(",");
+				}else{
+					bPrim=false;
+				}
 				if (refsetRow != null) {
 					String value = refsetRow.getValueId();
 					RetiredConcept concept=new RetiredConcept(long1.toString() ,rf2DescFile.getFsn(conceptFile.getDefinitionStatusId(long1)) , fsn , semanticTag,
@@ -533,6 +585,7 @@ public class ReleaseFilesReportPlugin extends AbstractMojo {
 				count++;
 			}
 		}
+		bw.append("]");
 		bw.close();
 		attrValue.releasePreciousMemory();
 		associationFile.releasePreciousMemory();
@@ -563,7 +616,14 @@ public class ReleaseFilesReportPlugin extends AbstractMojo {
 		logger.info("Generating new_relationships.json");
 		osw = new OutputStreamWriter(fos, "UTF-8");
 		bw = new BufferedWriter(osw);
+		boolean bPrim=true;
+		bw.append("[");
 		for (Long long1 : newRels) {
+			if (!bPrim){
+				bw.append(",");
+			}else{
+				bPrim=false;
+			}
 			Rf2RelationshipRow row = relFile.getById(long1, startDate);
 			Relationship rel=new Relationship(row.getId().toString() , String.valueOf(row.getActive()) , rf2DescFile.getFsn(row.getSourceId()),row.getSourceId().toString(), rf2DescFile.getFsn(row.getDestinationId()) ,
 				 rf2DescFile.getFsn(row.getTypeId()) , rf2DescFile.getFsn(row.getCharacteristicTypeId()));
@@ -571,6 +631,7 @@ public class ReleaseFilesReportPlugin extends AbstractMojo {
 			rel=null;
 			bw.append(sep);
 		}
+		bw.append("]");
 		bw.close();
 
 		addFileChangeReport(NEW_RELATIONSHIPS_FILE,newRels.size(),"New relationships");
@@ -583,8 +644,14 @@ public class ReleaseFilesReportPlugin extends AbstractMojo {
 		logger.info("Generating reporte_new_concepts.json");
 		OutputStreamWriter osw = new OutputStreamWriter(fos, "UTF-8");
 		BufferedWriter bw = new BufferedWriter(osw);
-
+		boolean bPrim=true;
+		bw.append("[");
 		for (Long long1 : newcomponents) {
+			if (!bPrim){
+				bw.append(",");
+			}else{
+				bPrim=false;
+			}
 			String fsn = rf2DescFile.getFsn(long1);
 			Pattern p = Pattern.compile("\\((.*?)\\)", Pattern.DOTALL);
 			String semanticTag = "";
@@ -599,6 +666,7 @@ public class ReleaseFilesReportPlugin extends AbstractMojo {
 			concept=null;
 			bw.append(sep);
 		}
+		bw.append("]");
 		bw.close();
 
 		addFileChangeReport(NEW_CONCEPTS_FILE,newcomponents.size(),"New concepts");
