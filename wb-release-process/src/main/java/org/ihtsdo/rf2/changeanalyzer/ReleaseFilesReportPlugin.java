@@ -158,27 +158,27 @@ public class ReleaseFilesReportPlugin extends AbstractMojo {
 
 			ArrayList<Long> newcomponents = generateNewConceptsReport(rf2DescFile, conceptFile);
 
-			generateNewRelationshipsReport(rf2DescFile, relFile);
+//			generateNewRelationshipsReport(rf2DescFile, relFile);
 
-			generateOldConceptsNewRelationships(rf2DescFile, relFile, newcomponents);
+//			generateOldConceptsNewRelationships(rf2DescFile, relFile, newcomponents);
 			//
-			generateRelGroupChangedRelationships(rf2DescFile, relFile, startDate, endDate);
+//			generateRelGroupChangedRelationships(rf2DescFile, relFile, startDate, endDate);
 			relFile.releasePreciousMemory();
 
 			generatingRetiredConceptReasons(rf2DescFile, conceptFile, attrValue, associationFile);
 
-			generateNewDescriptionsReport(rf2DescFile, newcomponents);
+//			generateNewDescriptionsReport(rf2DescFile, newcomponents);
 
 			generatingExistingConceptsNewDescriptions(rf2DescFile, newcomponents);
 
-			generatingDefinedConceptsReport(rf2DescFile, conceptFile);
+//			generatingDefinedConceptsReport(rf2DescFile, conceptFile);
 
-			generatingPrimitiveConceptsReport(rf2DescFile, conceptFile);
-			reactivatedConceptsReport(rf2DescFile, conceptFile);
-			generatingInactiveConcepts(rf2DescFile, conceptFile);
+//			generatingPrimitiveConceptsReport(rf2DescFile, conceptFile);
+//			reactivatedConceptsReport(rf2DescFile, conceptFile);
+//			generatingInactiveConcepts(rf2DescFile, conceptFile);
 			conceptFile.releasePreciousMemory();
 
-			generateReactivatedDescriptionsReport(rf2DescFile, newcomponents);
+//			generateReactivatedDescriptionsReport(rf2DescFile, newcomponents);
 			generateRetiredDescriptionsReport(rf2DescFile, newcomponents);
 			
 			saveSummary();
@@ -590,7 +590,7 @@ public class ReleaseFilesReportPlugin extends AbstractMojo {
 		attrValue.releasePreciousMemory();
 		associationFile.releasePreciousMemory();
 
-		addFileChangeReport(RETIRED_CONCEPT_REASON_FILE,count,"Retired concept reasons");
+		addFileChangeReport(RETIRED_CONCEPT_REASON_FILE,count,"Retired concepts");
 		
 	}
 
