@@ -15,7 +15,7 @@
 	<parent>
 		<groupId>org.ihtsdo</groupId>
 		<artifactId>wb-mmb</artifactId>
-		<version>se2.37fix-1.0-SNAPSHOT</version>
+		<version>1.0-se2.37fix-SNAPSHOT</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 	<packaging>pom</packaging>	
