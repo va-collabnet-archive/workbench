@@ -33,7 +33,7 @@ the specific language governing permissions and limitations under the License. -
         <url>https://csfe.aceworkspace.net/integration/viewvc/viewvc.cgi/tags/branches/trek-no-jini-2.37-se-fix?root=workbench&amp;system=exsy1002/wb-mmb-2.37-trek-no-jini</url>
     </scm>
     <properties>
-        <branch>no-jini</branch>
+        <branch>trek-no-jini-2.37-se-fix</branch>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <!-- <drools.version>5.3.0.Final</drools.version> <jbpm.version>5.1.0.Final</jbpm.version> 
         <mvel2.version>2.1.0.drools4</mvel2.version> -->
