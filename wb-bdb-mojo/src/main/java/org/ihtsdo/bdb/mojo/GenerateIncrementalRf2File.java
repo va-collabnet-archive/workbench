@@ -152,6 +152,11 @@ public class GenerateIncrementalRf2File extends AbstractMojo {
      * @required
      */
     private String editPathConceptSpecFsn;
+    /**
+     * Start date for inclusion in the RF2 files, in yyyy-MM-dd-HH.mm.ss format.
+     *
+     * @parameter
+     */
     private String startDate;
     /**
      * End date for inclusion in the RF2 files, in yyyy-MM-dd-HH.mm.ss format.
