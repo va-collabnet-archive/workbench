@@ -32,8 +32,10 @@ import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.cs.ChangeSetPolicy;
+import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
 import org.ihtsdo.tk.binding.snomed.TermAux;
 import org.ihtsdo.tk.dto.concept.TkConcept;
+import org.ihtsdo.tk.dto.concept.component.attribute.TkConceptAttributes;
 import org.ihtsdo.tk.dto.concept.component.refex.TkRefexAbstractMember;
 import org.ihtsdo.tk.dto.concept.component.refex.type_member.TkRefexMember;
 import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationship;
@@ -116,17 +118,18 @@ public class ReleaseSpecProcessor {
                     eC.writeExternal(eConceptDOS);
                 }
 //              write supporting metadata relationships on refset concept
-                TkConcept refsetEConcept = new TkConcept(refsetConcept);
-                refsetEConcept.setConceptAttributes(null);
-                refsetEConcept.getDescriptions().clear();
-                refsetEConcept.getRefsetMembers().clear();
-                ArrayList<TkRelationship> relsToKeep = new ArrayList<>();
-                for(TkRelationship r : refsetEConcept.getRelationships()){
+                TkConcept refsetEConcept = new TkConcept();
+                refsetEConcept.annotationStyleRefex = refsetConcept.isAnnotationStyleRefex();
+                refsetEConcept.annotationIndexStyleRefex = refsetConcept.isAnnotationIndex();
+                refsetEConcept.primordialUuid = refsetConcept.getPrimUuid();
+                refsetEConcept.relationships = new ArrayList<TkRelationship>(refsetConcept.getRelationshipsOutgoing().size());
+
+                for (RelationshipChronicleBI rel : refsetConcept.getRelationshipsOutgoing()) {
+                    TkRelationship r = new TkRelationship(rel);
                     if(r.getPathUuid().equals(TermAux.WB_AUX_PATH.getLenient().getPrimUuid())){
-                        relsToKeep.add(r);
+                        refsetEConcept.relationships.add(r);
                     }
                 }
-                refsetEConcept.setRelationships(relsToKeep);
                 refsetEConcept.writeExternal(eConceptDOS);
             }
         }
