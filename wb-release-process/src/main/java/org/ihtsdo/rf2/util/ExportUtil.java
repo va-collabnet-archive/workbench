@@ -231,9 +231,9 @@ public class ExportUtil {
 		while((line=rbr.readLine())!=null){
 
 			spl=line.split("\t",-1);
-//			if (!spl[5].equals("Self")){
-				refList.put(spl[6], -1);
-//			}
+			//			if (!spl[5].equals("Self")){
+			refList.put(spl[6], -1);
+			//			}
 		}
 		rbr.close();
 		rbr=null;
@@ -1635,6 +1635,8 @@ public class ExportUtil {
 		return statusType;
 	}
 	private static IdAssignmentImpl stIdGen =null;
+
+	private static HashSet<String> mapConceptId_Uuid;
 	private static IdAssignmentImpl getIdGeneratorClient(Config config){
 		if (stIdGen==null ){
 			stIdGen = new IdAssignmentImpl(config.getEndPoint(), config.getUsername(), config.getPassword());
@@ -2501,6 +2503,36 @@ public class ExportUtil {
 		}
 
 		return characteristicTypeId;
+	}
+
+
+
+	public static boolean isInKList(String conceptid) {
+		return mapConceptId_Uuid.contains(conceptid);
+	}
+
+
+
+	public static void init(String idfile) {
+		try {
+
+			FileInputStream rfis = new FileInputStream(idfile	);
+			InputStreamReader risr = new InputStreamReader(rfis,"UTF-8");
+			BufferedReader rbr = new BufferedReader(risr);
+
+			String line;
+			mapConceptId_Uuid=new HashSet<String>();
+			while((line=rbr.readLine())!=null){
+				mapConceptId_Uuid.add(line);
+			}
+			rbr.close();
+			rfis.close();
+			rbr=null;
+			rfis=null;
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 }
