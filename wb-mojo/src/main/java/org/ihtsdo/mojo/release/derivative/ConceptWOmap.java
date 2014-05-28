@@ -43,6 +43,73 @@ public class ConceptWOmap extends AbstractMojo {
 	 * @required
 	 */
 	private String idfile;
+
+	// for accessing the web service
+	/**
+	 * endpointURL
+	 * 
+	 * @parameter
+	 * 
+	 */
+	private String endpointURL;
+	
+	/**
+	 * username
+	 * 
+	 * @parameter
+	 * 
+	 */
+	private String username;
+	
+	/**
+	 * password
+	 * 
+	 * @parameter
+	 * 
+	 */
+	private String password;
+	
+	
+	/**
+	 * namespaceId
+	 * 
+	 * @parameter default-value="0"
+	 * 
+	 */
+	private String namespaceId;
+	
+	/**
+	 * partitionId
+	 * 
+	 * @parameter default-value="00"
+	 * 
+	 */
+	private String partitionId;
+	
+	/**
+	 * executionId
+	 * 
+	 * @parameter default-value="Daily-build"
+	 * 
+	 */
+	private String executionId;
+	
+	/**
+	 * moduleId
+	 * 
+	 * @parameter default-value="Core Concept Component"
+	 * 
+	 */
+	private String moduleId;
+	
+	/**
+	 * releaseId
+	 * 
+	 * @parameter default-value="20110131"
+	 * 
+	 */
+	private String releaseId;
+	
 	
 
 	public void execute() throws MojoExecutionException, MojoFailureException {
@@ -58,6 +125,15 @@ public class ConceptWOmap extends AbstractMojo {
 			config.setInvokeDroolRules("false");
 			config.setFileExtension("txt");
 
+			config.setNamespaceId(namespaceId);
+			config.setPartitionId(partitionId);
+			config.setExecutionId(executionId);
+			config.setModuleId(moduleId);
+			config.setReleaseId(releaseId);
+			config.setUsername(username);
+			config.setPassword(password);
+			config.setEndPoint(endpointURL);
+			
 			// initialize meta hierarchy
 			ExportUtil.init(idfile);
 
