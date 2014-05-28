@@ -15,6 +15,15 @@
 	<column>
 		<name>active</name>
 		<descripton></descripton>
+		<delimiter>\t</delimiter>
+	</column><column>
+		<name>ctv3id</name>
+		<descripton></descripton>
+		<delimiter>\t</delimiter>
+	</column>
+	<column>
+		<name>snomedid</name>
+		<descripton></descripton>
 		<delimiter>\r\n</delimiter>
 	</column>
 </config>

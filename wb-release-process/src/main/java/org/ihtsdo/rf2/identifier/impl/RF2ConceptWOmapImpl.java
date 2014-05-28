@@ -3,6 +3,7 @@ package org.ihtsdo.rf2.identifier.impl;
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 import org.apache.log4j.Logger;
 import org.dwfa.ace.api.I_ConceptAttributeTuple;
@@ -51,14 +52,22 @@ public class RF2ConceptWOmapImpl extends RF2AbstractImpl implements I_ProcessCon
 				} else {
 					active = "0";
 				}
+				String snomedid="";
+				String ctv3id="";
 				
 				if (ExportUtil.isInKList(conceptid)){
-				
-					writeRF2TypeLine(concept.getUids().iterator().next().toString(), conceptid,active);
+					UUID uuid=concept.getUids().iterator().next();
+					if (active.equals("1")){
+						ctv3id=this.getCTV3ID(getConfig(), uuid);
+						String parnSID=this.getParentSnomedId(concept);
+						snomedid=this.getSNOMEDID(getConfig(), uuid, parnSID);
+					}
+					writeRF2TypeLine(uuid.toString(), conceptid,active,ctv3id,snomedid);
 				}
 				
 			}
 		}catch (NullPointerException ne) {
+			ne.printStackTrace();
 			logger.error("NullPointerException: " + ne.getMessage());
 			logger.error(" NullPointerException " + conceptid);
 		} catch (IOException e) {
@@ -72,8 +81,8 @@ public class RF2ConceptWOmapImpl extends RF2AbstractImpl implements I_ProcessCon
 	}
 
 
-	public static void writeRF2TypeLine(String uuid, String conceptid, String active) throws IOException {
-		WriteUtil.write(getConfig(), uuid + "\t" + conceptid  + "\t" + active );
+	public static void writeRF2TypeLine(String uuid, String conceptid, String active, String ctv3id, String snomedid) throws IOException {
+		WriteUtil.write(getConfig(), uuid + "\t" + conceptid  + "\t" + active + "\t" + ctv3id + "\t" + snomedid);
 		WriteUtil.write(getConfig(), "\r\n");
 	}
 
