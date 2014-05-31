@@ -371,9 +371,10 @@ public class GenerateIncrementalRf2File extends AbstractMojo {
             refsetCs.mkdir();
             if (makeRf2Refsets) {
                 Rf2RefexComputer rf2RefexComputer = new Rf2RefexComputer(vc, Ts.get().getMetadataEditCoordinate(),
-                        refsetCs, stampsToWrite.getAsSet());
+                        refsetCs, stampsToWrite.getAsSet(), effectiveDate, snomedCoreReleaseDate);
                 rf2RefexComputer.setup();
                 Ts.get().iterateConceptDataInSequence(rf2RefexComputer);
+                rf2RefexComputer.addModuleDependencyMember();
                 rf2RefexComputer.cleanup();
 
                 Set<Integer> newStampNids = rf2RefexComputer.getNewStampNids();

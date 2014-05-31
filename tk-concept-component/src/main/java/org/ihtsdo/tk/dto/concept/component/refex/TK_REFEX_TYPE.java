@@ -202,11 +202,11 @@ public enum TK_REFEX_TYPE {
         if (RefexNidVersionBI.class.isAssignableFrom(c)) {
             return CID;
         }
-        if (RefexStringVersionBI.class.isAssignableFrom(c)) {
-            return STR;
-        }
         if (RefexStringStringVersionBI.class.isAssignableFrom(c)) {
             return STR_STR;
+        }
+        if (RefexStringVersionBI.class.isAssignableFrom(c)) {
+            return STR;
         }
         if (RefexIntVersionBI.class.isAssignableFrom(c)) {
             return INT;

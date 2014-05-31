@@ -118,6 +118,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
     private Set<Integer> sameCycleStampNids;
     private Collection<Integer> taxonomyParentNids;
     private ConceptVersionBI conNumRefsetParentConcept;
+    private Date previousReleaseDate;
 
     //~--- constructors --------------------------------------------------------
         /**
@@ -255,7 +256,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
         if(conNumRefesetParentConceptNid != null){
             this.conNumRefsetParentConcept = Ts.get().getConceptVersion(viewCoordinate, conNumRefesetParentConceptNid);
         }
-       
+        this.previousReleaseDate = previousReleaseDate;
         if(releaseType.equals(ReleaseType.DELTA) && previousReleaseDate != null){
             for(int stamp : stampNids){
                 long time = Ts.get().getTimeForStampNid(stamp);
@@ -2037,110 +2038,82 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
      * has occurred
      * @see Rf2File.ModuleDependencyFileFields
      */
-    private void processModularDependency() throws IOException, NoSuchAlgorithmException {
-        ConceptSpec modDepenRefex = new ConceptSpec("Module dependency reference set (foundation metadata concept)",
-                UUID.fromString("19076bfe-661f-39c2-860c-8706a37073b0"));
+    private void processModularDependency() throws IOException, NoSuchAlgorithmException, ContradictionException {
         ConceptSpec coreModule = new ConceptSpec("SNOMED CT core module (core metadata concept)",
                 UUID.fromString("1b4f1ba5-b725-390f-8c3b-33ec7096bdca"));
-        if (releaseType.equals(ReleaseType.FULL)) {
-            ConceptVersionBI concept = Ts.get().getConceptVersion(viewCoordinate, modDepenRefex.getLenient().getPrimUuid());
-            for (RefexChronicleBI rc : concept.getRefsetMembers()) {
-                for (Object o : rc.getVersions()) {
-                    RefexStringStringVersionBI rv = (RefexStringStringVersionBI) o;
-                    for (Rf2File.ModuleDependencyFileFields field : Rf2File.ModuleDependencyFileFields.values()) {
-                        switch (field) {
-                            case ID:
-                                modDependWriter.write(rv.getPrimUuid() + field.seperator);
-
-                                break;
-
-                            case EFFECTIVE_TIME:
-                                modDependWriter.write(rv.getTime() + field.seperator);
-
-                                break;
-
-                            case ACTIVE:
-                                modDependWriter.write(store.getUuidPrimordialForNid(rv.getStatusNid()) + field.seperator);
-
-                                break;
-
-                            case MODULE_ID:
-                                modDependWriter.write(module + field.seperator);
-
-                                break;
-
-                            case REFSET_ID:
-                                modDependWriter.write(modDepenRefex.getStrict(viewCoordinateAllStatus).getPrimUuid() + field.seperator);
-
-                                break;
-
-                            case REFERENCED_COMPONENT_ID:
-                                modDependWriter.write(store.getUuidPrimordialForNid(rv.getReferencedComponentNid()) + field.seperator);
-
-                                break;
-
-                            case SOURCE_TIME:
-                                modDependWriter.write(rv.getString1() + field.seperator);
-
-                                break;
-
-                            case TARGET_TIME:
-                                modDependWriter.write(rv.getString2() + field.seperator);
-
-                                break;
-                        }
+        Collection<? extends RefexChronicleBI<?>> refsetMembers = Ts.get().getConcept(
+                Snomed.MODULE_DEPENDENCY.getLenient().getPrimUuid()).getRefsetMembers();
+        for (RefexChronicleBI refexChronicle : refsetMembers) {
+            Collection<RefexVersionBI> versions = new HashSet<>();
+            if (releaseType.equals(ReleaseType.DELTA)) { //This is for delta
+                for (Object o : refexChronicle.getVersions()) {
+                    RefexVersionBI version = (RefexVersionBI) o;
+                    if (version.getTime() > previousReleaseDate.getTime()) {
+                        versions.add(version);
                     }
                 }
+            } else {
+                //if not previously released or latest version remove
+                RefexVersionBI latest = (RefexVersionBI) refexChronicle.getVersions().iterator().next(); //will only be one, maintained programatically
+                versions.add(latest);
             }
-        }
-        //ADD LASTEST MEMBER HERE
-        for (Rf2File.ModuleDependencyFileFields field : Rf2File.ModuleDependencyFileFields.values()) {
-            switch (field) {
-                case ID:
-                    //use module, referenced component, source time, destination time
-                    UUID uuid = UuidT5Generator.get(MODULE_DEPEND_NAMESPACE,
-                            module
-                            + coreModule.getStrict(viewCoordinateAllStatus).getPrimUuid()
-                            + effectiveDateString
-                            + effectiveDateString);
-                    modDependWriter.write(uuid + field.seperator);
+            boolean write = true;
+            for (RefexVersionBI rv : versions) {
+                if (!rv.isActive(viewCoordinate)) {
+                    if (sameCycleStampNids.contains(rv.getStampNid())) {
+                        write = false;
+                    }
+                }
+                if (rv.isActive(viewCoordinate)) { //CHANGE FOR DK, source data incorrect, retired descriptions should also have retired lang refsets
+                    ComponentVersionBI rc = Ts.get().getComponentVersion(viewCoordinate, rv.getReferencedComponentNid());
+                    if (rc == null || !rc.isActive(viewCoordinate)) {
+                        write = false;
+                    }
+                }
+                RefexStringStringVersionBI rssv = (RefexStringStringVersionBI) rv;
+                for (Rf2File.ModuleDependencyFileFields field : Rf2File.ModuleDependencyFileFields.values()) {
+                    switch (field) {
+                        case ID:
+                            modDependWriter.write(rssv.getPrimUuid() + field.seperator);
 
-                    break;
+                            break;
 
-                case EFFECTIVE_TIME:
-                    modDependWriter.write(effectiveDateString + field.seperator);
+                        case EFFECTIVE_TIME:
+                            modDependWriter.write(rssv.getTime() + field.seperator);
 
-                    break;
+                            break;
 
-                case ACTIVE:
-                    modDependWriter.write(store.getUuidPrimordialForNid(SnomedMetadataRfx.getSTATUS_CURRENT_NID()) + field.seperator);
+                        case ACTIVE:
+                            modDependWriter.write(store.getUuidPrimordialForNid(rssv.getStatusNid()) + field.seperator);
 
-                    break;
+                            break;
 
-                case MODULE_ID:
-                    modDependWriter.write(module + field.seperator);
+                        case MODULE_ID:
+                            modDependWriter.write(module + field.seperator);
 
-                    break;
+                            break;
 
-                case REFSET_ID:
-                    modDependWriter.write(modDepenRefex.getStrict(viewCoordinateAllStatus).getPrimUuid() + field.seperator);
+                        case REFSET_ID:
+                            modDependWriter.write(Snomed.MODULE_DEPENDENCY.getStrict(viewCoordinateAllStatus).getPrimUuid() + field.seperator);
 
-                    break;
+                            break;
 
-                case REFERENCED_COMPONENT_ID:
-                    modDependWriter.write(coreModule.getStrict(viewCoordinateAllStatus).getPrimUuid() + field.seperator);
+                        case REFERENCED_COMPONENT_ID:
+                            modDependWriter.write(store.getUuidPrimordialForNid(rssv.getReferencedComponentNid()) + field.seperator);
 
-                    break;
+                            break;
 
-                case SOURCE_TIME:
-                    modDependWriter.write(effectiveDateString + field.seperator);
+                        case SOURCE_TIME:
+                            modDependWriter.write(rssv.getString1() + field.seperator);
 
-                    break;
+                            break;
 
-                case TARGET_TIME:
-                    modDependWriter.write(TimeHelper.getShortFileDateFormat().format(snomedCoreReleaseDate) + field.seperator);
+                        case TARGET_TIME:
+                            modDependWriter.write(rssv.getString2() + field.seperator);
 
-                    break;
+                            break;
+                    }
+                }
             }
         }
     }

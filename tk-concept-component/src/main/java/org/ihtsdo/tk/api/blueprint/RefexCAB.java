@@ -50,6 +50,8 @@ import org.ihtsdo.tk.api.refex.type_nid_nid_nid.RefexNidNidNidAnalogBI;
 import org.ihtsdo.tk.api.refex.type_nid_nid_nid.RefexNidNidNidVersionBI;
 import org.ihtsdo.tk.api.refex.type_string.RefexStringAnalogBI;
 import org.ihtsdo.tk.api.refex.type_string.RefexStringVersionBI;
+import org.ihtsdo.tk.api.refex.type_string_string.RefexStringStringAnalogBI;
+import org.ihtsdo.tk.api.refex.type_string_string.RefexStringStringVersionBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 import org.ihtsdo.tk.dto.concept.component.refex.TK_REFEX_TYPE;
 import org.ihtsdo.tk.uuid.UuidT5Generator;
@@ -514,7 +516,8 @@ public class RefexCAB extends CreateOrAmendBlueprint {
      * key, <code>null</code> if no value was previously associated
      */
     public Object put(RefexProperty key, String stringValue) {
-        assert key == RefexProperty.STRING1;
+        assert key == RefexProperty.STRING1
+                || key == RefexProperty.STRING2;
         return properties.put(key, stringValue);
     }
 
@@ -821,8 +824,12 @@ public class RefexCAB extends CreateOrAmendBlueprint {
                     // SAP property
                     break;
                 case STRING1:
-                    RefexStringAnalogBI<?> strPart = (RefexStringAnalogBI<?>) refexAnalog;
-                    strPart.setString1((String) entry.getValue());
+                    RefexStringAnalogBI<?> str1Part = (RefexStringAnalogBI<?>) refexAnalog;
+                    str1Part.setString1((String) entry.getValue());
+                    break;
+                case STRING2:
+                    RefexStringStringAnalogBI<?> str2Part = (RefexStringStringAnalogBI<?>) refexAnalog;
+                    str2Part.setString2((String) entry.getValue());
                     break;
                 case ARRAY_BYTEARRAY:
                     RefexArrayOfBytearrayAnalogBI<?> arrayPart = (RefexArrayOfBytearrayAnalogBI<?>) refexAnalog;
@@ -980,8 +987,17 @@ public class RefexCAB extends CreateOrAmendBlueprint {
                     if (!RefexStringVersionBI.class.isAssignableFrom(refexVersion.getClass())) {
                         return false;
                     }
-                    RefexStringVersionBI<?> strPart = (RefexStringVersionBI<?>) refexVersion;
-                    if (!entry.getValue().equals(strPart.getString1())) {
+                    RefexStringVersionBI<?> str1Part = (RefexStringVersionBI<?>) refexVersion;
+                    if (!entry.getValue().equals(str1Part.getString1())) {
+                        return false;
+                    }
+                    break;
+                case STRING2:
+                    if (!RefexStringStringVersionBI.class.isAssignableFrom(refexVersion.getClass())) {
+                        return false;
+                    }
+                    RefexStringStringVersionBI<?> str2Part = (RefexStringStringVersionBI<?>) refexVersion;
+                    if (!entry.getValue().equals(str2Part.getString2())) {
                         return false;
                     }
                     break;

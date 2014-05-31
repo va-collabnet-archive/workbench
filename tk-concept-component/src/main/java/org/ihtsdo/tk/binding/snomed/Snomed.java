@@ -543,4 +543,9 @@ public class Snomed {
     public static ConceptSpec SOME =
                 new ConceptSpec("Some", 
                 UUID.fromString("a526d5af-b083-3f20-86af-9a6ce17a8b72"));
+    /**
+     * Represents the module dependency refset.
+     */
+    public static ConceptSpec MODULE_DEPENDENCY = new ConceptSpec("Module dependency reference set (foundation metadata concept)",
+                UUID.fromString("19076bfe-661f-39c2-860c-8706a37073b0"));
 }
