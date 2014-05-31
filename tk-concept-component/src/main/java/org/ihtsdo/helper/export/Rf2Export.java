@@ -17,36 +17,35 @@
 package org.ihtsdo.helper.export;
 
 //~--- non-JDK imports --------------------------------------------------------
+import java.io.*;
+import java.security.NoSuchAlgorithmException;
+import java.util.*;
 import org.ihtsdo.country.COUNTRY_CODE;
 import org.ihtsdo.helper.rf2.Rf2File;
 import org.ihtsdo.helper.rf2.Rf2File.ReleaseType;
 import org.ihtsdo.helper.time.TimeHelper;
 import org.ihtsdo.lang.LANG_CODE;
 import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.*;
 import org.ihtsdo.tk.api.ConceptFetcherBI;
 import org.ihtsdo.tk.api.NidBitSetBI;
 import org.ihtsdo.tk.api.ProcessUnfetchedConceptDataBI;
 import org.ihtsdo.tk.api.TerminologyStoreDI;
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
+import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.conceptattribute.ConceptAttributeChronicleBI;
 import org.ihtsdo.tk.api.conceptattribute.ConceptAttributeVersionBI;
-import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.description.DescriptionChronicleBI;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
-import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
-import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
-
-//~--- JDK imports ------------------------------------------------------------
-
-import java.io.*;
-import java.security.NoSuchAlgorithmException;
-import java.util.*;
-import org.ihtsdo.tk.api.*;
-import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
+import org.ihtsdo.tk.api.refex.type_member.RefexMemberVersionBI;
 import org.ihtsdo.tk.api.refex.type_nid.RefexNidVersionBI;
 import org.ihtsdo.tk.api.refex.type_nid_float.RefexNidFloatVersionBI;
+import org.ihtsdo.tk.api.refex.type_string_string.RefexStringStringVersionBI;
+import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
+import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 import org.ihtsdo.tk.binding.snomed.ConceptInactivationType;
 import org.ihtsdo.tk.binding.snomed.HistoricalRelType;
 import org.ihtsdo.tk.binding.snomed.RefsetAux;
@@ -2043,6 +2042,58 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                 UUID.fromString("19076bfe-661f-39c2-860c-8706a37073b0"));
         ConceptSpec coreModule = new ConceptSpec("SNOMED CT core module (core metadata concept)",
                 UUID.fromString("1b4f1ba5-b725-390f-8c3b-33ec7096bdca"));
+        if (releaseType.equals(ReleaseType.FULL)) {
+            ConceptVersionBI concept = Ts.get().getConceptVersion(viewCoordinate, modDepenRefex.getLenient().getPrimUuid());
+            for (RefexChronicleBI rc : concept.getRefsetMembers()) {
+                for (Object o : rc.getVersions()) {
+                    RefexStringStringVersionBI rv = (RefexStringStringVersionBI) o;
+                    for (Rf2File.ModuleDependencyFileFields field : Rf2File.ModuleDependencyFileFields.values()) {
+                        switch (field) {
+                            case ID:
+                                modDependWriter.write(rv.getPrimUuid() + field.seperator);
+
+                                break;
+
+                            case EFFECTIVE_TIME:
+                                modDependWriter.write(rv.getTime() + field.seperator);
+
+                                break;
+
+                            case ACTIVE:
+                                modDependWriter.write(store.getUuidPrimordialForNid(rv.getStatusNid()) + field.seperator);
+
+                                break;
+
+                            case MODULE_ID:
+                                modDependWriter.write(module + field.seperator);
+
+                                break;
+
+                            case REFSET_ID:
+                                modDependWriter.write(modDepenRefex.getStrict(viewCoordinateAllStatus).getPrimUuid() + field.seperator);
+
+                                break;
+
+                            case REFERENCED_COMPONENT_ID:
+                                modDependWriter.write(store.getUuidPrimordialForNid(rv.getReferencedComponentNid()) + field.seperator);
+
+                                break;
+
+                            case SOURCE_TIME:
+                                modDependWriter.write(rv.getString1() + field.seperator);
+
+                                break;
+
+                            case TARGET_TIME:
+                                modDependWriter.write(rv.getString2() + field.seperator);
+
+                                break;
+                        }
+                    }
+                }
+            }
+        }
+        //ADD LASTEST MEMBER HERE
         for (Rf2File.ModuleDependencyFileFields field : Rf2File.ModuleDependencyFileFields.values()) {
             switch (field) {
                 case ID:

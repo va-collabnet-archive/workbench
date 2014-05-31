@@ -23,8 +23,8 @@ public interface I_ExtendByRefPartStr<A extends RefexStringAnalogBI<A>> extends 
 
     public I_ExtendByRefPartStr<A> duplicate();
 
-    public String getStringValue();
+    public String getString1Value();
 
-    public void setStringValue(String stringValue) throws PropertyVetoException;
+    public void setString1Value(String string1Value) throws PropertyVetoException;
 
 }

@@ -213,6 +213,7 @@ public class RefsetAuxiliary implements I_AddToMemoryTermServer {
         MEMBERSHIP_EXTENSION(new String[]{"membership extension by reference", "membership extension"}, REFSET_TYPE),
         BOOLEAN_EXTENSION(new String[]{"boolean extension by reference", "boolean extension"}, REFSET_TYPE),
         STRING_EXTENSION(new String[]{"string extension by reference", "string extension"}, REFSET_TYPE),
+        STRING_STRING_EXTENSION(new String[]{"string string extension by reference", "string string extension"}, REFSET_TYPE),
         INT_EXTENSION(new String[]{"int extension by reference", "int extension"}, REFSET_TYPE),
         LONG_EXTENSION(new String[]{"long extension by reference", "long extension"}, REFSET_TYPE),
         ARRAY_OF_BYTEARRAY_EXTENSION(new String[]{"array of bytearray extension by reference", "array of bytearray extension"}, REFSET_TYPE),

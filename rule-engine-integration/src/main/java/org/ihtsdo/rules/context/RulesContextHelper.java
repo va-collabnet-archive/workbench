@@ -425,7 +425,7 @@ public class RulesContextHelper {
 							List<I_ExtendByRefPartCidString> ruleParts = new ArrayList<I_ExtendByRefPartCidString>();
 							for (I_ExtendByRefPart part : extension.getMutableParts()) {
 								I_ExtendByRefPartCidString strPart = (I_ExtendByRefPartCidString) part;
-								if (strPart.getStringValue().equals(ruleUid)) {
+								if (strPart.getString1Value().equals(ruleUid)) {
 									ruleParts.add(strPart);
 								}
 							}
@@ -456,7 +456,7 @@ public class RulesContextHelper {
 						List<I_ExtendByRefPartCidString> ruleParts = new ArrayList<I_ExtendByRefPartCidString>();
 						for (I_ExtendByRefPart part : extension.getMutableParts()) {
 							I_ExtendByRefPartCidString strPart = (I_ExtendByRefPartCidString) part;
-							if (strPart.getStringValue().equals(ruleUid)) {
+							if (strPart.getString1Value().equals(ruleUid)) {
 								ruleParts.add(strPart);
 							}
 						}
@@ -511,7 +511,7 @@ public class RulesContextHelper {
 					List<I_ExtendByRefPartCidString> ruleParts = new ArrayList<I_ExtendByRefPartCidString>();
 					for (I_ExtendByRefPart part : extension.getMutableParts()) {
 						I_ExtendByRefPartCidString strPart = (I_ExtendByRefPartCidString) part;
-						if (strPart.getStringValue().equals(ruleUid)) {
+						if (strPart.getString1Value().equals(ruleUid)) {
 							ruleParts.add(strPart);
 						}
 					}

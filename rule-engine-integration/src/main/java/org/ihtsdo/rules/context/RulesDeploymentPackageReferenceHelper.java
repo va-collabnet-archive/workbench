@@ -191,7 +191,7 @@ public class RulesDeploymentPackageReferenceHelper {
 
 			for (I_ExtendByRefPart loopPart : currentExtensionParts) {
 				I_ExtendByRefPartStr strPart = (I_ExtendByRefPartStr) loopPart;
-				String metadata = strPart.getStringValue();
+				String metadata = strPart.getString1Value();
 				rulesPackage.setUrl(metadata);
 			}
 
@@ -245,7 +245,7 @@ public class RulesDeploymentPackageReferenceHelper {
                                                                 config.getEditCoordinate().getAuthorNid(),
                                                                 config.getEditCoordinate().getModuleNid(),
 								editPath.getConceptNid());
-						part.setStringValue(metadata);
+						part.setString1Value(metadata);
 						extension.addVersion(part);
 						termFactory.addUncommittedNoChecks(extension);
 					}

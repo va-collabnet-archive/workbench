@@ -279,7 +279,7 @@ public class RefsetSpecTreeCellRenderer extends DefaultTreeCellRenderer {
         htmlParts.add("&nbsp;&nbsp;");
         addConceptDescription(htmlParts, ccsPart.getC2id(), "#483D8B");
         htmlParts.add("<font color='#483D8B'>:&nbsp;&nbsp;\"</font>");
-        String text = ccsPart.getStringValue();
+        String text = ccsPart.getString1Value();
         if (text.toLowerCase().startsWith("<html>")) {
             htmlParts.add(text.substring(5));
         } else {

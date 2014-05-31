@@ -561,7 +561,7 @@ public abstract class ReflexiveTableModel extends AbstractTableModel implements 
                                 if (I_ExtendByRefPartBoolean.class.isAssignableFrom(part.getClass())) {
                                     value = ((I_ExtendByRefPartBoolean) part).getBooleanValue();
                                 } else if (I_ExtendByRefPartStr.class.isAssignableFrom(part.getClass())) {
-                                    value = ((I_ExtendByRefPartStr) part).getStringValue();
+                                    value = ((I_ExtendByRefPartStr) part).getString1Value();
                                 } else if (I_ExtendByRefPartInt.class.isAssignableFrom(part.getClass())) {
                                     value = ((I_ExtendByRefPartInt) part).getIntValue();
                                 } else {

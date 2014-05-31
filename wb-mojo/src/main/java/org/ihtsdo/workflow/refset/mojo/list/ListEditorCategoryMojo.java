@@ -84,7 +84,7 @@ public class ListEditorCategoryMojo extends AbstractMojo {
                 	int refCompId = thinExtByRefTuple.getComponentId();
                 	I_ExtendByRefPartStr part = (I_ExtendByRefPartStr) thinExtByRefTuple.getMutablePart();
 
-                    results.add(refCompId + " *with* " + part.getStringValue());
+                    results.add(refCompId + " *with* " + part.getString1Value());
                 }
             }
         }

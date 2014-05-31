@@ -54,7 +54,7 @@ public class ConceptStringExtTupleFileUtil {
             UUID pathUuid = termFactory.getUids(tuple.getPathId()).iterator().next();
             UUID statusUuid = termFactory.getUids(tuple.getStatusId()).iterator().next();
             long effectiveDate = tuple.getTime();
-            String extString = part.getStringValue();
+            String extString = part.getString1Value();
 
             return tupleUuid + "\t" + memberUuid + "\t" + refsetUuid + "\t" + componentUuid + "\t" + typeUuid + "\t"
                 + conceptUuid + "\t" + extString + "\t" + pathUuid + "\t" + statusUuid + "\t" + effectiveDate + "\n";

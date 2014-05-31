@@ -1080,7 +1080,7 @@ public class WorkflowHelper {
 
 			bean = populateWorkflowHistoryJavaBean(ref.getMemberId(), 
 												   Terms.get().nidToUuid(ref.getComponentNid()), 
-												   latestPart.getStringValue(), 
+												   latestPart.getString1Value(), 
 												   new Long(latestPart.getTime()));
 		} catch (Exception e) {
 			AceLog.getAppLog().log(Level.WARNING, "Failure to read WfHx Java Bean from Refset Member:" + ref);
@@ -1351,7 +1351,7 @@ public class WorkflowHelper {
 
 			bean = populateWorkflowHistoryJavaBean(refsetVersion.getMemberId(), 
 												   Terms.get().nidToUuid(refsetVersion.getComponentId()), 
-												   strPart.getStringValue(), 
+												   strPart.getString1Value(), 
 												   new Long(refsetVersion.getTime()));
 		} catch (Exception e) {
             AceLog.getAppLog().log(Level.WARNING, "Failure to read WfHx Java Bean from Refset Member");
@@ -1592,7 +1592,7 @@ public class WorkflowHelper {
 				EditorCategoryRefsetWriter edCatWriter = new EditorCategoryRefsetWriter();
 				edCatWriter.setReferencedComponentId(Terms.get().nidToUuid(((I_ExtendByRefVersion<?>)member).getReferencedComponentNid()));
 
-				String s = ((I_ExtendByRefPartStr<?>)member).getStringValue();
+				String s = ((I_ExtendByRefPartStr<?>)member).getString1Value();
 				
 				EditorCategoryRefsetReader reader = new EditorCategoryRefsetReader();
 				edCatWriter.setCategory(reader.getEditorCategoryUid(s));
@@ -1602,7 +1602,7 @@ public class WorkflowHelper {
 				StateTransitionRefsetWriter stateTransWriter = new StateTransitionRefsetWriter();
 				stateTransWriter.setReferencedComponentId(Terms.get().nidToUuid(((I_ExtendByRefVersion<?>)member).getReferencedComponentNid()));
 
-				String s = ((I_ExtendByRefPartStr<?>)member).getStringValue();
+				String s = ((I_ExtendByRefPartStr<?>)member).getString1Value();
 				
 				StateTransitionRefsetReader reader = new StateTransitionRefsetReader();
 				stateTransWriter.setWorkflowType(ArchitectonicAuxiliary.Concept.WORKFLOW_USE_CASE.getPrimoridalUid());
@@ -1615,7 +1615,7 @@ public class WorkflowHelper {
 				SemanticHierarchyRefsetWriter semHierWriter = new SemanticHierarchyRefsetWriter();
 				semHierWriter.setReferencedComponentId(Terms.get().nidToUuid(((I_ExtendByRefVersion<?>)member).getReferencedComponentNid()));
 
-				String s = ((I_ExtendByRefPartStr<?>)member).getStringValue();
+				String s = ((I_ExtendByRefPartStr<?>)member).getString1Value();
 				
 				SemanticHierarchyRefsetReader reader = new SemanticHierarchyRefsetReader();
 				semHierWriter.setChildSemanticArea(reader.getChildSemanticTag(s));
@@ -1626,7 +1626,7 @@ public class WorkflowHelper {
 				SemanticTagsRefsetWriter semTagWriter = new SemanticTagsRefsetWriter();
 				semTagWriter.setReferencedComponentId(Terms.get().nidToUuid(((I_ExtendByRefVersion<?>)member).getReferencedComponentNid()));
 
-				String s = ((I_ExtendByRefPartStr<?>)member).getStringValue();
+				String s = ((I_ExtendByRefPartStr<?>)member).getString1Value();
 				
 				SemanticTagsRefsetReader reader = new SemanticTagsRefsetReader();
 				semTagWriter.setSemanticTag(reader.getSemanticTag(s));

@@ -518,7 +518,7 @@ public class ReferenceSetExport extends AbstractMojo implements I_ProcessConcept
                                     + org.dwfa.ace.refset.ConceptConstants.PATH_VERSION_REFSET.getDescription());
                             }
 
-                            pathVersion = ((I_ExtendByRefPartStr) latestPart).getStringValue();
+                            pathVersion = ((I_ExtendByRefPartStr) latestPart).getString1Value();
                         }
                     }
                 }

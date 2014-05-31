@@ -268,8 +268,8 @@ public class RefsetSpecTreeNode extends DefaultMutableTreeNode implements Compar
     }
 
     private int compareString(I_ExtendByRefVersion thisExt, I_ExtendByRefVersion otherExt) throws IOException {
-        String thisExtStr = ((I_ExtendByRefPartCidCidString) thisExt.getMutablePart()).getStringValue();
-        String otherExtStr = ((I_ExtendByRefPartCidCidString) otherExt.getMutablePart()).getStringValue();
+        String thisExtStr = ((I_ExtendByRefPartCidCidString) thisExt.getMutablePart()).getString1Value();
+        String otherExtStr = ((I_ExtendByRefPartCidCidString) otherExt.getMutablePart()).getString1Value();
         return thisExtStr.toLowerCase().compareTo(otherExtStr.toLowerCase());
     }
 

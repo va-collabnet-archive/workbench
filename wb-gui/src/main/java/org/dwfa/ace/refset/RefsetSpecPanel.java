@@ -279,8 +279,8 @@ public class RefsetSpecPanel extends JPanel {
       column2.setPref(300);
       column2.setMax(2000);
       column2.setInvokeOnObjectType(INVOKE_ON_OBJECT_TYPE.PART);
-      column2.setReadMethod(REFSET_TYPES.STRING.getPartClass().getMethod("getStringValue"));
-      column2.setWriteMethod(REFSET_TYPES.STRING.getPartClass().getMethod("setStringValue", String.class));
+      column2.setReadMethod(REFSET_TYPES.STRING.getPartClass().getMethod("getString1Value"));
+      column2.setWriteMethod(REFSET_TYPES.STRING.getPartClass().getMethod("setString1Value", String.class));
       column2.setType(REFSET_FIELD_TYPE.STRING);
       columns.add(column2);
 

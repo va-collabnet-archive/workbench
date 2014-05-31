@@ -124,7 +124,7 @@ public abstract class MemberRefsetHandler {
             } else if (part instanceof I_ExtendByRefPartStr) {
                 I_ExtendByRefPartStr stringPart = (I_ExtendByRefPartStr) part;
 
-                formattedLine += stringPart.getStringValue();
+                formattedLine += stringPart.getString1Value();
             } else if (part instanceof I_ExtendByRefPartInt) {
                 I_ExtendByRefPartInt stringPart = (I_ExtendByRefPartInt) part;
 

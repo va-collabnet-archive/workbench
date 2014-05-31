@@ -428,9 +428,13 @@ public class RefexCAB extends CreateOrAmendBlueprint {
          */
         INTEGER1,
         /**
-         * The string value associated with this refex member.
+         * The first string value associated with this refex member.
          */
         STRING1,
+        /**
+         * The second string value associated with this refex member.
+         */
+        STRING2,
         /**
          * The long value associated with this refex member.
          */

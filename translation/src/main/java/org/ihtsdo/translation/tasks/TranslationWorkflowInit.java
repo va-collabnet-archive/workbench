@@ -264,7 +264,7 @@ public class TranslationWorkflowInit extends AbstractTask {
 					I_ExtendByRefPartCidString part = (I_ExtendByRefPartCidString) getLastExtensionPart(extension.getMutableParts());
 					if (part.getC1id() == commentId) {
 						commentExtension = extension;
-						if (part.getStringValue().equals(comment)) {
+						if (part.getString1Value().equals(comment)) {
 							newCommentPartNeeded = false;
 						} 
 					}

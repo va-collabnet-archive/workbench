@@ -229,14 +229,14 @@ public class RefsetQueryFactory {
 
                     I_GetConceptData truthToken = termFactory.getConcept(part.getC1id());
                     I_GetConceptData groupingToken = termFactory.getConcept(part.getC2id());
-                    String constraint = part.getStringValue();
+                    String constraint = part.getString1Value();
 
                     RefsetComputeType statementType = RefsetComputeType.getTypeFromQueryToken(groupingToken);
                     switch (statementType) {
                         case CONCEPT: {
                             if (part.getC2id() == RefsetAuxiliary.Concept.DIFFERENCE_V1_IS.localize().getNid()
                                     || part.getC2id() == RefsetAuxiliary.Concept.DIFFERENCE_V2_IS.localize().getNid()) {
-                                String pos_str = part.getStringValue();
+                                String pos_str = part.getString1Value();
                                 // System.out.println("1:" + pos_str);
                                 pos_str = pos_str.substring(pos_str.lastIndexOf("(") + 1, pos_str.lastIndexOf(")"));
                                 // System.out.println("2:" + pos_str);

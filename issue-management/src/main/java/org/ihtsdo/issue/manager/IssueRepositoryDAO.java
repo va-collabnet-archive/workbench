@@ -240,7 +240,7 @@ public static IssueRepository getIssueRepository(I_GetConceptData issueRepoConce
 
 		for (I_ExtendByRefPart loopPart : currentExtensionParts) {
 			I_ExtendByRefPartStr strPart = (I_ExtendByRefPartStr) loopPart;
-			String metadata = strPart.getStringValue();
+			String metadata = strPart.getString1Value();
 			deserializedIssueRepoWithMetadata = (IssueRepository) deserialize(metadata);
 		}
 
@@ -330,7 +330,7 @@ public static IssueRepository updateRepositoryMetadata(IssueRepository issueRepo
                                         config.getDbConfig().getUserConcept().getNid());
                             
                                 part.setStatusNid(ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid());
-				part.setStringValue(metadata);
+				part.setString1Value(metadata);
 				extension.addVersion(part);
 				termFactory.addUncommitted(extension);
 				promote(extension, config);

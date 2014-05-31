@@ -984,7 +984,7 @@ private AtomicReference<RelativePositionComputerBI> conflictMapper;
 										for (ComponentVersionBI v : developerVersions) {
 	    				        			I_ExtendByRefVersion version = (I_ExtendByRefVersion)v;
 	    				        			I_ExtendByRefPartStr wfHxRefsetMember = (I_ExtendByRefPartStr)version.getMutablePart(); 
-	    				        			UUID versionWfId = reader.getWorkflowId(wfHxRefsetMember.getStringValue());
+	    				        			UUID versionWfId = reader.getWorkflowId(wfHxRefsetMember.getString1Value());
 	
 	    				        			if (versionWfId.equals(testWfId)) {
 	    				        				// Base autmation case of true conflict
@@ -1010,7 +1010,7 @@ private AtomicReference<RelativePositionComputerBI> conflictMapper;
 										for (ComponentVersionBI v : developerVersions) {
 						        			I_ExtendByRefVersion version = (I_ExtendByRefVersion)v;
 						        			I_ExtendByRefPartStr wfHxRefsetMember = (I_ExtendByRefPartStr)version.getMutablePart(); 
-						        			UUID versionWfId = reader.getWorkflowId(wfHxRefsetMember.getStringValue());
+						        			UUID versionWfId = reader.getWorkflowId(wfHxRefsetMember.getString1Value());
 						        			
 						        			if (versionWfId.equals(wfId)) {
 						        				// Version in WfId
@@ -1357,7 +1357,7 @@ private AtomicReference<RelativePositionComputerBI> conflictMapper;
 					EditorCategoryRefsetWriter writer = new EditorCategoryRefsetWriter();
 					writer.setReferencedComponentId(Terms.get().nidToUuid(((I_ExtendByRefVersion)version).getReferencedComponentNid()));
 
-					String s = ((I_ExtendByRefPartStr)version).getStringValue();
+					String s = ((I_ExtendByRefPartStr)version).getString1Value();
 					
 					EditorCategoryRefsetReader reader = new EditorCategoryRefsetReader();
 					writer.setCategory(reader.getEditorCategoryUid(s));
@@ -1368,7 +1368,7 @@ private AtomicReference<RelativePositionComputerBI> conflictMapper;
 					StateTransitionRefsetWriter writer = new StateTransitionRefsetWriter();
 					writer.setReferencedComponentId(Terms.get().nidToUuid(((I_ExtendByRefVersion)version).getReferencedComponentNid()));
 
-					String s = ((I_ExtendByRefPartStr)version).getStringValue();
+					String s = ((I_ExtendByRefPartStr)version).getString1Value();
 					
 					StateTransitionRefsetReader reader = new StateTransitionRefsetReader();
 					writer.setWorkflowType(ArchitectonicAuxiliary.Concept.WORKFLOW_USE_CASE.getPrimoridalUid());
@@ -1381,7 +1381,7 @@ private AtomicReference<RelativePositionComputerBI> conflictMapper;
 					SemanticHierarchyRefsetWriter writer = new SemanticHierarchyRefsetWriter();
 					writer.setReferencedComponentId(Terms.get().nidToUuid(((I_ExtendByRefVersion)version).getReferencedComponentNid()));
 
-					String s = ((I_ExtendByRefPartStr)version).getStringValue();
+					String s = ((I_ExtendByRefPartStr)version).getString1Value();
 					
 					SemanticHierarchyRefsetReader reader = new SemanticHierarchyRefsetReader();
 					writer.setChildSemanticArea(reader.getChildSemanticTag(s));
@@ -1392,7 +1392,7 @@ private AtomicReference<RelativePositionComputerBI> conflictMapper;
 					SemanticTagsRefsetWriter writer = new SemanticTagsRefsetWriter();
 					writer.setReferencedComponentId(Terms.get().nidToUuid(((I_ExtendByRefVersion)version).getReferencedComponentNid()));
 
-					String s = ((I_ExtendByRefPartStr)version).getStringValue();
+					String s = ((I_ExtendByRefPartStr)version).getString1Value();
 					
 					SemanticTagsRefsetReader reader = new SemanticTagsRefsetReader();
 					writer.setSemanticTag(reader.getSemanticTag(s));

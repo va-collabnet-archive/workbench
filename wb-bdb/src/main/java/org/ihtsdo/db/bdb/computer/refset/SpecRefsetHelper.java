@@ -243,7 +243,7 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
                 if (v.getStatusNid() == statusNid) {
                     if (v.getTypeNid() == REFSET_TYPES.CID_STR.getTypeNid()) {
                         if (((I_ExtendByRefPartCidString) v).getC1id() == c1Nid
-                                && ((I_ExtendByRefPartCidString) v).getStringValue().equals(extString)) {
+                                && ((I_ExtendByRefPartCidString) v).getString1Value().equals(extString)) {
                             return true;
                         }
                     }
@@ -261,7 +261,7 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
             for (RefsetMember.Version v : extension.getVersions(config.getViewCoordinate())) {
                 if (v.getStatusNid() == statusNid) {
                     if (v.getTypeNid() == REFSET_TYPES.STR.getTypeNid()) {
-                        if (((I_ExtendByRefPartStr) v).getStringValue().equals(
+                        if (((I_ExtendByRefPartStr) v).getString1Value().equals(
                                 extString)) {
                             return true;
                         }
@@ -356,7 +356,7 @@ public class SpecRefsetHelper extends RefsetHelper implements I_HelpSpecRefset {
                         && v.getTypeNid() == REFSET_TYPES.CID_CID_STR.getTypeNid()) {
                     if (((I_ExtendByRefPartCidCidString) v).getC1id() == c1Nid
                             && ((I_ExtendByRefPartCidCidString) v).getC2id() == c2Nid
-                            && ((I_ExtendByRefPartCidCidString) v).getStringValue().equals(stringInput)) {
+                            && ((I_ExtendByRefPartCidCidString) v).getString1Value().equals(stringInput)) {
                         return true;
                     }
                 }
