@@ -407,7 +407,6 @@ public class ExportUtil {
 			sb.append(refinability);
 			sb.append("\t");
 			sb.append("0");
-			sb.append("\r\n");
 		}
 		return sb.toString();
 	}
