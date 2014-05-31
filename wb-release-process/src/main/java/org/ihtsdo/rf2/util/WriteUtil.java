@@ -53,8 +53,8 @@ public class WriteUtil {
 
 	public static void writeNewLine(Config config, String str) throws IOException {
 
-		// config.getBw().write("\r\n");
-		config.getBw().newLine();
+		 config.getBw().write("\r\n");
+//		config.getBw().newLine();
 
 		int count = getWriteCount();
 		setWriteCount(++count);

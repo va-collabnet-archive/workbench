@@ -77,7 +77,7 @@ public class RF2QualifierImpl extends RF2AbstractImpl implements I_ProcessConcep
 				for (Integer order:types.keySet()){
 					if (ExportUtil.testDomain(order, concept, currenAceConfig)){
 						String line=ExportUtil.getQualifierRF1Row(order,  conceptid, getConfig());
-						if (!line.equals("")){
+						if (!line.trim().equals("")){
 							writeRF1TypeLine(line);
 						}
 					}

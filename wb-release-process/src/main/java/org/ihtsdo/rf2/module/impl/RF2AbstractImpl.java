@@ -9,8 +9,6 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.apache.log4j.Logger;
-import org.drools.KnowledgeBase;
-import org.drools.KnowledgeBaseFactory;
 import org.dwfa.ace.api.I_AmPart;
 import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_ConfigAceFrame;
@@ -49,9 +47,9 @@ public abstract class RF2AbstractImpl {
 	private static Config config;
 
 	// String timeFormat = I_Constants.TimeFormat;
-
-	/** The kbase. */
-	private final KnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase();
+//
+//	/** The kbase. */
+//	private final KnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase();
 
 	/** The logger. */
 	private static Logger logger = Logger.getLogger(RF2AbstractImpl.class);
@@ -219,14 +217,14 @@ public abstract class RF2AbstractImpl {
 		return metadataCount;
 	}
 	
-	/**
-	 * Gets the kbase.
-	 *
-	 * @return the kbase
-	 */
-	public KnowledgeBase getKbase() {
-		return kbase;
-	}
+//	/**
+//	 * Gets the kbase.
+//	 *
+//	 * @return the kbase
+//	 */
+//	public KnowledgeBase getKbase() {
+//		return kbase;
+//	}
 
 	/**
 	 * Gets the module sctid for stamp nid.
