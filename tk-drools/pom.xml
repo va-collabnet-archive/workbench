@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.ihtsdo</groupId>
         <artifactId>wb-mmb</artifactId>
-        <version>1.0-se3.37fix-SNAPSHOT</version>
+        <version>1.0-se3.37fix</version>
     </parent>
     <artifactId>tk-drools</artifactId>
     <name>${branch}: Toolkit Extensions for DROOLS</name>
