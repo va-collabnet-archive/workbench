@@ -2079,8 +2079,11 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                             break;
 
                         case EFFECTIVE_TIME:
-                            modDependWriter.write(rssv.getTime() + field.seperator);
-
+                            if(rssv.getTime() > previousReleaseDate.getTime()){
+                                modDependWriter.write(TimeHelper.getShortFileDateFormat().format(rssv.getTime()) + field.seperator);
+                            }else{
+                                modDependWriter.write(effectiveDateString + field.seperator);
+                            }
                             break;
 
                         case ACTIVE:
