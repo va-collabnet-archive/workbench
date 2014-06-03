@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>org.ihtsdo</groupId>
 		<artifactId>wb-mmb</artifactId>
-		<version>1.0-se4.37fix</version>
+		<version>1.0-se5.37fix-SNAPSHOT</version>
 	</parent>
 	<artifactId>wb-mojo</artifactId>
 	<packaging>maven-plugin</packaging>
