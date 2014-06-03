@@ -562,6 +562,9 @@ public abstract class TkComponent<V extends TkRevision> extends TkRevision {
     @Override
     public void writeExternal(DataOutput out) throws IOException {
         super.writeExternal(out);
+        if (primordialUuid == null) {
+            System.out.println(":DEBUG:!!!: primordialUuid == null");
+        } 
         out.writeLong(primordialUuid.getMostSignificantBits());
         out.writeLong(primordialUuid.getLeastSignificantBits());
 
