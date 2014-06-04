@@ -38,6 +38,7 @@ import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.refex.type_nid.RefexNidVersionBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
+import org.ihtsdo.tk.query.helper.RefsetHelper;
 
 /**
  * The Class PromotionRefset.
@@ -261,11 +262,8 @@ public class PromotionRefset extends Refset {
             }
         } else {
             I_GetConceptData newMemberConcept = termFactory.getConcept(componentId);
-            I_HelpRefsets refsetHelper = termFactory.getRefsetHelper(config);
-
-            refsetHelper.newRefsetExtension(this.refsetId,
-                    componentId, EConcept.REFSET_TYPES.CID,
-                    new RefsetPropertyMap().with(RefsetPropertyMap.REFSET_PROPERTY.CID_ONE, statusConceptId), config);
+            RefsetHelper helper = new RefsetHelper(config.getViewCoordinate(), config.getEditCoordinate());
+            helper.newConceptRefsetExtension(refsetId, componentId, statusConceptId);
 
             //termFactory.addUncommittedNoChecks(refsetConcept);
             termFactory.addUncommittedNoChecks(newMemberConcept);

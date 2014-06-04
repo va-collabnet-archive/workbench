@@ -70,10 +70,6 @@ import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.refset.spec.I_HelpSpecRefset;
 import org.dwfa.ace.task.commit.AlertToDataConstraintFailure;
 import org.dwfa.ace.task.commit.AlertToDataConstraintFailure.ALERT_TYPE;
-import org.dwfa.ace.task.refset.spec.RefsetSpec;
-import org.dwfa.ace.task.refset.spec.compute.RefsetComputeType;
-import org.dwfa.ace.task.refset.spec.compute.RefsetQueryFactory;
-import org.dwfa.ace.task.refset.spec.compute.RefsetSpecQuery;
 import org.dwfa.app.DwfaEnv;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
@@ -109,6 +105,11 @@ import org.mvel2.ast.IsDef;
 import com.googlecode.sardine.Sardine;
 import com.googlecode.sardine.SardineFactory;
 import org.ihtsdo.tk.api.ConceptFetcherSimple;
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
+import org.ihtsdo.tk.query.RefsetComputer.ComputeType;
+import org.ihtsdo.tk.query.RefsetSpec;
+import org.ihtsdo.tk.query.RefsetSpecFactory;
+import org.ihtsdo.tk.query.RefsetSpecQuery;
 
 /**
  * The Class RulesLibrary.
@@ -1279,15 +1280,15 @@ public class RulesLibrary {
 		boolean result = false;
 		// AceLog.getAppLog().info("************ Starting test computation *****************");
 		Long start = System.currentTimeMillis();
-		RefsetSpec refsetSpecHelper = new RefsetSpec(refset, true, config);
-		I_GetConceptData refsetSpec = refsetSpecHelper.getRefsetSpecConcept();
+		RefsetSpec refsetSpecHelper = new RefsetSpec(refset, true, config.getViewCoordinate());
+		ConceptChronicleBI refsetSpec = refsetSpecHelper.getRefsetSpecConcept();
 		// AceLog.getAppLog().info("Refset: " + refset.getInitialText() +
 		// " " + refset.getUids().get(0));
 		// AceLog.getAppLog().info("Checking Refset spec: " +
 		// refsetSpec.getInitialText() + " " + refsetSpec.getUids().get(0));
-		RefsetComputeType computeType = RefsetComputeType.CONCEPT; // default
+		ComputeType computeType = ComputeType.CONCEPT; // default
 		if (refsetSpecHelper.isDescriptionComputeType()) {
-			computeType = RefsetComputeType.DESCRIPTION;
+			computeType = ComputeType.DESCRIPTION;
 		} else if (refsetSpecHelper.isRelationshipComputeType()) {
 			throw new Exception("Invalid refset spec to compute - relationship compute types not supported.(" + refset.toUserString() + ")");
 		}
@@ -1297,7 +1298,7 @@ public class RulesLibrary {
 			throw new Exception("Invalid refset spec to compute - refset is null. (" + refset.toUserString() + ")");
 		}
 		// Step 1: create the query object, based on the refset spec
-		RefsetSpecQuery query = RefsetQueryFactory.createQuery(config, Terms.get(), refsetSpec, refset, computeType);
+		RefsetSpecQuery query = RefsetSpecFactory.createQuery(config.getViewCoordinate(),refsetSpec, refset, computeType);
 
 		// check validity of query
 		if (!query.isValidQuery() && query.getTotalStatementCount() != 0) {
@@ -1313,7 +1314,9 @@ public class RulesLibrary {
 		// selectedConcept.toString());
 
 		List<I_ShowActivity> activities = new ArrayList<I_ShowActivity>();
-		result = query.execute(selectedConcept.getNid(), selectedConcept, activities);
+		result = query.execute(selectedConcept.getNid(),
+                        selectedConcept,
+                        null, null, null);
 
 		// ArrayList<RefsetSpecComponent> components =
 		// query.getAllComponents();
@@ -1495,8 +1498,7 @@ public class RulesLibrary {
 			I_GetConceptData userParent = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.USER.getUids());
 			I_GetConceptData ihtsdoUserParent = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.IHTSDO.getUids());
 			I_IntSet allowedTypes = Terms.get().getActiveAceFrameConfig().getDestRelTypes();
-			I_HelpSpecRefset helper = Terms.get().getSpecRefsetHelper(Terms.get().getActiveAceFrameConfig());
-			Set<Integer> currentStatuses = helper.getCurrentStatusIds();
+                        int[] currentStatuses = config.getViewCoordinate().getAllowedStatusNids().getSetValues();
 			Set<? extends I_GetConceptData> allUsers = userParent.getDestRelOrigins(config.getAllowedStatus(), allowedTypes, config.getViewPositionSetReadOnly(), Precedence.TIME, config.getConflictResolutionStrategy());
 			Set<? extends I_GetConceptData> allIhtsdoUsrs = ihtsdoUserParent.getDestRelOrigins(config.getAllowedStatus(), allowedTypes, config.getViewPositionSetReadOnly(), Precedence.TIME, config.getConflictResolutionStrategy());
 			I_GetConceptData descriptionType = Terms.get().getConcept(ArchitectonicAuxiliary.Concept.USER_INBOX.getUids());

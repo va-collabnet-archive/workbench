@@ -160,7 +160,6 @@ public class ExportConceptMemberRefsetToRefset {
 
             refsetSCTID = refsetId;
         }
-        I_HelpSpecRefset helper = termFactory.getSpecRefsetHelper(config);
         for (I_ExtendByRef ext : extensions) {
 
             I_ExtendByRefPart lastPart = TerminologyProjectDAO.getLastExtensionPart(ext);

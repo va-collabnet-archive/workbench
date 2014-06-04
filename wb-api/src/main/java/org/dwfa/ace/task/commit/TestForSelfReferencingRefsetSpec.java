@@ -30,17 +30,15 @@ import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidCidCid;
-import org.dwfa.ace.task.commit.AlertToDataConstraintFailure;
-import org.dwfa.ace.task.refset.spec.RefsetSpec;
-import org.dwfa.ace.task.refset.spec.compute.RefsetComputeType;
-import org.dwfa.ace.task.refset.spec.compute.RefsetQueryFactory;
-import org.dwfa.ace.task.refset.spec.compute.RefsetSpecQuery;
 import org.dwfa.bpa.process.TaskFailedException;
-import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
+import org.ihtsdo.tk.query.RefsetComputer.ComputeType;
+import org.ihtsdo.tk.query.RefsetSpec;
+import org.ihtsdo.tk.query.RefsetSpecFactory;
+import org.ihtsdo.tk.query.RefsetSpecQuery;
 
 /**
  * Tests if the refset spec is self referencing i.e. has a "is member of" clause
@@ -91,7 +89,7 @@ public class TestForSelfReferencingRefsetSpec extends AbstractExtensionTest {
                 return alertList;
             }
 
-            RefsetSpec specHelper = new RefsetSpec(refsetSpecConcept, configFrame);
+            RefsetSpec specHelper = new RefsetSpec(refsetSpecConcept, configFrame.getViewCoordinate());
 
             alertList.addAll(verifyRefsetSpec(extension, specHelper, alertList, configFrame, new HashSet<Integer>()));
 
@@ -105,18 +103,18 @@ public class TestForSelfReferencingRefsetSpec extends AbstractExtensionTest {
     private ArrayList<AlertToDataConstraintFailure> verifyRefsetSpec(I_ExtendByRef extension, RefsetSpec specHelper,
             ArrayList<AlertToDataConstraintFailure> alertList, I_ConfigAceFrame configFrame, HashSet<Integer> invalidIds) {
         I_TermFactory termFactory = Terms.get();
-        RefsetComputeType computeType;
+        ComputeType computeType;
         if (specHelper.isConceptComputeType()) {
-            computeType = RefsetComputeType.CONCEPT;
+            computeType = ComputeType.CONCEPT;
         } else if (specHelper.isDescriptionComputeType()) {
-            computeType = RefsetComputeType.DESCRIPTION;
+            computeType = ComputeType.DESCRIPTION;
         } else {
-            computeType = RefsetComputeType.RELATIONSHIP;
+            computeType = ComputeType.RELATIONSHIP;
         }
 
         try {
             RefsetSpecQuery q =
-                    RefsetQueryFactory.createQuery(configFrame, termFactory, specHelper.getRefsetSpecConcept(), specHelper
+                    RefsetSpecFactory.createQuery(configFrame.getViewCoordinate(), specHelper.getRefsetSpecConcept(), specHelper
                         .getMemberRefsetConcept(), computeType);
             Set<Integer> nestedRefsetIds = q.getNestedRefsets();
             if (nestedRefsetIds.contains(specHelper.getMemberRefsetConcept().getConceptNid())) {
@@ -132,7 +130,7 @@ public class TestForSelfReferencingRefsetSpec extends AbstractExtensionTest {
             }
 
             for (Integer nestedRefsetId : nestedRefsetIds) {
-                RefsetSpec nestedSpecHelper = new RefsetSpec(termFactory.getConcept(nestedRefsetId), true, configFrame);
+                RefsetSpec nestedSpecHelper = new RefsetSpec(termFactory.getConcept(nestedRefsetId), true, configFrame.getViewCoordinate());
                 HashSet<Integer> nestedInvalidIds = new HashSet<Integer>();
                 nestedInvalidIds.addAll(invalidIds);
                 if (nestedSpecHelper.getMemberRefsetConcept() != null && nestedSpecHelper.getRefsetSpecConcept() != null) {

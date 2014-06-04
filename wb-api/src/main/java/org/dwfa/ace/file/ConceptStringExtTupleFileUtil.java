@@ -26,10 +26,10 @@ import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidString;
 import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
-import org.dwfa.ace.refset.spec.I_HelpSpecRefset;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.tk.query.helper.RefsetHelper;
 
 public class ConceptStringExtTupleFileUtil {
 
@@ -127,8 +127,6 @@ public class ConceptStringExtTupleFileUtil {
                 return null;
             }
 
-            I_HelpSpecRefset refsetHelper = Terms.get().getSpecRefsetHelper(importConfig);
-            refsetHelper.setAutocommitActive(false);
             I_TermFactory termFactory = Terms.get();
 
             if (!termFactory.hasId(refsetUuid)) {
@@ -148,9 +146,9 @@ public class ConceptStringExtTupleFileUtil {
                     "CidStr: statusUuid matches no identifier in database: " + statusUuid);
             }
             try {
+                RefsetHelper refsetHelper = new RefsetHelper(importConfig.getViewCoordinate(), importConfig.getEditCoordinate());
                 refsetHelper.newConceptStringRefsetExtension(termFactory.uuidToNative(refsetUuid), termFactory
-                    .uuidToNative(componentUuid), termFactory.uuidToNative(conceptUuid), extString, memberUuid,
-                    (UUID) importConfig.getProperty("pathUuid"), statusUuid, effectiveDate);
+                    .uuidToNative(componentUuid), termFactory.uuidToNative(conceptUuid), extString);
             } catch (Exception e) {
                 String errorMessage = "CidStr: Exception thrown while creating new concept string refset extension";
                 outputFileWriter.write("Error on line " + lineCount + " : ");

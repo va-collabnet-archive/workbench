@@ -45,7 +45,6 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.task.AceTaskUtil;
 import org.dwfa.ace.task.ProcessAttachmentKeys;
 import org.dwfa.ace.task.commit.TestForCreateNewRefsetPermission;
-import org.dwfa.ace.task.refset.spec.RefsetSpec;
 import org.dwfa.ace.task.wfdetailsSheet.ClearWorkflowDetailsSheet;
 import org.dwfa.bpa.process.Condition;
 import org.dwfa.bpa.process.I_EncodeBusinessProcess;
@@ -58,6 +57,7 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
+import org.ihtsdo.tk.query.RefsetSpec;
 
 /**
  * This task prepares the Workflow Details Sheet to display the
@@ -387,10 +387,8 @@ public class SetWFDSheetToRefreshRefsetSpecParamsPanelTask extends AbstractTask 
                         .getConflictResolutionStrategy());
             for (I_GetConceptData child : children) {
                 if (isRefset(child)) {
-                    RefsetSpec spec = new RefsetSpec(child, true, config);
-                    if (spec.isEditableRefset()) {
+                    RefsetSpec spec = new RefsetSpec(child, true, config.getViewCoordinate());
                         refsetSpecs.add(child);
-                    }
                 }
             }
         }

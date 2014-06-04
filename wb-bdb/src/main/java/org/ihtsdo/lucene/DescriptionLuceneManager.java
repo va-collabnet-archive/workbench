@@ -5,10 +5,9 @@ import java.io.IOException;
 import java.util.Collection;
 
 import org.apache.lucene.index.CorruptIndexException;
-import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.Term;
-import org.dwfa.ace.log.AceLog;
 import org.ihtsdo.concept.component.description.Description;
+import static org.ihtsdo.lucene.LuceneManager.descWriter;
 
 public class DescriptionLuceneManager extends LuceneManager {
 
@@ -21,27 +20,15 @@ public class DescriptionLuceneManager extends LuceneManager {
     protected static void writeToLuceneNoLock(Collection<Description> descriptions) throws CorruptIndexException, IOException {
         if (descWriter == null) {
             descLuceneMutableDir = setupWriter(descLuceneMutableDirFile, descLuceneMutableDir, LuceneSearchType.DESCRIPTION);
-            descWriter.setUseCompoundFile(true);
-            descWriter.setMergeFactor(15);
-            descWriter.setMaxMergeDocs(Integer.MAX_VALUE);
-            descWriter.setMaxBufferedDocs(1000);
         }
 
-        IndexWriter writerCopy = descWriter;
-        if (writerCopy != null) {
+        if (descWriter != null) {
             for (Description desc : descriptions) {
                 if (desc != null) {
-                    writerCopy.deleteDocuments(new Term("dnid", Integer.toString(desc.getDescId())));
-                    writerCopy.addDocument(DescriptionIndexGenerator.createDoc(desc));
+                    descWriter.deleteDocuments(new Term("dnid", Integer.toString(desc.getDescId())));
+                    descWriter.addDocument(DescriptionIndexGenerator.createDoc(desc));
                 }
             }
-            writerCopy.commit();
         }
-
-        if (descSearcher != null) {
-            descSearcher.close();
-            AceLog.getAppLog().info("Closing lucene desc Searcher");
-        }
-        descSearcher = null;
     }
 }

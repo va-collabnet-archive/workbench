@@ -25,7 +25,6 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.MalformedURLException;
-import java.security.PrivilegedActionException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -62,6 +61,7 @@ import org.ihtsdo.project.model.TranslationProject;
 import org.ihtsdo.project.model.WorkList;
 import org.ihtsdo.project.model.WorkSet;
 import org.ihtsdo.project.refset.partition.RefsetSplitter;
+import org.ihtsdo.tk.query.helper.RefsetHelper;
 
 /**
  * The Class CreateNewProject.
@@ -184,29 +184,16 @@ public class CreateNewProject extends AbstractTask {
 					config.getConflictResolutionStrategy());
 			//TODO review!!
 			I_GetConceptData refset = tf.getConcept(RefsetAuxiliary.Concept.REFSET_TYPE.getUids());
+                        RefsetHelper helper = new RefsetHelper(config.getViewCoordinate(), config.getEditCoordinate());
 			for (I_RelTuple rel : relationships) {
 				I_GetConceptData member = tf.getConcept(rel.getC1Id());
-				tf.getRefsetHelper(config).newRefsetExtension(
-						refset.getConceptNid(), 
-						member.getConceptNid(), 
-						EConcept.REFSET_TYPES.CID, 
-						new RefsetPropertyMap().with(RefsetPropertyMap.REFSET_PROPERTY.CID_ONE, member.getConceptNid())
-						, config); 
+                                helper.newConceptRefsetExtension(refset.getConceptNid(), 
+						member.getConceptNid(), member.getConceptNid());
 			}
-			tf.getRefsetHelper(config).newRefsetExtension(
-					refset.getConceptNid(), 
-					colonoscopicPolypectomy.getConceptNid(), 
-					EConcept.REFSET_TYPES.CID, 
-					new RefsetPropertyMap().with(RefsetPropertyMap.REFSET_PROPERTY.CID_ONE, colonoscopicPolypectomy.getConceptNid())
-					, config);
-			tf.getRefsetHelper(config).newRefsetExtension(
-					refset.getConceptNid(), 
-					pneumonitis.getConceptNid(), 
-					EConcept.REFSET_TYPES.CID, 
-					new RefsetPropertyMap().with(RefsetPropertyMap.REFSET_PROPERTY.CID_ONE, pneumonitis.getConceptNid())
-					, config);
-
-
+                        helper.newConceptRefsetExtension(refset.getConceptNid(), 
+					colonoscopicPolypectomy.getConceptNid(), colonoscopicPolypectomy.getConceptNid());
+                        helper.newConceptRefsetExtension(refset.getConceptNid(), 
+					pneumonitis.getConceptNid(), pneumonitis.getConceptNid());
 			tf.commit();
 
 			project.addRefsetAsSourceLanguage(sourceLangConcept);

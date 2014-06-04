@@ -49,7 +49,6 @@ import org.dwfa.ace.TermComponentLabel;
 import org.dwfa.ace.api.I_AmTermComponent;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_HelpRefsets;
 import org.dwfa.ace.api.I_HostConceptPlugins;
 import org.dwfa.ace.api.I_IntSet;
 import org.dwfa.ace.api.I_TermFactory;
@@ -57,7 +56,6 @@ import org.dwfa.ace.api.PathSetReadOnly;
 import org.dwfa.ace.api.PositionSetReadOnly;
 import org.dwfa.ace.api.RefsetPropertyMap;
 import org.dwfa.ace.api.Terms;
-import org.dwfa.ace.api.RefsetPropertyMap.REFSET_PROPERTY;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPart;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidCid;
@@ -69,7 +67,6 @@ import org.dwfa.ace.table.RelationshipTableRenderer;
 import org.dwfa.ace.table.SrcRelTableModel;
 import org.dwfa.ace.table.RelTableModel.REL_FIELD;
 import org.dwfa.ace.table.RelTableModel.StringWithRelTuple;
-import org.dwfa.ace.task.refset.spec.RefsetSpec;
 import org.dwfa.bpa.util.SortClickListener;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
@@ -77,8 +74,15 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.LogWithAlerts;
 import org.dwfa.vodb.types.IntSet;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
+import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.PathBI;
 import org.ihtsdo.tk.api.PositionBI;
+import org.ihtsdo.tk.api.TerminologyBuilderBI;
+import org.ihtsdo.tk.api.blueprint.RefexCAB;
+import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
+import org.ihtsdo.tk.dto.concept.component.refex.TK_REFEX_TYPE;
+import org.ihtsdo.tk.query.RefsetSpec;
+import org.ihtsdo.tk.query.helper.RefsetHelper;
 
 public class RefreshSpecClausePanel extends JPanel implements ActionListener {
 
@@ -110,20 +114,20 @@ public class RefreshSpecClausePanel extends JPanel implements ActionListener {
 
     private HostProxy host = new HostProxy();
 
-    private I_HelpRefsets refsetHelper;
+    private RefsetHelper refsetHelper;
 
     @SuppressWarnings("unchecked")
     public RefreshSpecClausePanel(I_GetConceptData refsetIdentityConcept, PositionSetReadOnly refsetSpecVersionSet,
             PositionSetReadOnly sourceTerminologyVersionSet, List<Collection<UUID>> clausesToUpdate,
-            I_ConfigAceFrame frameConfig) throws IOException, TerminologyException {
+            I_ConfigAceFrame frameConfig) throws IOException, TerminologyException, Exception {
         super();
         replacementConceptLabel = null;
         replacementConceptLabel = new ArrayList<TermComponentLabel>();
         replacementConceptLabel.add(new TermComponentLabel(frameConfig));
 
-        this.refsetHelper = Terms.get().getRefsetHelper(frameConfig);
-        this.refsetSpec =
-                this.refsetHelper.getSpecificationRefsetForRefset(refsetIdentityConcept, frameConfig).iterator().next();
+        this.refsetHelper = new RefsetHelper(frameConfig.getViewCoordinate(), frameConfig.getEditCoordinate());
+        RefsetSpec specHelper = new RefsetSpec((ConceptChronicleBI) refsetIdentityConcept, true, frameConfig.getViewCoordinate());
+        this.refsetSpec = (I_GetConceptData) specHelper.getRefsetSpecConcept();
         this.refsetSpecVersionSet = refsetSpecVersionSet;
         this.sourceTerminologyVersionSet = sourceTerminologyVersionSet;
         this.clausesToUpdate = clausesToUpdate;
@@ -651,8 +655,8 @@ public class RefreshSpecClausePanel extends JPanel implements ActionListener {
         retiredSet.add(retiredNid);
         boolean writeComment = editorComments.getText().length() > 3;
         I_ExtendByRef comment = null;
-        RefsetSpec refsetSpecHelper = new RefsetSpec(refsetSpec, frameConfig);
-        I_GetConceptData commentRefset = refsetSpecHelper.getCommentsRefsetConcept();
+        RefsetSpec refsetSpecHelper = new RefsetSpec(refsetSpec, frameConfig.getViewCoordinate());
+        I_GetConceptData commentRefset = (I_GetConceptData) refsetSpecHelper.getCommentsRefsetConcepts().iterator().next().getChronicle();
 
         if (updateOptions.getSelectedItem().equals(REPLACE_OPTION)) {
             // Do replacement here...
@@ -701,44 +705,54 @@ public class RefreshSpecClausePanel extends JPanel implements ActionListener {
                             }
 
                             RefsetPropertyMap propMap = new RefsetPropertyMap();
+                            int cNid1 = 0;
+                            int cNid2 = 0;
                             if (newRetiredPart.getC1id() == conceptUnderReview.getConceptNid()) {
-                                propMap.put(REFSET_PROPERTY.CID_ONE, label.getTermComponent().getNid());
+                                cNid1 = label.getTermComponent().getNid();
                             } else {
-                                propMap.put(REFSET_PROPERTY.CID_ONE, newRetiredPart.getC1id());
+                                cNid1 = newRetiredPart.getC1id();
                             }
                             if (newRetiredPart.getC2id() == conceptUnderReview.getConceptNid()) {
-                                propMap.put(REFSET_PROPERTY.CID_TWO, label.getTermComponent().getNid());
+                                cNid2 = label.getTermComponent().getNid();
                             } else {
-                                propMap.put(REFSET_PROPERTY.CID_TWO, newRetiredPart.getC2id());
+                                cNid2 = newRetiredPart.getC2id();
                             }
-                            I_ExtendByRef newMember;
+                            I_ExtendByRef newMember = null;
+                            TerminologyBuilderBI builder = Ts.get().getTerminologyBuilder(frameConfig.getEditCoordinate(), frameConfig.getViewCoordinate());
                             switch (REFSET_TYPES.nidToType(tuple.getTypeId())) {
                             case CID_CID:
-                                newMember =
-                                        this.refsetHelper.getOrCreateRefsetExtension(member.getRefsetId(), member
-                                            .getComponentId(), REFSET_TYPES.CID_CID, propMap, UUID.randomUUID());
+                                 RefexCAB memberBp = new RefexCAB(TK_REFEX_TYPE.CID_CID,
+                                        member.getComponentNid(),
+                                        member.getRefsetId());
+                                memberBp.put(RefexCAB.RefexProperty.CNID1, cNid1);
+                                memberBp.put(RefexCAB.RefexProperty.CNID2, cNid2);
+                                newMember = (I_ExtendByRef) builder.constructIfNotCurrent(memberBp);
                                 break;
                             case CID_CID_CID:
+                                int cNid3 = 0;
                                 I_ExtendByRefPartCidCidCid c3Part = (I_ExtendByRefPartCidCidCid) newRetiredPart;
                                 if (c3Part.getC3id() == conceptUnderReview.getConceptNid()) {
-                                    propMap.put(REFSET_PROPERTY.CID_THREE, label.getTermComponent().getNid());
+                                    cNid3 = label.getTermComponent().getNid();
                                 } else {
-                                    propMap.put(REFSET_PROPERTY.CID_THREE, c3Part.getC3id());
+                                    cNid3 =  c3Part.getC3id();
                                 }
-                                newMember =
-                                        this.refsetHelper.getOrCreateRefsetExtension(member.getRefsetId(), member
-                                            .getComponentId(), REFSET_TYPES.CID_CID_CID, propMap, UUID.randomUUID());
+                                memberBp = new RefexCAB(TK_REFEX_TYPE.CID_CID_CID,
+                                        member.getComponentNid(),
+                                        member.getRefsetId());
+                                memberBp.put(RefexCAB.RefexProperty.CNID1, cNid1);
+                                memberBp.put(RefexCAB.RefexProperty.CNID2, cNid2);
+                                memberBp.put(RefexCAB.RefexProperty.CNID3, cNid3);
+                                builder.constructIfNotCurrent(memberBp);
                                 break;
                             default:
                                 throw new Exception("Can't handle: " + REFSET_TYPES.nidToType(member.getTypeId()));
                             }
                             if (writeComment) {
-                                RefsetPropertyMap commentPropMap = new RefsetPropertyMap();
-                                commentPropMap.put(REFSET_PROPERTY.STRING_VALUE, editorComments.getText());
-                                comment =
-                                        this.refsetHelper.getOrCreateRefsetExtension(commentRefset.getConceptNid(),
-                                            newMember.getComponentId(), REFSET_TYPES.STR, commentPropMap, UUID
-                                                .randomUUID());
+                                RefexCAB memberBp = new RefexCAB(TK_REFEX_TYPE.STR,
+                                        newMember.getComponentNid(),
+                                        commentRefset.getConceptNid());
+                                memberBp.put(RefexCAB.RefexProperty.STRING1, editorComments.getText());
+                                comment = (I_ExtendByRef) builder.constructIfNotCurrent(memberBp);
                                 tf.addUncommittedNoChecks(commentRefset);
                             }
                             tf.addUncommittedNoChecks(refsetSpec);
@@ -763,7 +777,7 @@ public class RefreshSpecClausePanel extends JPanel implements ActionListener {
                     }
                     }
 
-                    refsetSpecHelper.setLastEditTime(System.currentTimeMillis());
+                    refsetSpecHelper.setLastEditTime(System.currentTimeMillis(), config.getEditCoordinate());
                     frameConfig.fireRefsetSpecChanged(member);
                     frameConfig.refreshRefsetTab();
                 }
@@ -787,11 +801,12 @@ public class RefreshSpecClausePanel extends JPanel implements ActionListener {
             }
             tf.addUncommittedNoChecks(refsetSpec);
             if (writeComment) {
-                RefsetPropertyMap commentPropMap = new RefsetPropertyMap();
-                commentPropMap.put(REFSET_PROPERTY.STRING_VALUE, editorComments.getText());
-                comment =
-                        this.refsetHelper.getOrCreateRefsetExtension(commentRefset.getConceptNid(), member.getComponentId(),
-                            REFSET_TYPES.STR, commentPropMap, UUID.randomUUID());
+                RefexCAB memberBp = new RefexCAB(TK_REFEX_TYPE.STR,
+                        member.getComponentNid(),
+                        commentRefset.getConceptNid());
+                memberBp.put(RefexCAB.RefexProperty.STRING1, editorComments.getText());
+                TerminologyBuilderBI builder = Ts.get().getTerminologyBuilder(frameConfig.getEditCoordinate(), frameConfig.getViewCoordinate());
+                comment = (I_ExtendByRef) builder.constructIfNotCurrent(memberBp);
                 tf.addUncommittedNoChecks(commentRefset);
             }
             tf.commit();
@@ -804,7 +819,7 @@ public class RefreshSpecClausePanel extends JPanel implements ActionListener {
                 tf.addUncommitted(comment);
             }
             tf.commit();
-            refsetSpecHelper.setLastEditTime(System.currentTimeMillis());
+            refsetSpecHelper.setLastEditTime(System.currentTimeMillis(), config.getEditCoordinate());
             frameConfig.fireRefsetSpecChanged(member);
             frameConfig.refreshRefsetTab();
 
