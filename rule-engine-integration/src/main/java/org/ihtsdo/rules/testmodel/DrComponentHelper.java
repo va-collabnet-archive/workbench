@@ -337,11 +337,7 @@ public class DrComponentHelper {
 				loopRel.setModifierUuid("someUuid");
 				loopRel.setAuthorUuid(tf.nidToUuid(relTuple.getAuthorNid()).toString());
 				loopRel.setSourceUuid(tf.nidToUuid(relTuple.getSourceNid()).toString());
-                                if(tf.nidToUuid(relTuple.getTargetNid()) != null){
-                                    loopRel.setTargetUuid(tf.nidToUuid(relTuple.getTargetNid()).toString());
-                                }else{
-                                    System.out.println("Relationship used with null target (DrComponentHelper): " + relTuple.toString());
-                                }
+				loopRel.setTargetUuid(tf.nidToUuid(relTuple.getTargetNid()).toString());
 				loopRel.setCharacteristicUuid(tf.nidToUuid(relTuple.getCharacteristicNid()).toString());
 				loopRel.setPathUuid(tf.nidToUuid(relTuple.getPathNid()).toString());
 				loopRel.setPrimordialUuid(relTuple.getPrimUuid().toString());

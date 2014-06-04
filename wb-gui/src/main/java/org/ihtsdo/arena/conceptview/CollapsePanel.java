@@ -278,14 +278,19 @@ public class CollapsePanel extends JPanel {
 
 
                 Collection<Object> facts = new ArrayList<Object>();
-                View viewType;
+                View viewType = null;
                 if (settings.getRelAssertionType() == RelAssertionType.STATED) {
                     viewType = View.STATED;
                 } else if (settings.getRelAssertionType() == RelAssertionType.INFERRED) {
                     viewType = View.INFERRED;
-                } else {
+                } else if (settings.getRelAssertionType() == RelAssertionType.INFERRED_THEN_STATED) {
                     viewType = View.STATED_AND_INFERRED;
+                }else if (settings.getRelAssertionType() == RelAssertionType.LONG_NORMAL_FORM) {
+                    viewType = View.LONG_NORMAL_FORM;
+                }else if (settings.getRelAssertionType() == RelAssertionType.SHORT_NORMAL_FORM) {
+                    viewType = View.SHORT_NORMAL_FORM;
                 }
+                
                 facts.add(FactFactory.get(viewType));
                 ConceptFact cFact = new ConceptFact(Context.FOCUS_CONCEPT,
                         Ts.get().getConceptVersion(coordinate,
