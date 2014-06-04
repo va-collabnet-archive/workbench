@@ -262,18 +262,19 @@ public class Rf2File<T extends Rf2Row> {
 		return result;
 	}
 
-	public ArrayList<Long> getReactivatedCount(String startDate, String endDate) {
+	public ArrayList<Long> getReactivatedComponents(String startDate, String endDate) {
 		ArrayList<Long> result = new ArrayList<Long>();
 		Set<Long> keyset = rows.keySet();
 		for (Long long1 : keyset) {
 			Set<T> currentRows = rows.get(long1);
-			String minorDate = "99999999";
+
+			String biggestStartDate = "00000000";
 			String majorDate = "00000000";
-			Integer firstState = null;
-			Integer lastState = null;
+			int firstState = 0;
+			int lastState = 0;
 			for (T rf2Row : currentRows) {
-				if (between(startDate, endDate, rf2Row) && rf2Row.getEffectiveTime().compareTo(minorDate) <= 0) {
-					minorDate = rf2Row.getEffectiveTime();
+				if (rf2Row.getEffectiveTime().compareTo(startDate) <= 0 && rf2Row.getEffectiveTime().compareTo(biggestStartDate) >= 0) {
+					biggestStartDate = rf2Row.getEffectiveTime();
 					firstState = rf2Row.getActive();
 				}
 				if (between(startDate, endDate, rf2Row) && rf2Row.getEffectiveTime().compareTo(majorDate) >= 0) {
@@ -281,7 +282,7 @@ public class Rf2File<T extends Rf2Row> {
 					lastState = rf2Row.getActive();
 				}
 			}
-			if (firstState != null && lastState != null && firstState < lastState) {
+			if (  !biggestStartDate.equals("00000000") && !majorDate.equals("00000000") && firstState < lastState) {
 				result.add(long1);
 			}
 		}

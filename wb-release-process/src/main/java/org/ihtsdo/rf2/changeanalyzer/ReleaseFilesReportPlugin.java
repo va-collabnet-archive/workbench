@@ -1,5 +1,8 @@
 package org.ihtsdo.rf2.changeanalyzer;
 
+import org.apache.log4j.Logger;
+
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -36,14 +39,10 @@ import org.ihtsdo.rf2.changeanalyzer.model.RetiredConcept;
 import com.google.gson.Gson;
 
 /**
- * The <code>ReleaseFilesReportPlugin</code> performs different analysis over
- * SNOMED RF2 Release files<br>
- * Reporting all the differences.
- * 
- * @see <code>org.apache.maven.plugin.AbstractMojo</code>
  * @goal report-differences
  * @phase install
  */
+//public class ReleaseFilesReportPlugin {
 public class ReleaseFilesReportPlugin extends AbstractMojo {
 
 	private static final String SUMMARY_FILE = "diff_index.json";
@@ -75,6 +74,8 @@ public class ReleaseFilesReportPlugin extends AbstractMojo {
 	private static final String REACTIVATED_DESCRIPTIONS_FILE = "reactDesc.json";
 
 	private static final String PRIMITIVE_CONCEPTS_REPORT = "primitive_concepts.json";
+
+	private static final String CHANGED_FSN="changed_fsn.json";
 
     private String sep = System.getProperty("line.separator");
     
@@ -121,23 +122,24 @@ public class ReleaseFilesReportPlugin extends AbstractMojo {
 
 	private ChangeSummary changeSummary;
 
+
 	public enum ReleaseFileType {
 		DESCRIPTION, CONCEPT, RELATIONSHIP, ATTRIBUTE_VALUE_REFSET, ASSOCIATION_REFSET
 	}
 
-	public static void main(String[] args) {
-		ReleaseFilesReportPlugin relplugin = new ReleaseFilesReportPlugin();
-		try {
-			relplugin.inputDirectory = new File("Full");
-			relplugin.endDate = "20130731";
-			relplugin.startDate = "20120131";
-			relplugin.releaseDate = "20130131";
-			relplugin.outputDirectory = new File(".");
-			relplugin.execute();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+//	public static void main(String[] args) {
+//		ReleaseFilesReportPlugin relplugin = new ReleaseFilesReportPlugin();
+//		try {
+//			relplugin.inputDirectory = new File("Full");
+//			relplugin.endDate = "20130731";
+//			relplugin.startDate = "20120131";
+//			relplugin.releaseDate = "20130131";
+//			relplugin.outputDirectory = new File(".");
+//			relplugin.execute();
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
+//	}
 
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		try {
@@ -158,28 +160,41 @@ public class ReleaseFilesReportPlugin extends AbstractMojo {
 
 			ArrayList<Long> newcomponents = generateNewConceptsReport(rf2DescFile, conceptFile);
 
+			ArrayList<Long> retiredConcepts=generatingRetiredConceptReasons(rf2DescFile, conceptFile, attrValue, associationFile);
+			
+			relFile.releasePreciousMemory();
+
+			ArrayList<Long> reactivatedConcepts=reactivatedConceptsReport(rf2DescFile, conceptFile);
+
+			conceptFile.releasePreciousMemory();
+
+			generatingChangedFSN(rf2DescFile, newcomponents,retiredConcepts,reactivatedConcepts);
+			
+			conceptFile.releasePreciousMemory();
+			
+			generatingExistingConceptsNewDescriptions(rf2DescFile, newcomponents,reactivatedConcepts);
+			
+			conceptFile.releasePreciousMemory();
+			
+			generateRetiredDescriptionsReport(rf2DescFile, newcomponents,retiredConcepts,reactivatedConcepts);
+
+			conceptFile.releasePreciousMemory();
+			
+			generateReactivatedDescriptionsReport(rf2DescFile, newcomponents,retiredConcepts,reactivatedConcepts);
+			
+			conceptFile.releasePreciousMemory();
+			
 //			generateNewRelationshipsReport(rf2DescFile, relFile);
 
 //			generateOldConceptsNewRelationships(rf2DescFile, relFile, newcomponents);
 			//
 //			generateRelGroupChangedRelationships(rf2DescFile, relFile, startDate, endDate);
-			relFile.releasePreciousMemory();
 
-			generatingRetiredConceptReasons(rf2DescFile, conceptFile, attrValue, associationFile);
-
-//			generateNewDescriptionsReport(rf2DescFile, newcomponents);
-
-			generatingExistingConceptsNewDescriptions(rf2DescFile, newcomponents);
 
 //			generatingDefinedConceptsReport(rf2DescFile, conceptFile);
 
 //			generatingPrimitiveConceptsReport(rf2DescFile, conceptFile);
-//			reactivatedConceptsReport(rf2DescFile, conceptFile);
-//			generatingInactiveConcepts(rf2DescFile, conceptFile);
-			conceptFile.releasePreciousMemory();
 
-//			generateReactivatedDescriptionsReport(rf2DescFile, newcomponents);
-			generateRetiredDescriptionsReport(rf2DescFile, newcomponents);
 			
 			saveSummary();
 		} catch (Exception e) {
@@ -342,17 +357,21 @@ public class ReleaseFilesReportPlugin extends AbstractMojo {
 		
 	}
 
-	private void reactivatedConceptsReport(Rf2DescriptionFile rf2DescFile, Rf2ConceptFile conceptFile) throws FileNotFoundException, UnsupportedEncodingException, IOException {
+	private ArrayList<Long> reactivatedConceptsReport(Rf2DescriptionFile rf2DescFile, Rf2ConceptFile conceptFile) throws FileNotFoundException, UnsupportedEncodingException, IOException {
 		FileOutputStream fos;
 		OutputStreamWriter osw;
 		BufferedWriter bw;
 		fos = new FileOutputStream(new File(outputDirectory, REACTIVATED_CONCEPTS_REPORT));
+		logger.info("Generating " + REACTIVATED_CONCEPTS_REPORT);
 		osw = new OutputStreamWriter(fos, "UTF-8");
 		bw = new BufferedWriter(osw);
-		ArrayList<Long> newInactive = conceptFile.getReactivatedCount(startDate, endDate);
-		generateConceptReport(rf2DescFile, conceptFile, bw, newInactive);
+		ArrayList<Long> reactConcepts = conceptFile.getReactivatedComponents(startDate, endDate);
+		
+		generateConceptReport(rf2DescFile, conceptFile, bw, reactConcepts);
 
-		addFileChangeReport(REACTIVATED_CONCEPTS_REPORT,newInactive.size(),"Ractivated concepts");
+		addFileChangeReport(REACTIVATED_CONCEPTS_REPORT,reactConcepts.size(),"Ractivated concepts");
+		
+		return reactConcepts;
 	}
 
 	private void generatingPrimitiveConceptsReport(Rf2DescriptionFile rf2DescFile, Rf2ConceptFile conceptFile) throws FileNotFoundException, UnsupportedEncodingException, IOException {
@@ -405,23 +424,25 @@ public class ReleaseFilesReportPlugin extends AbstractMojo {
 		addFileChangeReport(OLD_CONCEPTS_NEW_RELATIONSHIPS_FILE,count,"New relationships in existing concepts");
 		
 	}
-
-	private void generatingExistingConceptsNewDescriptions(Rf2DescriptionFile rf2DescFile, ArrayList<Long> newcomponents) throws FileNotFoundException, UnsupportedEncodingException, IOException {
+	
+	private void generatingExistingConceptsNewDescriptions(Rf2DescriptionFile rf2DescFile, ArrayList<Long> newcomponents, ArrayList<Long> reactivatedConcepts) throws FileNotFoundException, UnsupportedEncodingException, IOException {
 		FileOutputStream fos;
 		OutputStreamWriter osw;
 		BufferedWriter bw;
 		fos = new FileOutputStream(new File(outputDirectory, OLD_CONCEPTS_NEW_DESCRIPTIONS_FILE));
-		logger.info("Generating old_concepts_new_descriptions.json");
+		logger.info("Generating " + OLD_CONCEPTS_NEW_DESCRIPTIONS_FILE);
 		osw = new OutputStreamWriter(fos, "UTF-8");
 		bw = new BufferedWriter(osw);
-		ArrayList<Long> existingDescriptios = rf2DescFile.getNewComponentIds(startDate);
+		ArrayList<Long> newDescriptions = rf2DescFile.getNewComponentIds(startDate);
 		int count=0;
 		boolean bPrim=true;
 		bw.append("[");
-		for (Long long1 : existingDescriptios) {
+		for (Long long1 : newDescriptions) {
 			ArrayList<Rf2DescriptionRow> rf2DescRows = rf2DescFile.getAllRows(startDate, long1);
 			for (Rf2DescriptionRow rf2DescRow : rf2DescRows) {
-				if (!newcomponents.contains(rf2DescRow.getConceptId())) {
+				if (!newcomponents.contains(rf2DescRow.getConceptId()) 
+						&& !reactivatedConcepts.contains(rf2DescRow.getConceptId())
+						&& rf2DescRow.getTypeId()!=900000000000003001L) {
 					if (!bPrim){
 						bw.append(",");
 					}else{
@@ -440,7 +461,47 @@ public class ReleaseFilesReportPlugin extends AbstractMojo {
 		bw.append("]");
 		bw.close();
 
-		addFileChangeReport(OLD_CONCEPTS_NEW_DESCRIPTIONS_FILE,count,"New descriptions in existing concepts");
+		addFileChangeReport(OLD_CONCEPTS_NEW_DESCRIPTIONS_FILE,count,"New descriptions (no FSN) in existing concepts");
+	}
+	private void generatingChangedFSN(Rf2DescriptionFile rf2DescFile, ArrayList<Long> newcomponents, ArrayList<Long> retiredConcepts, ArrayList<Long> reactivatedConcepts) throws FileNotFoundException, UnsupportedEncodingException, IOException {
+		FileOutputStream fos;
+		OutputStreamWriter osw;
+		BufferedWriter bw;
+		fos = new FileOutputStream(new File(outputDirectory, CHANGED_FSN));
+		logger.info("Generating " + CHANGED_FSN);
+		osw = new OutputStreamWriter(fos, "UTF-8");
+		bw = new BufferedWriter(osw);
+		ArrayList<Long> descriptions = rf2DescFile.getChangedComponentIds(startDate, endDate);
+		int count=0;
+		boolean bPrim=true;
+		bw.append("[");
+		for (Long long1 : descriptions) {
+			ArrayList<Rf2DescriptionRow> rf2DescRows = rf2DescFile.getAllRows(startDate, long1);
+			for (Rf2DescriptionRow rf2DescRow : rf2DescRows) {
+				if (!newcomponents.contains(rf2DescRow.getConceptId()) 
+						&& !retiredConcepts.contains(rf2DescRow.getConceptId())
+						&& !reactivatedConcepts.contains(rf2DescRow.getConceptId())
+						&& rf2DescRow.getActive()==1 
+						&& rf2DescRow.getTypeId()==900000000000003001L ) {
+					if (!bPrim){
+						bw.append(",");
+					}else{
+						bPrim=false;
+					}
+					Description desc=new Description(long1.toString() , rf2DescRow.getEffectiveTime() , String.valueOf(rf2DescRow.getActive()) , rf2DescRow.getConceptId().toString() ,
+							rf2DescRow.getLanguageCode() , rf2DescFile.getFsn(rf2DescRow.getTypeId()) , rf2DescRow.getTerm() ,
+						    rf2DescFile.getFsn(rf2DescRow.getCaseSignificanceId()));
+					bw.append(gson.toJson(desc).toString());
+					desc=null;
+					bw.append(sep);
+					count++;
+				}
+			}
+		}
+		bw.append("]");
+		bw.close();
+
+		addFileChangeReport(CHANGED_FSN,count,"Changed FSNs");
 	}
 
 	private void generateNewDescriptionsReport(Rf2DescriptionFile rf2DescFile, ArrayList<Long> newcomponents) throws FileNotFoundException, UnsupportedEncodingException, IOException {
@@ -457,30 +518,55 @@ public class ReleaseFilesReportPlugin extends AbstractMojo {
 		addFileChangeReport(NEW_DESCRIPTIONS_FILE,count,"New descriptions");
 	}
 
-	private void generateRetiredDescriptionsReport(Rf2DescriptionFile rf2DescFile, ArrayList<Long> newcomponents) throws FileNotFoundException, UnsupportedEncodingException, IOException {
+	private void generateRetiredDescriptionsReport(Rf2DescriptionFile rf2DescFile, ArrayList<Long> newcomponents, ArrayList<Long> retiredConcepts, ArrayList<Long> reactivatedConcepts) throws FileNotFoundException, UnsupportedEncodingException, IOException {
 		FileOutputStream fos;
 		OutputStreamWriter osw;
 		BufferedWriter bw;
 		fos = new FileOutputStream(new File(outputDirectory, RETIRED_DESCRIPTIONS_FILE));
-		logger.info("Generating retired_descriptions_" + releaseDate + ".json");
+		logger.info("Generating " + RETIRED_DESCRIPTIONS_FILE);
 		osw = new OutputStreamWriter(fos, "UTF-8");
 		bw = new BufferedWriter(osw);
-		ArrayList<Long> retiredDescriptios = rf2DescFile.getRetiredComponents(startDate, endDate);
-		int count=writeDescriptionsFile(rf2DescFile, newcomponents, bw, retiredDescriptios);
+		ArrayList<Long> retiredDescriptions = rf2DescFile.getRetiredComponents(startDate, endDate);
+		ArrayList<Long> filteredRetDesc=new ArrayList<Long>();
+		for(Long retiredDesc:retiredDescriptions){
 
-		addFileChangeReport(RETIRED_DESCRIPTIONS_FILE,count,"Retired descriptions");
+			ArrayList<Rf2DescriptionRow> rf2DescRows = rf2DescFile.getAllRows(startDate, retiredDesc);
+			for (Rf2DescriptionRow rf2DescRow : rf2DescRows) {
+				if (!retiredConcepts.contains(rf2DescRow.getConceptId())
+						&& !reactivatedConcepts.contains(rf2DescRow.getConceptId())
+						&& rf2DescRow.getActive()==0 
+						&& rf2DescRow.getTypeId()!=900000000000003001L ) {
+					filteredRetDesc.add(retiredDesc);
+				}
+			}
+		}
+		int count=writeDescriptionsFile(rf2DescFile, newcomponents, bw, filteredRetDesc);
+
+		addFileChangeReport(RETIRED_DESCRIPTIONS_FILE,count,"Retired descriptions (no FSN)");
 	}
 
-	private void generateReactivatedDescriptionsReport(Rf2DescriptionFile rf2DescFile, ArrayList<Long> newcomponents) throws FileNotFoundException, UnsupportedEncodingException, IOException {
+	private void generateReactivatedDescriptionsReport(Rf2DescriptionFile rf2DescFile, ArrayList<Long> newcomponents, ArrayList<Long> retiredConcepts, ArrayList<Long> reactivatedConcepts) throws FileNotFoundException, UnsupportedEncodingException, IOException {
 		FileOutputStream fos;
 		OutputStreamWriter osw;
 		BufferedWriter bw;
 		fos = new FileOutputStream(new File(outputDirectory, REACTIVATED_DESCRIPTIONS_FILE));
-		logger.info("Generating reactivated_descriptions_" + releaseDate + ".json");
+		logger.info("Generating " + REACTIVATED_DESCRIPTIONS_FILE);
 		osw = new OutputStreamWriter(fos, "UTF-8");
 		bw = new BufferedWriter(osw);
-		ArrayList<Long> retiredDescriptios = rf2DescFile.getReactivatedCount(startDate, endDate);
-		int count=writeDescriptionsFile(rf2DescFile, newcomponents, bw, retiredDescriptios);
+		ArrayList<Long> reactivedDescriptions = rf2DescFile.getReactivatedComponents(startDate, endDate);
+		ArrayList<Long> filteredReactDesc=new ArrayList<Long>();
+		for(Long retiredDesc:reactivedDescriptions){
+
+			ArrayList<Rf2DescriptionRow> rf2DescRows = rf2DescFile.getAllRows(startDate, retiredDesc);
+			for (Rf2DescriptionRow rf2DescRow : rf2DescRows) {
+				if (!retiredConcepts.contains(rf2DescRow.getConceptId())
+						&& !reactivatedConcepts.contains(rf2DescRow.getConceptId())
+						&& rf2DescRow.getActive()==1 && rf2DescRow.getTypeId()!=900000000000003001L ) {
+					filteredReactDesc.add(retiredDesc);
+				}
+			}
+		}
+		int count=writeDescriptionsFile(rf2DescFile, newcomponents, bw, filteredReactDesc);
 
 		addFileChangeReport(REACTIVATED_DESCRIPTIONS_FILE,count,"Reactivated descriptions");
 	}
@@ -511,14 +597,14 @@ public class ReleaseFilesReportPlugin extends AbstractMojo {
 		return count;
 	}
 
-	private void generatingRetiredConceptReasons(Rf2DescriptionFile rf2DescFile, Rf2ConceptFile conceptFile, Rf2AttributeValueRefsetFile attrValue, Rf2AssociationRefsetFile associationFile)
+	private ArrayList<Long> generatingRetiredConceptReasons(Rf2DescriptionFile rf2DescFile, Rf2ConceptFile conceptFile, Rf2AttributeValueRefsetFile attrValue, Rf2AssociationRefsetFile associationFile)
 			throws FileNotFoundException, UnsupportedEncodingException, IOException {
 		FileOutputStream fos;
 		OutputStreamWriter osw;
 		BufferedWriter bw;
 		ArrayList<Long> retiredConcepts = conceptFile.getRetiredComponents(startDate, endDate);
 		fos = new FileOutputStream(new File(outputDirectory, RETIRED_CONCEPT_REASON_FILE));
-		logger.info("Generating retired_concept_reason.json");
+		logger.info("Generating " + RETIRED_CONCEPT_REASON_FILE);
 		osw = new OutputStreamWriter(fos, "UTF-8");
 		bw = new BufferedWriter(osw);
 		int count=0;
@@ -591,6 +677,8 @@ public class ReleaseFilesReportPlugin extends AbstractMojo {
 		associationFile.releasePreciousMemory();
 
 		addFileChangeReport(RETIRED_CONCEPT_REASON_FILE,count,"Retired concepts");
+		
+		return retiredConcepts;
 		
 	}
 
