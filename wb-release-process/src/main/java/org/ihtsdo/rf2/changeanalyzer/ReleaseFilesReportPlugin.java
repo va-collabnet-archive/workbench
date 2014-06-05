@@ -186,6 +186,7 @@ public class ReleaseFilesReportPlugin extends AbstractMojo {
 			Rf2LanguageRefsetFile targetLangFile=null;
 			langTargetCtrl=false;
 			if (targetLanguage!=null){
+				if (targetLanguage.exists()){
 					langTargetCtrl=true;
 //					logger.info("Loading source GB language refset");
 //					File sourceGB=new File(outputDirectory,"tmpGBLang.txt");
@@ -202,6 +203,9 @@ public class ReleaseFilesReportPlugin extends AbstractMojo {
 					logger.info("Loading target language refset");
 					targetLangFile = new Rf2LanguageRefsetFile(targetLanguage.getAbsolutePath());
 					System.gc();
+				}else{
+					logger.info("Target language doesn't exist");
+				}
 			}else{
 					logger.info("Target language is null");
 			}
