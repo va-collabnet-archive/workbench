@@ -34,6 +34,7 @@ import org.ihtsdo.rf2.changeanalyzer.model.FileChangeReport;
 import org.ihtsdo.rf2.changeanalyzer.model.Relationship;
 import org.ihtsdo.rf2.changeanalyzer.model.RetiredConcept;
 import org.ihtsdo.rf2.file.delta.snapshot.tasks.FileFilterAndSorter;
+import org.ihtsdo.rf2.postexport.FileHelper;
 
 import com.google.gson.Gson;
 
@@ -176,7 +177,7 @@ public class ReleaseFilesReportPlugin extends AbstractMojo {
 			if (!tempFolder.exists()) {
 				tempFolder.mkdirs();
 			}
-			FileFilterAndSorter ffs=new FileFilterAndSorter(inputFile, sourceUS, tempFolder, new int[]{5}, new Integer[]{5}, new String[]{"900000000000509007"});
+			FileFilterAndSorter ffs=new FileFilterAndSorter(inputFile, sourceUS, tempFolder, new int[]{4}, new Integer[]{4}, new String[]{"900000000000509007"});
 			ffs.execute();
 			ffs=null;
 			System.gc();
@@ -193,7 +194,7 @@ public class ReleaseFilesReportPlugin extends AbstractMojo {
 //					if (!tempFolder.exists()) {
 //						tempFolder.mkdirs();
 //					}
-//					ffs=new FileFilterAndSorter(inputFile, sourceGB, tempFolder, new int[]{5}, new Integer[]{5}, new String[]{"900000000000508004"});
+//					ffs=new FileFilterAndSorter(inputFile, sourceGB, tempFolder, new int[]{4}, new Integer[]{4}, new String[]{"900000000000508004"});
 //					ffs.execute();
 //					ffs=null;
 //					System.gc();
@@ -255,6 +256,13 @@ public class ReleaseFilesReportPlugin extends AbstractMojo {
 
 			repcomponents=null;
 			
+			if (sourceUS!=null && sourceUS.exists()){
+				sourceUS.delete();
+			}
+			if(tempFolder.exists()){
+				FileHelper.emptyFolder(tempFolder);
+				tempFolder.delete();
+			}
 			saveSummary();
 		} catch (Exception e) {
 			e.printStackTrace();
