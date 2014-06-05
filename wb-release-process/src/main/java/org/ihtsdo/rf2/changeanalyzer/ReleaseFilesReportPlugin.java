@@ -155,14 +155,14 @@ public class ReleaseFilesReportPlugin extends AbstractMojo {
 			Rf2AttributeValueRefsetFile attrValue = new Rf2AttributeValueRefsetFile(getFilePath(ReleaseFileType.ATTRIBUTE_VALUE_REFSET));
 			logger.info("Loading association value refset");
 			Rf2AssociationRefsetFile associationFile = new Rf2AssociationRefsetFile(getFilePath(ReleaseFileType.ASSOCIATION_REFSET));
-			logger.info("Loading relationships");
-			Rf2RelationshipFile relFile = new Rf2RelationshipFile(getFilePath(ReleaseFileType.RELATIONSHIP), startDate);
+//			logger.info("Loading relationships");
+//			Rf2RelationshipFile relFile = new Rf2RelationshipFile(getFilePath(ReleaseFileType.RELATIONSHIP), startDate);
 
 			ArrayList<Long> newcomponents = generateNewConceptsReport(rf2DescFile, conceptFile);
 
 			ArrayList<Long> retiredConcepts=generatingRetiredConceptReasons(rf2DescFile, conceptFile, attrValue, associationFile);
 			
-			relFile.releasePreciousMemory();
+//			relFile.releasePreciousMemory();
 
 			ArrayList<Long> reactivatedConcepts=reactivatedConceptsReport(rf2DescFile, conceptFile);
 
@@ -170,19 +170,15 @@ public class ReleaseFilesReportPlugin extends AbstractMojo {
 
 			generatingChangedFSN(rf2DescFile, newcomponents,retiredConcepts,reactivatedConcepts);
 			
-			conceptFile.releasePreciousMemory();
 			
 			generatingExistingConceptsNewDescriptions(rf2DescFile, newcomponents,reactivatedConcepts);
 			
-			conceptFile.releasePreciousMemory();
 			
 			generateRetiredDescriptionsReport(rf2DescFile, newcomponents,retiredConcepts,reactivatedConcepts);
 
-			conceptFile.releasePreciousMemory();
 			
 			generateReactivatedDescriptionsReport(rf2DescFile, newcomponents,retiredConcepts,reactivatedConcepts);
 			
-			conceptFile.releasePreciousMemory();
 			
 //			generateNewRelationshipsReport(rf2DescFile, relFile);
 
