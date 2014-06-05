@@ -51,7 +51,7 @@ public class ReleaseFilesReportPlugin extends AbstractMojo {
 
 	private static final String DEFINED_CONCEPTS_REPORT = "defined_concepts.json";
 
-	public static final String NEW_CONCEPTS_FILE = "reporte_new_concepts.json";
+	public static final String NEW_CONCEPTS_FILE = "new_concepts.json";
 
 	public static final String NEW_RELATIONSHIPS_FILE = "new_relationships.json";
 
@@ -69,15 +69,15 @@ public class ReleaseFilesReportPlugin extends AbstractMojo {
 
 	private static final Logger logger = Logger.getLogger(ReleaseFilesReportPlugin.class);
 
-	private static final String RETIRED_DESCRIPTIONS_FILE = "retiredDesc.json";
+	private static final String RETIRED_DESCRIPTIONS_FILE = "retired_descriptions.json";
 
-	private static final String REACTIVATED_DESCRIPTIONS_FILE = "reactDesc.json";
+	private static final String REACTIVATED_DESCRIPTIONS_FILE = "reactivated_descriptions.json";
 
 	private static final String PRIMITIVE_CONCEPTS_REPORT = "primitive_concepts.json";
 
 	private static final String CHANGED_FSN="changed_fsn.json";
 
-	private static final String SYN_ACCEPTABILITY_CHANGED = "changed_synonym_acceptability.json";
+	private static final String SYN_ACCEPTABILITY_CHANGED = "acceptability_changed_on_synonym.json";
 
 	private static final String TARGET_POINTER_TO_CHANGED_SOURCE_DESCRIPTION = "target_pointer_to_changed_source.json";
 
@@ -873,7 +873,7 @@ public class ReleaseFilesReportPlugin extends AbstractMojo {
 		logger.info("getting new conscpt ids");
 		ArrayList<Long> newcomponents = conceptFile.getNewComponentIds(startDate);
 		FileOutputStream fos = new FileOutputStream(new File(outputDirectory, NEW_CONCEPTS_FILE));
-		logger.info("Generating reporte_new_concepts.json");
+		logger.info("Generating " + NEW_CONCEPTS_FILE);
 		OutputStreamWriter osw = new OutputStreamWriter(fos, "UTF-8");
 		BufferedWriter bw = new BufferedWriter(osw);
 		boolean bPrim=true;
