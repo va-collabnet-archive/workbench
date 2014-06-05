@@ -78,4 +78,19 @@ public class Rf2AssociationRefsetFile extends Rf2RefsetFile<Rf2AssociationRefset
 		}
 		return result;
 	}
+
+	public Rf2AssociationRefsetRow getLastRowByReferencedComponentId(Long id) {
+		Rf2AssociationRefsetRow result =null;
+		Set<Rf2AssociationRefsetRow> currentRows = rows.get(id.toString());
+		String majorDate = "00000000";
+		if (currentRows != null) {
+			for (Rf2AssociationRefsetRow rf2Row : currentRows) {
+				if (rf2Row.getEffectiveTime().compareTo(majorDate) >= 0 && id.toString().equals(rf2Row.getReferencedComponentId())) {
+					majorDate = rf2Row.getEffectiveTime();
+					result=rf2Row;
+				}
+			}
+		}
+		return result;
+	}
 }

@@ -68,7 +68,7 @@ public class Rf2AttributeValueRefsetFile extends Rf2RefsetFile<Rf2AttributeValue
 
 	public Rf2AttributeValueRefsetRow getRowByReferencedComponentId(Long id) {
 		Rf2AttributeValueRefsetRow result = null;
-		Set<Rf2AttributeValueRefsetRow> currentRows = rows.get(id.toString());
+		Set<Rf2AttributeValueRefsetRow> currentRows = rows.get(id);
 		String majorDate = "00000000";
 		if (currentRows != null) {
 			for (Rf2AttributeValueRefsetRow rf2Row : currentRows) {

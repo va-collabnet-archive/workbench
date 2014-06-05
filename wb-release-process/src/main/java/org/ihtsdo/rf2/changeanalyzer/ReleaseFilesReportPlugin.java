@@ -1,8 +1,5 @@
 package org.ihtsdo.rf2.changeanalyzer;
 
-import org.apache.log4j.Logger;
-
-
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -28,6 +25,7 @@ import org.ihtsdo.rf2.changeanalyzer.file.Rf2AssociationRefsetFile;
 import org.ihtsdo.rf2.changeanalyzer.file.Rf2AttributeValueRefsetFile;
 import org.ihtsdo.rf2.changeanalyzer.file.Rf2ConceptFile;
 import org.ihtsdo.rf2.changeanalyzer.file.Rf2DescriptionFile;
+import org.ihtsdo.rf2.changeanalyzer.file.Rf2LanguageRefsetFile;
 import org.ihtsdo.rf2.changeanalyzer.file.Rf2RelationshipFile;
 import org.ihtsdo.rf2.changeanalyzer.model.ChangeSummary;
 import org.ihtsdo.rf2.changeanalyzer.model.Concept;
@@ -35,6 +33,7 @@ import org.ihtsdo.rf2.changeanalyzer.model.Description;
 import org.ihtsdo.rf2.changeanalyzer.model.FileChangeReport;
 import org.ihtsdo.rf2.changeanalyzer.model.Relationship;
 import org.ihtsdo.rf2.changeanalyzer.model.RetiredConcept;
+import org.ihtsdo.rf2.file.delta.snapshot.tasks.FileFilterAndSorter;
 
 import com.google.gson.Gson;
 
@@ -76,6 +75,10 @@ public class ReleaseFilesReportPlugin extends AbstractMojo {
 	private static final String PRIMITIVE_CONCEPTS_REPORT = "primitive_concepts.json";
 
 	private static final String CHANGED_FSN="changed_fsn.json";
+
+	private static final String SYN_ACCEPTABILITY_CHANGED = "changed_synonym_acceptability.json";
+
+	private static final String TARGET_POINTER_TO_CHANGED_SOURCE_DESCRIPTION = "target_pointer_to_changed_source.json";
 
     private String sep = System.getProperty("line.separator");
     
@@ -120,11 +123,20 @@ public class ReleaseFilesReportPlugin extends AbstractMojo {
 	 */
 	private String releaseDate;
 
+	/**
+	 * Target Language File
+	 * 
+	 * @parameter
+	 */
+	private File targetLanguage;
+
 	private ChangeSummary changeSummary;
+
+	private boolean langTargetCtrl;
 
 
 	public enum ReleaseFileType {
-		DESCRIPTION, CONCEPT, RELATIONSHIP, ATTRIBUTE_VALUE_REFSET, ASSOCIATION_REFSET
+		DESCRIPTION, CONCEPT, RELATIONSHIP, ATTRIBUTE_VALUE_REFSET, ASSOCIATION_REFSET, LANGUAGE_REFSET
 	}
 
 //	public static void main(String[] args) {
@@ -155,31 +167,81 @@ public class ReleaseFilesReportPlugin extends AbstractMojo {
 			Rf2AttributeValueRefsetFile attrValue = new Rf2AttributeValueRefsetFile(getFilePath(ReleaseFileType.ATTRIBUTE_VALUE_REFSET));
 			logger.info("Loading association value refset");
 			Rf2AssociationRefsetFile associationFile = new Rf2AssociationRefsetFile(getFilePath(ReleaseFileType.ASSOCIATION_REFSET));
+			logger.info("Loading source US language refset");
+			String langPath=getFilePath(ReleaseFileType.LANGUAGE_REFSET);
+			File inputFile=new File(langPath);
+			File sourceUS=new File(outputDirectory,"tmpUSLang.txt");
+			File tempFolder=new File(outputDirectory,"tmpSorting");
+
+			if (!tempFolder.exists()) {
+				tempFolder.mkdirs();
+			}
+			FileFilterAndSorter ffs=new FileFilterAndSorter(inputFile, sourceUS, tempFolder, new int[]{5}, new Integer[]{5}, new String[]{"900000000000509007"});
+			ffs.execute();
+			ffs=null;
+			System.gc();
+			Rf2LanguageRefsetFile sourceUSLangFile = new Rf2LanguageRefsetFile(sourceUS.getAbsolutePath());
+//			Rf2LanguageRefsetFile sourceGBLangFile=null;
+			Rf2LanguageRefsetFile targetLangFile=null;
+			langTargetCtrl=false;
+			if (targetLanguage!=null){
+				if (targetLanguage.exists()){
+					langTargetCtrl=true;
+//					logger.info("Loading source GB language refset");
+//					File sourceGB=new File(outputDirectory,"tmpGBLang.txt");
+//					
+//					if (!tempFolder.exists()) {
+//						tempFolder.mkdirs();
+//					}
+//					ffs=new FileFilterAndSorter(inputFile, sourceGB, tempFolder, new int[]{5}, new Integer[]{5}, new String[]{"900000000000508004"});
+//					ffs.execute();
+//					ffs=null;
+//					System.gc();
+//					sourceGBLangFile = new Rf2LanguageRefsetFile(sourceGB.getAbsolutePath());
+					
+					logger.info("Loading target language refset");
+					targetLangFile = new Rf2LanguageRefsetFile(targetLanguage.getAbsolutePath());
+					System.gc();
+				}
+			}
 //			logger.info("Loading relationships");
 //			Rf2RelationshipFile relFile = new Rf2RelationshipFile(getFilePath(ReleaseFileType.RELATIONSHIP), startDate);
 
-			ArrayList<Long> newcomponents = generateNewConceptsReport(rf2DescFile, conceptFile);
+			ArrayList<Long> repcomponents = generateNewConceptsReport(rf2DescFile, conceptFile);
 
-			ArrayList<Long> retiredConcepts=generatingRetiredConceptReasons(rf2DescFile, conceptFile, attrValue, associationFile);
+			ArrayList<Long> concepts=generatingRetiredConceptReasons(rf2DescFile, conceptFile, attrValue, associationFile);
 			
+			repcomponents.addAll(concepts);
+			
+			concepts=null;
 //			relFile.releasePreciousMemory();
 
-			ArrayList<Long> reactivatedConcepts=reactivatedConceptsReport(rf2DescFile, conceptFile);
+			concepts=reactivatedConceptsReport(rf2DescFile, conceptFile);
+			
+			repcomponents.addAll(concepts);
+			
+			concepts=null;
 
 			conceptFile.releasePreciousMemory();
 
-			generatingChangedFSN(rf2DescFile, newcomponents,retiredConcepts,reactivatedConcepts);
-			
-			
-			generatingExistingConceptsNewDescriptions(rf2DescFile, newcomponents,reactivatedConcepts);
-			
-			
-			generateRetiredDescriptionsReport(rf2DescFile, newcomponents,retiredConcepts,reactivatedConcepts);
+					
+			repcomponents=generatingChangedFSN(rf2DescFile, repcomponents);
 
+			if (langTargetCtrl){
+				repcomponents=generateTargetDescriptionPointerToSource(rf2DescFile,targetLangFile,repcomponents);
+			}
+			System.gc();
 			
-			generateReactivatedDescriptionsReport(rf2DescFile, newcomponents,retiredConcepts,reactivatedConcepts);
+			repcomponents=generateRetiredDescriptionsReport(rf2DescFile, repcomponents);
 			
+			repcomponents=generatingExistingConceptsNewDescriptions(rf2DescFile, repcomponents);
+			System.gc();
 			
+			repcomponents=generateReactivatedDescriptionsReport(rf2DescFile, repcomponents);
+			
+			repcomponents=generateDescriptionAcceptabilityChanges(sourceUSLangFile, rf2DescFile, repcomponents);
+		
+//ver		punteroalingles
 //			generateNewRelationshipsReport(rf2DescFile, relFile);
 
 //			generateOldConceptsNewRelationships(rf2DescFile, relFile, newcomponents);
@@ -191,12 +253,96 @@ public class ReleaseFilesReportPlugin extends AbstractMojo {
 
 //			generatingPrimitiveConceptsReport(rf2DescFile, conceptFile);
 
+			repcomponents=null;
 			
 			saveSummary();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
+	}
+
+	private ArrayList<Long> generateTargetDescriptionPointerToSource(
+			Rf2DescriptionFile rf2DescFile,
+			Rf2LanguageRefsetFile targetLangFile,
+			ArrayList<Long> repcomponents) throws Exception {
+		FileOutputStream fos;
+		OutputStreamWriter osw;
+		BufferedWriter bw;
+		fos = new FileOutputStream(new File(outputDirectory, TARGET_POINTER_TO_CHANGED_SOURCE_DESCRIPTION));
+		logger.info("Generating " + TARGET_POINTER_TO_CHANGED_SOURCE_DESCRIPTION);
+		osw = new OutputStreamWriter(fos, "UTF-8");
+		bw = new BufferedWriter(osw);
+		ArrayList<Long> changedDesc = rf2DescFile.getChangedComponentIds(startDate, endDate);
+		int count=0;
+		boolean bPrim=true;
+		bw.append("[");
+		for (Long long1 : changedDesc) {
+			if (targetLangFile.exists(long1)){
+				Rf2DescriptionRow rf2DescRow = rf2DescFile.getLastActiveRow(startDate,long1);
+				if (!repcomponents.contains(rf2DescRow.getConceptId())  ) {
+					repcomponents.add(rf2DescRow.getConceptId());
+					if (!bPrim){
+						bw.append(",");
+					}else{
+						bPrim=false;
+					}
+					Description desc=new Description(long1.toString(), rf2DescRow.getEffectiveTime() , String.valueOf(rf2DescRow.getActive()) , rf2DescRow.getConceptId().toString() ,
+							rf2DescRow.getLanguageCode() , rf2DescFile.getFsn(rf2DescRow.getTypeId()) , rf2DescRow.getTerm() ,
+						    rf2DescFile.getFsn(rf2DescRow.getCaseSignificanceId()));
+					bw.append(gson.toJson(desc).toString());
+					desc=null;
+					bw.append(sep);
+					count++;
+				}
+			}
+		}
+		bw.append("]");
+		bw.close();
+
+		addFileChangeReport(TARGET_POINTER_TO_CHANGED_SOURCE_DESCRIPTION,count,"Target pointer to changed source descriptions.");
+		
+		return repcomponents;		
+	}
+
+	private ArrayList<Long> generateDescriptionAcceptabilityChanges(
+			Rf2LanguageRefsetFile sourceLangFile, Rf2DescriptionFile rf2DescFile,ArrayList<Long> repcomponents) throws Exception {
+		FileOutputStream fos;
+		OutputStreamWriter osw;
+		BufferedWriter bw;
+		fos = new FileOutputStream(new File(outputDirectory, SYN_ACCEPTABILITY_CHANGED));
+		logger.info("Generating " + SYN_ACCEPTABILITY_CHANGED);
+		osw = new OutputStreamWriter(fos, "UTF-8");
+		bw = new BufferedWriter(osw);
+		ArrayList<String> changedLang = sourceLangFile.getAcceptabilityIdChanged(startDate, endDate);
+		int count=0;
+		boolean bPrim=true;
+		bw.append("[");
+		for (String string : changedLang) {
+			Rf2DescriptionRow rf2DescRow = rf2DescFile.getLastActiveRow(startDate,Long.parseLong(string));
+				if (!repcomponents.contains(rf2DescRow.getConceptId()) 
+						&& rf2DescRow.getTypeId()!=900000000000003001L) {
+					repcomponents.add(rf2DescRow.getConceptId());
+					if (!bPrim){
+						bw.append(",");
+					}else{
+						bPrim=false;
+					}
+					Description desc=new Description(string, rf2DescRow.getEffectiveTime() , String.valueOf(rf2DescRow.getActive()) , rf2DescRow.getConceptId().toString() ,
+							rf2DescRow.getLanguageCode() , rf2DescFile.getFsn(rf2DescRow.getTypeId()) , rf2DescRow.getTerm() ,
+						    rf2DescFile.getFsn(rf2DescRow.getCaseSignificanceId()));
+					bw.append(gson.toJson(desc).toString());
+					desc=null;
+					bw.append(sep);
+					count++;
+				}
+		}
+		bw.append("]");
+		bw.close();
+
+		addFileChangeReport(SYN_ACCEPTABILITY_CHANGED,count,"Acceptability changed in descriptions (no FSN)");
+		
+		return repcomponents;
 	}
 
 	private void saveSummary() throws IOException {
@@ -239,6 +385,9 @@ public class ReleaseFilesReportPlugin extends AbstractMojo {
 			break;
 		case ATTRIBUTE_VALUE_REFSET:
 			result = getFilePathRecursive(inputDirectory, "attributevalue");
+			break;
+		case LANGUAGE_REFSET:
+			result = getFilePathRecursive(inputDirectory, "refset_language");
 			break;
 		default:
 			break;
@@ -421,7 +570,7 @@ public class ReleaseFilesReportPlugin extends AbstractMojo {
 		
 	}
 	
-	private void generatingExistingConceptsNewDescriptions(Rf2DescriptionFile rf2DescFile, ArrayList<Long> newcomponents, ArrayList<Long> reactivatedConcepts) throws FileNotFoundException, UnsupportedEncodingException, IOException {
+	private ArrayList<Long> generatingExistingConceptsNewDescriptions(Rf2DescriptionFile rf2DescFile, ArrayList<Long> repcomponents) throws FileNotFoundException, UnsupportedEncodingException, IOException {
 		FileOutputStream fos;
 		OutputStreamWriter osw;
 		BufferedWriter bw;
@@ -436,9 +585,9 @@ public class ReleaseFilesReportPlugin extends AbstractMojo {
 		for (Long long1 : newDescriptions) {
 			ArrayList<Rf2DescriptionRow> rf2DescRows = rf2DescFile.getAllRows(startDate, long1);
 			for (Rf2DescriptionRow rf2DescRow : rf2DescRows) {
-				if (!newcomponents.contains(rf2DescRow.getConceptId()) 
-						&& !reactivatedConcepts.contains(rf2DescRow.getConceptId())
+				if (!repcomponents.contains(rf2DescRow.getConceptId()) 
 						&& rf2DescRow.getTypeId()!=900000000000003001L) {
+					repcomponents.add(rf2DescRow.getConceptId());
 					if (!bPrim){
 						bw.append(",");
 					}else{
@@ -458,8 +607,11 @@ public class ReleaseFilesReportPlugin extends AbstractMojo {
 		bw.close();
 
 		addFileChangeReport(OLD_CONCEPTS_NEW_DESCRIPTIONS_FILE,count,"New descriptions (no FSN) in existing concepts");
+		
+		return repcomponents;
 	}
-	private void generatingChangedFSN(Rf2DescriptionFile rf2DescFile, ArrayList<Long> newcomponents, ArrayList<Long> retiredConcepts, ArrayList<Long> reactivatedConcepts) throws FileNotFoundException, UnsupportedEncodingException, IOException {
+	
+	private ArrayList<Long> generatingChangedFSN(Rf2DescriptionFile rf2DescFile, ArrayList<Long> repcomponents) throws FileNotFoundException, UnsupportedEncodingException, IOException {
 		FileOutputStream fos;
 		OutputStreamWriter osw;
 		BufferedWriter bw;
@@ -474,11 +626,10 @@ public class ReleaseFilesReportPlugin extends AbstractMojo {
 		for (Long long1 : descriptions) {
 			ArrayList<Rf2DescriptionRow> rf2DescRows = rf2DescFile.getAllRows(startDate, long1);
 			for (Rf2DescriptionRow rf2DescRow : rf2DescRows) {
-				if (!newcomponents.contains(rf2DescRow.getConceptId()) 
-						&& !retiredConcepts.contains(rf2DescRow.getConceptId())
-						&& !reactivatedConcepts.contains(rf2DescRow.getConceptId())
+				if (!repcomponents.contains(rf2DescRow.getConceptId()) 
 						&& rf2DescRow.getActive()==1 
 						&& rf2DescRow.getTypeId()==900000000000003001L ) {
+					repcomponents.add(rf2DescRow.getConceptId());
 					if (!bPrim){
 						bw.append(",");
 					}else{
@@ -498,23 +649,10 @@ public class ReleaseFilesReportPlugin extends AbstractMojo {
 		bw.close();
 
 		addFileChangeReport(CHANGED_FSN,count,"Changed FSNs");
+		return repcomponents;
 	}
 
-	private void generateNewDescriptionsReport(Rf2DescriptionFile rf2DescFile, ArrayList<Long> newcomponents) throws FileNotFoundException, UnsupportedEncodingException, IOException {
-		FileOutputStream fos;
-		OutputStreamWriter osw;
-		BufferedWriter bw;
-		fos = new FileOutputStream(new File(outputDirectory, NEW_DESCRIPTIONS_FILE));
-		logger.info("Generating new_descriptions.json");
-		osw = new OutputStreamWriter(fos, "UTF-8");
-		bw = new BufferedWriter(osw);
-		ArrayList<Long> newDescriptios = rf2DescFile.getNewComponentIds(startDate);
-		int count=writeDescriptionsFile(rf2DescFile, newcomponents, bw, newDescriptios);
-
-		addFileChangeReport(NEW_DESCRIPTIONS_FILE,count,"New descriptions");
-	}
-
-	private void generateRetiredDescriptionsReport(Rf2DescriptionFile rf2DescFile, ArrayList<Long> newcomponents, ArrayList<Long> retiredConcepts, ArrayList<Long> reactivatedConcepts) throws FileNotFoundException, UnsupportedEncodingException, IOException {
+	private ArrayList<Long> generateRetiredDescriptionsReport(Rf2DescriptionFile rf2DescFile, ArrayList<Long> repcomponents) throws FileNotFoundException, UnsupportedEncodingException, IOException {
 		FileOutputStream fos;
 		OutputStreamWriter osw;
 		BufferedWriter bw;
@@ -528,20 +666,22 @@ public class ReleaseFilesReportPlugin extends AbstractMojo {
 
 			ArrayList<Rf2DescriptionRow> rf2DescRows = rf2DescFile.getAllRows(startDate, retiredDesc);
 			for (Rf2DescriptionRow rf2DescRow : rf2DescRows) {
-				if (!retiredConcepts.contains(rf2DescRow.getConceptId())
-						&& !reactivatedConcepts.contains(rf2DescRow.getConceptId())
+				if (!repcomponents.contains(rf2DescRow.getConceptId())
 						&& rf2DescRow.getActive()==0 
 						&& rf2DescRow.getTypeId()!=900000000000003001L ) {
 					filteredRetDesc.add(retiredDesc);
+					repcomponents.add(rf2DescRow.getConceptId());
 				}
 			}
 		}
-		int count=writeDescriptionsFile(rf2DescFile, newcomponents, bw, filteredRetDesc);
+		int count=writeDescriptionsFile(rf2DescFile, bw, filteredRetDesc);
 
 		addFileChangeReport(RETIRED_DESCRIPTIONS_FILE,count,"Retired descriptions (no FSN)");
+		
+		return repcomponents;
 	}
 
-	private void generateReactivatedDescriptionsReport(Rf2DescriptionFile rf2DescFile, ArrayList<Long> newcomponents, ArrayList<Long> retiredConcepts, ArrayList<Long> reactivatedConcepts) throws FileNotFoundException, UnsupportedEncodingException, IOException {
+	private ArrayList<Long> generateReactivatedDescriptionsReport(Rf2DescriptionFile rf2DescFile, ArrayList<Long> repcomponents) throws FileNotFoundException, UnsupportedEncodingException, IOException {
 		FileOutputStream fos;
 		OutputStreamWriter osw;
 		BufferedWriter bw;
@@ -555,25 +695,27 @@ public class ReleaseFilesReportPlugin extends AbstractMojo {
 
 			ArrayList<Rf2DescriptionRow> rf2DescRows = rf2DescFile.getAllRows(startDate, retiredDesc);
 			for (Rf2DescriptionRow rf2DescRow : rf2DescRows) {
-				if (!retiredConcepts.contains(rf2DescRow.getConceptId())
-						&& !reactivatedConcepts.contains(rf2DescRow.getConceptId())
+				if (!repcomponents.contains(rf2DescRow.getConceptId())
 						&& rf2DescRow.getActive()==1 && rf2DescRow.getTypeId()!=900000000000003001L ) {
+					repcomponents.add(rf2DescRow.getConceptId());
 					filteredReactDesc.add(retiredDesc);
 				}
 			}
 		}
-		int count=writeDescriptionsFile(rf2DescFile, newcomponents, bw, filteredReactDesc);
-
+		int count=writeDescriptionsFile(rf2DescFile,  bw, filteredReactDesc);
+		
 		addFileChangeReport(REACTIVATED_DESCRIPTIONS_FILE,count,"Reactivated descriptions");
+		
+		return repcomponents;
 	}
 
-	private int writeDescriptionsFile(Rf2DescriptionFile rf2DescFile, ArrayList<Long> newcomponents, BufferedWriter bw, ArrayList<Long> retiredDescriptions) throws IOException {
+	private int writeDescriptionsFile(Rf2DescriptionFile rf2DescFile,  BufferedWriter bw, ArrayList<Long> descriptions) throws IOException {
 		int count=0;
 		boolean bPrim=true;
 		bw.append("[");
-		for (Long long1 : retiredDescriptions) {
+		for (Long long1 : descriptions) {
 			Rf2DescriptionRow rf2DescRow = rf2DescFile.getLastActiveRow(startDate, long1);
-			if (!newcomponents.contains(rf2DescRow.getConceptId())) {
+//			if (!newcomponents.contains(rf2DescRow.getConceptId())) {
 				if (!bPrim){
 					bw.append(",");
 				}else{
@@ -586,7 +728,7 @@ public class ReleaseFilesReportPlugin extends AbstractMojo {
 				desc=null;
 				bw.append(sep);
 				count++;
-			}
+//			}
 		}
 		bw.append("]");
 		bw.close();
@@ -608,7 +750,7 @@ public class ReleaseFilesReportPlugin extends AbstractMojo {
 		bw.append("[");
 		for (Long long1 : retiredConcepts) {
 			Rf2AttributeValueRefsetRow refsetRow = attrValue.getRowByReferencedComponentId(long1);
-			ArrayList<Rf2AssociationRefsetRow> associationRow = associationFile.getRowByReferencedComponentId(long1);
+			Rf2AssociationRefsetRow associationRow = associationFile.getLastRowByReferencedComponentId(long1);
 
 			String fsn = rf2DescFile.getFsn(long1);
 			Pattern p = Pattern.compile("\\((.*?)\\)", Pattern.DOTALL);
@@ -619,9 +761,8 @@ public class ReleaseFilesReportPlugin extends AbstractMojo {
 					semanticTag = matcher.group(1);
 				}
 			}
-			if (!associationRow.isEmpty()) {
-				for (Rf2AssociationRefsetRow rf2AssociationRefsetRow : associationRow) {
-					String assValue = rf2AssociationRefsetRow.getTargetComponent();
+			if (associationRow!=null) {
+					String assValue = associationRow.getTargetComponent();
 					if (!bPrim){
 						bw.append(",");
 					}else{
@@ -630,21 +771,20 @@ public class ReleaseFilesReportPlugin extends AbstractMojo {
 					if (refsetRow != null) {
 						String value = refsetRow.getValueId();
 						RetiredConcept concept=new RetiredConcept(long1.toString() ,rf2DescFile.getFsn(conceptFile.getDefinitionStatusId(long1)) , fsn , semanticTag,
-								rf2DescFile.getFsn(Long.parseLong(value)),rf2DescFile.getFsn(Long.parseLong(rf2AssociationRefsetRow.getRefsetId())),
+								rf2DescFile.getFsn(Long.parseLong(value)),rf2DescFile.getFsn(Long.parseLong(associationRow.getRefsetId())),
 								rf2DescFile.getFsn(Long.parseLong(assValue)) ,String.valueOf(conceptFile.isNewComponent(long1, startDate)));
 						bw.append(gson.toJson(concept).toString());
 						
 						concept=null;
 					} else {
 						RetiredConcept concept=new RetiredConcept(long1.toString() ,rf2DescFile.getFsn(conceptFile.getDefinitionStatusId(long1)) , fsn , semanticTag,
-								"no reason",rf2DescFile.getFsn(Long.parseLong(rf2AssociationRefsetRow.getRefsetId())),
+								"no reason",rf2DescFile.getFsn(Long.parseLong(associationRow.getRefsetId())),
 								rf2DescFile.getFsn(Long.parseLong(assValue)) ,String.valueOf(conceptFile.isNewComponent(long1, startDate)));
 						bw.append(gson.toJson(concept).toString());
 						concept=null;
 					}
 					bw.append(sep);
 					count++;
-				}
 			} else {
 				if (!bPrim){
 					bw.append(",");
