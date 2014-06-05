@@ -203,7 +203,11 @@ public class ReleaseFilesReportPlugin extends AbstractMojo {
 					logger.info("Loading target language refset");
 					targetLangFile = new Rf2LanguageRefsetFile(targetLanguage.getAbsolutePath());
 					System.gc();
+				}else{
+					logger.info("Target language doesn't exist");
 				}
+			}else{
+					logger.info("Target language is null");
 			}
 //			logger.info("Loading relationships");
 //			Rf2RelationshipFile relFile = new Rf2RelationshipFile(getFilePath(ReleaseFileType.RELATIONSHIP), startDate);
