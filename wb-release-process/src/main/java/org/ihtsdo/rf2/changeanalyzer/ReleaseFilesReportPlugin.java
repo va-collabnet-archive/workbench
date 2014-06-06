@@ -20,6 +20,7 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.ihtsdo.rf2.changeanalyzer.data.Rf2AssociationRefsetRow;
 import org.ihtsdo.rf2.changeanalyzer.data.Rf2AttributeValueRefsetRow;
 import org.ihtsdo.rf2.changeanalyzer.data.Rf2DescriptionRow;
+import org.ihtsdo.rf2.changeanalyzer.data.Rf2LanguageRefsetRow;
 import org.ihtsdo.rf2.changeanalyzer.data.Rf2RelationshipRow;
 import org.ihtsdo.rf2.changeanalyzer.file.Rf2AssociationRefsetFile;
 import org.ihtsdo.rf2.changeanalyzer.file.Rf2AttributeValueRefsetFile;
@@ -290,15 +291,18 @@ public class ReleaseFilesReportPlugin extends AbstractMojo {
 		boolean bPrim=true;
 		bw.append("[");
 		for (Long long1 : changedDesc) {
-			if (targetLangFile.exists(long1)){
+			Rf2LanguageRefsetRow langRow = targetLangFile.getLastActiveRow(startDate,long1.toString());
+			if (langRow!=null && langRow.getActive()==1){
 				Rf2DescriptionRow rf2DescRow = rf2DescFile.getLastActiveRow(startDate,long1);
-				if (!repcomponents.contains(rf2DescRow.getConceptId())  ) {
+				if (!repcomponents.contains(rf2DescRow.getConceptId()) &&
+						rf2DescRow.getActive()==0) {
 					repcomponents.add(rf2DescRow.getConceptId());
 					if (!bPrim){
 						bw.append(",");
 					}else{
 						bPrim=false;
 					}
+					
 					Description desc=new Description(long1.toString(), rf2DescRow.getEffectiveTime() , String.valueOf(rf2DescRow.getActive()) , rf2DescRow.getConceptId().toString() ,
 							rf2DescRow.getLanguageCode() , rf2DescFile.getFsn(rf2DescRow.getTypeId()) , rf2DescRow.getTerm() ,
 						    rf2DescFile.getFsn(rf2DescRow.getCaseSignificanceId()));
