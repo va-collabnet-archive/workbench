@@ -56,7 +56,7 @@ public class ReleaseFilesReportPlugin extends AbstractMojo {
 
 	public static final String NEW_RELATIONSHIPS_FILE = "new_relationships.json";
 
-	public static final String RETIRED_CONCEPT_REASON_FILE = "retired_concept_reason.json";
+	public static final String RETIRED_CONCEPT_REASON_FILE = "inactivated_concept_reason.json";
 
 	public static final String NEW_DESCRIPTIONS_FILE = "new_descriptions.json";
 
@@ -70,7 +70,7 @@ public class ReleaseFilesReportPlugin extends AbstractMojo {
 
 	private static final Logger logger = Logger.getLogger(ReleaseFilesReportPlugin.class);
 
-	private static final String RETIRED_DESCRIPTIONS_FILE = "retired_descriptions.json";
+	private static final String RETIRED_DESCRIPTIONS_FILE = "inactivated_descriptions.json";
 
 	private static final String REACTIVATED_DESCRIPTIONS_FILE = "reactivated_descriptions.json";
 
@@ -80,7 +80,7 @@ public class ReleaseFilesReportPlugin extends AbstractMojo {
 
 	private static final String SYN_ACCEPTABILITY_CHANGED = "acceptability_changed_on_synonym.json";
 
-	private static final String TARGET_POINTER_TO_CHANGED_SOURCE_DESCRIPTION = "target_pointer_to_changed_source.json";
+	private static final String TARGET_POINTER_TO_CHANGED_SOURCE_DESCRIPTION = "active_language_references_to_now_inactive_descriptions.json";
 
     private String sep = System.getProperty("line.separator");
     
@@ -316,7 +316,7 @@ public class ReleaseFilesReportPlugin extends AbstractMojo {
 		bw.append("]");
 		bw.close();
 
-		addFileChangeReport(TARGET_POINTER_TO_CHANGED_SOURCE_DESCRIPTION,count,"Target pointer to changed source descriptions.");
+		addFileChangeReport(TARGET_POINTER_TO_CHANGED_SOURCE_DESCRIPTION,count,"Active language references to now inactive descriptions.");
 		
 		return repcomponents;		
 	}
@@ -692,7 +692,7 @@ public class ReleaseFilesReportPlugin extends AbstractMojo {
 		}
 		int count=writeDescriptionsFile(rf2DescFile, bw, filteredRetDesc);
 
-		addFileChangeReport(RETIRED_DESCRIPTIONS_FILE,count,"Retired descriptions (no FSN)");
+		addFileChangeReport(RETIRED_DESCRIPTIONS_FILE,count,"Inactivated descriptions (no FSN)");
 		
 		return repcomponents;
 	}
@@ -828,7 +828,7 @@ public class ReleaseFilesReportPlugin extends AbstractMojo {
 		attrValue.releasePreciousMemory();
 		associationFile.releasePreciousMemory();
 
-		addFileChangeReport(RETIRED_CONCEPT_REASON_FILE,count,"Retired concepts");
+		addFileChangeReport(RETIRED_CONCEPT_REASON_FILE,count,"Inactivated concepts");
 		
 		return retiredConcepts;
 		
