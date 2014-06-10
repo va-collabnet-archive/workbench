@@ -47,14 +47,12 @@ import org.ihtsdo.testmodel.DrLanguageDesignationSet;
 import org.ihtsdo.testmodel.DrRefsetExtension;
 import org.ihtsdo.testmodel.DrRelationship;
 import org.ihtsdo.tk.Ts;
-import org.ihtsdo.tk.api.PathBI;
-import org.ihtsdo.tk.api.PositionBI;
-import org.ihtsdo.tk.api.PositionSet;
-import org.ihtsdo.tk.api.TerminologyStoreDI;
+import org.ihtsdo.tk.api.*;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.api.id.IdBI;
+import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.refex.type_float.RefexFloatVersionBI;
 import org.ihtsdo.tk.api.refex.type_int.RefexIntVersionBI;
@@ -137,8 +135,9 @@ public class DrComponentHelper {
 			ConceptSpec referToRefset = new ConceptSpec("REFERS TO concept association reference set (foundation metadata concept)", UUID.fromString("d15fde65-ed52-3a73-926b-8981e9743ee9"));
 
 			for (DescriptionVersionBI descriptionVersion : descriptionsList) {
-				Collection<? extends RefexVersionBI<?>> currentAnnotations = descriptionVersion.getChronicle().getAnnotationsActive(mockVc);
-				for (RefexVersionBI<?> annotation : currentAnnotations) {
+				Collection<? extends RefexChronicleBI<?>> annotations = descriptionVersion.getChronicle().getAnnotations();
+				for (RefexChronicleBI<?> annotationChronicle : annotations) {
+                    RefexVersionBI annotation = annotationChronicle.getVersion(mockVc);
 					if (annotation instanceof RefexNidVersionBI) {
 						RefexNidVersionBI annotationNid = (RefexNidVersionBI) annotation;
 						int languageNid = annotationNid.getRefexNid();
@@ -180,8 +179,9 @@ public class DrComponentHelper {
 					loopDescription.getIdentifiers().add(drId);
 				}
 
-				Collection<? extends RefexVersionBI<?>> currentAnnotations = descriptionVersion.getChronicle().getAnnotationsActive(mockVc);
-				for (RefexVersionBI<?> annotation : currentAnnotations) {
+				Collection<? extends RefexChronicleBI<?>> currentAnnotations = descriptionVersion.getChronicle().getAnnotations();
+				for (RefexChronicleBI<?> annotationChronicle : currentAnnotations) {
+                    RefexVersionBI annotation = annotationChronicle.getVersion(mockVc);
 					try {
 						if (annotation instanceof RefexNidVersionBI) {
 							RefexNidVersionBI annotationNid = (RefexNidVersionBI) annotation;
@@ -492,9 +492,10 @@ public class DrComponentHelper {
 			ViewCoordinate mockVc, String factContextName) throws Exception {
 		I_TermFactory tf = Terms.get();
 		if (componentBi != null && componentBi.getConceptAttributesActive() != null) {
-			Collection<? extends RefexVersionBI<?>> annotations = componentBi.getConceptAttributesActive().getAnnotationsActive(mockVc);
+			Collection<? extends RefexChronicleBI<?>> annotations = componentBi.getConceptAttributesActive().getAnnotations();
 
-			for (RefexVersionBI annotation : annotations) {
+            for (RefexChronicleBI<?> annotationChronicle : annotations) {
+                RefexVersionBI annotation = annotationChronicle.getVersion(mockVc);
 				DrRefsetExtension extension = new DrRefsetExtension();
 				extension.setActive(true);
 				extension.setComponentUuid(tf.nidToUuid(annotation.getReferencedComponentNid()).toString());
@@ -594,11 +595,12 @@ public class DrComponentHelper {
 	}
 
 	private static void addAnnotationsToDescription(DrDescription description, DescriptionVersionBI componentBi, 
-			ViewCoordinate mockVc, String factContextName) throws IOException {
+			ViewCoordinate mockVc, String factContextName) throws IOException, ContradictionException {
 		I_TermFactory tf = Terms.get();
-		Collection<? extends RefexVersionBI<?>> annotations = componentBi.getAnnotationsActive(mockVc);
+		Collection<? extends RefexChronicleBI<?>> annotations = componentBi.getAnnotations();
 
-		for (RefexVersionBI annotation : annotations) {
+		for (RefexChronicleBI<?> annotationChronicle : annotations) {
+            RefexVersionBI annotation = annotationChronicle.getVersion(mockVc);
 			DrRefsetExtension extension = new DrRefsetExtension();
 			extension.setActive(true);
 			extension.setComponentUuid(tf.nidToUuid(annotation.getReferencedComponentNid()).toString());
