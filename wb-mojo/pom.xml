@@ -136,6 +136,18 @@
 			<artifactId>dom4j</artifactId>
 			<version>1.6.1</version>
 		</dependency>
+        <!-- JSR 353 API -->   
+        <dependency>
+            <groupId>javax.json</groupId>
+            <artifactId>javax.json-api</artifactId>
+            <version>1.0</version>
+        </dependency>    
+        <!-- JSR 353 Reference Implementation -->   
+        <dependency>
+            <groupId>org.glassfish</groupId>
+            <artifactId>javax.json</artifactId>
+            <version>1.0.4</version>
+        </dependency>
 	</dependencies>
 	<build>
 		<resources>
