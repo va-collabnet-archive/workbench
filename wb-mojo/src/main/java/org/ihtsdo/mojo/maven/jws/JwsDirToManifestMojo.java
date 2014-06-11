@@ -67,6 +67,7 @@ public class JwsDirToManifestMojo extends AbstractMojo implements Serializable {
         try {
             JwsFileTreeNode node = new JwsFileTreeNode();
             node.nodePath = ""; // root node
+            node.nodeType = "root"; // root node
             JwsFileTreeNode tree = JwsFileTreeUtils.createJwsTreeFromDirectory(
                             processDirectory,
                             relativeRootDirectory,

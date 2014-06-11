@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.ihtsdo.mojo.maven.jws;
 
 import java.util.Iterator;
@@ -25,17 +24,21 @@ import java.util.List;
  * @author marc
  */
 public class JwsFileTreeNode implements Iterable<JwsFileTreeNode> {
-   public String nodePath;
+
+    public String nodePath;
+    public String nodeType; // "root" "folder" "file"
     public JwsFileTreeNode parent;
     public List<JwsFileTreeNode> children;
 
     public JwsFileTreeNode() {
         this.nodePath = "";
+        this.nodeType = "";
         this.children = new LinkedList<>();
     }
 
     public JwsFileTreeNode(String dataPath /* ..data.. */) {
         this.nodePath = dataPath;
+        this.nodeType = "";
         this.children = new LinkedList<>();
     }
 
@@ -49,6 +52,7 @@ public class JwsFileTreeNode implements Iterable<JwsFileTreeNode> {
 
     public JwsFileTreeNode addChild(String childPath) {
         JwsFileTreeNode childNode = new JwsFileTreeNode(childPath);
+        childNode.nodeType = "file";
         childNode.parent = this;
         this.children.add(childNode);
         return childNode;
@@ -65,7 +69,7 @@ public class JwsFileTreeNode implements Iterable<JwsFileTreeNode> {
     @Override
     public String toString() {
         if (nodePath != null) {
-            return createIndent(getLevel()) + nodePath;
+            return createIndent(getLevel()) + nodePath + " (" + nodeType + ")";
         } else {
             return "[path null]";
         }
@@ -74,12 +78,13 @@ public class JwsFileTreeNode implements Iterable<JwsFileTreeNode> {
     public String toStringWithParentPaths() {
         if (nodePath != null) {
             StringBuilder sb = new StringBuilder();
+            sb.append(nodeType).append(": ");
             sb.append(nodePath);
             JwsFileTreeNode pathParent = parent;
             while (pathParent != null) {
                 sb.append(" > ").append(pathParent.nodePath);
                 pathParent = pathParent.parent;
-            }            
+            }
             return sb.toString();
         } else {
             return "[path null]";
@@ -98,5 +103,5 @@ public class JwsFileTreeNode implements Iterable<JwsFileTreeNode> {
     public Iterator<JwsFileTreeNode> iterator() {
         JwsFileTreeNodeIter iter = new JwsFileTreeNodeIter(this);
         return iter;
-    }    
+    }
 }

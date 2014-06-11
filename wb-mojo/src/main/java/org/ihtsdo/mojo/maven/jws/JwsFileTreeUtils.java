@@ -51,6 +51,7 @@ public class JwsFileTreeUtils {
             JsonArrayBuilder builder) {
         JsonObjectBuilder objBuilder = Json.createObjectBuilder();
         objBuilder.add("path", node.nodePath);
+        objBuilder.add("type", node.nodeType);
         List<JwsFileTreeNode> childrenList = node.children;
         if (node.children != null && !node.children.isEmpty()) {
             JsonArrayBuilder childBuilder = Json.createArrayBuilder();
@@ -77,6 +78,7 @@ public class JwsFileTreeUtils {
                 // ADD DIRECTORY NODE
                 JwsFileTreeNode dirNode = new JwsFileTreeNode();
                 dirNode.parent = node;
+                dirNode.nodeType = "folder";
                 String sPath = file.getAbsolutePath().substring(sRelativeRootDir.length() + 1);
                 dirNode.nodePath = sPath;
                 node.children.add(dirNode);
@@ -86,25 +88,6 @@ public class JwsFileTreeUtils {
         }
         return node;
     }
-
-//    public static JwsFileTreeNode createJwsTreeFromDirectory(String sDir,
-//            JwsFileTreeNode node) {
-//        File[] faFiles = new File(sDir).listFiles();
-//        for (File file : faFiles) {
-//            if (file.isFile()) { // file.getName().matches("^(.*?)")
-//                // System.out.println(file.getAbsolutePath()); // :VERBOSE:
-//                // add file node
-//                node.addChild(file.getAbsolutePath());
-//            }
-//            if (file.isDirectory()) {
-//                JwsFileTreeNode fileNode = new JwsFileTreeNode(file.getAbsolutePath());
-//                fileNode.parent = node;
-//                node.children.add(fileNode);
-//                createJwsTreeFromDirectory(file.getAbsolutePath(), fileNode);
-//            }
-//        }
-//        return node;
-//    }
 
     public static JwsFileTreeNode readJsonFile(String inPath)
             throws FileNotFoundException {
@@ -183,7 +166,7 @@ public class JwsFileTreeUtils {
             String key, String value) {
         switch (key) {
             case "type":
-                node.nodePath = value;
+                node.nodeType = value;
                 break;
             case "name":
                 node.nodePath = value;
