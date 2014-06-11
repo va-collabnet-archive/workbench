@@ -1487,14 +1487,9 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                 }
                 boolean write = true;
                 for (RefexVersionBI rv : versions) {
-                    if (!rv.isActive(viewCoordinate)) {
-                        if (sameCycleStampNids.contains(rv.getStampNid())) {
-                            write = false;
-                        }
-                    }
-                    if(rv.isActive(viewCoordinate)){ //CHANGE FOR DK, source data incorrect, retired descriptions should also have retired lang refsets
-                        ComponentVersionBI rc = Ts.get().getComponentVersion(viewCoordinate, rv.getReferencedComponentNid());
-                        if(rc == null || !rc.isActive(viewCoordinate)){
+                    if (sameCycleStampNids.contains(refexChronicle.getPrimordialVersion().getStampNid())) {
+                        if (!rv.isActive(viewCoordinate)) {
+                            //refex was created and retired in same cycle, don't write any part
                             write = false;
                         }
                     }
