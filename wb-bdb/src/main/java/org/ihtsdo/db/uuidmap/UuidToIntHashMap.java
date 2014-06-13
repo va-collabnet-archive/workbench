@@ -1,28 +1,19 @@
 package org.ihtsdo.db.uuidmap;
 
-import com.sleepycat.bind.tuple.IntegerBinding;
-import com.sleepycat.bind.tuple.TupleBinding;
-import com.sleepycat.bind.tuple.TupleInput;
-import com.sleepycat.bind.tuple.TupleOutput;
-import com.sleepycat.je.DatabaseEntry;
-import com.sleepycat.je.LockMode;
-import com.sleepycat.je.OperationStatus;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.logging.Level;
+
 import org.apache.mahout.math.function.DoubleProcedure;
 import org.apache.mahout.math.list.ByteArrayList;
 import org.apache.mahout.math.list.IntArrayList;
 import org.apache.mahout.math.map.HashFunctions;
 import org.apache.mahout.math.map.PrimeFinder;
-
 import org.dwfa.ace.log.AceLog;
-import org.ihtsdo.db.bdb.nidmaps.UuidIntConcurrentHashMapBinder;
-import org.ihtsdo.db.bdb.nidmaps.UuidIntConcurrentHashMapBinder.DB_TYPE;
-import org.ihtsdo.time.TimeUtil;
+import org.ihtsdo.helper.time.TimeHelper;
 
 public class UuidToIntHashMap extends AbstractUuidToIntHashMap {
 	
@@ -59,18 +50,14 @@ public class UuidToIntHashMap extends AbstractUuidToIntHashMap {
 	 */
 	protected int freeEntries;
 	
-    private final ReentrantReadWriteLock rwl = new ReentrantReadWriteLock();
-    private final Lock r = rwl.readLock();
-    private final Lock w = rwl.writeLock();
+	private final ReentrantReadWriteLock rwl = new ReentrantReadWriteLock();
+	private final Lock r = rwl.readLock();
+	private final Lock w = rwl.writeLock();
 
 
 	protected static final byte FREE = 0;
 	protected static final byte FULL = 1;
 	protected static final byte REMOVED = 2;
-
-    public static UuidToIntHashMapBinder getUuidIntMapBinder() {
-        return new UuidToIntHashMapBinder();
-    }
 
 	/**
 	 * Constructs an empty map with default capacity and default load factors.
@@ -84,9 +71,9 @@ public class UuidToIntHashMap extends AbstractUuidToIntHashMap {
 	 * load factors.
 	 * 
 	 * @param initialCapacity
-	 *            the initial capacity of the map.
+	 *			the initial capacity of the map.
 	 * @throws IllegalArgumentException
-	 *             if the initial capacity is less than zero.
+	 *			 if the initial capacity is less than zero.
 	 */
 	public UuidToIntHashMap(int initialCapacity) {
 		this(initialCapacity, 0, 0.8);
@@ -97,16 +84,16 @@ public class UuidToIntHashMap extends AbstractUuidToIntHashMap {
 	 * specified minimum and maximum load factor.
 	 * 
 	 * @param initialCapacity
-	 *            the initial capacity.
+	 *			the initial capacity.
 	 * @param minLoadFactor
-	 *            the minimum load factor.
+	 *			the minimum load factor.
 	 * @param maxLoadFactor
-	 *            the maximum load factor.
+	 *			the maximum load factor.
 	 * @throws IllegalArgumentException
-	 *             if
+	 *			 if
 	 * 
-	 *             <tt>initialCapacity < 0 || (minLoadFactor < 0.0 || minLoadFactor >= 1.0) || (maxLoadFactor <= 0.0 || maxLoadFactor >= 1.0) || (minLoadFactor >= maxLoadFactor)</tt>
-	 *             .
+	 *			 <tt>initialCapacity < 0 || (minLoadFactor < 0.0 || minLoadFactor >= 1.0) || (maxLoadFactor <= 0.0 || maxLoadFactor >= 1.0) || (minLoadFactor >= maxLoadFactor)</tt>
+	 *			 .
 	 */
 	public UuidToIntHashMap(int initialCapacity, double minLoadFactor,
 			double maxLoadFactor) {
@@ -184,7 +171,7 @@ public class UuidToIntHashMap extends AbstractUuidToIntHashMap {
 	 * instead of potentially many times and hash collisions get less probable.
 	 * 
 	 * @param minCapacity
-	 *            the desired minimum capacity.
+	 *			the desired minimum capacity.
 	 */
 	public void ensureCapacity(int minCapacity) {
 		if (state.length < minCapacity) {
@@ -200,10 +187,10 @@ public class UuidToIntHashMap extends AbstractUuidToIntHashMap {
 	 * method {@link #forEachKey(DoubleProcedure)}.
 	 * 
 	 * @param procedure
-	 *            the procedure to be applied. Stops iteration if the procedure
-	 *            returns <tt>false</tt>, otherwise continues.
+	 *			the procedure to be applied. Stops iteration if the procedure
+	 *			returns <tt>false</tt>, otherwise continues.
 	 * @return <tt>false</tt> if the procedure stopped before all keys where
-	 *         iterated over, <tt>true</tt> otherwise.
+	 *		 iterated over, <tt>true</tt> otherwise.
 	 */
 	public boolean forEachPair(final UuidIntProcedure procedure) {
 		for (int i = state.length; i-- > 0;) {
@@ -225,42 +212,42 @@ public class UuidToIntHashMap extends AbstractUuidToIntHashMap {
 	 * association for the given key or not.
 	 * 
 	 * @param key
-	 *            the key to be searched for.
+	 *			the key to be searched for.
 	 * @return the value associated with the specified key; <tt>0</tt> if no
-	 *         such key is present.
+	 *		 such key is present.
 	 */
 	public int get(long[] key) {
-            r.lock();
-            try {
-                    int i = indexOfKey(key);
-                    if (i < 0)
+			r.lock();
+			try {
+					int i = indexOfKey(key);
+					if (i < 0)
 			return Integer.MAX_VALUE; // not contained
 		return values[i];
-            } finally {
+			} finally {
 		r.unlock();
-            }
+			}
 	}
 	public int get(UUID key) {
-            r.lock();
-            try {
+			r.lock();
+			try {
 		int i = indexOfKey(key);
 		if (i < 0)
 			return Integer.MAX_VALUE; // not contained
 		return values[i];
-            } finally {
+			} finally {
 		r.unlock();
-            }
+			}
 	}
 
 	/**
 	 * @param key
-	 *            the key to be added to the receiver.
+	 *			the key to be added to the receiver.
 	 * @return the index where the key would need to be inserted, if it is not
-	 *         already contained. Returns -index-1 if the key is already
-	 *         contained at slot index. Therefore, if the returned index < 0,
-	 *         then it is already contained at slot -index-1. If the returned
-	 *         index >= 0, then it is NOT already contained and should be
-	 *         inserted at slot index.
+	 *		 already contained. Returns -index-1 if the key is already
+	 *		 contained at slot index. Therefore, if the returned index < 0,
+	 *		 then it is already contained at slot -index-1. If the returned
+	 *		 index >= 0, then it is NOT already contained and should be
+	 *		 inserted at slot index.
 	 */
 	protected int indexOfInsertion(long[] key) {
 		final long tab[] = table;
@@ -311,9 +298,9 @@ public class UuidToIntHashMap extends AbstractUuidToIntHashMap {
 
 	/**
 	 * @param key
-	 *            the key to be searched in the receiver.
+	 *			the key to be searched in the receiver.
 	 * @return the index where the key is contained in the receiver, returns -1
-	 *         if the key was not found.
+	 *		 if the key was not found.
 	 */
 	protected int indexOfKey(long[] key) {
 		final long tab[] = table;
@@ -372,9 +359,9 @@ public class UuidToIntHashMap extends AbstractUuidToIntHashMap {
 
 	/**
 	 * @param value
-	 *            the value to be searched in the receiver.
+	 *			the value to be searched in the receiver.
 	 * @return the index where the value is contained in the receiver, returns
-	 *         -1 if the value was not found.
+	 *		 -1 if the value was not found.
 	 */
 	protected int indexOfValue(int value) {
 		final int val[] = values;
@@ -388,7 +375,7 @@ public class UuidToIntHashMap extends AbstractUuidToIntHashMap {
 		return -1; // not found
 	}
 	protected List<Integer> indexesOfValue(int value) {
-                List<Integer> indexes = new ArrayList<>();
+				List<Integer> indexes = new ArrayList<>();
 		final int val[] = values;
 		final byte stat[] = state;
 
@@ -408,9 +395,9 @@ public class UuidToIntHashMap extends AbstractUuidToIntHashMap {
 	 * {@link #forEachKey(DoubleProcedure)}.
 	 * 
 	 * @param value
-	 *            the value to search for.
+	 *			the value to search for.
 	 * @return the first key for which holds <tt>get(key) == value</tt>; returns
-	 *         <tt>Double.NaN</tt> if no such key exists.
+	 *		 <tt>Double.NaN</tt> if no such key exists.
 	 */
 	public long[] keyOf(int value) {
 		// returns the first key found; there may be more matching keys,
@@ -427,13 +414,13 @@ public class UuidToIntHashMap extends AbstractUuidToIntHashMap {
 	}
 	public List<UUID> keysOf(int value) {
 		List<Integer> indexes = indexesOfValue(value);
-                List<UUID> keys = new ArrayList<>(indexes.size());
+				List<UUID> keys = new ArrayList<>(indexes.size());
 		
-                for (int index: indexes) {
-                    int msb = index * 2;
-                    int lsb = msb + 1;
-                    keys.add(new UUID(table[msb], table[lsb]));
-                }
+				for (int index: indexes) {
+					int msb = index * 2;
+					int lsb = msb + 1;
+					keys.add(new UUID(table[msb], table[lsb]));
+				}
 		return keys;
 	}
 
@@ -447,7 +434,7 @@ public class UuidToIntHashMap extends AbstractUuidToIntHashMap {
 	 * This method can be used to iterate over the keys of the receiver.
 	 * 
 	 * @param list
-	 *            the list to be filled, can have any size.
+	 *			the list to be filled, can have any size.
 	 */
 	public void keys(UuidArrayList list) {
 		list.setSize(distinct);
@@ -469,24 +456,24 @@ public class UuidToIntHashMap extends AbstractUuidToIntHashMap {
 			}
 		}
 	}
-        public boolean put(UUID key, int value) {
-            return put(UuidUtil.convert(key), value);
-        }
+		public boolean put(UUID key, int value) {
+			return put(UuidUtil.convert(key), value);
+		}
 	/**
 	 * Associates the given key with the given value. Replaces any old
 	 * <tt>(key,someOtherValue)</tt> association, if existing.
 	 * 
 	 * @param key
-	 *            the key the value shall be associated with.
+	 *			the key the value shall be associated with.
 	 * @param value
-	 *            the value to be associated.
+	 *			the value to be associated.
 	 * @return <tt>true</tt> if the receiver did not already contain such a key;
-	 *         <tt>false</tt> if the receiver did already contain such a key -
-	 *         the new value has now replaced the formerly associated value.
+	 *		 <tt>false</tt> if the receiver did already contain such a key -
+	 *		 the new value has now replaced the formerly associated value.
 	 */
 	public boolean put(long[] key, int value) {
 		w.lock();
-                try {
+				try {
 		int i = indexOfInsertion(key);
 		if (i < 0) { // already contained
 			i = -i - 1;
@@ -517,9 +504,19 @@ public class UuidToIntHashMap extends AbstractUuidToIntHashMap {
 		
 
 		return true;
-                } finally {
-                    w.unlock();
-                }
+				} finally {
+					w.unlock();
+				}
+	}
+	
+	/**
+	 * When we build this object by deserializing from BDB, we need a way to 
+	 * reset the distinct counter.
+	 */
+	protected void resetMetadata(int distinct)
+	{
+		this.distinct = distinct;
+		this.freeEntries = state.length - this.distinct; // delta
 	}
 
 	/**
@@ -571,7 +568,7 @@ public class UuidToIntHashMap extends AbstractUuidToIntHashMap {
 		if (newCapacity > 10240  && AceLog.getAppLog().isLoggable(Level.FINE)) {
 			AceLog.getAppLog().fine("----- Finished rehash:  newCapacity: " + 
 						newCapacity + " " + 
-					TimeUtil.getElapsedTimeString(System.currentTimeMillis() - start)
+					TimeHelper.getElapsedTimeString(System.currentTimeMillis() - start)
 					+ " ----- ");
 			}
 	}
@@ -581,9 +578,9 @@ public class UuidToIntHashMap extends AbstractUuidToIntHashMap {
 	 * present.
 	 * 
 	 * @param key
-	 *            the key to be removed from the receiver.
+	 *			the key to be removed from the receiver.
 	 * @return <tt>true</tt> if the receiver contained the specified key,
-	 *         <tt>false</tt> otherwise.
+	 *		 <tt>false</tt> otherwise.
 	 */
 	public boolean removeKey(long[] key) {
 		int i = indexOfKey(key);
@@ -614,16 +611,16 @@ public class UuidToIntHashMap extends AbstractUuidToIntHashMap {
 	 * Initializes the receiver.
 	 * 
 	 * @param initialCapacity
-	 *            the initial capacity of the receiver.
+	 *			the initial capacity of the receiver.
 	 * @param minLoadFactor
-	 *            the minLoadFactor of the receiver.
+	 *			the minLoadFactor of the receiver.
 	 * @param maxLoadFactor
-	 *            the maxLoadFactor of the receiver.
+	 *			the maxLoadFactor of the receiver.
 	 * @throws IllegalArgumentException
-	 *             if
+	 *			 if
 	 * 
-	 *             <tt>initialCapacity < 0 || (minLoadFactor < 0.0 || minLoadFactor >= 1.0) || (maxLoadFactor <= 0.0 || maxLoadFactor >= 1.0) || (minLoadFactor >= maxLoadFactor)</tt>
-	 *             .
+	 *			 <tt>initialCapacity < 0 || (minLoadFactor < 0.0 || minLoadFactor >= 1.0) || (maxLoadFactor <= 0.0 || maxLoadFactor >= 1.0) || (minLoadFactor >= maxLoadFactor)</tt>
+	 *			 .
 	 */
 	protected void setUp(int initialCapacity, double minLoadFactor,
 			double maxLoadFactor) {
@@ -684,7 +681,7 @@ public class UuidToIntHashMap extends AbstractUuidToIntHashMap {
 	 * This method can be used to iterate over the values of the receiver.
 	 * 
 	 * @param list
-	 *            the list to be filled, can have any size.
+	 *			the list to be filled, can have any size.
 	 */
 	public void values(IntArrayList list) {
 		list.setSize(distinct);
@@ -714,55 +711,4 @@ public class UuidToIntHashMap extends AbstractUuidToIntHashMap {
 		}
 		return true;
 	}
-
-        public static class UuidToIntHashMapBinder extends TupleBinding<UuidToIntHashMap> {
-        public boolean needToWriteBack = false;
-
-        @Override
-        public UuidToIntHashMap entryToObject(TupleInput input) {
-            int type = input.readInt();
-            if (type == DB_TYPE.READ_ONLY.getInt()) {
-                int length = input.readInt();
-                UuidToIntHashMap map = new UuidToIntHashMap(length);
-
-                for (int i = 0; i < length; i++) {
-                    map.values[i] = input.readInt();
-                    map.state[i] = input.readByte();
-                }
-
-                length = input.readInt();
-                for (int i = 0; i < length; i++) {
-                    map.table[i] = input.readLong();
-                }
-                return map;
-            }else {
-                // read
-                int length = input.readInt();
-                UuidToIntHashMap map = new UuidToIntHashMap(length);
-                for (int i = 0; i < length; i++) {
-                    long lsb = input.readLong();
-                    long msb = input.readLong();
-                    int nid = input.readInt();
-                    map.put(new UUID(msb, lsb), nid);
-                }
-                //write back
-                needToWriteBack = true;
-                return map;
-            }
-        }
-
-        @Override
-        public void objectToEntry(UuidToIntHashMap map, TupleOutput output) {
-            output.writeInt(DB_TYPE.READ_ONLY.getInt()); 
-            output.writeInt(map.values.length);
-            for (int i = 0; i < map.values.length; i++) {
-                output.writeInt(map.values[i]);
-                output.writeByte(map.state[i]);
-            }
-            output.writeInt(map.table.length);
-            for (int i = 0; i < map.table.length; i++) {
-                output.writeLong(map.table[i]);
-            }
-        }
-    }
 }

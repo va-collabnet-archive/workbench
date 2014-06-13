@@ -36,6 +36,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
 import org.ihtsdo.db.uuidmap.UuidToIntHashMap;
+import org.ihtsdo.db.uuidmap.UuidToIntHashMapBinder;
 
 /**
  *
@@ -53,7 +54,7 @@ public class UuidToNidMapBdb extends ComponentBdb {
     ConcurrentHashMap<UUID,Integer> mutableMap;
     UuidIntConcurrentHashMapBinder mutableMapBinder;
 
-    public void setMap(UuidToIntHashMap readOnlyMap, ConcurrentHashMap mutableMap) {
+    public void setMap(UuidToIntHashMap readOnlyMap, ConcurrentHashMap<UUID,Integer> mutableMap) {
         this.readOnlyMap = readOnlyMap;
         this.mutableMap = mutableMap;
    }
@@ -100,27 +101,12 @@ public class UuidToNidMapBdb extends ComponentBdb {
    protected void init() throws IOException {
        idSequence = new IdSequence();
        mutableMapBinder = new UuidIntConcurrentHashMapBinder();
-       
+
+       readOnlyMap = new UuidToIntHashMapBinder().read(readOnly);
+
        DatabaseEntry theKey = new DatabaseEntry();
        IntegerBinding.intToEntry(0, theKey);
-
        DatabaseEntry theData = new DatabaseEntry();
-       UuidToIntHashMap.UuidToIntHashMapBinder uuidIntMapBinder = UuidToIntHashMap.getUuidIntMapBinder();
-       if (readOnly.get(null, theKey, theData, LockMode.READ_UNCOMMITTED) == OperationStatus.SUCCESS) {
-           readOnlyMap = uuidIntMapBinder.entryToObject(theData);
-       } else {
-           readOnlyMap = new UuidToIntHashMap();
-       }
-       
-       if(uuidIntMapBinder.needToWriteBack == true){
-           DatabaseEntry valueEntry = new DatabaseEntry();
-           uuidIntMapBinder.objectToEntry(readOnlyMap, valueEntry);
-           theKey = new DatabaseEntry();
-
-           IntegerBinding.intToEntry(0, theKey);
-           readOnly.put(null, theKey, valueEntry);
-       }
-
        if (mutable.get(null, theKey, theData, LockMode.READ_UNCOMMITTED) == OperationStatus.SUCCESS) {
            mutableMap = mutableMapBinder.entryToObject(theData);
        } else {
