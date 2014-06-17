@@ -131,6 +131,10 @@ import org.ihtsdo.tk.query.helper.RefsetHelper;
  */
 public class TerminologyProjectDAO {
 
+   private static int WORKLISTS_PARENT_NID = 0;
+   private static int PARTITIONS_PARENT_NID = 0;
+   private static int WORKSETS_PARENT_NID = 0;
+   
 	/**
 	 * The work list cache.
 	 */
@@ -5929,4 +5933,22 @@ public class TerminologyProjectDAO {
 		promoter.promote(promotionNids, false);
 	}
 
+
+	public static boolean isWorkflowRefsetChange(int refsetId) throws IOException, ContradictionException, TerminologyException {
+		Set<Integer> ancestors = Ts.get().getAncestors(refsetId, Terms.get().getActiveAceFrameConfig().getViewCoordinate());
+		
+		if (WORKLISTS_PARENT_NID == 0) {
+			WORKLISTS_PARENT_NID = ArchitectonicAuxiliary.Concept.WORKLISTS_ROOT.localize().getNid();
+			PARTITIONS_PARENT_NID = ArchitectonicAuxiliary.Concept.PARTITIONS_ROOT.localize().getNid();
+			WORKSETS_PARENT_NID = ArchitectonicAuxiliary.Concept.WORKSETS_ROOT.localize().getNid();
+		}
+	   
+		if (ancestors.contains(WORKLISTS_PARENT_NID) ||
+			ancestors.contains(PARTITIONS_PARENT_NID) ||
+			ancestors.contains(WORKSETS_PARENT_NID)) {
+			return true;
+		}
+    
+    	return false;
+	}
 }

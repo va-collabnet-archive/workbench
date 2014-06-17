@@ -87,7 +87,7 @@ import org.dwfa.swing.SwingWorker;
 import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.bind.ThinVersionHelper;
 import org.dwfa.vodb.types.IntList;
-import org.ihtsdo.tk.Ts;
+import org.ihtsdo.project.TerminologyProjectDAO;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.query.helper.RefsetHelper;
 
@@ -996,14 +996,16 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
                 switch (columns[col]) {
                     case REFSET_ID:
                         Integer refsetId = (Integer) value;
-                        int oldId = extTuple.getCore().getRefsetId();
-                        if (refsetId != oldId) {
-                            
-                            extTuple.getCore().setRefsetId(refsetId);
-                            referencedConcepts.put(refsetId, Terms.get().getConcept(refsetId));
-                            changed = true;
-                            AceLog.getAppLog().info("Changing refset from: " + 
-                                    Terms.get().getConcept(oldId) + " to: " + Terms.get().getConcept(refsetId));
+                        if (!TerminologyProjectDAO.isWorkflowRefsetChange(refsetId)) {
+	                        int oldId = extTuple.getCore().getRefsetId();
+	                        if (refsetId != oldId) {
+	                            
+	                            extTuple.getCore().setRefsetId(refsetId);
+	                            referencedConcepts.put(refsetId, Terms.get().getConcept(refsetId));
+	                            changed = true;
+	                            AceLog.getAppLog().info("Changing refset from: " + 
+	                                    Terms.get().getConcept(oldId) + " to: " + Terms.get().getConcept(refsetId));
+	                        }
                         }
                         break;
                     case MEMBER_ID:

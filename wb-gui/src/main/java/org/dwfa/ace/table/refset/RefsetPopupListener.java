@@ -36,7 +36,7 @@ import org.dwfa.ace.refset.I_RefsetDefaults;
 import org.dwfa.ace.refset.I_RefsetDefaultsInteger;
 import org.dwfa.ace.table.refset.RefsetMemberTableModel.REFSET_FIELDS;
 import org.dwfa.tapi.TerminologyException;
-
+import org.ihtsdo.project.TerminologyProjectDAO;
 import org.ihtsdo.tk.api.PathBI;
 
 //~--- JDK imports ------------------------------------------------------------
@@ -56,7 +56,6 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JTable;
-import org.ihtsdo.tk.Ts;
 
 public class RefsetPopupListener extends MouseAdapter {
    private ActionListener         change;
@@ -248,28 +247,30 @@ public class RefsetPopupListener extends MouseAdapter {
         @Override
       public void actionPerformed(ActionEvent e) {
          try {
-            if (selectedObject.getTuple().getMutablePart().getTime() != Long.MAX_VALUE) {
-               for (PathBI p : config.getEditingPathSet()) {
-                  I_ExtendByRefPart currentPart = selectedObject.getTuple();
-                  I_ExtendByRefPart newPart     =
-                     (I_ExtendByRefPart) selectedObject.getTuple().getMutablePart().makeAnalog(
-                        currentPart.getStatusNid(),
-                        Long.MAX_VALUE,
-                        config.getEditCoordinate().getAuthorNid(),
-                        config.getEditCoordinate().getModuleNid(),
-                        p.getConceptNid());
-
-                  setProperStatus(newPart);
-                  model.referencedConcepts.put(newPart.getStatusNid(),
-                                               Terms.get().getConcept(newPart.getStatusNid()));
-                  selectedObject.getTuple().addVersion(newPart);
-               }
-
-               Terms.get().addUncommitted(selectedObject.getTuple().getCore());
-               model.allTuples = null;
-               model.fireTableDataChanged();
-               model.propertyChange(null);
-            }
+        	 if (!TerminologyProjectDAO.isWorkflowRefsetChange(selectedObject.getTuple().getCore().getRefsetId())) {
+	            if (selectedObject.getTuple().getMutablePart().getTime() != Long.MAX_VALUE) {
+	               for (PathBI p : config.getEditingPathSet()) {
+	                  I_ExtendByRefPart currentPart = selectedObject.getTuple();
+	                  I_ExtendByRefPart newPart     =
+	                     (I_ExtendByRefPart) selectedObject.getTuple().getMutablePart().makeAnalog(
+	                        currentPart.getStatusNid(),
+	                        Long.MAX_VALUE,
+	                        config.getEditCoordinate().getAuthorNid(),
+	                        config.getEditCoordinate().getModuleNid(),
+	                        p.getConceptNid());
+	
+	                  setProperStatus(newPart);
+	                  model.referencedConcepts.put(newPart.getStatusNid(),
+	                                               Terms.get().getConcept(newPart.getStatusNid()));
+	                  selectedObject.getTuple().addVersion(newPart);
+	               }
+	
+	               Terms.get().addUncommitted(selectedObject.getTuple().getCore());
+	               model.allTuples = null;
+	               model.fireTableDataChanged();
+	               model.propertyChange(null);
+	            }
+        	 }
          } catch (Throwable ex) {
             AceLog.getAppLog().alertAndLogException(ex);
          }
@@ -294,61 +295,63 @@ public class RefsetPopupListener extends MouseAdapter {
         @Override
       public void actionPerformed(ActionEvent e) {
          try {
-            for (PathBI p : config.getEditingPathSet()) {
-               I_ExtendByRefPart newPart;
-
-               if (selectedObject.getTuple().getMutablePart().getTime() != Long.MAX_VALUE) {
-                  I_ExtendByRefPart currentPart = selectedObject.getTuple();
-
-                  newPart = (I_ExtendByRefPart) selectedObject.getTuple().getMutablePart().makeAnalog(
-                        currentPart.getStatusNid(),
-                        Long.MAX_VALUE,
-                        config.getEditCoordinate().getAuthorNid(),
-                        config.getEditCoordinate().getModuleNid(),
-                        currentPart.getPathNid());
-               } else {
-                  newPart = selectedObject.getTuple().getMutablePart();
-               }
-
-               newPart.setPathNid(p.getConceptNid());
-               setProperStatus(newPart);
-
-               switch (field) {
-               case STATUS :
-                  newPart.setStatusNid((Terms.get().uuidToNative(ids)));
-                  model.referencedConcepts.put(newPart.getStatusNid(),
-                                               Terms.get().getConcept(newPart.getStatusNid()));
-
-                  break;
-
-               case CONCEPT_ID :
-                  ((I_ExtendByRefPartCid) newPart).setC1id((Terms.get().uuidToNative(ids)));
-
-                  break;
-
-               case INTEGER_VALUE :
-               case BOOLEAN_VALUE :
-               case STRING_VALUE :
-                  break;
-
-               default :
-                  throw new Exception("Don't know how to handle: " + field);
-               }
-
-               model.referencedConcepts.put(Terms.get().uuidToNative(ids),
-                                            Terms.get().getConcept((Terms.get().uuidToNative(ids))));
-               model.referencedConcepts.put(newPart.getStatusNid(),
-                                            Terms.get().getConcept(newPart.getStatusNid()));
-
-               if (selectedObject.getTuple().getMutablePart().getTime() != Long.MAX_VALUE) {
-                  selectedObject.getTuple().addVersion(newPart);
-               }
-            }
-
-            Terms.get().addUncommitted(selectedObject.getTuple().getCore());
-            model.allTuples = null;
-            model.fireTableDataChanged();
-            model.propertyChange(null);
+        	 if (!TerminologyProjectDAO.isWorkflowRefsetChange(selectedObject.getTuple().getCore().getRefsetId())) {
+	            for (PathBI p : config.getEditingPathSet()) {
+	               I_ExtendByRefPart newPart;
+	
+	               if (selectedObject.getTuple().getMutablePart().getTime() != Long.MAX_VALUE) {
+	                  I_ExtendByRefPart currentPart = selectedObject.getTuple();
+	
+	                  newPart = (I_ExtendByRefPart) selectedObject.getTuple().getMutablePart().makeAnalog(
+	                        currentPart.getStatusNid(),
+	                        Long.MAX_VALUE,
+	                        config.getEditCoordinate().getAuthorNid(),
+	                        config.getEditCoordinate().getModuleNid(),
+	                        currentPart.getPathNid());
+	               } else {
+	                  newPart = selectedObject.getTuple().getMutablePart();
+	               }
+	
+	               newPart.setPathNid(p.getConceptNid());
+	               setProperStatus(newPart);
+	
+	               switch (field) {
+	               case STATUS :
+	                  newPart.setStatusNid((Terms.get().uuidToNative(ids)));
+	                  model.referencedConcepts.put(newPart.getStatusNid(),
+	                                               Terms.get().getConcept(newPart.getStatusNid()));
+	
+	                  break;
+	
+	               case CONCEPT_ID :
+	                  ((I_ExtendByRefPartCid) newPart).setC1id((Terms.get().uuidToNative(ids)));
+	
+	                  break;
+	
+	               case INTEGER_VALUE :
+	               case BOOLEAN_VALUE :
+	               case STRING_VALUE :
+	                  break;
+	
+	               default :
+	                  throw new Exception("Don't know how to handle: " + field);
+	               }
+	
+	               model.referencedConcepts.put(Terms.get().uuidToNative(ids),
+	                                            Terms.get().getConcept((Terms.get().uuidToNative(ids))));
+	               model.referencedConcepts.put(newPart.getStatusNid(),
+	                                            Terms.get().getConcept(newPart.getStatusNid()));
+	
+	               if (selectedObject.getTuple().getMutablePart().getTime() != Long.MAX_VALUE) {
+	                  selectedObject.getTuple().addVersion(newPart);
+	               }
+	            }
+	
+	            Terms.get().addUncommitted(selectedObject.getTuple().getCore());
+	            model.allTuples = null;
+	            model.fireTableDataChanged();
+	            model.propertyChange(null);
+        	 }
          } catch (Throwable ex) {
             AceLog.getAppLog().alertAndLogException(ex);
          }
