@@ -88,6 +88,7 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.vodb.bind.ThinVersionHelper;
 import org.dwfa.vodb.types.IntList;
 import org.ihtsdo.project.TerminologyProjectDAO;
+import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.query.helper.RefsetHelper;
 
