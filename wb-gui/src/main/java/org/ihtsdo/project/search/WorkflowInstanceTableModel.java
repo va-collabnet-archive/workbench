@@ -141,6 +141,10 @@ public class WorkflowInstanceTableModel extends DefaultTableModel implements WfI
 		super(data, columns);
 		this.data = new LinkedList<Object[]>();
 	}
+        
+        public LinkedList<Object[]> getData(){
+            return data;
+        }
 
 	public Object[] getBean(int rowIndex) {
 		if (rowIndex < 0 || data == null || rowIndex == data.size()) {

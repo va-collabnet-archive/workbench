@@ -53,27 +53,32 @@ public class DiffReportTableRenderer extends AceTableRenderer {
                 renderComponent.setForeground(UIManager.getColor("Table.foreground"));
             }
             if (column == 0) {
+                if (((String) table.getValueAt(row, 0)).equals("was retired")) {
+                    renderComponent.setText("<html><font face='Dialog' size='3' color='blue'>"
+                            + (String) value);
+                } else {
                     renderComponent.setText("<html><font face='Dialog' size='3' color='black'>"
                             + (String) value);
+                }
             } else if (column == 1 || column == 2 || column == 3) {
                 I_GetConceptData cb = (I_GetConceptData) value;
                 renderComponent.setText("<html><font face='Dialog' size='3' color='black'>" + cb.toUserString());
             } else if (column == 4) {
                 renderComponent.setText("<html><font face='Dialog' size='3' color='black'>"
-                            + ((Integer) value).toString());
+                        + ((Integer) value).toString());
             }
         } else {
             renderComponent.setBackground(UIManager.getColor("Table.selectionBackground"));
             renderComponent.setForeground(UIManager.getColor("Table.selectionForeground"));
             if (column == 0) {
-                    renderComponent.setText("<html><font face='Dialog' size='3' color='white'>"
-                            + (String) value);
+                renderComponent.setText("<html><font face='Dialog' size='3' color='white'>"
+                        + (String) value);
             } else if (column == 1 || column == 2 || column == 3) {
                 I_GetConceptData cb = (I_GetConceptData) value;
                 renderComponent.setText("<html><font face='Dialog' size='3' color='white'>" + cb.toUserString());
             } else if (column == 4) {
                 renderComponent.setText("<html><font face='Dialog' size='3' color='white'>"
-                            + ((Integer) value).toString());
+                        + ((Integer) value).toString());
             }
         }
 

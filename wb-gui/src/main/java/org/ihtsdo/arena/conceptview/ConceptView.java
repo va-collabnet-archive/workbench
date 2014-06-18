@@ -419,9 +419,9 @@ public class ConceptView extends JPanel {
                     viewType = View.INFERRED;
                 } else if (getSettings().getRelAssertionType() == RelAssertionType.INFERRED_THEN_STATED) {
                     viewType = View.STATED_AND_INFERRED;
-                } else if (settings.getRelAssertionType() == RelAssertionType.LONG_NORMAL_FORM) {
+                } else if (getSettings().getRelAssertionType() == RelAssertionType.LONG_NORMAL_FORM) {
                     viewType = View.LONG_NORMAL_FORM;
-                }else if (settings.getRelAssertionType() == RelAssertionType.SHORT_NORMAL_FORM) {
+                }else if (getSettings().getRelAssertionType() == RelAssertionType.SHORT_NORMAL_FORM) {
                     viewType = View.SHORT_NORMAL_FORM;
                 }
 

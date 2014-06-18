@@ -16,6 +16,7 @@ import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.FontMetrics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.LayoutManager;
@@ -35,8 +36,7 @@ import javax.swing.JLabel;
 import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
 import javax.swing.TransferHandler;
-import javax.swing.border.Border;
-import javax.swing.border.CompoundBorder;
+import org.dwfa.ace.DynamicWidthTermComponentLabel;
 import org.ihtsdo.arena.editor.ArenaEditor;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ContradictionException;
@@ -102,28 +102,8 @@ public class DragPanelRel extends DragPanelComponentVersion<RelationshipVersionB
       }
       
       ConceptAttributeVersionBI conceptAttributesActive = Ts.get().getConceptVersion(cvLayout.getSettings().getConfig().getViewCoordinate(), getRel().getTargetNid()).getConceptAttributesActive();
-       if (conceptAttributesActive != null) {
-           if (Ts.get().getConceptVersion(cvLayout.getSettings().getConfig().getViewCoordinate(), getRel().getTargetNid()).getConceptAttributesActive().isDefined()) {
-               relLabel = new JLabel(definedIcon);
-           } else {
-               relLabel = new JLabel(primitiveIcon);
-           }
-       }else{
-           relLabel = new JLabel(" ");
-       }
-
       setupDrag(getRel());
       setBorder(BorderFactory.createRaisedBevelBorder());
-       //      relLabel = getJLabel(" ");
-      Border inside = BorderFactory.createEmptyBorder();
-      Border outside = BorderFactory.createEmptyBorder(4, 2, 4, 2);
-      CompoundBorder border = BorderFactory.createCompoundBorder(outside, inside);
-      relLabel.setBackground(Color.BLUE);
-      relLabel.setOpaque(true);
-      relLabel.setBorder(border);
-      relLabel.setMinimumSize(new Dimension(20, 28));
-      relLabel.setPreferredSize(new Dimension(20, 28));
-      setDropPopupInset(relLabel.getPreferredSize().width);
 
       GridBagConstraints gbc = new GridBagConstraints();
 
@@ -131,11 +111,54 @@ public class DragPanelRel extends DragPanelComponentVersion<RelationshipVersionB
       gbc.weightx    = 0;
       gbc.weighty    = 0;
       gbc.fill       = GridBagConstraints.BOTH;
-      gbc.gridheight = 1;
+      gbc.gridheight = 2;
       gbc.gridwidth  = 1;
       gbc.gridx      = 0;
       gbc.gridy      = 0;
-      add(relLabel, gbc);
+      
+      Color color = new Color(135,206,250);
+      
+      if ((getParentCollapsePanel() == null)
+                || !getSettings().getView().getConfig().getAllowedStatus().contains(getRel().getStatusNid())) {
+          gbc.gridheight = 1;
+            JButton button = getComponentActionMenuButton();
+            button.setMinimumSize(new Dimension(16, 16));
+            button.setPreferredSize(new Dimension(16, 16));
+            button.setBackground(color.darker());
+            button.setOpaque(true);
+            add(button, gbc);
+            gbc.gridy++;
+            gbc.gridheight = GridBagConstraints.REMAINDER;
+            gbc.weighty = 1;
+            relLabel = getJLabel(" ");
+            relLabel.setOpaque(true);
+            relLabel.setMinimumSize(new Dimension(16, 28));
+            relLabel.setPreferredSize(new Dimension(16, 28));
+            setDropPopupInset(relLabel.getPreferredSize().width);
+            relLabel.setBackground(color.darker());
+            add(relLabel, gbc);
+        } else {
+            gbc.gridheight = 1;
+            JButton button = getComponentActionMenuButton();
+            button.setMinimumSize(new Dimension(16, 16));
+            button.setPreferredSize(new Dimension(16, 16));
+            button.setBackground(color);
+            button.setOpaque(true);
+            add(button, gbc);
+            gbc.gridy++;
+            gbc.gridheight = GridBagConstraints.REMAINDER;
+            gbc.weighty = 1;
+            relLabel = getJLabel(" ");
+            relLabel.setOpaque(true);
+            relLabel.setMinimumSize(new Dimension(16, 12));
+            relLabel.setPreferredSize(new Dimension(16, 12));
+            setDropPopupInset(relLabel.getPreferredSize().width);
+            relLabel.setBackground(color);
+            add(relLabel, gbc);
+            gbc.gridy = 0;
+            gbc.gridheight = 2;
+            gbc.weighty = 0;
+        }
       gbc.gridx++;
       
        
@@ -150,10 +173,27 @@ public class DragPanelRel extends DragPanelComponentVersion<RelationshipVersionB
       add(dupLabel, gbc);
       dupLabel.setVisible(false);
       gbc.gridx++;
-      gbc.weightx = 1;
+      gbc.weightx = 0;
+      gbc.weighty = 1;
       gbc.gridx++;
 
-      TermComponentLabel typeLabel = getLabel(getRel().getTypeNid(), canDrop, getSettings().getRelType());
+      TermComponentLabel typeLabel = getLabel(getRel().getTypeNid(), canDrop, getSettings().getRelType(), 115);
+      FontMetrics metrics = typeLabel.getFontMetrics(typeLabel.getFont());
+      int hgt = metrics.getHeight();
+      String[] split = typeLabel.getText().split(" ");
+      String longest = "";
+      for(String s : split){
+          if(s.length() > longest.length()){
+              longest = s;
+          }
+      }
+
+      int adv = metrics.stringWidth(longest);
+      Dimension size = new Dimension(adv+2, hgt+2); 
+      if(size.getWidth() > 70){
+          typeLabel.setFixedWidth(adv+2);
+          typeLabel.setPreferredSize(size);
+      }
 
       if (getRel().isUncommitted()
               && (getRel().getStatusNid() == SnomedMetadataRfx.getSTATUS_RETIRED_NID())) {
@@ -179,6 +219,7 @@ public class DragPanelRel extends DragPanelComponentVersion<RelationshipVersionB
             }
          }
       });
+      typeLabel.setBorder(BorderFactory.createEmptyBorder(0,3,0,2));
       add(typeLabel, gbc);
       gbc.gridx++;
       gbc.weightx = 0;
@@ -186,8 +227,9 @@ public class DragPanelRel extends DragPanelComponentVersion<RelationshipVersionB
       gbc.weightx = 1;
       gbc.gridx++;
 
-      TermComponentLabel destLabel = getLabel(getRel().getTargetNid(), canDrop,
+      DynamicWidthTermComponentLabel destLabel = getDynamicLabel(getRel().getTargetNid(), canDrop,
                                         getSettings().getRelTarget());
+      destLabel.setBorder(BorderFactory.createEmptyBorder(0,0,0,3));
 
       if (getRel().isUncommitted()
               && (getRel().getStatusNid() == SnomedMetadataRfx.getSTATUS_RETIRED_NID())) {
@@ -221,18 +263,33 @@ public class DragPanelRel extends DragPanelComponentVersion<RelationshipVersionB
       add(destLabel, gbc);
       gbc.weightx = 0;
       gbc.gridx++;
+      
 
+      JButton collapseExpandButton = getCollapseExpandButton();
+      add(collapseExpandButton, gbc);
+      gbc.gridx++;
+      
       if (getRel().isInferred()) {
          add(new JLabel(getInferredIcon()), gbc);
          gbc.gridx++;
       }
 
-      add(getComponentActionMenuButton(), gbc);
+      JLabel icon = null;
+      if (conceptAttributesActive != null) {
+           if (Ts.get().getConceptVersion(cvLayout.getSettings().getConfig().getViewCoordinate(), getRel().getTargetNid()).getConceptAttributesActive().isDefined()) {
+               icon = new JLabel(definedIcon);
+           } else {
+               icon = new JLabel(primitiveIcon);
+           }
+           icon.setBorder(BorderFactory.createEmptyBorder(0, 2, 0, 2));
+       }else{
+           icon = new JLabel(" ");
+       }
+      add(icon, gbc);
       gbc.gridx++;
-
-      JButton collapseExpandButton = getCollapseExpandButton();
-
-      add(collapseExpandButton, gbc);
+      
+      gbc.gridy = 2;
+      gbc.gridheight = 1;
       addSubPanels(gbc);
    }
 

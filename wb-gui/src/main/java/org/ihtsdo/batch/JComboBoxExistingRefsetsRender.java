@@ -58,14 +58,14 @@ class JComboBoxExistingRefsetsRender extends JLabel implements ListCellRenderer 
         DefaultComboBoxModel model = (DefaultComboBoxModel) jlist.getModel();
         ConceptVersionBI cvbi = (ConceptVersionBI) model.getElementAt(index);
         try {
-            if (cvbi.getDescriptionFullySpecified() != null) {
+            if (cvbi.getNid() == Integer.MAX_VALUE) {
+                setText("-----");
+            } else if (cvbi.getDescriptionFullySpecified() != null) {
                 setText(cvbi.getDescriptionFullySpecified().getText());
             } else {
                 setText(cvbi.getDescriptionsActive().iterator().next().getText());
             }
-        } catch (IOException ex) {
-            setText(cvbi.toUserString() + " -- FSN missing");
-        } catch (ContradictionException ex) {
+        } catch (IOException | ContradictionException ex) {
             setText(cvbi.toUserString() + " -- FSN missing");
         }
 

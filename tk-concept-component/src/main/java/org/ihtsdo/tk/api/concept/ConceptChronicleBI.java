@@ -318,6 +318,15 @@ public interface ConceptChronicleBI extends ComponentChronicleBI<ConceptVersionB
      * @see RefexChronicleBI
      */
     boolean isAnnotationIndex() throws IOException;
+    
+    /**
+     * Checks if this is concept is a canceled concept. Canceled concepts
+     * are ones which have been created (in the uncommitted stated) but not committed
+     * to the database.
+     * @return <code>true</code>, if the concept is canceled
+     * @throws IOException 
+     */
+    public boolean isCanceled() throws IOException;
 
     //~--- set methods ---------------------------------------------------------
     /**

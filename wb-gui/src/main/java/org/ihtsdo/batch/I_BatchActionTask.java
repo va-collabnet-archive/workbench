@@ -39,7 +39,9 @@ public interface I_BatchActionTask {
      *
      * @param ec
      * @param vc
+     * @param concepts
      * @return
+     * @throws java.lang.Exception
      */
     BatchActionTask getTask(EditCoordinate ec, ViewCoordinate vc, List<ConceptChronicleBI> concepts) throws Exception;
 
@@ -49,7 +51,14 @@ public interface I_BatchActionTask {
      *
      * @param existingParents
      * @param existingRefsets
+     * @param existingDescriptionRefsets
      * @param existingRoles
+     * @param parentLinkages
      */
-    void updateExisting(List<RelationshipVersionBI> existingParents, List<ComponentVersionBI> existingRefsets, List<RelationshipVersionBI> existingRoles, List<ComponentVersionBI> parentLinkages);
+    void updateExisting(
+            List<RelationshipVersionBI> existingParents, 
+            List<ComponentVersionBI> existingRefsets, 
+            List<ComponentVersionBI> existingDescriptionRefsets, 
+            List<RelationshipVersionBI> existingRoles, 
+            List<ComponentVersionBI> parentLinkages);
 }

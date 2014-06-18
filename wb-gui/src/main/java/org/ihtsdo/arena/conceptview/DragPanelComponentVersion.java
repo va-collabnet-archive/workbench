@@ -42,6 +42,7 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.SwingWorker;
+import org.dwfa.ace.DynamicWidthTermComponentLabel;
 
 public abstract class DragPanelComponentVersion<T extends ComponentVersionBI>
         extends DragPanel<T> implements I_ToggleSubPanels {
@@ -422,7 +423,7 @@ public abstract class DragPanelComponentVersion<T extends ComponentVersionBI>
    protected JButton getActionMenuButton() {
       JButton popupMenuButton = new JButton(dynamicPopupImage);
 
-      popupMenuButton.setPreferredSize(new Dimension(21, 16));
+//      popupMenuButton.setPreferredSize(new Dimension(21, 16));
       popupMenuButton.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
       popupMenuButton.setToolTipText("contextual editing actions");
       popupMenuButton.setOpaque(false);
@@ -444,8 +445,7 @@ public abstract class DragPanelComponentVersion<T extends ComponentVersionBI>
       collapseExpandButton.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
       collapseExpandButton.setToolTipText("Collapse/Expand");
       collapseExpandButton.setOpaque(false);
-      collapseExpandButton.setBorder(BorderFactory.createEmptyBorder(0, 4, 0,
-              6));
+      collapseExpandButton.setBorder(BorderFactory.createEmptyBorder(0, 4, 0, 6));
       updateCollapseExpandButton();
       addPanelsChangedActionListener(
           getSettings().getView().getPanelsChangedActionListener());
@@ -504,6 +504,18 @@ public abstract class DragPanelComponentVersion<T extends ComponentVersionBI>
            throws IOException {
       return getLabel(nid, canDrop, textType.getLabelText());
    }
+   
+   protected TermComponentLabel getLabel(int nid, boolean canDrop,
+           DescType textType, int fixedWidth)
+           throws IOException {
+      return getLabel(nid, canDrop, textType.getLabelText(), fixedWidth);
+   }
+   
+   protected DynamicWidthTermComponentLabel getDynamicLabel(int nid, boolean canDrop,
+           DescType textType)
+           throws IOException {
+      return getDynamicLabel(nid, canDrop, textType.getLabelText());
+   }
 
    protected TermComponentLabel getLabel(int nid, boolean canDrop,
            LabelText textType)
@@ -514,6 +526,47 @@ public abstract class DragPanelComponentVersion<T extends ComponentVersionBI>
          termLabel.setLineWrapEnabled(true);
          termLabel.getDropTarget().setActive(canDrop);
          termLabel.setFixedWidth(150);
+         termLabel.setFont(
+             termLabel.getFont().deriveFont(getSettings().getFontSize()));
+         termLabel.setBorder(BorderFactory.createEmptyBorder(1, 5, 1, 5));
+         termLabel.setTermComponent(Terms.get().getConcept(nid));
+
+         return termLabel;
+      } catch (TerminologyException terminologyException) {
+         throw new IOException(terminologyException);
+      }
+   }
+   
+   protected TermComponentLabel getLabel(int nid, boolean canDrop,
+           LabelText textType, int fixedWidth)
+           throws IOException {
+      try {
+         TermComponentLabel termLabel = new TermComponentLabel(textType);
+
+         termLabel.setLineWrapEnabled(true);
+         termLabel.getDropTarget().setActive(canDrop);
+         if(fixedWidth > 0){
+             termLabel.setFixedWidth(fixedWidth);
+         }
+         termLabel.setFont(
+             termLabel.getFont().deriveFont(getSettings().getFontSize()));
+         termLabel.setBorder(BorderFactory.createEmptyBorder(1, 5, 1, 5));
+         termLabel.setTermComponent(Terms.get().getConcept(nid));
+
+         return termLabel;
+      } catch (TerminologyException terminologyException) {
+         throw new IOException(terminologyException);
+      }
+   }
+   
+   protected DynamicWidthTermComponentLabel getDynamicLabel(int nid, boolean canDrop,
+           LabelText textType)
+           throws IOException {
+      try {
+        DynamicWidthTermComponentLabel termLabel = new DynamicWidthTermComponentLabel(textType);
+
+//         termLabel.setLineWrapEnabled(true);
+         termLabel.getDropTarget().setActive(canDrop);
          termLabel.setFont(
              termLabel.getFont().deriveFont(getSettings().getFontSize()));
          termLabel.setBorder(BorderFactory.createEmptyBorder(1, 5, 1, 5));
@@ -608,7 +661,7 @@ public abstract class DragPanelComponentVersion<T extends ComponentVersionBI>
             actionButton.addActionListener(new DoDynamicPopup(actions));
 
             if ((actions == null) || actions.isEmpty()) {
-               actionButton.setVisible(false);
+               actionButton.setEnabled(false);
             }
          } catch (InterruptedException ex) {
             AceLog.getAppLog().alertAndLogException(ex);

@@ -42,7 +42,6 @@ import java.beans.PropertyVetoException;
 import java.io.IOException;
 
 import java.util.*;
-import org.ihtsdo.db.bdb.BdbTerminologySnapshot;
 import org.ihtsdo.db.bdb.BdbTerminologyStore;
 import org.ihtsdo.db.change.ChangeNotifier;
 import org.ihtsdo.tk.Ts;
@@ -717,7 +716,7 @@ public class Relationship extends ConceptComponent<RelationshipRevision, Relatio
     }
 
     @Override
-    public boolean isStated() throws IOException{
+    public boolean isStated() throws IOException {
         return !isInferred();
     }
 

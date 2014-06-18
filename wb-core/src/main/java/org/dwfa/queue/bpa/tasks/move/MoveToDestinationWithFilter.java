@@ -129,7 +129,7 @@ public class MoveToDestinationWithFilter extends AbstractTask {
                          + five;
          }
 
-         if (!Ts.get().hasUuid(UUID.fromString(uuidString))) {
+         if (!Ts.get().hasUuid(UUID.fromString(uuidString)) || Ts.get().getConcept(UUID.fromString(uuidString)).isCanceled()) {
 
             // check if inbox already contains entry
             Collection<I_DescribeBusinessProcess> entries =

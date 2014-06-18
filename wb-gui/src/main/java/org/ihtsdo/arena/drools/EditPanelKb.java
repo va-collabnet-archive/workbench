@@ -69,6 +69,7 @@ public class EditPanelKb {
             ViewCoordinate coordinate = config.getViewCoordinate();
             
             View viewType = null;
+
             if (settings.getRelAssertionType() == RelAssertionType.STATED) {
                 viewType = View.STATED;
             } else if (settings.getRelAssertionType() == RelAssertionType.INFERRED) {

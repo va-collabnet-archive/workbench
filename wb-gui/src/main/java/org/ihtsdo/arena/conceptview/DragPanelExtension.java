@@ -101,7 +101,7 @@ public class DragPanelExtension extends DragPanelComponentVersion<RefexVersionBI
 
       setBorder(BorderFactory.createRaisedBevelBorder());
       extensionLabel = getJLabel(" ");
-      extensionLabel.setBackground(Color.RED);
+      extensionLabel.setBackground(new Color (255, 64, 0));
       extensionLabel.setOpaque(true);
       extensionLabel.setMinimumSize(new Dimension(20, 28));
       extensionLabel.setPreferredSize(new Dimension(20, 28));
@@ -165,6 +165,7 @@ public class DragPanelExtension extends DragPanelComponentVersion<RefexVersionBI
       });
 
       typeLabel.setFrozen(canDrop);
+      typeLabel.setBorder(BorderFactory.createEmptyBorder(0,3,0,2));
       add(typeLabel, gbc);
       gbc.gridx++;
       gbc.weightx = 0;
