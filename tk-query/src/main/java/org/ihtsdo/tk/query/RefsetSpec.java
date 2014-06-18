@@ -1,18 +1,18 @@
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  */
 package org.ihtsdo.tk.query;
 
@@ -39,7 +39,7 @@ public class RefsetSpec {
 
     /**
      * Use this constructor if you wish to input the refset spec concept.
-     * 
+     *
      * @param spec
      */
     public RefsetSpec(ConceptChronicleBI spec, ViewCoordinate vc) {
@@ -51,7 +51,7 @@ public class RefsetSpec {
     /**
      * Use this constructor if you wish to input the member refset concept,
      * rather than the refset spec concept.
-     * 
+     *
      * @param concept
      * @param memberRefsetInputted
      */
@@ -60,13 +60,13 @@ public class RefsetSpec {
         this.vc = vc;
         if (memberRefsetInputted) {
             try {
-                int specifiesRefsetRelNid =
-                        ts.getNidForUuids(RefsetAuxiliary.Concept.SPECIFIES_REFSET.getUids());
+                int specifiesRefsetRelNid
+                        = ts.getNidForUuids(RefsetAuxiliary.Concept.SPECIFIES_REFSET.getUids());
                 Collection<? extends ConceptVersionBI> relSources = concept.getVersion(vc).getRelationshipsIncomingSourceConceptsActive(
-                                                                                                           specifiesRefsetRelNid);
-                if(relSources != null && !relSources.isEmpty()){
+                        specifiesRefsetRelNid);
+                if (relSources != null && !relSources.isEmpty()) {
                     this.spec = relSources.iterator().next().getChronicle();
-                }else{
+                } else {
                     this.spec = null;
                 }
                 this.refsetConcept = concept;
@@ -80,19 +80,19 @@ public class RefsetSpec {
 
     public boolean isConceptComputeType() {
         try {
-            int refsetComputeTypeRelNid =
-                    ts.getNidForUuids(RefsetAuxiliary.Concept.REFSET_COMPUTE_TYPE_REL.getUids());
-            if(spec == null){
+            int refsetComputeTypeRelNid
+                    = ts.getNidForUuids(RefsetAuxiliary.Concept.REFSET_COMPUTE_TYPE_REL.getUids());
+            if (spec == null) {
                 return true;
             }
             ConceptVersionBI version = spec.getVersion(vc);
             Collection<? extends ConceptVersionBI> relTargets = null;
-            if(version != null){
+            if (version != null) {
                 relTargets = spec.getVersion(vc).getRelationshipsOutgoingTargetConceptsActive(refsetComputeTypeRelNid);
             }
             ConceptChronicleBI computeType = null;
-            if(relTargets != null){
-                  computeType = relTargets.iterator().next();
+            if (relTargets != null) {
+                computeType = relTargets.iterator().next();
             }
             if (computeType == null) {
                 // backwards compatibility - if no compute type has been specified, then a default compute type of
@@ -100,7 +100,7 @@ public class RefsetSpec {
                 return true;
             } else {
                 if (computeType.getConceptNid() == ts.getNidForUuids(
-                    RefsetAuxiliary.Concept.CONCEPT_COMPUTE_TYPE.getUids())) {
+                        RefsetAuxiliary.Concept.CONCEPT_COMPUTE_TYPE.getUids())) {
                     return true;
                 } else {
                     return false;
@@ -126,19 +126,19 @@ public class RefsetSpec {
 
     public boolean isDescriptionComputeType() {
         try {
-            int refsetComputeTypeRelNid =
-                    ts.getNidForUuids(RefsetAuxiliary.Concept.REFSET_COMPUTE_TYPE_REL.getUids());
-            if(spec == null){
+            int refsetComputeTypeRelNid
+                    = ts.getNidForUuids(RefsetAuxiliary.Concept.REFSET_COMPUTE_TYPE_REL.getUids());
+            if (spec == null) {
                 return false;
             }
             ConceptVersionBI version = spec.getVersion(vc);
             Collection<? extends ConceptVersionBI> relTargets = null;
-            if(version != null){
+            if (version != null) {
                 relTargets = spec.getVersion(vc).getRelationshipsOutgoingTargetConceptsActive(refsetComputeTypeRelNid);
             }
             ConceptChronicleBI computeType = null;
-            if(relTargets != null){
-                  computeType = relTargets.iterator().next();
+            if (relTargets != null) {
+                computeType = relTargets.iterator().next();
             }
             if (computeType == null) {
                 // backwards compatibility - if no compute type has been specified, then a default compute type of
@@ -146,7 +146,7 @@ public class RefsetSpec {
                 return false;
             } else {
                 if (computeType.getConceptNid() == ts.getNidForUuids(
-                    RefsetAuxiliary.Concept.DESCRIPTION_COMPUTE_TYPE.getUids())) {
+                        RefsetAuxiliary.Concept.DESCRIPTION_COMPUTE_TYPE.getUids())) {
                     return true;
                 } else {
                     return false;
@@ -160,10 +160,15 @@ public class RefsetSpec {
 
     public boolean isRelationshipComputeType() {
         try {
-            int refsetComputeTypeRelNid =
-                    ts.getNidForUuids(RefsetAuxiliary.Concept.REFSET_COMPUTE_TYPE_REL.getUids());
-            ConceptChronicleBI computeType = spec.getVersion(vc).getRelationshipsOutgoingTargetConceptsActive(
-                    refsetComputeTypeRelNid).iterator().next();
+            int refsetComputeTypeRelNid
+                    = ts.getNidForUuids(RefsetAuxiliary.Concept.REFSET_COMPUTE_TYPE_REL.getUids());
+            ConceptChronicleBI computeType;
+            if (this.spec == null) {
+                computeType = null;
+            } else {
+                computeType = spec.getVersion(vc).getRelationshipsOutgoingTargetConceptsActive(
+                        refsetComputeTypeRelNid).iterator().next();
+            }
 
             if (computeType == null) {
                 // backwards compatibility - if no compute type has been specified, then a default compute type of
@@ -171,7 +176,7 @@ public class RefsetSpec {
                 return false;
             } else {
                 if (computeType.getConceptNid() == ts.getNidForUuids(
-                    RefsetAuxiliary.Concept.RELATIONSHIP_COMPUTE_TYPE.getUids())) {
+                        RefsetAuxiliary.Concept.RELATIONSHIP_COMPUTE_TYPE.getUids())) {
                     return true;
                 } else {
                     return false;
@@ -189,13 +194,13 @@ public class RefsetSpec {
 
     public ConceptChronicleBI getMemberRefsetConcept() {
         try {
-            if(refsetConcept != null){
+            if (refsetConcept != null) {
                 return refsetConcept;
             }
             int specifiesRefsetRelNid = ts.getNidForUuids(RefsetAuxiliary.Concept.SPECIFIES_REFSET.getUids());
             Collection<? extends ConceptVersionBI> specConcepts = getRefsetSpecConcept().getVersion(vc).getRelationshipsOutgoingTargetConceptsActive(
-                                                                                                       specifiesRefsetRelNid);
-            if(!specConcepts.isEmpty()){
+                    specifiesRefsetRelNid);
+            if (!specConcepts.isEmpty()) {
                 refsetConcept = specConcepts.iterator().next().getChronicle();
             }
             return refsetConcept;
@@ -207,8 +212,8 @@ public class RefsetSpec {
 
     public ConceptChronicleBI getMarkedParentRefsetConcept() {
         try {
-            int markedParentRelNid =
-                    ts.getNidForUuids(RefsetAuxiliary.Concept.MARKED_PARENT_REFSET.getUids());
+            int markedParentRelNid
+                    = ts.getNidForUuids(RefsetAuxiliary.Concept.MARKED_PARENT_REFSET.getUids());
             ConceptChronicleBI memberRefsetConcept = getMemberRefsetConcept();
             if (memberRefsetConcept == null) {
                 return null;
@@ -221,18 +226,18 @@ public class RefsetSpec {
             return null;
         }
     }
-    
+
     public ConceptChronicleBI getPromotionRefsetConcept() {
         try {
-            int promotionRelNid =
-                    ts.getNidForUuids(RefsetAuxiliary.Concept.PROMOTION_REL.getUids());
+            int promotionRelNid
+                    = ts.getNidForUuids(RefsetAuxiliary.Concept.PROMOTION_REL.getUids());
             ConceptChronicleBI memberRefsetConcept = getMemberRefsetConcept();
             if (memberRefsetConcept == null) {
                 return null;
             }
-            Collection<? extends ConceptVersionBI> promotionConcepts = 
-                    memberRefsetConcept.getVersion(vc).getRelationshipsOutgoingTargetConceptsActive(promotionRelNid);
-            if(promotionConcepts.isEmpty()){
+            Collection<? extends ConceptVersionBI> promotionConcepts
+                    = memberRefsetConcept.getVersion(vc).getRelationshipsOutgoingTargetConceptsActive(promotionRelNid);
+            if (promotionConcepts.isEmpty()) {
                 return null;
             }
             return promotionConcepts.iterator().next().getChronicle();
@@ -289,7 +294,7 @@ public class RefsetSpec {
             throw new IOException(e);
         }
     }
-    
+
     public Collection<? extends ConceptVersionBI> getCommentsRefsetConcepts() throws IOException {
         try {
             int computeTimeRelNid = ts.getNidForUuids(RefsetAuxiliary.Concept.COMMENTS_REL.getUids());
@@ -330,11 +335,11 @@ public class RefsetSpec {
         ConceptChronicleBI lastComputeTimeConcept = getComputeConcept();
         Long latestTime = null;
         Collection<? extends RefexVersionBI<?>> refsetMembersActive = lastComputeTimeConcept.getRefsetMembersActive(vc);
-        for(RefexVersionBI r : refsetMembersActive){
+        for (RefexVersionBI r : refsetMembersActive) {
             RefexLongVersionBI rl = (RefexLongVersionBI) r;
-            if(latestTime == null){
+            if (latestTime == null) {
                 latestTime = rl.getLong1();
-            }else if(rl.getLong1() > latestTime){
+            } else if (rl.getLong1() > latestTime) {
                 latestTime = rl.getLong1();
             }
         }
@@ -348,11 +353,11 @@ public class RefsetSpec {
         ConceptChronicleBI lastEditTimeConcept = getEditConcept();
         Long latestTime = null;
         Collection<? extends RefexVersionBI<?>> refsetMembersActive = lastEditTimeConcept.getRefsetMembersActive(vc);
-        for(RefexVersionBI r : refsetMembersActive){
+        for (RefexVersionBI r : refsetMembersActive) {
             RefexLongVersionBI rl = (RefexLongVersionBI) r;
-            if(latestTime == null){
+            if (latestTime == null) {
                 latestTime = rl.getLong1();
-            }else if(rl.getLong1() > latestTime){
+            } else if (rl.getLong1() > latestTime) {
                 latestTime = rl.getLong1();
             }
         }
