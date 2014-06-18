@@ -1,18 +1,18 @@
 /**
  * Copyright (c) 2009 International Health Terminology Standards Development
  * Organisation
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  */
 package org.dwfa.ace.activity;
 
@@ -24,7 +24,9 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -42,6 +44,7 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.Timer;
+import static javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_ShowActivity;
@@ -51,7 +54,8 @@ import org.dwfa.bpa.util.ComponentFrame;
 import org.ihtsdo.util.swing.GuiUtil;
 
 /**
- * TODO get this viewer to work more directly with the java 6 Swing worker.  
+ * TODO get this viewer to work more directly with the java 6 Swing worker.
+ *
  * @author kec
  *
  */
@@ -252,7 +256,7 @@ public class ActivityViewer implements ActionListener {
         }
 
         @Override
-        public String getNextFrameName()  {
+        public String getNextFrameName() {
             return "Activity Viewer";
         }
 
@@ -277,7 +281,6 @@ public class ActivityViewer implements ActionListener {
     });
     private static final Timer resortTimer = new Timer(1000, null);
     private static final Timer updateTimer = new Timer(500, null);
-
 
     public static void removeFromUpdateTimer(ActionListener l) {
         updateTimer.removeActionListener(l);
@@ -306,48 +309,100 @@ public class ActivityViewer implements ActionListener {
     }
     private static ActivityComparator activityComparator = new ActivityComparator();
 
+    /**
+     * Contains a "snapshot" of properties for use in the
+     * {@link #activityComparator}.
+     */
+    private static final Map<I_ShowActivity, I_ShowActivityProperties> I_SHOW_ACTIVITY_PROPERTIES = new HashMap<>();
+
     private static class ActivityComparator implements Comparator<I_ShowActivity> {
 
         @Override
         public int compare(I_ShowActivity a1, I_ShowActivity a2) {
-            if (a1.isCompleteForComparison() && a2.isCompleteForComparison()) {
+            //Get the map values for a1 and a2, which provide a "snapshot" of
+            //the I_ShowActivity properties
+            I_ShowActivityProperties a1Prop = I_SHOW_ACTIVITY_PROPERTIES.get(a1);
+            I_ShowActivityProperties a2Prop = I_SHOW_ACTIVITY_PROPERTIES.get(a2);
+
+            boolean a1CompleteForComparison;
+            boolean a2CompleteForComparison;
+            boolean a1Indeterminate;
+            boolean a2Indeterminate;
+            int a1Value;
+            int a2Value;
+            int a1Max;
+            int a2Max;
+
+            if (a1Prop != null) {
+                a1CompleteForComparison = a1Prop.isIsCompleteForComparison();
+                a1Indeterminate = a1Prop.isIsIndeterminate();
+                a1Value = a1Prop.getValue();
+                a1Max = a1.getMaximum();
+            } else {
+                a1CompleteForComparison = a1.isCompleteForComparison();
+                a1Indeterminate = a1.isIndeterminate();
+                a1Value = a1.getValue();
+                a1Max = a1.getMaximum();
+            }
+
+            if (a2Prop != null) {
+                a2CompleteForComparison = a2Prop.isIsCompleteForComparison();
+                a2Indeterminate = a2Prop.isIsIndeterminate();
+                a2Value = a2Prop.getValue();
+                a2Max = a2.getMaximum();
+            } else {
+                a2CompleteForComparison = a2.isCompleteForComparison();
+                a2Indeterminate = a2.isIndeterminate();
+                a2Value = a2.getValue();
+                a2Max = a2.getMaximum();
+            }
+
+            if (a1CompleteForComparison && a2CompleteForComparison) {
                 if (a1.getStartTime() < a2.getStartTime()) {
                     return 1;
+                } else if (a1.getStartTime() > a2.getStartTime()) {
+                    return -1;
+                } else {
+                    return 0;
                 }
-                return -1;
             }
-            if (a1.isCompleteForComparison() != a2.isCompleteForComparison()) {
-                if (a1.isCompleteForComparison()) {
+            if (a1CompleteForComparison != a2CompleteForComparison) {
+                if (a1CompleteForComparison) {
                     return 1;
                 }
                 return -1;
-            } else if (a1.isIndeterminate() != a2.isIndeterminate()) {
-                if (a1.isIndeterminate()) {
+            } else if (a1Indeterminate != a2Indeterminate) {
+                if (a1Indeterminate) {
                     return 1;
                 }
                 return -1;
             } else {
                 float a1Percent = 0;
-                if (a1.getMaximum() != 0) {
-                    a1Percent = a1.getValue() / a1.getMaximum();
+                if (a1Max != 0) {
+                    a1Percent = a1Value / a1Max;
                 }
                 float a2Percent = 0;
-                if (a2.getMaximum() != 0) {
-                    a2Percent = a2.getValue() / a2.getMaximum();
+                if (a2Max != 0) {
+                    a2Percent = a2Value / a2Max;
                 }
                 if (a1Percent != a2Percent) {
                     if (a1Percent < a2Percent) {
                         return 1;
+                    } else if (a1Percent < a2Percent) {
+                        return -1;
+                    } else {
+                        return 0;
                     }
-                    return -1;
                 }
             }
             if (a1.getStartTime() < a2.getStartTime()) {
                 return 1;
-            }
+            } else if (a1.getStartTime() > a2.getStartTime()) {
                 return -1;
             }
+            return 0;
         }
+    }
 
     public static void addActivity(final I_ShowActivity activity) throws Exception {
         if (DwfaEnv.isHeadless() == false) {
@@ -401,13 +456,56 @@ public class ActivityViewer implements ActionListener {
         }
     }
 
+    /**
+     * Private class to handle the storage of a "snapshot" of the properties in
+     * {@link org.dwfa.ace.api.I_ShowActivity} for use in
+     * {@link #activityComparator}.
+     */
+    private static class I_ShowActivityProperties {
+
+        private final boolean isCompleteForComparison;
+        private final boolean isIndeterminate;
+        private final int value;
+        private final int maximum;
+
+        public I_ShowActivityProperties(I_ShowActivity activity) {
+            this.isCompleteForComparison = activity.isCompleteForComparison();
+            this.isIndeterminate = activity.isIndeterminate();
+            this.value = activity.getValue();
+            this.maximum = activity.getMaximum();
+        }
+
+        public boolean isIsCompleteForComparison() {
+            return isCompleteForComparison;
+        }
+
+        public boolean isIsIndeterminate() {
+            return isIndeterminate;
+        }
+
+        public int getValue() {
+            return value;
+        }
+
+        public int getMaximum() {
+            return maximum;
+        }
+    }
+
     private static class ActivitySorter extends SwingWorker<Boolean, Object> {
 
         @Override
         protected Boolean doInBackground() throws Exception {
             ArrayList<I_ShowActivity> origOrder = null;
-            origOrder = new ArrayList<I_ShowActivity>(viewer.activitiesList);
-            List<I_ShowActivity> listToSort = new ArrayList<I_ShowActivity>(viewer.activitiesSet);
+            origOrder = new ArrayList<>(viewer.activitiesList);
+            List<I_ShowActivity> listToSort = new ArrayList<>(viewer.activitiesSet);
+            //load the map, which provides a "snapshot" of the properties for use in the Comparator
+            I_ShowActivityProperties actProperties;
+            for (I_ShowActivity activity : listToSort) {
+                actProperties = new I_ShowActivityProperties(activity);
+                I_SHOW_ACTIVITY_PROPERTIES.put(activity, actProperties);
+            }
+
             Collections.sort(listToSort, activityComparator);
             if (origOrder.equals(listToSort)) {
                 return false;
