@@ -41,6 +41,8 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.border.EmptyBorder;
+import static org.dwfa.bpa.util.AppInfoProperties.ABOUT_BOX_RELEASE_EDITION;
+import static org.dwfa.bpa.util.AppInfoProperties.ABOUT_BOX_RELEASE_VERSION;
 import static org.dwfa.bpa.util.AppInfoProperties.ARCHETYPE_ARTIFACT_ID;
 import static org.dwfa.bpa.util.AppInfoProperties.ARCHETYPE_GROUP_ID;
 import static org.dwfa.bpa.util.AppInfoProperties.ARCHETYPE_VERSION;
@@ -142,6 +144,8 @@ public class AboutBox {
 
     private static JLabel createReleaseEditionLabel() {
         Properties appInfoProperties = AppInfoProperties.getProperties();
+        String releaseName = appInfoProperties.getProperty(ABOUT_BOX_RELEASE_EDITION);
+        String releaseVersion = appInfoProperties.getProperty(ABOUT_BOX_RELEASE_VERSION);
         String projectName = buildProjectName(appInfoProperties);
         String projectDescription = buildProjectDesc(appInfoProperties);
         String bundleType = buildType(appInfoProperties);
@@ -157,9 +161,9 @@ public class AboutBox {
 
         JLabel label = null;
         if (siteURL != null) {
-            label = createLinkLabel(siteURL, projectName, projectDescription, projectId, bundleType, archetypeId, dataId, toolkitVersion, snomedCoreReleaseDate);
+            label = createLinkLabel(siteURL, releaseName, releaseVersion, projectName, projectDescription, projectId, bundleType, archetypeId, dataId, toolkitVersion, snomedCoreReleaseDate);
         } else {
-            label = createPlainLabel(projectName, projectDescription, projectId, bundleType, archetypeId, dataId, toolkitVersion, snomedCoreReleaseDate);
+            label = createPlainLabel(releaseName, releaseVersion, projectName, projectDescription, projectId, bundleType, archetypeId, dataId, toolkitVersion, snomedCoreReleaseDate);
         }
         label.setAlignmentX(Component.CENTER_ALIGNMENT);
         label.setBorder(new EmptyBorder(5, 0, 5, 0));
@@ -192,10 +196,10 @@ public class AboutBox {
         return archetypeGroupId + ":" + archetypeArtifactId + ":" + archetypeVersion;
     }
 
-    private static JLabel createLinkLabel(final String siteURL, String projectName,
+    private static JLabel createLinkLabel(final String siteURL, String releaseName, String releaseVersion, String projectName,
             String projectDesc, String projectId, String bundleType, String archetypeId, String dataId, String toolkitVersion, String snomedCoreReleaseDate) {
         final String href = buildHref(siteURL);
-        String labelText = buildLabelText(href, projectName, projectDesc, projectId, bundleType, archetypeId, dataId, toolkitVersion, snomedCoreReleaseDate);
+        String labelText = buildLabelText(href, releaseName, releaseVersion, projectName, projectDesc, projectId, bundleType, archetypeId, dataId, toolkitVersion, snomedCoreReleaseDate);
         JLabel label = new JLabel(labelText);
 
         // Simulate hyperlink.
@@ -222,9 +226,9 @@ public class AboutBox {
         return label;
     }
 
-    private static JLabel createPlainLabel(String projectName, String projectDesc,
+    private static JLabel createPlainLabel(String releaseName, String releaseVersion, String projectName, String projectDesc,
             String projectId,  String bundleType, String archetypeId, String dataId, String toolkitVersion, String snomedCoreReleaseDate) {
-        String labelText = buildLabelText(null, projectName, projectDesc, projectId, bundleType, archetypeId, dataId, toolkitVersion, snomedCoreReleaseDate);
+        String labelText = buildLabelText(null, releaseName, releaseVersion, projectName, projectDesc, projectId, bundleType, archetypeId, dataId, toolkitVersion, snomedCoreReleaseDate);
         return new JLabel(labelText);
     }
 
@@ -265,10 +269,20 @@ public class AboutBox {
         return appInfoProperties.getProperty(TOOLKIT_VERSION);
     }
 
-    static String buildLabelText(String href, String projectName, String projectDesc,
+    static String buildLabelText(String href, String releaseName, String releaseVersion, String projectName, String projectDesc,
             String projectId, String bundleType, String archetypeId, String dataId, String toolkitVersion, String snomedCTDate) {
         StringBuilder labelTextBuilder = new StringBuilder("<html><blockquote>");
 
+        if (releaseName != null && releaseName.length() > 0)
+        {
+            labelTextBuilder.append("<br><b>" + releaseName + "</b>");
+        }
+        
+        if (releaseVersion != null && releaseVersion.length() > 0)
+        {
+            labelTextBuilder.append("<br><b>" + releaseVersion + "</b>");
+        }
+        
         if (projectName != null) {
             labelTextBuilder.append("<br><b>Workbench name: </b>").append(projectName);
         }

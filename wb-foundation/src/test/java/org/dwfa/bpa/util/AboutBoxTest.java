@@ -116,10 +116,12 @@ public class AboutBoxTest {
         String toolkitVersion = AboutBox.buildToolkitVersion(appInfoProperties);
         String snomedCoreReleaseDate = AboutBox.buildSnomedCoreReleaseDate(appInfoProperties);
         String type = AboutBox.buildType(appInfoProperties);
-        String linkLabelText = AboutBox.buildLabelText(href, name, projectDescription, projectId, type, archetypeId,
+        String linkLabelText = AboutBox.buildLabelText(href, "Super Release", "1", name, projectDescription, projectId, type, archetypeId,
                 dataId, toolkitVersion, snomedCoreReleaseDate);
 
         String expectedValue = "<html><blockquote>"
+                + "<br><b>Super Release</b>"
+                + "<br><b>1</b>"
                 + "<br><b>Workbench name: </b>" + this.projectName
                 + "<br><b>Workbench description: </b>" + this.projectDesc
                 + "<br><b>Workbench type: </b>" + this.type
