@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<config>
+	<exportFileName>sct2_wfHx_Full-en_INT_</exportFileName>
+	<droolsDrlFile>org/ihtsdo/rf2/drools/NONEReleaseRules.drl</droolsDrlFile>
+	<column>
+		<name>WorkflowUUID</name>
+		<description></description>
+		<delimiter>\t</delimiter>
+	</column>
+	<column>
+		<name>ConceptUUID</name>
+		<description></description>
+		<delimiter>\t</delimiter>
+	</column>
+	<column>
+		<name>Modeler</name>
+		<description></description>
+		<delimiter>\t</delimiter>
+	</column>
+	<column>
+		<name>WorkflowAction</name>
+		<description></description>
+		<delimiter>\t</delimiter>
+	</column>
+	<column>
+		<name>WorkflowState</name>
+		<description></description>
+		<delimiter>\t</delimiter>
+	</column>
+	<column>
+		<name>FSN</name>
+		<description></description>
+		<delimiter>\t</delimiter>
+	</column>
+	<column>
+		<name>WorkflowTime</name>
+		<description></description>
+		<delimiter>\t</delimiter>
+	</column>	
+	<column>
+		<name>EFFECTIVETIME</name>
+		<description></description>
+		<delimiter>\r\n</delimiter>
+	</column>
+</config>
+
+
+							

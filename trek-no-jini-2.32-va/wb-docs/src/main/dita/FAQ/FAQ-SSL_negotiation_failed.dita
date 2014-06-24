@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN"
+"http://docs.oasis-open.org/dita/dtd/topic.dtd">
+<topic id="SSL_negotiation">
+  <title>Why do I get an "SSL negotiation failed" error?</title>
+
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>SSL negotiaion failed</indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+
+  <body>
+    <section><title>Error message: "SSL negotiation failed: SSL disabled due
+    to library version mismatch"</title><p>Check to see if other versions of
+    the above files are on your computer. If so, make sure that any entry in
+    the system path that points to the is later in the path than the entry for
+    the Subversion files. If they are earlier in the path, Subversion will
+    attempt to use them and, if incompatible, an error will occur. For
+    example, if an incompatible version of the file ssleay32.dll is used, you
+    will see the message "<i>SSL negotiation failed: SSL disabled due to
+    library version mismatch</i>".<fn><xref format="html"
+    href="http://www.oracle.com/technology/products/jdev/htdocs/partners/addins/exchange/subversion/subversion.html"
+    id="jdev"
+    scope="external">http://www.oracle.com/technology/products/jdev/htdocs/partners/addins/exchange/subversion/subversion.html</xref></fn></p></section>
+  </body>
+</topic>

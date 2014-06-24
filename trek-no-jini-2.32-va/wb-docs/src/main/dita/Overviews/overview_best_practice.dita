@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
+"http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+<topic id="best-practice" xml:lang="en">
+  <title>Best-Practice Based</title>
+
+  <shortdesc>The IHTSDO Workbench Toolkit constitutes a powerful and flexible
+  environment for building, packaging and deploying tools for the production
+  and management of clinical terminologies and classifications.</shortdesc>
+
+  <body>
+    <section><title>Develop Iteratively</title> Given today's sophisticated
+    systems, it is not possible to sequentially first define the entire
+    problem, design the entire solution, build the software and then test the
+    product at the end. An iterative approach is required that allows an
+    increasing understanding of the problem through successive refinements,
+    and to incrementally grow an effective solution over multiple iterations.
+    <p>The IHTSDO Workbench supports an iterative approach to development that
+    allows developers to address the highest risk items at every stage in the
+    lifecycle, significantly reducing a project's risk profile. This iterative
+    approach helps attack risk through demonstrable progress—frequent,
+    executable releases that enable continuous end-user involvement and
+    feedback. Because each iteration ends with an executable release, the
+    development team stays focused on producing results, and frequent status
+    checks help ensure that the project stays on schedule. An iterative
+    approach also makes it easier to accommodate tactical changes in
+    requirements, features or schedule.</p></section>
+
+    <section><title>Manage Requirements</title> The IHTSDO Workbench provides
+    the necessary tools to elicit, organize, and document required
+    functionality and constraints, track and document tradeoffs and decisions,
+    and easily capture and communicate business requirements.</section>
+
+    <section><title>Use Component-Based Architectures</title> The IHTSDO
+    Workbench provides a framework that enables early development and
+    baselining of a robust terminology architecture, prior to committing
+    resources for full-scale development. It describes how to design a
+    resilient architecture that is flexible, accommodates change, is
+    intuitively understandable, and promotes more effective reuse.</section>
+
+    <section><title>Verify Quality</title>The IHTSDO Workbench allows
+    terminology developers to build quality assessment into the process, in
+    all activities, involving all participants, using objective measurements
+    and criteria, without being treated as an afterthought or a separate
+    activity performed by a separate group.</section>
+
+    <section><title>Control Changes</title>The IHTSDO Workbench allows users
+    to manage change--making certain that each change is acceptable, and being
+    able to track those changes. The IHTSDO Workbench provides the ability to
+    control, track and monitor changes to enable successful iterative
+    development. The IHTSDO Workbench also makes it simple to establish secure
+    workspaces for each developer by providing isolation from changes made in
+    other workspaces and by controlling changes of all artifacts (e.g.,
+    models, code, documents, etc.). And it brings a team together to work as a
+    single unit by providing automated integration and build
+    management.</section>
+  </body>
+</topic>

@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
+"http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+<topic id="classifier_log" xml:lang="en">
+  <title>Classifier logging</title>
+
+  <prolog>
+    <author>Eric Browne</author>
+
+    <metadata>
+      <keywords>
+        <indexterm>classifier <indexterm>logging</indexterm></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+
+  <body>
+    <section><title>Workbench log file</title><p>The workbench keeps a
+    comprehensive log file of most operations whilst it is running. For a
+    better understanding of the classifier, and for resolving issues, it is
+    often worthwhile reviewing the log file located in the main Workbench
+    application folder. Entries related to the classifier can be found by
+    searching for "<codeph>SnorocketTask</codeph>" in the log file. A sample
+    fragment of a log file, with numerical identifiers removed, is illustrated
+    below.</p><codeblock>::: [SnorocketTask] evaluate() -- begin
+Aug 16, 2010 4:28:17 PM org.dwfa.ace.task.classify.SnorocketTask evaluate
+INFO:
+::: [SnorocketTask]
+:::     : isaNid
+:::     : rootNid
+:::     : isCURRENT
+:::     : isRETIRED
+:::     : isOPTIONAL_REFINABILITY
+:::     : isNOT_REFINABLE
+:::     : isMANDATORY_REFINABILITY
+:::     : isCh_STATED_RELATIONSHIP
+:::     : isCh_DEFINING_CHARACTERISTIC
+:::     : isCh_STATED_AND_INFERRED_RELATIONSHIP
+:::     : isCh_STATED_AND_SUBSUMED_RELATIONSHIP
+
+Aug 16, 2010 4:28:17 PM org.dwfa.ace.task.classify.SnorocketTask evaluate
+INFO:
+::: [SnorocketTask] PATH ID -- Edit Path
+::: ... PATH:   classifier user dev path
+::: ... PATH:   Stated Terminology Author Origin Path
+::: ... PATH:   Stated Resolution Origin Path
+::: ... PATH:   refset user promotion path
+::: ... PATH:   refset reviewer promotion path
+::: ... PATH:   Stated Promotion Template Path
+::: ... PATH:   classifier user promotion path
+::: ... PATH:   Stated Promotion Origin Path
+::: ... PATH:   Stated Origin Path
+::: ... PATH:   SNOMED Core Stated
+::: ... PATH:   SNOMED Core
+:::
+Aug 16, 2010 4:28:17 PM org.dwfa.ace.task.classify.SnorocketTask evaluate
+INFO:
+::: [SnorocketTask] PATH ID -- Classifier Path
+::: ... PATH:   classifier user classifier path
+::: ... PATH:   Inferred Origin Path
+::: ... PATH:   SNOMED Core Inferred
+::: ... PATH:   SNOMED Core
+:::
+Aug 16, 2010 4:28:17 PM org.dwfa.ace.task.classify.SnorocketTask setupRoleNids
+INFO: ::: ALLOWED ROLES = 62     **
+:::     Is a
+:::     Causative agent
+:::     Priority
+:::     Procedure site - Direct
+:::     Direct morphology
+:::     Method
+:::     Access
+:::     Part of
+:::     Laterality
+:::     Episodicity
+:::     Clinical course
+:::     Severity
+:::     Occurrence
+:::     Has definitional manifestation
+:::     Finding site
+:::     Specimen source topography
+:::     Procedure site
+:::     Direct device
+:::     Procedure site - Indirect
+:::     Using access device
+:::     Direct substance
+:::     Associated morphology
+:::     Pathological process
+:::     Associated with
+:::     Interprets
+:::     Has interpretation
+:::     Has intent
+:::     Using device
+:::     Has focus
+:::     Has active ingredient
+:::     After
+:::     Component
+:::     Due to
+:::     Indirect morphology
+:::     Subject relationship context
+:::     Recipient category
+:::     Finding method
+:::     Using substance
+:::     Surgical approach
+:::     Has specimen
+:::     Associated finding
+:::     Using energy
+:::     Temporal context
+:::     Procedure context
+:::     Associated procedure
+:::     Specimen procedure
+:::     Procedure morphology
+:::     Revision status
+:::     Finding context
+:::     Property
+:::     Procedure device
+:::     Scale type
+:::     Has dose form
+:::     Specimen substance
+:::     Measurement method
+:::     Finding informer
+:::     Specimen source morphology
+:::     Indirect device
+:::     Route of administration
+:::     Time aspect
+:::     Specimen source identity
+:::     Subject of information
+</codeblock></section>
+  </body>
+</topic>

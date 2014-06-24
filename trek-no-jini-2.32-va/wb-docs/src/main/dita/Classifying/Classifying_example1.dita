@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN"
+"http://docs.oasis-open.org/dita/dtd/topic.dtd">
+<topic id="classifying_example">
+  <title>Classification Example</title>
+
+  <prolog>
+    <author>Eric Browne</author>
+
+    <metadata>
+      <keywords>
+        <indexterm>classifier<indexterm>example</indexterm></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+
+  <body>
+    <p>This section illustrates using the classifier to examine the effects of
+    introducing a new concept into SNOMED CT.</p>
+
+    <section><title>The example scenario</title><p>Let's assume we have an
+    existing branch of the SNOMED Clinical Finding hierarchy as shown starting
+    with "numbness" in solid green in <xref
+    href="#classifying_example/numbness_hierarchy"/>.<fig
+        id="numbness_hierarchy">
+        <title>Test scenario - adding "numbness in calf"</title>
+
+        <image href="../images/classifier_images/numbness_of_calf_diag1a.jpg"/>
+
+        <p>If we now create a new concept "Numbness in calf" as a child of
+        "Numbness" with a finding site of "Structure of calf of leg", then we
+        should be able to run the classifier against this new structure. The
+        creation of the new concept "numbness in calf" in the Workbench Editor
+        is shown in <xref href="#classifying_example/new_concept"/>.</p>
+      </fig><fig id="new_concept">
+        <title>New concept added in Editor</title>
+
+        <image href="../images/classifier_images/numbness_in_calf_pre-classifier2.jpg"/>
+      </fig></p><p>The result of running the classifier is shown in <xref
+    href="#classifying_example/post_classifier"/>. By enabling the
+    stated/inferred display using the <image
+    href="../images/classifier_images/classifier_toggle_small.jpg"/> toggle,
+    we can view the table for stated, inferred and normal forms deduced by the
+    classifier as shown in the Normal Forms table at the bottom in <xref
+    href="#classifying_example/post_classifier"/>. Also evident in the
+    component panel are the new relationships added. In this case, a new "Is
+    a" relationship has been inferred from "numbness in calf" to "<i>Numbness
+    in lower limb</i>". This inferred relationship is shown by the blue arrow
+    in <xref href="#classifying_example/inferred_numbness"/>. Although the
+    original "Is a" relationship to <i>"numbness</i>" is now redundant and
+    could be removed as shown in <xref
+    href="#classifying_example/inferred_numbness"/>, the classifier does not
+    remove stated relationships. This is left to the discretion of the
+    terminology editor, and may be governed by institutional policies.<fig
+        id="post_classifier">
+        <title>Post classification results in Component panel.</title>
+
+        <image href="../images/classifier_images/numbness_in_calf_post-classifier2.jpg"/>
+      </fig><fig id="inferred_numbness">
+        <title>new IS-A relationship inferred by classifier is added on this
+        path</title>
+
+        <image href="../images/classifier_images/numbness_of_calf_diag2.jpg"/>
+      </fig></p><p>A summary of the added/dropped IS-As and other
+    added/dropped relationships can be viewed in the classifier tab of the
+    component panel. For the above example, the results are shown in <xref
+    href="#classifying_example/classifier_results"/>. <note>There is a pair of
+    spurious added/dropped roles "Allergic rhinitis due to tree pollens"
+    generated when the classifier is first run.</note><fig
+        id="classifier_results">
+        <title>Classifier results</title>
+
+        <image href="../images/classifier_images/classifier_results.jpg"/>
+      </fig></p></section>
+  </body>
+</topic>

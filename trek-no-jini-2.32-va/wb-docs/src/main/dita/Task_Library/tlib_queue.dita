@@ -1,0 +1,1729 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN" "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+<topic id="topic19" xml:lang="en">
+ <title>Queue tasks</title>
+ <abstract>
+  <simpletable id="ap1029412">
+   <strow>
+    <stentry>
+     <b>Add all profiles to visible queues<ph>
+       <indexterm>Task <indexterm>Add all profiles to visible queues</indexterm>
+       </indexterm>
+      </ph></b>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Description:</p>
+    </stentry>
+    <stentry/>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Availability in IDE: </p>
+    </stentry>
+    <stentry>
+     <p>Task list navigator, under:</p>
+     <p>ide queue</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Package: </p>
+    </stentry>
+    <stentry>
+     <p>org.dwfa.ace.tasks.queue</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Class: </p>
+    </stentry>
+    <stentry>
+     <p>AddAllProfilesToVisibleQueues.java<indexterm>Task bean
+        <indexterm>AddAllProfilesToVisibleQueues.java</indexterm>
+      </indexterm></p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Task Properties:</p>
+    </stentry>
+    <stentry/>
+   </strow>
+  </simpletable>
+
+  <simpletable id="ap1029597">
+   <strow>
+    <stentry>
+     <b>Add visible queue from property<ph>
+       <indexterm>Task <indexterm>Add visible queue from property</indexterm>
+       </indexterm>
+      </ph></b>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Description:</p>
+    </stentry>
+    <stentry/>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Availability in IDE: </p>
+    </stentry>
+    <stentry>
+     <p>Task list navigator, under:</p>
+     <p>ide queue</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Package: </p>
+    </stentry>
+    <stentry>
+     <p>org.dwfa.ace.tasks.queue</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Class: </p>
+    </stentry>
+    <stentry>
+     <p>AddVisibleQueueFromProperty.java<indexterm>Task bean
+        <indexterm>AddVisibleQueueFromProperty.java</indexterm>
+      </indexterm></p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Task Properties:</p>
+    </stentry>
+    <stentry>
+     <p><ph>visibleQueuePropName</ph>: Enter the property name of the queue address to be added.</p>
+    </stentry>
+   </strow>
+  </simpletable>
+
+  <simpletable id="ap1029775">
+   <strow>
+    <stentry>
+     <b>Add visible queue to specified profile from property<ph>
+       <indexterm>Task <indexterm>Add visible queue to specified profile from property</indexterm>
+       </indexterm>
+      </ph></b>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Description:</p>
+    </stentry>
+    <stentry/>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Availability in IDE: </p>
+    </stentry>
+    <stentry>
+     <p>Task list navigator, under:</p>
+     <p>ide queue</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Package: </p>
+    </stentry>
+    <stentry>
+     <p>org.dwfa.ace.tasks.queue</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Class: </p>
+    </stentry>
+    <stentry>
+     <p>AddVisibleQueueToWorkingProfile.java<indexterm>Task bean
+        <indexterm>AddVisibleQueueToWorkingProfile.java</indexterm>
+      </indexterm></p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Task Properties:</p>
+    </stentry>
+    <stentry>
+     <p><ph>visibleQueuePropName</ph>: Enter the property name of the queue address to be added.</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p><ph>profilePropName</ph>: The property that contains the profile to change.</p>
+    </stentry>
+   </strow>
+  </simpletable>
+
+  <simpletable id="ap1029973">
+   <strow>
+    <stentry>
+     <b>Open all inboxes<ph>
+       <indexterm>Task <indexterm>Open all inboxes</indexterm>
+       </indexterm>
+      </ph></b>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Description:</p>
+    </stentry>
+    <stentry/>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Availability in IDE: </p>
+    </stentry>
+    <stentry>
+     <p>Task list navigator, under:</p>
+     <p>ide queue</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Package: </p>
+    </stentry>
+    <stentry>
+     <p>org.dwfa.ace.tasks.queue</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Class: </p>
+    </stentry>
+    <stentry>
+     <p>OpenAllInboxes.java<indexterm>Task bean <indexterm>OpenAllInboxes.java</indexterm>
+      </indexterm></p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Task Properties:</p>
+    </stentry>
+    <stentry/>
+   </strow>
+  </simpletable>
+
+  <simpletable id="ap1030149">
+   <strow>
+    <stentry>
+     <b>Open queues in folder<ph>
+       <indexterm>Task <indexterm>Open queues in folder</indexterm>
+       </indexterm>
+      </ph></b>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Description:</p>
+    </stentry>
+    <stentry/>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Availability in IDE: </p>
+    </stentry>
+    <stentry>
+     <p>Task list navigator, under: ide queue</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Package: </p>
+    </stentry>
+    <stentry>
+     <p>org.dwfa.ace.tasks.queue</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Class: </p>
+    </stentry>
+    <stentry>
+     <p>OpenQueuesInFolder.java<indexterm>Task bean <indexterm>OpenQueuesInFolder.java</indexterm>
+      </indexterm></p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Task Properties:</p>
+    </stentry>
+    <stentry>
+     <p><ph>queueDir</ph>: The directory containing the queues to open (searched recursively).</p>
+    </stentry>
+   </strow>
+  </simpletable>
+
+  <simpletable id="ap1030345">
+   <strow>
+    <stentry>
+     <b>Make queue config in profile folder<ph>
+       <indexterm>Task <indexterm>Make queue config in profile folder</indexterm>
+       </indexterm>
+      </ph></b>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Description:</p>
+    </stentry>
+    <stentry/>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Availability in IDE: </p>
+    </stentry>
+    <stentry>
+     <p>Task list navigator, under:</p>
+     <p>ide queue</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Package: </p>
+    </stentry>
+    <stentry/>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Class: </p>
+    </stentry>
+    <stentry>
+     <p>MakeQueueConfigInProfileFolder.java<indexterm>Task bean
+        <indexterm>MakeQueueConfigInProfileFolder.java</indexterm>
+      </indexterm></p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Task Properties:</p>
+    </stentry>
+    <stentry>
+     <p><ph>profileDir</ph>: The profile directory to write the queue config file to.</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p><ph>queueFolderName</ph>: The directory name for the queue inside the user's profile
+      dir.</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p><ph>usernamePropName</ph>: The property that contains the username.</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p><ph>template</ph>: The template that the queue.config file will be based upon.</p>
+    </stentry>
+   </strow>
+  </simpletable>
+
+  <simpletable id="ap1030595">
+   <strow>
+    <stentry>
+     <b>To queue with entry record<ph>
+       <indexterm>Task <indexterm>To queue with entry record</indexterm>
+       </indexterm>
+      </ph></b>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Description:</p>
+    </stentry>
+    <stentry/>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Availability in IDE: </p>
+    </stentry>
+    <stentry>
+     <p>Task list navigator, under:</p>
+     <p>queue tasks move-to</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Package: </p>
+    </stentry>
+    <stentry/>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Class: </p>
+    </stentry>
+    <stentry>
+     <p>ToQueueWithEntryRecord.java<indexterm>Task bean
+        <indexterm>ToQueueWithEntryRecord.java</indexterm>
+      </indexterm></p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Task Properties:</p>
+    </stentry>
+    <stentry/>
+   </strow>
+  </simpletable>
+
+  <simpletable id="ap1030771">
+   <strow>
+    <stentry>
+     <b>Create entry record<ph>
+       <indexterm>Task <indexterm>Create entry record</indexterm>
+       </indexterm>
+      </ph></b>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Description:</p>
+    </stentry>
+    <stentry/>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Availability in IDE: </p>
+    </stentry>
+    <stentry>
+     <p>Task list navigator, under:</p>
+     <p>queue tasks entry</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Package: </p>
+    </stentry>
+    <stentry/>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Class: </p>
+    </stentry>
+    <stentry>
+     <p>CreateEntryRecord.java<indexterm>Task bean <indexterm>CreateEntryRecord.java</indexterm>
+      </indexterm></p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Task Properties:</p>
+    </stentry>
+    <stentry/>
+   </strow>
+  </simpletable>
+
+  <simpletable id="ap1030947">
+   <strow>
+    <stentry>
+     <b>Create entry record two criterion<ph>
+       <indexterm>Task <indexterm>Create entry record two criterion</indexterm>
+       </indexterm>
+      </ph></b>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Description:</p>
+    </stentry>
+    <stentry/>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Availability in IDE: </p>
+    </stentry>
+    <stentry>
+     <p>Task list navigator, under:</p>
+     <p>queue tasks entry</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Package: </p>
+    </stentry>
+    <stentry/>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Class: </p>
+    </stentry>
+    <stentry>
+     <p>CreateEntryRecordTwoCriterion.java<indexterm>Task bean
+        <indexterm>CreateEntryRecordTwoCriterion.java</indexterm>
+      </indexterm></p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Task Properties:</p>
+    </stentry>
+    <stentry/>
+   </strow>
+  </simpletable>
+
+  <simpletable id="ap1031123">
+   <strow>
+    <stentry>
+     <b>Move to destination<ph>
+       <indexterm>Task <indexterm>Move to destination</indexterm>
+       </indexterm>
+      </ph></b>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Description:</p>
+    </stentry>
+    <stentry/>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Availability in IDE: </p>
+    </stentry>
+    <stentry>
+     <p>Task list navigator, under:</p>
+     <p>queue tasks move-to</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Package: </p>
+    </stentry>
+    <stentry/>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Class: </p>
+    </stentry>
+    <stentry>
+     <p>MoveToDestination.java<indexterm>Task bean <indexterm>MoveToDestination.java</indexterm>
+      </indexterm></p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Task Properties:</p>
+    </stentry>
+    <stentry/>
+   </strow>
+  </simpletable>
+
+  <simpletable id="ap1031299">
+   <strow>
+    <stentry>
+     <b>Parent process Set Destination<ph>
+       <indexterm>Task <indexterm>Parent process Set Destination</indexterm>
+       </indexterm>
+      </ph></b>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Description:</p>
+    </stentry>
+    <stentry/>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Availability in IDE: </p>
+    </stentry>
+    <stentry>
+     <p>Task list navigator, under:</p>
+     <p>queue tasks set-select</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Package: </p>
+    </stentry>
+    <stentry/>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Class: </p>
+    </stentry>
+    <stentry>
+     <p>SetDestinationParentProcess.java<indexterm>Task bean
+        <indexterm>SetDestinationParentProcess.java</indexterm>
+      </indexterm></p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Task Properties:</p>
+    </stentry>
+    <stentry/>
+   </strow>
+  </simpletable>
+
+  <simpletable id="ap1031475">
+   <strow>
+    <stentry>
+     <b>Parent process To Queue<ph>
+       <indexterm>Task <indexterm>Parent process To Queue</indexterm>
+       </indexterm>
+      </ph></b>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Description:</p>
+    </stentry>
+    <stentry/>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Availability in IDE: </p>
+    </stentry>
+    <stentry>
+     <p>Task list navigator, under:</p>
+     <p>queue tasks move-to</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Package: </p>
+    </stentry>
+    <stentry/>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Class: </p>
+    </stentry>
+    <stentry>
+     <p>ToQueueParentProcess.java<indexterm>Task bean
+        <indexterm>ToQueueParentProcess.java</indexterm>
+      </indexterm></p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Task Properties:</p>
+    </stentry>
+    <stentry/>
+   </strow>
+  </simpletable>
+
+  <simpletable id="ap1031651">
+   <strow>
+    <stentry>
+     <b>Root process Select Destination<ph>
+       <indexterm>Task <indexterm>Root process Select Destination</indexterm>
+       </indexterm>
+      </ph></b>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Description:</p>
+    </stentry>
+    <stentry/>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Availability in IDE: </p>
+    </stentry>
+    <stentry>
+     <p>Task list navigator, under:</p>
+     <p>queue tasks set-select</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Package: </p>
+    </stentry>
+    <stentry/>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Class: </p>
+    </stentry>
+    <stentry>
+     <p>SelectDestinationRootProcess.java<indexterm>Task bean
+        <indexterm>SelectDestinationRootProcess.java</indexterm>
+      </indexterm></p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Task Properties:</p>
+    </stentry>
+    <stentry/>
+   </strow>
+  </simpletable>
+
+  <simpletable id="ap1031836">
+   <strow>
+    <stentry>
+     <b>Root process Set Destination<ph>
+       <indexterm>Task <indexterm>Root process Set Destination</indexterm>
+       </indexterm>
+      </ph></b>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Description:</p>
+    </stentry>
+    <stentry/>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Availability in IDE: </p>
+    </stentry>
+    <stentry>
+     <p>Task list navigator, under:</p>
+     <p>queue tasks set-select</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Package: </p>
+    </stentry>
+    <stentry/>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Class: </p>
+    </stentry>
+    <stentry>
+     <p>SetDestinationRootProcess.java<indexterm>Task bean
+        <indexterm>SetDestinationRootProcess.java</indexterm>
+      </indexterm></p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Task Properties:</p>
+    </stentry>
+    <stentry/>
+   </strow>
+  </simpletable>
+
+  <simpletable id="ap1032021">
+   <strow>
+    <stentry>
+     <b>Root process To Queue<ph>
+       <indexterm>Task <indexterm>Root process To Queue</indexterm>
+       </indexterm>
+      </ph></b>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Description:</p>
+    </stentry>
+    <stentry/>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Availability in IDE: </p>
+    </stentry>
+    <stentry>
+     <p>Task list navigator, under:</p>
+     <p>queue tasks move-to</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Package: </p>
+    </stentry>
+    <stentry/>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Class: </p>
+    </stentry>
+    <stentry>
+     <p>ToQueueRootProcess.java<indexterm>Task bean <indexterm>ToQueueRootProcess.java</indexterm>
+      </indexterm></p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Task Properties:</p>
+    </stentry>
+    <stentry/>
+   </strow>
+  </simpletable>
+
+  <simpletable id="ap1032206">
+   <strow>
+    <stentry>
+     <b>Select Destination<ph>
+       <indexterm>Task <indexterm>Select Destination</indexterm>
+       </indexterm>
+      </ph></b>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Description:</p>
+    </stentry>
+    <stentry>
+     <p>Presents a dialog box to the user to select a destination queue. Sets the destination
+      address of the process that directly contains this task to the selected destination. </p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Availability in IDE: </p>
+    </stentry>
+    <stentry>
+     <p>Task list navigator, under:</p>
+     <p>queue tasks set-select</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Package: </p>
+    </stentry>
+    <stentry/>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Class: </p>
+    </stentry>
+    <stentry>
+     <p>SelectDestination.java<indexterm>Task bean <indexterm>SelectDestination.java</indexterm>
+      </indexterm></p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Task Properties:</p>
+    </stentry>
+    <stentry/>
+   </strow>
+  </simpletable>
+
+  <simpletable id="ap1032392">
+   <strow>
+    <stentry>
+     <b>Set destination<ph>
+       <indexterm>Task <indexterm>Set destination</indexterm>
+       </indexterm>
+      </ph></b>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Description:</p>
+    </stentry>
+    <stentry/>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Availability in IDE: </p>
+    </stentry>
+    <stentry>
+     <p>Task list navigator, under:</p>
+     <p>queue tasks set-select</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Package: </p>
+    </stentry>
+    <stentry/>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Class: </p>
+    </stentry>
+    <stentry>
+     <p>SelectDestination.java<indexterm>Task bean <indexterm>SelectDestination.java</indexterm>
+      </indexterm></p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Task Properties:</p>
+    </stentry>
+    <stentry/>
+   </strow>
+  </simpletable>
+
+  <simpletable id="ap1032577">
+   <strow>
+    <stentry>
+     <b>To queue<ph>
+       <indexterm>Task <indexterm>To queue</indexterm>
+       </indexterm>
+      </ph></b>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Description:</p>
+    </stentry>
+    <stentry/>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Availability in IDE: </p>
+    </stentry>
+    <stentry>
+     <p>Task list navigator, under:</p>
+     <p>queue tasks move-to</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Package: </p>
+    </stentry>
+    <stentry/>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Class: </p>
+    </stentry>
+    <stentry>
+     <p>ToQueue.java<indexterm>Task bean <indexterm>ToQueue.java</indexterm>
+      </indexterm></p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Task Properties:</p>
+    </stentry>
+    <stentry/>
+   </strow>
+  </simpletable>
+
+  <simpletable id="ap1032762">
+   <strow>
+    <stentry>
+     <b>To queue Three criterion<ph>
+       <indexterm>Task <indexterm>To queue Three criterion</indexterm>
+       </indexterm>
+      </ph></b>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Description:</p>
+    </stentry>
+    <stentry/>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Availability in IDE: </p>
+    </stentry>
+    <stentry>
+     <p>Task list navigator, under:</p>
+     <p>queue tasks move-to</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Package: </p>
+    </stentry>
+    <stentry/>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Class: </p>
+    </stentry>
+    <stentry>
+     <p>ToQueueThreeCriterion.java<indexterm>Task bean
+        <indexterm>ToQueueThreeCriterion.java</indexterm>
+      </indexterm></p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Task Properties:</p>
+    </stentry>
+    <stentry/>
+   </strow>
+  </simpletable>
+
+  <simpletable id="ap1032947">
+   <strow>
+    <stentry>
+     <b>To queue Two criterion<ph>
+       <indexterm>Task <indexterm>To queue Two criterion</indexterm>
+       </indexterm>
+      </ph></b>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Description:</p>
+    </stentry>
+    <stentry/>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Availability in IDE: </p>
+    </stentry>
+    <stentry>
+     <p>Task list navigator, under:</p>
+     <p>queue tasks move-to</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Package: </p>
+    </stentry>
+    <stentry/>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Class: </p>
+    </stentry>
+    <stentry>
+     <p>ToQueueTwoCriterion.java<indexterm>Task bean <indexterm>ToQueueTwoCriterion.java</indexterm>
+      </indexterm></p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Task Properties:</p>
+    </stentry>
+    <stentry/>
+   </strow>
+  </simpletable>
+
+  <simpletable id="ap1033132">
+   <strow>
+    <stentry>
+     <b>To selected queue<ph>
+       <indexterm>Task <indexterm>To selected queue</indexterm>
+       </indexterm>
+      </ph></b>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Description:</p>
+    </stentry>
+    <stentry/>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Availability in IDE: </p>
+    </stentry>
+    <stentry>
+     <p>Task list navigator, under:</p>
+     <p>queue tasks move-to</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Package: </p>
+    </stentry>
+    <stentry/>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Class: </p>
+    </stentry>
+    <stentry>
+     <p>ToUserSelectedQueue.java<indexterm>Task bean <indexterm>ToUserSelectedQueue.java</indexterm>
+      </indexterm></p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Task Properties:</p>
+    </stentry>
+    <stentry/>
+   </strow>
+  </simpletable>
+
+  <simpletable id="ap1033317">
+   <strow>
+    <stentry>
+     <b>To selected queue (all groups)<ph>
+       <indexterm>Task <indexterm>To selected queue (all groups)</indexterm>
+       </indexterm>
+      </ph></b>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Description:</p>
+    </stentry>
+    <stentry/>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Availability in IDE: </p>
+    </stentry>
+    <stentry>
+     <p>Task list navigator, under:</p>
+     <p>queue tasks move-to </p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Package: </p>
+    </stentry>
+    <stentry>
+     <p>org.dwfa.queue.bpa.tasks.move</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Class: </p>
+    </stentry>
+    <stentry/>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Task Properties:</p>
+    </stentry>
+    <stentry/>
+   </strow>
+  </simpletable>
+
+  <simpletable id="ap1033497">
+   <strow>
+    <stentry>
+     <b>Move to inbox<ph>
+       <indexterm>Task <indexterm>Move to inbox</indexterm>
+       </indexterm>
+      </ph></b>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Description:</p>
+    </stentry>
+    <stentry/>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Availability in IDE: </p>
+    </stentry>
+    <stentry>
+     <p>Task list navigator, under:</p>
+     <p>queue tasks move-to</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Package: </p>
+    </stentry>
+    <stentry/>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Class: </p>
+    </stentry>
+    <stentry>
+     <p>MoveToInBox.java<indexterm>Task bean <indexterm>MoveToInBox.java</indexterm>
+      </indexterm></p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Task Properties:</p>
+    </stentry>
+    <stentry/>
+   </strow>
+  </simpletable>
+
+  <simpletable id="ap1033682">
+   <strow>
+    <stentry>
+     <b>Move to outbox<ph>
+       <indexterm>Task <indexterm>Move to outbox</indexterm>
+       </indexterm>
+      </ph></b>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Description:</p>
+    </stentry>
+    <stentry/>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Availability in IDE: </p>
+    </stentry>
+    <stentry>
+     <p>Task list navigator, under:</p>
+     <p>queue tasks move-to</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Package: </p>
+    </stentry>
+    <stentry/>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Class: </p>
+    </stentry>
+    <stentry>
+     <p>MoveToOutBox.java<indexterm>Task bean <indexterm>MoveToOutBox.java</indexterm>
+      </indexterm></p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Task Properties:</p>
+    </stentry>
+    <stentry/>
+   </strow>
+  </simpletable>
+
+  <simpletable id="ap1033867">
+   <strow>
+    <stentry>
+     <b>Delete entry<ph>
+       <indexterm>Task <indexterm>Delete entry</indexterm>
+       </indexterm>
+      </ph></b>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Description:</p>
+    </stentry>
+    <stentry/>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Availability in IDE: </p>
+    </stentry>
+    <stentry>
+     <p>Task list navigator, under:</p>
+     <p>queue taks entry</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Package: </p>
+    </stentry>
+    <stentry/>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Class: </p>
+    </stentry>
+    <stentry>
+     <p>DeleteEntry.java<indexterm>Task bean <indexterm>DeleteEntry.java</indexterm>
+      </indexterm></p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Task Properties:</p>
+    </stentry>
+    <stentry/>
+   </strow>
+  </simpletable>
+
+  <simpletable id="ap1034052">
+   <strow>
+    <stentry>
+     <b>Hide entry<ph>
+       <indexterm>Task <indexterm>Hide entry</indexterm>
+       </indexterm>
+      </ph></b>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Description:</p>
+    </stentry>
+    <stentry/>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Availability in IDE: </p>
+    </stentry>
+    <stentry>
+     <p>Task list navigator, under:</p>
+     <p>queue tasks entry</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Package: </p>
+    </stentry>
+    <stentry/>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Class: </p>
+    </stentry>
+    <stentry>
+     <p>HideEntry.java<indexterm>Task bean <indexterm>HideEntry.java</indexterm>
+      </indexterm></p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Task Properties:</p>
+    </stentry>
+    <stentry/>
+   </strow>
+  </simpletable>
+
+  <simpletable id="ap1034237">
+   <strow>
+    <stentry>
+     <b>Remove nonserializable attachments<ph>
+       <indexterm>Task <indexterm>Remove nonserializable attachments</indexterm>
+       </indexterm>
+      </ph></b>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Description:</p>
+    </stentry>
+    <stentry/>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Availability in IDE: </p>
+    </stentry>
+    <stentry>
+     <p>Task list navigator, under:</p>
+     <p>queue tasks attachments</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Package: </p>
+    </stentry>
+    <stentry/>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Class: </p>
+    </stentry>
+    <stentry>
+     <p>RemoveNonSerializableAttachments.java<indexterm>Task bean
+        <indexterm>RemoveNonSerializableAttachments.java</indexterm>
+      </indexterm></p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Task Properties:</p>
+    </stentry>
+    <stentry/>
+   </strow>
+  </simpletable>
+
+  <simpletable id="ap1034422">
+   <strow>
+    <stentry>
+     <b>Create sync record<ph>
+       <indexterm>Task <indexterm>Create sync record</indexterm>
+       </indexterm>
+      </ph></b>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Description:</p>
+    </stentry>
+    <stentry/>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Availability in IDE: </p>
+    </stentry>
+    <stentry>
+     <p>Task list navigator, under:</p>
+     <p>queue tasks sync</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Package: </p>
+    </stentry>
+    <stentry/>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Class: </p>
+    </stentry>
+    <stentry>
+     <p>CreateSyncRecord.java<indexterm>Task bean <indexterm>CreateSyncRecord.java</indexterm>
+      </indexterm></p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Task Properties:</p>
+    </stentry>
+    <stentry/>
+   </strow>
+  </simpletable>
+
+  <simpletable id="ap1034607">
+   <strow>
+    <stentry>
+     <b>Load from queue<ph>
+       <indexterm>Task <indexterm>Load from queue</indexterm>
+       </indexterm>
+      </ph></b>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Description:</p>
+    </stentry>
+    <stentry/>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Availability in IDE: </p>
+    </stentry>
+    <stentry>
+     <p>Task list navigator, under:</p>
+     <p>queue</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Package: </p>
+    </stentry>
+    <stentry/>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Class: </p>
+    </stentry>
+    <stentry>
+     <p>LoadFromQueue.java<indexterm>Task bean <indexterm>LoadFromQueue.java</indexterm>
+      </indexterm></p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Task Properties:</p>
+    </stentry>
+    <stentry/>
+   </strow>
+  </simpletable>
+
+  <simpletable id="ap1034792">
+   <strow>
+    <stentry>
+     <b>To sync queue<ph>
+       <indexterm>Task <indexterm>To sync queue</indexterm>
+       </indexterm>
+      </ph></b>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Description:</p>
+    </stentry>
+    <stentry/>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Availability in IDE: </p>
+    </stentry>
+    <stentry>
+     <p>Task list navigator, under:</p>
+     <p>queue tasks queue</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Package: </p>
+    </stentry>
+    <stentry/>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Class: </p>
+    </stentry>
+    <stentry>
+     <p>ToSyncQueue.java<indexterm>Task bean <indexterm>ToSyncQueue.java</indexterm>
+      </indexterm></p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Task Properties:</p>
+    </stentry>
+    <stentry/>
+   </strow>
+  </simpletable>
+
+  <simpletable id="ap1034977">
+   <strow>
+    <stentry>
+     <b>Create failsafe<ph>
+       <indexterm>Task <indexterm>Create failsafe</indexterm>
+       </indexterm>
+      </ph></b>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Description:</p>
+    </stentry>
+    <stentry>
+     <p>The <ph>Create Failsafe</ph> task locates an <ph>I_QueueProcesses</ph> service that also has
+      a <ph>QueueTypeAging</ph> attribute. After locating this queue, it creates a new "failsafe"
+      BusinessProcess that contains a copy of a business process as an attachment, and also contains
+      a sequence of tasks that will cause the failsafe process to periodically launch a copy of the
+      attached business process at the interval specified by this task. </p>
+     <p>The failsafe data is stored associated with the process rather than with the task since
+      other tasks need to access the failsafe data in a task independent manner. </p>
+     <p>Note that this task creates a failsafe of the process it is part of. If this processes is
+      embedded as a task inside another process, it may be desirable to create a failsafe of the
+      outer process. Creating a failsafe for the parent or for the root process may generate the
+      desired behaviour. </p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Availability in IDE: </p>
+    </stentry>
+    <stentry>
+     <p>Task list navigator, under:</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Package: </p>
+    </stentry>
+    <stentry/>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Class: </p>
+    </stentry>
+    <stentry>
+     <p>CreateFailsafe.java<indexterm>Task bean <indexterm>CreateFailsafe.java</indexterm>
+      </indexterm></p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Task Properties:</p>
+    </stentry>
+    <stentry>
+     <p><ph>relativeTimeInMins</ph>: The interval to launch failsafe processes.</p>
+     <p><ph>failSafeDataId</ph>: The String representation of the failsafe UUID.</p>
+    </stentry>
+   </strow>
+  </simpletable>
+
+  <simpletable id="ap1035205">
+   <strow>
+    <stentry>
+     <b>Launch failsafe<ph>
+       <indexterm>Task <indexterm>Launch failsafe</indexterm>
+       </indexterm>
+      </ph></b>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Description:</p>
+    </stentry>
+    <stentry>
+     <p>This task will unmarshal and continue execution of a process that has been attached to the
+      process that contains this task. The marshaled process must be attached with the key specified
+      in the <ph>failsafeKey</ph> field. </p>
+     <p>This task is not typically used in manually constructed processes, but is part of the
+      process created by the <ph>CreateFailsafe</ph> task. </p>
+     <p>Process execution is acomplished by temporarily substituting a new process stack for the
+      worker executing this task.</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Availability in IDE: </p>
+    </stentry>
+    <stentry>
+     <p>Task list navigator, under:</p>
+     <p>queue tasks failsafe</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Package: </p>
+    </stentry>
+    <stentry/>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Class: </p>
+    </stentry>
+    <stentry>
+     <p>LaunchFailsafe.java<indexterm>Task bean <indexterm>LaunchFailsafe.java</indexterm>
+      </indexterm></p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Task Properties:</p>
+    </stentry>
+    <stentry/>
+   </strow>
+  </simpletable>
+
+  <simpletable id="ap1035418">
+   <strow>
+    <stentry>
+     <b>parent process create failsafe<ph>
+       <indexterm>Task <indexterm>parent process create failsafe</indexterm>
+       </indexterm>
+      </ph></b>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Description:</p>
+    </stentry>
+    <stentry/>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Availability in IDE: </p>
+    </stentry>
+    <stentry>
+     <p>Task list navigator, under:</p>
+     <p>queue failsafe</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Package: </p>
+    </stentry>
+    <stentry/>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Class: </p>
+    </stentry>
+    <stentry>
+     <p>CreateFailsafeParentProcess.java<indexterm>Task bean
+        <indexterm>CreateFailsafeParentProcess.java</indexterm>
+      </indexterm></p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Task Properties:</p>
+    </stentry>
+    <stentry/>
+   </strow>
+  </simpletable>
+
+  <simpletable id="ap1035606">
+   <strow>
+    <stentry>
+     <b>Root process create failsafe<ph>
+       <indexterm>Task <indexterm>Root process create failsafe</indexterm>
+       </indexterm>
+      </ph></b>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Description:</p>
+    </stentry>
+    <stentry/>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Availability in IDE: </p>
+    </stentry>
+    <stentry>
+     <p>Task list navigator, under:</p>
+     <p>queue failsafe</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Package: </p>
+    </stentry>
+    <stentry/>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Class: </p>
+    </stentry>
+    <stentry>
+     <p>CreateFailsafeRootProcess.java<indexterm>Task bean
+        <indexterm>CreateFailsafeRootProcess.java</indexterm>
+      </indexterm></p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Task Properties:</p>
+    </stentry>
+    <stentry/>
+   </strow>
+  </simpletable>
+
+  <simpletable id="ap1035794">
+   <strow>
+    <stentry>
+     <b>Remove failsafe<ph>
+       <indexterm>Task <indexterm>Remove failsafe</indexterm>
+       </indexterm>
+      </ph></b>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Description:</p>
+    </stentry>
+    <stentry/>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Availability in IDE: </p>
+    </stentry>
+    <stentry>
+     <p>Task list navigator, under:</p>
+     <p>queue failsafe</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Package: </p>
+    </stentry>
+    <stentry/>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Class: </p>
+    </stentry>
+    <stentry>
+     <p>RemoveFailsafe.java<indexterm>Task bean <indexterm>RemoveFailsafe.java</indexterm>
+      </indexterm></p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Task Properties:</p>
+    </stentry>
+    <stentry/>
+   </strow>
+  </simpletable>
+
+ </abstract>
+</topic>
+

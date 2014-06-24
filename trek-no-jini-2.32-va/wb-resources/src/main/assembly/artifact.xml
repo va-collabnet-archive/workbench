@@ -1,0 +1,13 @@
+<assembly>
+  <formats>
+    <format>zip</format>
+  </formats>
+  <fileSets>
+    <fileSet>
+      <directory>src/main/changesets</directory>
+      <outputDirectory>/wb-changesets</outputDirectory>
+    </fileSet>
+  </fileSets>
+  <includeBaseDirectory>false</includeBaseDirectory>
+</assembly>
+

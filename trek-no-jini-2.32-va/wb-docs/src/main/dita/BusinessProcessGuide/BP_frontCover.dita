@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
+"http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+<topic id="WbUG_front" xml:lang="en">
+  <title><ph>The IHTSDO Workbench Business Process Guide</ph></title>
+
+  <abstract><p>The Workbench is an IHTSDO Collaborative Environment for
+  developing quality terminologies.</p> <p>October 2010</p></abstract>
+
+  <body>
+    <section><title>Acknowledgements:</title> This Guide, and the IHTSDO
+    Toolkit it describes are the result of collaborative contributions from a
+    number of organisations. The publishers hereby acknowledge and thank the
+    following organisations: <p><b>Informatics Inc.,</b> Bend, Oregon
+    USA.</p><p><xref format="html" href="http://www.informatics.com"
+    scope="external"><ph>http://www.informatics.com</ph></xref></p><p><b>National
+    Centre for Classification in Health</b>, Sydney Australia.</p><p><xref
+    format="html" href="http://www.ncch.com.au"
+    scope="external"><ph>http://www.ncch.com.au</ph></xref></p><p><b>National
+    E-Health Transition Authority</b>, Sydney, Australia</p><p><xref
+    format="html" href="http://www.nehta.gov.au"
+    scope="external"><ph>http://www.nehta.gov.au</ph></xref>.</p><p><b>Australian
+    e-Health Research Centre</b>, Brisbane, Australia</p><p><xref
+    format="html" href="http://e-hrc.net"
+    scope="external"><ph>http://e-hrc.net</ph></xref></p></section>
+
+    <section><title>Editors:</title> <p>Keith Campbell M.D. Ph.D.</p> <p>Susan
+    Castillo</p> <p>Eric Browne</p> <p>Publisher:</p> <p>Copyright IHTSDO
+    2010</p> <p>International Health Terminology Standards Development
+    Organisation</p> <p>Rued Langgaards Vej 7, 5, 2300 Copenhagen S,
+    Denmark</p> <p>http://www.ihtsdo.org</p></section>
+  </body>
+</topic>

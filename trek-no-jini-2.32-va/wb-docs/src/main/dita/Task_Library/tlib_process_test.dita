@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
+  "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+
+<topic id="topic6" xml:lang="en">
+ <title>Process control: Test tasks</title>
+ <abstract>
+  <simpletable id="ap1008781">
+   <strow>
+    <stentry>
+     <b>Test property equals text<ph>
+       <indexterm>Task <indexterm>Test property equals text</indexterm>
+       </indexterm>
+      </ph></b>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Description:</p>
+    </stentry>
+    <stentry>
+     <p>Test to determine if the property equals the value provided in the task.</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Availability in IDE: </p>
+    </stentry>
+    <stentry>
+     <p>Task list navigator, under:</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Package: </p>
+    </stentry>
+    <stentry>
+     <p>org.dwfa.bpa.tasks.prop</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Class: </p>
+    </stentry>
+    <stentry>
+     <p>TestPropertyEqualsText.java<indexterm>Task bean
+        <indexterm>TestPropertyEqualsText.java</indexterm>
+      </indexterm></p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Task Properties:</p>
+    </stentry>
+    <stentry>
+     <p><ph>valueText</ph>: Text representation of desired value.</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p><ph>localPropName</ph>: Name of the local property to test.</p>
+    </stentry>
+   </strow>
+  </simpletable>
+
+ </abstract>
+</topic>
+

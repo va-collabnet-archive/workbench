@@ -1,0 +1,17 @@
+/* Security policy for SSL-enabled apps */
+
+/* Keystore containing trusted certificates to use for authentication */
+keystore "..${/}prebuiltkeys${/}truststore";
+
+/* Grant all permissions to local JAR files */
+grant codebase "file:${/}-" {
+    permission java.security.AllPermission;
+};
+
+/*
+ * Allow runtime class loading for install4j-installed bundle.
+ * Otherwise org.drools.rule.JavaDialectRuntimeData$PackageClassLoader.loadClass() call fails.
+ */
+grant {
+      permission java.lang.RuntimePermission "getClassLoader";
+};

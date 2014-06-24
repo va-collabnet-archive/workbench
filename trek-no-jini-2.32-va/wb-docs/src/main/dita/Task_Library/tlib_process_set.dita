@@ -1,0 +1,752 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
+  "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+
+
+<topic id="topic7" xml:lang="en">
+ <title>Process control: Set tasks</title>
+ <abstract>
+  <simpletable id="ap1009025">
+   <strow>
+    <stentry>
+     <b>Set Remote Property from text<ph>
+       <indexterm>Task <indexterm>Set Remote Property from text</indexterm>
+       </indexterm>
+      </ph></b>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Description:</p>
+    </stentry>
+    <stentry>
+     <p>Set the specified remote property to the value provided in the task.</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Availability in IDE: </p>
+    </stentry>
+    <stentry>
+     <p>Task list navigator, under:</p>
+     <p>processes ⇒<ph> set tasks</ph></p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Package: </p>
+    </stentry>
+    <stentry>
+     <p>org.dwfa.bpa.tasks.prop</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Class: </p>
+    </stentry>
+    <stentry>
+     <p>SetRemotePropertyFromText.java<indexterm>Task bean
+        <indexterm>SetRemotePropertyFromText.java</indexterm>
+      </indexterm></p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Task Properties:</p>
+    </stentry>
+    <stentry>
+     <p><ph>remotePropertyName</ph>: Name of the remote property to set.</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p><ph>processDataId</ph>: A data id for the process container to launch. Only data containers
+      that contain I_EncodeBusinessProcess objects can be dropped.</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p><ph>valueText</ph>: Text representation of the new property value.</p>
+    </stentry>
+   </strow>
+  </simpletable>
+
+  <simpletable id="ap1009268">
+   <strow>
+    <stentry>
+     <b>Set destination from property<ph>
+       <indexterm>Task <indexterm>Set destination from property</indexterm>
+       </indexterm>
+      </ph></b>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Description:</p>
+    </stentry>
+    <stentry>
+     <p>Sets the destination of the process from a property at the time of execution. </p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Availability in IDE. </p>
+    </stentry>
+    <stentry>
+     <p>Task list navigator, under:</p>
+     <p>processes ⇒<ph> set tasks</ph></p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Package: </p>
+    </stentry>
+    <stentry>
+     <p>org.dwfa.bpa.tasks.process</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Class: </p>
+    </stentry>
+    <stentry>
+     <p>SetProcessDestinationFromProp.java<indexterm>Task bean
+        <indexterm>SetProcessDestinationFromProp.java</indexterm>
+      </indexterm></p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Task Properties:</p>
+    </stentry>
+    <stentry>
+     <p><ph>newDestinationProperty</ph>: Name of the property containing the new destination.</p>
+    </stentry>
+   </strow>
+  </simpletable>
+
+  <simpletable id="ap1009484">
+   <strow>
+    <stentry>
+     <b>Set name from property<ph>
+       <indexterm>Task <indexterm>Set name from property</indexterm>
+       </indexterm>
+      </ph></b>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Description:</p>
+    </stentry>
+    <stentry>
+     <p>Sets the process name to the contents of the specified property at the time of
+      execution.</p>
+     <p><ph>To do</ph>: Need tasks that will rename attachments or some other methods to allow forms
+      to pass in multiple encounter items, and retain them over time, such as when validating a
+      sample id that was previously entered in a different form.</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Availability in IDE: </p>
+    </stentry>
+    <stentry>
+     <p>Task list navigator, under:</p>
+     <p>processes ⇒<ph> set tasks</ph></p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Package: </p>
+    </stentry>
+    <stentry>
+     <p>org.dwfa.bpa.tasks.process</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Class: </p>
+    </stentry>
+    <stentry>
+     <p>SetProcessNameFromProp.java<indexterm>Task bean
+        <indexterm>SetProcessNameFromProp.java</indexterm>
+      </indexterm></p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Task Properties:</p>
+    </stentry>
+    <stentry>
+     <p><ph>newNameProp</ph>: Name of the property containing the new process name.</p>
+    </stentry>
+   </strow>
+  </simpletable>
+
+  <simpletable id="ap1009678">
+   <strow>
+    <stentry>
+     <b>Set origin from property<ph>
+       <indexterm>Task <indexterm>Set origin from property</indexterm>
+       </indexterm>
+      </ph></b>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Description:</p>
+    </stentry>
+    <stentry>
+     <p>Sets the origin of a process from a property at the time of execution.</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Availability in IDE: </p>
+    </stentry>
+    <stentry>
+     <p>Task list navigator, under:</p>
+     <p>processes ⇒<ph> set tasks</ph></p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Package: </p>
+    </stentry>
+    <stentry>
+     <p>org.dwfa.bpa.tasks.process</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Class: </p>
+    </stentry>
+    <stentry>
+     <p>SetProcessOriginFromProp.java<indexterm>Task bean
+        <indexterm>SetProcessOriginFromProp.java</indexterm>
+      </indexterm></p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Task Properties:</p>
+    </stentry>
+    <stentry>
+     <p><ph>newOriginProp</ph>: Name of the property containing the new origin for the process.</p>
+    </stentry>
+   </strow>
+  </simpletable>
+
+  <simpletable id="ap1009871">
+   <strow>
+    <stentry>
+     <b>Set subject from property<ph>
+       <indexterm>Task <indexterm>Set subject from property</indexterm>
+       </indexterm>
+      </ph></b>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Description:</p>
+    </stentry>
+    <stentry>
+     <p>Sets the subject of a process from a property at the time of execution. </p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Availability in IDE: </p>
+    </stentry>
+    <stentry>
+     <p>Task list navigator, under:</p>
+     <p>processes ⇒<ph> set tasks</ph></p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Package: </p>
+    </stentry>
+    <stentry>
+     <p>org.dwfa.bpa.tasks.process</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Class: </p>
+    </stentry>
+    <stentry>
+     <p>SetProcessSubjectFromProp.java<indexterm>Task bean
+        <indexterm>SetProcessSubjectFromProp.java</indexterm>
+      </indexterm></p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Task Properties:</p>
+    </stentry>
+    <stentry>
+     <p><ph>newSubject</ph>: the subject of the process to the provided value.</p>
+    </stentry>
+   </strow>
+  </simpletable>
+
+  <simpletable id="ap1010077">
+   <strow>
+    <stentry>
+     <b>Set destination<ph>
+       <indexterm>Task <indexterm>Set destination</indexterm>
+       </indexterm>
+      </ph></b>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Description:</p>
+    </stentry>
+    <stentry>
+     <p>Sets the destination of the process at the time of execution to the text entered in the
+      field provided in the tasks.</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Availability in IDE: </p>
+    </stentry>
+    <stentry>
+     <p>Task list navigator, under:</p>
+     <p>set tasks</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Package: </p>
+    </stentry>
+    <stentry>
+     <p>org.dwfa.bpa.tasks.process</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Class: </p>
+    </stentry>
+    <stentry>
+     <p>SetProcessDestination.java<indexterm>Task bean
+        <indexterm>SetProcessDestination.java</indexterm>
+      </indexterm></p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Task Properties:</p>
+    </stentry>
+    <stentry>
+     <p><ph>newDestination</ph>: the name of the process to the provided value.</p>
+    </stentry>
+   </strow>
+  </simpletable>
+
+  <simpletable id="ap1010264">
+   <strow>
+    <stentry>
+     <b>Set process name<ph>
+       <indexterm>Task <indexterm>Set process name</indexterm>
+       </indexterm>
+      </ph></b>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Description:</p>
+    </stentry>
+    <stentry>
+     <p>Sets the process name to the text entered in the box provided at the time of execution.</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Availability in IDE: </p>
+    </stentry>
+    <stentry>
+     <p>Task list navigator, under:</p>
+     <p>processes ⇒<ph> set tasks</ph></p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Package: </p>
+    </stentry>
+    <stentry>
+     <p>org.dwfa.bpa.tasks.process</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Class: </p>
+    </stentry>
+    <stentry>
+     <p>SetProcessName.java<indexterm>Task bean <indexterm>SetProcessName.java</indexterm>
+      </indexterm></p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Task Properties:</p>
+    </stentry>
+    <stentry>
+     <p><ph>newName</ph>: the name of the process to the provided value.</p>
+    </stentry>
+   </strow>
+  </simpletable>
+
+  <simpletable id="ap1010464">
+   <strow>
+    <stentry>
+     <b>Set process origin<ph>
+       <indexterm>Task <indexterm>Set process origin</indexterm>
+       </indexterm>
+      </ph></b>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Description:</p>
+    </stentry>
+    <stentry>
+     <p>Sets the origin of the current process to the the text entered in the box provided in the
+      task at the time of execution. </p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Availability in IDE: </p>
+    </stentry>
+    <stentry>
+     <p>Task list navigator, under:</p>
+     <p>processes ⇒<ph> set tasks</ph></p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Package: </p>
+    </stentry>
+    <stentry>
+     <p>org.dwfa.bpa.tasks.process</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Class: </p>
+    </stentry>
+    <stentry>
+     <p>SetProcessOrigin.java<indexterm>Task bean <indexterm>SetProcessOrigin.java</indexterm>
+      </indexterm></p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Task Properties:</p>
+    </stentry>
+    <stentry>
+     <p><ph>newOrigin</ph>: the origin of the process to the provided value.</p>
+    </stentry>
+   </strow>
+  </simpletable>
+
+  <simpletable id="ap1010634">
+   <strow>
+    <stentry>
+     <b>Set process subject<ph>
+       <indexterm>Task <indexterm>Set process subject</indexterm>
+       </indexterm>
+      </ph></b>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Description:</p>
+    </stentry>
+    <stentry>
+     <p>Sets the tasks subject to the text entered in the box provided in the task at execution
+      time. </p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Availability in IDE: </p>
+    </stentry>
+    <stentry>
+     <p>Task list navigator, under:</p>
+     <p>processes ⇒<ph> set tasks</ph></p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Package: </p>
+    </stentry>
+    <stentry>
+     <p>org.dwfa.bpa.tasks.process</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Class: </p>
+    </stentry>
+    <stentry>
+     <p>SetProcessSubject.java<indexterm>Task bean <indexterm>SetProcessSubject.java</indexterm>
+      </indexterm></p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Task Properties:</p>
+    </stentry>
+    <stentry>
+     <p><ph>newSubject</ph>: the subject of the process to the provided value.</p>
+    </stentry>
+   </strow>
+  </simpletable>
+
+  <simpletable id="ap1010804">
+   <strow>
+    <stentry>
+     <b>Set simple message renderer<ph>
+       <indexterm>Task <indexterm>Set simple message renderer</indexterm>
+       </indexterm>
+      </ph></b>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Description:</p>
+    </stentry>
+    <stentry>
+     <p>Contains the text to be rendered.</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Availability in IDE: </p>
+    </stentry>
+    <stentry>
+     <p>Task list navigator, under:</p>
+     <p>processes ⇒<ph> set tasks</ph></p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Package: </p>
+    </stentry>
+    <stentry>
+     <p>org.dwfa.bpa.tasks.process</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Class: </p>
+    </stentry>
+    <stentry>
+     <p>SetSimpleMessageRenderer.java<indexterm>Task bean
+        <indexterm>SetSimpleMessageRenderer.java</indexterm>
+      </indexterm></p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Task Properties:</p>
+    </stentry>
+    <stentry>
+     <p><ph>source</ph>: Sets the message renderer of the process to a SimpleMessageRenderer with
+      the provided source.</p>
+    </stentry>
+   </strow>
+  </simpletable>
+
+  <simpletable id="ap1010991">
+   <strow>
+    <stentry>
+     <b>Set local property<ph>
+       <indexterm>Task <indexterm>Set local property</indexterm>
+       </indexterm>
+      </ph></b>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Description:</p>
+    </stentry>
+    <stentry>
+     <p>Set the specified local property to the value provided by the property in the remote process
+      that initiates the process.</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Availability in IDE: </p>
+    </stentry>
+    <stentry>
+     <p>Task list navigator, under:</p>
+     <p>processes ⇒<ph> set tasks</ph></p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Package: </p>
+    </stentry>
+    <stentry>
+     <p>org.dwfa.bpa.tasks.prop</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Class: </p>
+    </stentry>
+    <stentry>
+     <p>SetLocalProperty.java<indexterm>Task bean <indexterm>SetLocalProperty.java</indexterm>
+      </indexterm></p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Task Properties:</p>
+    </stentry>
+    <stentry>
+     <p><ph>remotePropName</ph>: Name of the remote property to get.</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p><ph>localPropName</ph>: Name of the local property to set.</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p><ph>processDataId</ph>: A data id for the process whose property is to be copied. Only data
+      containers that contain I_EncodeBusinessProcess objects can be dropped.</p>
+    </stentry>
+   </strow>
+  </simpletable>
+
+  <simpletable id="ap1011228">
+   <strow>
+    <stentry>
+     <b>Set remote property<ph>
+       <indexterm>Task <indexterm>Set remote property</indexterm>
+       </indexterm>
+      </ph></b>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Description:</p>
+    </stentry>
+    <stentry>
+     <p>Set the specified remote property to the value provided by the property in the local
+      process.</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Availability in IDE: </p>
+    </stentry>
+    <stentry>
+     <p>Task list navigator, under:</p>
+     <p>processes ⇒<ph> set tasks</ph></p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Package: </p>
+    </stentry>
+    <stentry>
+     <p>org.dwfa.bpa.tasks.prop</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Class: </p>
+    </stentry>
+    <stentry>
+     <p>SetRemoteProperty.java<indexterm>Task bean <indexterm>SetRemoteProperty.java</indexterm>
+      </indexterm></p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Task Properties:</p>
+    </stentry>
+    <stentry>
+     <p><ph>remotePropName</ph>: Name of the remote property to set.</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p><ph>localPropName</ph>: Name of the local property to get.</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p><ph>processDataId</ph>: A data id for the process container to launch. Only data containers
+      that contain I_EncodeBusinessProcess objects can bedropped.</p>
+    </stentry>
+   </strow>
+  </simpletable>
+
+  <simpletable id="ap1011450">
+   <strow>
+    <stentry>
+     <b>Set property<ph>
+       <indexterm>Task <indexterm>Set property</indexterm>
+       </indexterm>
+      </ph></b>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Description:</p>
+    </stentry>
+    <stentry>
+     <p>Sets a local property from text defined prior to execution, usually entered into the task
+      during the process build phase.</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Availability in IDE: </p>
+    </stentry>
+    <stentry>
+     <p>Task list navigator, under:</p>
+     <p>processes ⇒<ph> set tasks</ph></p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Package: </p>
+    </stentry>
+    <stentry>
+     <p>org.dwfa.bpa.tasks.prop</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Class: </p>
+    </stentry>
+    <stentry>
+     <p>SetPropertyFromText.java<indexterm>Task bean <indexterm>SetPropertyFromText.java</indexterm>
+      </indexterm></p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Task Properties:</p>
+    </stentry>
+    <stentry>
+     <p><ph>localPropName</ph>: the name of the property local to this process.</p>
+     <p><ph>valueText</ph>: the text string to be assigned to the local property.</p>
+    </stentry>
+   </strow>
+  </simpletable>
+
+ </abstract>
+</topic>
+

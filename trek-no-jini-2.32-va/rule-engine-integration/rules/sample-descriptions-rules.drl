@@ -1,0 +1,55 @@
+package org.ihtsdo.rules.test;
+
+import org.ihtsdo.testmodel.Concept;
+import org.ihtsdo.testmodel.Description;
+import org.ihtsdo.testmodel.Relationship;
+import org.ihtsdo.testmodel.Identifier;
+import org.ihtsdo.testmodel.TerminologyComponent;
+import org.ihtsdo.rules.testmodel.TestModelUtil;
+import org.ihtsdo.rules.RulesLibrary;
+import java.util.ArrayList;
+import org.dwfa.cement.ArchitectonicAuxiliary;
+
+global org.ihtsdo.testmodel.ResultsCollector resultsCollector;
+global org.ihtsdo.testmodel.TransitiveClosureHelperMock transitiveClosureHelper;
+
+rule "No invalid chars"
+when
+	$concept : Concept($conceptId : id)
+    $description : Description(term matches ".*[@&\\+\"\\|\\{\\}].*", conceptId == $conceptId)
+then
+    resultsCollector.addError(1, "Error: Description '" + $description.getTerm() + "' matches a forbidden character.");
+end
+
+rule "No empty descriptions"
+when
+	$concept : Concept($conceptId : id)
+    $description : Description(term == "", conceptId == $conceptId)
+then
+	resultsCollector.addError(2, "Error: Description '" + $description.getTerm() + "' is empty");
+end
+
+rule "FSN needs to have a semantic tag"
+when
+	$concept : Concept($conceptId : id)
+    $description : Description(term not matches "..*\\(.*\\)$", conceptId == $conceptId)
+    eval($description.getTypeId() == ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids().iterator().next())
+then
+	resultsCollector.addError(3, "Error: Description '" + $description.getTerm() + "' does not have correct semantic tag");
+end
+
+rule "No double spaces"
+when
+    $concept : Concept($conceptId : id)
+    $description : Description(term matches ".*\\s\\s.*", conceptId == $conceptId)
+then
+	resultsCollector.addError(4, "Error: Description '" + $description.getTerm() + "' matches a double space");
+end
+
+rule "test rule"
+when
+    $concept : Concept($conceptId : id)
+    $description : Description(term matches ".*procedure.*", conceptId == $conceptId)
+then
+	resultsCollector.addError(4, "Error: Description '" + $description.getTerm() + "' matches test");
+end

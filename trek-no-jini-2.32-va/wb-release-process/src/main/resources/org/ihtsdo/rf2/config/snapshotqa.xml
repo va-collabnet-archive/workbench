@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<config>
+	<exportFileName>RF2_Release_QA_</exportFileName>
+	<droolsDrlFile>org/ihtsdo/rf2/drools/ConceptReleaseRules.drl</droolsDrlFile>
+	<column>
+		<name>Component Type</name>
+		<descripton></descripton>
+		<delimiter>\t</delimiter>
+	</column>
+	<column>
+		<name>Description</name>
+		<descripton></descripton>
+		<delimiter>\t</delimiter>
+	</column>
+	<column>
+		<name>ComponentId</name>
+		<descripton></descripton>
+		<delimiter>\t</delimiter>
+	</column>
+	<column>
+		<name>EffectiveTime</name>
+		<descripton></descripton>
+		<delimiter>\t</delimiter>
+	</column>
+	<column>
+		<name>AuthorName</name>
+		<descripton></descripton>
+		<delimiter>\r\n</delimiter>
+	</column>
+	
+</config>

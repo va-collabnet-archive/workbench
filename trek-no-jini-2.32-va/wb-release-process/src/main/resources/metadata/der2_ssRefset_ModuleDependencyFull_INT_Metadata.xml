@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<metadata xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="fileqa_metadata.xsd">
+	<file>
+		<description>ssRefset release export</description>
+		<regex>
+			<test>FileNameTest</test>
+			<expression>[der2]{4}_[ssRefset]{8}_[ModuleDependencyFull]{20}_[INT]{3}_\d{8}.[txt]{3}</expression>
+			<description>the file name should match the expression EXACTLY</description>
+			<successMessage>The file name does match</successMessage>
+			<failureMessage>The file name does NOT match</failureMessage>
+		</regex>
+		<delimiter>\t</delimiter>
+		<encoding>UTF-8</encoding>
+		<carryForward>true</carryForward>
+	</file>
+	<column>
+		<header>id</header>
+		<position>1</position>
+		<regex>
+			<test>ColumnNullTest</test>
+			<expression>.*</expression>
+			<description>Column is NOT null</description>
+			<successMessage>Column is NOT null</successMessage>
+			<failureMessage>Column is null</failureMessage>
+		</regex>
+		<regex>
+			<test>ColumnTypeTest</test>
+			<expression>[A-Za-z0-9\-]*</expression>
+			<description>Column type is UUID string</description>
+			<successMessage>Column type is UUID string</successMessage>
+			<failureMessage>Column type is NOT UUID string</failureMessage>
+		</regex>
+		<regex>
+			<test>ColumnWidthTest</test>
+			<expression>[A-Za-z0-9\-]{36}</expression>
+			<description>Column width is 36 characters UUID string</description>
+			<successMessage>Column width is 36 characters UUID string</successMessage>
+			<failureMessage>Column width is NOT 36 characters UUID string</failureMessage>
+		</regex>
+		<regex>
+			<test>ColumnValidTest</test>
+			<expression>[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$</expression>
+			<description>containing UUID</description>
+			<successMessage>Column is valid UUID</successMessage>
+			<failureMessage>Column is NOT valid UUID</failureMessage>
+		</regex>
+	</column>
+	<column>
+		<header>effectiveTime</header>
+		<position>2</position>
+		<regex>
+			<test>ColumnNullTest</test>
+			<expression>.*</expression>
+			<description>Column is NOT null</description>
+			<successMessage>Column is NOT null</successMessage>
+			<failureMessage>Column is null</failureMessage>
+		</regex>
+		<regex>
+			<test>ColumnTypeTest</test>
+			<expression>\d*</expression>
+			<description>containing is only digits</description>
+			<successMessage>Column is digits</successMessage>
+			<failureMessage>Column is NOT digits</failureMessage>
+		</regex>
+		<regex>
+			<test>ColumnValidTest</test>
+			<expression>((19|20)\d\d)(0?[1-9]|1[012])(0?[1-9]|[12][0-9]|3[01])</expression>
+			<description>containing date YYYYMMDD</description>
+			<successMessage>Column is valid date YYYYMMDD</successMessage>
+			<failureMessage>Column is NOT valid date YYYYMMDD</failureMessage>
+		</regex>
+		<regex>
+			<test>ColumnValuesTest</test>
+			<expression>(20)(02|03|04|05|06|07|08|09|10|11|12)(01|07)(31)</expression>
+			<successMessage>Column is valid date value</successMessage>
+			<failureMessage>Column is NOT valid date value</failureMessage>
+		</regex>
+	</column>
+	<column>
+		<header>active</header>
+		<position>3</position>
+		<regex>
+			<test>ColumnNullTest</test>
+			<expression>.*</expression>
+			<description>Column is NOT null</description>
+			<successMessage>Column is NOT null</successMessage>
+			<failureMessage>Column is null</failureMessage>
+		</regex>
+		<regex>
+			<test>ColumnTypeTest</test>
+			<expression>\d*</expression>
+			<description>Column type is int</description>
+			<successMessage>Column type is int</successMessage>
+			<failureMessage>Column type is NOT int</failureMessage>
+		</regex>
+		<regex>
+			<test>ColumnValidTest</test>
+			<expression>[0-1]{1}</expression>
+			<description>containing 1 in length only 0 or 1</description>
+			<successMessage>Column is 0 or 1 digit</successMessage>
+			<failureMessage>Column is NOT 0 or 1 digit</failureMessage>
+		</regex>
+	</column>
+	<column>
+		<header>moduleId</header>
+		<position>4</position>
+		<regex>
+			<test>ColumnNullTest</test>
+			<expression>.*</expression>
+			<description>Column is NOT null</description>
+			<successMessage>Column is NOT null</successMessage>
+			<failureMessage>Column is null</failureMessage>
+		</regex>
+		<regex>
+			<test>ColumnTypeTest</test>
+			<expression>\d*</expression>
+			<description>Column type is int</description>
+			<successMessage>Column type is int</successMessage>
+			<failureMessage>Column type is NOT int</failureMessage>
+		</regex>
+		<regex>
+			<test>ColumnWidthTest</test>
+			<expression>\d{18}</expression>
+			<description>containing 18 in length only digits</description>
+			<successMessage>Column is 18 digits</successMessage>
+			<failureMessage>Column is NOT 18 digits</failureMessage>
+		</regex>
+		<regex>
+			<test>ColumnValuesTest</test>
+			<expression>(900000000000207008)</expression>
+			<description>containing value only 900000000000207008</description>
+			<successMessage>Column is valid value 900000000000207008</successMessage>
+			<failureMessage>Column is NOT valid value 900000000000207008</failureMessage>
+		</regex>
+	</column>
+	<column>
+		<header>refsetId</header>
+		<position>5</position>
+		<regex>
+			<test>ColumnNullTest</test>
+			<expression>.*</expression>
+			<description>Column is NOT null</description>
+			<successMessage>Column is NOT null</successMessage>
+			<failureMessage>Column is null</failureMessage>
+		</regex>
+		<regex>
+			<test>ColumnTypeTest</test>
+			<expression>\d*</expression>
+			<description>Column type is int</description>
+			<successMessage>Column type is int</successMessage>
+			<failureMessage>Column type is NOT int</failureMessage>
+		</regex>
+		<regex>
+			<test>ColumnWidthTest</test>
+			<expression>\d{18}</expression>
+			<description>containing 18 in length only digits</description>
+			<successMessage>Column is 18 digits</successMessage>
+			<failureMessage>Column is NOT 18 digits</failureMessage>
+		</regex>
+		<regex>
+			<test>ColumnValuesTest</test>
+			<expression>(900000000000534007)</expression>
+			<description>containing value only 900000000000534007</description>
+			<successMessage>Column is valid value 900000000000534007</successMessage>
+			<failureMessage>Column is NOT valid value 900000000000534007</failureMessage>
+		</regex>
+	</column>
+	<column>
+		<header>referencedComponentId</header>
+		<position>6</position>
+		<regex>
+			<test>ColumnNullTest</test>
+			<expression>.*</expression>
+			<description>Column is NOT null</description>
+			<successMessage>Column is NOT null</successMessage>
+			<failureMessage>Column is null</failureMessage>
+		</regex>
+		<regex>
+			<test>ColumnTypeTest</test>
+			<expression>\d*</expression>
+			<description>Column type is int</description>
+			<successMessage>Column type is int</successMessage>
+			<failureMessage>Column type is NOT int</failureMessage>
+		</regex>
+		<regex>
+			<test>ColumnWidthTest</test>
+			<expression>\d{18}</expression>
+			<description>containing 18 in length only digits</description>
+			<successMessage>Column is 18 digits</successMessage>
+			<failureMessage>Column is NOT 18 digits</failureMessage>
+		</regex>
+	</column>
+	<column>
+		<header>sourceEffectiveTime</header>
+		<position>7</position>
+		<regex>
+			<test>ColumnNullTest</test>
+			<expression>.*</expression>
+			<description>Column is NOT null</description>
+			<successMessage>Column is NOT null</successMessage>
+			<failureMessage>Column is null</failureMessage>
+		</regex>
+		<regex>
+			<test>ColumnTypeTest</test>
+			<expression>\d*</expression>
+			<description>containing is only digits</description>
+			<successMessage>Column is digits</successMessage>
+			<failureMessage>Column is NOT digits</failureMessage>
+		</regex>
+		<regex>
+			<test>ColumnValidTest</test>
+			<expression>((19|20)\d\d)(0?[1-9]|1[012])(0?[1-9]|[12][0-9]|3[01])</expression>
+			<description>containing date YYYYMMDD</description>
+			<successMessage>Column is valid date YYYYMMDD</successMessage>
+			<failureMessage>Column is NOT valid date YYYYMMDD</failureMessage>
+		</regex>
+	</column>
+	<column>
+		<header>targetEffectiveTime</header>
+		<position>8</position>
+		<regex>
+			<test>ColumnNullTest</test>
+			<expression>.*</expression>
+			<description>Column is NOT null</description>
+			<successMessage>Column is NOT null</successMessage>
+			<failureMessage>Column is null</failureMessage>
+		</regex>
+		<regex>
+			<test>ColumnTypeTest</test>
+			<expression>\d*</expression>
+			<description>containing is only digits</description>
+			<successMessage>Column is digits</successMessage>
+			<failureMessage>Column is NOT digits</failureMessage>
+		</regex>
+		<regex>
+			<test>ColumnValidTest</test>
+			<expression>((19|20)\d\d)(0?[1-9]|1[012])(0?[1-9]|[12][0-9]|3[01])</expression>
+			<description>containing date YYYYMMDD</description>
+			<successMessage>Column is valid date YYYYMMDD</successMessage>
+			<failureMessage>Column is NOT valid date YYYYMMDD</failureMessage>
+		</regex>
+	</column>
+</metadata>

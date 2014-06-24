@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN"
+"http://docs.oasis-open.org/dita/dtd/topic.dtd">
+<topic id="setting_user_profiles">
+  <title>How to set user profiles?</title>
+
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>user profiles</indexterm>
+
+        <indexterm>profiles</indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+
+  <body>
+    <section>User profiles are established by the Software Developer. A user
+    can modify various configuration settings via the preferences toggle
+    <image height="22" href="../images/FAQ_Images/faq_img_2.jpg"
+    placement="inline" width="26"/> in the top far right corner of the editor.
+    A user can save a profile at any time via the Editor's <ph>File</ph> menu,
+    but otherwise will be prompted to save her/his profile on exiting the
+    editor.</section>
+  </body>
+</topic>

@@ -1,0 +1,1173 @@
+#created on: Sep 1, 2010
+package org.ihtsdo.arena.drools
+
+#list any import classes here.
+import java.util.Collection;
+
+import org.ihtsdo.concept.Concept;
+
+import org.dwfa.ace.api.I_ConfigAceFrame;
+import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.api.conceptattribute.ConceptAttributeChronicleBI;
+import org.ihtsdo.tk.api.ComponentVersionBI;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.api.description.DescriptionVersionBI;
+import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
+import org.ihtsdo.tk.api.relationship.group.RelationshipGroupVersionBI;
+
+import org.ihtsdo.arena.conceptview.ConceptViewSettings;
+import org.ihtsdo.arena.context.action.AddFromSpecAction;
+import org.ihtsdo.arena.context.action.AddFromDialectSpecAction;
+import org.ihtsdo.arena.context.action.AddToRelGroupAction;
+import org.ihtsdo.arena.context.action.CopyAction;
+import org.ihtsdo.arena.context.action.CopyDescAction;
+import org.ihtsdo.arena.context.action.CopyRelAction;
+import org.ihtsdo.arena.context.action.CopyRelGroupAction;
+import org.ihtsdo.arena.context.action.CopyToRelGroupAction;
+import org.ihtsdo.arena.context.action.CloneAction;
+import org.ihtsdo.arena.context.action.CloneRelAction;
+import org.ihtsdo.arena.context.action.CloneAndRetireAction;
+import org.ihtsdo.arena.context.action.CloneToRelGroupAction;
+import org.ihtsdo.arena.context.action.CloneRelGroupAction;
+import org.ihtsdo.arena.context.action.CreateRelAction;
+import org.ihtsdo.arena.context.action.MoveAction;
+import org.ihtsdo.arena.context.action.MoveDescAction;
+import org.ihtsdo.arena.context.action.MoveToRelGroupAction;
+import org.ihtsdo.arena.context.action.MoveRelAction;
+import org.ihtsdo.arena.context.action.MoveRelGroupAction;
+import org.ihtsdo.arena.context.action.RetireAction;
+import org.ihtsdo.arena.context.action.UngroupRelAction;
+import org.ihtsdo.arena.context.action.UngroupRelGroupAction;
+import org.ihtsdo.arena.context.action.UpdateDescFromSpecAction;
+import org.ihtsdo.arena.context.action.ReplaceAction;
+import org.ihtsdo.arena.context.action.MakeAcceptableAction;
+import org.ihtsdo.arena.context.action.MakePreferredAutoAction;
+import org.ihtsdo.arena.context.action.MakeNotAcceptableAction;
+import org.ihtsdo.arena.context.action.MakePreferredAction;
+import org.ihtsdo.arena.context.action.GroupRelsAction;
+import org.ihtsdo.arena.context.action.SetSynonymyAction;
+import org.ihtsdo.arena.context.action.SetDefinedAction;
+import org.ihtsdo.arena.context.action.SetICSignificantAction;
+import org.ihtsdo.arena.context.action.RetireAsInappropriateAction;
+import org.ihtsdo.arena.context.action.CancelAction;
+import org.ihtsdo.arena.context.action.AddToNidFloatRefexAction;
+import org.ihtsdo.arena.context.action.AddTextDefinitionAction;
+//import org.ihtsdo.arena.context.action.ChangeRefexAction;
+
+import org.ihtsdo.tk.drools.facts.ComponentFact;
+import org.ihtsdo.tk.drools.facts.ConAttrFact;
+import org.ihtsdo.tk.drools.facts.ConceptFact;
+import org.ihtsdo.tk.drools.facts.Context;
+import org.ihtsdo.tk.drools.facts.DescFact;
+import org.ihtsdo.tk.drools.facts.DescSpecFact;
+import org.ihtsdo.tk.drools.facts.RelFact;
+import org.ihtsdo.tk.drools.facts.RelSpecFact;
+import org.ihtsdo.tk.drools.facts.RelGroupFact;
+import org.ihtsdo.tk.drools.facts.RefexFact;
+import org.ihtsdo.tk.drools.facts.ViewFact;
+import org.ihtsdo.tk.drools.facts.View;
+
+
+import org.ihtsdo.tk.spec.DescriptionSpec;
+import org.ihtsdo.helper.dialect.DialectHelper;
+
+import org.ihtsdo.tk.binding.snomed.Language;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
+import org.ihtsdo.tk.binding.snomed.Snomed;
+import org.ihtsdo.tk.binding.snomed.SnomedConstraints;
+import org.ihtsdo.tk.binding.snomed.SnomedRelationshipType;
+import org.ihtsdo.tk.binding.snomed.SnomedRelationshipSpec;
+import org.ihtsdo.tk.binding.snomed.Taxonomies;
+import org.ihtsdo.tk.binding.snomed.TermAux;
+import org.ihtsdo.tk.binding.snomed.WbDescType;
+import org.ihtsdo.arena.spec.Refsets; 
+import org.ihtsdo.arena.spec.AcceptabilityType;
+import org.ihtsdo.arena.spec.SynonymyType;
+import org.ihtsdo.lang.LANG_CODE;
+
+
+
+#declare any global variables here
+
+global Collection actions;
+global ViewCoordinate vc;
+global ConceptViewSettings cvSettings;
+global I_ConfigAceFrame config;
+
+rule "rule 1" 
+#concept onto different SNOMED concept
+
+   when
+      (and
+         (ViewFact(getView() == View.STATED))
+         ($dropTarget: ConceptFact(this isKindOf Taxonomies.SNOMED, context == Context.DROP_TARGET))
+         ($dropObject: ConceptFact(context == Context.DROP_OBJECT, getConcept().getTime() != Long.MAX_VALUE))
+      )
+   then
+      actions.add(new CreateRelAction("Is-a", $dropTarget, Snomed.IS_A, $dropObject, config));
+end
+
+rule "rule 3" 
+#concept onto NOT snomed concept
+
+   when
+      (and
+         (ViewFact(getView() == View.STATED))
+         ($dropTarget: ConceptFact(this not isKindOf Taxonomies.SNOMED, context == Context.DROP_TARGET))
+         ($dropObject: ConceptFact(context == Context.DROP_OBJECT, getConcept().getTime() != Long.MAX_VALUE))
+      )
+   then
+      actions.add(new CreateRelAction("is-a", $dropTarget, TermAux.IS_A, $dropObject, config));
+end 
+
+
+rule "rule 4" 
+#concept onto same concept
+
+   when
+         ViewFact(getView() == View.STATED)
+         $dropTarget: ComponentFact(context == Context.DROP_TARGET)
+         $dropObject: ComponentFact(context == Context.DROP_OBJECT, component == $dropTarget.component,
+            ((ComponentVersionBI)this.component).getTime() != Long.MAX_VALUE)
+         not $groupConcept: RelGroupFact(context == Context.DROP_TARGET)
+         not $conceptAttr: ConAttrFact(context == Context.DROP_TARGET)
+         not $refex: RefexFact(context == Context.DROP_TARGET)
+   then
+      actions.add(new RetireAction("retire", $dropObject, config));
+      actions.add(new CloneAction("clone", $dropObject, config, cvSettings));
+      actions.add(new CloneAndRetireAction("clone & retire", $dropObject, config, cvSettings));
+end
+
+rule "rule 4.2" 
+#CANCEL concept onto same concept
+
+   when
+         ViewFact(getView() == View.STATED)
+         $dropTarget: ComponentFact(context == Context.DROP_TARGET)
+         $dropObject: ComponentFact(((ComponentVersionBI)this.component).getTime() == Long.MAX_VALUE,
+                context == Context.DROP_OBJECT, component == $dropTarget.component)
+         not $refex: RefexFact(context == Context.DROP_TARGET)
+         not $conceptAttr: ConAttrFact(context == Context.DROP_TARGET)
+         not $relGroup: RelGroupFact(context == Context.DROP_TARGET)
+   then
+      actions.add(new CancelAction("cancel", $dropObject, vc, config));
+end
+
+rule "rule 4.3" 
+#CANCEL conAttr 
+
+   when
+         ViewFact(getView() == View.STATED)
+         $dropTarget: ConAttrFact(context == Context.DROP_TARGET)
+         $dropObject: ConAttrFact(((ComponentVersionBI)this.component).getTime() == Long.MAX_VALUE,
+                getConAttr().getPrimordialVersion().getTime() != Long.MAX_VALUE,
+                context == Context.DROP_OBJECT, component == $dropTarget.component)
+   then
+      actions.add(new CancelAction("cancel", $dropObject, vc, config));
+end
+
+
+rule "rule 5" 
+#template onto concept
+
+   when
+      (and
+         (ViewFact(getView() == View.STATED))
+         ($dropTarget: ConceptFact(context == Context.DROP_TARGET))
+         ($dropObject: DescSpecFact(context == Context.DROP_OBJECT))
+      )
+
+   then
+   	  if(DialectHelper.isTextForDialect($dropObject.getDescSpec().getDescriptionText(),
+         		Language.EN_US.get(vc).getNid())){
+         		actions.add(new AddFromDialectSpecAction("add GB dialect", $dropTarget, $dropObject,LANG_CODE.EN_GB, config));
+         		}
+      if(DialectHelper.isTextForDialect($dropObject.getDescSpec().getDescriptionText(),
+         		Language.EN_UK.get(vc).getNid())){
+         		actions.add(new AddFromDialectSpecAction("add US dialect", $dropTarget, $dropObject,LANG_CODE.EN_US, config));
+                        }
+end
+
+rule "rule 6" 
+#rel template onto concept
+
+   when
+      (and
+         (ViewFact(getView() == View.STATED))
+         ($dropTarget: ConceptFact(context == Context.DROP_TARGET))
+         ($dropObject: RelSpecFact(context == Context.DROP_OBJECT))
+      )
+
+   then
+      actions.add(new AddFromSpecAction("add rel", $dropTarget, $dropObject, config));
+end 
+
+ rule "rule 7" 
+#rel onto rel (in group)
+
+   when
+         ViewFact(getView() == View.STATED)
+         $dropTarget: RelFact(context == Context.DROP_TARGET)
+         $dropObject: RelFact(context == Context.DROP_OBJECT,
+                              component == $dropTarget.component,
+                              getRel().getGroup() != 0,
+                              getRel().getTime() != Long.MAX_VALUE)
+
+   then
+      actions.add(new UngroupRelAction("ungroup", $dropObject, config));
+
+end
+
+rule "rule 8" 
+#desc onto concept
+
+   when
+      (and
+         (ViewFact(getView() == View.STATED))
+         ($dropTarget: ConceptFact(context == Context.DROP_TARGET))
+         ($dropObject: DescFact(context == Context.DROP_OBJECT,
+                                getDesc().getConceptNid() != $dropTarget.getConcept().getConceptNid(),
+                                getDesc().getTime() != Long.MAX_VALUE))
+         (eval($dropObject.getDesc().getTypeNid() !=
+                   Snomed.FULLY_SPECIFIED_DESCRIPTION_TYPE.get(vc).getNid()))
+      )
+
+   then
+      actions.add(new CopyDescAction("copy desc", $dropObject, $dropTarget, config));
+      actions.add(new MoveDescAction("move desc", $dropObject, $dropTarget, config));
+end
+
+rule "rule 9" 
+#rel (w/o group) onto rel group"
+   when
+      ViewFact(getView() == View.STATED)
+      $dropTarget: RelGroupFact(context == Context.DROP_TARGET)
+      $dropObject: RelFact(context == Context.DROP_OBJECT,
+                           getRel().getGroup() == 0,
+                           getRel().getTime() != Long.MAX_VALUE)
+
+   then
+      actions.add(new CopyToRelGroupAction("copy rel", $dropObject, $dropTarget, config));
+end
+
+rule "rule 9.1" 
+#rel (w/o group) onto rel group"
+   when
+      ViewFact(getView() == View.STATED)
+      $dropTarget: RelGroupFact(context == Context.DROP_TARGET)
+      $dropObject: RelFact(context == Context.DROP_OBJECT,
+                           getRel().getGroup() == 0,
+                           getRel().isStated() == true)
+
+   then
+      actions.add(new MoveToRelGroupAction("add rel", $dropObject, $dropTarget, config));
+end
+
+rule "rule 10" 
+#rel w/group onto different rel group"
+   when
+      ViewFact(getView() == View.STATED)
+      $dropTarget: RelGroupFact(context == Context.DROP_TARGET)
+      $dropObject: RelFact(context == Context.DROP_OBJECT,
+      					   getRel().getGroup() != 0,
+      					   getRel().getConceptNid() != $dropTarget.getRelGroup().getConceptNid() ||
+         (getRel().getConceptNid() == $dropTarget.getRelGroup().getConceptNid() && getRel().getGroup() != $dropTarget.getRelGroup().getRelationshipGroupNumber()))
+   then
+      actions.add(new CopyToRelGroupAction("copy to rel group", $dropObject, $dropTarget, config));
+end
+
+rule "rule 10.1" 
+#rel w/group onto different rel group"
+   when
+      ViewFact(getView() == View.STATED)
+      $dropTarget: RelGroupFact(context == Context.DROP_TARGET)
+      $dropObject: RelFact(context == Context.DROP_OBJECT,
+      					   getRel().getGroup() != 0,
+                           getRel().isStated() == true,
+      					   getRel().getConceptNid() != $dropTarget.getRelGroup().getConceptNid() ||
+         (getRel().getConceptNid() == $dropTarget.getRelGroup().getConceptNid() && getRel().getGroup() != $dropTarget.getRelGroup().getRelationshipGroupNumber()))
+   then
+      actions.add(new MoveToRelGroupAction("move to rel group", $dropObject, $dropTarget, config));
+end
+
+rule "rule 11" 
+#rel onto concept"
+
+   when
+       ViewFact(getView() == View.STATED)
+       $dropTarget: ConceptFact(context == Context.DROP_TARGET)
+       $dropObject: RelFact(context == Context.DROP_OBJECT, getRel().getConceptNid() != $dropTarget.getConcept().getConceptNid(),
+          getRel().getTime() != Long.MAX_VALUE)
+
+   then
+       actions.add(new CopyRelAction("copy rel", $dropObject, $dropTarget, config));
+
+end
+
+rule "rule 11.1" 
+#rel onto concept"
+
+   when
+       ViewFact(getView() == View.STATED)
+       $dropTarget: ConceptFact(context == Context.DROP_TARGET)
+       $dropObject: RelFact(context == Context.DROP_OBJECT,
+                    getRel().getConceptNid() != $dropTarget.getConcept().getConceptNid(),
+                    getRel().getTime() != Long.MAX_VALUE,
+                    getRel().isStated() == true)
+
+   then
+       actions.add(new MoveRelAction("move rel", $dropObject, $dropTarget, config));
+
+end
+
+rule "rule 11.2" 
+#clone rel (in rel group) onto concept
+
+   when
+   ViewFact(getView() == View.STATED)
+   $dropTarget: ConceptFact(context == Context.DROP_TARGET)
+   $dropObject: RelFact(context == Context.DROP_OBJECT, getRel().getGroup() != 0,
+      getRel().getConceptNid() == $dropTarget.getConcept().getConceptNid(), getRel().getTime() != Long.MAX_VALUE)
+
+   then
+   actions.add(new CloneRelAction("clone rel", $dropObject, config));
+
+end
+
+rule "rule 12" 
+#rel group onto same concept"
+
+   when
+   
+#concept  origin
+   ViewFact(getView() == View.STATED)
+   $dropTarget: ConceptFact(context == Context.DROP_TARGET)
+   $dropObject: RelGroupFact(context == Context.DROP_OBJECT,  
+   			getRelGroup().getConceptNid() == $dropTarget.getConcept().getConceptNid())
+
+   then
+   actions.add(new CloneRelGroupAction("clone rel group", $dropObject, $dropTarget, config));
+   actions.add(new UngroupRelGroupAction("ungroup", $dropObject, $dropTarget, config));
+
+
+end
+
+
+rule "rule 12.1" 
+#rel group onto concept"
+
+   when
+   
+#concept != origin
+   ViewFact(getView() == View.STATED)
+   $dropTarget: ConceptFact(context == Context.DROP_TARGET)
+   $dropObject: RelGroupFact(context == Context.DROP_OBJECT,
+                    getRelGroup().getConceptNid() != $dropTarget.getConcept().getConceptNid())
+
+   then
+   actions.add(new CopyRelGroupAction("copy rel group", $dropObject, $dropTarget, config));
+
+end
+
+rule "rule 12.2" 
+#rel group onto concept"
+
+   when
+   
+#concept != origin
+   ViewFact(getView() == View.STATED)
+   $dropTarget: ConceptFact(context == Context.DROP_TARGET)
+   $dropObject: RelGroupFact(context == Context.DROP_OBJECT,
+   		getRelGroup().getConceptNid() != $dropTarget.getConcept().getConceptNid())
+
+   then
+   actions.add(new MoveRelGroupAction("move rel group", $dropObject, $dropTarget, config));
+
+end 
+
+rule "rule 13" 
+#rel template onto rel group"
+   when
+   ViewFact(getView() == View.STATED)
+   $dropObject: RelSpecFact(context == Context.DROP_TARGET)
+   $dropTarget: RelGroupFact(context == Context.DROP_OBJECT)
+
+
+   then
+   actions.add(new AddToRelGroupAction("add to rel group", $dropTarget, $dropObject, config));
+end
+
+rule "rule 14" 
+#historical rel template onto rel"
+	when
+                ViewFact(getView() == View.STATED)
+		$dropObject : RelFact(context == Context.DROP_OBJECT);
+		$dropTarget : RelSpecFact(context == Context.DROP_TARGET);
+
+	then
+		actions.add(new ReplaceAction("Replace with", $dropObject, $dropTarget, config));
+end
+
+rule "rule 15" 
+#pref acceptability GB
+	when
+                ViewFact(getView() == View.STATED)
+		$dropTarget: DescFact(this isGbMemberTypeOf SnomedMetadataRfx.getDESC_PREFERRED(), 
+							  context == Context.DROP_TARGET)
+		$dropObject : DescFact(context == Context.DROP_OBJECT, component == $dropTarget.component);				   								   
+	then
+		actions.add(new MakeAcceptableAction("GB Acceptable", $dropTarget, LANG_CODE.EN_GB, config));
+end
+
+rule "rule 15.1" 
+#make preferred, set old preferred term to acceptible -- EN
+	when
+                ViewFact(getView() == View.STATED)
+		$dropTarget: DescFact(this isGbMemberTypeOf SnomedMetadataRfx.getDESC_ACCEPTABLE(),
+                                      this isUsMemberTypeOf SnomedMetadataRfx.getDESC_ACCEPTABLE(),
+				      context == Context.DROP_TARGET)
+		$dropObject : DescFact(context == Context.DROP_OBJECT, component == $dropTarget.component);				   								   
+	then
+		actions.add(new MakePreferredAutoAction("make preferred", $dropTarget, LANG_CODE.EN, config));
+end
+
+
+rule "rule 15.2" 
+#make preferred, set old preferred term to acceptible -- US
+	when
+                ViewFact(getView() == View.STATED)
+		$dropTarget: DescFact(this not isGbMemberTypeOf SnomedMetadataRfx.getDESC_ACCEPTABLE(),
+                                      this isUsMemberTypeOf SnomedMetadataRfx.getDESC_ACCEPTABLE(),
+							  context == Context.DROP_TARGET)
+		$dropObject : DescFact(context == Context.DROP_OBJECT, component == $dropTarget.component);				   								   
+	then
+		actions.add(new MakePreferredAutoAction("make preferred", $dropTarget, LANG_CODE.EN_US, config));
+end
+
+rule "rule 15.3" 
+#make preferred, set old preferred term to acceptible -- GB
+	when
+                ViewFact(getView() == View.STATED)
+		$dropTarget: DescFact(this isGbMemberTypeOf SnomedMetadataRfx.getDESC_ACCEPTABLE(),
+                                      this not isUsMemberTypeOf SnomedMetadataRfx.getDESC_ACCEPTABLE(),
+							  context == Context.DROP_TARGET)
+		$dropObject : DescFact(context == Context.DROP_OBJECT, component == $dropTarget.component);				   								   
+	then
+		actions.add(new MakePreferredAutoAction("make preferred", $dropTarget, LANG_CODE.EN_GB, config));
+end
+
+rule "rule 16.1" 
+#pref acceptibility US
+	when
+                ViewFact(getView() == View.STATED)
+		$dropTarget: DescFact(this isUsMemberTypeOf SnomedMetadataRfx.getDESC_PREFERRED(), 
+							  context == Context.DROP_TARGET)
+		$dropObject : DescFact(context == Context.DROP_OBJECT, component == $dropTarget.component);				   								   
+	then
+		actions.add(new MakeAcceptableAction("US Acceptable", $dropTarget, LANG_CODE.EN_US, config));
+end
+
+rule "rule 17.1" 
+#acceptable acceptability GB
+	when
+                ViewFact(getView() == View.STATED)
+		$dropTarget: DescFact(this isGbMemberTypeOf SnomedMetadataRfx.getDESC_ACCEPTABLE(), 
+							  context == Context.DROP_TARGET)
+		$dropObject : DescFact(context == Context.DROP_OBJECT, component == $dropTarget.component);					   								   
+	then
+		actions.add(new MakePreferredAction("GB Preferred", $dropTarget, LANG_CODE.EN_GB, config));
+end
+
+rule "rule 18.1" 
+#aceptable acceptibility US
+	when
+                ViewFact(getView() == View.STATED)
+		$dropTarget: DescFact(this isUsMemberTypeOf SnomedMetadataRfx.getDESC_ACCEPTABLE(), 
+							  context == Context.DROP_TARGET)
+		$dropObject : DescFact(context == Context.DROP_OBJECT, component == $dropTarget.component);				   								   
+	then
+		actions.add(new MakePreferredAction("US Preferred", $dropTarget, LANG_CODE.EN_US, config));
+end
+
+rule "rule 19" 
+#not acceptable acceptability GB
+	when
+                ViewFact(getView() == View.STATED)
+		$dropTarget: DescFact(this isGbMemberTypeOf AcceptabilityType.NOT_ACCEPTABLE, 
+							  context == Context.DROP_TARGET)
+		$dropObject : DescFact(context == Context.DROP_OBJECT, component == $dropTarget.component);					   								   
+	then
+		actions.add(new MakePreferredAction("GB Preferred", $dropTarget, LANG_CODE.EN_GB, config));
+		actions.add(new MakeAcceptableAction("GB Acceptable", $dropTarget, LANG_CODE.EN_GB, config));
+end
+
+rule "rule 20" 
+#not acceptable acceptibility US
+	when
+                ViewFact(getView() == View.STATED)
+		$dropTarget: DescFact(this isUsMemberTypeOf AcceptabilityType.NOT_ACCEPTABLE, 
+							  context == Context.DROP_TARGET)
+		$dropObject : DescFact(context == Context.DROP_OBJECT, component == $dropTarget.component);					   								   
+	then
+		actions.add(new MakePreferredAction("US Preferred", $dropTarget, LANG_CODE.EN_US, config));
+		actions.add(new MakeAcceptableAction("US Acceptable", $dropTarget, LANG_CODE.EN_US, config));
+end
+
+rule "rule 21" 
+#rel (w/o group) onto rel (w/o group): create new rel group"
+   when
+      ViewFact(getView() == View.STATED)
+      $dropTarget: RelFact(context == Context.DROP_TARGET,
+      			getRel().getGroup() == 0)
+      $dropObject: RelFact(context == Context.DROP_OBJECT,
+      			component != $dropTarget.component,
+      			getRel().getConceptNid() == $dropTarget.getRel().getConceptNid(),
+                        getRel().getGroup() == 0)
+
+   then
+      actions.add(new GroupRelsAction("group rels", $dropObject, $dropTarget, config));
+end
+
+rule "rule 22" 
+#set degree of synonymy if not set rf1
+	when
+                ViewFact(getView() == View.STATED)
+		$dropTarget: DescFact(this not isMemberOf SnomedMetadataRfx.getREFEX_SYNONYMY(),
+							  getDesc().getTypeNid() == SnomedMetadataRfx.getDES_SYNONYM_NID(),
+							  context == Context.DROP_TARGET)
+		$dropObject: DescFact(context == Context.DROP_OBJECT, component == $dropTarget.component)
+	then
+		actions.add(new SetSynonymyAction("synonymous", $dropTarget, SynonymyType.SYNONYM, false, config));
+		actions.add(new SetSynonymyAction("near synonym", $dropTarget, SynonymyType.NEAR_SYNONYMOUS, false, config));
+		actions.add(new SetSynonymyAction("non synonymous", $dropTarget, SynonymyType.NON_SYNONYMOUS, false, config));
+end
+
+rule "rule 23" 
+#change synonymy from synonymous
+	when
+                ViewFact(getView() == View.STATED)
+		$dropTarget: DescFact(this isSynonymMemberTypeOf SynonymyType.SYNONYM,
+							  getDesc().getTypeNid() == SnomedMetadataRfx.getDES_SYNONYM_NID(),
+							  context == Context.DROP_TARGET)
+		$dropObject: DescFact(context == Context.DROP_OBJECT, component == $dropTarget.component)
+	then
+		actions.add(new SetSynonymyAction("near synonym", $dropTarget, SynonymyType.NEAR_SYNONYMOUS, true, config));
+		actions.add(new SetSynonymyAction("non synonymous", $dropTarget, SynonymyType.NON_SYNONYMOUS, true, config));
+end
+
+rule "rule 24" 
+#change synonymy from near synonymous
+	when
+                ViewFact(getView() == View.STATED)
+		$dropTarget: DescFact(this isSynonymMemberTypeOf SynonymyType.NEAR_SYNONYMOUS,
+							  getDesc().getTypeNid() == SnomedMetadataRfx.getDES_SYNONYM_NID(),
+							  context == Context.DROP_TARGET)
+		$dropObject: DescFact(context == Context.DROP_OBJECT, component == $dropTarget.component)
+	then
+		actions.add(new SetSynonymyAction("synonym", $dropTarget, SynonymyType.SYNONYM, true, config));
+		actions.add(new SetSynonymyAction("non synonymous", $dropTarget, SynonymyType.NON_SYNONYMOUS, true, config));
+end
+
+rule "rule 25" 
+#change synonymy from non synonymous
+	when
+                ViewFact(getView() == View.STATED)
+		$dropTarget: DescFact(this isSynonymMemberTypeOf SynonymyType.NON_SYNONYMOUS,
+							  getDesc().getTypeNid() == SnomedMetadataRfx.getDES_SYNONYM_NID(),
+							  context == Context.DROP_TARGET)
+		$dropObject: DescFact(context == Context.DROP_OBJECT, component == $dropTarget.component)
+	then
+		actions.add(new SetSynonymyAction("synonym", $dropTarget, SynonymyType.SYNONYM, true, config));
+		actions.add(new SetSynonymyAction("near synonymous", $dropTarget, SynonymyType.NEAR_SYNONYMOUS, true, config));
+end
+
+rule "rule 26" 
+#procedure and decendants onto body structure
+
+   when
+      (and
+         (ViewFact(getView() == View.STATED))
+         ($dropTarget: ConceptFact(this isKindOf Snomed.PROCEDURE, context == Context.DROP_TARGET))
+         ($dropObject: ConceptFact(this isKindOf Snomed.BODY_STRUCTURE, this not isKindOf Snomed.MORPHOLOGIC_ABNORMALITY,
+         							 context == Context.DROP_OBJECT, getConcept().getTime() != Long.MAX_VALUE))
+      )
+   then
+      actions.add(new CreateRelAction("Procedure Site", $dropTarget, Snomed.PROCEDURE_SITE, $dropObject, config));
+      actions.add(new CreateRelAction("Procedure Site - Direct", $dropTarget, Snomed.PROCEDURE_SITE_DIRECT, $dropObject, config));
+      actions.add(new CreateRelAction("Procedure Site - Indirect", $dropTarget, Snomed.PROCEDURE_SITE_INDIRECT, $dropObject, config));
+end
+
+rule "rule 27" 
+#procedure onto morphologic abnormality
+	when
+	(and
+         (ViewFact(getView() == View.STATED))
+         ($dropTarget: ConceptFact(this isKindOf Snomed.PROCEDURE, context == Context.DROP_TARGET))
+         ($dropObject: ConceptFact(this isKindOf Snomed.MORPHOLOGIC_ABNORMALITY,
+         						   context == Context.DROP_OBJECT, getConcept().getTime() != Long.MAX_VALUE))
+      )
+	then
+	actions.add(new CreateRelAction("Procedure Morphology", $dropTarget, Snomed.PROCEDURE_MORPHOLOGY, $dropObject, config));
+      	actions.add(new CreateRelAction("Procedure Morphology - Direct", $dropTarget, Snomed.PROCEDURE_MORPHOLOGY_DIRECT, $dropObject, config));
+      	actions.add(new CreateRelAction("Procedure Morphology - Indirect", $dropTarget, Snomed.PROCEDURE_INDIRECT_MORPHOLOGY, $dropObject, config));
+end
+
+rule "rule 28" 
+#procedure onto physical object
+	when
+	(and
+         (ViewFact(getView() == View.STATED))
+         ($dropTarget: ConceptFact(this isKindOf Snomed.PROCEDURE, context == Context.DROP_TARGET))
+         ($dropObject: ConceptFact(this isKindOf Snomed.PHYSICAL_OBJECT, 
+                        context == Context.DROP_OBJECT, getConcept().getTime() != Long.MAX_VALUE))
+      )
+	then
+	actions.add(new CreateRelAction("Procedure Device", $dropTarget, Snomed.PROCEDURE_DEVICE, $dropObject, config));
+      	actions.add(new CreateRelAction("Procedure Device - Direct", $dropTarget, Snomed.PROCEDURE_DEVICE_DIRECT, $dropObject, config));
+      	actions.add(new CreateRelAction("Procedure Device - Indirect", $dropTarget, Snomed.PROCEDURE_INDIRECT_DEVICE, $dropObject, config));
+      	actions.add(new CreateRelAction("Procedure Device - using access device", $dropTarget, Snomed.PROCCEDURE_ACCESS_DEVICE, $dropObject, config));
+      	actions.add(new CreateRelAction("Procedure Device - using device", $dropTarget, Snomed.PROCEDURE_USING_DEVICE, $dropObject, config));
+end
+
+rule "rule 29" 
+#procedure onto substance
+	when
+	(and
+         (ViewFact(getView() == View.STATED))
+         ($dropTarget: ConceptFact(this isKindOf Snomed.PROCEDURE, context == Context.DROP_TARGET))
+         ($dropObject: ConceptFact(this isKindOf Snomed.SUBSTANCE, context == Context.DROP_OBJECT, getConcept().getTime() != Long.MAX_VALUE))
+      )
+	then
+	actions.add(new CreateRelAction("Direct Substance", $dropTarget, Snomed.DIRECT_SUBSTANCE, $dropObject, config));
+      	actions.add(new CreateRelAction("Using Substance", $dropTarget, Snomed.USING_SUBSTANCE, $dropObject, config));
+      	actions.add(new CreateRelAction("Component", $dropTarget, Snomed.COMPONENT, $dropObject, config));
+end
+
+rule "rule 29.1" 
+#procedure onto clinical finding
+	when
+	(and
+         (ViewFact(getView() == View.STATED))
+         ($dropTarget: ConceptFact(this isKindOf Snomed.PROCEDURE, context == Context.DROP_TARGET))
+         ($dropObject: ConceptFact(this isKindOf Snomed.CLINICAL_FINDING, context == Context.DROP_OBJECT, getConcept().getTime() != Long.MAX_VALUE))
+      )
+	then
+            actions.add(new CreateRelAction("Has Focus", $dropTarget, Snomed.HAS_FOCUS, $dropObject, config));
+end
+
+rule "rule 30" 
+#procedure onto specimen
+	when
+	(and
+         (ViewFact(getView() == View.STATED))
+         ($dropTarget: ConceptFact(this isKindOf Snomed.PROCEDURE, context == Context.DROP_TARGET))
+         ($dropObject: ConceptFact(this isKindOf Snomed.SPECIMEN, context == Context.DROP_OBJECT, getConcept().getTime() != Long.MAX_VALUE))
+      )
+	then
+		actions.add(new CreateRelAction("Has Specimen", $dropTarget, Snomed.HAS_SPECIMEN, $dropObject, config));
+end
+
+rule "rule 30.1" 
+#procedure onto procedure
+	when
+	(and
+         (ViewFact(getView() == View.STATED))
+         ($dropTarget: ConceptFact(this isKindOf Snomed.PROCEDURE, context == Context.DROP_TARGET))
+         ($dropObject: ConceptFact(this isKindOf Snomed.PROCEDURE, context == Context.DROP_OBJECT, getConcept().getTime() != Long.MAX_VALUE))
+      )
+	then
+		actions.add(new CreateRelAction("Measurement Method", $dropTarget, Snomed.MEASUREMENT_METHOD, $dropObject, config));
+end
+
+rule "rule 31" 
+#procedure onto social concept
+	when
+	(and
+         (ViewFact(getView() == View.STATED))
+         ($dropTarget: ConceptFact(this isKindOf Snomed.PROCEDURE, context == Context.DROP_TARGET))
+         ($dropObject: ConceptFact(this isKindOf Snomed.SOCIAL_CONTEXT, this not isKindOf Snomed.PERSON,
+         							 context == Context.DROP_OBJECT, getConcept().getTime() != Long.MAX_VALUE))
+      )
+	then
+		actions.add(new CreateRelAction("Recipient Category", $dropTarget, Snomed.RECIPIENT_CATEGORY, $dropObject, config));
+end
+
+rule "rule 31.1" 
+#procedure onto physical force
+	when
+	(and
+         (ViewFact(getView() == View.STATED))
+         ($dropTarget: ConceptFact(this isKindOf Snomed.PROCEDURE, context == Context.DROP_TARGET))
+         ($dropObject: ConceptFact(this isKindOf Snomed.PHYSICAL_FORCE, context == Context.DROP_OBJECT, getConcept().getTime() != Long.MAX_VALUE))
+      )
+	then
+		actions.add(new CreateRelAction("Using Energy", $dropTarget, Snomed.USING_ENERGY, $dropObject, config));
+end
+
+rule "rule 32" 
+#procedure onto qualifier value
+	when
+	(and
+         (ViewFact(getView() == View.STATED))
+         ($dropTarget: ConceptFact(this isKindOf Snomed.PROCEDURE, context == Context.DROP_TARGET))
+         ($dropObject: ConceptFact(this isKindOf Snomed.QUALIFIER_VALUE, context == Context.DROP_OBJECT, getConcept().getTime() != Long.MAX_VALUE))
+      )
+	then
+		actions.add(new CreateRelAction("Has Intent", $dropTarget, Snomed.HAS_INTENT, $dropObject, config));
+		actions.add(new CreateRelAction("Method", $dropTarget, Snomed.METHOD, $dropObject, config));
+		actions.add(new CreateRelAction("Priority", $dropTarget, Snomed.PRIORITY, $dropObject, config));
+		actions.add(new CreateRelAction("Property", $dropTarget, Snomed.PROPERTY, $dropObject, config));
+		actions.add(new CreateRelAction("Revision Status", $dropTarget, Snomed.REVISION_STATUS, $dropObject, config));
+		actions.add(new CreateRelAction("Route of Administration", $dropTarget, Snomed.ROUTE_OF_ADMIN, $dropObject, config));
+		actions.add(new CreateRelAction("Scale Type", $dropTarget, Snomed.SCALE_TYPE, $dropObject, config));
+		actions.add(new CreateRelAction("Time Aspect", $dropTarget, Snomed.TIME_ASPECT, $dropObject, config));
+		actions.add(new CreateRelAction("Access", $dropTarget, Snomed.ACCESS, $dropObject, config));
+		actions.add(new CreateRelAction("Approach", $dropTarget, Snomed.APPROACH, $dropObject, config));
+end
+
+rule "rule 33" 
+#clinical finding onto body structure
+	when
+	(and
+         (ViewFact(getView() == View.STATED))
+         ($dropTarget: ConceptFact(this isKindOf Snomed.CLINICAL_FINDING, context == Context.DROP_TARGET))
+         ($dropObject: ConceptFact(this isKindOf Snomed.BODY_STRUCTURE, this not isKindOf Snomed.MORPHOLOGIC_ABNORMALITY,
+         							context == Context.DROP_OBJECT, getConcept().getTime() != Long.MAX_VALUE))
+      )
+	then
+		actions.add(new CreateRelAction("Finding Site", $dropTarget, Snomed.FINDING_SITE, $dropObject, config));
+end
+
+rule "rule 34" 
+#clinical finding onto morphologic abnormality
+	when
+	(and
+         (ViewFact(getView() == View.STATED))
+         ($dropTarget: ConceptFact(this isKindOf Snomed.CLINICAL_FINDING, context == Context.DROP_TARGET))
+         ($dropObject: ConceptFact(this isKindOf Snomed.MORPHOLOGIC_ABNORMALITY, context == Context.DROP_OBJECT, getConcept().getTime() != Long.MAX_VALUE))
+      )
+	then
+		actions.add(new CreateRelAction("Associated Morphology", $dropTarget, Snomed.ASSOCIATED_MORPHOLOGY, $dropObject, config));
+end
+
+rule "rule 35" 
+#clinical finding onto procedure
+	when
+	(and
+         (ViewFact(getView() == View.STATED))
+         ($dropTarget: ConceptFact(this isKindOf Snomed.CLINICAL_FINDING, context == Context.DROP_TARGET))
+         ($dropObject: ConceptFact(this isKindOf Snomed.PROCEDURE, context == Context.DROP_OBJECT, getConcept().getTime() != Long.MAX_VALUE))
+      )
+	then
+		actions.add(new CreateRelAction("Associated With - after", $dropTarget, Snomed.ASSOCIATED_WITH_AFTER, $dropObject, config));
+		actions.add(new CreateRelAction("Associated With", $dropTarget, Snomed.ASSOCIATED_WITH, $dropObject, config));
+		actions.add(new CreateRelAction("Finding Method", $dropTarget, Snomed.FINDING_METHOD, $dropObject, config));
+                actions.add(new CreateRelAction("Interprets", $dropTarget, Snomed.INTERPRETS, $dropObject, config));
+end
+
+rule "rule 36" 
+#clinical finding onto clinical finding
+	when
+	(and
+         (ViewFact(getView() == View.STATED))
+         ($dropTarget: ConceptFact(this isKindOf Snomed.CLINICAL_FINDING, context == Context.DROP_TARGET))
+         ($dropObject: ConceptFact(this isKindOf Snomed.CLINICAL_FINDING, context == Context.DROP_OBJECT, getConcept().getTime() != Long.MAX_VALUE))
+      )
+	then
+		actions.add(new CreateRelAction("Associated With - due to", $dropTarget, Snomed.ASSOCIATED_WITH_DUE, $dropObject, config));
+		actions.add(new CreateRelAction("Has Definitional Manifestation", $dropTarget, Snomed.HAS_DEFINITIONAL_MANIFESTATION, $dropObject, config));
+end
+
+rule "rule 36.1" 
+#clinical finding onto event
+	when
+	(and
+         (ViewFact(getView() == View.STATED))
+         ($dropTarget: ConceptFact(this isKindOf Snomed.CLINICAL_FINDING, context == Context.DROP_TARGET))
+         ($dropObject: ConceptFact(this isKindOf Snomed.EVENT, context == Context.DROP_OBJECT, getConcept().getTime() != Long.MAX_VALUE))
+      )
+	then
+		actions.add(new CreateRelAction("Associated With - due to", $dropTarget, Snomed.ASSOCIATED_WITH_DUE, $dropObject, config));
+end
+
+rule "rule 37" 
+#clinical finding onto qualifier value
+	when
+	(and
+         (ViewFact(getView() == View.STATED))
+         ($dropTarget: ConceptFact(this isKindOf Snomed.CLINICAL_FINDING, context == Context.DROP_TARGET))
+         ($dropObject: ConceptFact(this isKindOf Snomed.QUALIFIER_VALUE, context == Context.DROP_OBJECT, getConcept().getTime() != Long.MAX_VALUE))
+      )
+	then
+		actions.add(new CreateRelAction("Clinical Course", $dropTarget, Snomed.CLINICAL_COURSE, $dropObject, config));
+		actions.add(new CreateRelAction("Has Interpretation", $dropTarget, Snomed.HAS_INTERPRETATION, $dropObject, config));
+		actions.add(new CreateRelAction("Occurrence", $dropTarget, Snomed.OCCURRENCE, $dropObject, config));
+		actions.add(new CreateRelAction("Pathological Process", $dropTarget, Snomed.PATHOLOGICAL_PROCESS, $dropObject, config));
+end
+
+rule "rule 38" 
+#clinical finding onto person
+	when
+	(and
+         (ViewFact(getView() == View.STATED))
+         ($dropTarget: ConceptFact(this isKindOf Snomed.CLINICAL_FINDING, context == Context.DROP_TARGET))
+         ($dropObject: ConceptFact(this isKindOf Snomed.PERSON, context == Context.DROP_OBJECT, getConcept().getTime() != Long.MAX_VALUE))
+      )
+	then
+		actions.add(new CreateRelAction("Finding Informer", $dropTarget, Snomed.FINDING_INFORMER, $dropObject, config));
+end
+
+rule "rule 39" 
+#clinical finding onto observable entity
+	when
+	(and
+         (ViewFact(getView() == View.STATED))
+         ($dropTarget: ConceptFact(this isKindOf Snomed.CLINICAL_FINDING, context == Context.DROP_TARGET))
+         ($dropObject: ConceptFact(this isKindOf Snomed.OBSERVABLE_ENTITY, context == Context.DROP_OBJECT, getConcept().getTime() != Long.MAX_VALUE))
+      )
+	then
+		actions.add(new CreateRelAction("Interprets", $dropTarget, Snomed.INTERPRETS, $dropObject, config));
+end
+
+rule "rule 40" 
+#clinical finding onto substance
+	when
+	(and
+         (ViewFact(getView() == View.STATED))
+         ($dropTarget: ConceptFact(this isKindOf Snomed.CLINICAL_FINDING, context == Context.DROP_TARGET))
+         ($dropObject: ConceptFact(this isKindOf Snomed.SUBSTANCE, context == Context.DROP_OBJECT, getConcept().getTime() != Long.MAX_VALUE))
+      )
+	then
+		actions.add(new CreateRelAction("Accociated With - Causative agent", $dropTarget, Snomed.ASSOCIATED_WITH_AGENT, $dropObject, config));
+end
+
+rule "rule 41" 
+#clinical finding onto organism
+	when
+	(and
+         (ViewFact(getView() == View.STATED))
+         ($dropTarget: ConceptFact(this isKindOf Snomed.CLINICAL_FINDING, context == Context.DROP_TARGET))
+         ($dropObject: ConceptFact(this isKindOf Snomed.ORGANISM, context == Context.DROP_OBJECT, getConcept().getTime() != Long.MAX_VALUE))
+      )
+	then
+		actions.add(new CreateRelAction("Accociated With - Causative agent", $dropTarget, Snomed.ASSOCIATED_WITH_AGENT, $dropObject, config));
+end
+
+rule "rule 41.1" 
+#clinical finding onto physical object
+	when
+	(and
+         (ViewFact(getView() == View.STATED))
+         ($dropTarget: ConceptFact(this isKindOf Snomed.CLINICAL_FINDING, context == Context.DROP_TARGET))
+         ($dropObject: ConceptFact(this isKindOf Snomed.PHYSICAL_OBJECT, context == Context.DROP_OBJECT, getConcept().getTime() != Long.MAX_VALUE))
+      )
+	then
+		actions.add(new CreateRelAction("Accociated With - Causative agent", $dropTarget, Snomed.ASSOCIATED_WITH_AGENT, $dropObject, config));
+end
+
+rule "rule 41.2" 
+#clinical finding onto physical force
+	when
+	(and
+         (ViewFact(getView() == View.STATED))
+         ($dropTarget: ConceptFact(this isKindOf Snomed.CLINICAL_FINDING, context == Context.DROP_TARGET))
+         ($dropObject: ConceptFact(this isKindOf Snomed.PHYSICAL_FORCE, context == Context.DROP_OBJECT, getConcept().getTime() != Long.MAX_VALUE))
+      )
+	then
+		actions.add(new CreateRelAction("Accociated With - Causative agent", $dropTarget, Snomed.ASSOCIATED_WITH_AGENT, $dropObject, config));
+end
+
+rule "rule 41.3" 
+#clinical finding onto product
+	when
+	(and
+         (ViewFact(getView() == View.STATED))
+         ($dropTarget: ConceptFact(this isKindOf Snomed.CLINICAL_FINDING, context == Context.DROP_TARGET))
+         ($dropObject: ConceptFact(this isKindOf Snomed.PRODUCT, context == Context.DROP_OBJECT, getConcept().getTime() != Long.MAX_VALUE))
+      )
+	then
+		actions.add(new CreateRelAction("Accociated With - Causative agent", $dropTarget, Snomed.ASSOCIATED_WITH_AGENT, $dropObject, config));
+end
+
+rule "rule 42" 
+#Specimen onto procedure
+	when
+	(and
+         (ViewFact(getView() == View.STATED))
+         ($dropTarget: ConceptFact(this isKindOf Snomed.SPECIMEN, context == Context.DROP_TARGET))
+         ($dropObject: ConceptFact(this isKindOf Snomed.PROCEDURE, context == Context.DROP_OBJECT, getConcept().getTime() != Long.MAX_VALUE))
+      )
+	then
+		actions.add(new CreateRelAction("Specimen Procedure", $dropTarget, Snomed.SPECIMEN_PROCEDURE, $dropObject, config));
+end
+
+rule "rule 43" 
+#Specimen onto person
+	when
+	(and
+         (ViewFact(getView() == View.STATED))
+         ($dropTarget: ConceptFact(this isKindOf Snomed.SPECIMEN, context == Context.DROP_TARGET))
+         ($dropObject: ConceptFact(this isKindOf Snomed.PERSON, context == Context.DROP_OBJECT, getConcept().getTime() != Long.MAX_VALUE))
+      )
+	then
+		actions.add(new CreateRelAction("Specimen Source Identity", $dropTarget, Snomed.SPECIMEN_SOURCE_ID, $dropObject, config));
+end
+
+rule "rule 44" 
+#Specimen onto physical object
+	when
+	(and
+         (ViewFact(getView() == View.STATED))
+         ($dropTarget: ConceptFact(this isKindOf Snomed.SPECIMEN, context == Context.DROP_TARGET))
+         ($dropObject: ConceptFact(this isKindOf Snomed.PHYSICAL_OBJECT, context == Context.DROP_OBJECT, getConcept().getTime() != Long.MAX_VALUE))
+      )
+	then
+		actions.add(new CreateRelAction("Specimen Source Identity", $dropTarget, Snomed.SPECIMEN_SOURCE_ID, $dropObject, config));
+end
+
+rule "rule 45" 
+#Specimen onto environment
+	when
+	(and
+         (ViewFact(getView() == View.STATED))
+         ($dropTarget: ConceptFact(this isKindOf Snomed.SPECIMEN, context == Context.DROP_TARGET))
+         ($dropObject: ConceptFact(this isKindOf Snomed.ENVIRONMENT, context == Context.DROP_OBJECT, getConcept().getTime() != Long.MAX_VALUE))
+      )
+	then
+		actions.add(new CreateRelAction("Specimen Source Identity", $dropTarget, Snomed.SPECIMEN_SOURCE_ID, $dropObject, config));
+end
+
+rule "rule 46" 
+#Specimen onto morphologic abnormality
+	when
+	(and
+         (ViewFact(getView() == View.STATED))
+         ($dropTarget: ConceptFact(this isKindOf Snomed.SPECIMEN, context == Context.DROP_TARGET))
+         ($dropObject: ConceptFact(this isKindOf Snomed.MORPHOLOGIC_ABNORMALITY,
+                             context == Context.DROP_OBJECT, 
+                             getConcept().getTime() != Long.MAX_VALUE))
+      )
+	then
+		actions.add(new CreateRelAction("Specimen Source Morphology", $dropTarget, Snomed.SPECIMEN_SOURCE_MORPHOLOGY, $dropObject, config));
+end
+
+rule "rule 47" 
+#Specimen onto body structure
+	when
+	(and
+         (ViewFact(getView() == View.STATED))
+         ($dropTarget: ConceptFact(this isKindOf Snomed.SPECIMEN, context == Context.DROP_TARGET))
+         ($dropObject: ConceptFact(this isKindOf Snomed.BODY_STRUCTURE, context == Context.DROP_OBJECT, getConcept().getTime() != Long.MAX_VALUE))
+      )
+	then
+		actions.add(new CreateRelAction("Specimen Source Topography", $dropTarget, Snomed.SPECIMEN_SOURCE_TOPOGRAPHY, $dropObject, config));
+end
+
+rule "rule 48" 
+#Specimen onto substance
+	when
+	(and
+         (ViewFact(getView() == View.STATED))
+         ($dropTarget: ConceptFact(this isKindOf Snomed.SPECIMEN, context == Context.DROP_TARGET))
+         ($dropObject: ConceptFact(this isKindOf Snomed.SUBSTANCE, context == Context.DROP_OBJECT, getConcept().getTime() != Long.MAX_VALUE))
+      )
+	then
+		actions.add(new CreateRelAction("Specimen Substance", $dropTarget, Snomed.SPECIMEN_SUBSTANCE, $dropObject, config));
+end
+
+rule "rule 49" 
+#Product onto substance
+	when
+	(and
+         (ViewFact(getView() == View.STATED))
+         ($dropTarget: ConceptFact(this isKindOf Snomed.PRODUCT, context == Context.DROP_TARGET))
+         ($dropObject: ConceptFact(this isKindOf Snomed.SUBSTANCE, context == Context.DROP_OBJECT, getConcept().getTime() != Long.MAX_VALUE))
+      )
+	then
+		actions.add(new CreateRelAction("Has Active Ingredient", $dropTarget, Snomed.HAS_ACTIVE_INGREDIENT, $dropObject, config));
+end
+
+rule "rule 50" 
+#Product onto qualifier value
+	when
+	(and
+         (ViewFact(getView() == View.STATED))
+         ($dropTarget: ConceptFact(this isKindOf Snomed.PRODUCT, context == Context.DROP_TARGET))
+         ($dropObject: ConceptFact(this isKindOf Snomed.QUALIFIER_VALUE, context == Context.DROP_OBJECT, getConcept().getTime() != Long.MAX_VALUE))
+      )
+	then
+		actions.add(new CreateRelAction("Has Dose Form", $dropTarget, Snomed.HAS_DOSE_FORM, $dropObject, config));
+end
+
+rule "rule 51" 
+#Situation with explicit context onto qualifier value
+	when
+	(and
+         (ViewFact(getView() == View.STATED))
+         ($dropTarget: ConceptFact(this isKindOf Snomed.SITUATION_WITH_EXPLICIT_CONTEXT, context == Context.DROP_TARGET))
+         ($dropObject: ConceptFact(this isKindOf Snomed.QUALIFIER_VALUE, context == Context.DROP_OBJECT, getConcept().getTime() != Long.MAX_VALUE))
+      )
+	then
+		actions.add(new CreateRelAction("Finding Context", $dropTarget, Snomed.FINDING_CONTEXT, $dropObject, config));
+		actions.add(new CreateRelAction("Procedure Context", $dropTarget, Snomed.PROCEDURE_CONTEXT, $dropObject, config));
+		actions.add(new CreateRelAction("Temporal Context", $dropTarget, Snomed.TEMPORAL_CONTEXT, $dropObject, config));
+end
+
+rule "rule 52" 
+#Situation with explicit context onto person
+	when
+	(and
+         (ViewFact(getView() == View.STATED))
+         ($dropTarget: ConceptFact(this isKindOf Snomed.SITUATION_WITH_EXPLICIT_CONTEXT, context == Context.DROP_TARGET))
+         ($dropObject: ConceptFact(this isKindOf Snomed.PERSON, context == Context.DROP_OBJECT, getConcept().getTime() != Long.MAX_VALUE))
+      )
+	then
+		actions.add(new CreateRelAction("Subject Relationship Context", $dropTarget, Snomed.SUBJECT_REL_CONTEXT, $dropObject, config));
+end
+
+rule "rule 52.1" 
+#Situation with explicit context onto clinical finding
+	when
+	(and
+         (ViewFact(getView() == View.STATED))
+         ($dropTarget: ConceptFact(this isKindOf Snomed.SITUATION_WITH_EXPLICIT_CONTEXT, context == Context.DROP_TARGET))
+         ($dropObject: ConceptFact(this isKindOf Snomed.CLINICAL_FINDING, context == Context.DROP_OBJECT, getConcept().getTime() != Long.MAX_VALUE))
+      )
+	then
+		actions.add(new CreateRelAction("Associated finding", $dropTarget, Snomed.ASSOCIATED_FINDING, $dropObject, config));
+end
+
+rule "rule 52.2" 
+#Situation with explicit context onto clinical finding
+	when
+	(and
+         (ViewFact(getView() == View.STATED))
+         ($dropTarget: ConceptFact(this isKindOf Snomed.SITUATION_WITH_EXPLICIT_CONTEXT, context == Context.DROP_TARGET))
+         ($dropObject: ConceptFact(this isKindOf Snomed.EVENT, context == Context.DROP_OBJECT, getConcept().getTime() != Long.MAX_VALUE))
+      )
+	then
+		actions.add(new CreateRelAction("Associated finding", $dropTarget, Snomed.ASSOCIATED_FINDING, $dropObject, config));
+end
+
+rule "rule 52.3" 
+#Situation with explicit context onto clinical finding
+	when
+	(and
+         (ViewFact(getView() == View.STATED))
+         ($dropTarget: ConceptFact(this isKindOf Snomed.SITUATION_WITH_EXPLICIT_CONTEXT, context == Context.DROP_TARGET))
+         ($dropObject: ConceptFact(this isKindOf Snomed.OBSERVABLE_ENTITY, context == Context.DROP_OBJECT, getConcept().getTime() != Long.MAX_VALUE))
+      )
+	then
+		actions.add(new CreateRelAction("Associated finding", $dropTarget, Snomed.ASSOCIATED_FINDING, $dropObject, config));
+end
+
+rule "rule 52.4" 
+#Situation with explicit context onto clinical finding
+	when
+	(and
+         (ViewFact(getView() == View.STATED))
+         ($dropTarget: ConceptFact(this isKindOf Snomed.SITUATION_WITH_EXPLICIT_CONTEXT, context == Context.DROP_TARGET))
+         ($dropObject: ConceptFact(this isKindOf Snomed.LINK_ASSERTION, context == Context.DROP_OBJECT, getConcept().getTime() != Long.MAX_VALUE))
+      )
+	then
+		actions.add(new CreateRelAction("Associated finding", $dropTarget, Snomed.ASSOCIATED_FINDING, $dropObject, config));
+end
+
+rule "rule 53" 
+#Body structure onto qualifier value
+	when
+	(and
+         (ViewFact(getView() == View.STATED))
+         ($dropTarget: ConceptFact(this isKindOf Snomed.BODY_STRUCTURE, context == Context.DROP_TARGET))
+         ($dropObject: ConceptFact(this isKindOf Snomed.QUALIFIER_VALUE, context == Context.DROP_OBJECT, getConcept().getTime() != Long.MAX_VALUE))
+      )
+	then
+		actions.add(new CreateRelAction("Laterality", $dropTarget, Snomed.LATERALITY, $dropObject, config));
+end 
+
+rule "rule 54" 
+#change from primitve to defined
+	when
+	(and
+         (ViewFact(getView() == View.STATED))
+         ($dropTarget: ConAttrFact(context == Context.DROP_TARGET, getConAttr().isDefined() == true))
+         ($dropObject: ConAttrFact(context == Context.DROP_OBJECT, component == $dropTarget.component))
+      )
+	then
+		actions.add(new SetDefinedAction("make primitive", $dropTarget, config));
+end
+
+rule "rule 55" 
+#change from defined to primitive
+	when
+	(and
+         (ViewFact(getView() == View.STATED))
+         ($dropTarget: ConAttrFact(context == Context.DROP_TARGET, getConAttr().isDefined() == false))
+         ($dropObject: ConAttrFact(context == Context.DROP_OBJECT, component == $dropTarget.component))
+      )
+	then
+		actions.add(new SetDefinedAction("make defined", $dropTarget, config));
+end
+
+rule "rule 56" 
+#set case sensitivity 
+	when
+                ViewFact(getView() == View.STATED)
+		$dropTarget: DescFact(context == Context.DROP_TARGET, getDesc().isInitialCaseSignificant() == false)
+		$dropObject: DescFact(context == Context.DROP_OBJECT, component == $dropTarget.component)
+	then
+		actions.add(new SetICSignificantAction("make case sensitive", $dropTarget, config));
+end
+
+rule "rule 57" 
+#change to non-case-sensitive
+	when
+                ViewFact(getView() == View.STATED)
+		$dropTarget: DescFact(context == Context.DROP_TARGET, getDesc().isInitialCaseSignificant() == true)
+		$dropObject: DescFact(context == Context.DROP_OBJECT, component == $dropTarget.component)
+	then
+		actions.add(new SetICSignificantAction("make case insensitive", $dropTarget, config));
+end
+
+rule "rule 58" 
+#retire inappropriate synonym
+	when
+                ViewFact(getView() == View.STATED)
+		$dropTarget: DescFact(getDesc().getTypeNid() == SnomedMetadataRfx.getDES_SYNONYM_NID(),
+                                        context == Context.DROP_TARGET)
+		$dropObject: DescFact(context == Context.DROP_OBJECT, component == $dropTarget.component)
+	then
+		actions.add(new RetireAsInappropriateAction("retire as inappropriate", $dropTarget, cvSettings, config));
+end
+
+# need to wait for these concepts to exist in int dev bundle
+/*
+rule "rule 59" 
+#quantity
+	when
+                ViewFact(getView() == View.STATED)
+		$dropTarget: RelFact(context == Context.DROP_TARGET)
+		$dropObject: RelFact(context == Context.DROP_OBJECT, component == $dropTarget.component)
+	then
+		actions.add(new AddToNidFloatRefexAction("add quantity", $dropTarget, Snomed.QUANTITY, config));
+end
+
+"rule 60" 
+#concentration
+	when
+                ViewFact(getView() == View.STATED)
+		$dropTarget: RelFact(context == Context.DROP_TARGET)
+		$dropObject: RelFact(context == Context.DROP_OBJECT, component == $dropTarget.component)
+	then
+		actions.add(new AddToNidFloatRefexAction("add concentration", $dropTarget, Snomed.CONCENTRATION, config));
+*/
+
+rule "61"
+#add text definition
+	when
+                ViewFact(getView() == View.STATED)
+		$dropTarget: DescFact(context == Context.DROP_TARGET)
+		$dropObject: DescFact(context == Context.DROP_OBJECT, component == $dropTarget.component)
+	then
+		actions.add(new AddTextDefinitionAction("create definition", $dropTarget, config));
+end

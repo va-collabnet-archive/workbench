@@ -1,0 +1,9 @@
+/* Security policy for SSL server */
+
+/* Keystore containing trusted certificates to use for authentication */
+keystore "..${/}prebuiltkeys${/}truststore";
+
+/* Grant all permissions to local JAR files */
+grant codeBase "file:${/}-" {
+    permission java.security.AllPermission;
+};

@@ -1,0 +1,30 @@
+package org.ihtsdo.rules.test;
+
+import org.ihtsdo.testmodel.Concept;
+import org.ihtsdo.testmodel.Description;
+import org.ihtsdo.testmodel.Relationship;
+import org.ihtsdo.testmodel.Identifier;
+import org.ihtsdo.testmodel.TerminologyComponent;
+import org.ihtsdo.rules.testmodel.TestModelUtil;
+import org.ihtsdo.rules.RulesLibrary;
+import java.util.ArrayList;
+import org.dwfa.cement.ArchitectonicAuxiliary;
+
+global org.ihtsdo.testmodel.ResultsCollector resultsCollector;
+global org.ihtsdo.testmodel.TransitiveClosureHelperMock transitiveClosureHelper;
+
+rule "procedure"
+when
+	$concept : Concept($conceptId : id)
+    $description : Description(term matches ".*(procedure).*", conceptId == $conceptId)
+then
+    resultsCollector.addError(1, "<p>This is a message for <b>procedure<b> words</p>");
+end
+
+rule "asthma"
+when
+	$concept : Concept($conceptId : id)
+    $description : Description(term matches ".*(asthma).*", conceptId == $conceptId)
+then
+    resultsCollector.addError(2, "<p>This is a message for <b>asthma<b> words</p>");
+end

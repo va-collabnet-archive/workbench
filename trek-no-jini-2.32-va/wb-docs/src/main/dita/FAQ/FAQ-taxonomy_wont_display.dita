@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN"
+"http://docs.oasis-open.org/dita/dtd/topic.dtd">
+<topic id="taxonomy_display">
+  <title>Taxonomy won't display</title>
+
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>taxonomy won't display</indexterm>
+
+        <indexterm>hierarchy won't display</indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+
+  <body>
+    <section>The workbench is capable of displaying multiple taxonomy trees in
+    the taxonomy pane, and descriptions from those taxonomies may be needed in
+    other views and panes also. Sometimes new description types are introduced
+    when new terminologies are to be brought into the workbench, such as
+    ICD10. If the corresponding descriptions don't appear in the taxonomy of
+    other views, then check to ensure that the required <i>description
+    types</i> have been set in the <b>View</b> - <b>descriptions</b> pane of
+    the preferences panel, as shown in <xref format="dita"
+    href="#taxonomy_display/adding_description_type"/>.</section>
+
+    <fig id="adding_description_type">
+      <title>Adding new description type in preferences panel</title>
+
+      <image href="../images/prefs_images/adding_description_type.jpg"
+             placement="break"/>
+    </fig>
+
+    <section>Also ensure that the taxonomy root is listed in the <b>View</b> -
+    <b>taxonomy</b> pane of the preferences panel, as shown in <xref
+    format="dita" href="#taxonomy_display/add_root_taxonomy"/>.</section>
+
+    <fig id="add_root_taxonomy">
+      <title>Adding a taxonomy root concept in preferences panel</title>
+
+      <image href="../images/prefs_images/add_root_taxonomy.jpg"
+             placement="break"/>
+    </fig>
+
+    <section>Finally, check that the relevant taxonomy reltationships are
+    listed in the <b>View</b> - <b>taxonomy</b> pane of the preferences panel,
+    as shown in <xref format="dita"
+    href="#taxonomy_display/add_taxonomy_relationship"/>.</section>
+
+    <fig id="add_taxonomy_relationship">
+      <title>Adding new description type in preferences panel</title>
+
+      <image href="../images/prefs_images/add_taxonomy_relationship.jpg"
+             placement="break"/>
+    </fig>
+  </body>
+</topic>

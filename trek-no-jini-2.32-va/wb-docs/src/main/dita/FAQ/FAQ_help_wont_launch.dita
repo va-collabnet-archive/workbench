@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN"
+"http://docs.oasis-open.org/dita/dtd/topic.dtd">
+<topic id="PDF">
+  <title>Help won't launch</title>
+
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>help<indexterm>launching</indexterm></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+
+  <body>
+    <section>The workbench IDE help is distributed in 2 forms - PDF and HTML.
+    These are invoked from the Help field of the main menu. If either of these
+    fails to launch, check the file association of the corresponding file
+    type. For PDF format for example, check that you have a PDF reader
+    installed on your system and that files of type PDF are associated with
+    that PDF reader. To change the file association in Windows, right click on
+    any PDF file and chose "open with", then "Choose program ...". A dialogue
+    box appears allowing file type association with a specific application.
+    Select the application and check the checkbox "Always use the selected
+    program to open this kind of file".</section>
+  </body>
+</topic>

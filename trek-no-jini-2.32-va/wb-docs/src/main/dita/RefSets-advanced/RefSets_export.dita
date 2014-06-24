@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
+  "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+<topic id="refsets_export" xml:lang="en">
+ <title>Exporting a Refset to file</title>
+ <prolog>
+  <author>Eric Browne</author>
+  <metadata>
+   <keywords>
+    <indexterm>exporting refsets </indexterm>
+    <indexterm>refsets <indexterm>exporting</indexterm></indexterm>
+   </keywords>
+  </metadata>
+ </prolog>
+ <body>
+  <section>Once a member refset ( and its associated marked parent and specification refsets) has
+   been created, the results can be exported for quality review and distribution. This is achieved
+   via the <i>Export current refset specification</i> under the main menu heading <i>Refsets</i>.
+   The format of this file conforms to the SNOMED Reference Set Specification ( part of the SNOMED
+   Release Format 2 specification available from the IHTSDO).</section>
+ </body>
+</topic>

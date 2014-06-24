@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<config>
+	<exportFileName>sct2_Identifier_Full_INT_</exportFileName>
+	<droolsDrlFile>org/ihtsdo/rf2/drools/IdentifierReleaseRules.drl</droolsDrlFile>
+	<column>
+		<name>identifierSchemeId</name>
+		<description></description>
+		<delimiter>\t</delimiter>
+	</column>
+	<column>
+		<name>alternateIdentifier</name>
+		<description></description>
+		<delimiter>\t</delimiter>
+	</column>
+	<column>
+		<name>effectiveTime</name>
+		<description></description>
+		<delimiter>\t</delimiter>
+	</column>
+	<column>
+		<name>active</name>
+		<description></description>
+		<delimiter>\t</delimiter>
+	</column>
+	<column>
+		<name>moduleId</name>
+		<description></description>
+		<delimiter>\t</delimiter>
+	</column>
+	<column>
+		<name>referencedComponentId</name>
+		<description></description>
+		<delimiter>\r\n</delimiter>
+	</column>
+</config>

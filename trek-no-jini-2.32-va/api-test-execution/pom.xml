@@ -1,0 +1,270 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+   <parent>
+        <groupId>org.ihtsdo</groupId>
+        <artifactId>wb-mmb</artifactId>
+        <version>2.32-trek-no-jini-va-1.18-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+   <artifactId>api-test-execution</artifactId>
+
+    <name>${branch}: API Integration Test Execution</name>
+
+    <packaging>jar</packaging>
+
+    <dependencies>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>api-test-cases</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.ihtsdo.sct.baseline</groupId>
+            <artifactId>sct-bdb</artifactId>
+            <version>2013.01.31-build-8</version>
+            <classifier>all</classifier>
+            <type>zip</type>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.ihtsdo.sct</groupId>
+                    <artifactId>mrcm-refset-specs</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.ihtsdo.sct</groupId>
+                    <artifactId>sct-econcept</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>net.sourceforge.cobertura</groupId>
+            <artifactId>cobertura</artifactId>
+            <version>1.9.4.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>ant</groupId>
+            <artifactId>ant-junit</artifactId>
+            <version>1.6.5</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.ihtsdo</groupId>
+            <artifactId>tk-concept-component</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.ihtsdo</groupId>
+            <artifactId>tk-concept-component</artifactId>
+            <version>${project.version}</version>
+            <classifier>sources</classifier>
+        </dependency>
+
+        <dependency>
+            <groupId>org.ihtsdo</groupId>
+            <artifactId>wb-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.ihtsdo</groupId>
+            <artifactId>wb-api</artifactId>
+            <version>${project.version}</version>
+            <classifier>sources</classifier>
+        </dependency>
+
+        <dependency>
+            <groupId>org.ihtsdo</groupId>
+            <artifactId>wb-bdb</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.ihtsdo</groupId>
+            <artifactId>wb-bdb</artifactId>
+            <version>${project.version}</version>
+            <classifier>sources</classifier>
+        </dependency>
+
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>extract-berkeley-db</id>
+                        <phase>generate-test-resources</phase>
+                        <goals>
+                            <goal>unpack-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <includeArtifactIds>sct-bdb</includeArtifactIds>
+                            <outputDirectory>${project.build.directory}/test-resources/</outputDirectory>
+                        </configuration>
+                    </execution>
+                    
+                    <execution>
+                        <id>extract-test-classes</id>
+                        <phase>process-test-classes</phase>
+                        <goals>
+                            <goal>unpack-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <excludeTransitive>true</excludeTransitive>
+                            <includeArtifactIds>api-test-cases</includeArtifactIds>
+                            <outputDirectory>${project.build.directory}/test-classes/</outputDirectory>
+                        </configuration>
+                    </execution>
+
+                    <execution>
+                        <id>extract-api-source</id>
+                        <phase>generate-test-resources</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>org.ihtsdo</groupId>
+                                    <artifactId>tk-concept-component</artifactId>
+                                    <classifier>sources</classifier>
+                                    <type>jar</type>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.ihtsdo</groupId>
+                                    <artifactId>wb-api</artifactId>
+                                    <classifier>sources</classifier>
+                                    <type>jar</type>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.ihtsdo</groupId>
+                                    <artifactId>wb-bdb</artifactId>
+                                    <classifier>sources</classifier>
+                                    <type>jar</type>
+                                </artifactItem>
+                            </artifactItems>
+                            <outputDirectory>${project.build.directory}/source-files/</outputDirectory>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>extract-api-classes</id>
+                        <phase>generate-test-resources</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>org.ihtsdo</groupId>
+                                    <artifactId>tk-concept-component</artifactId>
+                                    <type>jar</type>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.ihtsdo</groupId>
+                                    <artifactId>wb-api</artifactId>
+                                    <type>jar</type>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.ihtsdo</groupId>
+                                    <artifactId>wb-bdb</artifactId>
+                                    <type>jar</type>
+                                </artifactItem>
+                            </artifactItems>
+                            <outputDirectory>${project.build.directory}/coverage-classes/</outputDirectory>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>extract-cobertura-runtime</id>
+                        <phase>generate-test-resources</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <includeArtifactIds>cobertura,asm,asm-tree,log4j,oro,ant-junit</includeArtifactIds>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.7</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>ant</groupId>
+                        <artifactId>ant-junit</artifactId>
+                        <version>1.6.5</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>junit</groupId>
+                        <artifactId>junit</artifactId>
+                        <version>4.8.1</version>
+                    </dependency>
+                </dependencies>
+                <executions>
+                    <execution>
+                        <id>ant-initialisation</id>
+                        <phase>generate-test-resources</phase>
+                        <configuration>
+                            <target>
+                                <copy file="src/main/resources/build.xml" todir="${project.build.directory}" />
+                            </target>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>ant-instrument-classes</id>
+                        <phase>process-test-classes</phase>
+                        <configuration>
+                            <target>
+                                <ant dir="${project.build.directory}" target="instrument" />
+                            </target>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>ant-coverage-report</id>
+                        <phase>prepare-package</phase>
+                        <configuration>
+                            <target>
+                                <ant dir="${project.build.directory}" target="report" />
+                            </target>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.12</version>
+                <configuration>
+                    <includes>
+                        <include>**/*.class</include>
+                    </includes>
+                    <workingDirectory>${project.build.directory}/test-classes</workingDirectory>
+                    <testClassesDirectory>${project.build.directory}/test-classes</testClassesDirectory>
+                    <classesDirectory>${project.build.directory}/instrumented-classes</classesDirectory>
+                    <argLine>-XX:-UseSplitVerifier -Dnet.sourceforge.cobertura.datafile=${project.build.directory}/cobertura.ser</argLine>
+                    <testFailureIgnore>true</testFailureIgnore>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
+

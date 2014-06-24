@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<config>
+	<exportFileName>sct2_Concept_Full_INT_</exportFileName>
+	<droolsDrlFile>org/ihtsdo/rf2/drools/ConceptReleaseRules.drl</droolsDrlFile>
+	<column>
+		<name>id</name>
+		<descripton></descripton>
+		<delimiter>\t</delimiter>
+	</column>
+	<column>
+		<name>effectiveTime</name>
+		<descripton></descripton>
+		<delimiter>\t</delimiter>
+	</column>
+	<column>
+		<name>active</name>
+		<descripton></descripton>
+		<delimiter>\t</delimiter>
+	</column>
+	<column>
+		<name>moduleId</name>
+		<descripton></descripton>
+		<delimiter>\t</delimiter>
+	</column>
+	<column>
+		<name>definitionStatusId</name>
+		<descripton></descripton>
+		<delimiter>\r\n</delimiter>
+	</column>
+</config>

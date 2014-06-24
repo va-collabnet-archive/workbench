@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
+"http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+<topic id="topic8" xml:lang="en">
+  <title>Gap Analysis</title>
+
+  <body>
+    <section id="ar1000099"><title>Writing Inferred Relationships into the
+    Workbench database </title></section>
+
+    <section>The inferred relationships derived by the IHTSDO classifier are
+    not written back into the Workbench database. This is an important aspect
+    for modellers to be able to view. This could be accomplished by writing
+    these relationships with a characteristic type of "inferred". A somewhat
+    more compact form would note the characteristic type as "inferred and
+    defined". The latter may require additional editing logic in the UI, for
+    example to remove a defining relationship but still note its inferred
+    status. Perhaps the Workbench path mechanism would mitigate
+    this.</section>
+
+    <section>Once the inferred relationships are in the Workbench database, it
+    would also be useful to provide notification to the user that
+    classification is necessary. That is, visibly noting that the inferred
+    relationships do not necessarily refiect the current definitions. This
+    sort of capability might operate similarly to the commit button, by
+    enabling a "classify" button whenever definitions change since the last
+    classify. Note that this is a property of the state of the db, not the
+    UI.</section>
+
+    <section id="ar1000142"><title>Displaying Equivalent Concepts
+    </title></section>
+
+    <section>The presence of equivalent concepts in SNOMED is not necessarily
+    an error from the perspective of the description logic formalism, but does
+    present an error in modelling from the SNOMED perspective. If two concepts
+    were equivalent in SNOMED their descriptions should be merged for
+    example.</section>
+
+    <section>There should therefore be a prominent display to the user that
+    equivalent concepts exist and a means to display the sets of equivalent
+    concepts for remediation.</section>
+
+    <section id="ar1000175"><title>Displaying Cyclic Definitions
+    </title></section>
+
+    <section>Modellers may also introduce cyclic definitions, for example,
+    stating A isa B and B isa A. Note that these may also be introduced via
+    role relationships and may be of arbitrary length. These are indeed errors
+    and should be detected and displayed for remediation.</section>
+
+    <section id="ar1000203"><title>Right Identities </title></section>
+
+    <section>Some means needs to be devised to handle the definition of right
+    identities.</section>
+
+    <section id="ar1000220"><title>Remediation of Incremental Classification
+    Defects </title></section>
+
+    <section>As noted earlier there are several aspects of the incremental
+    classification capability that need to be addressed. These include
+    exhausting memory when creating the classification state, display of
+    concept equivalence, and detection of cycles. There are also ways in which
+    the results display could be improved. Some progress information should
+    also be displayed during the initial creation of the classification
+    state.</section>
+
+    <section id="ar1000243"><title>Improved Memory Utilization
+    </title></section>
+
+    <section>When classifying SNOMED, the Classifier memory footprint is
+    fairly substantial. Since the Classifier and IHTSDO Workbench were
+    initially independently developed, there is some duplication of
+    information. On 32-bit environments this could become a substantial issue
+    as SNOMED grows. One way to minimize memory footprint is by running the
+    Classifier in a separate process. If the incremental classification
+    capability has utility for extensions, certain environments may benefit by
+    maintaining a classification engine for base SNOMED and classifying just
+    the extension in a servlet container or continuous integration
+    environment. A related area is the file size for the classification state,
+    which could likely be reduced by writing as a binary object (as opposed to
+    the current plain text).</section>
+  </body>
+</topic>

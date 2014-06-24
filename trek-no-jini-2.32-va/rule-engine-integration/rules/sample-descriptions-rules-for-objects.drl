@@ -1,0 +1,62 @@
+package org.ihtsdo.rules.test;
+
+import org.ihtsdo.rules.testmodel.ResultsCollectorWorkBench;
+import org.ihtsdo.rules.testmodel.Concept;
+import org.ihtsdo.rules.testmodel.Description;
+import org.ihtsdo.rules.testmodel.Relationship;
+import org.ihtsdo.rules.testmodel.Identifier;
+import org.ihtsdo.rules.testmodel.TerminologyComponent;
+import org.ihtsdo.rules.testmodel.TestModelUtil;
+import org.ihtsdo.rules.RulesLibrary;
+import java.util.ArrayList;
+import java.util.HashMap;
+import org.dwfa.ace.task.commit.AlertToDataConstraintFailure;
+import org.dwfa.cement.ArchitectonicAuxiliary;
+
+rule "No invalid chars"
+when
+	$concept : Concept($conceptId : id)
+    $description : Description(term matches ".*[@&\\+\"\\|\\{\\}].*", conceptId == $conceptId)
+    $results : ResultsCollector()
+then
+    $results.getErrorCodes().put(0,"Error 0");
+end
+
+rule "No empty descriptions"
+when
+	$concept : Concept($conceptId : id)
+    $description : Description(term == "", conceptId == $conceptId)
+    $results : ResultsCollector()
+then
+	$results.getErrorCodes().put(1,"Error 1");
+end
+
+rule "FSN needs to have a semantic tag"
+when
+	$concept : Concept($conceptId : id)
+    $description : Description(term not matches "..*\\(.*\\)$", conceptId == $conceptId)
+    eval($description.getTypeId() == ArchitectonicAuxiliary.Concept.FULLY_SPECIFIED_DESCRIPTION_TYPE.getUids().iterator().next())
+    $results : ResultsCollector()
+then
+	$results.getErrorCodes().put(2,"Error 2");
+end
+
+rule "No double spaces"
+when
+    $concept : Concept($conceptId : id)
+    $description : Description(term matches ".*\\s\\s.*", conceptId == $conceptId)
+    $results : ResultsCollector()
+then
+	$results.getErrorCodes().put(3,"Error 3");
+end
+
+rule "No repeated text on descriptions"
+when
+	$concept : Concept($conceptId : id)
+    $description1 : Description(conceptId == $conceptId)
+    $description2 : Description(conceptId == $conceptId)
+    eval($description1.getTerm().trim().equals($description2.getTerm().trim()) && $description1.getId() != $description2.getId())
+	$results : ResultsCollector()
+then
+		$results.getErrorCodes().put(4,"Error 4");
+end

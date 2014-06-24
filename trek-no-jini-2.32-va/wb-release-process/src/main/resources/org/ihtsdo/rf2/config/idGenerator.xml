@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<config>
+	<exportFileName>sct2_Full_INT_</exportFileName>
+	<droolsDrlFile>org/ihtsdo/rf2/drools/NONEReleaseRules.drl</droolsDrlFile>
+	<column>
+		<name>id</name>
+		<descripton></descripton>
+		<delimiter>\t</delimiter>
+	</column>
+</config>

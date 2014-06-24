@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
+  "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+
+
+ <topic id="topic9" xml:lang="en">
+  <title>Inclusion Types</title>
+  <body>
+   <section>In order to rule in or rule out concepts in the SNOMED hierarchy for mem­bership in a
+    reference set (refset), you must use the appropriate Inclusion Type.</section>
+   <section>An inclusion type determines whether a selected concept will be explicitly included or
+    explicitly excluded from a reference set. It can also specify whether the children of a concept
+    will (together with the parent) be included or excluded from the reference set.</section>
+   <section>Inclusion types are used to define which members of the hierarchy will be included in a
+    given refset. Rather than manually flagging each concept to be included, inclusion types define
+    branches of the hierarchy to include. If some sub-branches or individual concepts are to be
+    excluded from the ref­set, they may be flagged with “exception” inclusion types.</section>
+   <section>There are four inclusion types; each has a symbol associated with it. These symbols
+    appear in the taxonomy view pane, next to concepts that have a ref­set membership definition
+    associated with them, as shown in <xref href="#topic9/ak1008643" type="fig" format="dita"
+    />.</section>
+   <fig id="ak1008643">
+    <title>Fragment of Hierarchy Showing Refset Associations</title>
+    <image href="../images/Refsets_Images/refsets_img_19.jpg" placement="break" width="149"
+     height="241"/>
+   </fig>
+   <section id="ak1008668">
+    <title>Individual Include <image href="../images/Refsets_Images/refsets_img_20.jpg"
+      placement="inline" width="25" height="22"/><ph>
+      <indexterm>Individual Include </indexterm>
+     </ph></title>
+   </section>
+   <section> Individual Include means that the selected concept should be included in the member
+    refset. Its child concepts, if any, are not included.</section>
+   <section id="ak1008690">
+    <title>Lineage Include <image href="../images/Refsets_Images/refsets_img_21.jpg"
+      placement="inline" width="24" height="24"/><ph>
+      <indexterm>Lineage Include </indexterm>
+     </ph></title>
+   </section>
+   <section> Lineage Include means that the selected concept and all of its children (and
+    sub-children) will be included in the member refset. However, only con­cepts whose status is
+    either current or pending move will be included. If a concept has any other status (e.g. retired
+    or inactive), it will not be included in the member refset, nor will any of its children or
+    sub-children, regardless of their status.</section>
+   <section>Furthermore, if a parent concept has a status of current or pending move but one or more
+    of its children or sub-children does not, the parent will be included but those children or
+    sub-children will be excluded from the mem­ber refset, as will their children and
+    sub-children.</section>
+   <section id="ak1008738">
+    <title>Exclude Individual <image href="../images/Refsets_Images/refsets_img_8.jpg"
+      placement="inline" width="18" height="18"/><ph>
+      <indexterm>Exclude Individual </indexterm>
+     </ph></title>
+   </section>
+   <section> Exclude Individual means to exclude a concept from the member refset. If the concept
+    has any child concepts, they will still be included.</section>
+   <section id="ak1008757">
+    <title>Exclude Lineage <image href="../images/Refsets_Images/refsets_img_22.jpg"
+      placement="inline" width="21" height="22"/><ph>
+      <indexterm>Exclude Lineage </indexterm>
+     </ph></title>
+   </section>
+   <section> Exclude Lineage means that this concept and all of its children (and sub-children) will
+    be excluded from the member refset.</section>
+   <section id="ak1008776">
+    <title>Inclusion Types and Multiple Inheritance<ph>
+      <indexterm>Multiple Inheritance <indexterm>and inclusion types</indexterm>
+      </indexterm>
+     </ph></title>
+   </section>
+   <section>A concept may have multiple inheritance (i.e., it may appear in more than one place in
+    the SNOMED hierarchy). Such concepts are indicated by a <image
+     href="../images/Refsets_Images/refsets_img_23.jpg" placement="inline" width="24"
+     height="24"/> (green up-arrow) symbol next to them in the taxonomy view pane. When specifying
+    a refset using inclusion types, it is possible to include one instance of such a concept (either
+    individually or by lineage) and exclude another, leading to a conflict. (The same concept cannot
+    be simultaneously both included and excluded from membership in a refset.) The algorithm that
+    generates the member refset will flag this as an error. To resolve such conflicts, you must
+    ensure that each instance of a concept with multiple inheritance is either consistently included
+    or excluded.</section>
+   <section>The hierarchy fragment shown in Figure 35 shows an example of this type of conflict. The
+    concept Alcoholic beverage has multiple inheritance. It appears as a sub-child of the concept
+    Dietary substance and also as a sub-child of the concept Substance of abuse. Dietary substance
+    has the lin­eage include inclusion type applied to it, and thus its sub-child Alcoholic beverage
+    will be included in the member refset. But Substance of abuse has the exclude lineage inclusion
+    type applied, meaning that its sub-child Alcoholic beverage will be excluded from the refset.
+    The concept Alco­holic beverage cannot be both included and excluded; the two options are
+    mutually exclusive. Unless this situation is resolved, a member refset can­not be
+    generated.</section>
+
+  </body>
+ </topic>
+
+

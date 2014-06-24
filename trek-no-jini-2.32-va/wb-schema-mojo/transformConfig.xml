@@ -1,0 +1,289 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+	<transformer>
+		<id>boolean-to-enumerated</id>
+		<class>org.ihtsdo.mojo.schema.transformer.BooleanToEnumeratedTransformer
+		</class>
+		<parameters>
+			<refset>
+				<uuid>846ef00d-6629-5270-bfe0-75338d125831</uuid>
+				<description>Submitted To NLM</description>
+			</refset>
+			<valueForTrue>
+				<uuid>573a2008-9893-3989-b635-0c1800129e94</uuid>
+				<description>completed</description>
+			</valueForTrue>
+			<valueForFalse>
+				<uuid>0fdca2a1-3c80-366a-acb0-f05266c56fa7</uuid>
+				<description>in_review</description>
+			</valueForFalse>
+		</parameters>
+	</transformer>
+	<transformer>
+		<id>enumerated-to-boolean</id>
+		<class>org.ihtsdo.mojo.schema.transformer.EnumeratedToBooleanTransformer
+		</class>
+		<parameters>
+			<refset>
+				<uuid>846ef00d-6629-5270-bfe0-75338d125831</uuid>
+				<description>Submitted To NLM</description>
+			</refset>
+			<valuesForTrue>
+				<concept>
+					<uuid>573a2008-9893-3989-b635-0c1800129e94</uuid>
+					<description>completed</description>
+				</concept>
+				<concept>
+					<uuid>573a2008-9893-3989-b635-0c1800129e94</uuid>
+					<description>completed</description>
+				</concept>
+			</valuesForTrue>
+			<valuesForFalse>
+				<concept>
+					<uuid>0fdca2a1-3c80-366a-acb0-f05266c56fa7</uuid>
+					<description>in_review</description>
+				</concept>
+				<concept>
+					<uuid>0fdca2a1-3c80-366a-acb0-f05266c56fa7</uuid>
+					<description>in_review</description>
+				</concept>
+			</valuesForFalse>
+			<defaultValue>true</defaultValue>
+		</parameters>
+	</transformer>
+	<transformer>
+		<id>refset-to-annotation</id>
+		<class>org.ihtsdo.mojo.schema.transformer.RefsetToAnnotation
+		</class>
+		<parameters>
+			<refset>
+				<uuid>afaf06c9-9caa-5b50-859f-89ab44f9a18d</uuid>
+				<description>User Last Name</description>
+			</refset>
+		</parameters>
+	</transformer>
+	<transformer>
+		<id>annotation-to-refset</id>
+		<class>org.ihtsdo.mojo.schema.transformer.AnnotationToRefset
+		</class>
+		<parameters>
+			<refset>
+				<uuid>cfaabccf-f66a-5d17-be55-84fab0e11919</uuid>
+				<description>Top 2500 Problem List</description>
+			</refset>
+		</parameters>
+	</transformer>
+	<transformer>
+		<id>cid-float-to-cid-int</id>
+		<class>org.ihtsdo.mojo.schema.transformer.CidFloatToCidIntegerTransformer
+		</class>
+		<parameters>
+			<refset>
+				<uuid>cfaabccf-f66a-5d17-be55-84fab0e11919</uuid>
+				<description>Top 2500 Problem List</description>
+			</refset>
+			<replaceMap>
+				<set>
+					<source>
+						<uuid>cfaabccf-f66a-5d17-be55-84fab0e11919</uuid>
+						<description>Source measure unit A</description>
+					</source>
+					<target>
+						<uuid>cfaabccf-f66a-5d17-be55-84fab0e11919</uuid>
+						<description>Target measure unit X</description>
+					</target>
+					<scalar>1</scalar>
+				</set>
+				<set>
+					<source>
+						<uuid>cfaabccf-f66a-5d17-be55-84fab0e11919</uuid>
+						<description>Source measure unit B</description>
+					</source>
+					<target>
+						<uuid>cfaabccf-f66a-5d17-be55-84fab0e11919</uuid>
+						<description>Target measure unit Y</description>
+					</target>
+					<scalar>1</scalar>
+				</set>
+			</replaceMap>
+		</parameters>
+	</transformer>
+	<transformer>
+		<id>cid-int-to-cid-float</id>
+		<class>org.ihtsdo.mojo.schema.transformer.CidIntegerToCidFloatTransformer
+		</class>
+		<parameters>
+			<refset>
+				<uuid>cfaabccf-f66a-5d17-be55-84fab0e11919</uuid>
+				<description>Top 2500 Problem List</description>
+			</refset>
+			<replaceMap>
+				<set>
+					<source>
+						<uuid>cfaabccf-f66a-5d17-be55-84fab0e11919</uuid>
+						<description>Source measure unit A</description>
+					</source>
+					<target>
+						<uuid>cfaabccf-f66a-5d17-be55-84fab0e11919</uuid>
+						<description>Target measure unit X</description>
+					</target>
+					<scalar>1</scalar>
+				</set>
+				<set>
+					<source>
+						<uuid>cfaabccf-f66a-5d17-be55-84fab0e11919</uuid>
+						<description>Source measure unit B</description>
+					</source>
+					<target>
+						<uuid>cfaabccf-f66a-5d17-be55-84fab0e11919</uuid>
+						<description>Target measure unit Y</description>
+					</target>
+					<scalar>1</scalar>
+				</set>
+			</replaceMap>
+		</parameters>
+	</transformer>
+	<transformer>
+		<id>cid-int-to-cid-long</id>
+		<class>org.ihtsdo.mojo.schema.transformer.CidIntegerToCidLongTransformer
+		</class>
+		<parameters>
+			<refset>
+				<uuid>cfaabccf-f66a-5d17-be55-84fab0e11919</uuid>
+				<description>Top 2500 Problem List</description>
+			</refset>
+			<replaceMap>
+				<set>
+					<source>
+						<uuid>cfaabccf-f66a-5d17-be55-84fab0e11919</uuid>
+						<description>Source measure unit A</description>
+					</source>
+					<target>
+						<uuid>cfaabccf-f66a-5d17-be55-84fab0e11919</uuid>
+						<description>Target measure unit X</description>
+					</target>
+					<scalar>1</scalar>
+				</set>
+				<set>
+					<source>
+						<uuid>cfaabccf-f66a-5d17-be55-84fab0e11919</uuid>
+						<description>Source measure unit B</description>
+					</source>
+					<target>
+						<uuid>cfaabccf-f66a-5d17-be55-84fab0e11919</uuid>
+						<description>Target measure unit Y</description>
+					</target>
+					<scalar>1</scalar>
+				</set>
+			</replaceMap>
+		</parameters>
+	</transformer>
+	<transformer>
+		<id>cid-long-to-cid-int</id>
+		<class>org.ihtsdo.mojo.schema.transformer.CidLongToCidIntegerTransformer
+		</class>
+		<parameters>
+			<refset>
+				<uuid>cfaabccf-f66a-5d17-be55-84fab0e11919</uuid>
+				<description>Top 2500 Problem List</description>
+			</refset>
+			<replaceMap>
+				<set>
+					<source>
+						<uuid>cfaabccf-f66a-5d17-be55-84fab0e11919</uuid>
+						<description>Source measure unit A</description>
+					</source>
+					<target>
+						<uuid>cfaabccf-f66a-5d17-be55-84fab0e11919</uuid>
+						<description>Target measure unit X</description>
+					</target>
+					<scalar>1</scalar>
+				</set>
+				<set>
+					<source>
+						<uuid>cfaabccf-f66a-5d17-be55-84fab0e11919</uuid>
+						<description>Source measure unit B</description>
+					</source>
+					<target>
+						<uuid>cfaabccf-f66a-5d17-be55-84fab0e11919</uuid>
+						<description>Target measure unit Y</description>
+					</target>
+					<scalar>1</scalar>
+				</set>
+			</replaceMap>
+		</parameters>
+	</transformer>
+	<transformer>
+		<id>enumerated-to-enumerated</id>
+		<class>org.ihtsdo.mojo.schema.transformer.EnumerationToEnumerationTransformer
+		</class>
+		<parameters>
+			<refset>
+				<uuid>cfaabccf-f66a-5d17-be55-84fab0e11919</uuid>
+				<description>Top 2500 Problem List</description>
+			</refset>
+			<replaceMap>
+				<pair>
+					<source>
+						<uuid>cfaabccf-f66a-5d17-be55-84fab0e11919</uuid>
+						<description>Concept 1</description>
+					</source>
+					<target>
+						<uuid>cfaabccf-f66a-5d17-be55-84fab0e11919</uuid>
+						<description>Concept 2</description>
+					</target>
+				</pair>
+				<pair>
+					<source>
+						<uuid>cfaabccf-f66a-5d17-be55-84fab0e11919</uuid>
+						<description>Concept 3</description>
+					</source>
+					<target>
+						<uuid>cfaabccf-f66a-5d17-be55-84fab0e11919</uuid>
+						<description>Concept 4</description>
+					</target>
+				</pair>
+			</replaceMap>
+		</parameters>
+	</transformer>
+	<transformer>
+		<id>int-to-long</id>
+		<class>org.ihtsdo.mojo.schema.transformer.IntegerToLongTransformer
+		</class>
+		<parameters>
+			<refset>
+				<uuid>cfaabccf-f66a-5d17-be55-84fab0e11919</uuid>
+				<description>Top 2500 Problem List</description>
+			</refset>
+			<scalar>1</scalar>
+		</parameters>
+	</transformer>
+	<transformer>
+		<id>long-to-int</id>
+		<class>org.ihtsdo.mojo.schema.transformer.LongToIntegerTransformer
+		</class>
+		<parameters>
+			<refset>
+				<uuid>cfaabccf-f66a-5d17-be55-84fab0e11919</uuid>
+				<description>Top 2500 Problem List</description>
+			</refset>
+			<scalar>1</scalar>
+		</parameters>
+	</transformer>
+	<transformer>
+		<id>auxiliary-to-rf2</id>
+		<class>org.ihtsdo.mojo.schema.transformer.AuxiliaryToRF2Transformer
+		</class>
+		<parameters>
+		</parameters>
+	</transformer>
+	<transformer>
+		<id>time-and-optional-rels-filter</id>
+		<class>org.ihtsdo.mojo.schema.transformer.DateLimitedComponentFilter
+		</class>
+		<parameters>
+			<dateLimit>31/01/2011</dateLimit>
+			<includeRetiredRels>true</includeRetiredRels>
+		</parameters>
+	</transformer>
+</config>

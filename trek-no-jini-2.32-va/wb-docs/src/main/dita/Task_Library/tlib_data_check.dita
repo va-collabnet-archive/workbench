@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
+  "http://docs.oasis-open.org/dita/v1.1/OS/dtd/topic.dtd">
+
+<topic id="topic14" xml:lang="en">
+ <title>Data check tasks</title>
+ <abstract>
+  <simpletable id="ap1023417">
+   <strow>
+    <stentry>
+     <b>Verify concept is not a potential duplicate<ph>
+       <indexterm>Task <indexterm>Verify concept is not a potential duplicate</indexterm>
+       </indexterm>
+      </ph></b>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Description:</p>
+    </stentry>
+    <stentry>
+     <p>Checks that the user's view paths for any source concepts that have a status of
+      IS_POT_DUP_REL. </p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Availability in IDE: </p>
+    </stentry>
+    <stentry>
+     <p>Task list navigator, under:</p>
+     <p>ide data checks</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Package: </p>
+    </stentry>
+    <stentry>
+     <p>org.dwfa.ace.data.checks</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Class: </p>
+    </stentry>
+    <stentry>
+     <p>VerifyNoPotentialDups.java<indexterm>Task bean
+        <indexterm>VerifyNoPotentialDups.java</indexterm>
+      </indexterm></p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Task Properties:</p>
+    </stentry>
+    <stentry>
+     <p><ph>activeConceptPropName</ph>: process property containing name of concept tobe
+      checked.</p>
+    </stentry>
+   </strow>
+  </simpletable>
+
+  <simpletable id="ap1023617">
+   <strow>
+    <stentry>
+     <b>Verify duplicate concept is resolved<ph>
+       <indexterm>Task <indexterm>Verify duplicate concept is resolved</indexterm>
+       </indexterm>
+      </ph></b>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Description:</p>
+    </stentry>
+    <stentry>
+     <p>Checks the users view paths for any source concepts that have a status of IS_A_DUP_REL. If
+      the concept has a IS_A_DUP_REL relationship, then check to ensure that either the source or
+      destination concept has a status of DUPLICATE_PENDING_RETIREMENT.</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Availability in IDE: </p>
+    </stentry>
+    <stentry>
+     <p>Task list navigator, under:</p>
+     <p>ide data checks</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Package: </p>
+    </stentry>
+    <stentry>
+     <p>org.dwfa.ace.data.checks</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Class: </p>
+    </stentry>
+    <stentry>
+     <p>VerifyValidIsADups.java<indexterm>Task bean <indexterm>VerifyValidIsADups.java</indexterm>
+      </indexterm></p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Task Properties:</p>
+    </stentry>
+    <stentry>
+     <p><ph>activeConceptPropName</ph>: Name of the property containing the concept.</p>
+    </stentry>
+   </strow>
+  </simpletable>
+
+  <simpletable id="ap1023817">
+   <strow>
+    <stentry>
+     <b>Verify concepts with is_not_a_dup relationships do not have status of dup_pending_retirement<ph>
+       <indexterm>Task <indexterm>Verify concepts with is_not_a_dup relationships do not have status
+         of dup_pending_retirement</indexterm>
+       </indexterm>
+      </ph></b>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Description:</p>
+    </stentry>
+    <stentry>
+     <p>Checks the users view paths for any source concepts that have a status of IS_NOT_A_DUP_REL.
+      If the concept has a IS_NOT_A_DUP_REL relationship, then check to ensure that neither the
+      source nor destination concept has a status of DUPLICATE_PENDING_RETIREMENT.</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Availability in IDE: </p>
+    </stentry>
+    <stentry>
+     <p>Task list navigator, under:</p>
+     <p>ide data checks</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Package: </p>
+    </stentry>
+    <stentry>
+     <p>org.dwfa.ace.data.checks</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Class: </p>
+    </stentry>
+    <stentry>
+     <p>VerifyValidIsNotADups.java<indexterm>Task bean
+        <indexterm>VerifyValidIsNotADups.java</indexterm>
+      </indexterm></p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Task Properties:</p>
+    </stentry>
+    <stentry>
+     <p><ph>activeConceptPropName</ph>: Name of the property containing the concept.</p>
+    </stentry>
+   </strow>
+  </simpletable>
+
+  <simpletable id="ap1024006">
+   <strow>
+    <stentry>
+     <b>Verify refset spec has no conflicts<ph>
+       <indexterm>Task <indexterm>Verify refset spec has no conflicts</indexterm>
+       </indexterm>
+      </ph></b>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Description:</p>
+    </stentry>
+    <stentry>
+     <p>Checks for conflicts between concepts in the hierarchy that are members of the refset</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Availability in IDE: </p>
+    </stentry>
+    <stentry>
+     <p>Task list navigator, under:</p>
+     <p>ide data checks</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Package: </p>
+    </stentry>
+    <stentry>
+     <codeph>org.dwfa.ace.data.checks</codeph>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Class: </p>
+    </stentry>
+    <stentry>
+     <p>VerifyNoRefSetConflicts.java<indexterm>Task bean
+        <indexterm>VerifyNoRefSetConflicts.java</indexterm>
+      </indexterm></p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Task Properties:</p>
+    </stentry>
+    <stentry>
+     <p>none</p>
+    </stentry>
+   </strow>
+  </simpletable>
+
+  <simpletable id="ap1024202">
+   <strow>
+    <stentry>
+     <b>Verify refest member overlaps<ph>
+       <indexterm>Task <indexterm>Verify refest member overlaps</indexterm>
+       </indexterm>
+      </ph></b>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Description:</p>
+    </stentry>
+    <stentry/>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Availability in IDE: </p>
+    </stentry>
+    <stentry>
+     <p>Task list navigator, under:</p>
+     <p>ide data checks</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Package: </p>
+    </stentry>
+    <stentry>
+     <p>org.dwfa.ace.data.checks</p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Implementation Class: </p>
+    </stentry>
+    <stentry>
+     <p>VerifyRefsetMemberOverlaps.java<indexterm>Task bean
+        <indexterm>VerifyRefsetMemberOverlaps.java</indexterm>
+      </indexterm></p>
+    </stentry>
+   </strow>
+   <strow>
+    <stentry>
+     <p>Task Properties:</p>
+    </stentry>
+    <stentry>
+     <p>none</p>
+    </stentry>
+   </strow>
+  </simpletable>
+
+ </abstract>
+</topic>
+

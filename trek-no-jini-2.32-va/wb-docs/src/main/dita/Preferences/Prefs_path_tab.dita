@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE dita PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
+  "http://docs.oasis-open.org/dita/v1.1/OS/dtd/ditabase.dtd">
+<dita>
+
+ <topic id="path_tab" xml:lang="en">
+  <title>Path Tab</title>
+  <abstract>
+   <p>Terminology Auxiliary -</p>
+   <shortdesc>
+    <ph>Target terminology independent concepts used by the IHTSDO Workbench Editor</ph>
+   </shortdesc>
+   <p>.SNOMED Core -SNOMED CT Terminology concepts, descriptions and relationships distributed by
+    IHTSDO.</p>
+  </abstract>
+ </topic>
+
+</dita>

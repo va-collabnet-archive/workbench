@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE topic PUBLIC "-//OASIS//DTD DITA Topic//EN"
+"http://docs.oasis-open.org/dita/dtd/topic.dtd">
+<topic id="workbench_version">
+  <title>How to determine the version of the IHTSDO Workbench Toolkit being
+  used?</title>
+
+  <prolog>
+    <metadata>
+      <keywords>
+        <indexterm>version of workbench<indexterm>how to
+        determine</indexterm></indexterm>
+      </keywords>
+    </metadata>
+  </prolog>
+
+  <body>
+    <section>The IHTSDO Toolkit is a complex and compound entity, and each
+    component generally has some version identifier. For an executable bundle,
+    the version details can be found in the About dialog, accessed from the
+    main menu bar ( this may be a sub menu in some releases ). An example is
+    shown in <xref href="#workbench_version/about_dialog"/>.<fig
+        id="about_dialog">
+        <title>example "About" dialog</title>
+
+        <image href="../images/FAQ_Images/about.jpg"/>
+      </fig>For source code, subversion provides for automatic versioning (
+    and tagging of branches ). For built components, predominantly jar files,
+    Maven <ph>pom.xml</ph> files and the Maven build process are used to
+    manage versions. The component jar files ( e.g. <ph>vodb-1.20.jar</ph> )
+    are normally found in the <ph>lib</ph> folder of a distributed application
+    bundle.</section>
+  </body>
+</topic>

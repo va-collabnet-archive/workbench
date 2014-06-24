@@ -1,0 +1,9 @@
+ -----
+ DWFA Core Module
+ -----
+ Keith Campbell
+ -----
+
+Core Module for DWFA
+
+ Provides provides the primary implementation for the core functions of the distributed workflow architecture.

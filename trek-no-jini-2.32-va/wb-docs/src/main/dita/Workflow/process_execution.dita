@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dita PUBLIC "-//OASIS//DTD DITA 1.1 Composite//EN"
+"http://docs.oasis-open.org/dita/v1.1/OS/dtd/ditabase.dtd">
+<dita>
+  <topic id="process_execution" xml:lang="en">
+    <title>Executing a Process</title>
+
+    <body>
+      <section>Please refer to <xref format="dita"
+      href="process_creation.dita#process_creation/ai935381"
+      type="section"/>.</section>
+    </body>
+  </topic>
+</dita>
