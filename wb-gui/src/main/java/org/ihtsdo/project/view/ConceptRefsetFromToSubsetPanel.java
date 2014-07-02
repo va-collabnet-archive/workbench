@@ -457,39 +457,39 @@ public class ConceptRefsetFromToSubsetPanel extends JPanel {
 							txtExplogFile.setText(fileName + ".log");
 						}
 
-						File reportFile=new File(txtExplogFile.getText().trim());
+						File logFile=new File(txtExplogFile.getText().trim());
 						
 						String fileName2=fileName;
-						File exportFile2=null;
-						File exportFile3=null;
+						File exportSCTFile=null;
+						File exportReportFile=null;
 						if (rbERF2.isSelected()){
 							fileName2+="_SCTID";
 							fileName2+= (rbTxt.isSelected()? ".txt": ".csv");
-							exportFile2=new File(fileName2);
+							exportSCTFile=new File(fileName2);
 							
 							fileName+="_UUID";
 							
 							fileName3+="_Report";
 							fileName3+= (rbTxt.isSelected()? ".txt": ".csv");
-							exportFile3 = new File(fileName3);
+							exportReportFile = new File(fileName3);
 						}
 						
 						fileName+= (rbTxt.isSelected()? ".txt": ".csv");
-						File exportFile=new File(fileName);
+						File exportUUIDFile=new File(fileName);
 
 
 						String strErr="";
 						try {
 							if (rbERF1.isSelected()){
 								ExportConceptMemberRefsetAsSubset expConcept=new ExportConceptMemberRefsetAsSubset();
-								eRes=expConcept.exportFile(exportFile, reportFile, refsetExp,rbCsv.isSelected());
-								txtERes.setText("Exported to file " + exportFile.getName()  + " : " + eRes[0] + " lines");
+								eRes=expConcept.exportFile(exportUUIDFile, logFile, refsetExp,rbCsv.isSelected());
+								txtERes.setText("Exported to file " + exportUUIDFile.getName()  + " : " + eRes[0] + " lines");
 							}else{
 								ExportConceptMemberRefsetToRefset expConcept=new ExportConceptMemberRefsetToRefset();
-								eRes=expConcept.exportFile(exportFile,exportFile2, exportFile3, reportFile, refsetExp,rbCsv.isSelected());
-								txtERes.setText("Exported to UUID file " + exportFile.getName()  + " : " + eRes[0] + " lines.\n" +
-												"Exported to SCTID file " + exportFile2.getName()  + " : " + eRes[1] + " lines.\n" + 
-												"Exported to Descrtion file " + exportFile3.getName()  + " : " + eRes[1] + " lines.");
+								eRes=expConcept.exportFile(exportUUIDFile,exportSCTFile, exportReportFile, logFile, refsetExp,rbCsv.isSelected());
+								txtERes.setText("Exported to UUID file " + exportUUIDFile.getName()  + " : " + eRes[0] + " lines.\n" +
+												"Exported to SCTID file " + exportSCTFile.getName()  + " : " + eRes[1] + " lines.\n" + 
+												"Exported to Report file " + exportReportFile.getName()  + " : " + eRes[2] + " lines.");
 
 							}
 						} catch (TerminologyException e) {
