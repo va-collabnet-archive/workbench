@@ -28,11 +28,16 @@ import java.awt.event.ActionListener;
 import java.awt.image.FilteredImageSource;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.BufferedWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -61,14 +66,17 @@ import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.dnd.ConceptTransferable;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.helper.time.TimeHelper;
 import org.ihtsdo.project.filter.WfProjectFilter;
 import org.ihtsdo.project.filter.WfWorklistFilter;
 import org.ihtsdo.project.search.WorkflowInstanceTableModel.WORKFLOW_FIELD;
 import org.ihtsdo.project.workflow.api.wf2.implementation.CancelSearch;
 import org.ihtsdo.project.workflow.api.wf2.implementation.WorkflowStore;
+import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.workflow.api.WfFilterBI;
 import org.ihtsdo.tk.workflow.api.WfProcessInstanceBI;
+import org.ihtsdo.tk.workflow.api.WfUserBI;
 
 /**
  * @author Guillermo Reynoso
@@ -334,13 +342,38 @@ public class WfInstanceSearchPanel extends JPanel implements WFSearchFilterConta
 
         WorkflowStore ws = new WorkflowStore();
         ProgressListener propertyChangeListener = new ProgressListener(progressBar1);
+        
         try {
             Collection<WfProcessInstanceBI> instances = ws.searchWorkflow(filters, model, propertyChangeListener, keepSearching);
+
             if (instances != null) {
+          	
+                // For Report
+               	Set<WfProcessInstanceBI> canceledInstances = new HashSet();
+                BufferedWriter reportFileWriter =  new BufferedWriter(new OutputStreamWriter(new FileOutputStream("searchPanelOutputReport.txt"), "UTF8"));
+
                 for (WfProcessInstanceBI wfProcessInstanceBI : instances) {
                     model.addWfInstance(wfProcessInstanceBI);
+
+                    // Add non-canceled items into report
+                    if (isCanceledInstance(wfProcessInstanceBI)) {
+						canceledInstances.add(wfProcessInstanceBI);
+					} else {
+						reportFileWriter.write(outputResultsToText(wfProcessInstanceBI));
+						reportFileWriter.newLine();
+					}
                 }
-                propertyChangeListener.progressBar.setIndeterminate(false);
+
+                // Add canceled items into report
+				reportFileWriter.newLine();
+				reportFileWriter.newLine();
+				for (WfProcessInstanceBI wfProcessInstanceBI : canceledInstances) {
+					reportFileWriter.write(outputResultsToText(wfProcessInstanceBI));
+					reportFileWriter.newLine();
+				}
+				reportFileWriter.close();
+				
+				propertyChangeListener.progressBar.setIndeterminate(false);
                 searchButton.setVisible(true);
                 stopButton.setVisible(false);
             }
@@ -368,7 +401,7 @@ public class WfInstanceSearchPanel extends JPanel implements WFSearchFilterConta
         }
     }
 
-    private class ProgressListener implements PropertyChangeListener {
+	private class ProgressListener implements PropertyChangeListener {
 
         // Prevent creation without providing a progress bar.
         @SuppressWarnings("unused")
@@ -489,4 +522,43 @@ public class WfInstanceSearchPanel extends JPanel implements WFSearchFilterConta
     private SearchFilterPanel searchFilterPanel;
     // JFormDesigner - End of variables declaration //GEN-END:variables
 
+
+
+	// For Report
+	private boolean isCanceledInstance(WfProcessInstanceBI instance) throws IOException {
+		String state = Ts.get().getConcept(instance.getState().getUuid()).toUserString();
+		
+		if (state.trim().equals("canceled status")) {
+			return true;
+		}
+		
+		return false;
+	}
+
+	// For Report
+	private String outputResultsToText(WfProcessInstanceBI instance) throws IOException {
+		// Current State
+		String state = Ts.get().getConcept(instance.getState().getUuid()).toUserString();
+		
+		// Modeler
+		WfUserBI assignedUser = instance.getAssignedUser();
+		String modeler = "";
+		if (assignedUser != null) {
+			modeler = assignedUser.getName();
+		} else {
+			modeler = "not assigned";
+		}
+
+		// Last Change
+		Long lastChangeDate = instance.getLastChangeTime();
+		String time = TimeHelper.formatDate(lastChangeDate);
+		
+		// FSN
+		ConceptChronicleBI conceptFsn = Ts.get().getConcept(instance.getComponentPrimUuid());
+		String fsn = conceptFsn.toUserString();
+		
+		String s = "FSN: " + fsn + "\tModeler: " + modeler + "\tState: " + state + "\tTimeStamp: " + time;
+		
+		return s;
+	}
 }
