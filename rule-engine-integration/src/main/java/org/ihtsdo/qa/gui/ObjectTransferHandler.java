@@ -322,9 +322,9 @@ public class ObjectTransferHandler extends TransferHandler {
 				DescriptionVersionBI description = (DescriptionVersionBI)conceptvbi.getAtrValue();
 				concept = Terms.get().getConcept(description.getConceptNid());
 			} catch (TerminologyException e) {
-				e.printStackTrace();
+				//e.printStackTrace();
 			} catch (IOException e) {
-				e.printStackTrace();
+				//e.printStackTrace();
 			}
 		} else {
 			JList list = (JList) c;

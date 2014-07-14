@@ -111,6 +111,8 @@ public class DrComponentHelper {
 			ViewCoordinate mockVc = new ViewCoordinate(config.getViewCoordinate());
 			mockVc.setPositionSet(mockViewSet);
 
+            mockVc = config.getViewCoordinate();
+
 			List<? extends I_ConceptAttributeTuple> attributeTuples = oldStyleConcept.getConceptAttributeTuples(null, 
 					mockViewSet, config.getPrecedence(), 
 					config.getConflictResolutionStrategy());
@@ -601,7 +603,13 @@ public class DrComponentHelper {
 
 		for (RefexChronicleBI<?> annotationChronicle : annotations) {
             RefexVersionBI annotation = annotationChronicle.getVersion(mockVc);
-			DrRefsetExtension extension = new DrRefsetExtension();
+            System.out.println("*+*+*+*+*+*+ Annot UUID = " + annotationChronicle.getPrimUuid() + " - isVersionNull? = " + (annotation == null));
+            try {
+                System.out.println("*+*+*+*+*+*+ Annot UUID = " + annotation.getPrimUuid() + " - Status = " + tf.getUids(annotation.getStatusNid()).iterator().next().toString());
+            } catch (TerminologyException e) {
+                //e.printStackTrace();
+            }
+            DrRefsetExtension extension = new DrRefsetExtension();
 			extension.setActive(true);
 			extension.setComponentUuid(tf.nidToUuid(annotation.getReferencedComponentNid()).toString());
 			extension.setRefsetUuid(tf.nidToUuid(annotation.getRefexNid()).toString());

@@ -68,7 +68,7 @@ public class TestMemoryLeak extends TestCase {
 
                   session = null;
 
-                  System.gc();
+                  //System.gc();
 
            }     
 
