@@ -28,9 +28,9 @@ the specific language governing permissions and limitations under the License. -
         needs of their end users.
     </description>
     <scm>
-        <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/branches/silver-swordfish-work-package</connection>
-        <developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/branches/silver-swordfish-work-package</developerConnection>
-        <url>https://csfe.aceworkspace.net/integration/viewvc/viewvc.cgi/branches/silver-swordfish-work-package?root=workbench&amp;system=exsy1002</url>
+        <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/branches/silver-swordfish-qa-enhancements</connection>
+        <developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/branches/silver-swordfish-qa-enhancements</developerConnection>
+        <url>https://csfe.aceworkspace.net/integration/viewvc/viewvc.cgi/branches/silver-swordfish-qa-enhancements?root=workbench&amp;system=exsy1002</url>
     </scm>
     <properties>
         <branch>silver-swordfish</branch>
