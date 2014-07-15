@@ -215,7 +215,23 @@ public class GenerateScripts extends AbstractMojo {
                         true);
                     startAllScript64(jars, "pWb", null, "4g", "4g", "128", "Workbench Bundle", false, false,
                         true);
+                }  else if (name.equalsIgnoreCase("wbJre")) {
+                    startAllScript(jars, "wbJre", null, "1400m", "1400m", "128", "Workbench Bundle", true, false,
+                        false);
+                    startAllScript64(jars, "wbJre", null, "4g", "4g", "128", "Workbench Bundle", true, false,
+                        false);
+                }  else if (name.equalsIgnoreCase("dWbJre")) {
+                    startAllScript(jars, "dWbJre", null, "1400m", "1400m", "128", "Workbench Bundle", true, true,
+                        false);
+                    startAllScript64(jars, "dWbJre", null, "4g", "4g", "128", "Workbench Bundle", true, true,
+                        false);
+                }  else if (name.equalsIgnoreCase("pWbJre")) {
+                    startAllScript(jars, "pWbJre", null, "1400m", "1400m", "128", "Workbench Bundle", true, false,
+                        true);
+                    startAllScript64(jars, "pWbJre", null, "4g", "4g", "128", "Workbench Bundle", true, false,
+                        true);
                 }
+                
             }
         }
     }
