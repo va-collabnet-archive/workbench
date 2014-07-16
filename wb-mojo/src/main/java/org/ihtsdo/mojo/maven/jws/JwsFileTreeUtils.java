@@ -1,27 +1,32 @@
-/*
- * Copyright 2014 International Health Terminology Standards Development Organisation.
+/**
+ * Copyright (c) 2014 International Health Terminology Standards Development Organisation
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
  *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 package org.ihtsdo.mojo.maven.jws;
 
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
+import java.security.DigestInputStream;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonArrayBuilder;
@@ -31,7 +36,7 @@ import javax.json.stream.JsonParser;
 
 /**
  *
- * @author marc
+ * @author Marc Campbell
  */
 public class JwsFileTreeUtils {
 
@@ -52,6 +57,9 @@ public class JwsFileTreeUtils {
         JsonObjectBuilder objBuilder = Json.createObjectBuilder();
         objBuilder.add("path", node.nodePath);
         objBuilder.add("type", node.nodeType);
+        if (node.sha1 != null && !node.sha1.isEmpty()) {
+            objBuilder.add("sha1", node.sha1);
+        }
         List<JwsFileTreeNode> childrenList = node.children;
         if (node.children != null && !node.children.isEmpty()) {
             JsonArrayBuilder childBuilder = Json.createArrayBuilder();
@@ -72,7 +80,7 @@ public class JwsFileTreeUtils {
                 // ADD FILE NODE
                 String sPath = file.getAbsolutePath().substring(sRelativeRootDir.length()+ 1);
                 // System.out.println(sPath); // :VERBOSE:
-                node.addChild(sPath);
+                node.addChild(sPath, createSha1(file));
             }
             if (file.isDirectory()) {
                 // ADD DIRECTORY NODE
@@ -87,6 +95,45 @@ public class JwsFileTreeUtils {
             }
         }
         return node;
+    }
+
+    public static String createSha1(File file) {
+        try {
+            // MessageDigest md5 = MessageDigest.getInstance("MD5");
+            MessageDigest sha1 = MessageDigest.getInstance("SHA1");
+
+            FileInputStream fis = new FileInputStream(file);
+            BufferedInputStream bis = new BufferedInputStream(fis);
+            DigestInputStream dis = new DigestInputStream(bis, sha1);
+
+            // read the file and update the hash calculation
+            while (dis.read() != -1) {
+                // no inner executable statements. work do by dis.read()
+            }
+
+            // get the hash value as byte array
+            byte[] hash = sha1.digest();
+
+            /* alternate string Formatter based on C's printf */
+//        Formatter formatter = new Formatter();
+//        for (byte b : hash) {
+//            formatter.format("%02x", b);
+//        }
+//        return formatter.toString();
+            StringBuilder hexStringBuilder = new StringBuilder();
+            for (int i = 0; i < hash.length; i++) {
+                hexStringBuilder.append(Integer.toHexString(0xFF & hash[i]));
+            }
+
+            return hexStringBuilder.toString();
+        } catch (NoSuchAlgorithmException ex) {
+            Logger.getLogger(JwsFileTreeUtils.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(JwsFileTreeUtils.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(JwsFileTreeUtils.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
     }
 
     public static JwsFileTreeNode readJsonFile(String inPath)
@@ -168,11 +215,14 @@ public class JwsFileTreeUtils {
             case "type":
                 node.nodeType = value;
                 break;
-            case "name":
+            case "name":  // no longer used
                 node.nodePath = value;
                 break;
             case "path":
                 node.nodePath = value;
+                break;
+            case "sha1":
+                node.sha1 = value;
                 break;
             default:
                 System.out.println("Unknown Key = " + key);
@@ -181,9 +231,9 @@ public class JwsFileTreeUtils {
 
     public static void writeJsonFile(JsonArray jsonArray, String outPath)
             throws FileNotFoundException {
-
-        // 
-        OutputStream os = new FileOutputStream(outPath);
+        File fpOut = new File(outPath);
+        fpOut.getParentFile().mkdirs();
+        OutputStream os = new FileOutputStream(fpOut);
         try (JsonWriter jsonWriter = Json.createWriter(os)) {
             jsonWriter.writeArray(jsonArray);
         }

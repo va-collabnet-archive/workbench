@@ -1,5 +1,6 @@
-/*
- * Copyright 2014 International Health Terminology Standards Development Organisation.
+/**
+ * Copyright (c) 2014 International Health Terminology Standards Development
+ * Organisation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,12 +22,15 @@ import java.util.List;
 
 /**
  *
- * @author marc
+ * @author Marc Campbell
  */
 public class JwsFileTreeNode implements Iterable<JwsFileTreeNode> {
 
     public String nodePath;
     public String nodeType; // "root" "folder" "file"
+    public String sha1; // used only for "files"
+    // public String versionDateTime; // used only for root ... add directly
+    // public String jreVersion; // used only for root ... add directly
     public JwsFileTreeNode parent;
     public List<JwsFileTreeNode> children;
 
@@ -51,8 +55,13 @@ public class JwsFileTreeNode implements Iterable<JwsFileTreeNode> {
     }
 
     public JwsFileTreeNode addChild(String childPath) {
+        return addChild(childPath, null);
+    }
+    
+    public JwsFileTreeNode addChild(String childPath, String sha1) {
         JwsFileTreeNode childNode = new JwsFileTreeNode(childPath);
         childNode.nodeType = "file";
+        childNode.sha1 = sha1;
         childNode.parent = this;
         this.children.add(childNode);
         return childNode;

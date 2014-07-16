@@ -15,44 +15,89 @@
  */
 package org.ihtsdo.mojo.maven.jws;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.json.JsonArray;
+import javax.json.JsonObject;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 
 /**
  *
+ * @author Marc Campbell
+ * 
  * @goal jws-dir-to-manifest
+ * @requiresProject false
  */
 public class JwsDirToManifestMojo extends AbstractMojo implements Serializable {
+    /**
+     *
+     */
+    private static final long serialVersionUID = 1L;
 
     /**
-     * concepts file names.
+     * Process Directory. Directory to process to create JSON manifest.
      *
      * @parameter
      * @required
      */
     private String processDirectory;
-
     /**
-     * concepts file names.
+     * Relative Root Directory. Directory path to be remove for JSON path to create relative paths.
      *
      * @parameter
      * @required
      */
     private String relativeRootDirectory;
-
     /**
-     * concepts file names.
+     * JSON File Path. Output file path to which to write resulting JSON manifest file.
      *
      * @parameter
      * @required
      */
     private String jsonFilePath;
+    /**
+     * JRE Version.
+     *
+     * @parameter
+     * @required
+     */
+    private String jreVersion;
+    /**
+     * Skip Always. patterns
+     *
+     * @parameter
+     */
+    private String[] skipAlways;
+    /**
+     * Skip On Update. patterns
+     *
+     * @parameter
+     */
+    private String[] skipOnUpdate;
+    /**
+     * Update Priority. optional | required
+     *
+     * @parameter
+     * @required
+     */
+    private String updatePriority;
+    /**
+     * JSON Install File Path. Output file path to which to write resulting InstallVersion JSON
+     * manifest file
+     *
+     * @parameter
+     * @required
+     */
+    private String jsonInstallFilePath;
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
@@ -69,12 +114,38 @@ public class JwsDirToManifestMojo extends AbstractMojo implements Serializable {
             node.nodePath = ""; // root node
             node.nodeType = "root"; // root node
             JwsFileTreeNode tree = JwsFileTreeUtils.createJwsTreeFromDirectory(
-                            processDirectory,
-                            relativeRootDirectory,
-                            node
-           );
+                    processDirectory,
+                    relativeRootDirectory,
+                    node
+            );
             JsonArray json = JwsFileTreeUtils.convertTreeNodeToJson(tree);
             JwsFileTreeUtils.writeJsonFile(json, jsonFilePath);
+            // Create the install.json file
+            // generate Date
+            SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy.MM.dd_HH:mm:ssZ");
+            String manifestDate = dateFormatter.format(new Date());
+            // generate SHA-1
+            String manifestSha1 = JwsFileTreeUtils.createSha1(new File(jsonFilePath));
+            //
+            ArrayList<String> skipAlwaysList = new ArrayList<>();
+            if (skipAlways != null) {
+                skipAlwaysList.addAll(Arrays.asList(skipAlways));
+            }
+            //
+            ArrayList<String> skipOnUpdateList = new ArrayList<>();
+            if (skipOnUpdate != null) {
+                skipOnUpdateList.addAll(Arrays.asList(skipOnUpdate));
+            }
+            //
+            JwsInstallVersion iVersion = new JwsInstallVersion(jreVersion,
+                    manifestDate,
+                    manifestSha1,
+                    skipAlwaysList,
+                    skipOnUpdateList,
+                    updatePriority);
+            JsonObject vJson = JwsInstallVersionUtils.convertInstallVersionToJson(iVersion);
+            JwsInstallVersionUtils.writeJsonFile(vJson, jsonInstallFilePath);
+
         } catch (FileNotFoundException ex) {
             Logger.getLogger(JwsDirToManifestMojo.class.getName()).log(Level.SEVERE, null, ex);
         }
