@@ -74,7 +74,7 @@ public class WorkflowInitiator implements WorkflowInitiatiorBI {
 					}
 					alreadySeen.get(workflowNid).put(possibleItr.nid(), System.currentTimeMillis());
 					
-					if ( timeDiff == Long.MIN_VALUE || timeDiff >  3000) {
+					if ( timeDiff == Long.MIN_VALUE || timeDiff >  12000) {
 						concept=Ts.get().getConcept(possibleItr.nid());
 						if (concept!=null){
 							System.out.println("Sending to workflow: " + concept.toString());
