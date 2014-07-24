@@ -29,14 +29,14 @@ public class JwsFileTreeNode implements Iterable<JwsFileTreeNode> {
     public String nodePath;
     public String nodeType; // "root" "folder" "file"
     public String sha1; // used only for "files"
-    // public String versionDateTime; // used only for root ... add directly
-    // public String jreVersion; // used only for root ... add directly
+    public long size; // used only for "files"
     public JwsFileTreeNode parent;
     public List<JwsFileTreeNode> children;
 
     public JwsFileTreeNode() {
         this.nodePath = "";
         this.nodeType = "";
+        this.size = 0L;
         this.children = new LinkedList<>();
     }
 
@@ -55,13 +55,14 @@ public class JwsFileTreeNode implements Iterable<JwsFileTreeNode> {
     }
 
     public JwsFileTreeNode addChild(String childPath) {
-        return addChild(childPath, null);
+        return addChild(childPath, null, 0L);
     }
     
-    public JwsFileTreeNode addChild(String childPath, String sha1) {
+    public JwsFileTreeNode addChild(String childPath, String sha1, long fileSize) {
         JwsFileTreeNode childNode = new JwsFileTreeNode(childPath);
         childNode.nodeType = "file";
         childNode.sha1 = sha1;
+        childNode.size = fileSize;
         childNode.parent = this;
         this.children.add(childNode);
         return childNode;
@@ -78,7 +79,11 @@ public class JwsFileTreeNode implements Iterable<JwsFileTreeNode> {
     @Override
     public String toString() {
         if (nodePath != null) {
-            return createIndent(getLevel()) + nodePath + " (" + nodeType + ")";
+            String sha1Str = "";
+            if (sha1 != null) {
+                sha1Str = ":" + sha1 + ": " + size + " bytes";
+            }
+            return createIndent(getLevel()) + nodePath + " (" + nodeType + sha1Str + ")";
         } else {
             return "[path null]";
         }

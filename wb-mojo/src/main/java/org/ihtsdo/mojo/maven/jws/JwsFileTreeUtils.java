@@ -59,6 +59,7 @@ public class JwsFileTreeUtils {
         objBuilder.add("type", node.nodeType);
         if (node.sha1 != null && !node.sha1.isEmpty()) {
             objBuilder.add("sha1", node.sha1);
+            objBuilder.add("size", node.size);
         }
         List<JwsFileTreeNode> childrenList = node.children;
         if (node.children != null && !node.children.isEmpty()) {
@@ -80,7 +81,7 @@ public class JwsFileTreeUtils {
                 // ADD FILE NODE
                 String sPath = file.getAbsolutePath().substring(sRelativeRootDir.length()+ 1);
                 // System.out.println(sPath); // :VERBOSE:
-                node.addChild(sPath, createSha1(file));
+                node.addChild(sPath, createSha1(file), file.length());
             }
             if (file.isDirectory()) {
                 // ADD DIRECTORY NODE
@@ -187,7 +188,8 @@ public class JwsFileTreeUtils {
                 case VALUE_STRING:
                     setStringValues(node, keyName, parser.getString());
                     break;
-                case VALUE_NUMBER: // setNumberValues(... , keyName, parser.getLong());
+                case VALUE_NUMBER:
+                    setNumberValues(node , keyName, parser.getLong());
                     break;
                 case VALUE_FALSE: // setBooleanValues(... , false);
                     break;
@@ -225,7 +227,17 @@ public class JwsFileTreeUtils {
                 node.sha1 = value;
                 break;
             default:
-                System.out.println("Unknown Key = " + key);
+                System.out.println("Unknown setStringValues key = " + key);
+        }
+    }
+
+    private static void setNumberValues(JwsFileTreeNode node, String keyName, long aLong) {
+        switch (keyName) {
+            case "size":
+                node.size = aLong;
+                break;
+            default:
+                System.out.println("Unknown setNumberValues keyName = " + keyName);
         }
     }
 
