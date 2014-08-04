@@ -203,7 +203,7 @@ public class RulesDeploymentPackageReference {
 					fileBased = RulesLibrary.getKnowledgeBase(uuids.iterator().next(), 
 							getChangeSetXmlBytesForFile(), recreate);
 				} catch (Exception e) {
-					AceLog.getAppLog().info("File Package not accessible: " + getName());
+					AceLog.getAppLog().info("File Package not accessible: " + getName() + " Exception: " + e.getMessage());
 				}
 				if (fileBased != null && fileBased.getKnowledgePackages().size() > 0) {
 					return fileBased;
@@ -213,7 +213,7 @@ public class RulesDeploymentPackageReference {
 						guvnorBased = RulesLibrary.getKnowledgeBase(uuids.iterator().next(), 
 								getChangeSetXmlBytes(), recreate);
 					} catch (Exception e1) {
-						AceLog.getAppLog().info("Web Package not accessible: " + getName());
+						AceLog.getAppLog().info("Web Package not accessible: " + getName() + " Exception: " + e1.getMessage());
 					}
 					if (guvnorBased != null && guvnorBased.getKnowledgePackages().size() > 0) {
 						return guvnorBased;
@@ -226,7 +226,7 @@ public class RulesDeploymentPackageReference {
 					guvnorBased = RulesLibrary.getKnowledgeBase(uuids.iterator().next(), 
 							getChangeSetXmlBytes(), recreate);
 				} catch (Exception e1) {
-					AceLog.getAppLog().info("Web Package not accessible: " + getName());
+					AceLog.getAppLog().info("Web Package not accessible: " + getName() + " Exception: " + e1.getMessage());
 				}
 				if (guvnorBased != null && guvnorBased.getKnowledgePackages().size() > 0) {
 					return guvnorBased;
@@ -236,7 +236,7 @@ public class RulesDeploymentPackageReference {
 						fileBased = RulesLibrary.getKnowledgeBase(uuids.iterator().next(), 
 								getChangeSetXmlBytesForFile(), recreate);
 					} catch (Exception e) {
-						AceLog.getAppLog().info("File Package not accessible: " + getName());
+						AceLog.getAppLog().info("File Package not accessible: " + getName() + " Exception: " + e.getMessage());
 					}
 					if (fileBased != null && fileBased.getKnowledgePackages().size() > 0) return fileBased;
 				}
