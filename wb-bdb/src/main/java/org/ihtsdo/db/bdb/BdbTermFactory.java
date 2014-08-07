@@ -589,6 +589,24 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     @Override
     public SearchResult doLuceneSearch(String query)
             throws IOException, org.apache.lucene.queryParser.ParseException {
+        String[] queryWords = query.split(" ");
+        boolean isChanged = false;
+        for(int i = 0; i < queryWords.length; i++){
+            if(queryWords[i].equalsIgnoreCase("OR") || 
+                    queryWords[i].equalsIgnoreCase("AND") ||
+                    queryWords[i].equalsIgnoreCase("+OR") ||
+                    queryWords[i].equalsIgnoreCase("+AND")){
+                queryWords[i] = "\"" + queryWords[i] + "\"";
+                isChanged = true;
+            }
+        }
+        if(isChanged){
+            query = "";
+            for(int i = 0; i < queryWords.length; i++){
+                query = query + " " + queryWords[i];
+            }
+            query.trim();
+        }
         Query q = new QueryParser(LuceneManager.version, "desc",
                 new StandardAnalyzer(LuceneManager.version)).parse(query);
 
@@ -1290,6 +1308,25 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         timer.start();
 
         try {
+            String[] queryWords = query.split(" ");
+            boolean isChanged = false;
+            for(int i = 0; i < queryWords.length; i++){
+                if(queryWords[i].equalsIgnoreCase("OR") || 
+                        queryWords[i].equalsIgnoreCase("AND") ||
+                        queryWords[i].equalsIgnoreCase("+OR") ||
+                        queryWords[i].equalsIgnoreCase("+AND")){
+                    queryWords[i] = "\"" + queryWords[i] + "\"";
+                    isChanged = true;
+                }
+            }
+            if(isChanged){
+                query = "";
+                for(int i = 0; i < queryWords.length; i++){
+                    query = query + " " + queryWords[i];
+                }
+                query.trim();
+            }
+            
             Query q = new QueryParser(LuceneManager.version, "desc",
                     new StandardAnalyzer(LuceneManager.version)).parse(query);
 
@@ -1791,6 +1828,24 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
     public Set<I_GetConceptData> getConcept(String conceptIdStr)
             throws TerminologyException, org.apache.lucene.queryParser.ParseException, IOException {
         Set<I_GetConceptData> matchingConcepts = new HashSet<I_GetConceptData>();
+        String[] queryWords = conceptIdStr.split(" ");
+        boolean isChanged = false;
+        for(int i = 0; i < queryWords.length; i++){
+            if(queryWords[i].equalsIgnoreCase("OR") || 
+                    queryWords[i].equalsIgnoreCase("AND") ||
+                    queryWords[i].equalsIgnoreCase("+OR") ||
+                    queryWords[i].equalsIgnoreCase("+AND")){
+                queryWords[i] = "\"" + queryWords[i] + "\"";
+                isChanged = true;
+            }
+        }
+        if(isChanged){
+            conceptIdStr = "";
+            for(int i = 0; i < queryWords.length; i++){
+                conceptIdStr = conceptIdStr + " " + queryWords[i];
+            }
+            conceptIdStr.trim();
+        }
         Query q =
                 new QueryParser(LuceneManager.version, "desc",
                 new StandardAnalyzer(LuceneManager.version)).parse(conceptIdStr);
