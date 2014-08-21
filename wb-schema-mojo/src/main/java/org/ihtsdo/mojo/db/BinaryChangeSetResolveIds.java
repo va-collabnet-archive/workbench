@@ -51,6 +51,7 @@ import org.ihtsdo.tk.dto.concept.component.description.TkDescription;
 import org.ihtsdo.tk.dto.concept.component.description.TkDescriptionRevision;
 import org.ihtsdo.tk.dto.concept.component.identifier.IDENTIFIER_PART_TYPES;
 import org.ihtsdo.tk.dto.concept.component.identifier.TkIdentifier;
+import org.ihtsdo.tk.dto.concept.component.identifier.TkIdentifierLong;
 import org.ihtsdo.tk.dto.concept.component.refex.TkRefexAbstractMember;
 import org.ihtsdo.tk.dto.concept.component.refex.type_uuid.TkRefexUuidRevision;
 import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationship;
@@ -63,6 +64,9 @@ import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationshipRevision;
 public class BinaryChangeSetResolveIds {
 
     private ArrayList<File> eccsInputFiles;
+    private File econceptsFile;
+    private ArrayList<SctIdPairing> pairingListFinal;
+    private long pairingListLookup[];
     private File eccsOutputFile;
     private File keepMapOutputFile;
     private UUID snomedIntUuid;
@@ -145,12 +149,18 @@ public class BinaryChangeSetResolveIds {
     long countSctIdsAsLong;
 
     public BinaryChangeSetResolveIds(String rootDirStr,
+            String econceptsFileStr,
             String targetDirStr,
             SctIdResolution resolutionApproach,
             boolean logPreEccsB,
             boolean logPostEccsB,
             String extensionPathUuidStr)
             throws IOException, TerminologyException {
+        econceptsFile = new File(econceptsFileStr);
+        if (!econceptsFile.exists()) {
+            throw new IOException("FAIL: did not find econcepts file.");
+        }
+        
         this.snomedIntUuid = ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.getPrimoridalUid();
         this.rf1ActiveUuid = SnomedMetadataRf1.CURRENT_RF1.getUuids()[0];
         this.rf2ActiveUuid = SnomedMetadataRf2.ACTIVE_VALUE_RF2.getUuids()[0];
@@ -245,6 +255,18 @@ public class BinaryChangeSetResolveIds {
         // enclosing concept, sctidL, data, status
         ArrayList<SctIdUseInstance> keepList = new ArrayList<>();
         ArrayList<SctIdUseInstance> useList = gatherIdsUseList(eccsInputFiles);
+        
+        ArrayList<SctIdPairing> pairingListEccs = gatherIdsFromEccs(eccsInputFiles);
+        ArrayList<SctIdPairing> pairingListEConcept = gatherIdsFromEConcepts(econceptsFile);
+        pairingListFinal = new ArrayList<>();
+        pairingListFinal.addAll(pairingListEccs);
+        pairingListFinal.addAll(pairingListEConcept);
+        pairingListFinal = findSctidEarliestPairing(pairingListFinal);
+        pairingListLookup = new long[pairingListFinal.size()];
+        for (int i = 0; i < pairingListFinal.size(); i++) {
+            pairingListLookup[i] = pairingListFinal.get(i).sctidDescriptionL;
+        }
+
         Collections.sort(useList);
         int i = 0;
         SctIdUseInstance prevKeep = null;
@@ -302,7 +324,7 @@ public class BinaryChangeSetResolveIds {
                     + keep.enclosingConcept + "\t" + keep.timeL + "\t" + keep.activeInt);
         }
 
-        // write keemMap to text file
+        // write keepMap to text file
         FileOutputStream fos;
         OutputStreamWriter osw;
         try {
@@ -496,8 +518,16 @@ public class BinaryChangeSetResolveIds {
                             }
                             // Process additional ids
                             if (tkd.additionalIds != null) {
+                                ArrayList<TkIdentifier> cSctIds;
+                                TkConceptAttributes ca = eConcept.getConceptAttributes();
+                                if (ca != null) {
+                                    cSctIds = findSctid(ca.additionalIds);
+                                } else {
+                                    cSctIds = new ArrayList<>();
+                                }
                                 preList = tkd.additionalIds;
-                                postList = processIdListWithFilterDesc(enclosingUuid, tkd, preList);
+                                postList = processIdListPairing(cSctIds, enclosingUuid, tkd, preList);
+                                // postList = processIdListWithFilterDesc(enclosingUuid, tkd, preList);
                                 tkd.additionalIds = postList;
                                 timeFirstEditL = findIdListFirstUseDate(postList, timeFirstEditL);
                             }
@@ -605,6 +635,173 @@ public class BinaryChangeSetResolveIds {
         System.out.println("SCTIDs as String = " + countSctIdsAsString);
     }
 
+    private ArrayList<SctIdPairing> findSctidEarliestPairing(ArrayList<SctIdPairing> pairingList) {
+        if (pairingList.isEmpty()) {
+            return pairingList;
+        }
+        
+        Collections.sort(pairingList); // sort by description sctid, time
+
+        ArrayList<SctIdPairing> earliestPairingList = new ArrayList<>();
+        earliestPairingList.add(pairingList.get(0));
+        
+        int idx = 1;
+        while (idx < pairingList.size()) {
+            SctIdPairing previous = pairingList.get(idx-1);
+            SctIdPairing current = pairingList.get(idx);
+            if (current.sctidDescriptionL != previous.sctidDescriptionL) {
+                earliestPairingList.add(current);
+            }
+            idx++;
+        }
+        
+        return earliestPairingList;
+    }
+    
+    private ArrayList<TkIdentifier> findSctid(List<TkIdentifier> idList) {
+        ArrayList<TkIdentifier> sctidList = new ArrayList<>();
+        if (idList == null) {
+            return sctidList;
+        }
+        for (TkIdentifier tki : idList) {
+            if (tki.authorityUuid.compareTo(snomedIntUuid) == 0) {
+                if (String.class.isAssignableFrom(tki.getDenotation().getClass())) {
+                    // System.out.println(":WARNING:2: found as String : " + tki.getDenotation());
+                } else {
+                    sctidList.add(tki);
+                }
+            }
+        }
+        return sctidList;
+    }
+    
+    private ArrayList<SctIdPairing> gatherIdsFromEccs(ArrayList<File> eccsInputFilesList) {
+        ArrayList<SctIdPairing> sctIdPairingOuterList = new ArrayList<>();
+
+        for (File file : eccsInputFilesList) {
+            try {
+                FileInputStream fis = new FileInputStream(file);
+                BufferedInputStream bis = new BufferedInputStream(fis);
+                DataInputStream in = new DataInputStream(bis);
+
+                while (true) {
+                    TkConcept eConcept;
+                    try {
+                        long eccsTimeStamp = in.readLong(); // ECCS timeStamp
+                        eConcept = new TkConcept(in);
+                    } catch (EOFException e) {
+                        in.close();
+                        break;
+                    }
+                    // Concept Attributes
+                    List<TkIdentifier> conceptSctidList = null;
+                    if (eConcept.getConceptAttributes() != null) {
+                        if (eConcept.getConceptAttributes().additionalIds != null) {
+                            List<TkIdentifier> idList = eConcept.getConceptAttributes().additionalIds;
+                            conceptSctidList = findSctid(idList);
+                        }
+                    }
+                    // Description
+                    List<TkIdentifier> descriptionSctidList = new ArrayList<>();
+                    List<TkDescription> descriptionList = eConcept.getDescriptions();
+                    if (descriptionList != null) {
+                        for (TkDescription tkd : descriptionList) {
+                            if (tkd.additionalIds != null) {
+                                descriptionSctidList.addAll(findSctid(tkd.additionalIds));
+                            }
+                        }
+                    }
+                    
+                    if (conceptSctidList != null) {
+                        ArrayList<SctIdPairing> sctIdPairingInnerList = new ArrayList<>();
+                        for (TkIdentifier conceptTkSctid : conceptSctidList) {
+                            for (TkIdentifier descriptionTkSctid : descriptionSctidList) {
+                                sctIdPairingInnerList.add(new SctIdPairing(
+                                        eConcept.primordialUuid,
+                                        (Long) conceptTkSctid.getDenotation(),
+                                        (Long) descriptionTkSctid.getDenotation(),
+                                        descriptionTkSctid.time
+                                ));
+                            }
+                        }
+                        sctIdPairingOuterList.addAll(findSctidEarliestPairing(sctIdPairingInnerList));
+                    }
+
+                } // for each eConcept
+
+            } catch (ClassNotFoundException | IOException ex) {
+                Logger.getLogger(BinaryChangeSetResolveIds.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+        }
+
+        sctIdPairingOuterList = findSctidEarliestPairing(sctIdPairingOuterList);
+        
+        return sctIdPairingOuterList;
+    }
+    
+    private ArrayList<SctIdPairing> gatherIdsFromEConcepts(File econceptFile) {
+        ArrayList<SctIdPairing> sctIdPairingOuterList = new ArrayList<>();
+
+        File file = econceptFile;
+        try {
+            FileInputStream fis = new FileInputStream(file);
+            BufferedInputStream bis = new BufferedInputStream(fis);
+            DataInputStream in = new DataInputStream(bis);
+
+            while (true) {
+                TkConcept eConcept;
+                try {
+                    eConcept = new TkConcept(in);
+                } catch (EOFException e) {
+                    in.close();
+                    break;
+                }
+                // Concept Attributes
+                List<TkIdentifier> conceptSctidList = null;
+                if (eConcept.getConceptAttributes() != null) {
+                    if (eConcept.getConceptAttributes().additionalIds != null) {
+                        List<TkIdentifier> idList = eConcept.getConceptAttributes().additionalIds;
+                        conceptSctidList = findSctid(idList);
+                    }
+                }
+                // Description
+                List<TkIdentifier> descriptionSctidList = new ArrayList<>();
+                List<TkDescription> descriptionList = eConcept.getDescriptions();
+                if (descriptionList != null) {
+                    for (TkDescription tkd : descriptionList) {
+                        if (tkd.additionalIds != null) {
+                            descriptionSctidList.addAll(findSctid(tkd.additionalIds));
+                        }
+                    }
+                }
+
+                if (conceptSctidList != null) {
+                    ArrayList<SctIdPairing> sctIdPairingInnerList = new ArrayList<>();
+                    for (TkIdentifier conceptTkSctid : conceptSctidList) {
+                        for (TkIdentifier descriptionTkSctid : descriptionSctidList) {
+                            sctIdPairingInnerList.add(new SctIdPairing(
+                                    eConcept.primordialUuid,
+                                    (Long) conceptTkSctid.getDenotation(),
+                                    (Long) descriptionTkSctid.getDenotation(),
+                                    descriptionTkSctid.time
+                            ));
+                        }
+                    }
+                    sctIdPairingOuterList.addAll(findSctidEarliestPairing(sctIdPairingInnerList));
+                }
+
+            } // for each eConcept
+
+        } catch (ClassNotFoundException | IOException ex) {
+            Logger.getLogger(BinaryChangeSetResolveIds.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        sctIdPairingOuterList = findSctidEarliestPairing(sctIdPairingOuterList);
+
+        return sctIdPairingOuterList;
+    }
+    
     private ArrayList<SctIdUseInstance> gatherIdsUseList(ArrayList<File> eccsInputFilesList) {
         ArrayList<SctIdUseInstance> sctIdUseList = new ArrayList<>();
 
@@ -614,11 +811,11 @@ public class BinaryChangeSetResolveIds {
                 BufferedInputStream bis = new BufferedInputStream(fis);
                 DataInputStream in = new DataInputStream(bis);
 
-                long firstDate;
+                long eccsTimeStamp;
                 while (true) {
                     TkConcept eConcept;
                     try {
-                        firstDate = in.readLong(); // time
+                        eccsTimeStamp = in.readLong(); // time
                         eConcept = new TkConcept(in);
                     } catch (EOFException e) {
                         in.close();
@@ -791,8 +988,99 @@ public class BinaryChangeSetResolveIds {
         return tmpIdArrayList;        
     }
 
+    private List<TkIdentifier> processIdListPairing(
+            List<TkIdentifier> conceptSctIdList, 
+            UUID enclosingConceptUuid, 
+            TkDescription tkd, 
+            List<TkIdentifier> idList
+    )
+            throws IOException {
+        ArrayList<TkIdentifier> filteredIdList = new ArrayList<>();
+        for (TkIdentifier tki : idList) {
+            // Report any extension path exception
+            if (extensionPath != null
+                    && tki.getPathUuid().compareTo(snomedCorePath) == 0
+                    && tki.getTime() > eccsTimeThreshold) {
+                tki.setPathUuid(extensionPath);
+                if (!eccsPathExceptionFoundB) {
+                    eccsLogExceptionsWriter.append(enclosingConceptUuid.toString());
+                    eccsPathExceptionFoundB = true;
+                }
+                eccsLogExceptionsWriter.append(" id");
+            }
+            // Process additional ids
+            if (tki.authorityUuid.compareTo(snomedIntUuid) == 0) {
+                boolean keep = false;
+                TkIdentifier tmpTki = tki;
+                if (String.class.isAssignableFrom(tmpTki.getDenotation().getClass())) {
+                    eccsLogExceptionsWriter.append(":WARNING:String_Converted_To_Long:@: " + tmpTki.getDenotation() + "\n");
+                    tmpTki = new TkIdentifierLong();
+                    tmpTki.authorUuid = tki.authorUuid;
+                    tmpTki.authorityUuid = tki.authorityUuid;
+                    tmpTki.moduleUuid = tki.moduleUuid;
+                    tmpTki.pathUuid = tki.pathUuid;
+                    tmpTki.statusUuid = tki.statusUuid;
+                    tmpTki.time = tki.time;                          
+                    tmpTki.setDenotation(Long.parseLong((String) tki.getDenotation()));
+                }
+                int idx = Arrays.binarySearch(pairingListLookup, ((Long)tmpTki.getDenotation()).longValue() );
+                if (idx > -1) {
+                    long expectedConceptSctid = pairingListFinal.get(idx).sctidConceptL;
+                    UUID expectedConceptUuid = pairingListFinal.get(idx).primodialUuidConcept;
+                    for (TkIdentifier conceptTki : conceptSctIdList) {
+                        long actualConceptSctid = (long)conceptTki.getDenotation();
+                        if (expectedConceptSctid == actualConceptSctid) {
+                            keep = true;
+                        }
+                        if (expectedConceptUuid.compareTo(enclosingConceptUuid) == 0) {
+                            keep = true;
+                        }
+                    }
+                }
+                
+                // FILTER SCTIDs
+                if (keep) {
+                    // only keep SCTID on extension path or SNOMED Core path
+                    filteredIdList.add(tmpTki);
+                    countSctIdsAsLong++;
+                    descriptionsKept.append((Long) tmpTki.getDenotation());
+                    descriptionsKept.append("\t");
+                    descriptionsKept.append(enclosingConceptUuid.toString());
+                    descriptionsKept.append("\t");
+                    descriptionsKept.append(tkd.primordialUuid.toString());
+                    descriptionsKept.append("\t");
+                    descriptionsKept.append(tkd.pathUuid.toString());
+                    descriptionsKept.append("\tKEEP\n");
+                } else {
+                    if (String.class.isAssignableFrom(tmpTki.getDenotation().getClass())) {
+                        countSctIdsAsString++;
+                        instancesNotKept.append(tmpTki.getDenotation());
+                    } else {
+                        instancesNotKept.append((Long) tmpTki.getDenotation());
+                        countSctIdsAsLong++;
+                    }
+                    instancesNotKept.append("\t");
+                    instancesNotKept.append(enclosingConceptUuid.toString());
+                    instancesNotKept.append("\t");
+                    instancesNotKept.append(tkd.primordialUuid.toString());
+                    instancesNotKept.append("\t");
+                    instancesNotKept.append(tkd.pathUuid.toString());
+                    instancesNotKept.append("\tDROP\n");
+                    writeSctIdHistory(tkd, tmpTki);
+                }
+            } else {
+                // not a filtered authority
+                // in particular, any non-SCT ID are just passed through
+                filteredIdList.add(tki);
+            }
+        }
+        return filteredIdList;
+    }
 
-    private List<TkIdentifier> processIdListWithFilterDesc(UUID enclosingConceptUuid, TkDescription tkd, List<TkIdentifier> idList)
+    private List<TkIdentifier> processIdListWithFilterDesc(
+            UUID enclosingConceptUuid, 
+            TkDescription tkd, 
+            List<TkIdentifier> idList)
             throws IOException {
         if (resolution.compareTo(SctIdResolution.KEEP_ALL_SCTID) == 0) {
             return idList; // do not filter list
@@ -833,7 +1121,8 @@ public class BinaryChangeSetResolveIds {
                         descriptionsKept.append("\tKEEP\n");
                     } else {
                         if (String.class.isAssignableFrom(tki.getDenotation().getClass())) {
-                            System.out.println(":WARNING: found as String : (not on Extension | Core) " + tki.getDenotation());
+                            System.out.println(":WARNING: found as String (not on Extension | Core)"
+                                    + tki.getDenotation());
                             countSctIdsAsString++;
                             instancesNotKept.append(tki.getDenotation());
                         } else {
@@ -1252,6 +1541,42 @@ public class BinaryChangeSetResolveIds {
         return aDate;
     }
 
+    private class SctIdPairing implements Comparable<SctIdPairing> {
+        UUID primodialUuidConcept;
+        long sctidConceptL;
+        long sctidDescriptionL;
+        long timeL;
+
+        public SctIdPairing(
+                UUID uuidConcept,
+                long sctidConceptL, 
+                long sctidDescriptionL, 
+                long timeL) {
+            this.primodialUuidConcept = uuidConcept;
+            this.sctidConceptL = sctidConceptL;
+            this.sctidDescriptionL = sctidDescriptionL;
+            this.timeL = timeL;
+        }
+
+        @Override
+        public int compareTo(SctIdPairing o) {
+            if (this.sctidDescriptionL < o.sctidDescriptionL) {
+                return -1; // instance less than received
+            } else if (this.sctidDescriptionL > o.sctidDescriptionL) {
+                return 1; // instance greater than received
+            } else {
+                if (this.timeL < o.timeL) {
+                    return -1; // instance less than received
+                } else if (this.timeL > o.timeL) {
+                    return 1; // instance greater than received
+                } else {
+                    return 0; // equal
+                }
+            }
+        }
+
+    }
+    
     private class SctIdUseInstance implements Comparable<SctIdUseInstance> {
 
         long sctidL;

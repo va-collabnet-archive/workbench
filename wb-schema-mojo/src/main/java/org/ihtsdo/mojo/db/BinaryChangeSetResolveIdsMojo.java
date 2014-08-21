@@ -47,6 +47,12 @@ public class BinaryChangeSetResolveIdsMojo extends AbstractMojo {
      */
     String changeSetDir;
     /**
+     * The change set directory
+     *
+     * @parameter default-value= "${project.build.directory}/sctSiEConcepts.jbin"
+     */
+    String econceptsFileStr;
+    /**
      * Location of the build directory.
      *
      * @parameter expression="${project.build.directory}/generated-artifact"
@@ -111,6 +117,7 @@ public class BinaryChangeSetResolveIdsMojo extends AbstractMojo {
 
         try {
             BinaryChangeSetResolveIds rcsi = new BinaryChangeSetResolveIds(changeSetDir, 
+                    econceptsFileStr,
                     genArtifactDir, 
                     resolution, 
                     true, // log "eccs_in.txt"
