@@ -131,7 +131,7 @@ public class BinaryChangeSetResolveIds {
 
     public enum SctIdResolution {
 
-        KEEP_ALL_SCTID, KEEP_NO_ECCS_SCTID, KEEP_LAST_CURRENT_USE, FILTER_DESCRIPTION_SCTIDS
+        KEEP_ALL_SCTID, KEEP_NO_ECCS_SCTID, KEEP_LAST_CURRENT_USE, FILTER_DESCRIPTION_SCTIDS, FILTER_CONCEPT_DESCRIPTION_SCTID_PAIRS
     };
     // DETAIL LOG FILES
     private boolean eccsLogPreB;
@@ -147,6 +147,7 @@ public class BinaryChangeSetResolveIds {
     boolean eccsPathExceptionFoundB;
     long countSctIdsAsString;
     long countSctIdsAsLong;
+    long countSctIdsNonCoreAdded;
 
     public BinaryChangeSetResolveIds(String rootDirStr,
             String econceptsFileStr,
@@ -357,6 +358,7 @@ public class BinaryChangeSetResolveIds {
         List<TkChangeSortable> bcsList = new ArrayList<>();
         countSctIdsAsString = 0;
         countSctIdsAsLong = 0;
+        countSctIdsNonCoreAdded = 0;
 
         // :DEBUG:BEGIN:
 //        HashSet<UUID> debugSet = new HashSet<>();
@@ -526,8 +528,11 @@ public class BinaryChangeSetResolveIds {
                                     cSctIds = new ArrayList<>();
                                 }
                                 preList = tkd.additionalIds;
-                                postList = processIdListPairing(cSctIds, enclosingUuid, tkd, preList);
-                                // postList = processIdListWithFilterDesc(enclosingUuid, tkd, preList);
+                                if (resolution.compareTo(SctIdResolution.FILTER_CONCEPT_DESCRIPTION_SCTID_PAIRS) == 0) {
+                                    postList = processIdListPairing(cSctIds, enclosingUuid, tkd, preList);
+                                } else {
+                                    postList = processIdListWithFilterDesc(enclosingUuid, tkd, preList);
+                                }
                                 tkd.additionalIds = postList;
                                 timeFirstEditL = findIdListFirstUseDate(postList, timeFirstEditL);
                             }
@@ -633,6 +638,7 @@ public class BinaryChangeSetResolveIds {
         // RF1 import change which the SCTIDs started showing up as String instead of Long
         System.out.println("SCTIDs as Long = " + countSctIdsAsLong);
         System.out.println("SCTIDs as String = " + countSctIdsAsString);
+        System.out.println("SCTIDs, non-core, kept = " + countSctIdsNonCoreAdded);
     }
 
     private ArrayList<SctIdPairing> findSctidEarliestPairing(ArrayList<SctIdPairing> pairingList) {
@@ -1077,6 +1083,9 @@ public class BinaryChangeSetResolveIds {
         return filteredIdList;
     }
 
+    private final UUID uuidKpd = UUID.fromString("ecfd4324-04de-5503-8274-3116f8f07217");
+	private final UUID uuidPfdn = UUID.fromString("084283a0-b7ca-5626-b604-6dd69fb5ff2d");
+    
     private List<TkIdentifier> processIdListWithFilterDesc(
             UUID enclosingConceptUuid, 
             TkDescription tkd, 
@@ -1119,10 +1128,27 @@ public class BinaryChangeSetResolveIds {
                         descriptionsKept.append("\t");
                         descriptionsKept.append(tkd.pathUuid.toString());
                         descriptionsKept.append("\tKEEP\n");
+                    } else if (tkd.typeUuid.compareTo(uuidKpd) != 0
+                            && tkd.typeUuid.compareTo(uuidPfdn) != 0) {
+                        if (String.class.isAssignableFrom(tki.getDenotation().getClass())) {
+                            System.out.println(":ERROR: found as String : " + tki.getDenotation());
+                            throw new IOException("SCTID as String not support\n");
+                        }
+                        // only keep SCTID on extension path or SNOMED Core path
+                        filteredIdList.add(tki);
+                        countSctIdsNonCoreAdded++;
+                        countSctIdsAsLong++;
+                        descriptionsKept.append((Long) tki.getDenotation());
+                        descriptionsKept.append("\t");
+                        descriptionsKept.append(enclosingConceptUuid.toString());
+                        descriptionsKept.append("\t");
+                        descriptionsKept.append(tkd.primordialUuid.toString());
+                        descriptionsKept.append("\t");
+                        descriptionsKept.append(tkd.pathUuid.toString());
+                        descriptionsKept.append("\tKEEP\n");
                     } else {
                         if (String.class.isAssignableFrom(tki.getDenotation().getClass())) {
-                            System.out.println(":WARNING: found as String (not on Extension | Core)"
-                                    + tki.getDenotation());
+                            eccsLogExceptionsWriter.append(":WARNING: found as String (not on Extension | Core) " + tki.getDenotation() + "\n");
                             countSctIdsAsString++;
                             instancesNotKept.append(tki.getDenotation());
                         } else {

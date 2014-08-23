@@ -111,6 +111,9 @@ public class BinaryChangeSetResolveIdsMojo extends AbstractMojo {
         } else if (resolutionApproach.equalsIgnoreCase("FILTER_DESCRIPTION_SCTIDS")) {
             // only process descriptions
             resolution = SctIdResolution.FILTER_DESCRIPTION_SCTIDS;
+        } else if (resolutionApproach.equalsIgnoreCase("FILTER_CONCEPT_DESCRIPTION_SCTID_PAIRS")) {
+            // only process descriptions
+            resolution = SctIdResolution.FILTER_CONCEPT_DESCRIPTION_SCTID_PAIRS;
         } else {
             throw new MojoFailureException("BinaryChangeSetResolveIdsMojo invalid ");
         }
