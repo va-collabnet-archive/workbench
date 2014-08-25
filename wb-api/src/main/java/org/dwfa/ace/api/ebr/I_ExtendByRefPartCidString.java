@@ -26,8 +26,8 @@ public interface I_ExtendByRefPartCidString<A extends RefexNidStringAnalogBI<A>>
 
 	public void setC1id(int c1id) throws PropertyVetoException;
 
-	public String getStringValue();
+	public String getString1Value();
 
-	public void setStringValue(String value) throws PropertyVetoException;
+	public void setString1Value(String value) throws PropertyVetoException;
 
 }

@@ -192,7 +192,7 @@ public class StrMember extends RefsetMember<StrRevision, StrMember>
    }
 
    @Override
-   public String getStringValue() {
+   public String getString1Value() {
       return stringValue;
    }
 
@@ -262,7 +262,7 @@ public class StrMember extends RefsetMember<StrRevision, StrMember>
    }
 
    @Override
-   public void setStringValue(String stringValue) {
+   public void setString1Value(String stringValue) {
       this.stringValue = stringValue;
       modified();
    }
@@ -283,8 +283,8 @@ public class StrMember extends RefsetMember<StrRevision, StrMember>
          if (I_ExtendByRefPartStr.class.isAssignableFrom(o.getClass())) {
             I_ExtendByRefPartStr<StrRevision> another = (I_ExtendByRefPartStr<StrRevision>) o;
 
-            if (!this.getStringValue().equals(another.getStringValue())) {
-               return this.getStringValue().compareTo(another.getStringValue());
+            if (!this.getString1Value().equals(another.getString1Value())) {
+               return this.getString1Value().compareTo(another.getString1Value());
             }
          }
 
@@ -298,7 +298,7 @@ public class StrMember extends RefsetMember<StrRevision, StrMember>
 
       @Override
       public int hashCodeOfParts() {
-         return Hashcode.compute(new int[] { getStringValue().hashCode() });
+         return Hashcode.compute(new int[] { getString1Value().hashCode() });
       }
 
       //~--- get methods ------------------------------------------------------
@@ -323,7 +323,7 @@ public class StrMember extends RefsetMember<StrRevision, StrMember>
       }
 
       @Override
-      public String getStringValue() {
+      public String getString1Value() {
          return getCv().getString1();
       }
 
@@ -335,7 +335,7 @@ public class StrMember extends RefsetMember<StrRevision, StrMember>
       }
 
       @Override
-      public void setStringValue(String stringValue) throws PropertyVetoException {
+      public void setString1Value(String stringValue) throws PropertyVetoException {
          getCv().setString1(stringValue);
       }
    }

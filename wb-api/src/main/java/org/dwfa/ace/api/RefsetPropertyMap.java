@@ -136,7 +136,7 @@ public class RefsetPropertyMap {
                 break;
             case STRING_VALUE:
                 I_ExtendByRefPartStr strPart = (I_ExtendByRefPartStr) part;
-                strPart.setStringValue((String) entry.getValue());
+                strPart.setString1Value((String) entry.getValue());
                 break;
             case VERSION:
                 part.setTime(Terms.get().convertToThickVersion((Integer) entry.getValue()));
@@ -186,7 +186,7 @@ public class RefsetPropertyMap {
                 break;
             case STRING_VALUE:
                 I_ExtendByRefPartStr strPart = (I_ExtendByRefPartStr) part;
-                strPart.setStringValue((String) entry.getValue());
+                strPart.setString1Value((String) entry.getValue());
                 break;
             case VERSION:
                 // SAP Property
@@ -278,7 +278,7 @@ public class RefsetPropertyMap {
                     return false;
                 }
                 I_ExtendByRefPartStr strPart = (I_ExtendByRefPartStr) part;
-                if (!entry.getValue().equals(strPart.getStringValue())) {
+                if (!entry.getValue().equals(strPart.getString1Value())) {
                     return false;
                 }
                 break;

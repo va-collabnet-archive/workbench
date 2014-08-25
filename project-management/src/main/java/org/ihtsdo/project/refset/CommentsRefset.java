@@ -117,7 +117,7 @@ public class CommentsRefset extends Refset {
                 }
                 // TODO: convert time from int to readable time
                 if (commentsExtensionPart != null) {
-                    comments.put(commentsMember, commentsExtensionPart.getStringValue() + " - Time: " + commentsExtensionPart.getTime());
+                    comments.put(commentsMember, commentsExtensionPart.getString1Value() + " - Time: " + commentsExtensionPart.getTime());
                 }
             }
         }
@@ -222,7 +222,7 @@ public class CommentsRefset extends Refset {
                 // TODO: convert time from int to readable time
                 if (commentsExtensionPart != null) {
                     Comment comment = new Comment(commentsExtensionPart.getC1id(), commentsExtensionPart.getC2id(),
-                            commentsExtensionPart.getStringValue() + " - Time: " + commentsExtensionPart.getTime(),
+                            commentsExtensionPart.getString1Value() + " - Time: " + commentsExtensionPart.getTime(),
                             commentsExtensionPart.getTime(), commentsMember);
                     comments.add(comment);
                 }

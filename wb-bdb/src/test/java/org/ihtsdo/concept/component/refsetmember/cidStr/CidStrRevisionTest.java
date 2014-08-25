@@ -116,7 +116,7 @@ public class CidStrRevisionTest {
         // Create an object to test... 
         CidStrRevision obj = new CidStrRevision();
         obj.setC1id(1);
-        obj.setStringValue("Test Object 1");
+        obj.setString1Value("Test Object 1");
         obj.setStatusAtPositionNid(1);
         obj.sapNid = 1; 
         
@@ -126,7 +126,7 @@ public class CidStrRevisionTest {
         member.nid = 1;
         member.primordialSapNid = 1; 
         member.setC1Nid(1);
-        member.setStringValue("Test Object 1 - Rev 1");
+        member.setString1Value("Test Object 1 - Rev 1");
         member.setStatusAtPositionNid(1);
         obj.primordialComponent = member; 
 
@@ -138,7 +138,7 @@ public class CidStrRevisionTest {
         // Create an object to test... 
         CidStrRevision obj = new CidStrRevision();
         obj.setC1id(2);
-        obj.setStringValue("Test Object 2");
+        obj.setString1Value("Test Object 2");
         obj.setStatusAtPositionNid(2);
         obj.sapNid = 2; 
         
@@ -148,7 +148,7 @@ public class CidStrRevisionTest {
         member.nid = 2;
         member.primordialSapNid = 2; 
         member.setC1Nid(2);
-        member.setStringValue("Test Object 2 - Rev 1");
+        member.setString1Value("Test Object 2 - Rev 1");
         member.setStatusAtPositionNid(2);
         obj.primordialComponent = member; 
 

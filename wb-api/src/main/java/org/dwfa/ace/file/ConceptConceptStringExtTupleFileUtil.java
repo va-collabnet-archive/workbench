@@ -54,7 +54,7 @@ public class ConceptConceptStringExtTupleFileUtil {
             I_ExtendByRefPartCidCidString part = (I_ExtendByRefPartCidCidString) tuple.getMutablePart();
             UUID c1Uuid = termFactory.getUids(part.getC1id()).iterator().next();
             UUID c2Uuid = termFactory.getUids(part.getC2id()).iterator().next();
-            String strValue = part.getStringValue();
+            String strValue = part.getString1Value();
 
             UUID pathUuid = termFactory.getUids(tuple.getPathId()).iterator().next();
             UUID statusUuid = termFactory.getUids(tuple.getStatusId()).iterator().next();

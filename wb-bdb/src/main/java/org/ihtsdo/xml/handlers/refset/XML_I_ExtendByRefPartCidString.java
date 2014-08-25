@@ -33,7 +33,7 @@ public class XML_I_ExtendByRefPartCidString extends XML_RefSetBasic implements
 		
 		if (!debug) {
 			c1id = rpcs.getC1id();
-			text = rpcs.getStringValue();
+			text = rpcs.getString1Value();
 			versionid = rpcs.getVersion();
 			positionid = -2;
 			//positionid = rpi.getPositionId();

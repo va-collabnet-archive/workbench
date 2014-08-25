@@ -129,7 +129,7 @@ public  class EditorCategoryRefsetSearcher extends WorkflowRefsetSearcher
 		for (int i = 0; i < l.size(); i++)
 		{
 			I_ExtendByRefPartStr<?> props = (I_ExtendByRefPartStr<?>)l.get(i);
-			results.add(props.getStringValue());
+			results.add(props.getString1Value());
 		}
 
 		return results;
@@ -152,9 +152,9 @@ public  class EditorCategoryRefsetSearcher extends WorkflowRefsetSearcher
 
 			// If has same modeler & semantic tag combination already in refset, ensure is active.  
 			// If so, return existing category
-			if (reader.getSemanticTag(version.getStringValue()).equalsIgnoreCase(tag)) {
+			if (reader.getSemanticTag(version.getString1Value()).equalsIgnoreCase(tag)) {
 				if (version.getStatusNid() == activeRf1 || version.getStatusNid() == activeRf2) {
-					return reader.getEditorCategory(version.getStringValue()).getVersion(vc);
+					return reader.getEditorCategory(version.getString1Value()).getVersion(vc);
 				}
 			}
 		}

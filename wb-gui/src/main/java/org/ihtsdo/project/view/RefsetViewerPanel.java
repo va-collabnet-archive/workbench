@@ -226,7 +226,7 @@ public class RefsetViewerPanel extends JPanel {
 						}
 						I_ExtendByRefVersion lastTuple = tuples.iterator().next();
 						I_ExtendByRefPartCidString cidPart = (I_ExtendByRefPartCidString) lastTuple.getMutablePart();
-						refsetTableModel.addRow(new Object[] { tf.getConcept(lastTuple.getComponentId()), tf.getConcept(cidPart.getC1id()), cidPart.getStringValue() });
+						refsetTableModel.addRow(new Object[] { tf.getConcept(lastTuple.getComponentId()), tf.getConcept(cidPart.getC1id()), cidPart.getString1Value() });
 					}
 					refsetTable.validate();
 				} else if (target.getConceptNid() == RefsetAuxiliary.Concept.STRING_EXTENSION.localize().getNid()) {
@@ -243,7 +243,7 @@ public class RefsetViewerPanel extends JPanel {
 						}
 						I_ExtendByRefVersion lastTuple = tuples.iterator().next();
 						I_ExtendByRefPartStr cidPart = (I_ExtendByRefPartStr) lastTuple.getMutablePart();
-						refsetTableModel.addRow(new Object[] { tf.getConcept(lastTuple.getComponentId()), tf.getConcept(cidPart.getStringValue()) });
+						refsetTableModel.addRow(new Object[] { tf.getConcept(lastTuple.getComponentId()), tf.getConcept(cidPart.getString1Value()) });
 					}
 					refsetTable.validate();
 				} else if (target.getConceptNid() == RefsetAuxiliary.Concept.LANGUAGE_ENUMERATION_EXTENSION.localize().getNid()) {

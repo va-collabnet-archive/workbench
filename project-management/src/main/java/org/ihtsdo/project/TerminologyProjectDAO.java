@@ -852,7 +852,7 @@ public class TerminologyProjectDAO {
 					if (extension.getRefsetId() == projectsRefset.getConceptNid()) {
 						I_ExtendByRefPart lastPart = getLastExtensionPart(extension);
 						I_ExtendByRefPartStr part = (I_ExtendByRefPartStr) lastPart.makeAnalog(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid(), Long.MAX_VALUE, config.getDbConfig().getUserConcept().getNid(), config.getEditCoordinate().getModuleNid(), editPath.getConceptNid());
-						part.setStringValue(metadata);
+						part.setString1Value(metadata);
 						extension.addVersion(part);
 						termFactory.addUncommittedNoChecks(projectsRefset);
 						termFactory.addUncommittedNoChecks(extension);
@@ -912,7 +912,7 @@ public class TerminologyProjectDAO {
 					if (extension.getRefsetId() == projectsRefset.getConceptNid()) {
 						I_ExtendByRefPart lastPart = getLastExtensionPart(extension);
 						I_ExtendByRefPartStr part = (I_ExtendByRefPartStr) lastPart.makeAnalog(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid(), Long.MAX_VALUE, config.getDbConfig().getUserConcept().getNid(), config.getEditCoordinate().getModuleNid(), editPath.getConceptNid());
-						part.setStringValue(metadata);
+						part.setString1Value(metadata);
 						extension.addVersion(part);
 						termFactory.addUncommittedNoChecks(projectsRefset);
 						termFactory.addUncommittedNoChecks(extension);
@@ -2637,7 +2637,7 @@ public class TerminologyProjectDAO {
 					I_ExtendByRefPart lastPart = getLastExtensionPart(extension);
 					for (PathBI editPath : config.getEditingPathSet()) {
 						I_ExtendByRefPartStr part = (I_ExtendByRefPartStr) lastPart.makeAnalog(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid(), Long.MAX_VALUE, config.getDbConfig().getUserConcept().getNid(), config.getEditCoordinate().getModuleNid(), editPath.getConceptNid());
-						part.setStringValue(metadata);
+						part.setString1Value(metadata);
 						extension.addVersion(part);
 					}
 					termFactory.addUncommittedNoChecks(workListExtensionRefset);
@@ -2690,7 +2690,7 @@ public class TerminologyProjectDAO {
 					for (PathBI editPath : config.getEditingPathSet()) {
 						I_ExtendByRefPartStr part = (I_ExtendByRefPartStr) extTuples.iterator().next()
 								.makeAnalog(SnomedMetadataRf2.INACTIVE_VALUE_RF2.getLenient().getNid(), Long.MAX_VALUE, config.getDbConfig().getUserConcept().getNid(), config.getEditCoordinate().getModuleNid(), editPath.getConceptNid());
-						part.setStringValue(metadata);
+						part.setString1Value(metadata);
 						extension.addVersion(part);
 					}
 					termFactory.addUncommittedNoChecks(workSetExtensionRefset);
@@ -2736,7 +2736,7 @@ public class TerminologyProjectDAO {
 					I_ExtendByRefPart lastPart = getLastExtensionPart(extension);
 					for (PathBI editPath : config.getEditingPathSet()) {
 						I_ExtendByRefPartStr part = (I_ExtendByRefPartStr) lastPart.makeAnalog(SnomedMetadataRf2.INACTIVE_VALUE_RF2.getLenient().getNid(), Long.MAX_VALUE, config.getDbConfig().getUserConcept().getNid(), config.getEditCoordinate().getModuleNid(), editPath.getConceptNid());
-						part.setStringValue(metadata);
+						part.setString1Value(metadata);
 						extension.addVersion(part);
 					}
 					termFactory.addUncommittedNoChecks(worksetConcept);
@@ -2827,7 +2827,7 @@ public class TerminologyProjectDAO {
 					I_ExtendByRefPart lastPart = getLastExtensionPart(extension);
 					for (PathBI editPath : config.getEditingPathSet()) {
 						I_ExtendByRefPartStr part = (I_ExtendByRefPartStr) lastPart.makeAnalog(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid(), Long.MAX_VALUE, config.getDbConfig().getUserConcept().getNid(), config.getEditCoordinate().getModuleNid(), editPath.getConceptNid());
-						part.setStringValue(metadata);
+						part.setString1Value(metadata);
 						extension.addVersion(part);
 					}
 					termFactory.addUncommittedNoChecks(workSetConcept);
@@ -3231,7 +3231,7 @@ public class TerminologyProjectDAO {
 					if (extension.getComponentNid() == workListConcept.getConceptNid()) {
 						I_ExtendByRefPart lastPart = getLastExtensionPart(extension);
 						I_ExtendByRefPartStr part = (I_ExtendByRefPartStr) lastPart;
-						String metadata = part.getStringValue();
+						String metadata = part.getString1Value();
 						// deserializedWorkListWithMetadata = (WorkList)
 						// deserialize(metadata);
 						deserializedWorkListMetadata = (WorklistMetadata) deserialize(metadata);
@@ -4590,7 +4590,7 @@ public class TerminologyProjectDAO {
 					for (PathBI editPath : config.getEditingPathSet()) {
 						Object makeAnalog = extTuples.iterator().next().makeAnalog(SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid(), Long.MAX_VALUE, config.getDbConfig().getUserConcept().getNid(), config.getEditCoordinate().getModuleNid(), editPath.getConceptNid());
 						I_ExtendByRefPartStr part = (I_ExtendByRefPartStr) makeAnalog;
-						part.setStringValue(metadata);
+						part.setString1Value(metadata);
 						extension.addVersion(part);
 					}
 					termFactory.addUncommittedNoChecks(componentsRefset);

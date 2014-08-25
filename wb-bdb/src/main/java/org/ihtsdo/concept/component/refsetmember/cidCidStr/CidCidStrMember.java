@@ -241,7 +241,7 @@ public class CidCidStrMember extends RefsetMember<CidCidStrRevision, CidCidStrMe
    }
 
    @Override
-   public String getStringValue() {
+   public String getString1Value() {
       return strValue;
    }
 
@@ -353,7 +353,7 @@ public class CidCidStrMember extends RefsetMember<CidCidStrRevision, CidCidStrMe
    }
 
    @Override
-   public void setStringValue(String strValue) {
+   public void setString1Value(String strValue) {
       this.strValue = strValue;
       modified();
    }
@@ -384,8 +384,8 @@ public class CidCidStrMember extends RefsetMember<CidCidStrRevision, CidCidStrMe
                return this.getC2id() - another.getC2id();
             }
 
-            if (this.getStringValue().equals(another.getStringValue())) {
-               return this.getStringValue().compareTo(another.getStringValue());
+            if (this.getString1Value().equals(another.getString1Value())) {
+               return this.getString1Value().compareTo(another.getString1Value());
             }
          }
 
@@ -399,7 +399,7 @@ public class CidCidStrMember extends RefsetMember<CidCidStrRevision, CidCidStrMe
 
       @Override
       public int hashCodeOfParts() {
-         return Hashcode.compute(new int[] { getC1Nid(), getC2Nid(), getStringValue().hashCode() });
+         return Hashcode.compute(new int[] { getC1Nid(), getC2Nid(), getString1Value().hashCode() });
       }
 
       //~--- get methods ------------------------------------------------------
@@ -444,7 +444,7 @@ public class CidCidStrMember extends RefsetMember<CidCidStrRevision, CidCidStrMe
       }
 
       @Override
-      public String getStringValue() {
+      public String getString1Value() {
          return getCv().getString1();
       }
 
@@ -476,7 +476,7 @@ public class CidCidStrMember extends RefsetMember<CidCidStrRevision, CidCidStrMe
       }
 
       @Override
-      public void setStringValue(String value) throws PropertyVetoException {
+      public void setString1Value(String value) throws PropertyVetoException {
          getCv().setString1(value);
       }
    }

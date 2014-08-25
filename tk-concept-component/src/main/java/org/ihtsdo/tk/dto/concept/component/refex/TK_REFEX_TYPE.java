@@ -22,17 +22,18 @@ import java.io.IOException;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.refex.type_array_of_bytearray.RefexArrayOfBytearrayVersionBI;
 import org.ihtsdo.tk.api.refex.type_boolean.RefexBooleanVersionBI;
+import org.ihtsdo.tk.api.refex.type_int.RefexIntVersionBI;
+import org.ihtsdo.tk.api.refex.type_long.RefexLongVersionBI;
 import org.ihtsdo.tk.api.refex.type_nid.RefexNidVersionBI;
-import org.ihtsdo.tk.api.refex.type_nid_nid.RefexNidNidVersionBI;
-import org.ihtsdo.tk.api.refex.type_nid_nid_nid.RefexNidNidNidVersionBI;
-import org.ihtsdo.tk.api.refex.type_nid_nid_string.RefexNidNidStringVersionBI;
 import org.ihtsdo.tk.api.refex.type_nid_float.RefexNidFloatVersionBI;
 import org.ihtsdo.tk.api.refex.type_nid_int.RefexNidIntVersionBI;
 import org.ihtsdo.tk.api.refex.type_nid_long.RefexNidLongVersionBI;
+import org.ihtsdo.tk.api.refex.type_nid_nid.RefexNidNidVersionBI;
+import org.ihtsdo.tk.api.refex.type_nid_nid_nid.RefexNidNidNidVersionBI;
+import org.ihtsdo.tk.api.refex.type_nid_nid_string.RefexNidNidStringVersionBI;
 import org.ihtsdo.tk.api.refex.type_nid_string.RefexNidStringVersionBI;
-import org.ihtsdo.tk.api.refex.type_int.RefexIntVersionBI;
-import org.ihtsdo.tk.api.refex.type_long.RefexLongVersionBI;
 import org.ihtsdo.tk.api.refex.type_string.RefexStringVersionBI;
+import org.ihtsdo.tk.api.refex.type_string_string.RefexStringStringVersionBI;
 
 /**
  * The Enum TK_REFEX_TYPE lists all the types of supported refexes. A
@@ -113,6 +114,11 @@ public enum TK_REFEX_TYPE {
      * <code>RefexArrayOfBytearrayVersionBI</code>
      */
     ARRAY_BYTEARRAY(14, RefexArrayOfBytearrayVersionBI.class),
+    /**
+     * A string string refex. Returns the refex class:
+     * <code>RefexStringVersionBI</code>
+     */
+    STR_STR(15, RefexStringStringVersionBI.class),
     /**
      * An unknown type. Has an identifier of Byte.MAX_VALUE and returns
      * <code>null</code> for the refex class.
@@ -196,6 +202,9 @@ public enum TK_REFEX_TYPE {
         if (RefexNidVersionBI.class.isAssignableFrom(c)) {
             return CID;
         }
+        if (RefexStringStringVersionBI.class.isAssignableFrom(c)) {
+            return STR_STR;
+        }
         if (RefexStringVersionBI.class.isAssignableFrom(c)) {
             return STR;
         }
@@ -254,6 +263,8 @@ public enum TK_REFEX_TYPE {
                 return LONG;
             case 14:
                 return ARRAY_BYTEARRAY;
+            case 15:
+                return STR_STR;
         }
         throw new UnsupportedOperationException("Can't handle type: " + type);
     }

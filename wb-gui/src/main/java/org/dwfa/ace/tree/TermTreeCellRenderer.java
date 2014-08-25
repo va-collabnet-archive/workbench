@@ -415,7 +415,7 @@ public class TermTreeCellRenderer extends DefaultTreeCellRenderer
                                 aceConfig.getConflictResolutionStrategy());
 
                   for (I_ExtendByRefVersion t : returnTuples) {
-                     String strExt = ((I_ExtendByRefPartStr) t.getMutablePart()).getStringValue();
+                     String strExt = ((I_ExtendByRefPartStr) t.getMutablePart()).getString1Value();
 
                      htmlSuffixes.add("<code><strong>" + strExt + "'</strong></code>");
                   }

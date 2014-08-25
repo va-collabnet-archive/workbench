@@ -14,7 +14,7 @@ public class Sct1_RefSetRecord implements Comparable<Sct1_RefSetRecord>, Seriali
 
     enum ValueType {
 
-        BOOLEAN, CONCEPT, INTEGER, STRING, C_FLOAT
+        BOOLEAN, CONCEPT, INTEGER, STRING, C_FLOAT, STRING_STRING
     };
     private static final long serialVersionUID = 1L;
     long conUuidMsb; // ENVELOP CONCEPTID (eConcept to which this concept belongs)
@@ -31,7 +31,8 @@ public class Sct1_RefSetRecord implements Comparable<Sct1_RefSetRecord>, Seriali
     long valueConUuidLsb;
     int valueInt;
     float valueFloat;
-    String valueString;
+    String valueString1;
+    String valueString2;
     ValueType valueType;
     int status; // CONCEPTSTATUS
     long revTime;
@@ -59,7 +60,8 @@ public class Sct1_RefSetRecord implements Comparable<Sct1_RefSetRecord>, Seriali
         this.valueConUuidLsb = Long.MAX_VALUE;
         this.valueInt = Integer.MAX_VALUE;
         this.valueFloat = Float.MAX_VALUE;
-        this.valueString = null;
+        this.valueString1 = null;
+        this.valueString2 = null;
         this.valueType = ValueType.BOOLEAN; // BOOLEAN
 
         this.status = status;
@@ -89,7 +91,8 @@ public class Sct1_RefSetRecord implements Comparable<Sct1_RefSetRecord>, Seriali
         this.valueConUuidLsb = vConcept.getLeastSignificantBits();
         this.valueInt = Integer.MAX_VALUE;
         this.valueFloat = Float.MAX_VALUE;
-        this.valueString = null;
+        this.valueString1 = null;
+        this.valueString2 = null;
         this.valueType = ValueType.CONCEPT; // CONCEPT
 
         this.status = status;
@@ -119,7 +122,8 @@ public class Sct1_RefSetRecord implements Comparable<Sct1_RefSetRecord>, Seriali
         this.valueConUuidLsb = Long.MAX_VALUE;
         this.valueInt = vInteger;
         this.valueFloat = Float.MAX_VALUE;
-        this.valueString = null;
+        this.valueString1 = null;
+        this.valueString2 = null;
         this.valueType = ValueType.INTEGER; // INTEGER
 
         this.status = status;
@@ -149,7 +153,8 @@ public class Sct1_RefSetRecord implements Comparable<Sct1_RefSetRecord>, Seriali
         this.valueConUuidLsb = vConcept.getLeastSignificantBits();
         this.valueInt = Integer.MAX_VALUE;
         this.valueFloat = vFloat;
-        this.valueString = null;
+        this.valueString1 = null;
+        this.valueString2 = null;
         this.valueType = ValueType.C_FLOAT; // FLOAT
 
         this.status = status;
@@ -179,8 +184,40 @@ public class Sct1_RefSetRecord implements Comparable<Sct1_RefSetRecord>, Seriali
         this.valueConUuidLsb = Long.MAX_VALUE;
         this.valueInt = Integer.MAX_VALUE;
         this.valueFloat = Float.MAX_VALUE;
-        this.valueString = vString;
+        this.valueString1 = vString;
+        this.valueString2 = null;
         this.valueType = ValueType.STRING; // STRING
+
+        this.status = status;
+        this.revTime = zRevTime;
+        this.pathIdx = zPathIdx;
+        this.authorIdx = zAuthIdx;
+        this.moduleIdx = zModuleIdx;
+    }
+    
+    // STRING_STRING
+    public Sct1_RefSetRecord(UUID refsetUuid, UUID memberUuid, UUID componentUuid, int status,
+            long zRevTime, int zPathIdx, int zAuthIdx, int zModuleIdx,
+            String vString1, String vString2) {
+        super();
+        this.conUuidMsb = Long.MAX_VALUE;
+        this.conUuidLsb = Long.MAX_VALUE;
+        this.referencedComponentUuidMsb = componentUuid.getMostSignificantBits();
+        this.referencedComponentUuidLsb = componentUuid.getLeastSignificantBits();
+        this.componentType = ComponentType.UNKNOWN;
+        this.refsetUuidMsb = refsetUuid.getMostSignificantBits();
+        this.refsetUuidLsb = refsetUuid.getLeastSignificantBits();
+        this.refsetMemberUuidMsb = memberUuid.getMostSignificantBits();
+        this.refsetMemberUuidLsb = memberUuid.getLeastSignificantBits();
+
+        this.valueBoolean = false;
+        this.valueConUuidMsb = Long.MAX_VALUE;
+        this.valueConUuidLsb = Long.MAX_VALUE;
+        this.valueInt = Integer.MAX_VALUE;
+        this.valueFloat = Float.MAX_VALUE;
+        this.valueString1 = vString1;
+        this.valueString2 = vString2;
+        this.valueType = ValueType.STRING_STRING; // STRING_STRING
 
         this.status = status;
         this.revTime = zRevTime;
@@ -270,7 +307,10 @@ public class Sct1_RefSetRecord implements Comparable<Sct1_RefSetRecord>, Seriali
         sb.append("\r\n::: revision date ").append(formatter.format(d).toString());
 
         if (this.valueType == Sct1_RefSetRecord.ValueType.STRING) {
-            sb.append("\r\n::: value string ").append(this.valueString);
+            sb.append("\r\n::: value string ").append(this.valueString1);
+        }else if (this.valueType == Sct1_RefSetRecord.ValueType.STRING_STRING) {
+            sb.append("\r\n::: value string1 ").append(this.valueString1);
+            sb.append("\r\n::: value string2 ").append(this.valueString2);
         } else if (this.valueType == Sct1_RefSetRecord.ValueType.BOOLEAN) {
             sb.append("\r\n::: value boolean ").append(this.valueBoolean);
         } else if (this.valueType == Sct1_RefSetRecord.ValueType.INTEGER) {

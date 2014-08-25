@@ -112,7 +112,7 @@ public class CidStrMemberTest {
         // Create an object to test... 
         CidStrMember obj = new CidStrMember();
         obj.setC1Nid(1);
-        obj.setStringValue("Test Object 1");
+        obj.setString1Value("Test Object 1");
          
         obj.nid = 1;
         obj.primordialSapNid = 1; 
@@ -123,7 +123,7 @@ public class CidStrMemberTest {
         rev.sapNid = 1;
         rev.setC1id(1);
         rev.setC1Nid(1);
-        rev.setStringValue("Test Object 1 - Rev 1");
+        rev.setString1Value("Test Object 1 - Rev 1");
         obj.revisions.add(rev); 
         
         return obj; 
@@ -134,7 +134,7 @@ public class CidStrMemberTest {
         // Create an object to test... 
         CidStrMember obj = new CidStrMember();
         obj.setC1Nid(2);
-        obj.setStringValue("Test Object 2");
+        obj.setString1Value("Test Object 2");
          
         obj.nid = 2;
         obj.primordialSapNid = 2; 
@@ -145,7 +145,7 @@ public class CidStrMemberTest {
         rev.sapNid = 2;
         rev.setC1id(2);
         rev.setC1Nid(2);
-        rev.setStringValue("Test Object 2 - Rev 1");
+        rev.setString1Value("Test Object 2 - Rev 1");
         obj.revisions.add(rev); 
         
         return obj; 

@@ -323,7 +323,7 @@ public static IssueRepository updateRepositoryMetadata(IssueRepository issueRepo
                                         config.getDbConfig().getUserConcept().getNid());
                             
                                 part.setStatusNid(ArchitectonicAuxiliary.Concept.CURRENT.localize().getNid());
-				part.setStringValue(metadata);
+				part.setString1Value(metadata);
 				extension.addVersion(part);
 				termFactory.addUncommitted(extension);
 				promote(extension, config);

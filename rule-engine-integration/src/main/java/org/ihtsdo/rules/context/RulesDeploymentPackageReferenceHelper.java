@@ -244,7 +244,7 @@ public class RulesDeploymentPackageReferenceHelper {
                                                                 config.getEditCoordinate().getAuthorNid(),
                                                                 config.getEditCoordinate().getModuleNid(),
 								editPath.getConceptNid());
-						part.setStringValue(metadata);
+						part.setString1Value(metadata);
 						extension.addVersion(part);
 						termFactory.addUncommittedNoChecks(extension);
 					}

@@ -113,7 +113,7 @@ public class TermmedUtils
 					I_ExtendByRefPartCidString conceptPart = (I_ExtendByRefPartCidString) lastPart; 
 					I_GetConceptData concept1 = termFactory.getConcept(conceptPart.getC1id());
 					System.out.println("Comments: " + getFSN(refset, termFactory) + " - Concept1: " + getFSN(concept1, termFactory)
-							 + " - Text: " + conceptPart.getStringValue() + " Versions: " + extension.getMutableParts().size());
+							 + " - Text: " + conceptPart.getString1Value() + " Versions: " + extension.getMutableParts().size());
 				}
 				if (extension.getTypeNid() == intExtensionTypeId) {
 					DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
@@ -243,7 +243,7 @@ public class TermmedUtils
 					I_ExtendByRefPartCidString part = (I_ExtendByRefPartCidString) getLastExtensionPart(extension.getMutableParts());
 					if (part.getC1id() == commentId) {
 						commentExtension = extension;
-						if (part.getStringValue().equals(comment)) {
+						if (part.getString1Value().equals(comment)) {
 							newCommentPartNeeded = false;
 						} 
 					}

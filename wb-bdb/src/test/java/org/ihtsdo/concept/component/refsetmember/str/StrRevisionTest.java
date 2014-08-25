@@ -116,7 +116,7 @@ public class StrRevisionTest {
         // Create an object to test... 
         StrRevision obj = new StrRevision();
         obj.setStatusAtPositionNid(1);
-        obj.setStringValue("Test Object 1 - Rev 1");
+        obj.setString1Value("Test Object 1 - Rev 1");
         obj.sapNid = 1; 
         
         StrMember member = new StrMember();
@@ -125,7 +125,7 @@ public class StrRevisionTest {
         member.nid = 1;
         member.primordialSapNid = 1; 
         member.setStatusAtPositionNid(1);
-        member.setStringValue("Test Object 1");
+        member.setString1Value("Test Object 1");
         obj.primordialComponent = member; 
 
         return obj; 
@@ -136,7 +136,7 @@ public class StrRevisionTest {
         // Create an object to test... 
         StrRevision obj = new StrRevision();
         obj.setStatusAtPositionNid(2);
-        obj.setStringValue("Test Object 2 - Rev 1");
+        obj.setString1Value("Test Object 2 - Rev 1");
         obj.sapNid = 2; 
         
         StrMember member = new StrMember();
@@ -145,7 +145,7 @@ public class StrRevisionTest {
         member.nid = 2;
         member.primordialSapNid = 2; 
         member.setStatusAtPositionNid(2);
-        member.setStringValue("Test Object 2");
+        member.setString1Value("Test Object 2");
         obj.primordialComponent = member; 
 
         return obj; 

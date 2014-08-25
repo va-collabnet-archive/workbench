@@ -32,7 +32,7 @@ public class StringRefsetHandler extends MemberRefsetHandler {
         I_ExtendByRefPartStr stringPart = (I_ExtendByRefPartStr) tuple.getMutablePart();
 
         return super.formatRefsetLine(tf, tuple, sctid, namespace, project) + MemberRefsetHandler.FILE_DELIMITER
-            + stringPart.getStringValue();
+            + stringPart.getString1Value();
     }
 
     @Override
@@ -41,7 +41,7 @@ public class StringRefsetHandler extends MemberRefsetHandler {
         I_ExtendByRefPartStr stringPart = (I_ExtendByRefPartStr) part;
 
         return super.formatRefsetLine(tf, part, memberId, refsetId, componentId, sctId, namespace, project)
-            + MemberRefsetHandler.FILE_DELIMITER + stringPart.getStringValue();
+            + MemberRefsetHandler.FILE_DELIMITER + stringPart.getString1Value();
     }
 
     @Override

@@ -117,8 +117,8 @@ public class CidCidStrRevisionTest {
         CidCidStrRevision obj = new CidCidStrRevision();
         obj.setC1id(1);
         obj.setC2id(1);
-        obj.setStringValue("Test Object 1");
-        obj.setStringValue("Test Object 1");
+        obj.setString1Value("Test Object 1");
+        obj.setString1Value("Test Object 1");
         obj.setStrValue("Test Object 1");
         obj.setC1Nid(1);
         obj.setC2Nid(1);
@@ -145,8 +145,8 @@ public class CidCidStrRevisionTest {
         CidCidStrRevision obj = new CidCidStrRevision();
         obj.setC1id(2);
         obj.setC2id(2);
-        obj.setStringValue("Test Object 2");
-        obj.setStringValue("Test Object 2");
+        obj.setString1Value("Test Object 2");
+        obj.setString1Value("Test Object 2");
         obj.setStrValue("Test Object 2");
         obj.setC1Nid(2);
         obj.setC2Nid(2);
