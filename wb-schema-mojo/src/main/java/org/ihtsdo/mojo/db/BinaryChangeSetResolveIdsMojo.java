@@ -153,6 +153,14 @@ public class BinaryChangeSetResolveIdsMojo extends AbstractMojo {
                 }
                 rcsi.setSkipMemberUuidSet(skipMemberUuidSet);
             }
+            
+            // skip description SCTIDs of Contact UUIDs in set
+            // :NYI: move setSkipDesriptionSctidInConceptUuid to pom parameter 
+            HashSet<UUID> skipDSctidSet = new HashSet<>();
+            skipDSctidSet.add(UUID.fromString("b3d54317-8ffa-507e-8682-f3800d78eeee")); 
+            skipDSctidSet.add(UUID.fromString("1bda3ae3-76fa-56a3-aa5b-356ce6f9ce29"));
+            skipDSctidSet.add(UUID.fromString("40368518-8dac-54d6-89f8-875766f60a73"));
+            rcsi.setSkipDesriptionSctidInConceptUuidSet(skipDSctidSet);
 
             rcsi.processFiles();
         } catch (IOException | TerminologyException ex) {

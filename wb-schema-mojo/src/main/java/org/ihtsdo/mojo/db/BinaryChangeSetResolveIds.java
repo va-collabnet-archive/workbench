@@ -85,8 +85,9 @@ public class BinaryChangeSetResolveIds {
     private UuidUuidRemapper sctPrimorialUuidRemapper;
     private HashSet<UUID> skipUuidSet;
     private HashSet<UUID> skipMemberUuidSet;
+    /* Set of Concept UUIDs for which the Description SCTIDs will be dropped */
+    private HashSet<UUID> skipDesriptionSctidInConceptUuidSet;
     
-
     void setSkipUuidSet(HashSet<UUID> uuidSet) {
         this.skipUuidSet = uuidSet;
     }
@@ -99,6 +100,10 @@ public class BinaryChangeSetResolveIds {
         this.sctPrimorialUuidRemapper = uuidUuidRemapper;
     }
 
+    public void setSkipDesriptionSctidInConceptUuidSet(HashSet<UUID> setSkipDesriptionSctidInConceptUuidSet) {
+        this.skipDesriptionSctidInConceptUuidSet = setSkipDesriptionSctidInConceptUuidSet;
+    }
+    
     private void writeSctIdHistory(TkDescription tkd, TkIdentifier tki) throws IOException {
         BufferedWriter w = eccsLogSctIdHistoryWriter;
         SimpleDateFormat dateFormatter = new SimpleDateFormat("dd-MMM-yyyy HH:mm:ss");
@@ -1111,7 +1116,25 @@ public class BinaryChangeSetResolveIds {
             if (tki.authorityUuid.compareTo(snomedIntUuid) == 0) {
                 // FILTER SCTIDs
                 if (resolution.compareTo(SctIdResolution.FILTER_DESCRIPTION_SCTIDS) == 0) {
-                    if (tki.pathUuid.compareTo(extensionPath) == 0
+                    if (skipDesriptionSctidInConceptUuidSet.contains(enclosingConceptUuid) ||
+                            skipDesriptionSctidInConceptUuidSet.contains(tkd.primordialUuid)) {
+                        if (String.class.isAssignableFrom(tki.getDenotation().getClass())) {
+                            eccsLogExceptionsWriter.append(":WARNING: found as String (DIRECT FILTER) " + tki.getDenotation() + "\n");
+                            countSctIdsAsString++;
+                            instancesNotKept.append(tki.getDenotation());
+                        } else {
+                            instancesNotKept.append((Long) tki.getDenotation());
+                            countSctIdsAsLong++;
+                        }
+                        instancesNotKept.append("\t");
+                        instancesNotKept.append(enclosingConceptUuid.toString());
+                        instancesNotKept.append("\t");
+                        instancesNotKept.append(tkd.primordialUuid.toString());
+                        instancesNotKept.append("\t");
+                        instancesNotKept.append(tkd.pathUuid.toString());
+                        instancesNotKept.append("\tDROP -- DIRECT FILTER\n");
+                        writeSctIdHistory(tkd, tki);
+                    } else if (tki.pathUuid.compareTo(extensionPath) == 0
                             || tki.pathUuid.compareTo(snomedCorePath) == 0) {
                         if (String.class.isAssignableFrom(tki.getDenotation().getClass())) {
                             System.out.println(":ERROR: found as String : " + tki.getDenotation());
