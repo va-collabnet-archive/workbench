@@ -151,7 +151,8 @@ public class RF2RelationshipImpl extends RF2AbstractImpl implements I_ProcessCon
 								&& effectiveTime.compareTo("20130131")>0){
 							moduleId=I_Constants.CORE_MODULE_ID;
 						}else{
-							moduleId = getConceptMetaModuleID(sourceConcept,releaseDate);
+							moduleId = computeModuleId(sourceConcept);
+//							moduleId = getConceptMetaModuleID(sourceConcept,releaseDate);
 						}
 				     } else if (relationshipStatusId == inactiveNid) {               
 					      active = "0";
