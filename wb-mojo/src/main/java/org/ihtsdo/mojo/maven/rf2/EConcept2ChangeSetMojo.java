@@ -275,6 +275,9 @@ public class EConcept2ChangeSetMojo extends AbstractMojo {
                 ec.conceptAttributes = makeAttr(attr, attrRev, caids, cannotas);
                 eccsMap.put(attrRev.time, ec);
             }
+            if (!caids.isEmpty() || !cannotas.isEmpty()) {
+                throw new UnsupportedOperationException("DESA. Not supported yet.");
+            }
         }
 
         // DESCRIPTIONS
