@@ -17,6 +17,7 @@ package org.ihtsdo.mojo.maven.rf2;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.BufferedWriter;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.EOFException;
@@ -24,7 +25,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -43,14 +46,20 @@ import org.ihtsdo.tk.dto.concept.component.attribute.TkConceptAttributes;
 import org.ihtsdo.tk.dto.concept.component.attribute.TkConceptAttributesRevision;
 import org.ihtsdo.tk.dto.concept.component.description.TkDescription;
 import org.ihtsdo.tk.dto.concept.component.description.TkDescriptionRevision;
+import org.ihtsdo.tk.dto.concept.component.identifier.TkIdentifier;
 import org.ihtsdo.tk.dto.concept.component.media.TkMedia;
 import org.ihtsdo.tk.dto.concept.component.media.TkMediaRevision;
 import org.ihtsdo.tk.dto.concept.component.refex.TkRefexAbstractMember;
 import org.ihtsdo.tk.dto.concept.component.refex.type_boolean.TkRefexBooleanMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_boolean.TkRefexBooleanRevision;
 import org.ihtsdo.tk.dto.concept.component.refex.type_int.TkRefexIntMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_int.TkRefexIntRevision;
 import org.ihtsdo.tk.dto.concept.component.refex.type_string.TkRefsetStrMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_string.TkRefsetStrRevision;
 import org.ihtsdo.tk.dto.concept.component.refex.type_uuid.TkRefexUuidMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_uuid.TkRefexUuidRevision;
 import org.ihtsdo.tk.dto.concept.component.refex.type_uuid_float.TkRefexUuidFloatMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_uuid_float.TkRefexUuidFloatRevision;
 import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationship;
 import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationshipRevision;
 
@@ -64,7 +73,6 @@ import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationshipRevision;
  */
 public class EConcept2ChangeSetMojo extends AbstractMojo {
 
-    private static final String FILE_SEPARATOR = File.separator;
     private static final String LINE_TERMINATOR = "\n"; // \n == $0A
 
     AtomicInteger conceptsRead = new AtomicInteger();
@@ -92,7 +100,8 @@ public class EConcept2ChangeSetMojo extends AbstractMojo {
     /**
      * The changeset output directory
      *
-     * @parameter default-value= "${project.build.directory}/${project.build.finalName}/sct_changesets"
+     * @parameter default-value=
+     * "${project.build.directory}/${project.build.finalName}/sct_changesets"
      */
     File changeSetDir;
 
@@ -110,6 +119,17 @@ public class EConcept2ChangeSetMojo extends AbstractMojo {
      */
     private String[] watchConceptUuids;
 
+    /**
+     * The debug file output directory
+     *
+     * @parameter default-value= "${project.build.directory}"
+     */
+    File debugFileDir;
+    BufferedWriter debugWriter;
+    public static boolean debugWriteFileEnabled = false;
+    public static long debugDumpCount;
+    public static final long debugDumpLimit = 200;
+
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         StringBuilder sb = new StringBuilder();
@@ -121,7 +141,15 @@ public class EConcept2ChangeSetMojo extends AbstractMojo {
         sb.append("\n  changeSetDir       = ");
         sb.append(changeSetDir.toString());
         getLog().info(sb.toString());
+
         try {
+            if (debugWriteFileEnabled) {
+                debugDumpCount = 0;
+                String s = debugFileDir.toString() + File.separator + "debug.txt";
+                FileWriter fw = new FileWriter(s);
+                debugWriter = new BufferedWriter(fw);
+            }
+
             executeMojo(econceptsFileName, generatedResources, changeSetDir);
         } catch (FileNotFoundException ex) {
             throw new MojoExecutionException("econcepts in file error", ex);
@@ -187,6 +215,12 @@ public class EConcept2ChangeSetMojo extends AbstractMojo {
 
                 HashMap<Long, EConcept> eccsList = processEconcept2ChangeSet(eConcept);
                 writeEccsList(eccsList);
+                if (debugWriteFileEnabled && (debugDumpCount < debugDumpLimit)) {
+                    debugWriter.append("\n#######\n");
+                    debugWriter.append(eConcept.toString());
+                    writeEccsListDebugDump(eccsList);
+                    debugDumpCount++;
+                }
             }
         } catch (EOFException e) {
             System.out.print("\n\n");
@@ -196,6 +230,10 @@ public class EConcept2ChangeSetMojo extends AbstractMojo {
         for (DataOutputStream dos : eccsOutput) {
             dos.flush();
             dos.close();
+        }
+        if (debugWriteFileEnabled) {
+            debugWriter.flush();
+            debugWriter.close();
         }
 
     }
@@ -209,7 +247,7 @@ public class EConcept2ChangeSetMojo extends AbstractMojo {
             idx++;
         }
         if (idx >= dateBoundaryList.size()) {
-            System.out.println(":DEBUG:!!!: idx out of range");
+            throw new UnsupportedOperationException("Not supported yet.");
         }
         return idx;
     }
@@ -220,13 +258,21 @@ public class EConcept2ChangeSetMojo extends AbstractMojo {
 
         // ATTRIBUTES
         TkConceptAttributes attr = eConcept.conceptAttributes;
+        ArrayList<TkIdentifier> caids = new ArrayList<>();
+        if (attr.additionalIds != null) {
+            caids.addAll(attr.additionalIds);
+        }
+        List<TkRefexAbstractMember<?>> cannotas = new ArrayList<>();
+        if (attr.annotations != null) {
+            cannotas.addAll(attr.annotations);
+        }
         ec = makeEconcept(eConcept);
-        ec.conceptAttributes = makeAttr(attr);
+        ec.conceptAttributes = makeAttr(attr, caids, cannotas);
         eccsMap.put(attr.time, ec);
         if (attr.revisions != null) {
             for (TkConceptAttributesRevision attrRev : attr.revisions) {
                 ec = makeEconcept(eConcept);
-                ec.conceptAttributes = makeAttr(attr, attrRev);
+                ec.conceptAttributes = makeAttr(attr, attrRev, caids, cannotas);
                 eccsMap.put(attrRev.time, ec);
             }
         }
@@ -234,25 +280,41 @@ public class EConcept2ChangeSetMojo extends AbstractMojo {
         // DESCRIPTIONS
         if (eConcept.descriptions != null) {
             for (TkDescription tkd : eConcept.descriptions) {
+                // additional ids
+                ArrayList<TkIdentifier> ids = new ArrayList<>();
+                if (tkd.additionalIds != null) {
+                    ids.addAll(tkd.additionalIds);
+                }
+                // annotations
+                ArrayList<TkRefexAbstractMember<?>> notas = new ArrayList<>();
+                if (tkd.annotations != null) {
+                    notas.addAll(tkd.annotations);
+                }
+                //
                 ec = eccsMap.get(tkd.time);
                 if (ec == null) {
                     ec = makeEconcept(eConcept);
+                    eccsMap.put(tkd.time, ec);
                 }
                 if (ec.descriptions == null) {
                     ec.descriptions = new ArrayList<>();
                 }
-                ec.descriptions.add(makeDescr(tkd));
+                ec.descriptions.add(makeDescr(tkd, ids, notas));
                 if (tkd.revisions != null) {
                     for (TkDescriptionRevision tkdRev : tkd.revisions) {
                         ec = eccsMap.get(tkdRev.time);
                         if (ec == null) {
                             ec = makeEconcept(eConcept);
+                            eccsMap.put(tkdRev.time, ec);
                         }
                         if (ec.descriptions == null) {
                             ec.descriptions = new ArrayList<>();
                         }
-                        ec.descriptions.add(makeDescr(tkd, tkdRev));
+                        ec.descriptions.add(makeDescr(tkd, tkdRev, ids, notas));
                     }
+                }
+                if (!ids.isEmpty() || !notas.isEmpty()) {
+                    throw new UnsupportedOperationException("DESA. Not supported yet.");
                 }
             }
         }
@@ -260,25 +322,41 @@ public class EConcept2ChangeSetMojo extends AbstractMojo {
         // RELATIONSHIPS
         if (eConcept.relationships != null) {
             for (TkRelationship tkr : eConcept.relationships) {
+                // additional ids
+                ArrayList<TkIdentifier> ids = new ArrayList<>();
+                if (tkr.additionalIds != null) {
+                    ids.addAll(tkr.additionalIds);
+                }
+                // annotations
+                ArrayList<TkRefexAbstractMember<?>> notas = new ArrayList<>();
+                if (tkr.annotations != null) {
+                    notas.addAll(tkr.annotations);
+                }
+                //
                 ec = eccsMap.get(tkr.time);
                 if (ec == null) {
                     ec = makeEconcept(eConcept);
+                    eccsMap.put(tkr.time, ec);
                 }
                 if (ec.relationships == null) {
                     ec.relationships = new ArrayList<>();
                 }
-                ec.relationships.add(makeRel(tkr));
+                ec.relationships.add(makeRel(tkr, ids, notas));
                 if (tkr.revisions != null) {
                     for (TkRelationshipRevision tkrRev : tkr.revisions) {
                         ec = eccsMap.get(tkrRev.time);
                         if (ec == null) {
                             ec = makeEconcept(eConcept);
+                            eccsMap.put(tkrRev.time, ec);
                         }
                         if (ec.relationships == null) {
                             ec.relationships = new ArrayList<>();
                         }
-                        ec.relationships.add(makeRel(tkr, tkrRev));
+                        ec.relationships.add(makeRel(tkr, tkrRev, ids, notas));
                     }
+                }
+                if (!ids.isEmpty() || !notas.isEmpty()) {
+                    throw new UnsupportedOperationException("RELA. Not supported yet.");
                 }
             }
         }
@@ -286,19 +364,46 @@ public class EConcept2ChangeSetMojo extends AbstractMojo {
         // REFSET MEMBERS
         if (eConcept.refsetMembers != null) {
             for (TkRefexAbstractMember<?> tkram : eConcept.refsetMembers) {
+                // additional ids
+                ArrayList<TkIdentifier> ids = new ArrayList<>();
+                if (tkram.additionalIds != null) {
+                    ids.addAll(tkram.additionalIds);
+                }
+                // annotations
+                ArrayList<TkRefexAbstractMember<?>> notas = new ArrayList<>();
+                if (tkram.annotations != null) {
+                    notas.addAll(tkram.annotations);
+                }
+                //
                 ec = eccsMap.get(tkram.time);
                 if (ec == null) {
                     ec = makeEconcept(eConcept);
+                    eccsMap.put(tkram.time, ec);
                 }
                 if (ec.refsetMembers == null) {
                     ec.refsetMembers = new ArrayList<>();
                 }
-                ec.refsetMembers.add(makeMemb(tkram));
+                ec.refsetMembers.add(makeMemb(tkram, ids, notas));
                 List<?> tkramrev = tkram.revisions;
                 if (tkram.revisions != null) {
                     for (Object o : tkramrev) {
-                        // makeMemb(tkram, o);
-                        System.out.println(":!!!:???: is this a non-issue? ");
+                        long oTime;
+                        if (TkRefexUuidRevision.class.isAssignableFrom(o.getClass())) {
+                            oTime = ((TkRefexUuidRevision) o).time;
+                        } else if (TkRefsetStrRevision.class.isAssignableFrom(o.getClass())) {
+                            oTime = ((TkRefsetStrRevision) o).time;
+                        } else {
+                            throw new UnsupportedOperationException("Member Revision Type Not supported yet.");
+                        }
+                        ec = eccsMap.get(oTime);
+                        if (ec == null) {
+                            ec = makeEconcept(eConcept);
+                            eccsMap.put(oTime, ec);
+                        }
+                        if (ec.refsetMembers == null) {
+                            ec.refsetMembers = new ArrayList<>();
+                        }
+                        ec.refsetMembers.add(makeMemb(tkram, o, ids, notas));
                     }
                 }
             }
@@ -307,9 +412,13 @@ public class EConcept2ChangeSetMojo extends AbstractMojo {
         // MEDIA
         if (eConcept.media != null) {
             for (TkMedia tkm : eConcept.media) {
+                if (tkm.additionalIds != null || tkm.annotations != null) {
+                    throw new UnsupportedOperationException("MEDIA A. Not supported yet.");
+                }
                 ec = eccsMap.get(tkm.time);
                 if (ec == null) {
                     ec = makeEconcept(eConcept);
+                    eccsMap.put(tkm.time, ec);
                 }
                 if (ec.media == null) {
                     ec.media = new ArrayList<>();
@@ -320,6 +429,7 @@ public class EConcept2ChangeSetMojo extends AbstractMojo {
                         ec = eccsMap.get(tkmRev.time);
                         if (ec == null) {
                             ec = makeEconcept(eConcept);
+                            eccsMap.put(tkmRev.time, ec);
                         }
                         if (ec.media == null) {
                             ec.media = new ArrayList<>();
@@ -347,11 +457,11 @@ public class EConcept2ChangeSetMojo extends AbstractMojo {
             eccsOutput.get(idx).writeLong(eccsDate);
             EConcept ec = eccsMap.get(eccsDate);
             if (ec == null) {
-                System.out.println(":DEBUG:!!!: concept not in map");
+                throw new UnsupportedOperationException("Concept not in map. Not supported yet.");
             } else {
                 DataOutputStream dos = eccsOutput.get(idx);
                 if (dos == null) {
-                    System.out.println(":DEBUG:!!!: null dos");
+                    throw new UnsupportedOperationException("NULL DOS. Not supported yet.");
                 } else {
                     ec.writeExternal(dos);
                 }
@@ -359,43 +469,157 @@ public class EConcept2ChangeSetMojo extends AbstractMojo {
         }
     }
 
+    private void writeEccsListDebugDump(HashMap<Long, EConcept> eccsMap)
+            throws IOException {
+        Long[] eccsDateKeys = eccsMap.keySet().toArray(new Long[eccsMap.size()]);
+
+        // sort keys to be in date order
+        Arrays.sort(eccsDateKeys);
+
+        // 
+        for (Long eccsDateMillis : eccsDateKeys) {
+            int idx = getDateIndex(eccsDateMillis);
+
+            Date dt = new Date(eccsDateMillis);
+            String s = "yyyy-MM-dd HH:mm:ss";
+            DateFormat fmt = new SimpleDateFormat(s);
+            String s2 = fmt.format(dt);  // formatted oTime string
+
+            debugWriter.append("\n---- ");
+            debugWriter.append(String.valueOf(idx));
+            debugWriter.append(" ---- ");
+            debugWriter.append(eccsDateMillis.toString());
+            debugWriter.append(" ---- ");
+            debugWriter.append(s2);
+            debugWriter.append(" ----\n");
+
+            EConcept ec = eccsMap.get(eccsDateMillis);
+            if (ec == null) {
+                throw new UnsupportedOperationException("Concept_not_in_map. Not supported yet.");
+            } else {
+                debugWriter.append(ec.toString());
+            }
+        }
+    }
+
+    private void writeEccsListDebugString(HashMap<Long, EConcept> eccsMap)
+            throws IOException {
+        Long[] eccsDateKeys = eccsMap.keySet().toArray(new Long[eccsMap.size()]);
+
+        // sort keys to be in date order
+        Arrays.sort(eccsDateKeys);
+
+        // 
+        for (Long eccsDateMillis : eccsDateKeys) {
+            int idx = getDateIndex(eccsDateMillis);
+
+            Date dt = new Date(eccsDateMillis);
+            String s = "yyyy-MM-dd HH:mm:ss";
+            DateFormat fmt = new SimpleDateFormat(s);
+            String s2 = fmt.format(dt);  // formatted oTime string
+
+            System.out.print("\n---- ");
+            System.out.print(String.valueOf(idx));
+            System.out.print(" ---- ");
+            System.out.print(eccsDateMillis.toString());
+            System.out.print(" ---- ");
+            System.out.print(s2);
+            System.out.print(" ----\n");
+
+            EConcept ec = eccsMap.get(eccsDateMillis);
+            if (ec == null) {
+                System.out.println(":DEBUG: concept not in map");
+            } else {
+                System.out.print(ec.toString());
+            }
+        }
+    }
+
     private EConcept makeEconcept(EConcept ec) {
         EConcept ecTmp = new EConcept();
         ecTmp.primordialUuid = ec.primordialUuid;
-        
+
         ecTmp.annotationIndexStyleRefex = ec.annotationIndexStyleRefex;
         ecTmp.annotationStyleRefex = ec.annotationStyleRefex;
-        ec.conceptAttributes = null;
-        ec.descriptions = null;
-        ec.relationships = null;
-        ec.refsetMembers = null;
-        ec.media = null;
+        ecTmp.conceptAttributes = null;
+        ecTmp.descriptions = null;
+        ecTmp.relationships = null;
+        ecTmp.refsetMembers = null;
+        ecTmp.media = null;
+
         return ecTmp;
     }
 
-    private TkConceptAttributes makeAttr(TkConceptAttributes attr) {
+    private TkConceptAttributes makeAttr(TkConceptAttributes attr,
+            List<TkIdentifier> caids,
+            List<TkRefexAbstractMember<?>> cannotas) {
         TkConceptAttributes attrTmp = new TkConceptAttributes();
         attrTmp.primordialUuid = attr.primordialUuid;
+
+        attrTmp.additionalIds = null;
+        for (TkIdentifier tki : caids) {
+            if (tki.time == attr.time) {
+                if (attrTmp.additionalIds == null) {
+                    attrTmp.additionalIds = new ArrayList<>();
+                }
+                attrTmp.additionalIds.add(tki);
+            }
+        }
+        caids.removeAll(attrTmp.additionalIds);
+
+        attrTmp.annotations = null;
+        for (TkRefexAbstractMember<?> tkram : cannotas) {
+            if (tkram.time == attr.time) {
+                if (attrTmp.annotations == null) {
+                    attrTmp.annotations = new ArrayList<>();
+                }
+                attrTmp.annotations.add(tkram);
+            }
+        }
+        cannotas.removeAll(attrTmp.annotations);
+
         attrTmp.revisions = null;
 
-        attrTmp.additionalIds = attr.additionalIds;
         attrTmp.defined = attr.defined;
         attrTmp.statusUuid = attr.statusUuid;
         attrTmp.time = attr.time;
         attrTmp.authorUuid = attr.authorUuid;
         attrTmp.moduleUuid = attr.moduleUuid;
         attrTmp.pathUuid = attr.pathUuid;
-        // :!!!:
-        // attrTmp.annotations = attr.annotations;
+
         return attrTmp;
     }
 
     private TkConceptAttributes makeAttr(TkConceptAttributes attr,
-            TkConceptAttributesRevision attrRev) {
+            TkConceptAttributesRevision attrRev,
+            ArrayList<TkIdentifier> caids,
+            List<TkRefexAbstractMember<?>> cannotas) {
         TkConceptAttributes attrTmp = new TkConceptAttributes();
         attrTmp.primordialUuid = attr.primordialUuid;
+
         attrTmp.additionalIds = null;
-        // attrTmp.annotations = attr.annotations;
+        for (TkIdentifier tki : caids) {
+            if (tki.time == attrRev.time) {
+                if (attrTmp.additionalIds == null) {
+                    attrTmp.additionalIds = new ArrayList<>();
+                }
+                attrTmp.additionalIds.add(tki);
+            }
+        }
+        caids.removeAll(attrTmp.additionalIds);
+
+        attrTmp.annotations = null;
+        for (TkRefexAbstractMember<?> tkram : cannotas) {
+            if (tkram.time == attrRev.time) {
+                if (attrTmp.annotations == null) {
+                    attrTmp.annotations = new ArrayList<>();
+                }
+                attrTmp.annotations.add(tkram);
+            }
+        }
+        cannotas.removeAll(attrTmp.annotations);
+
+        attrTmp.revisions = null;
 
         attrTmp.defined = attrRev.defined;
         attrTmp.statusUuid = attrRev.statusUuid;
@@ -403,17 +627,40 @@ public class EConcept2ChangeSetMojo extends AbstractMojo {
         attrTmp.authorUuid = attrRev.authorUuid;
         attrTmp.moduleUuid = attrRev.moduleUuid;
         attrTmp.pathUuid = attrRev.pathUuid;
-        attrTmp.revisions = null;
+
         return attrTmp;
     }
 
-    private TkDescription makeDescr(TkDescription tkd) {
+    private TkDescription makeDescr(TkDescription tkd,
+            ArrayList<TkIdentifier> ids,
+            ArrayList<TkRefexAbstractMember<?>> notas) {
         TkDescription tmpDesc = new TkDescription();
         tmpDesc.primordialUuid = tkd.primordialUuid;
+
+        tmpDesc.additionalIds = null;
+        for (TkIdentifier tki : ids) {
+            if (tki.time == tkd.time) {
+                if (tmpDesc.additionalIds == null) {
+                    tmpDesc.additionalIds = new ArrayList<>();
+                }
+                tmpDesc.additionalIds.add(tki);
+            }
+        }
+        ids.removeAll(tmpDesc.additionalIds);
+
         tmpDesc.annotations = null;
+        for (TkRefexAbstractMember<?> tkram : notas) {
+            if (tkram.time == tkd.time) {
+                if (tmpDesc.annotations == null) {
+                    tmpDesc.annotations = new ArrayList<>();
+                }
+                tmpDesc.annotations.add(tkram);
+            }
+        }
+        notas.removeAll(tmpDesc.annotations);
+
         tmpDesc.revisions = null;
 
-        tmpDesc.additionalIds = tkd.additionalIds;
         tmpDesc.authorUuid = tkd.authorUuid;
         tmpDesc.conceptUuid = tkd.conceptUuid;
         tmpDesc.initialCaseSignificant = tkd.initialCaseSignificant;
@@ -428,17 +675,44 @@ public class EConcept2ChangeSetMojo extends AbstractMojo {
         return tmpDesc;
     }
 
-    private TkDescription makeDescr(TkDescription tkd, TkDescriptionRevision tkdRev) {
+    private TkDescription makeDescr(TkDescription tkd,
+            TkDescriptionRevision tkdRev,
+            ArrayList<TkIdentifier> ids,
+            ArrayList<TkRefexAbstractMember<?>> notas) {
         TkDescription tmpDesc = new TkDescription();
         tmpDesc.primordialUuid = tkd.primordialUuid;
+
+        tmpDesc.additionalIds = null;
+        for (TkIdentifier tki : ids) {
+            if (tki.time == tkdRev.time) {
+                if (tmpDesc.additionalIds == null) {
+                    tmpDesc.additionalIds = new ArrayList<>();
+                }
+                tmpDesc.additionalIds.add(tki);
+            }
+        }
+        ids.removeAll(tmpDesc.additionalIds);
+
+        tmpDesc.annotations = null;
+        for (TkRefexAbstractMember<?> tkram : notas) {
+            if (tkram.time == tkdRev.time) {
+                if (tmpDesc.annotations == null) {
+                    tmpDesc.annotations = new ArrayList<>();
+                }
+                tmpDesc.annotations.add(tkram);
+            }
+        }
+        notas.removeAll(tmpDesc.annotations);
+
         tmpDesc.revisions = null;
 
         tmpDesc.authorUuid = tkdRev.authorUuid;
+        tmpDesc.conceptUuid = tkd.conceptUuid; // immutable
         tmpDesc.initialCaseSignificant = tkdRev.initialCaseSignificant;
         tmpDesc.lang = tkdRev.lang;
         tmpDesc.moduleUuid = tkdRev.moduleUuid;
         tmpDesc.pathUuid = tkdRev.pathUuid;
-        tmpDesc.pathUuid = tkdRev.statusUuid;
+        tmpDesc.statusUuid = tkdRev.statusUuid;
         tmpDesc.text = tkdRev.text;
         tmpDesc.time = tkdRev.time;
         tmpDesc.typeUuid = tkdRev.typeUuid;
@@ -446,13 +720,36 @@ public class EConcept2ChangeSetMojo extends AbstractMojo {
         return tmpDesc;
     }
 
-    private TkRelationship makeRel(TkRelationship tkr) {
+    private TkRelationship makeRel(TkRelationship tkr,
+            ArrayList<TkIdentifier> ids,
+            ArrayList<TkRefexAbstractMember<?>> notas) {
         TkRelationship tmpRel = new TkRelationship();
         tmpRel.primordialUuid = tkr.primordialUuid;
-        tmpRel.revisions = null;
-        tmpRel.annotations = null;
 
-        tmpRel.additionalIds = tkr.additionalIds;
+        tmpRel.additionalIds = null;
+        for (TkIdentifier tki : ids) {
+            if (tki.time == tkr.time) {
+                if (tmpRel.additionalIds == null) {
+                    tmpRel.additionalIds = new ArrayList<>();
+                }
+                tmpRel.additionalIds.add(tki);
+            }
+        }
+        ids.removeAll(tmpRel.additionalIds);
+
+        tmpRel.annotations = null;
+        for (TkRefexAbstractMember<?> tkram : notas) {
+            if (tkram.time == tkr.time) {
+                if (tmpRel.annotations == null) {
+                    tmpRel.annotations = new ArrayList<>();
+                }
+                tmpRel.annotations.add(tkram);
+            }
+        }
+        notas.removeAll(tmpRel.annotations);
+
+        tmpRel.revisions = null;
+
         tmpRel.authorUuid = tkr.authorUuid;
         tmpRel.c1Uuid = tkr.c1Uuid;
         tmpRel.c2Uuid = tkr.c2Uuid;
@@ -468,21 +765,44 @@ public class EConcept2ChangeSetMojo extends AbstractMojo {
         return tmpRel;
     }
 
-    private TkRelationship makeRel(TkRelationship tkr, TkRelationshipRevision tkrRev) {
+    private TkRelationship makeRel(TkRelationship tkr,
+            TkRelationshipRevision tkrRev,
+            ArrayList<TkIdentifier> ids,
+            ArrayList<TkRefexAbstractMember<?>> notas) {
         TkRelationship tmpRel = new TkRelationship();
         tmpRel.primordialUuid = tkr.primordialUuid;
-        tmpRel.revisions = null;
-        tmpRel.annotations = null;
 
-        // tmpRel.additionalIds = tkr.additionalIds; :!!!: 
+        tmpRel.additionalIds = null;
+        for (TkIdentifier tki : ids) {
+            if (tki.time == tkrRev.time) {
+                if (tmpRel.additionalIds == null) {
+                    tmpRel.additionalIds = new ArrayList<>();
+                }
+                tmpRel.additionalIds.add(tki);
+            }
+        }
+
+        tmpRel.annotations = null;
+        for (TkRefexAbstractMember<?> tkram : notas) {
+            if (tkram.time == tkrRev.time) {
+                if (tmpRel.annotations == null) {
+                    tmpRel.annotations = new ArrayList<>();
+                }
+                tmpRel.annotations.add(tkram);
+            }
+        }
+        notas.removeAll(tmpRel.annotations);
+
+        tmpRel.revisions = null;
+
         tmpRel.authorUuid = tkrRev.authorUuid;
-        // tmpRel.c1Uuid = tkr.c1Uuid; // :!!!: what to do with immutiable
-        // tmpRel.c2Uuid = tkr.c2Uuid;
+        tmpRel.c1Uuid = tkr.c1Uuid; // immutable
+        tmpRel.c2Uuid = tkr.c2Uuid; // immutable
         tmpRel.characteristicUuid = tkrRev.characteristicUuid;
         tmpRel.moduleUuid = tkrRev.moduleUuid;
         tmpRel.pathUuid = tkrRev.pathUuid;
         tmpRel.refinabilityUuid = tkrRev.refinabilityUuid;
-        // tmpRel.relGroup = tkr.relGroup;
+        tmpRel.relGroup = tkrRev.group;
         tmpRel.statusUuid = tkrRev.statusUuid;
         tmpRel.time = tkrRev.time;
         tmpRel.typeUuid = tkrRev.typeUuid;
@@ -490,7 +810,9 @@ public class EConcept2ChangeSetMojo extends AbstractMojo {
         return tmpRel;
     }
 
-    private TkRefexAbstractMember makeMemb(TkRefexAbstractMember<?> tkram) {
+    private TkRefexAbstractMember makeMemb(TkRefexAbstractMember<?> tkram,
+            ArrayList<TkIdentifier> ids,
+            ArrayList<TkRefexAbstractMember<?>> notas) {
         TkRefexAbstractMember tmpMemb = null;
 
         if (TkRefexBooleanMember.class.isAssignableFrom(tkram.getClass())) {
@@ -516,14 +838,35 @@ public class EConcept2ChangeSetMojo extends AbstractMojo {
             ((TkRefexUuidFloatMember) tmpMemb).float1 = ((TkRefexUuidFloatMember) tkram).float1;
             ((TkRefexUuidFloatMember) tmpMemb).uuid1 = ((TkRefexUuidFloatMember) tkram).uuid1;
         } else {
-            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            throw new UnsupportedOperationException("Not supported yet.");
         }
 
         tmpMemb.primordialUuid = tkram.primordialUuid;
-        tmpMemb.revisions = null;
-        tmpMemb.annotations = null;
 
-        tmpMemb.additionalIds = tkram.additionalIds;
+        tmpMemb.additionalIds = null;
+        for (TkIdentifier tki : ids) {
+            if (tki.time == tkram.time) {
+                if (tmpMemb.additionalIds == null) {
+                    tmpMemb.additionalIds = new ArrayList<>();
+                }
+                tmpMemb.additionalIds.add(tki);
+            }
+        }
+        ids.removeAll(tmpMemb.additionalIds);
+
+        tmpMemb.annotations = null;
+        for (TkRefexAbstractMember<?> annotation : notas) {
+            if (annotation.time == tkram.time) {
+                if (tmpMemb.annotations == null) {
+                    tmpMemb.annotations = new ArrayList<>();
+                }
+                tmpMemb.annotations.add(annotation);
+            }
+        }
+        notas.removeAll(tmpMemb.annotations);
+
+        tmpMemb.revisions = null;
+
         tmpMemb.authorUuid = tkram.authorUuid;
         tmpMemb.componentUuid = tkram.componentUuid;
         tmpMemb.moduleUuid = tkram.moduleUuid;
@@ -532,20 +875,128 @@ public class EConcept2ChangeSetMojo extends AbstractMojo {
         tmpMemb.statusUuid = tkram.statusUuid;
         tmpMemb.time = tkram.time;
 
-        return tkram; // :!!!:
+        return tmpMemb;
+    }
+
+    private TkRefexAbstractMember makeMemb(TkRefexAbstractMember<?> tkram,
+            Object o,
+            ArrayList<TkIdentifier> ids,
+            ArrayList<TkRefexAbstractMember<?>> notas) {
+
+        if (TkRefexBooleanRevision.class.isAssignableFrom(o.getClass())) {
+            // BOOLEAN
+//            tmpMemb = new TkRefexBooleanMember();
+//            ((TkRefexBooleanMember) tmpMemb).boolean1 = ((TkRefexBooleanMember) o).boolean1;
+            throw new UnsupportedOperationException("Not supported yet.");
+        } else if (TkRefexUuidRevision.class.isAssignableFrom(o.getClass())) {
+            // CONCEPT ERefsetCidMember()
+            TkRefexUuidMember tmpMemb = new TkRefexUuidMember();
+            TkRefexUuidRevision membRev = (TkRefexUuidRevision) o;
+            tmpMemb.uuid1 = membRev.uuid1;
+            tmpMemb.primordialUuid = tkram.primordialUuid; // immutable
+
+            tmpMemb.additionalIds = null;
+            for (TkIdentifier tki : ids) {
+                if (tki.time == membRev.time) {
+                    if (tmpMemb.additionalIds == null) {
+                        tmpMemb.additionalIds = new ArrayList<>();
+                    }
+                    tmpMemb.additionalIds.add(tki);
+                }
+            }
+            ids.removeAll(tmpMemb.additionalIds);
+
+            tmpMemb.annotations = null;
+            for (TkRefexAbstractMember<?> annotation : notas) {
+                if (annotation.time == membRev.time) {
+                    if (tmpMemb.annotations == null) {
+                        tmpMemb.annotations = new ArrayList<>();
+                    }
+                    tmpMemb.annotations.add(annotation);
+                }
+            }
+            notas.removeAll(tmpMemb.annotations);
+
+            tmpMemb.revisions = null;
+
+            tmpMemb.authorUuid = membRev.authorUuid;
+            tmpMemb.componentUuid = tkram.componentUuid; // immutable
+            tmpMemb.moduleUuid = membRev.moduleUuid;
+            tmpMemb.pathUuid = membRev.pathUuid;
+            tmpMemb.refsetUuid = tkram.refsetUuid; // immutable
+            tmpMemb.statusUuid = membRev.statusUuid;
+            tmpMemb.time = membRev.time;
+
+            return tmpMemb;
+        } else if (TkRefexIntRevision.class.isAssignableFrom(o.getClass())) {
+            // INTEGER
+//            tmpMemb = new TkRefexIntMember();
+//            ((TkRefexIntMember) tmpMemb).int1 = ((TkRefexIntMember) o).int1;
+            throw new UnsupportedOperationException("Not supported yet.");
+        } else if (TkRefsetStrRevision.class.isAssignableFrom(o.getClass())) {
+            // STRING
+            TkRefsetStrMember tmpMemb = new TkRefsetStrMember();
+            TkRefsetStrRevision membRev = (TkRefsetStrRevision) o;
+            tmpMemb.string1 = membRev.string1;
+
+            tmpMemb.primordialUuid = tkram.primordialUuid; // immutable
+
+            tmpMemb.additionalIds = null;
+            for (TkIdentifier tki : ids) {
+                if (tki.time == membRev.time) {
+                    if (tmpMemb.additionalIds == null) {
+                        tmpMemb.additionalIds = new ArrayList<>();
+                    }
+                    tmpMemb.additionalIds.add(tki);
+                }
+            }
+            ids.removeAll(tmpMemb.additionalIds);
+
+            tmpMemb.annotations = null;
+            for (TkRefexAbstractMember<?> annotation : notas) {
+                if (annotation.time == membRev.time) {
+                    if (tmpMemb.annotations == null) {
+                        tmpMemb.annotations = new ArrayList<>();
+                    }
+                    tmpMemb.annotations.add(annotation);
+                }
+            }
+            notas.removeAll(tmpMemb.annotations);
+
+            tmpMemb.revisions = null;
+
+            tmpMemb.authorUuid = membRev.authorUuid;
+            tmpMemb.componentUuid = tkram.componentUuid; // immutable
+            tmpMemb.moduleUuid = membRev.moduleUuid;
+            tmpMemb.pathUuid = membRev.pathUuid;
+            tmpMemb.refsetUuid = tkram.refsetUuid; // immutable
+            tmpMemb.statusUuid = membRev.statusUuid;
+            tmpMemb.time = membRev.time;
+
+            return tmpMemb;
+        } else if (TkRefexUuidFloatRevision.class.isAssignableFrom(o.getClass())) {
+            // C_FLOAT CidFloatMember
+//            tmpMemb = new TkRefexUuidFloatMember();
+//            ((TkRefexUuidFloatMember) tmpMemb).float1 = ((TkRefexUuidFloatMember) o).float1;
+//            ((TkRefexUuidFloatMember) tmpMemb).uuid1 = ((TkRefexUuidFloatMember) o).uuid1;
+            throw new UnsupportedOperationException("Not supported yet.");
+        } else {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
     }
 
     private TkMedia makeMedia(TkMedia tkm) {
         TkMedia tmpMedia = new TkMedia();
         tmpMedia.primordialUuid = tkm.primordialUuid;
-        tmpMedia.revisions = null;
-        tmpMedia.annotations = null;
 
-        tmpMedia.additionalIds = tkm.additionalIds;
+        tmpMedia.additionalIds = null;
+        tmpMedia.annotations = null;
+        tmpMedia.revisions = null;
+
         tmpMedia.authorUuid = tkm.authorUuid;
         tmpMedia.conceptUuid = tkm.conceptUuid;
         tmpMedia.dataBytes = tkm.dataBytes;
-        tmpMedia.conceptUuid = tkm.conceptUuid;
         tmpMedia.format = tkm.format;
         tmpMedia.moduleUuid = tkm.moduleUuid;
         tmpMedia.pathUuid = tkm.pathUuid;
@@ -560,16 +1011,15 @@ public class EConcept2ChangeSetMojo extends AbstractMojo {
     private TkMedia makeMedia(TkMedia tkm, TkMediaRevision tkmRev) {
         TkMedia tmpMedia = new TkMedia();
         tmpMedia.primordialUuid = tkm.primordialUuid;
-        tmpMedia.revisions = null;
-        tmpMedia.annotations = null;
-        // tmpMedia.annotations = tkmRev.annotations;
 
-        // tmpMedia.additionalIds = tkmRev.additionalIds;
+        tmpMedia.additionalIds = null;
+        tmpMedia.annotations = null;
+        tmpMedia.revisions = null;
+
         tmpMedia.authorUuid = tkmRev.authorUuid;
-        // tmpMedia.conceptUuid = tkmRev.conceptUuid;
-        // tmpMedia.dataBytes= tkmRev.dataBytes;
-        // tmpMedia.conceptUuid = tkmRev.conceptUuid;
-        // tmpMedia.format = tkmRev.format;
+        tmpMedia.conceptUuid = tkm.conceptUuid;
+        tmpMedia.dataBytes = tkm.dataBytes;
+        tmpMedia.format = tkm.format;
         tmpMedia.moduleUuid = tkmRev.moduleUuid;
         tmpMedia.pathUuid = tkmRev.pathUuid;
         tmpMedia.statusUuid = tkmRev.statusUuid;
