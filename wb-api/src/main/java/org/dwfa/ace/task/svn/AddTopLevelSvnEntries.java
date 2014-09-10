@@ -30,6 +30,8 @@ import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 import org.dwfa.util.io.FileIO;
+import org.tmatesoft.svn.core.wc2.SvnInfo;
+import org.tmatesoft.svn.core.wc2.SvnWorkingCopyInfo;
 
 /**
  *
@@ -84,28 +86,13 @@ public class AddTopLevelSvnEntries extends AbstractTask {
                         SubversionData svd = config.getSubversionMap().get(workingCopy);
                         if (svd == null) {
                             svd = new SubversionData(null, workingCopy);
-                            File svnEntries = new File(svnMetaDir, "entries");
-                            try {
-                                LineNumberReader lnr = new LineNumberReader(new java.io.FileReader(svnEntries));
-                                @SuppressWarnings("unused")
-                                String line1 = lnr.readLine();
-                                @SuppressWarnings("unused")
-                                String line2 = lnr.readLine();
-                                @SuppressWarnings("unused")
-                                String line3 = lnr.readLine();
-                                @SuppressWarnings("unused")
-                                String line4 = lnr.readLine();
-                                String line5 = lnr.readLine();
-                                AceLog.getAppLog().info("Found url " + line5 + " for working copy: " + svd.getWorkingCopyStr());
-                                lnr.close();
-                                svd.setRepositoryUrlStr(line5);
-                                config.getSubversionMap().put(workingCopy, svd);
-
-                            } catch (FileNotFoundException e) {
-                                AceLog.getAppLog().alertAndLogException(e);
-                            } catch (IOException e) {
-                                AceLog.getAppLog().alertAndLogException(e);
-                            }
+                            SvnInfo svnInfo = new SvnInfo();
+                            SvnWorkingCopyInfo svnWcInfo = new SvnWorkingCopyInfo();
+                            svnWcInfo.setWcRoot(svnDir.getParentFile());
+                            svnInfo.setWcInfo(svnWcInfo);
+                            AceLog.getAppLog().info("Found url " + svnInfo.getUrl().toString() + " for working copy: " + svd.getWorkingCopyStr());
+                            svd.setRepositoryUrlStr(svnInfo.getUrl().toString());
+                            config.getSubversionMap().put(workingCopy, svd);
                         }
                     }
                 }

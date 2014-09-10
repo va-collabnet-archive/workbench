@@ -6,7 +6,7 @@
                 <goal>install</goal>
             </goals>
             <properties>
-                <Env.MAVEN_OPTS>-ea -XX:MaxPermSize=256M -d64 -XX:+UseCompressedOops -Xmx4g -Xms2g</Env.MAVEN_OPTS>
+                <Env.MAVEN_OPTS>-ea -d64 -XX:+UseCompressedOops -Xmx4g -Xms2g</Env.MAVEN_OPTS>
             </properties>
         </action>
         <action>
@@ -17,7 +17,7 @@
                 <goal>-e</goal>
             </goals>
             <properties>
-                <Env.MAVEN_OPTS>-ea -XX:MaxPermSize=256M -d64 -XX:+UseCompressedOops -Xmx4g -Xms2g</Env.MAVEN_OPTS>
+                <Env.MAVEN_OPTS>-ea -d64 -XX:+UseCompressedOops -Xmx4g -Xms2g</Env.MAVEN_OPTS>
             </properties>
         </action>
         <action>
@@ -27,7 +27,7 @@
                 <goal>install</goal>
             </goals>
             <properties>
-                <Env.MAVEN_OPTS>-ea -XX:MaxPermSize=256M -d64 -XX:+UseCompressedOops -Xmx4g -Xms2g</Env.MAVEN_OPTS>
+                <Env.MAVEN_OPTS>-ea -d64 -XX:+UseCompressedOops -Xmx4g -Xms2g</Env.MAVEN_OPTS>
             </properties>
         </action>
         <action>
@@ -39,7 +39,7 @@
                 <goal>-e</goal>
             </goals>
             <properties>
-                <Env.MAVEN_OPTS>-ea -XX:MaxPermSize=256M -d64 -XX:+UseCompressedOops -Xmx4g -Xms2g</Env.MAVEN_OPTS>
+                <Env.MAVEN_OPTS>-ea -d64 -XX:+UseCompressedOops -Xmx4g -Xms2g</Env.MAVEN_OPTS>
                 <skipTests>true</skipTests>
             </properties>
         </action>
