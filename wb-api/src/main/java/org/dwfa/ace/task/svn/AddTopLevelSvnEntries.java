@@ -30,6 +30,12 @@ import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 import org.dwfa.util.io.FileIO;
+import org.tmatesoft.svn.core.internal.io.dav.DAVRepositoryFactory;
+import org.tmatesoft.svn.core.internal.io.fs.FSRepositoryFactory;
+import org.tmatesoft.svn.core.internal.io.svn.SVNRepositoryFactoryImpl;
+import org.tmatesoft.svn.core.wc.SVNClientManager;
+import org.tmatesoft.svn.core.wc.SVNInfo;
+import org.tmatesoft.svn.core.wc.SVNRevision;
 import org.tmatesoft.svn.core.wc2.SvnInfo;
 import org.tmatesoft.svn.core.wc2.SvnWorkingCopyInfo;
 
@@ -74,6 +80,9 @@ public class AddTopLevelSvnEntries extends AbstractTask {
     @Override
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         try {
+            setupLibrary();
+            SVNClientManager clientManager = SVNClientManager.newInstance();
+
             I_ConfigAceFrame config = (I_ConfigAceFrame) process.readAttachement(ProcessAttachmentKeys.WORKING_PROFILE.name());
             File dir = new File(System.getProperty("user.dir"));
             File[] childrenDirs = dir.listFiles();
@@ -85,13 +94,15 @@ public class AddTopLevelSvnEntries extends AbstractTask {
 
                         SubversionData svd = config.getSubversionMap().get(workingCopy);
                         if (svd == null) {
+                            
                             svd = new SubversionData(null, workingCopy);
-                            SvnInfo svnInfo = new SvnInfo();
-                            SvnWorkingCopyInfo svnWcInfo = new SvnWorkingCopyInfo();
-                            svnWcInfo.setWcRoot(svnDir.getParentFile());
-                            svnInfo.setWcInfo(svnWcInfo);
-                            AceLog.getAppLog().info("Found url " + svnInfo.getUrl().toString() + " for working copy: " + svd.getWorkingCopyStr());
-                            svd.setRepositoryUrlStr(svnInfo.getUrl().toString());
+                            
+                            SVNInfo svnInfo = clientManager.getWCClient().doInfo(
+                                    svnDir.getParentFile(), SVNRevision.UNDEFINED);
+                            
+
+                            AceLog.getAppLog().info("Found url " + svnInfo.getURL() + " for working copy: " + svd.getWorkingCopyStr());
+                            svd.setRepositoryUrlStr(svnInfo.getURL().toString());
                             config.getSubversionMap().put(workingCopy, svd);
                         }
                     }
@@ -120,4 +131,23 @@ public class AddTopLevelSvnEntries extends AbstractTask {
     public void setProfilePropName(String profilePropName) {
         this.profilePropName = profilePropName;
     }
+    /*
+     * Initializes the library to work with a repository via 
+     * different protocols.
+     */
+    private static void setupLibrary() {
+        /*
+         * For using over http:// and https://
+         */
+        DAVRepositoryFactory.setup();
+        /*
+         * For using over svn:// and svn+xxx://
+         */
+        SVNRepositoryFactoryImpl.setup();
+        
+        /*
+         * For using over file:///
+         */
+        FSRepositoryFactory.setup();
+    }    
 }
