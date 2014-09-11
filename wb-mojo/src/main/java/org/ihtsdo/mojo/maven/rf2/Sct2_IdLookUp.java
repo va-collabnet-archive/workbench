@@ -16,17 +16,20 @@
 package org.ihtsdo.mojo.maven.rf2;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedWriter;
 import java.io.EOFException;
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import org.dwfa.ace.log.AceLog;
 
 /**
@@ -38,9 +41,17 @@ public class Sct2_IdLookUp {
     private long sctIdArray[];
     private long uuidMsbArray[];
     private long uuidLsbArray[];
+    BufferedWriter uuidsWriter;
 
     public Sct2_IdLookUp(String filePathName)
             throws IOException {
+        int indexOf = filePathName.indexOf("target");
+        String uuidsFileName = filePathName.substring(0, indexOf);
+        uuidsFileName = uuidsFileName + "/target/input-files/generated-arf/additional.txt";
+        File additionalUuidsFile = new File(uuidsFileName);
+        FileOutputStream uuidsOs = new FileOutputStream(additionalUuidsFile);
+        uuidsWriter = new BufferedWriter(new OutputStreamWriter(uuidsOs, "UTF8"));
+        
         ArrayList<Sct2_IdCompact> idList = new ArrayList<>();
         ObjectInputStream ois;
         ois = new ObjectInputStream(new BufferedInputStream(new FileInputStream(filePathName)));
@@ -60,43 +71,27 @@ public class Sct2_IdLookUp {
         setupArrays(idList);
     }
 
-    public Sct2_IdLookUp(ArrayList<Sct2_IdCompact> idList) {
+    public Sct2_IdLookUp(ArrayList<Sct2_IdCompact> idList) throws IOException {
         setupArrays(idList);
     }
 
-    private void setupArrays(ArrayList<Sct2_IdCompact> idList) {
+    private void setupArrays(ArrayList<Sct2_IdCompact> idList) throws IOException {
         int countSctDuplicates = 0;
         int countSctPairUuidChanged = 0;
         StringBuilder sb = new StringBuilder();
+        ArrayList<Sct2_IdCompact> tempIdList = new ArrayList<>(idList);
         Collections.sort(idList); // required for binarySearch
-        for (int i = 0; i < idList.size() - 1; i++) {
-            if (idList.get(i).sctIdL == idList.get(i + 1).sctIdL) {
-                countSctDuplicates++;
-                boolean isNotChanged = true;
-                if (idList.get(i).uuidMsbL != idList.get(i + 1).uuidMsbL
-                        || idList.get(i).uuidLsbL != idList.get(i + 1).uuidLsbL) {
-                    countSctPairUuidChanged++;
-                    isNotChanged = false;
-                }
-                if (countSctDuplicates < 200) {
-                    if (isNotChanged) {
-                        sb.append("\r\nAMBIGUOUS PRIMORDIAL UUID ====\r\n");
-                    } else {
-                        sb.append("\r\nAMBIGUOUS PRIMORDIAL UUID\r\n");
-                    }
-                    sb.append(idList.get(i).sctIdL);
-                    sb.append("\r\n");
-                    UUID uuid1 = new UUID(idList.get(i).uuidMsbL,
-                            idList.get(i).uuidLsbL);
-                    UUID uuid2 = new UUID(idList.get(i + 1).uuidMsbL,
-                            idList.get(i + 1).uuidLsbL);
-                    sb.append(uuid1.toString());
-                    sb.append("\r\n");
-                    sb.append(uuid2.toString());
-                    sb.append("\r\n");
-                }
+        Collections.sort(tempIdList);
+        for (int i = 0; i < tempIdList.size() - 1; i++) {
+            if (tempIdList.get(i).sctIdL == tempIdList.get(i + 1).sctIdL) {
+                //remove and write to additional ids file
+                idList.remove(i);
+                Sct2_IdCompact sct = tempIdList.get(i);
+                uuidsWriter.write(tempIdList.get(i).toString());
             }
         }
+        uuidsWriter.flush();
+        uuidsWriter.close();
         sb.append("\r\n::: countSctDuplicates = ");
         sb.append(countSctDuplicates);
         sb.append("\r\n::: countSctPairUuidChanged = ");

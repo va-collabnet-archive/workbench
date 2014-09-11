@@ -116,6 +116,7 @@ import java.util.logging.Level;
 
 import jsr166y.ConcurrentReferenceHashMap;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
+import org.ihtsdo.tk.dto.concept.component.identifier.TkIdentifierUuid;
 //~--- JDK imports ------------------------------------------------------------
 
 public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI, Comparable<Concept> {
@@ -512,7 +513,27 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
                 Set<Integer> currentDNids = c.data.getDescNids();
 
                 for (TkDescription ed : eConcept.getDescriptions()) {
-                    int dNid = Bdb.uuidToNid(ed.primordialUuid);
+                    HashSet<UUID> newUuids = new HashSet<>();
+                    int dNid = 0;
+                    for(UUID id : ed.getUuids()){
+                        if(Bdb.hasUuid(id)){
+                            if(dNid == 0){
+                                dNid = Bdb.uuidToNid(id);
+                            }else if(dNid != Bdb.uuidToNid(id)){
+                                throw new IOException("Different nids for: " + ed.getUuids());
+                            }
+                        }else{
+                            newUuids.add(id);
+                        }
+                    }
+                    
+                    if(dNid != 0){
+                        for(UUID id : newUuids){
+                            Bdb.putUuid(id, dNid);
+                        }
+                    }else{
+                        dNid = Bdb.uuidsToNid(ed.getUuids());
+                    }
 
                     if (currentDNids.contains(dNid)) {
                         Description d = c.getDescription(dNid);
@@ -539,7 +560,27 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
                 Set<Integer> currentSrcRelNids = c.data.getSrcRelNids();
 
                 for (TkRelationship er : eConcept.getRelationships()) {
-                    int rNid = Bdb.uuidToNid(er.primordialUuid);
+                    HashSet<UUID> newUuids = new HashSet<>();
+                    int rNid = 0;
+                    for(UUID id : er.getUuids()){
+                        if(Bdb.hasUuid(id)){
+                            if(rNid == 0){
+                                rNid = Bdb.uuidToNid(id);
+                            }else if(rNid != Bdb.uuidToNid(id)){
+                                throw new IOException("Different nids for: " + er.getUuids());
+                            }
+                        }else{
+                            newUuids.add(id);
+                        }
+                    }
+                    
+                    if(rNid != 0){
+                        for(UUID id : newUuids){
+                            Bdb.putUuid(id, rNid);
+                        }
+                    }else{
+                        rNid = Bdb.uuidsToNid(er.getUuids());
+                    }
 
                     if (currentSrcRelNids.contains(rNid)) {
                         Relationship r = c.getSourceRel(rNid);
@@ -565,8 +606,28 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
                 Set<Integer> currentImageNids = c.data.getImageNids();
 
                 for (TkMedia eImg : eConcept.getImages()) {
-                    int iNid = Bdb.uuidToNid(eImg.primordialUuid);
-
+                    HashSet<UUID> newUuids = new HashSet<>();
+                    int iNid = 0;
+                    for(UUID id : eImg.getUuids()){
+                        if(Bdb.hasUuid(id)){
+                            if(iNid == 0){
+                                iNid = Bdb.uuidToNid(id);
+                            }else if(iNid != Bdb.uuidToNid(id)){
+                                throw new IOException("Different nids for: " + eImg.getUuids());
+                            }
+                        }else{
+                            newUuids.add(id);
+                        }
+                    }
+                    
+                    if(iNid != 0){
+                        for(UUID id : newUuids){
+                            Bdb.putUuid(id, iNid);
+                        }
+                    }else{
+                        iNid = Bdb.uuidsToNid(eImg.getUuids());
+                    }
+                    
                     if (currentImageNids.contains(iNid)) {
                         Image img = c.getImage(iNid);
 
@@ -598,14 +659,26 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
                             cc = (ConceptComponent) referencedComponent;
                         }
 
-                        RefsetMember r = (RefsetMember) Ts.get().getComponent(er.getPrimordialComponentUuid());
-
+                        RefsetMember r = null;
+                        for(UUID id : er.getUuids()){
+                            r = (RefsetMember) Ts.get().getComponent(id);
+                        }
+                          
                         if (r == null) {
                             r = RefsetMemberFactory.create(er,
                                     Bdb.getConceptNid(cc.getNid()));
                             cc.addAnnotation(r);
                             BdbCommitManager.addUncommittedNoChecks(cc.getEnclosingConcept());
                         } else {
+                            HashSet<UUID> newUuids = new HashSet<>();
+                            for(UUID id : er.getUuids()){
+                                if(!r.getUUIDs().contains(id)){
+                                    newUuids.add(id);
+                                }
+                            }
+                            for(UUID id : newUuids){
+                                Bdb.putUuid(id, r.getNid());
+                            }
                             r.merge((RefsetMember) RefsetMemberFactory.create(er,
                                     Bdb.getConceptNid(cc.getNid())), indexedAnnotationConcepts);
                         }
@@ -622,7 +695,27 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
                     Set<Integer> currentMemberNids = c.data.getMemberNids();
 
                     for (TkRefexAbstractMember<?> er : eConcept.getRefsetMembers()) {
-                        int rNid = Bdb.uuidToNid(er.primordialUuid);
+                        HashSet<UUID> newUuids = new HashSet<>();
+                        int rNid = 0;
+                        for (UUID id : er.getUuids()) {
+                            if (Bdb.hasUuid(id)) {
+                                if (rNid == 0) {
+                                    rNid = Bdb.uuidToNid(id);
+                                } else if (rNid != Bdb.uuidToNid(id)) {
+                                    throw new IOException("Different nids for: " + er.getUuids());
+                                }
+                            } else {
+                                newUuids.add(id);
+                            }
+                        }
+
+                        if (rNid != 0) {
+                            for (UUID id : newUuids) {
+                                Bdb.putUuid(id, rNid);
+                            }
+                        } else {
+                            rNid = Bdb.uuidsToNid(er.getUuids());
+                        }
                         RefsetMember<?, ?> r = c.getRefsetMember(rNid);
 
                         if (currentMemberNids.contains(rNid) && (r != null)) {

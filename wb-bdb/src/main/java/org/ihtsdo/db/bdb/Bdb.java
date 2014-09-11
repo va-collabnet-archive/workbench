@@ -659,6 +659,10 @@ public class Bdb {
     public static int uuidToNid(UUID... uuids) {
         return uuidsToNidMapDb.uuidsToNid(uuids);
     }
+    
+    public static void putUuid(UUID uuid, int nid){
+        uuidsToNidMapDb.put(uuid, nid);
+    }
 
     public static ComponentBI getComponent(int nid) throws IOException {
         int cNid = Bdb.getConceptNid(nid);
