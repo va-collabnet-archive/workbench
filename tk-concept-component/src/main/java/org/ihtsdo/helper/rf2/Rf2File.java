@@ -563,7 +563,57 @@ public class Rf2File {
         }
     }
     
-     /**
+    /**
+     * The Enum JifReactantsRefsetFileFields represents the fields needed in the
+     * language refsets files.
+     */
+    public enum JifReactantsRefsetFileFields {
+
+        /**
+         * The member id field.
+         */
+        ID("id", "\t"),
+        /**
+         * The effective time field.
+         */
+        EFFECTIVE_TIME("effectiveTime", "\t"),
+        /**
+         * The active status field.
+         */
+        ACTIVE("active", "\t"),
+        /**
+         * The module id field.
+         */
+        MODULE_ID("moduleId", "\t"),
+        /**
+         * The refset id field.
+         */
+        REFSET_ID("refsetId", "\t"),
+        /**
+         * The referenced component id field.
+         */
+        REFERENCED_COMPONENT_ID("referencedComponentId", "\t"),
+        /**
+         * The acceptability field.
+         */
+        REACTANTS("reactantId", "\r\n");
+        public final String headerText;
+        public final String seperator;
+
+        //~--- constructors -----------------------------------------------------
+        /**
+         * Instantiates a new language refset file fields.
+         *
+         * @param headerText the text to display in the header
+         * @param seperator the separator to use for separating the field
+         */
+        private JifReactantsRefsetFileFields(String headerText, String seperator) {
+            this.headerText = headerText;
+            this.seperator = seperator;
+        }
+    }
+
+    /**
      * The Enum ConNumRefsetFileFields represents the fields needed in the
      * concept number refsets file.
      */
