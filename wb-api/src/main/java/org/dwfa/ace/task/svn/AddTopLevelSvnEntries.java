@@ -87,10 +87,10 @@ public class AddTopLevelSvnEntries extends AbstractTask {
             File dir = new File(System.getProperty("user.dir"));
             File[] childrenDirs = dir.listFiles();
             if (childrenDirs != null) {
-                for (File svnDir : childrenDirs) {
-                    File svnMetaDir = new File(svnDir, ".svn");
+                for (File possibleWorkingCopyDir : childrenDirs) {
+                    File svnMetaDir = new File(possibleWorkingCopyDir, ".svn");
                     if (svnMetaDir.exists()) {
-                        String workingCopy = FileIO.getRelativePath(svnDir);
+                        String workingCopy = FileIO.getRelativePath(possibleWorkingCopyDir);
 
                         SubversionData svd = config.getSubversionMap().get(workingCopy);
                         if (svd == null) {
@@ -98,10 +98,11 @@ public class AddTopLevelSvnEntries extends AbstractTask {
                             svd = new SubversionData(null, workingCopy);
                             
                             SVNInfo svnInfo = clientManager.getWCClient().doInfo(
-                                    svnDir.getParentFile(), SVNRevision.UNDEFINED);
+                                    possibleWorkingCopyDir, SVNRevision.UNDEFINED);
                             
 
-                            AceLog.getAppLog().info("Found url " + svnInfo.getURL() + " for working copy: " + svd.getWorkingCopyStr());
+                            AceLog.getAppLog().info("Found url " + svnInfo.getURL() + 
+                                    " for working copy: " + svd.getWorkingCopyStr());
                             svd.setRepositoryUrlStr(svnInfo.getURL().toString());
                             config.getSubversionMap().put(workingCopy, svd);
                         }
