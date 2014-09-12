@@ -86,4 +86,8 @@ public class RefsetAux {
     public static ConceptSpec MARKED_PARENT_ISA =
             new ConceptSpec("marked parent is-a type",
             UUID.fromString("bb57ffef-ff51-3015-9b81-e37a1cf40acc"));
+    
+    public static ConceptSpec NORMAL_MEMBER = 
+            new ConceptSpec("normal member",
+            UUID.fromString("cc624429-b17d-4ac5-a69e-0b32448aaf3c"));
 }
