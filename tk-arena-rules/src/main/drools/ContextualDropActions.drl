@@ -838,7 +838,7 @@ rule "rule 40"
          ($dropObject: ConceptFact(this isKindOf Snomed.SUBSTANCE, context == Context.DROP_OBJECT, getConcept().getTime() != Long.MAX_VALUE))
       )
 	then
-		actions.add(new CreateRelAction("Accociated With - Causative agent", $dropTarget, Snomed.ASSOCIATED_WITH_AGENT, $dropObject, config));
+		actions.add(new CreateRelAction("Associated With - Causative agent", $dropTarget, Snomed.ASSOCIATED_WITH_AGENT, $dropObject, config));
 end
 
 rule "rule 41" 
@@ -850,7 +850,7 @@ rule "rule 41"
          ($dropObject: ConceptFact(this isKindOf Snomed.ORGANISM, context == Context.DROP_OBJECT, getConcept().getTime() != Long.MAX_VALUE))
       )
 	then
-		actions.add(new CreateRelAction("Accociated With - Causative agent", $dropTarget, Snomed.ASSOCIATED_WITH_AGENT, $dropObject, config));
+		actions.add(new CreateRelAction("Associated With - Causative agent", $dropTarget, Snomed.ASSOCIATED_WITH_AGENT, $dropObject, config));
 end
 
 rule "rule 41.1" 
@@ -862,7 +862,7 @@ rule "rule 41.1"
          ($dropObject: ConceptFact(this isKindOf Snomed.PHYSICAL_OBJECT, context == Context.DROP_OBJECT, getConcept().getTime() != Long.MAX_VALUE))
       )
 	then
-		actions.add(new CreateRelAction("Accociated With - Causative agent", $dropTarget, Snomed.ASSOCIATED_WITH_AGENT, $dropObject, config));
+		actions.add(new CreateRelAction("Associated With - Causative agent", $dropTarget, Snomed.ASSOCIATED_WITH_AGENT, $dropObject, config));
 end
 
 rule "rule 41.2" 
@@ -874,7 +874,7 @@ rule "rule 41.2"
          ($dropObject: ConceptFact(this isKindOf Snomed.PHYSICAL_FORCE, context == Context.DROP_OBJECT, getConcept().getTime() != Long.MAX_VALUE))
       )
 	then
-		actions.add(new CreateRelAction("Accociated With - Causative agent", $dropTarget, Snomed.ASSOCIATED_WITH_AGENT, $dropObject, config));
+		actions.add(new CreateRelAction("Associated With - Causative agent", $dropTarget, Snomed.ASSOCIATED_WITH_AGENT, $dropObject, config));
 end
 
 rule "rule 41.3" 
@@ -886,7 +886,7 @@ rule "rule 41.3"
          ($dropObject: ConceptFact(this isKindOf Snomed.PRODUCT, context == Context.DROP_OBJECT, getConcept().getTime() != Long.MAX_VALUE))
       )
 	then
-		actions.add(new CreateRelAction("Accociated With - Causative agent", $dropTarget, Snomed.ASSOCIATED_WITH_AGENT, $dropObject, config));
+		actions.add(new CreateRelAction("Associated With - Causative agent", $dropTarget, Snomed.ASSOCIATED_WITH_AGENT, $dropObject, config));
 end
 
 rule "rule 42" 
@@ -1038,7 +1038,7 @@ rule "rule 52.1"
 end
 
 rule "rule 52.2" 
-#Situation with explicit context onto clinical finding
+#Situation with explicit context onto event
 	when
 	(and
          (ViewFact(getView() == View.STATED))
@@ -1050,7 +1050,7 @@ rule "rule 52.2"
 end
 
 rule "rule 52.3" 
-#Situation with explicit context onto clinical finding
+#Situation with explicit context onto observable entity
 	when
 	(and
          (ViewFact(getView() == View.STATED))
@@ -1062,7 +1062,7 @@ rule "rule 52.3"
 end
 
 rule "rule 52.4" 
-#Situation with explicit context onto clinical finding
+#Situation with explicit context onto link assertion
 	when
 	(and
          (ViewFact(getView() == View.STATED))
