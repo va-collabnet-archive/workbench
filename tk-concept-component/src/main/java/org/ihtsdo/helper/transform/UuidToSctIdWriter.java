@@ -64,6 +64,7 @@ public class UuidToSctIdWriter {
     private Writer uuidToSctMapWriter;
     private Writer associationWriter;
     private Writer attributeValueWriter;
+    private Writer jifReactantsWriter;
     private BufferedReader conceptsReader;
     private BufferedReader descriptionsReader;
     private BufferedReader identifiersReader;
@@ -78,6 +79,7 @@ public class UuidToSctIdWriter {
     private BufferedReader uuidSctMapReader;
     private BufferedReader associationReader;
     private BufferedReader attributeValueReader;
+    private BufferedReader jifReactantsReader;
     private TerminologyStoreDI store;
     private HashMap<UUID, String> uuidToSctMap = new HashMap<>();
     private HashMap<UUID, String> uuidToExistingSctMap = new HashMap<>();
@@ -225,6 +227,13 @@ public class UuidToSctIdWriter {
             attribValueLine = attributeValueReader.readLine();
         }
 
+        String jifReactantsLine = jifReactantsReader.readLine();
+        jifReactantsLine = jifReactantsReader.readLine();
+        while(jifReactantsLine != null){
+            processJifReactantsRefset(jifReactantsLine);
+            jifReactantsLine = jifReactantsReader.readLine();
+        }
+
         String langRefLine = langRefsetsReader.readLine();
         langRefLine = langRefsetsReader.readLine();
         while (langRefLine != null) {
@@ -320,6 +329,7 @@ public class UuidToSctIdWriter {
         File statedRelFileUuid = null;
         File associationFileUuid = null;
         File attributeValueFileUuid = null;
+        File jifReactantsFileUuid = null;
         File langRefsetsFileUuid = null;
         File otherLangRefsetsFileUuid = null;
         File modDependFileUuid = null;
@@ -351,6 +361,9 @@ public class UuidToSctIdWriter {
             }else if (inputFile.getName().startsWith("der2_cRefset_AttributeValue_UUID" + this.releaseType.suffix)) {
                 attributeValueFileUuid = inputFile;
                 attributeValueReader = new BufferedReader(new InputStreamReader(new FileInputStream(inputFile), "UTF8"));
+            }else if (inputFile.getName().startsWith("der2_cRefset_JifReactants_UUID" + this.releaseType.suffix)) {
+                jifReactantsFileUuid = inputFile;
+                jifReactantsReader = new BufferedReader(new InputStreamReader(new FileInputStream(inputFile), "UTF8"));
             }else if (inputFile.getName().startsWith("der2_cRefset_Language_UUID" + this.releaseType.suffix)
                     && inputFile.getName().contains(LANG_CODE.EN.getFormatedLanguageCode())) {
                 langRefsetsFileUuid = inputFile;
@@ -390,6 +403,8 @@ public class UuidToSctIdWriter {
                 associationFileUuid.getName().replace("der2_cRefset_AssociationReference_UUID", "der2_cRefset_AssociationReference"));
         File attributeValueFile = new File(content,
                 attributeValueFileUuid.getName().replace("der2_cRefset_AttributeValue_UUID", "der2_cRefset_AttributeValue"));
+        File jifReactantsFile = new File(content,
+                jifReactantsFileUuid.getName().replace("der2_cRefset_JifReactants_UUID", "der2_cRefset_JifReactants"));
         File langRefsetsFile = new File(languageDir,
                 langRefsetsFileUuid.getName().replace("der2_cRefset_Language_UUID", "der2_cRefset_Language"));
         File otherLangRefsetsFile = null;
@@ -427,6 +442,8 @@ public class UuidToSctIdWriter {
         associationWriter = new BufferedWriter(new OutputStreamWriter(associationOs, "UTF8"));
         FileOutputStream attributeValueOs = new FileOutputStream(attributeValueFile);
         attributeValueWriter = new BufferedWriter(new OutputStreamWriter(attributeValueOs, "UTF8"));
+        FileOutputStream jifReactantsOs = new FileOutputStream(jifReactantsFile);
+        jifReactantsWriter = new BufferedWriter(new OutputStreamWriter(jifReactantsOs, "UTF8"));
         FileOutputStream langRefOs = new FileOutputStream(langRefsetsFile);
         langRefsetsWriter = new BufferedWriter(new OutputStreamWriter(langRefOs, "UTF8"));
         if(otherLangRefsetsFile != null){
@@ -468,6 +485,10 @@ public class UuidToSctIdWriter {
         
         for (Rf2File.AttribValueRefsetFileFields field : Rf2File.AttribValueRefsetFileFields.values()) {
             attributeValueWriter.write(field.headerText + field.seperator);
+        }
+
+        for (Rf2File.JifReactantsRefsetFileFields field : Rf2File.JifReactantsRefsetFileFields.values()) {
+            jifReactantsWriter.write(field.headerText + field.seperator);
         }
 
         for (Rf2File.LanguageRefsetFileFields field : Rf2File.LanguageRefsetFileFields.values()) {
@@ -1110,6 +1131,67 @@ private void processIdentifiers(String line, Writer writer) throws IOException {
                             this.uuidToSctMap.put(UUID.fromString(valueId), valueSctId);
                         }
                         attributeValueWriter.write(valueSctId + field.seperator);
+
+                        break;
+            }
+        }
+        }
+    }
+
+    /**
+     * Must happen after all components have been processed.
+     * @param line
+     * @throws IOException 
+     */
+    private void processJifReactantsRefset(String line) throws IOException{
+        if (line != null) {
+            String[] parts = line.split("\t");
+        for (Rf2File.JifReactantsRefsetFileFields field : Rf2File.JifReactantsRefsetFileFields.values()) {
+            switch (field) {
+                case ID:
+                        String memberUuid = parts[Rf2File.JifReactantsRefsetFileFields.ID.ordinal()];
+                        jifReactantsWriter.write(memberUuid + field.seperator);
+
+                        break;
+                    case EFFECTIVE_TIME:
+                        String effectiveDateString = parts[Rf2File.JifReactantsRefsetFileFields.EFFECTIVE_TIME.ordinal()];
+                        jifReactantsWriter.write(effectiveDateString + field.seperator);
+
+                        break;
+                    case ACTIVE:
+                        String status = parts[Rf2File.JifReactantsRefsetFileFields.ACTIVE.ordinal()];
+                        jifReactantsWriter.write(convertStatus(status) + field.seperator);
+
+                        break;
+                    case MODULE_ID:
+                        jifReactantsWriter.write(module + field.seperator);
+
+                        break;
+                    case REFSET_ID:
+                        String refsetId = parts[Rf2File.JifReactantsRefsetFileFields.REFSET_ID.ordinal()];
+                        String refsetSctId = getExistingSctId(refsetId);
+                        if (refsetSctId == null) {
+                            refsetSctId = handler.getWithGeneration(UUID.fromString(refsetId), SctIdGenerator.TYPE.CONCEPT).toString(); //TODO akf: subset?
+                            this.uuidToSctMap.put(UUID.fromString(refsetId), refsetSctId);
+                        }
+                        jifReactantsWriter.write(refsetSctId + field.seperator);
+
+                        break;
+                case REFERENCED_COMPONENT_ID:
+                    //TODO assuming this is already assigned
+                    String rcId = parts[Rf2File.AssociationRefsetFileFields.REFERENCED_COMPONENT_ID.ordinal()];
+                        String rcSctId = getExistingSctId(rcId);
+                        jifReactantsWriter.write(rcSctId + field.seperator);
+                    break;
+                case REACTANTS:
+                    //concept
+                   String valueId = parts[Rf2File.JifReactantsRefsetFileFields.REACTANTS.ordinal()];
+                        String valueSctId = getExistingSctId(valueId);
+                        if (valueSctId == null) {
+                            valueSctId = handler.getWithGeneration(UUID.fromString(valueId), SctIdGenerator.TYPE.CONCEPT).toString(); //TODO akf: subset?
+                            this.uuidToSctMap.put(UUID.fromString(valueId), valueSctId);
+                        }
+                        jifReactantsWriter.write(valueSctId + field.seperator);
 
                         break;
             }
@@ -1820,6 +1902,10 @@ private void processIdentifiers(String line, Writer writer) throws IOException {
             attributeValueWriter.close();
         }
 
+        if(jifReactantsWriter != null){
+        	jifReactantsWriter.close();
+        }
+
         if (langRefsetsWriter != null) {
             langRefsetsWriter.close();
         }
@@ -1870,6 +1956,10 @@ private void processIdentifiers(String line, Writer writer) throws IOException {
         
         if(attributeValueReader != null){
             attributeValueReader.close();
+        }
+        
+        if(jifReactantsReader != null){
+        	jifReactantsReader.close();
         }
         
         if (langRefsetsReader != null) {

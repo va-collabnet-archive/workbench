@@ -345,7 +345,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                 + TimeHelper.getShortFileDateFormat().format(effectiveDate) + ".txt");
         
         File jifReactantsFile = new File(directory, 
-                "der2_cRefset_jifReactants_UUID" + releaseType.suffix + "_"
+                "der2_cRefset_JifReactants_UUID" + releaseType.suffix + "_"
                 + country.getFormatedCountryCode().toUpperCase() + namespace + "_"
                 + TimeHelper.getShortFileDateFormat().format(effectiveDate) + ".txt");
 
