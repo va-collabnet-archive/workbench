@@ -1426,14 +1426,15 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
             return null;
         }
 
-        for (Description d : getDescs()) {
+        Collection<Description> descriptions = getDescs();
+        for (Description d : descriptions) {
             if (d.getNid() == nid) {
                 return d;
             }
         }
 
         throw new IOException("No description: " + nid + " " + Ts.get().getUuidsForNid(nid) + " found in\n"
-                + toLongString());
+                + toLongString() + "\n\nList size: " + descriptions.size() + "\n\nList: " + descriptions);
     }
 
     @Override
