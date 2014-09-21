@@ -2034,11 +2034,15 @@ public class Concept implements I_Transact, I_GetConceptData, ConceptChronicleBI
     }
 
     public Relationship getRelationship(int relNid) throws IOException {
-        for (Relationship r : getNativeSourceRels()) {
+        Collection<Relationship> relationships = getNativeSourceRels();
+        for (Relationship r : relationships) {
             if (r.getNid() == relNid) {
                 return r;
             }
         }
+        System.out.println("no rel for RelNid found: " + relNid);
+        System.out.println("getNativeSourceRels() count: " + relationships.size());
+        System.out.println("rels: " + relationships);
 
         return null;
     }
