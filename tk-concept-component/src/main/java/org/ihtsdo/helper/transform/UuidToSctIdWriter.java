@@ -1179,7 +1179,7 @@ private void processIdentifiers(String line, Writer writer) throws IOException {
                         break;
                 case REFERENCED_COMPONENT_ID:
                     //TODO assuming this is already assigned
-                    String rcId = parts[Rf2File.AssociationRefsetFileFields.REFERENCED_COMPONENT_ID.ordinal()];
+                    String rcId = parts[Rf2File.JifReactantsRefsetFileFields.REFERENCED_COMPONENT_ID.ordinal()];
                         String rcSctId = getExistingSctId(rcId);
                         jifReactantsWriter.write(rcSctId + field.seperator);
                     break;

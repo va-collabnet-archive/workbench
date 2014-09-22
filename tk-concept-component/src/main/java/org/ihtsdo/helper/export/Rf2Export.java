@@ -538,6 +538,10 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
         if (refsetDescWriter != null) {
             refsetDescWriter.close();
         }
+
+        if (jifReactantsWriter != null){
+        	jifReactantsWriter.close();
+        }
     }
 
     /**
