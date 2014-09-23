@@ -31,6 +31,7 @@ import org.ihtsdo.country.COUNTRY_CODE;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.helper.export.Rf2Export;
 import org.ihtsdo.helper.refex.Rf2RefexComputer;
+import org.ihtsdo.helper.refex.TranslatedConceptsRefexComputer;
 import org.ihtsdo.helper.rf2.Rf2File.ReleaseType;
 import org.ihtsdo.helper.time.TimeHelper;
 import org.ihtsdo.helper.transform.UuidSnomedMapHandler;
@@ -288,6 +289,19 @@ public class GenerateIncrementalRf2File extends AbstractMojo {
      * @parameter @required
      */
     private ConceptDescriptor conceptNumberRefsetParentConceptSpec;
+    /**
+     * Translated Concepts Refset concept.
+     * @parameter
+     */
+    private ConceptDescriptor translatedConceptsRefset;
+     /**
+     * Text of desired edit path concept's FSN, to be used when only the FSN is known,
+     * and the path concept was generated with the proper type 5 UUID algorithm
+     * using the Type5UuidFactory.PATH_ID_FROM_FS_DESC namespace.
+     *
+     * @parameter
+     */
+    private String translatedConceptsEditPath;
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
@@ -380,6 +394,19 @@ public class GenerateIncrementalRf2File extends AbstractMojo {
                     refsetSpecComputer.writeRefsetSpecMetadata(metaDir); //only care about FULL for import
                 }
             }
+            if(translatedConceptsRefset != null){
+                UUID pathUuid = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, translatedConceptsEditPath);
+                EditCoordinate metaEc = Ts.get().getMetadataEditCoordinate();
+                EditCoordinate ec = new EditCoordinate(metaEc.getAuthorNid(),
+                        moduleIds.getSetValues()[0],
+                        Ts.get().getNidForUuids(pathUuid));
+                TranslatedConceptsRefexComputer transComputer = new TranslatedConceptsRefexComputer(ec,
+                        vc, output, languageCode, UUID.fromString(translatedConceptsRefset.getUuid()));
+                transComputer.setup();
+                Ts.get().iterateConceptDataInParallel(transComputer);
+                transComputer.cleanup();
+            }
+            
             stampsToWrite = Bdb.getSapDb().getSpecifiedSapNids(null,
                     TimeHelper.getTimeFromString(startDate, TimeHelper.getFileDateFormat()),
                     TimeHelper.getTimeFromString(endDate, TimeHelper.getFileDateFormat()),
@@ -407,7 +434,7 @@ public class GenerateIncrementalRf2File extends AbstractMojo {
                     stampsToWrite.add(stamp);
                 }
             }
-
+            
             IntSet sapsToRemove = new IntSet();
             if (previousReleaseDate != null) {
                 IntSet allPaths = new IntSet(pathIds.getSetValues());
