@@ -150,6 +150,11 @@ public class AddLegacyUuidsMojo extends AbstractMojo {
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         watchUuidSet = new HashSet<>();
+        // 'HX of bulimia nervosa'
+        // watchUuidSet.add(UUID.fromString("945ef09a-83f6-5b46-88b6-1192a0edb592"));
+        // watchUuidSet.add(UUID.fromString("54e15101-d390-11e2-8b8b-0800200c9a66"));
+        // EDG Clinical Contextset Member Id
+        // watchUuidSet.add(UUID.fromString("9ef4e796-d5b9-538e-b1b4-43b4d9d7815a")); 
         // RF2 "Ischemia, viscera" -- SNOMED ASSIGNED
         // watchUuidSet.add(UUID.fromString("ae72b717-f028-766d-91ef-0216c2f5b505"));
         // RF1 "Ischemia, viscera" -- KP Created, then submitted ?
@@ -587,22 +592,61 @@ public class AddLegacyUuidsMojo extends AbstractMojo {
                 }
             }
         }
-        if (existingAdditionalUuids.size() >= 2) {
-            throw new UnsupportedOperationException("AddLegacyUuidsMojo: case not implemented, existingAdditionalUuids.size() >= 2");
+        if (existingAdditionalUuids.size() > 1) {
+            throw new UnsupportedOperationException("AddLegacyUuidsMojo: case not implemented, existingAdditionalUuids.size() > 1");
+
         } else if (existingAdditionalUuids.size() == 1) {
-            existingAdditionalUuids.get(0).authorityUuid = schemeIdAuthorityUuid;
-        } else { // no existing uuid
+            StringBuilder sb = new StringBuilder();
+            sb.append("\n::ID_SCHEME::");
+            sb.append("\tPrimordialPath:\t");
+            sb.append(primordialPath.toString());
+            sb.append("\tAdditionalUuidPath:\t");
+            sb.append(existingAdditionalUuids.get(0).pathUuid.toString());
+            sb.append("\tPrimordialUuid\t");
+            sb.append(primordialUuid.toString());
+            sb.append("\tAdditionalUuid\t");
+            sb.append(((TkIdentifierUuid) existingAdditionalUuids.get(0)).denotation.toString());
+            sb.append("\tAdditionalIdAuthority\t");
+            sb.append(existingAdditionalUuids.get(0).authorityUuid.toString());
+            
+            if (primordialPath.compareTo(this.schemePathUuid) == 0) {
+                sb.append("\t:ADDED UUID SCHEMA\n");
+                System.out.println(sb.toString());
+                // use the primordial uuid to add a target schema UUID
+                EIdentifierUuid tmpId = createNewEIdentifierUuidWithIdScheme(primordialUuid, timeL);
+                if (additionalIds != null) {
+                    additionalIds.add(tmpId);
+                } else {
+                    throw new UnsupportedOperationException("AddLegacyUuidsMojo: additional IDs expected to be not null");
+                }
+            } else if (existingAdditionalUuids.get(0).pathUuid.compareTo(this.schemePathUuid) == 0) {
+                if (existingAdditionalUuids.get(0).authorityUuid.compareTo(this.schemeIdAuthorityUuid) == 0) {
+                    sb.append("\t:NO EDIT REQUIRED\n");
+                } else {
+                    sb.append("\t:SET UUID SCHEMA AUTHORITY\n");
+                    existingAdditionalUuids.get(0).authorityUuid = this.schemeIdAuthorityUuid;
+                    existingAdditionalUuids.get(0).moduleUuid = this.schemeModuleUuid;
+                }
+                System.out.println(sb.toString());
+            } else {
+                sb.append("\t:NO ID EDIT\n");
+                System.out.println(sb.toString());
+            }
+            
+
+        } else { // no existing additional uuid
             UUID remapUuid = idLookup.getComputedUuid(primordialUuid);
             EIdentifierUuid tmpId;
             
-            if(primordialPath.compareTo(SNOMED_CORE_PATH_UUID) != 0 &&
-                    remapUuid != null) {
+            if(primordialPath.compareTo(SNOMED_CORE_PATH_UUID) != 0 && remapUuid != null) {
                 throw new UnsupportedOperationException("AddLegacyUuidsMojo: case not implemented, !SNOMED_CORE_PATH_UUID && remapUuid != null");
             }
             
             if (remapUuid != null) {
+                // Use SCTID computed UUID
                 tmpId = createNewEIdentifierUuidWithIdScheme(remapUuid, timeL);
             } else {
+                // Use primordial UUID
                 tmpId = createNewEIdentifierUuidWithIdScheme(primordialUuid, timeL);
             }
             
