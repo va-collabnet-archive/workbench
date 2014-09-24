@@ -216,7 +216,7 @@ public class TerminologyTransferHandler extends TransferHandler {
 	                        return new ConceptTransferable(Terms.get().getConcept(extVersion.getStatusNid()));
 						case STRING_VALUE:
 	                        return new StringSelection(
-	                        		((I_ExtendByRefPartStr) extVersion.getMutablePart()).getStringValue());
+	                        		((I_ExtendByRefPartStr) extVersion.getMutablePart()).getString1Value());
 						case VERSION:
 	                        return new StringSelection(swet.getCellText());
 						default:

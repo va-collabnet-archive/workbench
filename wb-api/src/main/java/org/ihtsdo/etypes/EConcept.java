@@ -32,6 +32,7 @@ import org.dwfa.ace.api.ebr.I_ExtendByRefPartCidString;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartInt;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartLong;
 import org.dwfa.ace.api.ebr.I_ExtendByRefPartStr;
+import org.dwfa.ace.api.ebr.I_ExtendByRefPartStrStr;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.ace.utypes.I_AmChangeSetObject;
 import org.dwfa.cement.ArchitectonicAuxiliary;
@@ -220,7 +221,8 @@ public class EConcept extends TkConcept implements I_AmChangeSetObject {
       CID_LONG(12, RefsetAuxiliary.Concept.CID_LONG_EXTENSION, I_ExtendByRefPartCidLong.class), 
       LONG(13, RefsetAuxiliary.Concept.LONG_EXTENSION, I_ExtendByRefPartLong.class),
       ARRAY_OF_BYTEARRAY(14, RefsetAuxiliary.Concept.ARRAY_OF_BYTEARRAY_EXTENSION, 
-              RefexArrayOfBytearrayVersionBI.class);
+              RefexArrayOfBytearrayVersionBI.class),
+      STR_STR(15, RefsetAuxiliary.Concept.STRING_STRING_EXTENSION, I_ExtendByRefPartStrStr.class);
 
       private static Map<Integer, REFSET_TYPES> nidTypeMap;
 

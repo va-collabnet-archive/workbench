@@ -102,6 +102,8 @@ public class UuidToSctIdWriter {
     private HashSet<Long> inactives = new HashSet<>();
     private HashSet<Long> actives = new HashSet<>();
     private HashSet<Long> activeDups = new HashSet<>();
+    private HashSet<Long> descriptionIdSet = new HashSet<>();
+    private HashSet<Long> langRefsetIdSet = new HashSet<>();
 
     /**
      * Instantiates a new uuid to sct id writer for release files from the
@@ -626,6 +628,7 @@ public class UuidToSctIdWriter {
                         descriptionsWriter.write(descSctId + field.seperator);
                         combinedIdList.add(Long.parseLong(descSctId));
                         combinedIdSet.add(Long.parseLong(descSctId));
+                        descriptionIdSet.add(Long.parseLong(descSctId));
                         descId = Long.parseLong(descSctId);
 
                         break;
@@ -1252,6 +1255,7 @@ private void processIdentifiers(String line, Writer writer) throws IOException {
                             this.uuidToSctMap.put(UUID.fromString(rc), rcSctId);
                         }
                         langRefsetsWriter.write(rcSctId + field.seperator);
+                        langRefsetIdSet.add(Long.parseLong(rcSctId));
 
                         break;
 
@@ -1323,6 +1327,7 @@ private void processIdentifiers(String line, Writer writer) throws IOException {
                             this.uuidToSctMap.put(UUID.fromString(rc), rcSctId);
                         }
                         otherLangRefsetsWriter.write(rcSctId + field.seperator);
+                        langRefsetIdSet.add(Long.parseLong(rcSctId));
 
                         break;
 
@@ -2066,6 +2071,19 @@ private void processIdentifiers(String line, Writer writer) throws IOException {
             } else {
                 System.out.println("Passed.");
             }
+        }
+        System.out.println("### CHECKING for one language refset member for each description.");
+        int count = 0;
+        for(Long id : descriptionIdSet){
+            if(!langRefsetIdSet.contains(id)){
+                count++;
+                System.out.println("Found description ID not present in a language refset file. ID: " + id);
+            }
+        }
+        if(count > 0){
+            System.out.println("Found " + count + " descriptions not present in language refsets.");
+        }else{
+            System.out.println("Passed.");
         }
     }
 }

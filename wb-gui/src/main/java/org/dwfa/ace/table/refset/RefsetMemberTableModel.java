@@ -168,7 +168,7 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
 
             switch (field) {
                 case STRING_VALUE:
-                    return ((I_ExtendByRefPartStr) swet.getTuple().getMutablePart()).getStringValue();
+                    return ((I_ExtendByRefPartStr) swet.getTuple().getMutablePart()).getString1Value();
                 default:
                     throw new UnsupportedOperationException("Can't do string combobox on " + field);
 
@@ -826,7 +826,7 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
                     return new StringWithExtTuple(Boolean.toString(((I_ExtendByRefPartBoolean) tuple.getMutablePart()).getBooleanValue()), tuple, tuple.getMemberId(), inConflict);
 
                 case STRING_VALUE:
-                    return new StringWithExtTuple(((I_ExtendByRefPartStr) tuple.getMutablePart()).getStringValue(), tuple,
+                    return new StringWithExtTuple(((I_ExtendByRefPartStr) tuple.getMutablePart()).getString1Value(), tuple,
                             tuple.getMemberId(), inConflict);
 
                 case CONCEPT_ID:
@@ -1034,8 +1034,8 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
                         break;
                     case STRING_VALUE:
                         String stringValue = (String) value;
-                        if (stringValue.equals(((I_ExtendByRefPartStr) extTuple.getMutablePart()).getStringValue()) == false) {
-                            ((I_ExtendByRefPartStr) extTuple.getMutablePart()).setStringValue(stringValue);
+                        if (stringValue.equals(((I_ExtendByRefPartStr) extTuple.getMutablePart()).getString1Value()) == false) {
+                            ((I_ExtendByRefPartStr) extTuple.getMutablePart()).setString1Value(stringValue);
                             changed = true;
                         }
                         break;

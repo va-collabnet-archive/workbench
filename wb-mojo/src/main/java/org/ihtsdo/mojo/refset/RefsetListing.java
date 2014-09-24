@@ -218,7 +218,7 @@ public class RefsetListing extends AbstractMojo {
                                     out.println("<tr>");
                                     out.println("<td>");
                                     out.println("<td>");
-                                    out.println(escapeString(pccs.getStringValue()));
+                                    out.println(escapeString(pccs.getString1Value()));
                                 } else {
                                     getLog().info("Wrong type: " + p.getClass() + " " + mem_con.getInitialText());
                                 }

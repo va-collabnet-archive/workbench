@@ -33,7 +33,7 @@ public  class SemanticTagsRefsetSearcher extends WorkflowRefsetSearcher
 		Collection<? extends I_ExtendByRef> allTags = Terms.get().getRefsetExtensionMembers(refsetNid);
 		
 		for (I_ExtendByRef row : allTags) {
-			String semTag = reader.getSemanticTag(((I_ExtendByRefPartStr)row).getStringValue());
+			String semTag = reader.getSemanticTag(((I_ExtendByRefPartStr)row).getString1Value());
 		}
 		
 		return retSet;

@@ -45,7 +45,6 @@ import java.util.List;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -69,6 +68,8 @@ import org.ihtsdo.etypes.ERefsetIntMember;
 import org.ihtsdo.etypes.ERefsetIntRevision;
 import org.ihtsdo.etypes.ERefsetStrMember;
 import org.ihtsdo.etypes.ERefsetStrRevision;
+import org.ihtsdo.etypes.ERefsetStrStrMember;
+import org.ihtsdo.etypes.ERefsetStrStrRevision;
 import org.ihtsdo.etypes.ERelationship;
 import org.ihtsdo.etypes.ERelationshipRevision;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf1;
@@ -81,6 +82,7 @@ import org.ihtsdo.tk.dto.concept.component.refex.TkRefexAbstractMember;
 import org.ihtsdo.tk.dto.concept.component.refex.type_boolean.TkRefexBooleanRevision;
 import org.ihtsdo.tk.dto.concept.component.refex.type_int.TkRefexIntRevision;
 import org.ihtsdo.tk.dto.concept.component.refex.type_string.TkRefsetStrRevision;
+import org.ihtsdo.tk.dto.concept.component.refex.type_string_string.TkRefsetStrStrRevision;
 import org.ihtsdo.tk.dto.concept.component.refex.type_uuid.TkRefexUuidRevision;
 import org.ihtsdo.tk.dto.concept.component.refex.type_uuid_float.TkRefexUuidFloatRevision;
 import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationship;
@@ -201,6 +203,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
     private int statRsFloatFromArf;
     private int statRsConFromArf;
     private int statRsStrFromArf;
+    private int statRsStrStrFromArf;
     private static final int IS_LESS = -1;
     private static final int IS_EQUAL = 0;
     private static final int IS_GREATER = 1;
@@ -924,6 +927,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
         statRsFloatFromArf = 0;
         statRsConFromArf = 0;
         statRsStrFromArf = 0;
+        statRsStrStrFromArf = 0;
 
         getLog().info("::: RF2 Mapping: " + rf2Mapping);
         getLog().info("::: Target Directory: " + tDir);
@@ -1251,9 +1255,16 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
             System.gc();
 
             // PROCESS REFSET STRING FILES
-            List<List<ARFFile>> listOfRsStrDirs = getArfFiles(wDir, subDir, arfDirs, "string",
+            List<List<ARFFile>> listOfRsStrDirs = getArfFiles(wDir, subDir, arfDirs, "_string_",
                     ".refset");
             processArfRsStrFiles(wDir, listOfRsStrDirs, oosRefSet);
+            listOfRsStrDirs = null;
+            System.gc();
+            
+            // PROCESS REFSET STRING STRING FILES
+            List<List<ARFFile>> listOfRsStrStrDirs = getArfFiles(wDir, subDir, arfDirs, "stringstring",
+                    ".refset");
+            processArfRsStrStrFiles(wDir, listOfRsStrStrDirs, oosRefSet);
             listOfRsStrDirs = null;
             System.gc();
 
@@ -1885,6 +1896,74 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
                     vStr);
 
             statRsStrFromArf++;
+            oos.writeUnshared(tmpRsRec);
+        }
+
+        br.close();
+    }
+    
+    private void processArfRsStrStrFiles(String wDir, List<List<ARFFile>> listOfDirs,
+            ObjectOutputStream oos)
+            throws IOException, MojoFailureException {
+        for (List<ARFFile> laf : listOfDirs) {
+            for (ARFFile f : laf) {
+                parseArfRsStrStrFile(f.file, oos);
+            }
+        }
+    }
+
+    private void parseArfRsStrStrFile(File f, ObjectOutputStream oos)
+            throws IOException, MojoFailureException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(f),
+                "UTF-8"));
+
+        int REFSEST_UUID = 0;
+        int MEMBER_UUID = 1;
+        int STATUS_UUID = 2;
+        int REFERENCED_COMPONENT_UUID = 3;
+        int EFFECTIVE_DATE = 4; // yyyy-MM-dd HH:mm:ss
+        int PATH_UUID = 5;
+        int STRING1 = 6;
+        int STRING2 = 7;
+        int AUTHOR_UUID = 8; // Author UUID
+        int MODULE_UUID = 9; // Module UUID
+
+        while (br.ready()) {
+            String[] line = br.readLine().split(TAB_CHARACTER);
+
+            // REFSEST_UUID = 0;
+            UUID uuidRefset = UUID.fromString(line[REFSEST_UUID]);
+            // MEMBER_UUID = 1;
+            UUID uuidMember = UUID.fromString(line[MEMBER_UUID]);
+            // STATUS_UUID = 2;
+            int status = lookupZStatusUuidIdx(line[STATUS_UUID]);
+            // REFERENCED_COMPONENT_UUID = 3;
+            UUID uuidComponent = UUID.fromString(line[REFERENCED_COMPONENT_UUID]);
+            // EFFECTIVE_DATE = 4; // yyyy-MM-dd HH:mm:ss
+            long revTime = convertDateStrToTime(line[EFFECTIVE_DATE]);
+            // PATH_UUID = 5;
+            int pathIdx = lookupZPathIdx(line[PATH_UUID]);
+            // STRING1 = 6;
+            String vStr1 = line[STRING1];
+            // STRING2 = 7;
+            String vStr2 = line[STRING2];
+            // AUTHOR_UUID = 7;
+            int authorIdx = -1;
+            if (line.length > AUTHOR_UUID) {
+                authorIdx = lookupZAuthorIdx(line[AUTHOR_UUID]);
+            }
+            // MODULE_UUID = 8;
+            int moduleIdx = -1;
+            if (line.length > MODULE_UUID) {
+                moduleIdx = lookupZModuleIdx(line[MODULE_UUID]);
+            }
+
+            Sct1_RefSetRecord tmpRsRec = new Sct1_RefSetRecord(uuidRefset, uuidMember,
+                    uuidComponent, status,
+                    revTime, pathIdx, authorIdx, moduleIdx,
+                    vStr1,vStr2);
+
+            statRsStrStrFromArf++;
             oos.writeUnshared(tmpRsRec);
         }
 
@@ -4124,7 +4203,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
                     tmp.setStatusUuid(zStatusUuidArray[r.status]);
                     tmp.setTime(r.revTime);
                     tmp.setPathUuid(zPathArray[r.pathIdx]);
-                    tmp.setString1(r.valueString);
+                    tmp.setString1(r.valueString1);
                     if (r.authorIdx != -1) {
                         tmp.setAuthorUuid(zAuthorUuidArray[r.authorIdx]);
                     } else {
@@ -4145,7 +4224,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
                             // FIRST REVISION
                             List<TkRefsetStrRevision> revisionList = new ArrayList<TkRefsetStrRevision>();
                             ERefsetStrRevision revision = new ERefsetStrRevision();
-                            revision.setString1(r.valueString);
+                            revision.setString1(r.valueString1);
                             revision.setStatusUuid(zStatusUuidArray[r.status]);
                             revision.setPathUuid(zPathArray[r.pathIdx]);
                             revision.setTime(r.revTime);
@@ -4171,7 +4250,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
                                     if (r.refsetMemberUuidMsb == lastRefsetMemberUuidMsb
                                             && r.refsetMemberUuidLsb == lastRefsetMemberUuidLsb) {
                                         revision = new ERefsetStrRevision();
-                                        revision.setString1(r.valueString);
+                                        revision.setString1(r.valueString1);
                                         revision.setStatusUuid(zStatusUuidArray[r.status]);
                                         revision.setPathUuid(zPathArray[r.pathIdx]);
                                         revision.setTime(r.revTime);
@@ -4204,7 +4283,105 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
 
                     // :NYI: tmp.setAdditionalIdComponents(additionalIdComponents);
                     listErm.add(tmp);
-                } else if (r.valueType == Sct1_RefSetRecord.ValueType.C_FLOAT) {
+                } else if (r.valueType == Sct1_RefSetRecord.ValueType.STRING_STRING) {
+                    // :DEBUG:
+                    //                    UUID debugUuid = new UUID(r.refsetMemberUuidMsb, r.refsetMemberUuidLsb);
+                    //                    if (debugUuid.compareTo(debugUuid02) == 0) 
+                    //                        System.out.println(":DEBUG:");
+
+                    ERefsetStrStrMember tmp = new ERefsetStrStrMember();
+                    tmp.setRefsetUuid(new UUID(r.refsetUuidMsb, r.refsetUuidLsb));
+                    tmp.setPrimordialComponentUuid(new UUID(r.refsetMemberUuidMsb,
+                            r.refsetMemberUuidLsb));
+                    tmp.setComponentUuid(new UUID(r.referencedComponentUuidMsb,
+                            r.referencedComponentUuidLsb));
+                    tmp.setStatusUuid(zStatusUuidArray[r.status]);
+                    tmp.setTime(r.revTime);
+                    tmp.setPathUuid(zPathArray[r.pathIdx]);
+                    tmp.setString1(r.valueString1);
+                    tmp.setString2(r.valueString2);
+                    if (r.authorIdx != -1) {
+                        tmp.setAuthorUuid(zAuthorUuidArray[r.authorIdx]);
+                    } else {
+                        tmp.setAuthorUuid(uuidUser);
+                    }
+                    if (r.moduleIdx == MODULE_DEFAULT_IDX) {
+                        tmp.setModuleUuid(uuidModule);
+                    } else {
+                        tmp.setModuleUuid(zModuleArray[r.moduleIdx]);
+                    }
+
+                    if (rsmIdx < rsmMax) { // CHECK REVISIONS
+                        lastRefsetMemberUuidMsb = r.refsetMemberUuidMsb;
+                        lastRefsetMemberUuidLsb = r.refsetMemberUuidLsb;
+                        r = rsByRsList.get(rsmIdx++);
+                        if (r.refsetMemberUuidMsb == lastRefsetMemberUuidMsb
+                                && r.refsetMemberUuidLsb == lastRefsetMemberUuidLsb) {
+                            // FIRST REVISION
+                            List<TkRefsetStrStrRevision> revisionList = new ArrayList<TkRefsetStrStrRevision>();
+                            ERefsetStrStrRevision revision = new ERefsetStrStrRevision();
+                            revision.setString1(r.valueString1);
+                            revision.setString2(r.valueString2);
+                            revision.setStatusUuid(zStatusUuidArray[r.status]);
+                            revision.setPathUuid(zPathArray[r.pathIdx]);
+                            revision.setTime(r.revTime);
+                            if (r.authorIdx != -1) {
+                                revision.setAuthorUuid(zAuthorUuidArray[r.authorIdx]);
+                            } else {
+                                revision.setAuthorUuid(uuidUser);
+                            }
+                            if (r.moduleIdx == MODULE_DEFAULT_IDX) {
+                                revision.setModuleUuid(uuidModule);
+                            } else {
+                                revision.setModuleUuid(zModuleArray[r.moduleIdx]);
+                            }
+                            revisionList.add(revision);
+
+                            boolean checkForMoreVersions = true;
+                            do {
+                                // SET UP NEXT MEMBER
+                                if (rsmIdx < rsmMax) {
+                                    lastRefsetMemberUuidMsb = r.refsetMemberUuidMsb;
+                                    lastRefsetMemberUuidLsb = r.refsetMemberUuidLsb;
+                                    r = rsByRsList.get(rsmIdx++);
+                                    if (r.refsetMemberUuidMsb == lastRefsetMemberUuidMsb
+                                            && r.refsetMemberUuidLsb == lastRefsetMemberUuidLsb) {
+                                        revision = new ERefsetStrStrRevision();
+                                        revision.setString1(r.valueString1);
+                                        revision.setString2(r.valueString2);
+                                        revision.setStatusUuid(zStatusUuidArray[r.status]);
+                                        revision.setPathUuid(zPathArray[r.pathIdx]);
+                                        revision.setTime(r.revTime);
+                                        if (r.authorIdx != -1) {
+                                            revision.setAuthorUuid(zAuthorUuidArray[r.authorIdx]);
+                                        } else {
+                                            revision.setAuthorUuid(uuidUser);
+                                        }
+                                        if (r.moduleIdx == MODULE_DEFAULT_IDX) {
+                                            revision.setModuleUuid(uuidModule);
+                                        } else {
+                                            revision.setModuleUuid(zModuleArray[r.moduleIdx]);
+                                        }
+                                        revisionList.add(revision);
+                                    } else {
+                                        checkForMoreVersions = false;
+                                    }
+                                } else {
+                                    checkForMoreVersions = false;
+                                    hasMembersToProcess = false;
+                                }
+
+                            } while (checkForMoreVersions);
+
+                            tmp.setRevisions(revisionList); // ADD REVISIONS
+                        }
+                    } else {
+                        hasMembersToProcess = false;
+                    }
+
+                    // :NYI: tmp.setAdditionalIdComponents(additionalIdComponents);
+                    listErm.add(tmp);
+                }else if (r.valueType == Sct1_RefSetRecord.ValueType.C_FLOAT) {
                     ERefsetCidFloatMember tmp = new ERefsetCidFloatMember();
                     tmp.setRefsetUuid(new UUID(r.refsetUuidMsb, r.refsetUuidLsb));
                     tmp.setPrimordialComponentUuid(new UUID(r.refsetMemberUuidMsb,

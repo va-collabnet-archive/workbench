@@ -17,13 +17,16 @@ package org.ihtsdo.helper.refex;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentSkipListSet;
+import org.ihtsdo.helper.time.TimeHelper;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.ConceptFetcherBI;
@@ -46,6 +49,7 @@ import org.ihtsdo.tk.api.refex.RefexVersionBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 import org.ihtsdo.tk.binding.snomed.ConceptInactivationType;
 import org.ihtsdo.tk.binding.snomed.HistoricalRelType;
+import org.ihtsdo.tk.binding.snomed.Snomed;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 import org.ihtsdo.tk.dto.concept.component.refex.TK_REFEX_TYPE;
 import org.ihtsdo.tk.spec.ValidationException;
@@ -66,13 +70,17 @@ public class Rf2RefexComputer implements ProcessUnfetchedConceptDataBI {
     private int descInactiveRefexNid;
     private int conceptInactiveRefexNid;
     private ConcurrentSkipListSet<Integer> newStamps = new ConcurrentSkipListSet<>();
+    private String sourceTime;
+    private String targetTime;
 
     public Rf2RefexComputer(ViewCoordinate viewCoordinate, EditCoordinate editCoordinate,
-            File output, Set<Integer> stampNids) {
+            File output, Set<Integer> stampNids, String sourceTime, String targetTime) {
         this.viewCoordinate = viewCoordinate;
         this.editCoordinate = editCoordinate;
         this.output = output;
         this.stampNids = stampNids;
+        this.sourceTime = sourceTime;
+        this.targetTime = targetTime;
     }
 
     public void setup() throws ValidationException, IOException {
@@ -93,6 +101,27 @@ public class Rf2RefexComputer implements ProcessUnfetchedConceptDataBI {
                 "#0#" + changsetFileName), ChangeSetGenerationPolicy.MUTABLE_ONLY);
         Ts.get().addChangeSetGenerator(tempKey, generator);
 
+    }
+    
+    public void addModuleDependencyMember() throws IOException, InvalidCAB, ContradictionException, ParseException{
+        Date sourceDate = new Date(TimeHelper.getTimeFromString(sourceTime,
+                TimeHelper.getAltFileDateFormat()));
+        Date targetDate = new Date(TimeHelper.getTimeFromString(targetTime,
+                TimeHelper.getAltFileDateFormat()));
+        sourceTime = TimeHelper.getShortFileDateFormat().format(sourceDate);
+        targetTime = TimeHelper.getShortFileDateFormat().format(targetDate);
+        RefexCAB memberBp = new RefexCAB(TK_REFEX_TYPE.STR_STR,
+                Snomed.CORE_MODULE.getLenient().getConceptNid(),
+                Snomed.MODULE_DEPENDENCY.getLenient().getConceptNid());
+        memberBp.put(RefexCAB.RefexProperty.STRING1, sourceTime);
+        memberBp.put(RefexCAB.RefexProperty.STRING2, targetTime);
+        TerminologyBuilderBI builder = Ts.get().getTerminologyBuilder(editCoordinate, viewCoordinate);
+        RefexChronicleBI<?> newMember = builder.constructIfNotCurrent(memberBp);
+        Ts.get().addUncommitted(Ts.get().getConcept(Snomed.MODULE_DEPENDENCY.getLenient().getConceptNid()));
+        Ts.get().commit(Ts.get().getConcept(Snomed.MODULE_DEPENDENCY.getLenient().getConceptNid()));
+        for (int stampNid : newMember.getAllStampNids()) {
+            newStamps.add(stampNid);
+        }
     }
 
     public void cleanup() throws IOException {

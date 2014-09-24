@@ -521,7 +521,7 @@ public class VersionDiff extends DiffBase {
             if (p instanceof I_ExtendByRefPartCidString) {
                 I_ExtendByRefPartCidString pccs = (I_ExtendByRefPartCidString) p;
                 if (description_changes.contains(pccs.getC1id())) {
-                    String[] comments = pccs.getStringValue().split("\t");
+                    String[] comments = pccs.getString1Value().split("\t");
                     int id = Integer.parseInt(comments[0]);
                     // I_DescriptionVersioned descr = tf.getDescription(id, pccs
                     // .getC1id());
@@ -531,7 +531,7 @@ public class VersionDiff extends DiffBase {
                     continue;
                 }
                 out.println(tf.getConcept(pccs.getC1id()).getInitialText()
-                        + "\t" + pccs.getStringValue() + "\t"
+                        + "\t" + pccs.getString1Value() + "\t"
                         + mem_con.getInitialText());
             } else {
                 getLog().info("Wrong type: " + mem_con.getInitialText());

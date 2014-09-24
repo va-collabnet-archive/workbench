@@ -3,7 +3,6 @@ package org.ihtsdo.concept.component.refset;
 import java.beans.PropertyVetoException;
 import java.io.IOException;
 import java.util.Arrays;
-
 import org.ihtsdo.concept.component.refsetmember.Boolean.BooleanMember;
 import org.ihtsdo.concept.component.refsetmember.Long.LongMember;
 import org.ihtsdo.concept.component.refsetmember.cid.CidMember;
@@ -17,25 +16,25 @@ import org.ihtsdo.concept.component.refsetmember.cidStr.CidStrMember;
 import org.ihtsdo.concept.component.refsetmember.integer.IntMember;
 import org.ihtsdo.concept.component.refsetmember.membership.MembershipMember;
 import org.ihtsdo.concept.component.refsetmember.str.StrMember;
+import org.ihtsdo.concept.component.refsetmember.strStr.StrStrMember;
 import org.ihtsdo.etypes.EConcept.REFSET_TYPES;
 import org.ihtsdo.tk.dto.concept.component.refex.TkRefexAbstractMember;
 import org.ihtsdo.tk.dto.concept.component.refex.type_boolean.TkRefexBooleanMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_int.TkRefexIntMember;
 import org.ihtsdo.tk.dto.concept.component.refex.type_long.TkRefexLongMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_member.TkRefexMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_string.TkRefsetStrMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_string_string.TkRefsetStrStrMember;
 import org.ihtsdo.tk.dto.concept.component.refex.type_uuid.TkRefexUuidMember;
-import org.ihtsdo.tk.dto.concept.component.refex.type_uuid_uuid.TkRefexUuidUuidMember;
-import org.ihtsdo.tk.dto.concept.component.refex.type_uuid_uuid_uuid.TkRefexUuidUuidUuidMember;
-import org.ihtsdo.tk.dto.concept.component.refex.type_uuid_uuid_string.TkRefexUuidUuidStringMember;
 import org.ihtsdo.tk.dto.concept.component.refex.type_uuid_float.TkRefexUuidFloatMember;
 import org.ihtsdo.tk.dto.concept.component.refex.type_uuid_int.TkRefexUuidIntMember;
 import org.ihtsdo.tk.dto.concept.component.refex.type_uuid_long.TkRefexUuidLongMember;
 import org.ihtsdo.tk.dto.concept.component.refex.type_uuid_string.TkRefexUuidStringMember;
-import org.ihtsdo.tk.dto.concept.component.refex.type_int.TkRefexIntMember;
-import org.ihtsdo.tk.dto.concept.component.refex.type_member.TkRefexMember;
-import org.ihtsdo.tk.dto.concept.component.refex.type_string.TkRefsetStrMember;
-
+import org.ihtsdo.tk.dto.concept.component.refex.type_uuid_uuid.TkRefexUuidUuidMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_uuid_uuid_string.TkRefexUuidUuidStringMember;
+import org.ihtsdo.tk.dto.concept.component.refex.type_uuid_uuid_uuid.TkRefexUuidUuidUuidMember;
 import com.sleepycat.bind.tuple.TupleInput;
 import org.ihtsdo.concept.Concept;
-import org.ihtsdo.concept.I_ManageConceptData;
 import org.ihtsdo.concept.component.refsetmember.array.bytearray.ArrayOfBytearrayMember;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.tk.Ts;
@@ -129,6 +128,8 @@ public class RefsetMemberFactory {
                 return new MembershipMember(enclosingConceptNid, input);
             case STR:
                 return new StrMember(enclosingConceptNid, input);
+            case STR_STR:
+                return new StrStrMember(enclosingConceptNid, input);
             case CID_LONG:
                 return new CidLongMember(enclosingConceptNid, input);
             case LONG:
@@ -165,6 +166,8 @@ public class RefsetMemberFactory {
                 return new MembershipMember((TkRefexMember) refsetMember, enclosingConceptNid);
             case STR:
                 return new StrMember((TkRefsetStrMember) refsetMember, enclosingConceptNid);
+            case STR_STR:
+                return new StrStrMember((TkRefsetStrStrMember) refsetMember, enclosingConceptNid);
             case CID_LONG:
                 return new CidLongMember((TkRefexUuidLongMember) refsetMember, enclosingConceptNid);
             case LONG:
@@ -260,6 +263,8 @@ public class RefsetMemberFactory {
                 return new MembershipMember();
             case STR:
                 return new StrMember();
+            case STR_STR:
+                return new StrStrMember();
             case CID_LONG:
                 return new CidLongMember();
             case LONG:

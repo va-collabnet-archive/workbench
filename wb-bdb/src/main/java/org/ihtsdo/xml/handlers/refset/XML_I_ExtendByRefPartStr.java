@@ -33,7 +33,7 @@ public class XML_I_ExtendByRefPartStr extends XML_RefSetBasic implements
 		getLocalE();
 		
 		if (!debug) {
-			text = rps.getStringValue();
+			text = rps.getString1Value();
 			versionid = rps.getVersion();
 			positionid = -2;
 			//positionid = rpi.getPositionId();

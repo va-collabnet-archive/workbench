@@ -46,7 +46,7 @@ public class StrRevision extends RefsetRevision<StrRevision, StrMember>
 
    public StrRevision(int statusAtPositionNid, StrMember another) {
       super(statusAtPositionNid, another);
-      stringValue = another.getStringValue();
+      stringValue = another.getString1Value();
    }
 
    public StrRevision(TkRefsetStrRevision eVersion, StrMember primoridalMember) {
@@ -61,7 +61,7 @@ public class StrRevision extends RefsetRevision<StrRevision, StrMember>
 
    public StrRevision(int statusNid, long time, int authorNid, int moduleNid, int pathNid, StrMember another) {
       super(statusNid, time, authorNid, moduleNid, pathNid, another);
-      stringValue = another.getStringValue();
+      stringValue = another.getString1Value();
    }
 
    protected StrRevision(int statusNid, long time, int authorNid, int moduleNid, int pathNid, StrRevision another) {
@@ -166,7 +166,7 @@ public class StrRevision extends RefsetRevision<StrRevision, StrMember>
    }
 
    @Override
-   public String getStringValue() {
+   public String getString1Value() {
       return stringValue;
    }
 
@@ -217,7 +217,7 @@ public class StrRevision extends RefsetRevision<StrRevision, StrMember>
       modified();
    }
 
-   public void setStringValue(String stringValue) {
+   public void setString1Value(String stringValue) {
       this.stringValue = stringValue;
       modified();
    }

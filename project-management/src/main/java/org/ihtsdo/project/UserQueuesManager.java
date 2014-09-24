@@ -196,7 +196,7 @@ public class UserQueuesManager {
             for (I_ExtendByRef extension : tf.getRefsetExtensionMembers(workListRefset.getConceptNid())) {
                 I_ExtendByRefPart lastPart = TerminologyProjectDAO.getLastExtensionPart(extension);
                 I_ExtendByRefPartStr part = (I_ExtendByRefPartStr) lastPart;
-                String metadata = part.getStringValue();
+                String metadata = part.getString1Value();
                 WorklistMetadata deserializedWorkListMetadata = (WorklistMetadata) TerminologyProjectDAO.deserialize(metadata);
                 deserializedWorkListWithMetadata = WorkList.getInstanceFromMetadata(deserializedWorkListMetadata);
                 if (deserializedWorkListWithMetadata.getUsers().contains(user)) {

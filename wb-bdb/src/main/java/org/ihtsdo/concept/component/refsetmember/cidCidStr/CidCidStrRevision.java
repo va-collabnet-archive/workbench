@@ -52,7 +52,7 @@ public class CidCidStrRevision extends RefsetRevision<CidCidStrRevision, CidCidS
       super(statusAtPositionNid, primoridalMember);
       c1Nid    = primoridalMember.getC1Nid();
       c2Nid    = primoridalMember.getC2Nid();
-      strValue = primoridalMember.getStringValue();
+      strValue = primoridalMember.getString1Value();
    }
 
    public CidCidStrRevision(TkRefexUuidUuidStringRevision eVersion, CidCidStrMember member) {
@@ -74,7 +74,7 @@ public class CidCidStrRevision extends RefsetRevision<CidCidStrRevision, CidCidS
       super(statusNid, time, authorNid, moduleNid, pathNid, primoridalMember);
       c1Nid    = primoridalMember.getC1Nid();
       c2Nid    = primoridalMember.getC2Nid();
-      strValue = primoridalMember.getStringValue();
+      strValue = primoridalMember.getString1Value();
    }
 
    protected CidCidStrRevision(int statusNid, long time, int authorNid, int moduleNid, int pathNid, 
@@ -220,7 +220,7 @@ public class CidCidStrRevision extends RefsetRevision<CidCidStrRevision, CidCidS
    }
 
    @Override
-   public String getStringValue() {
+   public String getString1Value() {
       return strValue;
    }
 
@@ -316,7 +316,7 @@ public class CidCidStrRevision extends RefsetRevision<CidCidStrRevision, CidCidS
    }
 
    @Override
-   public void setStringValue(String value) {
+   public void setString1Value(String value) {
       this.strValue = value;
       modified();
    }

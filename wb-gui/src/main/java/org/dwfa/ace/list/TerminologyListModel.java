@@ -38,6 +38,9 @@ public class TerminologyListModel extends AbstractListModel implements I_ModelTe
     public TerminologyListModel(List<I_GetConceptData> elements) {
         super();
         this.elements = elements;
+        for(I_GetConceptData c : elements){
+            tracker.add(c.getConceptNid());
+        }
     }
 
     public TerminologyListModel() {

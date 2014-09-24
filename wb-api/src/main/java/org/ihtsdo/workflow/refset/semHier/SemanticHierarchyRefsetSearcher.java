@@ -75,10 +75,10 @@ public  class SemanticHierarchyRefsetSearcher extends WorkflowRefsetSearcher
 		{
 			I_ExtendByRefPartStr props = (I_ExtendByRefPartStr)l.get(i);
 			
-			String childTag =  reader.getChildSemanticTag(props.getStringValue());
+			String childTag =  reader.getChildSemanticTag(props.getString1Value());
 			if (childTag.equalsIgnoreCase(tag))
 			{
-				String parentTag = reader.getParentSemanticTag(props.getStringValue());
+				String parentTag = reader.getParentSemanticTag(props.getString1Value());
 				
 				if (!parentTag.equals(childTag) &&
 					!parentTag.equals("inactive concept") &&
@@ -98,8 +98,8 @@ public  class SemanticHierarchyRefsetSearcher extends WorkflowRefsetSearcher
 		Collection<? extends I_ExtendByRef> rows = Terms.get().getRefsetExtensionMembers(refsetNid);
 		
 		for (I_ExtendByRef row : rows) {
-			String childTag =  reader.getChildSemanticTag(((I_ExtendByRefPartStr)row).getStringValue());
-			String parentTag = reader.getParentSemanticTag(((I_ExtendByRefPartStr)row).getStringValue());			
+			String childTag =  reader.getChildSemanticTag(((I_ExtendByRefPartStr)row).getString1Value());
+			String parentTag = reader.getParentSemanticTag(((I_ExtendByRefPartStr)row).getString1Value());			
 
 			retSet.add(childTag);
 			retSet.add(parentTag);

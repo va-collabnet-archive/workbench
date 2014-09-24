@@ -80,7 +80,7 @@ public class SemanticTagWorkflowHistory extends AbstractWorkflowHistorySearchTes
         for (I_ExtendByRef extension : exts) {
 			I_ExtendByRefPartStr props = (I_ExtendByRefPartStr)extension;
 		
-			if (props.getStringValue().equalsIgnoreCase(testHierarchy)) {
+			if (props.getString1Value().equalsIgnoreCase(testHierarchy)) {
 				return Terms.get().getConcept(extension.getComponentId());
 			}
         }

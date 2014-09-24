@@ -76,12 +76,12 @@ public  class StateTransitionRefsetSearcher extends WorkflowRefsetSearcher
 			for (int i = 0; i < l.size(); i++)
 			{
 				props = (I_ExtendByRefPartStr)l.get(i);
-				int testStateNid = reader.getInitialState(props.getStringValue()).getConceptNid();
+				int testStateNid = reader.getInitialState(props.getString1Value()).getConceptNid();
 
 				if (matchInitialStateNid == testStateNid) 
 				{
-					I_GetConceptData action =  reader.getAction(props.getStringValue());
-					I_GetConceptData finalState =  reader.getFinalState(props.getStringValue());
+					I_GetConceptData action =  reader.getAction(props.getString1Value());
+					I_GetConceptData finalState =  reader.getFinalState(props.getString1Value());
 					
 					if (addAutoApproval && action.getPrimUuid().equals(WorkflowHelper.getAcceptAction())) {
 						// On, but already have it, avoid DB hit (till use more UUID and lesse I_GetConceptData)
@@ -100,7 +100,7 @@ public  class StateTransitionRefsetSearcher extends WorkflowRefsetSearcher
 		} catch (Exception e) {
 			StringBuffer str = new StringBuffer();
 			str.append("\ntestInitState: " + matchInitialStateNid);
-			str.append("\nOn Row: " + props.getStringValue());
+			str.append("\nOn Row: " + props.getString1Value());
 			AceLog.getAppLog().log(Level.WARNING, str.toString() + " with error: " + e.getMessage());
 		}
 		
