@@ -189,6 +189,7 @@ public abstract class RelPlugin extends AbstractPlugin implements TableModelList
         addToList.setToolTipText("add to list view");
         addToList.addActionListener(new AddToList(model));
         relPanel.add(addToList, c);
+        c.fill = GridBagConstraints.BOTH;
         c.weighty = 0.0;
         c.gridy = c.gridy + c.gridheight;
         c.gridheight = 1;
