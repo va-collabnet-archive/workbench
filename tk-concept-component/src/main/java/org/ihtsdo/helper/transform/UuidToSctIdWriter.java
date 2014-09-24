@@ -102,7 +102,8 @@ public class UuidToSctIdWriter {
     private HashSet<Long> inactives = new HashSet<>();
     private HashSet<Long> actives = new HashSet<>();
     private HashSet<Long> activeDups = new HashSet<>();
-    private HashSet<Long> descriptionIdSet = new HashSet<>();
+    private HashSet<Long> activeDescriptionIdSet = new HashSet<>();
+    private HashSet<Long> inactiveDescriptionIdSet = new HashSet<>();
     private HashSet<Long> langRefsetIdSet = new HashSet<>();
 
     /**
@@ -628,7 +629,13 @@ public class UuidToSctIdWriter {
                         descriptionsWriter.write(descSctId + field.seperator);
                         combinedIdList.add(Long.parseLong(descSctId));
                         combinedIdSet.add(Long.parseLong(descSctId));
-                        descriptionIdSet.add(Long.parseLong(descSctId));
+                        statusUuid = parts[Rf2File.DescriptionsFileFields.ACTIVE.ordinal()];
+                        status = convertStatus(statusUuid);
+                        if(status == 1){
+                            activeDescriptionIdSet.add(Long.parseLong(descSctId));
+                        }else{
+                            inactiveDescriptionIdSet.add(Long.parseLong(descSctId));
+                        }
                         descId = Long.parseLong(descSctId);
 
                         break;
@@ -2074,7 +2081,8 @@ private void processIdentifiers(String line, Writer writer) throws IOException {
         }
         System.out.println("### CHECKING for one language refset member for each description.");
         int count = 0;
-        for(Long id : descriptionIdSet){
+        activeDescriptionIdSet.removeAll(inactiveDescriptionIdSet);
+        for(Long id : activeDescriptionIdSet){
             if(!langRefsetIdSet.contains(id)){
                 count++;
                 System.out.println("Found description ID not present in a language refset file. ID: " + id);

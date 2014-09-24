@@ -16,6 +16,8 @@
 package org.ihtsdo.mojo.maven.rf2;
 
 import java.io.Serializable;
+import static org.ihtsdo.mojo.maven.rf2.Sct2_IdRecord.LINE_TERMINATOR;
+import static org.ihtsdo.mojo.maven.rf2.Sct2_IdRecord.TAB_CHARACTER;
 
 /**
  *
@@ -24,14 +26,16 @@ import java.io.Serializable;
 public class Sct2_IdCompact implements Comparable<Sct2_IdCompact>, Serializable {
 
     private static final long serialVersionUID = 1L;
-    long uuidMsbL;
-    long uuidLsbL;
-    long sctIdL;
+    public long uuidMsbL;
+    public long uuidLsbL;
+    public long sctIdL;
+    public long time;
 
-    public Sct2_IdCompact(long uuidMsbL, long uuidLsbL, long sctIdL) {
+    public Sct2_IdCompact(long uuidMsbL, long uuidLsbL, long sctIdL, long time) {
         this.uuidMsbL = uuidMsbL;
         this.uuidLsbL = uuidLsbL;
         this.sctIdL = sctIdL;
+        this.time = time; //assuming that path, module, user will all be the same (for now)
     }
 
     /**
@@ -59,6 +63,20 @@ public class Sct2_IdCompact implements Comparable<Sct2_IdCompact>, Serializable 
             }
             return 0; // instance == received
         }
+    }
+    
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(sctIdL);
+        sb.append(TAB_CHARACTER);
+        sb.append(uuidLsbL);
+        sb.append(TAB_CHARACTER);
+        sb.append(uuidMsbL);
+        sb.append(TAB_CHARACTER);
+        sb.append(time);
+        sb.append(LINE_TERMINATOR);
+        return sb.toString();
     }
 
 }

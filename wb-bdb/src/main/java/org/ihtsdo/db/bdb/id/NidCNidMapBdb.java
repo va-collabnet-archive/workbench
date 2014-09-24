@@ -3,32 +3,15 @@ package org.ihtsdo.db.bdb.id;
 import com.sleepycat.bind.tuple.IntegerBinding;
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
-import com.sleepycat.je.Cursor;
-import com.sleepycat.je.CursorConfig;
-import com.sleepycat.je.Database;
-import com.sleepycat.je.DatabaseEntry;
-import com.sleepycat.je.LockMode;
-import com.sleepycat.je.OperationStatus;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.NoSuchElementException;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
-import java.util.logging.Level;
-import org.ihtsdo.db.bdb.Bdb;
-import org.ihtsdo.db.bdb.ComponentBdb;
+import com.sleepycat.je.*;
 import org.dwfa.ace.log.AceLog;
-import org.ihtsdo.db.util.NidPairForRefex;
+import org.ihtsdo.cern.colt.map.OpenIntIntHashMap;
 import org.ihtsdo.concept.Concept;
 import org.ihtsdo.concept.component.relationship.Relationship;
-import org.ihtsdo.cern.colt.map.OpenIntIntHashMap;
-import org.ihtsdo.concurrency.ConcurrentReentrantLocks;
 import org.ihtsdo.concurrency.ConcurrentReentrantReadWriteLocks;
-import org.ihtsdo.db.bdb.BdbCommitManager;
+import org.ihtsdo.db.bdb.Bdb;
+import org.ihtsdo.db.bdb.ComponentBdb;
+import org.ihtsdo.db.util.NidPairForRefex;
 import org.ihtsdo.helper.version.RelativePositionComputer;
 import org.ihtsdo.helper.version.RelativePositionComputerBI;
 import org.ihtsdo.tk.api.ContradictionException;
@@ -38,6 +21,12 @@ import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.binding.snomed.Snomed;
 import org.ihtsdo.tk.spec.ValidationException;
+
+import java.io.IOException;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.logging.Level;
 
 /**
  * <h2>Implementation Details</h2> The
@@ -80,17 +69,17 @@ public class NidCNidMapBdb extends ComponentBdb {
         if (mapIndex >= nidCNidMaps.get().length) {
             ensureCapacity(nid);
         }
-        IndexCacheRecord record = new IndexCacheRecord(indexCacheRecords.get()[mapIndex][nidIndexInMap]);
+        locks.writeLock(nid);
+        try {
+            IndexCacheRecord record = new IndexCacheRecord(indexCacheRecords.get()[mapIndex][nidIndexInMap]);
 
-        if (!record.refexAlreadyThere(pair.getMemberNid())) {
-            locks.writeLock(nid);
-            try {
+            if (!record.refexAlreadyThere(pair.getMemberNid())) {
                 record.addNidPairForRefex(pair.getRefexNid(), pair.getMemberNid());
                 indexCacheRecords.get()[mapIndex][nidIndexInMap] = record.getData();
                 mapChanged[mapIndex] = true;
-            } finally {
-                locks.unlockWrite(nid);
             }
+        } finally {
+            locks.unlockWrite(nid);
         }
     }
 
@@ -104,16 +93,17 @@ public class NidCNidMapBdb extends ComponentBdb {
         if (mapIndex >= nidCNidMaps.get().length) {
             ensureCapacity(destinationCNid);
         }
-        IndexCacheRecord record = new IndexCacheRecord(indexCacheRecords.get()[mapIndex][nidIndexInMap]);
-        if (!record.destinationRelOriginAlreadyThere(originCNid)) {
-            locks.writeLock(destinationCNid);
-            try {
+        locks.writeLock(destinationCNid);
+        try {
+            IndexCacheRecord record = new IndexCacheRecord(indexCacheRecords.get()[mapIndex][nidIndexInMap]);
+            if (!record.destinationRelOriginAlreadyThere(originCNid)) {
+                record = new IndexCacheRecord(indexCacheRecords.get()[mapIndex][nidIndexInMap]);
                 record.addDestinationOriginNid(originCNid);
                 indexCacheRecords.get()[mapIndex][nidIndexInMap] = record.getData();
                 mapChanged[mapIndex] = true;
-            } finally {
-                locks.unlockWrite(destinationCNid);
             }
+        } finally {
+            locks.unlockWrite(destinationCNid);
         }
     }
 

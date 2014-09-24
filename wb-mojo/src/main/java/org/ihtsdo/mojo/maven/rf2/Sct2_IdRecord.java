@@ -45,8 +45,8 @@ import org.dwfa.util.id.Type3UuidFactory;
 public class Sct2_IdRecord implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    private static final String LINE_TERMINATOR = "\r\n";
-    private static final String TAB_CHARACTER = "\t";
+    protected static final String LINE_TERMINATOR = "\r\n";
+    protected static final String TAB_CHARACTER = "\t";
     // RECORD FILES
     // long identifierScheme; // IDENTIFIER_SCHEME_ID column 0;
     private UUID primordialUuid; // ALTERNATE_IDENTIFIER column 1;
@@ -159,7 +159,8 @@ public class Sct2_IdRecord implements Serializable {
                     Sct2_IdCompact tempIdCompact = new Sct2_IdCompact(
                             aUuid.getMostSignificantBits(),
                             aUuid.getLeastSignificantBits(),
-                            sctIdL);
+                            sctIdL,
+                            eTime);
                     // Write to JBIN file
                     oos.writeUnshared(tempIdCompact);
                     

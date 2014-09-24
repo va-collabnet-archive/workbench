@@ -32,6 +32,7 @@ import java.io.OutputStreamWriter;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -58,6 +59,7 @@ import org.ihtsdo.etypes.EDescription;
 import org.ihtsdo.etypes.EDescriptionRevision;
 import org.ihtsdo.etypes.EIdentifierLong;
 import org.ihtsdo.etypes.EIdentifierString;
+import org.ihtsdo.etypes.EIdentifierUuid;
 import org.ihtsdo.etypes.ERefsetBooleanMember;
 import org.ihtsdo.etypes.ERefsetBooleanRevision;
 import org.ihtsdo.etypes.ERefsetCidFloatMember;
@@ -72,8 +74,11 @@ import org.ihtsdo.etypes.ERefsetStrStrMember;
 import org.ihtsdo.etypes.ERefsetStrStrRevision;
 import org.ihtsdo.etypes.ERelationship;
 import org.ihtsdo.etypes.ERelationshipRevision;
+import org.ihtsdo.helper.time.TimeHelper;
+import org.ihtsdo.mojo.maven.rf2.Sct2_IdCompact;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf1;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
+import org.ihtsdo.tk.binding.snomed.TermAux;
 import org.ihtsdo.tk.dto.concept.component.attribute.TkConceptAttributesRevision;
 import org.ihtsdo.tk.dto.concept.component.description.TkDescription;
 import org.ihtsdo.tk.dto.concept.component.description.TkDescriptionRevision;
@@ -400,6 +405,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
     private SimpleDateFormat arfSimpleDateFormatDash;
     private SimpleDateFormat arfSimpleDateFormatDot;
     private SimpleDateFormat arfSimpleDateFormat;
+    private HashMap<Long, ArrayList<Sct2_IdCompact>> additionalIds;
 
     private class ARFFile {
 
@@ -897,7 +903,35 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
         if (arfInputDirs == null) {
             arfInputDirs = new String[0];
         }
+        additionalIds = new HashMap<>();
         for (int i = 0; i < arfInputDirs.length; i++) {
+            if (arfInputDirs[i].endsWith("additional.txt")) {
+                ObjectInputStream ois = null;
+                try {
+                    ois = new ObjectInputStream(new BufferedInputStream(new FileInputStream(arfInputDirs[i])));
+                    Object obj;
+                    while ((obj = ois.readObject()) != null) {
+                        if (obj instanceof Sct2_IdCompact) {
+                            Sct2_IdCompact sct = (Sct2_IdCompact) obj;
+                            long id = sct.sctIdL;
+                            if(additionalIds.containsKey(id)){
+                                additionalIds.get(id).add(sct);
+                            }else{
+                                ArrayList<Sct2_IdCompact> scts = new ArrayList<>();
+                                scts.add(sct);
+                                additionalIds.put(id, scts);
+                            }
+                        }
+                    }
+                    ois.close();
+                } catch (FileNotFoundException ex) {
+                    Logger.getLogger(Sct1ArfToEConceptMojo.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (IOException ex) {
+                    Logger.getLogger(Sct1ArfToEConceptMojo.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (ClassNotFoundException ex) {
+                    Logger.getLogger(Sct1ArfToEConceptMojo.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
             arfInputDirs[i] = arfInputDirs[i].replace('/', File.separatorChar);
             getLog().info("POM ARF Input Directory (" + i + ") = " + arfInputDirs[i]);
             if (!arfInputDirs[i].startsWith(FILE_SEPARATOR)) {
@@ -3611,7 +3645,25 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
                     tmpAdditionalIds.add(createEIdentifier(eId));
                 }
             }
-
+            
+            if (additionalIds.containsKey(cRec0.conSnoId)) {
+                for(Sct2_IdCompact sct : additionalIds.get(cRec0.conSnoId)){
+                EIdentifierUuid uuid = new EIdentifierUuid();
+                uuid.setAuthorityUuid(UUID.fromString("2faa9262-8fb2-11db-b606-0800200c9a66")); //GENERATED UUID
+                uuid.setDenotation(new UUID(sct.uuidMsbL, sct.uuidLsbL));
+                uuid.setPathUuid(zPathArray[cRec0.pathIdx]);
+                uuid.setStatusUuid(uuidCurrent);
+                uuid.setTime(sct.time);
+                uuid.setAuthorUuid(uuidUser);
+                if (cRec0.moduleIdx == MODULE_DEFAULT_IDX) {
+                    uuid.setModuleUuid(uuidModule);
+                } else {
+                    uuid.setModuleUuid(zModuleArray[cRec0.moduleIdx]);
+                }
+                tmpAdditionalIds.add(uuid);
+                }
+            }
+            
             if (tmpAdditionalIds.size() > 0) {
                 ca.additionalIds = tmpAdditionalIds;
             } else {
@@ -3691,6 +3743,23 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
                         for (Sct1_IdRecord eId : dRec.addedIds) {
                             tmpDesAdditionalIds.add(createEIdentifier(eId));
                         }
+                    }
+                    if (additionalIds.containsKey(dRec.desSnoId)) {
+                        for(Sct2_IdCompact sct : additionalIds.get(dRec.desSnoId)){
+                        EIdentifierUuid uuid = new EIdentifierUuid();
+                        uuid.setAuthorityUuid(UUID.fromString("2faa9262-8fb2-11db-b606-0800200c9a66")); //GENERATED UUID
+                        uuid.setDenotation(new UUID(sct.uuidMsbL, sct.uuidLsbL));
+                        uuid.setPathUuid(zPathArray[dRec.pathIdx]);
+                        uuid.setStatusUuid(uuidCurrent);
+                        uuid.setTime(sct.time);
+                        uuid.setAuthorUuid(uuidUser);
+                        if (dRec.moduleIdx == MODULE_DEFAULT_IDX) {
+                            uuid.setModuleUuid(uuidModule);
+                        } else {
+                            uuid.setModuleUuid(zModuleArray[dRec.moduleIdx]);
+                        }
+                        tmpDesAdditionalIds.add(uuid);
+                    }
                     }
                     if (tmpDesAdditionalIds.size() > 0) {
                         des.additionalIds = tmpDesAdditionalIds;
@@ -3782,6 +3851,23 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
                             rid.setModuleUuid(zModuleArray[rRec.moduleIdx]);
                         }
                         tmpRelAdditionalIds.add(rid);
+                    }
+                    if (additionalIds.containsKey(rRec.relSnoId)) {
+                        for (Sct2_IdCompact sct : additionalIds.get(rRec.relSnoId)) {
+                            EIdentifierUuid uuid = new EIdentifierUuid();
+                            uuid.setAuthorityUuid(UUID.fromString("2faa9262-8fb2-11db-b606-0800200c9a66")); //GENERATED UUID
+                            uuid.setDenotation(new UUID(sct.uuidMsbL, sct.uuidLsbL));
+                            uuid.setPathUuid(zPathArray[rRec.pathIdx]);
+                            uuid.setStatusUuid(uuidCurrent);
+                            uuid.setTime(sct.time);
+                            uuid.setAuthorUuid(uuidUser);
+                            if (rRec.moduleIdx == MODULE_DEFAULT_IDX) {
+                                uuid.setModuleUuid(uuidModule);
+                            } else {
+                                uuid.setModuleUuid(zModuleArray[rRec.moduleIdx]);
+                            }
+                            tmpRelAdditionalIds.add(uuid);
+                        }
                     }
                     if (tmpRelAdditionalIds.size() > 0) {
                         rel.additionalIds = tmpRelAdditionalIds;

@@ -145,7 +145,7 @@ public class Rf2IdUuidCacheArfGenMojo extends AbstractMojo implements Serializab
 
             // Parse IHTSDO Terminology Identifiers to Sct_CompactId cache file.
             filesIn = Rf2File.getFiles(wDir, inputSubDir, inputSctDir,
-                    "_Identifier_", ".txt");
+                    "_Identifier", ".txt");
             Sct2_IdRecord.parseToIdPreCacheFile(filesIn, idCacheFName);
             // Setup id array cache object
             // idCacheDir + FILE_SEPARATOR + "idObjectCache.jbin"
