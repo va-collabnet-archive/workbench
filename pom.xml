@@ -17,7 +17,7 @@ the specific language governing permissions and limitations under the License. -
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.ihtsdo</groupId>
     <artifactId>wb-mmb</artifactId>
-    <version>2.2-kp-no-jini-SNAPSHOT</version>
+    <version>2.2-kp-no-jini</version>
     <packaging>pom</packaging>
     <name>${branch}: (MMP) Workbench Toolkit</name>
     <description>The IHTSDO Workbench provides two software frameworks for
@@ -28,9 +28,9 @@ the specific language governing permissions and limitations under the License. -
         needs of their end users.
     </description>
     <scm>
-        <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/branches/trek-no-jini-kp</connection>
-        <developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/branches/trek-no-jini-kp</developerConnection>
-        <url>https://csfe.aceworkspace.net/integration/viewvc/viewvc.cgi/branches/trek-no-jini-kp?root=workbench&amp;system=exsy1002</url>
+        <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/tags/wb-mmb-2.2-kp-no-jini</connection>
+        <developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/tags/wb-mmb-2.2-kp-no-jini</developerConnection>
+        <url>https://csfe.aceworkspace.net/integration/viewvc/viewvc.cgi/tags?root=workbench&amp;system=exsy1002/wb-mmb-2.2-kp-no-jini</url>
     </scm>
     <properties>
         <branch>kp no-jini</branch>
