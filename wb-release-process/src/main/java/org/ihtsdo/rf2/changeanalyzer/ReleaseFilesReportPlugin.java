@@ -136,25 +136,7 @@ public class ReleaseFilesReportPlugin extends AbstractMojo {
 
 	private boolean langTargetCtrl;
 
-
-	public enum ReleaseFileType {
-		DESCRIPTION, CONCEPT, RELATIONSHIP, ATTRIBUTE_VALUE_REFSET, ASSOCIATION_REFSET, LANGUAGE_REFSET
-	}
-
-//	public static void main(String[] args) {
-//		ReleaseFilesReportPlugin relplugin = new ReleaseFilesReportPlugin();
-//		try {
-//			relplugin.inputDirectory = new File("Full");
-//			relplugin.endDate = "20130731";
-//			relplugin.startDate = "20120131";
-//			relplugin.releaseDate = "20130131";
-//			relplugin.outputDirectory = new File(".");
-//			relplugin.execute();
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
-//	}
-
+	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		try {
 			if (!outputDirectory.exists()) {
@@ -912,6 +894,11 @@ public class ReleaseFilesReportPlugin extends AbstractMojo {
 		addFileChangeReport(NEW_CONCEPTS_FILE,newcomponents.size(),"New concepts");
 		
 		return newcomponents;
+	}
+
+
+	public enum ReleaseFileType {
+		DESCRIPTION, CONCEPT, RELATIONSHIP, ATTRIBUTE_VALUE_REFSET, ASSOCIATION_REFSET, LANGUAGE_REFSET
 	}
 
 }

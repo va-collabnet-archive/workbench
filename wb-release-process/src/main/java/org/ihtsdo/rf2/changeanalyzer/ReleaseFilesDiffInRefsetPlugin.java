@@ -9,48 +9,36 @@ import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashSet;
-import java.util.List;
 import java.util.UUID;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.dwfa.util.id.Type5UuidFactory;
-import org.ihtsdo.rf2.changeanalyzer.data.Rf2AssociationRefsetRow;
-import org.ihtsdo.rf2.changeanalyzer.data.Rf2AttributeValueRefsetRow;
 import org.ihtsdo.rf2.changeanalyzer.data.Rf2DescriptionRow;
 import org.ihtsdo.rf2.changeanalyzer.data.Rf2LanguageRefsetRow;
-import org.ihtsdo.rf2.changeanalyzer.data.Rf2RelationshipRow;
 import org.ihtsdo.rf2.changeanalyzer.file.Rf2AssociationRefsetFile;
 import org.ihtsdo.rf2.changeanalyzer.file.Rf2AttributeValueRefsetFile;
 import org.ihtsdo.rf2.changeanalyzer.file.Rf2ConceptFile;
 import org.ihtsdo.rf2.changeanalyzer.file.Rf2DescriptionFile;
 import org.ihtsdo.rf2.changeanalyzer.file.Rf2LanguageRefsetFile;
-import org.ihtsdo.rf2.changeanalyzer.file.Rf2RelationshipFile;
-import org.ihtsdo.rf2.changeanalyzer.model.ChangeSummary;
-import org.ihtsdo.rf2.changeanalyzer.model.Concept;
-import org.ihtsdo.rf2.changeanalyzer.model.Description;
-import org.ihtsdo.rf2.changeanalyzer.model.FileChangeReport;
-import org.ihtsdo.rf2.changeanalyzer.model.Relationship;
-import org.ihtsdo.rf2.changeanalyzer.model.RetiredConcept;
 import org.ihtsdo.rf2.file.delta.snapshot.tasks.FileFilterAndSorter;
 import org.ihtsdo.rf2.postexport.CommonUtils;
 import org.ihtsdo.rf2.postexport.FileHelper;
-
-import com.google.gson.Gson;
 
 /**
  * @goal report-differences-to-refset
  * @phase install
  */
-//public class ReleaseFilesReportPlugin {
+
 public class ReleaseFilesDiffInRefsetPlugin extends AbstractMojo {
 
+	public enum ReleaseFileTypes {
+		DESCRIPTION, CONCEPT, RELATIONSHIP, ATTRIBUTE_VALUE_REFSET, ASSOCIATION_REFSET, LANGUAGE_REFSET, SIMPLE_REFSET, STATED_RELATIONSHIP, TEXT_DEFINITION, SIMPLE_MAP
+	}
+	
 	private static final String REFSET_CONCEPTS_TMP_FOLDER = "refsetConcepts";
 
 	private static final String SIMPLE_REFSET_TXT = "simpleRefset.txt";
@@ -65,11 +53,7 @@ public class ReleaseFilesDiffInRefsetPlugin extends AbstractMojo {
 
 	private static final String REFSET_CONCEPTS_TXT = "refsetConcepts.txt";
 
-	private static final String SUMMARY_FILE = "diff_index.json";
-
 	private static final String REACTIVATED_CONCEPTS_REPORT = "reactivated_concepts.json";
-
-	private static final String DEFINED_CONCEPTS_REPORT = "defined_concepts.json";
 
 	public static final String NEW_CONCEPTS_FILE = "new_concepts.json";
 
@@ -93,7 +77,6 @@ public class ReleaseFilesDiffInRefsetPlugin extends AbstractMojo {
 
 	private static final String REACTIVATED_DESCRIPTIONS_FILE = "reactivated_descriptions.json";
 
-	private static final String PRIMITIVE_CONCEPTS_REPORT = "primitive_concepts.json";
 
 	private static final String CHANGED_FSN="changed_fsn.json";
 
@@ -101,9 +84,7 @@ public class ReleaseFilesDiffInRefsetPlugin extends AbstractMojo {
 
 	private static final String TARGET_POINTER_TO_CHANGED_SOURCE_DESCRIPTION = "active_language_references_to_now_inactive_descriptions.json";
 
-	private String sep = System.getProperty("line.separator");
 
-	private Gson gson = new Gson();
 	/**
 	 * Location of the directory of report files
 	 * 
@@ -159,187 +140,44 @@ public class ReleaseFilesDiffInRefsetPlugin extends AbstractMojo {
 	 */
 	private File targetLanguage;
 
-	private ChangeSummary changeSummary;
-
-	private boolean langTargetCtrl;
+	private boolean langTargetCtrl=false;
 
 	private BufferedWriter bwsr;
 
 
-	public enum ReleaseFileType {
-		DESCRIPTION, CONCEPT, RELATIONSHIP, ATTRIBUTE_VALUE_REFSET, ASSOCIATION_REFSET, LANGUAGE_REFSET,SIMPLE_REFSET,STATED_RELATIONSHIP, TEXT_DEFINITION,SIMPLE_MAP
-	}
-
-	//	public static void main(String[] args) {
-	//		ReleaseFilesReportPlugin relplugin = new ReleaseFilesReportPlugin();
-	//		try {
-	//			relplugin.inputDirectory = new File("Full");
-	//			relplugin.endDate = "20130731";
-	//			relplugin.startDate = "20120131";
-	//			relplugin.releaseDate = "20130131";
-	//			relplugin.outputDirectory = new File(".");
-	//			relplugin.execute();
-	//		} catch (Exception e) {
-	//			e.printStackTrace();
-	//		}
-	//	}
-
-	public void execute() throws MojoExecutionException, MojoFailureException {
-		try {
-			if (!outputDirectory.exists()) {
-				outputDirectory.mkdirs();
-			}
-			createRefsetConcepts();
-			//			changeSummary=new ChangeSummary();
-			logger.info("Loading descriptinos");
-			Rf2DescriptionFile rf2DescFile = new Rf2DescriptionFile(getFilePath(ReleaseFileType.DESCRIPTION,inputFullDirectory), startDate);
-			logger.info("Loading concepts");
-			Rf2ConceptFile conceptFile = new Rf2ConceptFile(getFilePath(ReleaseFileType.CONCEPT,inputFullDirectory), startDate);
-			logger.info("Loading attribute value refset");
-			Rf2AttributeValueRefsetFile attrValue = new Rf2AttributeValueRefsetFile(getFilePath(ReleaseFileType.ATTRIBUTE_VALUE_REFSET,inputFullDirectory));
-			logger.info("Loading association value refset");
-			Rf2AssociationRefsetFile associationFile = new Rf2AssociationRefsetFile(getFilePath(ReleaseFileType.ASSOCIATION_REFSET,inputFullDirectory));
-			logger.info("Loading source US language refset");
-			String langPath=getFilePath(ReleaseFileType.LANGUAGE_REFSET,inputFullDirectory);
-			File inputFile=new File(langPath);
-			File sourceUS=new File(outputDirectory,"tmpUSLang.txt");
-			File tempFolder=new File(outputDirectory,"tmpSorting");
-
-			if (!tempFolder.exists()) {
-				tempFolder.mkdirs();
-			}
-			FileFilterAndSorter ffs=new FileFilterAndSorter(inputFile, sourceUS, tempFolder, new int[]{4}, new Integer[]{4}, new String[]{"900000000000509007"});
-			ffs.execute();
-			ffs=null;
-			System.gc();
-			Rf2LanguageRefsetFile sourceUSLangFile = new Rf2LanguageRefsetFile(sourceUS.getAbsolutePath());
-			//			Rf2LanguageRefsetFile sourceGBLangFile=null;
-			Rf2LanguageRefsetFile targetLangFile=null;
-			langTargetCtrl=false;
-			if (targetLanguage!=null){
-				if (targetLanguage.exists()){
-					langTargetCtrl=true;
-					//					logger.info("Loading source GB language refset");
-					//					File sourceGB=new File(outputDirectory,"tmpGBLang.txt");
-					//					
-					//					if (!tempFolder.exists()) {
-					//						tempFolder.mkdirs();
-					//					}
-					//					ffs=new FileFilterAndSorter(inputFile, sourceGB, tempFolder, new int[]{4}, new Integer[]{4}, new String[]{"900000000000508004"});
-					//					ffs.execute();
-					//					ffs=null;
-					//					System.gc();
-					//					sourceGBLangFile = new Rf2LanguageRefsetFile(sourceGB.getAbsolutePath());
-
-					logger.info("Loading target language refset");
-					targetLangFile = new Rf2LanguageRefsetFile(targetLanguage.getAbsolutePath());
-					System.gc();
-				}else{
-					logger.info("Target language doesn't exist");
-				}
-			}else{
-				logger.info("Target language is null");
-			}
-			//			logger.info("Loading relationships");
-			//			Rf2RelationshipFile relFile = new Rf2RelationshipFile(getFilePath(ReleaseFileType.RELATIONSHIP), startDate);
-
-
-
-			ArrayList<Long> repcomponents = generateNewConceptsReport(rf2DescFile, conceptFile);
-
-			ArrayList<Long> concepts=generatingRetiredConceptReasons(rf2DescFile, conceptFile, attrValue, associationFile);
-
-			repcomponents.addAll(concepts);
-
-			concepts=null;
-			//			relFile.releasePreciousMemory();
-
-			concepts=reactivatedConceptsReport(rf2DescFile, conceptFile);
-
-			repcomponents.addAll(concepts);
-
-			concepts=null;
-
-			conceptFile.releasePreciousMemory();
-
-
-			repcomponents=generatingChangedFSN(rf2DescFile, repcomponents);
-
-			if (langTargetCtrl){
-				repcomponents=generateTargetDescriptionPointerToSource(rf2DescFile,targetLangFile,repcomponents);
-			}
-			System.gc();
-
-			repcomponents=generateRetiredDescriptionsReport(rf2DescFile, repcomponents);
-
-			repcomponents=generatingExistingConceptsNewDescriptions(rf2DescFile, repcomponents);
-			System.gc();
-
-			repcomponents=generateReactivatedDescriptionsReport(rf2DescFile, repcomponents);
-
-			repcomponents=generateDescriptionAcceptabilityChanges(sourceUSLangFile, rf2DescFile, repcomponents);
-
-			//ver		punteroalingles
-			//			generateNewRelationshipsReport(rf2DescFile, relFile);
-
-			//			generateOldConceptsNewRelationships(rf2DescFile, relFile, newcomponents);
-			//
-			//			generateRelGroupChangedRelationships(rf2DescFile, relFile, startDate, endDate);
-
-
-			//			generatingDefinedConceptsReport(rf2DescFile, conceptFile);
-
-			//			generatingPrimitiveConceptsReport(rf2DescFile, conceptFile);
-
-			repcomponents=null;
-
-			if (sourceUS!=null && sourceUS.exists()){
-				sourceUS.delete();
-			}
-			if(tempFolder.exists()){
-				FileHelper.emptyFolder(tempFolder);
-				tempFolder.delete();
-			}
-//			saveSummary();
-			fileConsolidate();
-			bwsr.close();
-			bwsr=null;
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-	}
 
 	private void fileConsolidate() throws IOException {
 
 		File tmpdir=new File(outputDirectory, REFSET_CONCEPTS_TMP_FOLDER);
 		tmpdir.mkdirs();
-		mergeFiles(ReleaseFileType.CONCEPT,REFSET_CONCEPTS_TXT, tmpdir);
-		mergeFiles(ReleaseFileType.DESCRIPTION,REFSET_DESCRIPTIONS_TXT, tmpdir);
-		mergeFiles(ReleaseFileType.RELATIONSHIP,REFSET_RELATIONSHIPS_TXT, tmpdir);
-		mergeFiles(ReleaseFileType.STATED_RELATIONSHIP,REFSET_STATED_RELS_TXT, tmpdir);
-		mergeFiles(ReleaseFileType.LANGUAGE_REFSET,REFSET_LANGUAGE_TXT, tmpdir);
-		mergeFiles(ReleaseFileType.SIMPLE_REFSET,SIMPLE_REFSET_TXT, tmpdir);
+		mergeFiles(ReleaseFileTypes.CONCEPT,REFSET_CONCEPTS_TXT, tmpdir);
+		mergeFiles(ReleaseFileTypes.DESCRIPTION,REFSET_DESCRIPTIONS_TXT, tmpdir);
+		mergeFiles(ReleaseFileTypes.RELATIONSHIP,REFSET_RELATIONSHIPS_TXT, tmpdir);
+		mergeFiles(ReleaseFileTypes.STATED_RELATIONSHIP,REFSET_STATED_RELS_TXT, tmpdir);
+		mergeFiles(ReleaseFileTypes.LANGUAGE_REFSET,REFSET_LANGUAGE_TXT, tmpdir);
+		mergeFiles(ReleaseFileTypes.SIMPLE_REFSET,SIMPLE_REFSET_TXT, tmpdir);
 		
-		copyReleaseFileToOutput(ReleaseFileType.TEXT_DEFINITION);
-		copyReleaseFileToOutput(ReleaseFileType.SIMPLE_MAP);
-		copyReleaseFileToOutput(ReleaseFileType.ASSOCIATION_REFSET);
-		copyReleaseFileToOutput(ReleaseFileType.ATTRIBUTE_VALUE_REFSET);
+		copyReleaseFileToOutput(ReleaseFileTypes.TEXT_DEFINITION);
+		copyReleaseFileToOutput(ReleaseFileTypes.SIMPLE_MAP);
+		copyReleaseFileToOutput(ReleaseFileTypes.ASSOCIATION_REFSET);
+		copyReleaseFileToOutput(ReleaseFileTypes.ATTRIBUTE_VALUE_REFSET);
 		
 		FileHelper.emptyFolder(tmpdir);
 		tmpdir.delete();
 		
 	}
 
-	private void copyReleaseFileToOutput(ReleaseFileType fileType) throws IOException {
+
+	private void copyReleaseFileToOutput(ReleaseFileTypes fileType) throws IOException {
 
 		String rFilePath = getFilePath(fileType, inputSnapshotDirectory);
 		File releaseFile=new File(rFilePath);
 		File outputFile= new File(outputDirectory,releaseFile.getName());
-		FileHelper.copyTo(releaseFile, outputFile);		
-	}
+		FileHelper.copyTo(releaseFile, outputFile);
+	}		
+	
 
-	private void mergeFiles(ReleaseFileType fileType, String txtfile, File tmpDir) {
+	private void mergeFiles(ReleaseFileTypes fileType, String txtfile, File tmpDir) {
 		HashSet<File> hFile = new HashSet<File>();
 		String rFilePath = getFilePath(fileType, inputSnapshotDirectory);
 		File releaseFile=new File(rFilePath);
@@ -586,10 +424,6 @@ public class ReleaseFilesDiffInRefsetPlugin extends AbstractMojo {
 
 		return bw;
 	}
-	private BufferedWriter getWriter(String sfile) throws FileNotFoundException, UnsupportedEncodingException{
-		File file=new File(sfile);
-		return getWriter(file);
-	}
 	private ArrayList<Long> generateTargetDescriptionPointerToSource(
 			Rf2DescriptionFile rf2DescFile,
 			Rf2LanguageRefsetFile targetLangFile,
@@ -679,30 +513,7 @@ public class ReleaseFilesDiffInRefsetPlugin extends AbstractMojo {
 		return repcomponents;
 	}
 
-//	private void saveSummary() throws IOException {
-//
-//		changeSummary.setTitle("Changes in International Edition " +  endDate + " Development Path since " + startDate + " International Release");
-//		Date now=new Date();
-//		changeSummary.setExecutionTime(now.toString());
-//		changeSummary.setFrom(startDate);
-//		changeSummary.setTo(endDate);
-//		FileOutputStream fos;
-//		OutputStreamWriter osw;
-//		BufferedWriter bw;
-//		fos = new FileOutputStream(new File(outputDirectory, SUMMARY_FILE));
-//		logger.info("Generating diff_index.json");
-//		osw = new OutputStreamWriter(fos, "UTF-8");
-//		bw = new BufferedWriter(osw);	
-//
-//		bw.append(gson.toJson(changeSummary).toString());
-//		bw.append(sep);
-//
-//		bw.close();
-//		System.gc();
-//
-//	}
-
-	private String getFilePath(ReleaseFileType descriptions,File inputDir) {
+	private String getFilePath(ReleaseFileTypes descriptions,File inputDir) {
 		String result = "";
 		switch (descriptions) {
 		case DESCRIPTION:
@@ -762,92 +573,8 @@ public class ReleaseFilesDiffInRefsetPlugin extends AbstractMojo {
 		return result;
 	}
 
-	private void generateRelGroupChangedRelationships(Rf2DescriptionFile rf2DescFile, Rf2RelationshipFile relFile, String startDate, String endDate) throws Exception {
-		FileOutputStream fos;
-		OutputStreamWriter osw;
-		BufferedWriter bw;
-		ArrayList<Long> newRels = relFile.getRelGroupChanged(startDate, endDate);
-		fos = new FileOutputStream(new File(outputDirectory, REL_GROUP_CHANGED_FILE));
-		logger.info("Generating rel_group_changed_relationships.json");
-		osw = new OutputStreamWriter(fos, "UTF-8");
-		bw = new BufferedWriter(osw);
-		int count=0;
-		boolean bPrim=true;
-		bw.append("[");
-		for (Long long1 : newRels) {
-			if (!bPrim){
-				bw.append(",");
-			}else{
-				bPrim=false;
-			}
-			Rf2RelationshipRow row = relFile.getById(long1, startDate);
-			Relationship rel=new Relationship(row.getId().toString() , String.valueOf(row.getActive()) , rf2DescFile.getFsn(row.getSourceId()),row.getSourceId().toString(), rf2DescFile.getFsn(row.getDestinationId()) ,
-					rf2DescFile.getFsn(row.getTypeId()) , rf2DescFile.getFsn(row.getCharacteristicTypeId()));
-			bw.append(gson.toJson(rel).toString());
-			rel=null;
-			bw.append(sep);
-			count++;
-		}
-		bw.append("]");
-		bw.close();
-
-//		addFileChangeReport(REL_GROUP_CHANGED_FILE,count,"Relationships group number changed");
-
-	}
-
-	private void generatingInactiveConcepts(Rf2DescriptionFile rf2DescFile, Rf2ConceptFile conceptFile) throws FileNotFoundException, UnsupportedEncodingException, IOException {
-		FileOutputStream fos;
-		OutputStreamWriter osw;
-		BufferedWriter bw;
-		fos = new FileOutputStream(new File(outputDirectory, NEW_INACTIVE_CONCEPTS_FILE));
-		osw = new OutputStreamWriter(fos, "UTF-8");
-		bw = new BufferedWriter(osw);
-		ArrayList<Long> newInactive = conceptFile.getNewInactiveComponentIds(startDate);
-		generateConceptReport(rf2DescFile, conceptFile, bw, newInactive);
-//		addFileChangeReport(NEW_INACTIVE_CONCEPTS_FILE,newInactive.size(),"New inactive concepts");
-	}
-
-	private void generateConceptReport(Rf2DescriptionFile rf2DescFile, Rf2ConceptFile conceptFile, BufferedWriter bw, ArrayList<Long> newInactive) throws IOException {
-		boolean bPrim=true;
-		bw.append("[");
-		for (Long long1 : newInactive) {
-			if (!bPrim){
-				bw.append(",");
-			}else{
-				bPrim=false;
-			}
-			String fsn = rf2DescFile.getFsn(long1);
-			Pattern p = Pattern.compile("\\((.*?)\\)", Pattern.DOTALL);
-			String semanticTag = "";
-			if (fsn != null) {
-				Matcher matcher = p.matcher(fsn);
-				while (matcher.find()) {
-					semanticTag = matcher.group(1);
-				}
-			}
-			Concept concept=new Concept(long1.toString() ,rf2DescFile.getFsn(conceptFile.getDefinitionStatusId(long1)) , fsn , semanticTag);
-			bw.append(gson.toJson(concept).toString());
-			concept=null;
-			bw.append(sep);
-		}
-		bw.append("]");
-		bw.close();
-	}
 	
-	private void generatingDefinedConceptsReport(Rf2DescriptionFile rf2DescFile, Rf2ConceptFile conceptFile) throws FileNotFoundException, UnsupportedEncodingException, IOException {
-		FileOutputStream fos;
-		OutputStreamWriter osw;
-		BufferedWriter bw;
-		fos = new FileOutputStream(new File(outputDirectory, DEFINED_CONCEPTS_REPORT));
-		osw = new OutputStreamWriter(fos, "UTF-8");
-		bw = new BufferedWriter(osw);
-		ArrayList<Long> newInactive = conceptFile.getDefinedConectps(startDate, endDate);
-		generateConceptReport(rf2DescFile, conceptFile, bw, newInactive);
-
-//		addFileChangeReport(DEFINED_CONCEPTS_REPORT,newInactive.size(),"New fully defined concepts");
-
-	}
-
+	
 	private ArrayList<Long> reactivatedConceptsReport(Rf2DescriptionFile rf2DescFile, Rf2ConceptFile conceptFile) throws FileNotFoundException, UnsupportedEncodingException, IOException, NoSuchAlgorithmException {
 //		FileOutputStream fos;
 //		OutputStreamWriter osw;
@@ -865,57 +592,6 @@ public class ReleaseFilesDiffInRefsetPlugin extends AbstractMojo {
 //		addFileChangeReport(REACTIVATED_CONCEPTS_REPORT,reactConcepts.size(),"Ractivated concepts");
 
 		return reactConcepts;
-	}
-
-	private void generatingPrimitiveConceptsReport(Rf2DescriptionFile rf2DescFile, Rf2ConceptFile conceptFile) throws FileNotFoundException, UnsupportedEncodingException, IOException {
-		FileOutputStream fos;
-		OutputStreamWriter osw;
-		BufferedWriter bw;
-		fos = new FileOutputStream(new File(outputDirectory, PRIMITIVE_CONCEPTS_REPORT));
-		osw = new OutputStreamWriter(fos, "UTF-8");
-		bw = new BufferedWriter(osw);
-		ArrayList<Long> newInactive = conceptFile.getPrimitivatedConectps(startDate, endDate);
-		generateConceptReport(rf2DescFile, conceptFile, bw, newInactive);
-
-//		addFileChangeReport(PRIMITIVE_CONCEPTS_REPORT,newInactive.size(),"New primitive concepts");
-	}
-
-	private void generateOldConceptsNewRelationships(Rf2DescriptionFile rf2DescFile, Rf2RelationshipFile relFile, ArrayList<Long> newcomponents) throws FileNotFoundException,
-	UnsupportedEncodingException, IOException {
-		FileOutputStream fos;
-		OutputStreamWriter osw;
-		BufferedWriter bw;
-		fos = new FileOutputStream(new File(outputDirectory, OLD_CONCEPTS_NEW_RELATIONSHIPS_FILE));
-		logger.info("Generating old_concepts_new_relationships.json");
-		osw = new OutputStreamWriter(fos, "UTF-8");
-		bw = new BufferedWriter(osw);
-		ArrayList<Long> existingRels = relFile.getExistingComponentIds(startDate);
-		int count=0;
-		boolean bPrim=true;
-		bw.append("[");
-		for (Long long1 : existingRels) {
-			ArrayList<Rf2RelationshipRow> rf2RelRows = relFile.getAllRows(startDate, long1);
-			for (Rf2RelationshipRow row : rf2RelRows) {
-				if (!newcomponents.contains(Long.parseLong(row.getSourceId().toString()))) {
-					if (!bPrim){
-						bw.append(",");
-					}else{
-						bPrim=false;
-					}
-					Relationship rel=new Relationship(row.getId().toString() , String.valueOf(row.getActive()) , rf2DescFile.getFsn(row.getSourceId()),row.getSourceId().toString(), rf2DescFile.getFsn(row.getDestinationId()) ,
-							rf2DescFile.getFsn(row.getTypeId()) , rf2DescFile.getFsn(row.getCharacteristicTypeId()));
-					bw.append(gson.toJson(rel).toString());
-					rel=null;
-					bw.append(sep);
-					count++;
-				}
-			}
-		}
-		bw.append("]");
-		bw.close();
-
-//		addFileChangeReport(OLD_CONCEPTS_NEW_RELATIONSHIPS_FILE,count,"New relationships in existing concepts");
-
 	}
 
 	private ArrayList<Long> generatingExistingConceptsNewDescriptions(Rf2DescriptionFile rf2DescFile, ArrayList<Long> repcomponents) throws FileNotFoundException, UnsupportedEncodingException, IOException, NoSuchAlgorithmException {
@@ -1061,31 +737,6 @@ public class ReleaseFilesDiffInRefsetPlugin extends AbstractMojo {
 		return repcomponents;
 	}
 
-	private int writeDescriptionsFile(Rf2DescriptionFile rf2DescFile,  BufferedWriter bw, ArrayList<Long> descriptions) throws IOException {
-		int count=0;
-		boolean bPrim=true;
-		bw.append("[");
-		for (Long long1 : descriptions) {
-			Rf2DescriptionRow rf2DescRow = rf2DescFile.getLastActiveRow(startDate, long1);
-			//			if (!newcomponents.contains(rf2DescRow.getConceptId())) {
-			if (!bPrim){
-				bw.append(",");
-			}else{
-				bPrim=false;
-			}
-			Description desc=new Description(long1.toString() , rf2DescRow.getEffectiveTime() , String.valueOf(rf2DescRow.getActive()) , rf2DescRow.getConceptId().toString() ,
-					rf2DescRow.getLanguageCode() , rf2DescFile.getFsn(rf2DescRow.getTypeId()) , rf2DescRow.getTerm() ,
-					rf2DescFile.getFsn(rf2DescRow.getCaseSignificanceId()));
-			bw.append(gson.toJson(desc).toString());
-			desc=null;
-			bw.append(sep);
-			count++;
-			//			}
-		}
-		bw.append("]");
-		bw.close();
-		return count;
-	}
 
 	private ArrayList<Long> generatingRetiredConceptReasons(Rf2DescriptionFile rf2DescFile, Rf2ConceptFile conceptFile, Rf2AttributeValueRefsetFile attrValue, Rf2AssociationRefsetFile associationFile)
 			throws FileNotFoundException, UnsupportedEncodingException, IOException, NoSuchAlgorithmException {
@@ -1170,48 +821,7 @@ public class ReleaseFilesDiffInRefsetPlugin extends AbstractMojo {
 
 	}
 
-//	private void addFileChangeReport(String fileName, int count, String reportName) {
-//		FileChangeReport fileChanges= new FileChangeReport();
-//		fileChanges.setFile(fileName);
-//		fileChanges.setCount(count);
-//		fileChanges.setName(reportName);
-//		List<FileChangeReport>lChanges= changeSummary.getReports();
-//		if (lChanges==null){
-//			lChanges=new ArrayList<FileChangeReport>();
-//		}
-//		lChanges.add(fileChanges);
-//		changeSummary.setReports(lChanges);
-//	}
 
-	private void generateNewRelationshipsReport(Rf2DescriptionFile rf2DescFile, Rf2RelationshipFile relFile) throws FileNotFoundException, UnsupportedEncodingException, IOException {
-		FileOutputStream fos;
-		OutputStreamWriter osw;
-		BufferedWriter bw;
-		ArrayList<Long> newRels = relFile.getNewComponentIds(startDate);
-		fos = new FileOutputStream(new File(outputDirectory, NEW_RELATIONSHIPS_FILE));
-		logger.info("Generating new_relationships.json");
-		osw = new OutputStreamWriter(fos, "UTF-8");
-		bw = new BufferedWriter(osw);
-		boolean bPrim=true;
-		bw.append("[");
-		for (Long long1 : newRels) {
-			if (!bPrim){
-				bw.append(",");
-			}else{
-				bPrim=false;
-			}
-			Rf2RelationshipRow row = relFile.getById(long1, startDate);
-			Relationship rel=new Relationship(row.getId().toString() , String.valueOf(row.getActive()) , rf2DescFile.getFsn(row.getSourceId()),row.getSourceId().toString(), rf2DescFile.getFsn(row.getDestinationId()) ,
-					rf2DescFile.getFsn(row.getTypeId()) , rf2DescFile.getFsn(row.getCharacteristicTypeId()));
-			bw.append(gson.toJson(rel).toString());
-			rel=null;
-			bw.append(sep);
-		}
-		bw.append("]");
-		bw.close();
-
-//		addFileChangeReport(NEW_RELATIONSHIPS_FILE,newRels.size(),"New relationships");
-	}
 
 	private ArrayList<Long> generateNewConceptsReport(Rf2DescriptionFile rf2DescFile, Rf2ConceptFile conceptFile) throws FileNotFoundException, UnsupportedEncodingException, IOException, NoSuchAlgorithmException {
 		logger.info("getting new conscpt ids");
@@ -1251,4 +861,130 @@ public class ReleaseFilesDiffInRefsetPlugin extends AbstractMojo {
 		return newcomponents;
 	}
 
+	@Override
+	public void execute() throws MojoExecutionException, MojoFailureException {
+		try {
+			if (!outputDirectory.exists()) {
+				outputDirectory.mkdirs();
+			}
+			createRefsetConcepts();
+			//			changeSummary=new ChangeSummary();
+			logger.info("Loading descriptinos");
+			Rf2DescriptionFile rf2DescFile = new Rf2DescriptionFile(getFilePath(ReleaseFileTypes.DESCRIPTION,inputFullDirectory), startDate);
+			logger.info("Loading concepts");
+			Rf2ConceptFile conceptFile = new Rf2ConceptFile(getFilePath(ReleaseFileTypes.CONCEPT,inputFullDirectory), startDate);
+			logger.info("Loading attribute value refset");
+			Rf2AttributeValueRefsetFile attrValue = new Rf2AttributeValueRefsetFile(getFilePath(ReleaseFileTypes.ATTRIBUTE_VALUE_REFSET,inputFullDirectory));
+			logger.info("Loading association value refset");
+			Rf2AssociationRefsetFile associationFile = new Rf2AssociationRefsetFile(getFilePath(ReleaseFileTypes.ASSOCIATION_REFSET,inputFullDirectory));
+			logger.info("Loading source US language refset");
+			String langPath=getFilePath(ReleaseFileTypes.LANGUAGE_REFSET,inputFullDirectory);
+			File inputFile=new File(langPath);
+			File sourceUS=new File(outputDirectory,"tmpUSLang.txt");
+			File tempFolder=new File(outputDirectory,"tmpSorting");
+
+			if (!tempFolder.exists()) {
+				tempFolder.mkdirs();
+			}
+			FileFilterAndSorter ffs=new FileFilterAndSorter(inputFile, sourceUS, tempFolder, new int[]{4}, new Integer[]{4}, new String[]{"900000000000509007"});
+			ffs.execute();
+			ffs=null;
+			System.gc();
+			Rf2LanguageRefsetFile sourceUSLangFile = new Rf2LanguageRefsetFile(sourceUS.getAbsolutePath());
+			//			Rf2LanguageRefsetFile sourceGBLangFile=null;
+			Rf2LanguageRefsetFile targetLangFile=null;
+			langTargetCtrl=false;
+			if (targetLanguage!=null){
+				if (targetLanguage.exists()){
+					langTargetCtrl=true;
+					//					logger.info("Loading source GB language refset");
+					//					File sourceGB=new File(outputDirectory,"tmpGBLang.txt");
+					//					
+					//					if (!tempFolder.exists()) {
+					//						tempFolder.mkdirs();
+					//					}
+					//					ffs=new FileFilterAndSorter(inputFile, sourceGB, tempFolder, new int[]{4}, new Integer[]{4}, new String[]{"900000000000508004"});
+					//					ffs.execute();
+					//					ffs=null;
+					//					System.gc();
+					//					sourceGBLangFile = new Rf2LanguageRefsetFile(sourceGB.getAbsolutePath());
+
+					logger.info("Loading target language refset");
+					targetLangFile = new Rf2LanguageRefsetFile(targetLanguage.getAbsolutePath());
+					System.gc();
+				}else{
+					logger.info("Target language doesn't exist");
+				}
+			}else{
+				logger.info("Target language is null");
+			}
+			//			logger.info("Loading relationships");
+			//			Rf2RelationshipFile relFile = new Rf2RelationshipFile(getFilePath(ReleaseFileType.RELATIONSHIP), startDate);
+
+
+
+			ArrayList<Long> repcomponents = generateNewConceptsReport(rf2DescFile, conceptFile);
+
+			ArrayList<Long> concepts=generatingRetiredConceptReasons(rf2DescFile, conceptFile, attrValue, associationFile);
+
+			repcomponents.addAll(concepts);
+
+			concepts=null;
+			//			relFile.releasePreciousMemory();
+
+			concepts=reactivatedConceptsReport(rf2DescFile, conceptFile);
+
+			repcomponents.addAll(concepts);
+
+			concepts=null;
+
+			conceptFile.releasePreciousMemory();
+
+
+			repcomponents=generatingChangedFSN(rf2DescFile, repcomponents);
+
+			if (langTargetCtrl){
+				repcomponents=generateTargetDescriptionPointerToSource(rf2DescFile,targetLangFile,repcomponents);
+			}
+			System.gc();
+
+			repcomponents=generateRetiredDescriptionsReport(rf2DescFile, repcomponents);
+
+			repcomponents=generatingExistingConceptsNewDescriptions(rf2DescFile, repcomponents);
+			System.gc();
+
+			repcomponents=generateReactivatedDescriptionsReport(rf2DescFile, repcomponents);
+
+			repcomponents=generateDescriptionAcceptabilityChanges(sourceUSLangFile, rf2DescFile, repcomponents);
+
+			//ver		punteroalingles
+			//			generateNewRelationshipsReport(rf2DescFile, relFile);
+
+			//			generateOldConceptsNewRelationships(rf2DescFile, relFile, newcomponents);
+			//
+			//			generateRelGroupChangedRelationships(rf2DescFile, relFile, startDate, endDate);
+
+
+			//			generatingDefinedConceptsReport(rf2DescFile, conceptFile);
+
+			//			generatingPrimitiveConceptsReport(rf2DescFile, conceptFile);
+
+			repcomponents=null;
+
+			if (sourceUS!=null && sourceUS.exists()){
+				sourceUS.delete();
+			}
+			if(tempFolder.exists()){
+				FileHelper.emptyFolder(tempFolder);
+				tempFolder.delete();
+			}
+//			saveSummary();
+			bwsr.close();
+			bwsr=null;
+			fileConsolidate();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+	}
 }
