@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.apache.log4j.Logger;
+import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IdPart;
 import org.dwfa.ace.api.I_Identify;
@@ -53,7 +54,7 @@ public class RF2HistoricalRelationshipImpl extends RF2AbstractImpl implements I_
 			String relationshipId = "";
 			String destinationId = "";
 			String relTypeId = "";
-			String moduleId ="";
+			String moduleId =I_Constants.CORE_MODULE_ID;
 			String active = "";
 			String characteristicTypeId = "";
 			String modifierId = I_Constants.SOMEMODIFIER;
@@ -77,45 +78,45 @@ public class RF2HistoricalRelationshipImpl extends RF2AbstractImpl implements I_
 						if (c != null)  characteristicTypeId = c.toString();
 					}
 				}*/
-				
+
 				//if (characteristicTypeId.equals(I_Constants.INFERRED) || characteristicTypeId.equals(I_Constants.ADDITIONALRELATION) || characteristicTypeId.equals(I_Constants.STATED) ){
-					destinationId = "";
-					I_Identify id = tf.getId(rel.getC2Id());
-					if (id != null) {
-						idParts = id.getVisibleIds(currenAceConfig.getViewPositionSetReadOnly(), 
-								snomedIntId);
-						if (idParts != null) {
-							Object denotation = getLastCurrentVisibleId(idParts, currenAceConfig.getViewPositionSetReadOnly(), 
-									RelAssertionType.INFERRED_THEN_STATED);
-							if (denotation instanceof Long) {
-								Long c = (Long) denotation;
-								if (c != null)  destinationId = c.toString();
-							}
+				destinationId = "";
+				I_Identify id = tf.getId(rel.getC2Id());
+				if (id != null) {
+					idParts = id.getVisibleIds(currenAceConfig.getViewPositionSetReadOnly(), 
+							snomedIntId);
+					if (idParts != null) {
+						Object denotation = getLastCurrentVisibleId(idParts, currenAceConfig.getViewPositionSetReadOnly(), 
+								RelAssertionType.INFERRED_THEN_STATED);
+						if (denotation instanceof Long) {
+							Long c = (Long) denotation;
+							if (c != null)  destinationId = c.toString();
 						}
 					}
+				}
 
-					relTypeId = "";
+				relTypeId = "";
 
-					id = tf.getId(rel.getTypeNid());
-					if (id != null) {
-						idParts = tf.getId(rel.getTypeNid()).getVisibleIds(currenAceConfig.getViewPositionSetReadOnly(), 
-								snomedIntId);
-						if (idParts != null) {
-							Object denotation = getLastCurrentVisibleId(idParts, currenAceConfig.getViewPositionSetReadOnly(), 
-									RelAssertionType.INFERRED_THEN_STATED);
-							if (denotation instanceof Long) {
-								Long c = (Long) denotation;
-								if (c != null)  relTypeId = c.toString();
-							}
+				id = tf.getId(rel.getTypeNid());
+				if (id != null) {
+					idParts = tf.getId(rel.getTypeNid()).getVisibleIds(currenAceConfig.getViewPositionSetReadOnly(), 
+							snomedIntId);
+					if (idParts != null) {
+						Object denotation = getLastCurrentVisibleId(idParts, currenAceConfig.getViewPositionSetReadOnly(), 
+								RelAssertionType.INFERRED_THEN_STATED);
+						if (denotation instanceof Long) {
+							Long c = (Long) denotation;
+							if (c != null)  relTypeId = c.toString();
 						}
 					}
-					
-					if (!(relTypeId==null || relTypeId.equals(""))){
-						if (relTypeId.equals(I_Constants.MAY_BE) || relTypeId.equals(I_Constants.WAS_A) || relTypeId.equals(I_Constants.SAME_AS) || relTypeId.equals(I_Constants.REPLACED_BY)
-								|| relTypeId.equals(I_Constants.MOVED_FROM) || relTypeId.equals(I_Constants.MOVED_TO)) {
-	
+				}
+
+				if (!(relTypeId==null || relTypeId.equals(""))){
+					if (relTypeId.equals(I_Constants.MAY_BE) || relTypeId.equals(I_Constants.WAS_A) || relTypeId.equals(I_Constants.SAME_AS) || relTypeId.equals(I_Constants.REPLACED_BY)
+							|| relTypeId.equals(I_Constants.MOVED_FROM) || relTypeId.equals(I_Constants.MOVED_TO)) {
+
 						relationshipId = "";
-	
+
 						id = tf.getId(rel.getNid());
 						if (id != null) {
 							idParts = tf.getId(rel.getNid()).getVisibleIds(currenAceConfig.getViewPositionSetReadOnly(), 
@@ -129,59 +130,30 @@ public class RF2HistoricalRelationshipImpl extends RF2AbstractImpl implements I_
 								}
 							}
 						}
-						
+
 						relationshipStatusId = rel.getStatusNid();
 						if (relationshipStatusId == activeNid) { 														
 							active = "1";
-							moduleId = computeModuleId(sourceConcept);
 						} else if (relationshipStatusId == inactiveNid) { 														
 							active = "0";
-							moduleId = computeModuleId(sourceConcept);
-						}
-						
-						if(moduleId.equals(I_Constants.META_MODULE_ID)){		
-							logger.info("==Meta Concept==" + sourceId + " & Name : " + sourceConcept.getInitialText());
-							incrementMetaDataCount();
 						}
 
 						effectiveTime = getDateFormat().format(new Date(rel.getTime()));
-	
+
 						int relationshipGroup = rel.getGroup();
 
-						/*if (sourceId==null || sourceId.equals("")){
-							sourceId=sourceConcept.getUids().iterator().next().toString();
-						}
-				
-						if (relTypeId==null || relTypeId.equals("")){
-							relTypeId=tf.getUids(rel.getTypeNid()).iterator().next().toString();
-						}
-						if (destinationId==null || destinationId.equals("")){
-							Collection<UUID> Uids=tf.getUids(rel.getC2Id());
-							if (Uids==null  ){
-								continue;
-							}
-							destinationId=Uids.iterator().next().toString();
-							if (destinationId.equals(nullUuid)){
-								continue;
-							}
-						}
-						
-						if ((relationshipId==null || relationshipId.equals("")) && active.equals("1")){
-							relationshipId=rel.getUUIDs().iterator().next().toString();
-						}*/
-					
 						if (relationshipId==null || relationshipId.equals("")){
 							logger.info("Unplublished Retired Stated Relationship: " + rel.getUUIDs().iterator().next().toString());
 						}else if (!((destinationId==null || destinationId.equals("") || destinationId.equals("0"))
-							&& (sourceId==null || sourceId.equals("") || sourceId.equals("0"))
-							&& (relTypeId==null || relTypeId.equals("") || relTypeId.equals("0")))){
-								String reluuidStr =rel.getUUIDs().iterator().next().toString();
-								writeRF2TypeLine(reluuidStr , relationshipId, effectiveTime, active, moduleId, sourceId, destinationId, relationshipGroup, relTypeId,
+								&& (sourceId==null || sourceId.equals("") || sourceId.equals("0"))
+								&& (relTypeId==null || relTypeId.equals("") || relTypeId.equals("0")))){
+							String reluuidStr =rel.getUUIDs().iterator().next().toString();
+							writeRF2TypeLine(reluuidStr , relationshipId, effectiveTime, active, moduleId, sourceId, destinationId, relationshipGroup, relTypeId,
 									characteristicTypeId, modifierId);
-							}
 						}
 					}
 				}
+			}
 			//}
 		} catch (IOException e) {
 			logger.error("======failing for the sourceId=====" + sourceId);
@@ -200,13 +172,13 @@ public class RF2HistoricalRelationshipImpl extends RF2AbstractImpl implements I_
 				+ "\t" + characteristicTypeId + "\t" + modifierId);
 		WriteUtil.write(getConfig(), "\r\n");
 	}
-	
-	
+
+
 	public static void writeRF2TypeLine(String uuid , String relationshipId, String effectiveTime, String active, String moduleId, String sourceId, String destinationId, int relationshipGroup, String relTypeId,
 			String characteristicTypeId, String modifierId) throws IOException {
 		WriteUtil.write(getConfig(), uuid + "\t" + relationshipId + "\t" + effectiveTime + "\t" + active + "\t" + moduleId + "\t" + sourceId + "\t" + destinationId + "\t" + relationshipGroup + "\t" + relTypeId
 				+ "\t" + characteristicTypeId + "\t" + modifierId);
 		WriteUtil.write(getConfig(), "\r\n");
 	}
-	
+
 }

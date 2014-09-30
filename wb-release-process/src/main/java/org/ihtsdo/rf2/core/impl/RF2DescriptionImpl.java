@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
+import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_ProcessConcepts;
@@ -47,7 +48,7 @@ public class RF2DescriptionImpl extends RF2AbstractImpl implements I_ProcessConc
 	public void export(I_GetConceptData concept, String conceptid) {
 		String effectiveTime = "";
 		String descriptionid = "";
-		String moduleId = "";
+		String moduleId = I_Constants.CORE_MODULE_ID;
 		String active = "";
 		String caseSignificanceId = "";
 		String typeId = "";
@@ -104,12 +105,29 @@ public class RF2DescriptionImpl extends RF2AbstractImpl implements I_ProcessConc
 					} else {
 						caseSignificanceId = I_Constants.INITIAL_INSENSITIVE;
 					}
-					
-					//moduleId = getConceptMetaModuleID(concept , getConfig().getReleaseDate());
-					moduleId = computeModuleId(concept);	
-					if(moduleId.equals(I_Constants.META_MODULE_ID)){			
-						//logger.info("==Meta Concept==" + conceptid + " & Name : " + concept.getInitialText());
-						incrementMetaDataCount();
+
+					List<? extends I_ConceptAttributeTuple> conceptAttributes = concept.getConceptAttributeTuples(
+							allStatuses, 
+							currenAceConfig.getViewPositionSetReadOnly(), 
+							Precedence.PATH, currenAceConfig.getConflictResolutionStrategy());
+
+					if (conceptAttributes != null && !conceptAttributes.isEmpty()) {
+						I_ConceptAttributeTuple attributes = conceptAttributes.iterator().next();
+						
+						String conceptStatus = getStatusType(attributes.getStatusNid());
+						// Before Jan 31, 2010, then conceptstatus 0 & 6 means current concept (Active)
+						// After Jan 31, 2010 , then conceptstatus 0 means current but 6 means retired
+						String conceptActive;
+						if (conceptStatus.equals("0")) {
+							conceptActive = "1";
+						} else if (getConfig().getReleaseDate().compareTo(I_Constants.limited_policy_change)<0 && conceptStatus.equals("6")) {
+							conceptActive = "1";
+						} else {
+							conceptActive = "0";
+						}
+						if(conceptActive.equals("1")){
+							moduleId = computeModuleId(concept);	
+						}
 					}
 					
 					if (conceptid==null || conceptid.equals("") || conceptid.equals("0")){

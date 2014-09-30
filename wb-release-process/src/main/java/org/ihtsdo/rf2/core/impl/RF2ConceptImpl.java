@@ -51,12 +51,8 @@ public class RF2ConceptImpl extends RF2AbstractImpl implements I_ProcessConcepts
 		String active = "";
 		String moduleId = I_Constants.CORE_MODULE_ID;
 		String definitionStatusId = "";
-		String updateWbSctId = "false";
 		
 		try {
-			if(!getConfig().isUpdateWbSctId().equals(null)){
-				updateWbSctId = getConfig().isUpdateWbSctId();
-			}
 		
 			List<? extends I_ConceptAttributeTuple> conceptAttributes = concept.getConceptAttributeTuples(
 					allStatuses, 
@@ -91,12 +87,8 @@ public class RF2ConceptImpl extends RF2AbstractImpl implements I_ProcessConcepts
 				}
 				
 				if(active.equals("1")){
-					//moduleId = getConceptMetaModuleID(concept , getConfig().getReleaseDate());
 					moduleId = computeModuleId(concept);					
-					if(moduleId.equals(I_Constants.META_MODULE_ID)){
-						//logger.info("==Meta Concept==" + conceptid + " & Name : " + concept.getInitialText());
-						incrementMetaDataCount();
-					}
+					
 				}
 				
 				if(getConfig().getRf2Format().equals("false") ){
