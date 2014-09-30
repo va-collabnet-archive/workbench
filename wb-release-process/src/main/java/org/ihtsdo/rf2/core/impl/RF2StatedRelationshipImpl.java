@@ -136,6 +136,8 @@ public class RF2StatedRelationshipImpl extends RF2AbstractImpl implements I_Proc
 						}
 					}
 
+					Date et = new Date(rel.getTime());
+					effectiveTime = getDateFormat().format(et);
 					if (!(sourceId.equals("900000000000441003") 
 							&& destinationId.equals("138875005")
 							&& relTypeId.equals("116680003") 
@@ -165,8 +167,6 @@ public class RF2StatedRelationshipImpl extends RF2AbstractImpl implements I_Proc
 							}
 						}
 					}
-					Date et = new Date(rel.getTime());
-					effectiveTime = getDateFormat().format(et);
 
 					relationshipStatusId = rel.getStatusNid();
 					if (relationshipStatusId == activeNid) {               

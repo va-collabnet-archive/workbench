@@ -135,6 +135,7 @@ public class RF2RelationshipImpl extends RF2AbstractImpl implements I_ProcessCon
 							}
 						}
 					}
+					effectiveTime = getDateFormat().format(new Date(rel.getTime()));
 
 					if (!(sourceId.equals("900000000000441003") 
 							&& destinationId.equals("138875005")
@@ -165,7 +166,6 @@ public class RF2RelationshipImpl extends RF2AbstractImpl implements I_ProcessCon
 							}
 						}
 					}
-					effectiveTime = getDateFormat().format(new Date(rel.getTime()));
 					relationshipStatusId = rel.getStatusNid();
 					if (relationshipStatusId == activeNid) {               
 						active = "1";
