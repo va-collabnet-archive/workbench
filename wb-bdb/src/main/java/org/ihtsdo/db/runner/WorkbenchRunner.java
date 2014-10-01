@@ -53,6 +53,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Properties;
@@ -97,6 +98,31 @@ public class WorkbenchRunner {
             AceLog.getAppLog().info("\n*******************\n" + "\n Starting " + this.getClass().getSimpleName()
                                     + "\n with config file: " + getArgString(args) + "\n\n******************\n");
             wbConfigFile = new File("config/wb.config");
+            
+            // Load wb-svn.properties from file
+            Properties wbSvnProperties = null;
+            File wbSvnPropertiesFile = new File("config" + File.separator + "wb-svn.properties");
+            if (wbSvnPropertiesFile.exists()) {
+                AceLog.getAppLog().info("### config/wb-svn.properties : " + wbSvnPropertiesFile.getAbsolutePath().toString());
+                wbSvnProperties = new Properties();
+                try (InputStream iStream = Files.newInputStream(wbSvnPropertiesFile.toPath())) {
+                    wbSvnProperties.load(iStream);
+                } catch (IOException ex) {
+                    AceLog.getAppLog().warning("### config/wb-svn.properties read failed.");
+                }
+
+                String initFromSubversioStr = wbSvnProperties.getProperty("initFromSubversion");
+                if (initFromSubversioStr != null
+                        && initFromSubversioStr.compareToIgnoreCase("true") == 0) {
+                    initializeFromSubversion = true;
+                }
+                
+                String svnUpdateOnStartStr = wbSvnProperties.getProperty("svnUpdateOnStart", "null");
+                if (svnUpdateOnStartStr != null) {
+                    svnUpdateOnStart = svnUpdateOnStartStr.split(";");
+                }
+
+            }
 
             UIManager.LookAndFeelInfo[] lookAndFeels  = UIManager.getInstalledLookAndFeels();
             boolean                     windowsSystem = false;
@@ -189,7 +215,7 @@ public class WorkbenchRunner {
             EConceptChangeSetWriter.writeDebugFiles = false;
             BatchActionEditorPanel.batchEditingDisabled = false;
             
-            SvnHelper svnHelper = new SvnHelper(WorkbenchRunner.class);
+            SvnHelper svnHelper = new SvnHelper(WorkbenchRunner.class, wbSvnProperties);
 
             if ((acePropertiesFileExists == false) || (initialized == false)) {
                 try {

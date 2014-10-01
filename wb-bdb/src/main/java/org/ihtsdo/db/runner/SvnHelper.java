@@ -15,6 +15,8 @@ import java.util.TreeSet;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration.ConfigurationException;
 
 import org.dwfa.ace.api.I_ConfigAceDb;
 import org.dwfa.ace.api.I_ShowActivity;
@@ -66,8 +68,33 @@ public class SvnHelper {
         this.subversionMap = subversionMap;
     }
 
-    public SvnHelper(Class<?> jiniClassToSet) {
+    public SvnHelper(Class<?> jiniClassToSet, Properties svnConfigProperties) throws ConfigurationException {
         jiniClass = jiniClassToSet;
+        Properties svnProperties = svnConfigProperties;
+        if (svnProperties != null) {
+
+            svnCheckoutProfileOnStart = svnProperties.getProperty("svnCheckoutProfileOnStart");
+            
+            String svnCheckoutOnStartStr = svnProperties.getProperty("svnCheckoutOnStart");
+            if (svnCheckoutOnStartStr != null) {
+                svnCheckoutOnStart = svnCheckoutOnStartStr.split(";");
+            }
+            
+            String svnUpdateOnStartStr = svnProperties.getProperty("svnUpdateOnStart");
+            if (svnUpdateOnStartStr != null) {
+                svnUpdateOnStart = svnUpdateOnStartStr.split(";");
+            }
+            
+            String csImportOnStartStr = svnProperties.getProperty("csImportOnStart");
+            if (csImportOnStartStr != null) {
+                csImportOnStart = csImportOnStartStr.split(";");
+                if (csImportOnStart != null) {
+                    for (String importLoc : csImportOnStart) {
+                        changeLocations.add(new File(importLoc));
+                    }
+                }
+            }
+        }
 
     }
 
