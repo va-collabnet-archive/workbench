@@ -137,38 +137,38 @@ public class RF2RelationshipImpl extends RF2AbstractImpl implements I_ProcessCon
 					}
 					effectiveTime = getDateFormat().format(new Date(rel.getTime()));
 
-					if (!(sourceId.equals("900000000000441003") 
-							&& destinationId.equals("138875005")
-							&& relTypeId.equals("116680003") 
-							&& effectiveTime.compareTo("20130131")>0)){
-						List<? extends I_ConceptAttributeTuple> conceptAttributes = sourceConcept.getConceptAttributeTuples(
-								allStatuses, 
-								currenAceConfig.getViewPositionSetReadOnly(), 
-								Precedence.PATH, currenAceConfig.getConflictResolutionStrategy());
-
-						if (conceptAttributes != null && !conceptAttributes.isEmpty()) {
-							I_ConceptAttributeTuple attributes = conceptAttributes.iterator().next();
-
-							String conceptStatus = getStatusType(attributes.getStatusNid());
-							// Before Jan 31, 2010, then conceptstatus 0 & 6 means current concept (Active)
-							// After Jan 31, 2010 , then conceptstatus 0 means current but 6 means retired
-							String conceptActive;
-							if (conceptStatus.equals("0")) {
-								conceptActive = "1";
-							} else if (getConfig().getReleaseDate().compareTo(I_Constants.limited_policy_change)<0 && conceptStatus.equals("6")) {
-								conceptActive = "1";
-							} else {
-								conceptActive = "0";
-							}
-
-							if(conceptActive.equals("1")){
-								moduleId = computeModuleId(sourceConcept);	
-							}
-						}
-					}
 					relationshipStatusId = rel.getStatusNid();
 					if (relationshipStatusId == activeNid) {               
 						active = "1";
+						if (!(sourceId.equals("900000000000441003") 
+								&& destinationId.equals("138875005")
+								&& relTypeId.equals("116680003") 
+								&& effectiveTime.compareTo("20130131")>0)){
+							List<? extends I_ConceptAttributeTuple> conceptAttributes = sourceConcept.getConceptAttributeTuples(
+									allStatuses, 
+									currenAceConfig.getViewPositionSetReadOnly(), 
+									Precedence.PATH, currenAceConfig.getConflictResolutionStrategy());
+
+							if (conceptAttributes != null && !conceptAttributes.isEmpty()) {
+								I_ConceptAttributeTuple attributes = conceptAttributes.iterator().next();
+
+								String conceptStatus = getStatusType(attributes.getStatusNid());
+								// Before Jan 31, 2010, then conceptstatus 0 & 6 means current concept (Active)
+								// After Jan 31, 2010 , then conceptstatus 0 means current but 6 means retired
+								String conceptActive;
+								if (conceptStatus.equals("0")) {
+									conceptActive = "1";
+								} else if (getConfig().getReleaseDate().compareTo(I_Constants.limited_policy_change)<0 && conceptStatus.equals("6")) {
+									conceptActive = "1";
+								} else {
+									conceptActive = "0";
+								}
+
+								if(conceptActive.equals("1")){
+									moduleId = computeModuleId(sourceConcept);	
+								}
+							}
+						}
 					} else if (relationshipStatusId == inactiveNid) {               
 						active = "0";
 					}
