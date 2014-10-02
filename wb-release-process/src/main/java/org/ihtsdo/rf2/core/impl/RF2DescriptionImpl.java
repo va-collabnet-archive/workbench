@@ -48,7 +48,6 @@ public class RF2DescriptionImpl extends RF2AbstractImpl implements I_ProcessConc
 	public void export(I_GetConceptData concept, String conceptid) {
 		String effectiveTime = "";
 		String descriptionid = "";
-		String moduleId = I_Constants.CORE_MODULE_ID;
 		String active = "";
 		String caseSignificanceId = "";
 		String typeId = "";
@@ -66,6 +65,7 @@ public class RF2DescriptionImpl extends RF2AbstractImpl implements I_ProcessConc
 
 			for (I_DescriptionTuple description: descriptions) {
 
+				String moduleId=I_Constants.CORE_MODULE_ID;
 				String sDescType = getSnomedDescriptionType(description.getTypeNid());
 				typeId = getTypeId(sDescType);
 

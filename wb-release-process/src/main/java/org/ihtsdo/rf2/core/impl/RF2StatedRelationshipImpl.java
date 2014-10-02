@@ -54,7 +54,7 @@ public class RF2StatedRelationshipImpl extends RF2AbstractImpl implements I_Proc
 			String relationshipId = "";
 			String destinationId = "";
 			String relTypeId = "";
-			String moduleId =I_Constants.CORE_MODULE_ID;
+			
 			String active = "";
 			String characteristicTypeId = "";
 			String modifierId = I_Constants.SOMEMODIFIER;
@@ -66,6 +66,7 @@ public class RF2StatedRelationshipImpl extends RF2AbstractImpl implements I_Proc
 
 			for (I_RelTuple rel : relationships) {
 				characteristicTypeId="";
+				String moduleId =I_Constants.CORE_MODULE_ID;
 				I_Identify charId = tf.getId(rel.getCharacteristicId());
 
 				List<? extends I_IdPart> idParts = charId.getVisibleIds(currenAceConfig.getViewPositionSetReadOnly(), 

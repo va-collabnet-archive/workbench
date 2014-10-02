@@ -55,7 +55,6 @@ public class RF2RelationshipImpl extends RF2AbstractImpl implements I_ProcessCon
 			String destinationId = "";
 			String relTypeId = "";
 			String active = "";
-			String moduleId=I_Constants.CORE_MODULE_ID;
 			String characteristicTypeId = "";
 			String modifierId = I_Constants.SOMEMODIFIER; 
 			int relationshipStatusId=0;
@@ -65,6 +64,7 @@ public class RF2RelationshipImpl extends RF2AbstractImpl implements I_ProcessCon
 					Precedence.PATH, currenAceConfig.getConflictResolutionStrategy());
 
 			for (I_RelTuple rel : relationships) {
+				String moduleId=I_Constants.CORE_MODULE_ID;
 				characteristicTypeId="";
 
 				I_Identify charId = tf.getId(rel.getCharacteristicId());
