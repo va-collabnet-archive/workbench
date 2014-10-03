@@ -51,7 +51,8 @@ public class WorkflowInitiator implements WorkflowInitiatiorBI {
 		I_GetConceptData workflow = Terms.get().getActiveAceFrameConfig().getDefaultWorkflowForChangedConcept();
 		final Integer workflowNid;
 		if (workflow == null) {
-			workflowNid = 0;
+            return false;
+			//workflowNid = 0;
 		} else {
 			workflowNid = workflow.getNid();
 		}
@@ -68,18 +69,18 @@ public class WorkflowInitiator implements WorkflowInitiatiorBI {
 				boolean individualCommit = (idSet.cardinality() < 10);
 				NidBitSetItrBI possibleItr = idSet.iterator();
 				while (possibleItr.next()) {
-					System.out.println("AlreadySeen: " + alreadySeen.get(workflowNid).containsKey(possibleItr.nid()));
+//					System.out.println("AlreadySeen: " + alreadySeen.get(workflowNid).containsKey(possibleItr.nid()));
 					long timeDiff = Long.MIN_VALUE;
 					if (alreadySeen.get(workflowNid).containsKey(possibleItr.nid())) {
 						timeDiff = System.currentTimeMillis() - (Long) alreadySeen.get(workflowNid).get(possibleItr.nid());
-						System.out.println("Diff cache time: " + timeDiff);
+//						System.out.println("Diff cache time: " + timeDiff);
 					}
 					alreadySeen.get(workflowNid).put(possibleItr.nid(), System.currentTimeMillis());
 					
 					if ( timeDiff == Long.MIN_VALUE || timeDiff >  3000) {
 						concept=Ts.get().getConcept(possibleItr.nid());
 						if (concept!=null){
-							System.out.println("Sending to workflow: " + concept.toString());
+//							System.out.println("Sending to workflow: " + concept.toString());
 							addComponentToDefaultWorklist(concept, individualCommit);
 						}
 					}
