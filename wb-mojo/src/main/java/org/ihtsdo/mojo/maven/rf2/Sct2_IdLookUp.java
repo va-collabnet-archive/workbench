@@ -42,13 +42,14 @@ public class Sct2_IdLookUp {
     private long uuidMsbArray[];
     private long uuidLsbArray[];
     BufferedWriter uuidsWriter;
+    protected File additionalUuidsFile;
 
     public Sct2_IdLookUp(String filePathName)
             throws IOException {
         int indexOf = filePathName.indexOf("target");
         String uuidsFileName = filePathName.substring(0, indexOf);
         uuidsFileName = uuidsFileName + "/target/input-files/generated-arf/additional.txt";
-        File additionalUuidsFile = new File(uuidsFileName);
+        additionalUuidsFile = new File(uuidsFileName);
         FileOutputStream uuidsOs = new FileOutputStream(additionalUuidsFile);
         uuidsWriter = new BufferedWriter(new OutputStreamWriter(uuidsOs, "UTF8"));
         
