@@ -30,6 +30,14 @@ import org.dwfa.util.bean.BeanList;
 import org.dwfa.util.bean.BeanType;
 import org.dwfa.util.bean.Spec;
 import org.dwfa.util.io.FileIO;
+import org.tmatesoft.svn.core.internal.io.dav.DAVRepositoryFactory;
+import org.tmatesoft.svn.core.internal.io.fs.FSRepositoryFactory;
+import org.tmatesoft.svn.core.internal.io.svn.SVNRepositoryFactoryImpl;
+import org.tmatesoft.svn.core.wc.SVNClientManager;
+import org.tmatesoft.svn.core.wc.SVNInfo;
+import org.tmatesoft.svn.core.wc.SVNRevision;
+import org.tmatesoft.svn.core.wc2.SvnInfo;
+import org.tmatesoft.svn.core.wc2.SvnWorkingCopyInfo;
 
 /**
  *
@@ -72,40 +80,31 @@ public class AddTopLevelSvnEntries extends AbstractTask {
     @Override
     public Condition evaluate(I_EncodeBusinessProcess process, I_Work worker) throws TaskFailedException {
         try {
+            setupLibrary();
+            SVNClientManager clientManager = SVNClientManager.newInstance();
+
             I_ConfigAceFrame config = (I_ConfigAceFrame) process.readAttachement(ProcessAttachmentKeys.WORKING_PROFILE.name());
             File dir = new File(System.getProperty("user.dir"));
             File[] childrenDirs = dir.listFiles();
             if (childrenDirs != null) {
-                for (File svnDir : childrenDirs) {
-                    File svnMetaDir = new File(svnDir, ".svn");
+                for (File possibleWorkingCopyDir : childrenDirs) {
+                    File svnMetaDir = new File(possibleWorkingCopyDir, ".svn");
                     if (svnMetaDir.exists()) {
-                        String workingCopy = FileIO.getRelativePath(svnDir);
+                        String workingCopy = FileIO.getRelativePath(possibleWorkingCopyDir);
 
                         SubversionData svd = config.getSubversionMap().get(workingCopy);
                         if (svd == null) {
-                            svd = new SubversionData(null, workingCopy);
-                            File svnEntries = new File(svnMetaDir, "entries");
-                            try {
-                                LineNumberReader lnr = new LineNumberReader(new java.io.FileReader(svnEntries));
-                                @SuppressWarnings("unused")
-                                String line1 = lnr.readLine();
-                                @SuppressWarnings("unused")
-                                String line2 = lnr.readLine();
-                                @SuppressWarnings("unused")
-                                String line3 = lnr.readLine();
-                                @SuppressWarnings("unused")
-                                String line4 = lnr.readLine();
-                                String line5 = lnr.readLine();
-                                AceLog.getAppLog().info("Found url " + line5 + " for working copy: " + svd.getWorkingCopyStr());
-                                lnr.close();
-                                svd.setRepositoryUrlStr(line5);
-                                config.getSubversionMap().put(workingCopy, svd);
 
-                            } catch (FileNotFoundException e) {
-                                AceLog.getAppLog().alertAndLogException(e);
-                            } catch (IOException e) {
-                                AceLog.getAppLog().alertAndLogException(e);
-                            }
+                            svd = new SubversionData(null, workingCopy);
+
+                            SVNInfo svnInfo = clientManager.getWCClient().doInfo(
+                                    possibleWorkingCopyDir, SVNRevision.UNDEFINED);
+
+
+                            AceLog.getAppLog().info("Found url " + svnInfo.getURL() +
+                                    " for working copy: " + svd.getWorkingCopyStr());
+                            svd.setRepositoryUrlStr(svnInfo.getURL().toString());
+                            config.getSubversionMap().put(workingCopy, svd);
                         }
                     }
                 }
@@ -132,5 +131,24 @@ public class AddTopLevelSvnEntries extends AbstractTask {
 
     public void setProfilePropName(String profilePropName) {
         this.profilePropName = profilePropName;
+    }
+    /*
+     * Initializes the library to work with a repository via 
+     * different protocols.
+     */
+    private static void setupLibrary() {
+        /*
+         * For using over http:// and https://
+         */
+        DAVRepositoryFactory.setup();
+        /*
+         * For using over svn:// and svn+xxx://
+         */
+        SVNRepositoryFactoryImpl.setup();
+        
+        /*
+         * For using over file:///
+         */
+        FSRepositoryFactory.setup();
     }
 }

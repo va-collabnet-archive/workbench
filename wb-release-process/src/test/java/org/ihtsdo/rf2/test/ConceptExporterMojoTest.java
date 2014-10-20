@@ -24,7 +24,9 @@ public class ConceptExporterMojoTest extends TestCase {
 	 *            name of the test case
 	 * @return
 	 */
-        @Ignore @Test
+
+	@Ignore
+	@Test
 	public void testApp() {
 		System.out.println("**************Starting Data Extraction Program************" + (new Timestamp(new Date().getTime())));
 		System.out.println("ConceptExporterMojoTest Test Cases");
