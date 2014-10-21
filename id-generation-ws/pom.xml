@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>org.ihtsdo</groupId>
 		<artifactId>wb-mmb</artifactId>
-		<version>prod.rel-july-2014</version>
+		<version>prod.rel-GMDN-jan-2015</version>
 	</parent>
 	<artifactId>id-generation-ws</artifactId>
 	<packaging>jar</packaging>
