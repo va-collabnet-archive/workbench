@@ -81,6 +81,8 @@ public abstract class RF2AbstractImpl {
 	protected NidSetBI textDefinTypes;
 
 	private I_GetConceptData snomedRoot;
+
+	private I_GetConceptData PhysicalObjectRoot;
 	
 	private I_GetConceptData snomedCTModelComponent;	
 	private I_GetConceptData coreMetaConceptRoot;
@@ -105,6 +107,8 @@ public abstract class RF2AbstractImpl {
 	private int activeStatus;
 
 	private I_IntSet activeStatusSet;
+
+	private BufferedWriter bw;
 
 	public static Config getConfig() {
 		return config;
@@ -150,6 +154,7 @@ public abstract class RF2AbstractImpl {
 			this.currenAceConfig = tf.getActiveAceFrameConfig();
 			snomedIntId = tf.uuidToNative(ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.getUids());
 			snomedRoot = tf.getConcept(UUID.fromString("ee9ac5d2-a07c-3981-a57a-f7f26baf38d8"));
+			PhysicalObjectRoot = tf.getConcept(UUID.fromString("72765109-6b53-3814-9b05-34ebddd16592"));
 			
 			snomedCTModelComponent = tf.getConcept(UUID.fromString("a60bd881-9010-3260-9653-0c85716b4391"));
 			coreMetaConceptRoot = tf.getConcept(UUID.fromString("4c6d8b0b-774a-341e-b0e5-1fc2deedb5a5"));
@@ -625,6 +630,20 @@ public abstract class RF2AbstractImpl {
 				logger.info("Unplublished Retired Concept: " + concept.getUUIDs().iterator().next().toString());
 			}else{
 					export(concept, conceptid);
+					bw=ExportUtil.getPObjectWriter();
+					if (bw!=null && PhysicalObjectRoot.isParentOf(concept, 
+							currenAceConfig.getAllowedStatus(),
+							currenAceConfig.getDestRelTypes(), 
+							currenAceConfig.getViewPositionSetReadOnly(), 
+							currenAceConfig.getPrecedence(), 
+							currenAceConfig.getConflictResolutionStrategy())) {
+						
+						bw.append(conceptid);
+						bw.append("\t");
+						bw.append(concept.getInitialText());
+						bw.append("\r\n");
+						
+					}
 			}
 		}
 	}

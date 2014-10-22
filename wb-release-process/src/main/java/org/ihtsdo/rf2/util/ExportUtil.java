@@ -1,12 +1,16 @@
 package org.ihtsdo.rf2.util;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -2533,5 +2537,21 @@ public class ExportUtil {
 			e.printStackTrace();
 		}
 	}
+	private static BufferedWriter bwPObject;
 
+	public static void createPObjectWriter(String outFile) throws UnsupportedEncodingException, FileNotFoundException {
+
+		FileOutputStream tfos = new FileOutputStream( outFile);
+		OutputStreamWriter tfosw = new OutputStreamWriter(tfos,"UTF-8");
+		bwPObject=new BufferedWriter(tfosw);
+
+	}
+	public static BufferedWriter getPObjectWriter(){
+		return bwPObject;
+	}
+	public static void closePObjectWriter() throws IOException{
+		bwPObject.close();
+		bwPObject=null;
+	}
+	
 }
