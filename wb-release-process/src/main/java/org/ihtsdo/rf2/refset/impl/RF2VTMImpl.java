@@ -118,6 +118,11 @@ public class RF2VTMImpl extends RF2AbstractImpl implements I_ProcessConcepts {
 								}else {
 									refsetuuid = Type5UuidFactory.get(refsetId + conceptid);
 									effectiveTime = getDateFormat().format(new Date(extensionPart.getTime()));
+
+									if (!(effectiveTime.compareTo(getConfig().getPreviousReleaseDate())>0) ||
+											!(effectiveTime.compareTo(getConfig().getReleaseDate())<=0)){
+										continue;
+									}
 									writeRF2TypeLine(refsetuuid, effectiveTime, active, moduleId, refsetId, conceptid);
 								}
 							}

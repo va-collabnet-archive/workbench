@@ -140,6 +140,10 @@ public class RF2StatedRelationshipImpl extends RF2AbstractImpl implements I_Proc
 					Date et = new Date(rel.getTime());
 					effectiveTime = getDateFormat().format(et);
 
+					if (!(effectiveTime.compareTo(getConfig().getPreviousReleaseDate())>0) ||
+							!(effectiveTime.compareTo(getConfig().getReleaseDate())<=0)){
+						continue;
+					}
 					relationshipStatusId = rel.getStatusNid();
 					if (relationshipStatusId == activeNid) {               
 						active = "1";

@@ -95,6 +95,11 @@ public class RF2TextDefinitionImpl extends RF2AbstractImpl implements I_ProcessC
 
 					Date textDefEffectiveDate = new Date(getTermFactory().convertToThickVersion(description.getVersion()));
 					effectiveTime = getDateFormat().format(textDefEffectiveDate);
+
+					if (!(effectiveTime.compareTo(getConfig().getPreviousReleaseDate())>0) ||
+							!(effectiveTime.compareTo(getConfig().getReleaseDate())<=0)){
+						continue;
+					}
 					if (textDefstatus.equals("0") || textDefstatus.equals("6") || textDefstatus.equals("8"))
 						active = "1";
 					else

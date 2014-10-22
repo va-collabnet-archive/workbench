@@ -108,7 +108,11 @@ public class RF2HistoricalAssociationImpl extends RF2AbstractImpl implements I_P
 					}else{
 
 						effectiveTime = getDateFormat().format(new Date(rel.getTime()));
-	
+
+						if (!(effectiveTime.compareTo(getConfig().getPreviousReleaseDate())>0) ||
+								!(effectiveTime.compareTo(getConfig().getReleaseDate())<=0)){
+							continue;
+						}
 						String refsetId = getRefsetId(relTypeId);
 	
 						if (referencedComponentId==null || referencedComponentId.equals("")){

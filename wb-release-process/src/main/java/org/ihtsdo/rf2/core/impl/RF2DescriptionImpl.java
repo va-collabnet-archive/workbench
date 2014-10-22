@@ -72,6 +72,10 @@ public class RF2DescriptionImpl extends RF2AbstractImpl implements I_ProcessConc
 				Date descriptionEffectiveDate = new Date(getTermFactory().convertToThickVersion(description.getVersion()));
 				effectiveTime = getDateFormat().format(descriptionEffectiveDate);
 
+				if (!(effectiveTime.compareTo(getConfig().getPreviousReleaseDate())>0) ||
+						!(effectiveTime.compareTo(getConfig().getReleaseDate())<=0)){
+					continue;
+				}
 				if (!sDescType.equals("4") && !description.getLang().equals("es")) { 
 					//&& !effectiveTime.contains("1031") && !effectiveTime.contains("0430")) {
 					descriptionid = getDescriptionId(description.getDescId(), ExportUtil.getSnomedCorePathNid());

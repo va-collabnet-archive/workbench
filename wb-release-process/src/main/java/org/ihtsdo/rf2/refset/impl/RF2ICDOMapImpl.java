@@ -121,6 +121,10 @@ public class RF2ICDOMapImpl extends RF2AbstractImpl implements I_ProcessConcepts
 										
 								effectiveTime = getDateFormat().format(new Date(extensionPart.getTime()));
 
+								if (!(effectiveTime.compareTo(getConfig().getPreviousReleaseDate())>0) ||
+										!(effectiveTime.compareTo(getConfig().getReleaseDate())<=0)){
+									continue;
+								}
 								mapTarget = extensionPart.getStringValue();
 								if(mapTarget.contains(" ") || mapTarget.contains("[") || mapTarget.contains("]") ){
 									String test[] = mapTarget.split(" ");

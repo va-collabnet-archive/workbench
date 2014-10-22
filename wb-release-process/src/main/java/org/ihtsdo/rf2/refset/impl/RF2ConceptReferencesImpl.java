@@ -109,6 +109,10 @@ public class RF2ConceptReferencesImpl extends RF2AbstractImpl implements I_Proce
 								Date effectiveDate = new Date(extensionPart.getTime());
 								effectiveTime = getDateFormat().format(effectiveDate);
 
+								if (!(effectiveTime.compareTo(getConfig().getPreviousReleaseDate())>0) ||
+										!(effectiveTime.compareTo(getConfig().getReleaseDate())<=0)){
+									continue;
+								}
 								if (referencedComponentId==null || referencedComponentId.equals("")){
 									referencedComponentId=concept.getUids().iterator().next().toString();
 								}

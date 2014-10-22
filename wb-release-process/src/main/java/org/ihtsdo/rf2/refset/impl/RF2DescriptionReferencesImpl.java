@@ -131,7 +131,11 @@ public class RF2DescriptionReferencesImpl extends RF2AbstractImpl implements I_P
 									uuid = extensionPart.getPrimUuid();
 									Date effectiveDate = new Date(extensionPart.getTime());
 									effectiveTime = getDateFormat().format(effectiveDate);
-									
+
+									if (!(effectiveTime.compareTo(getConfig().getPreviousReleaseDate())>0) ||
+											!(effectiveTime.compareTo(getConfig().getReleaseDate())<=0)){
+										continue;
+									}
 
 									if (descriptionid==null || descriptionid.equals("")){
 										descriptionid=description.getUUIDs().iterator().next().toString();

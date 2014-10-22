@@ -27,10 +27,11 @@ public class ConsolidateInfRelsSnapshotAndDelta extends AbstractTask {
 	private BufferedWriter dbw;
 	private int effectiveTimeColIndex;
 	private int[] indexes;
+	private String previousReleaseDate;
 
 	public ConsolidateInfRelsSnapshotAndDelta(FILE_TYPE fType,
 			File snapshotSortedPreviousfile, File snapshotSortedExportedfile,
-			File snapshotFinalFile, File deltaFinalFile, String releaseDate) {
+			File snapshotFinalFile, File deltaFinalFile, String releaseDate, String previousReleaseDate) {
 		this.snapshotSortedPreviousfile=snapshotSortedPreviousfile;	
 		this.snapshotSortedExportedfile=snapshotSortedExportedfile;
 		this.snapshotFinalFile=snapshotFinalFile;
@@ -39,6 +40,7 @@ public class ConsolidateInfRelsSnapshotAndDelta extends AbstractTask {
 		this.indexes=fType.getSnapshotIndex();
 		this.effectiveTimeColIndex=fType.getEffectiveTimeColIndex();
 		this.releaseDate=releaseDate;
+		this.previousReleaseDate=previousReleaseDate;
 	}
 
 	@Override
@@ -99,7 +101,9 @@ public class ConsolidateInfRelsSnapshotAndDelta extends AbstractTask {
 					}else{
 						if (comp>0){
 							while (comp>0){
-								addExportedLine(splittedLine2);
+								if (splittedLine2[1].compareTo(previousReleaseDate)>=0){
+									addExportedLine(splittedLine2);
+								}
 								lines++;
 								line2=br2.readLine();
 								if (line2==null){
@@ -116,7 +120,7 @@ public class ConsolidateInfRelsSnapshotAndDelta extends AbstractTask {
 							}
 						}
 						while(comp==0){
-							if (fieldsCompare(splittedLine1,splittedLine2)!=0){
+							if (fieldsCompare(splittedLine1,splittedLine2)!=0 && splittedLine2[1].compareTo(previousReleaseDate)>=0){
 								addExportedLine(splittedLine2);
 								lines++;
 							}else{
@@ -141,13 +145,18 @@ public class ConsolidateInfRelsSnapshotAndDelta extends AbstractTask {
 
 			if (line2!=null){
 
-				addExportedLine(splittedLine2);
-				lines++;
+				if (splittedLine2[1].compareTo(previousReleaseDate)>=0){
+					addExportedLine(splittedLine2);
+					lines++;
+				}
 
 				while ((line2= br2.readLine()) != null) {
 					splittedLine2=line2.split("\t",-1);
-					addExportedLine(splittedLine2);
-					lines++;
+
+					if (splittedLine2[1].compareTo(previousReleaseDate)>=0){
+						addExportedLine(splittedLine2);
+						lines++;
+					}
 				}
 			}
 			br1.close();

@@ -158,6 +158,10 @@ public class RF2ConceptInactivationImpl extends RF2AbstractImpl implements I_Pro
 					Date et = new Date(getTermFactory().convertToThickVersion(i_ConceptAttributeTuple.getVersion()));
 					effectiveTime = getDateFormat().format(et);
 
+					if (!(effectiveTime.compareTo(getConfig().getPreviousReleaseDate())>0) ||
+							!(effectiveTime.compareTo(getConfig().getReleaseDate())<=0)){
+						continue;
+					}
 					if (conceptStatus.equals("0")){
 						valueId="XXX";
 					} else {

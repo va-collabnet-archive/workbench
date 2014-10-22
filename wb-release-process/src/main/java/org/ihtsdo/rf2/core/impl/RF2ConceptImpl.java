@@ -72,6 +72,11 @@ public class RF2ConceptImpl extends RF2AbstractImpl implements I_ProcessConcepts
 				conceptStatus = getStatusType(attributes.getStatusNid());
 				et = new Date(attributes.getTime());
 				effectiveTime = getDateFormat().format(et);
+
+				if (!(effectiveTime.compareTo(getConfig().getPreviousReleaseDate())>0) ||
+						!(effectiveTime.compareTo(getConfig().getReleaseDate())<=0)){
+					return;
+				}
 				// Before Jan 31, 2010, then conceptstatus 0 & 6 means current concept (Active)
 				// After Jan 31, 2010 , then conceptstatus 0 means current but 6 means retired
 				if (conceptStatus.equals("0")) {
