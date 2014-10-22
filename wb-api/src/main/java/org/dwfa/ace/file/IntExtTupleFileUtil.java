@@ -30,6 +30,7 @@ import org.dwfa.ace.refset.spec.I_HelpSpecRefset;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.tk.dto.concept.component.TkRevision;
 
 public class IntExtTupleFileUtil {
 
@@ -87,6 +88,7 @@ public class IntExtTupleFileUtil {
                         importConfig.getEditingPathSet().clear();
                         importConfig.getEditingPathSet().add(Terms.get().getPath(pathUuid));
                         importConfig.setProperty("pathUuid", pathUuid);
+                        importConfig.setModuleNid(Terms.get().uuidToNative(TkRevision.unspecifiedModuleUuid));
                     } else {
                         String errorMessage =
                                 "No path with identifier: " + pathUuid
@@ -101,6 +103,7 @@ public class IntExtTupleFileUtil {
                                 ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getUids().iterator().next()));
                         importConfig.setProperty("pathUuid", ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH
                             .getUids().iterator().next());
+                        importConfig.setModuleNid(Terms.get().uuidToNative(TkRevision.unspecifiedModuleUuid));
                     }
                 }
                 statusUuid = UUID.fromString(lineParts[7]);

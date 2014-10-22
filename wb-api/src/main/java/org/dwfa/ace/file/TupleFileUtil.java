@@ -61,6 +61,7 @@ import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.time.TimeUtil;
+import org.ihtsdo.tk.dto.concept.component.TkRevision;
 
 public class TupleFileUtil {
 
@@ -108,6 +109,19 @@ public class TupleFileUtil {
                 }
                 if (!currentLine.trim().equals("")) {
                     String[] lineParts = currentLine.split("\t");
+                    
+                    // REPORT UUIDs not already present in database.
+                    for (String part : lineParts) {
+                        if (part.length() == 36
+                                && part.charAt(8) == '-' 
+                                && part.charAt(13) == '-'
+                                && part.charAt(18) == '-'
+                                && part.charAt(23) == '-') {
+                            if (Terms.get().hasId(UUID.fromString(part)) == false) {
+                                // System.out.println("\n::UUID::NO_PRESENT::\t" + part + "\tFILE:\t" + importFile);
+                            }
+                        }
+                    }
 
                     UUID tupleUuid = UUID.fromString(lineParts[0]);
 
@@ -136,6 +150,7 @@ public class TupleFileUtil {
                                 ConceptConceptExtTupleFileUtil.importTuple(currentLine, outputFileWriter, lineCount,
                                 importConfig);
                         if (refsetConcept != null) {
+                            refsetConcept.getConAttrs().setModuleNid(Terms.get().uuidToNative(TkRevision.unspecifiedModuleUuid));
                             refsetConcepts.add(refsetConcept);
                             tupleCounter.ccTupleCount++;
                         } else {
@@ -147,6 +162,7 @@ public class TupleFileUtil {
                                 ConceptConceptConceptExtTupleFileUtil.importTuple(currentLine, outputFileWriter,
                                 lineCount, importConfig);
                         if (refsetConcept != null) {
+                            refsetConcept.getConAttrs().setModuleNid(Terms.get().uuidToNative(TkRevision.unspecifiedModuleUuid));
                             refsetConcepts.add(refsetConcept);
                             tupleCounter.cccTupleCount++;
                         } else {
@@ -158,6 +174,7 @@ public class TupleFileUtil {
                                 ConceptConceptStringExtTupleFileUtil.importTuple(currentLine, outputFileWriter,
                                 lineCount, importConfig);
                         if (refsetConcept != null) {
+                            refsetConcept.getConAttrs().setModuleNid(Terms.get().uuidToNative(TkRevision.unspecifiedModuleUuid));
                             refsetConcepts.add(refsetConcept);
                             tupleCounter.ccsTupleCount++;
                         } else {
@@ -169,6 +186,7 @@ public class TupleFileUtil {
                                 ConceptExtTupleFileUtil.importTuple(currentLine, outputFileWriter, lineCount,
                                 importConfig);
                         if (refsetConcept != null) {
+                            refsetConcept.getConAttrs().setModuleNid(Terms.get().uuidToNative(TkRevision.unspecifiedModuleUuid));
                             refsetConcepts.add(refsetConcept);
                             tupleCounter.conceptExtTupleCount++;
                         } else {
@@ -179,6 +197,7 @@ public class TupleFileUtil {
                         I_GetConceptData refsetConcept =
                                 IntExtTupleFileUtil.importTuple(currentLine, outputFileWriter, lineCount, importConfig);
                         if (refsetConcept != null) {
+                            refsetConcept.getConAttrs().setModuleNid(Terms.get().uuidToNative(TkRevision.unspecifiedModuleUuid));
                             refsetConcepts.add(refsetConcept);
                             tupleCounter.intTupleCount++;
                         } else {
@@ -192,6 +211,7 @@ public class TupleFileUtil {
                                 StringExtTupleFileUtil.importTuple(currentLine, outputFileWriter, lineCount,
                                 importConfig);
                         if (refsetConcept != null) {
+                            refsetConcept.getConAttrs().setModuleNid(Terms.get().uuidToNative(TkRevision.unspecifiedModuleUuid));
                             refsetConcepts.add(refsetConcept);
                             tupleCounter.stringTupleCount++;
                         } else {
@@ -203,6 +223,7 @@ public class TupleFileUtil {
                                 ConceptStringExtTupleFileUtil.importTuple(currentLine, outputFileWriter, lineCount,
                                 importConfig);
                         if (refsetConcept != null) {
+                            refsetConcept.getConAttrs().setModuleNid(Terms.get().uuidToNative(TkRevision.unspecifiedModuleUuid));
                             refsetConcepts.add(refsetConcept);
                             tupleCounter.csTupleCount++;
                         } else {
@@ -215,6 +236,7 @@ public class TupleFileUtil {
                                     LongExtTupleFileUtil
                                     .importTuple(currentLine, outputFileWriter, lineCount, importConfig);
                             if (refsetConcept != null) {
+                                refsetConcept.getConAttrs().setModuleNid(Terms.get().uuidToNative(TkRevision.unspecifiedModuleUuid));
                                 refsetConcepts.add(refsetConcept);
                                 tupleCounter.longTupleCount++;
                             } else {

@@ -29,6 +29,7 @@ import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.tk.dto.concept.component.TkRevision;
 
 public class RelTupleFileUtil {
 
@@ -108,6 +109,7 @@ public class RelTupleFileUtil {
                         importConfig.getEditingPathSet().clear();
                         importConfig.getEditingPathSet().add(Terms.get().getPath(pathUuid));
                         importConfig.setProperty("pathUuid", pathUuid);
+                        importConfig.setModuleNid(Terms.get().uuidToNative(TkRevision.unspecifiedModuleUuid));
                     } else {
                         String errorMessage =
                                 "No path with identifier: " + pathUuid
@@ -122,6 +124,7 @@ public class RelTupleFileUtil {
                                 ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getUids().iterator().next()));
                         importConfig.setProperty("pathUuid", ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH
                             .getUids().iterator().next());
+                        importConfig.setModuleNid(Terms.get().uuidToNative(TkRevision.unspecifiedModuleUuid));
                     }
                 }
                 statusUuid = UUID.fromString(lineParts[9]);
@@ -192,6 +195,7 @@ public class RelTupleFileUtil {
                         termFactory.newRelationship(relUuid, concept, termFactory.getConcept(relTypeUuid), termFactory
                             .getConcept(c2Uuid), termFactory.getConcept(charUuid), termFactory.getConcept(refUuid),
                             termFactory.getConcept(statusUuid), group, importConfig, effectiveDate);
+                irv.setModuleNid(Terms.get().uuidToNative(TkRevision.unspecifiedModuleUuid));
                 termFactory.addUncommittedNoChecks(concept);
             } else {
                 boolean found = false;
@@ -219,6 +223,7 @@ public class RelTupleFileUtil {
                     newPart.setCharacteristicId(termFactory.getConcept(charUuid).getNid());
                     newPart.setRefinabilityId(termFactory.getConcept(refUuid).getNid());
                     newPart.setGroup(group);
+                    newPart.setModuleNid(Terms.get().uuidToNative(TkRevision.unspecifiedModuleUuid));
                     termFactory.addUncommittedNoChecks(concept);
                 }
             }

@@ -29,6 +29,7 @@ import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.tk.dto.concept.component.TkRevision;
 
 public class DescTupleFileUtil {
 
@@ -79,6 +80,7 @@ public class DescTupleFileUtil {
                         importConfig.getEditingPathSet().clear();
                         importConfig.getEditingPathSet().add(Terms.get().getPath(pathUuid));
                         importConfig.setProperty("pathUuid", pathUuid);
+                        importConfig.setModuleNid(Terms.get().uuidToNative(TkRevision.unspecifiedModuleUuid));
                     } else {
                         String errorMessage =
                                 "No path with identifier: " + pathUuid
@@ -93,6 +95,7 @@ public class DescTupleFileUtil {
                                 ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getUids().iterator().next()));
                         importConfig.setProperty("pathUuid", ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH
                             .getUids().iterator().next());
+                        importConfig.setModuleNid(Terms.get().uuidToNative(TkRevision.unspecifiedModuleUuid));
                     }
                 }
                 statusUuid = UUID.fromString(lineParts[8]);
@@ -154,6 +157,7 @@ public class DescTupleFileUtil {
                     idv =
                             termFactory.newDescription(descUuid, concept, lang, text, typeConcept, importConfig,
                                 statusConcept, effectiveDate);
+                    idv.setModuleNid(Terms.get().uuidToNative(TkRevision.unspecifiedModuleUuid));
                     termFactory.addUncommittedNoChecks(concept);
                 } else {
                     boolean found = false;
@@ -178,6 +182,7 @@ public class DescTupleFileUtil {
                         newPart.setText(text);
                         newPart.setTypeId(typeConcept.getNid());
                         newPart.setInitialCaseSignificant(initialCapSignificant);
+                        newPart.setModuleNid(Terms.get().uuidToNative(TkRevision.unspecifiedModuleUuid));
                         termFactory.addUncommittedNoChecks(concept);
                     }
                 }

@@ -30,6 +30,7 @@ import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
+import org.ihtsdo.tk.dto.concept.component.TkRevision;
 
 public class IDTupleFileUtil {
 
@@ -78,6 +79,7 @@ public class IDTupleFileUtil {
                     importConfig.getEditingPathSet().clear();
                     importConfig.getEditingPathSet().add(Terms.get().getPath(pathUuid));
                     importConfig.setProperty("pathUuid", pathUuid);
+                    importConfig.setModuleNid(Terms.get().uuidToNative(TkRevision.unspecifiedModuleUuid));
                 } else {
                     String errorMessage =
                             "No path with identifier: " + pathUuid
@@ -92,6 +94,7 @@ public class IDTupleFileUtil {
                             ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getUids().iterator().next()));
                     importConfig.setProperty("pathUuid", ArchitectonicAuxiliary.Concept.ARCHITECTONIC_BRANCH.getUids()
                         .iterator().next());
+                    importConfig.setModuleNid(Terms.get().uuidToNative(TkRevision.unspecifiedModuleUuid));
                 }
 
             }
@@ -146,6 +149,7 @@ public class IDTupleFileUtil {
 
                     if (termFactory.hasConcept(versioned.getNid())) {
                         I_GetConceptData concept = termFactory.getConcept(versioned.getNid());
+                        concept.getConAttrs().setModuleNid(Terms.get().uuidToNative(TkRevision.unspecifiedModuleUuid));
                         termFactory.addUncommittedNoChecks(concept);
                     }
                 }
