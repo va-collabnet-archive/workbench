@@ -187,10 +187,11 @@ public class RF2ConceptExporterMojo extends AbstractMojo {
 			
 			// initialize meta hierarchy
 			ExportUtil.init();
+			ExportUtil.createPObjectWriter("PhysicalObject.txt");
 
 			RF2ConceptFactory factory = new RF2ConceptFactory(config);
 			factory.export();
-
+			ExportUtil.closePObjectWriter();
 		} catch (Exception e) {
 			e.printStackTrace();
 			e.getMessage();
