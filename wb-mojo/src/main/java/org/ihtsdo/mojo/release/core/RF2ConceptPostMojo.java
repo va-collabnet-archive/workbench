@@ -36,7 +36,7 @@ public class RF2ConceptPostMojo extends AbstractMojo {
 	private String releaseDate;
 	
 	/**
-	 * previuous release date. 20100731
+	 * previuous release date. 
 	 * 
 	 * @parameter
 	 * @required

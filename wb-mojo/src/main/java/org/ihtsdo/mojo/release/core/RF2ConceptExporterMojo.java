@@ -36,11 +36,20 @@ public class RF2ConceptExporterMojo extends AbstractMojo {
 	private String releaseDate;
 
 	/**
+	 * previuous release date. 
+	 * 
+	 * @parameter
+	 * @required
+	 */
+	private String previousReleaseDate;
+	
+	/**
 	 * Location of the exportFoler.
 	 * 
 	 * @parameter
 	 * @required
 	 */
+	
 	private String exportFolder;
 	
 	/**
@@ -156,6 +165,7 @@ public class RF2ConceptExporterMojo extends AbstractMojo {
 //			DateFormat releaseFormat = new SimpleDateFormat("yyyyMMdd");
 //			String releaseDateString = releaseFormat.format(time);
 			config.setReleaseDate(releaseDate);
+			config.setPreviousReleaseDate(previousReleaseDate);
 			config.setRf2Format(rF2Format);
 			config.setFlushCount(10000);
 			config.setInvokeDroolRules("false");
