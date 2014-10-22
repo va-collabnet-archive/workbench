@@ -195,7 +195,6 @@ public class RelTupleFileUtil {
                         termFactory.newRelationship(relUuid, concept, termFactory.getConcept(relTypeUuid), termFactory
                             .getConcept(c2Uuid), termFactory.getConcept(charUuid), termFactory.getConcept(refUuid),
                             termFactory.getConcept(statusUuid), group, importConfig, effectiveDate);
-                irv.setModuleNid(Terms.get().uuidToNative(TkRevision.unspecifiedModuleUuid));
                 termFactory.addUncommittedNoChecks(concept);
             } else {
                 boolean found = false;

@@ -149,7 +149,6 @@ public class IDTupleFileUtil {
 
                     if (termFactory.hasConcept(versioned.getNid())) {
                         I_GetConceptData concept = termFactory.getConcept(versioned.getNid());
-                        concept.getConAttrs().setModuleNid(Terms.get().uuidToNative(TkRevision.unspecifiedModuleUuid));
                         termFactory.addUncommittedNoChecks(concept);
                     }
                 }

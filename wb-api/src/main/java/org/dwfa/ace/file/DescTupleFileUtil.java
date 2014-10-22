@@ -157,7 +157,6 @@ public class DescTupleFileUtil {
                     idv =
                             termFactory.newDescription(descUuid, concept, lang, text, typeConcept, importConfig,
                                 statusConcept, effectiveDate);
-                    idv.setModuleNid(Terms.get().uuidToNative(TkRevision.unspecifiedModuleUuid));
                     termFactory.addUncommittedNoChecks(concept);
                 } else {
                     boolean found = false;

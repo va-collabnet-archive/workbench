@@ -180,7 +180,6 @@ public class ConceptTupleFileUtil {
                 I_GetConceptData newConcept =
                         termFactory.newConcept(conceptUuid, isDefined, importConfig, termFactory
                             .uuidToNative(statusUuid), effectiveDate);
-                newConcept.getConAttrs().setModuleNid(Terms.get().uuidToNative(TkRevision.unspecifiedModuleUuid));
                 lastConcept = newConcept;
                 termFactory.addUncommittedNoChecks(newConcept);
             }
