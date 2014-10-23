@@ -33,11 +33,11 @@ public class RF2SimpleMapRefsetFactory extends RF2AbstractFactory {
 		try {
 			logger.info("Started Simple Map Snomed Id & CTV3 Id Refset Export ...");
 			
-			RF2SnomedIdImpl snomedIdIterator = new RF2SnomedIdImpl(getConfig());
-			Terms.get().iterateConcepts(snomedIdIterator);
+//			RF2SnomedIdImpl snomedIdIterator = new RF2SnomedIdImpl(getConfig());
+//			Terms.get().iterateConcepts(snomedIdIterator);
 
-//			RF2Ctv3IdImpl ctv3IdIterator = new RF2Ctv3IdImpl(getConfig());
-//			Terms.get().iterateConcepts(ctv3IdIterator);
+			RF2Ctv3IdImpl ctv3IdIterator = new RF2Ctv3IdImpl(getConfig());
+			Terms.get().iterateConcepts(ctv3IdIterator);
 //
 //			logger.info("Finished Simple Map SnomedId & CTV3Id  Refset Export.");
 //			

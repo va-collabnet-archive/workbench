@@ -66,6 +66,9 @@ public class RF2Ctv3IdImpl extends RF2AbstractImpl implements I_ProcessConcepts 
 					mapTarget = getCTV3ID(getConfig(), concept.getUids().iterator().next());
 					
 				}
+				if (mapTarget.equals("null")){
+					logger.info( concept.getUids().iterator().next() + "\t" + referencedComponentId);
+				}
 				if (wsConceptId!=null && !wsConceptId.equals("")){
 					referencedComponentId=wsConceptId;
 				}
