@@ -75,6 +75,9 @@ public class RF2SnomedIdImpl extends RF2AbstractImpl implements I_ProcessConcept
 						mapTarget = getSNOMEDID(getConfig(), concept.getUids().iterator().next(), parentSnomedId);
 						
 					}
+					if (mapTarget.equals("null")){
+						logger.info( concept.getUids().iterator().next() + "\t" + referencedComponentId);
+					}
 					if (wsConceptId!=null && !wsConceptId.equals("")){
 						referencedComponentId=wsConceptId;
 					}
