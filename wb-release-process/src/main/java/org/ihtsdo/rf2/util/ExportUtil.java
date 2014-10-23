@@ -1659,7 +1659,7 @@ public class ExportUtil {
 
 			snomedId = idGen.createSNOMEDID(uuid, parentSnomedId);
 
-			logger.info("===SnomedId Created: " + snomedId);
+//			logger.info("===SnomedId Created: " + snomedId);
 		} catch (Exception cE) {
 			logger.error("Message : SnomedId creation error for UUID :" + uuid, cE);
 		}
