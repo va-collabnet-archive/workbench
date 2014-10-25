@@ -26,7 +26,8 @@ import org.tmatesoft.svn.core.wc2.SvnTarget;
  * @goal svn-checkout-in-target
  * 
  * @phase process-sources
- */public class SvnCheckoutInTarget     extends AbstractMojo {
+ */
+public class SvnCheckoutInTarget extends AbstractMojo {
      
    /**
      * username on the scm server.
