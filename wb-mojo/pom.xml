@@ -141,6 +141,16 @@
 			<artifactId>dom4j</artifactId>
 			<version>1.6.1</version>
 		</dependency>
+        <dependency>
+            <groupId>org.tmatesoft.svnkit</groupId>
+            <artifactId>svnkit</artifactId>
+            <type>jar</type>
+            <optional>false</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.tmatesoft.svnkit</groupId>
+            <artifactId>svnkit-javahl16</artifactId>
+        </dependency>
 	</dependencies>
 	<build>
 		<resources>
