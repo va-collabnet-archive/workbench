@@ -141,10 +141,10 @@ the specific language governing permissions and limitations under the License. -
                             <groupId>net.java.dev.jna</groupId>
                             <artifactId>jna</artifactId>
                         </exclusion>
-                        <exclusion>
+                        <!-- exclusion>
                             <groupId>org.tmatesoft.sqljet</groupId>
                             <artifactId>sqljet</artifactId>
-                        </exclusion>
+                        </exclusion -->
                     </exclusions>
                 </dependency>
         </dependencies>
