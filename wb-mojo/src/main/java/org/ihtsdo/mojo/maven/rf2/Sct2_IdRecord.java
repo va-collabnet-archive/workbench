@@ -86,12 +86,14 @@ public class Sct2_IdRecord implements Serializable {
         Set<Long> idSchemeSet = new HashSet<>();
         Set<Long> dateTimeSet = new HashSet<>();
         Set<Long> moduleIdSet = new HashSet<>();
+        AceLog.getAppLog().info("\n::: parseToIdPreCacheFile() setting up ObjectOutStream()");
         try (ObjectOutputStream oos = new ObjectOutputStream(
                 new BufferedOutputStream(
                         new FileOutputStream(idCacheOutputPathFnameStr)))) {
                     // open searchable text file
                     File txtFile = new File(idCacheOutputPathFnameStr + ".txt");
             try (BufferedWriter bw = new BufferedWriter(new FileWriter(txtFile))) {
+                AceLog.getAppLog().info("\n::: parseToIdPreCacheFile() ObjectOutStream() allocated");
                     bw.append("SCT");
                     bw.append(TAB_CHARACTER);
                     bw.append("COMPUTED");

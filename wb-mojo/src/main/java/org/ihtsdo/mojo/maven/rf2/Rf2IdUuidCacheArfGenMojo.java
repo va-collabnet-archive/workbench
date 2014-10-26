@@ -128,7 +128,7 @@ public class Rf2IdUuidCacheArfGenMojo extends AbstractMojo implements Serializab
             
             // Setup directory paths
             getLog().info("::: Input Sct Path: " + wDir + FILE_SEPARATOR 
-                    + inputSubDir + FILE_SEPARATOR + inputSctDir);
+                    + inputSubDir + inputSctDir);
             String cachePath = wDir + FILE_SEPARATOR + idCacheDir + FILE_SEPARATOR;
             String idCacheFName = cachePath + "idSctUuidCache.ser";
             if ((new File(cachePath)).mkdirs()) {
@@ -145,6 +145,9 @@ public class Rf2IdUuidCacheArfGenMojo extends AbstractMojo implements Serializab
             // Parse IHTSDO Terminology Identifiers to Sct_CompactId cache file.
             filesIn = Rf2File.getFiles(wDir, inputSubDir, inputSctDir,
                     "_Identifier_", ".txt");
+            if (filesIn == null || filesIn.isEmpty()) {
+                throw new UnsupportedOperationException("NOT SUPPORTED: Rf2IdUuidCacheArfGenMojo no _Identifier_ file found.");
+            }
             Sct2_IdRecord.parseToIdPreCacheFile(filesIn, idCacheFName);
             // Setup id array cache object
             // idCacheDir + FILE_SEPARATOR + "idObjectCache.jbin"

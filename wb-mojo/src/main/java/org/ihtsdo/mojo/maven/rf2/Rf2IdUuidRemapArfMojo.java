@@ -108,11 +108,11 @@ public class Rf2IdUuidRemapArfMojo
             throws MojoExecutionException, MojoFailureException {
         // SHOW DIRECTORIES
         String wDir = targetDirectory.getAbsolutePath();
-        getLog().info("  POM       Target Directory:           "
+        getLog().info("  POM       Target Directory:                   "
                 + targetDirectory.getAbsolutePath());
-        getLog().info("  POM Input Target/Sub Directory:       "
+        getLog().info("  POM Input Target/Sub Directory:  (idSubDir)   "
                 + idSubDir);
-        getLog().info("  POM ID SCT/UUID Cache Directory:      "
+        getLog().info("  POM ID SCT/UUID Cache Directory: (idCacheDir) "
                 + idCacheDir);
 
         // Setup cache paths
@@ -122,21 +122,21 @@ public class Rf2IdUuidRemapArfMojo
             getLog().info("::: UUID Remap Cache : " + idCacheFName);
         }
 
-        CreateUuidRemapCache(wDir, idCacheFName);
+        createUuidRemapCache(wDir, idCacheFName);
 
         try {
             UuidUuidRemapper idLookup = new UuidUuidRemapper(idCacheFName);
             // idLookup.setupReverseLookup();
             
             if (remapArfDirs != null) {
-                RemapAllFiles(wDir, remapSubDir, remapArfDirs, idLookup);
+                remapAllFiles(wDir, remapSubDir, remapArfDirs, idLookup);
             }
         } catch (IOException ex) {
             throw new MojoExecutionException("failed uuid remap", ex);
         }
     }
 
-    void CreateUuidRemapCache(String wDir, String idCacheFName) {
+    void createUuidRemapCache(String wDir, String idCacheFName) {
         List<Rf2File> filesIn;
         getLog().info("::: BEGIN Rf2IdUuidRemapArfMojo");
         try {
@@ -144,6 +144,9 @@ public class Rf2IdUuidRemapArfMojo
             // Parse IHTSDO Terminology Identifiers to Sct_CompactId cache file.
             filesIn = Rf2File.getFiles(wDir, idSubDir, idInputDir,
                     "_Identifier_", ".txt");
+            if (filesIn == null || filesIn.isEmpty()) {
+                throw new UnsupportedOperationException("NOT SUPPORTED: Rf2IdUuidRemapArfMojo no _Identifier_ file found.");
+            }
             parseToUuidRemapCacheFile(filesIn, idCacheFName);
 
         } catch (Exception ex) {
@@ -152,7 +155,7 @@ public class Rf2IdUuidRemapArfMojo
 
     }
 
-    void RemapAllFiles(String tDir, String tSubDir, String[] inDirs, UuidUuidRemapper idLookup)
+    void remapAllFiles(String tDir, String tSubDir, String[] inDirs, UuidUuidRemapper idLookup)
             throws IOException {
         long startTime = System.currentTimeMillis();
         System.out.println((System.currentTimeMillis() - startTime) + " mS");
@@ -170,14 +173,14 @@ public class Rf2IdUuidRemapArfMojo
                         || fileName.contains("ids.txt")) {
                     String fPathNameIn = dirPathName + FILE_SEPARATOR + fileName;
                     String fPathNameOut = dirPathName + FILE_SEPARATOR + "tmp_" + fileName;
-                    RemapFile(new File(fPathNameIn), new File(fPathNameOut), idLookup);
+                    remapFile(new File(fPathNameIn), new File(fPathNameOut), idLookup);
                 }
             }
         }
 
     }
 
-    void RemapFile(File inFile, File outFile, UuidUuidRemapper uuidUuidRemapper)
+    void remapFile(File inFile, File outFile, UuidUuidRemapper uuidUuidRemapper)
             throws IOException {
         getLog().info("remap UUIDs in: " + inFile.getAbsolutePath());
 
@@ -234,7 +237,7 @@ public class Rf2IdUuidRemapArfMojo
      * @param parseToUuidRemapCacheFile
      * @throws Exception
      */
-    static void parseToUuidRemapCacheFile(List<Rf2File> fList, String idCacheOutputPathFnameStr)
+    void parseToUuidRemapCacheFile(List<Rf2File> fList, String idCacheOutputPathFnameStr)
             throws Exception {
         // SNOMED CT UUID scheme
         long sctUuidSchemeIdL = Long.parseLong("900000000000002006");
@@ -245,9 +248,11 @@ public class Rf2IdUuidRemapArfMojo
         Set<Long> idSchemeSet = new HashSet<>();
         Set<Long> dateTimeSet = new HashSet<>();
         Set<Long> moduleIdSet = new HashSet<>();
+        getLog().info("\n::: parseToUuidRemapCacheFile() setting up ObjectOutStream()");
         try (ObjectOutputStream oos = new ObjectOutputStream(
                 new BufferedOutputStream(
                 new FileOutputStream(idCacheOutputPathFnameStr)))) {
+            getLog().info("\n::: parseToUuidRemapCacheFile() ObjectOutStream() allocated");
             int IDENTIFIER_SCHEME_ID = 0;
             int ALTERNATE_IDENTIFIER = 1;
             int EFFECTIVE_TIME = 2;
@@ -313,7 +318,7 @@ public class Rf2IdUuidRemapArfMojo
 
                 }
                 StringBuilder sb = new StringBuilder();
-                sb.append("\n::: parseToUuidRemapCacheFile(..) ");
+                sb.append("\n::: parseToUuidRemapCacheFile(..) in Rf2IdUuidRematArfMojo");
                 sb.append("\n::: SNOMED CT UUID Schema (900000000000002006) cached");
                 if (idSchemeSet.size() > 0) {
                    sb.append("\n::: Other UUID Schemas (900000000000002006) not cached");

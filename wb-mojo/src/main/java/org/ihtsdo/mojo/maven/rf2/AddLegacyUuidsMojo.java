@@ -150,9 +150,8 @@ public class AddLegacyUuidsMojo extends AbstractMojo {
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         watchUuidSet = new HashSet<>();
-        // 'HX of bulimia nervosa'
-        // watchUuidSet.add(UUID.fromString("945ef09a-83f6-5b46-88b6-1192a0edb592"));
-        // watchUuidSet.add(UUID.fromString("54e15101-d390-11e2-8b8b-0800200c9a66"));
+//        watchUuidSet.add(UUID.fromString("81563ceb-74e1-5f0b-9183-aa50d9498aad"));
+//        watchUuidSet.add(UUID.fromString("2532c18e-bb18-5c9b-b267-3b8075d67769"));
         // EDG Clinical Contextset Member Id
         // watchUuidSet.add(UUID.fromString("9ef4e796-d5b9-538e-b1b4-43b4d9d7815a")); 
         // RF2 "Ischemia, viscera" -- SNOMED ASSIGNED
@@ -169,9 +168,9 @@ public class AddLegacyUuidsMojo extends AbstractMojo {
         getLog().info("AddLegacyUuidsMojo : adds legacy computed uuids ");
         // SHOW DIRECTORIES
         String wDir = targetDirectory.getAbsolutePath();
-        getLog().info(":::           Target Dir: " + targetDirectory.getAbsolutePath());
-        getLog().info("::: generated-source Dir: " + generatedSourcesDir);
-        getLog().info(":::   SCT/UUID Cache Dir: " + idCacheDir);
+        getLog().info(":::           Target Dir: .getAbsolutePath()    " + targetDirectory.getAbsolutePath());
+        getLog().info("::: generated-source Dir: (generatedSourcesDir) " + generatedSourcesDir);
+        getLog().info(":::   SCT/UUID Cache Dir: (idCacheDir)          " + idCacheDir);
 
         // Setup cache paths
         String cachePath = wDir + FILE_SEPARATOR + idCacheDir + FILE_SEPARATOR;
@@ -181,7 +180,7 @@ public class AddLegacyUuidsMojo extends AbstractMojo {
         }
 
         // create actual to computed SNOMED cUUID/aUUID map cache
-        CreateUuidRemapCache(wDir, idCacheFName);
+        createUuidRemapCache(wDir, idCacheFName);
 
         try {
 
@@ -204,14 +203,17 @@ public class AddLegacyUuidsMojo extends AbstractMojo {
 
     }
 
-    void CreateUuidRemapCache(String wDir, String idCacheFName) {
+    void createUuidRemapCache(String wDir, String idCacheFName) {
         List<Rf2File> filesIn;
-        getLog().info("::: BEGIN Rf2IdUuidRemapArfMojo");
+        getLog().info("::: BEGIN AddLegacyUuidsMojo createUuidRemapCache");
         try {
 
             // Parse IHTSDO Terminology Identifiers to UuidUuidRecord cache file.
             filesIn = Rf2File.getFiles(wDir, generatedSourcesDir, snomedIdInputDir,
                     "_Identifier_", ".txt");
+            if (filesIn == null || filesIn.isEmpty()) {
+                throw new UnsupportedOperationException("NOT SUPPORTED: AddLegacyUuidsMojo createUuidRemapCache no _Identifier_ file found.");
+            }
             parseToUuidRemapCacheFile(filesIn, idCacheFName);
 
         } catch (Exception ex) {
@@ -226,7 +228,7 @@ public class AddLegacyUuidsMojo extends AbstractMojo {
      * @param parseToUuidRemapCacheFile
      * @throws Exception
      */
-    static void parseToUuidRemapCacheFile(List<Rf2File> fList, String idCacheOutputPathFnameStr)
+    void parseToUuidRemapCacheFile(List<Rf2File> fList, String idCacheOutputPathFnameStr)
             throws Exception {
         // SNOMED CT UUID scheme
         long sctUuidSchemeIdL = Long.parseLong("900000000000002006");
@@ -237,9 +239,11 @@ public class AddLegacyUuidsMojo extends AbstractMojo {
         Set<Long> idSchemeSet = new HashSet<>();
         Set<Long> dateTimeSet = new HashSet<>();
         Set<Long> moduleIdSet = new HashSet<>();
+        getLog().info("\n::: parseToUuidRemapCacheFile() setting up ObjectOutStream()");
         try (ObjectOutputStream oos = new ObjectOutputStream(
                 new BufferedOutputStream(
                         new FileOutputStream(idCacheOutputPathFnameStr)))) {
+                    getLog().info("\n::: parseToUuidRemapCacheFile() ObjectOutStream() allocated");
                     int IDENTIFIER_SCHEME_ID = 0;
                     int ALTERNATE_IDENTIFIER = 1;
                     int EFFECTIVE_TIME = 2;
@@ -312,7 +316,7 @@ public class AddLegacyUuidsMojo extends AbstractMojo {
 
                         }
                         StringBuilder sb = new StringBuilder();
-                        sb.append("\n::: parseToUuidRemapCacheFile(..) ");
+                        sb.append("\n::: parseToUuidRemapCacheFile(..) in AddLegacyUuidsMojo");
                         sb.append("\n::: SNOMED CT UUID Scheme (900000000000002006) cached");
                         if (idSchemeSet.size() > 0) {
                             sb.append("\n::: Other UUID Schemes (900000000000002006) not cached");
@@ -393,7 +397,13 @@ public class AddLegacyUuidsMojo extends AbstractMojo {
                 getLog().info("::: AddLegacyUuids: output file closed");
                 break;
             }
+//            if (watchUuidSet.contains(tkConcept.primordialUuid)) {
+//                System.out.println("AddLegacyUuids::BEFORE:: " + tkConcept.primordialUuid + "\n" + tkConcept.toString() + "\n");
+//            }
             addLegacyUuidsToEConceptWithIdScheme(tkConcept, idLookup);
+//            if (watchUuidSet.contains(tkConcept.primordialUuid)) {
+//                System.out.println("AddLegacyUuids::AFTER:: " + tkConcept.primordialUuid + "\n" + tkConcept.toString() + "\n");
+//            }
             tkConcept.writeExternal(dos);
         }
 

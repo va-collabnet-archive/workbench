@@ -112,9 +112,10 @@ public class AddDesSctIdsMojo extends AbstractMojo {
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
-        watchConceptSet = new HashSet<>();
-        //watchConceptSet.add(UUID.fromString("b95f7cac-8021-40bc-92d9-4e236b48967b"));
-        //watchConceptSet.add(UUID.fromString("3f18d530-fe1a-3884-953f-26bcc3480d0d"));
+        watchConceptSet = new HashSet<>();            
+            
+//         watchConceptSet.add(UUID.fromString("2532c18e-bb18-5c9b-b267-3b8075d67769"));
+//         watchConceptSet.add(UUID.fromString("81563ceb-74e1-5f0b-9183-aa50d9498aad"));
         watchSctIdSet = new HashSet<>();
         //watchSctIdSet.add(2169711000119110L);
 
