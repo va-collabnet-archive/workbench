@@ -42,8 +42,7 @@ import org.ihtsdo.tk.uuid.UuidT3Generator;
 
 /**
  *
- * Read a file of SCTID with corresponding UUIDs and determines if the UUIDs 
- * need to be re-mapped.
+ * Read a file of SCTID with corresponding UUIDs and determines if the UUIDs need to be re-mapped.
  *
  * @author Marc E. Campbell
  *
@@ -127,7 +126,7 @@ public class Rf2IdUuidRemapArfMojo
         try {
             UuidUuidRemapper idLookup = new UuidUuidRemapper(idCacheFName);
             // idLookup.setupReverseLookup();
-            
+
             if (remapArfDirs != null) {
                 remapAllFiles(wDir, remapSubDir, remapArfDirs, idLookup);
             }
@@ -146,6 +145,14 @@ public class Rf2IdUuidRemapArfMojo
                     "_Identifier_", ".txt");
             if (filesIn == null || filesIn.isEmpty()) {
                 throw new UnsupportedOperationException("NOT SUPPORTED: Rf2IdUuidRemapArfMojo no _Identifier_ file found.");
+            } else {
+                StringBuilder sb = new StringBuilder();
+                sb.append("\n### Rf2IdUuidRemapArfMojo ID Files");
+                for (Rf2File rf2File : filesIn) {
+                    sb.append("\n### FOUND: ").append(rf2File.toString());
+                }
+                Logger logger = Logger.getLogger(Rf2IdUuidRemapArfMojo.class.getName());
+                logger.info(sb.toString());
             }
             parseToUuidRemapCacheFile(filesIn, idCacheFName);
 
@@ -251,114 +258,118 @@ public class Rf2IdUuidRemapArfMojo
         getLog().info("\n::: parseToUuidRemapCacheFile() setting up ObjectOutStream()");
         try (ObjectOutputStream oos = new ObjectOutputStream(
                 new BufferedOutputStream(
-                new FileOutputStream(idCacheOutputPathFnameStr)))) {
-            getLog().info("\n::: parseToUuidRemapCacheFile() ObjectOutStream() allocated");
-            int IDENTIFIER_SCHEME_ID = 0;
-            int ALTERNATE_IDENTIFIER = 1;
-            int EFFECTIVE_TIME = 2;
-            int ACTIVE = 3;
-            int MODULE_ID = 4;
-            int REFERENCED_COMPONENT_ID = 5;
-            for (Rf2File f : fList) {
-                BufferedReader br = new BufferedReader(
-                        new InputStreamReader(
-                        new FileInputStream(f.file), "UTF-8"));
-                br.readLine();
-                countNonActiveL = 0;
-                countNonComputedIdsL = 0;
-                totalParsedLinesL = 0;
-                nonParsableLinesL = 0;
-                while (br.ready()) {
-                    String tempLine = br.readLine();
-                    String[] line = tempLine.split(TAB_CHARACTER);
-                    if (line.length < REFERENCED_COMPONENT_ID + 1) {
-                        System.err.println("not parsed: " + tempLine);
-                        nonParsableLinesL++;
-                        continue;
-                    } else {
-                        totalParsedLinesL++;
-                    }
-                    // IDENTIFIER_SCHEME_ID
-                    long identifierScheme = Long.parseLong(line[IDENTIFIER_SCHEME_ID]);
-                    if (identifierScheme != sctUuidSchemeIdL) {
-                        idSchemeSet.add(identifierScheme);
-                        continue;
-                    }
-                    // ACTIVE
-                    int activeData = Integer.parseInt(line[ACTIVE]);
-                    if (activeData != 1) {
-                        countNonActiveL++;
-                    }
-                    // EFFECTIVE_TIME
-                    String eTimeStr = Rf2x.convertEffectiveTimeToDate(line[EFFECTIVE_TIME]);
-                    long eTime = Rf2x.convertDateToTime(eTimeStr);
-                    dateTimeSet.add(eTime);
+                        new FileOutputStream(idCacheOutputPathFnameStr)))) {
+                    getLog().info("\n::: parseToUuidRemapCacheFile() ObjectOutStream() allocated");
+                    int IDENTIFIER_SCHEME_ID = 0;
+                    int ALTERNATE_IDENTIFIER = 1;
+                    int EFFECTIVE_TIME = 2;
+                    int ACTIVE = 3;
+                    int MODULE_ID = 4;
+                    int REFERENCED_COMPONENT_ID = 5;
+                    for (Rf2File f : fList) {
+                        BufferedReader br = new BufferedReader(
+                                new InputStreamReader(
+                                        new FileInputStream(f.file), "UTF-8"));
+                        br.readLine();
+                        countNonActiveL = 0;
+                        countNonComputedIdsL = 0;
+                        totalParsedLinesL = 0;
+                        nonParsableLinesL = 0;
+                        while (br.ready()) {
+                            String tempLine = br.readLine();
+                            String[] line = tempLine.split(TAB_CHARACTER);
+                            if (line.length < REFERENCED_COMPONENT_ID + 1) {
+                                System.err.println("not parsed: " + tempLine);
+                                nonParsableLinesL++;
+                                continue;
+                            } else {
+                                totalParsedLinesL++;
+                            }
+                            // IDENTIFIER_SCHEME_ID
+                            long identifierScheme = Long.parseLong(line[IDENTIFIER_SCHEME_ID]);
+                            if (identifierScheme != sctUuidSchemeIdL) {
+                                idSchemeSet.add(identifierScheme);
+                                continue;
+                            }
+                            // ACTIVE
+                            int activeData = Integer.parseInt(line[ACTIVE]);
+                            if (activeData != 1) {
+                                countNonActiveL++;
+                            }
+                            // EFFECTIVE_TIME
+                            String eTimeStr = Rf2x.convertEffectiveTimeToDate(line[EFFECTIVE_TIME]);
+                            long eTime = Rf2x.convertDateToTime(eTimeStr);
+                            dateTimeSet.add(eTime);
 
-                    // MODULE_ID
-                    Long moduleIdL = Long.parseLong(line[MODULE_ID]);
-                    moduleIdSet.add(moduleIdL);
+                            // MODULE_ID
+                            Long moduleIdL = Long.parseLong(line[MODULE_ID]);
+                            moduleIdSet.add(moduleIdL);
 
-                    // ALTERNATE_IDENTIFIER and REFERENCED_COMPONENT_ID
-                    // Assigned uuid
-                    UUID aUuid = UUID.fromString(line[ALTERNATE_IDENTIFIER]);
-                    // Computed uuid
-                    long sctIdL = Long.parseLong(line[REFERENCED_COMPONENT_ID]);
-                    UUID cUuid = UUID.fromString(
-                            UuidT3Generator.fromSNOMED(sctIdL).toString());
-                    
-                    // UUID cUuid = UUID.fromString(Rf2x.convertSctIdToUuidStr(sctIdL));
-                    if (identifierScheme == sctUuidSchemeIdL && aUuid.compareTo(cUuid) != 0) {
-                        countNonComputedIdsL++;
-                        UuidUuidRecord tempIdCompact = new UuidUuidRecord(
-                                cUuid,
-                                aUuid);
-                        // Write to JBIN file
-                        oos.writeUnshared(tempIdCompact);
-                    }
+                            // ALTERNATE_IDENTIFIER and REFERENCED_COMPONENT_ID
+                            // Assigned uuid
+                            UUID aUuid = UUID.fromString(line[ALTERNATE_IDENTIFIER]);
+                            // Computed uuid
+                            long sctIdL = Long.parseLong(line[REFERENCED_COMPONENT_ID]);
+                            UUID cUuid = UUID.fromString(
+                                    UuidT3Generator.fromSNOMED(sctIdL).toString());
 
-                }
-                StringBuilder sb = new StringBuilder();
-                sb.append("\n::: parseToUuidRemapCacheFile(..) in Rf2IdUuidRematArfMojo");
-                sb.append("\n::: SNOMED CT UUID Schema (900000000000002006) cached");
-                if (idSchemeSet.size() > 0) {
-                   sb.append("\n::: Other UUID Schemas (900000000000002006) not cached");
-                }
-                sb.append("\n::: PARSED & WRITTEN TO UUID ID REMAP CACHE: ");
-                sb.append(f.file.toURI().toString());
-                if (idSchemeSet.size() > 0) {
-                    Long[] idSchemeArray = idSchemeSet.toArray(new Long[0]);
-                    for (Long long1 : idSchemeArray) {
-                        sb.append("\n::: ID Schema: ");
-                        sb.append(long1.toString());
+                            // UUID cUuid = UUID.fromString(Rf2x.convertSctIdToUuidStr(sctIdL));
+                            if (identifierScheme == sctUuidSchemeIdL && aUuid.compareTo(cUuid) != 0) {
+                                countNonComputedIdsL++;
+                                UuidUuidRecord tempIdCompact = new UuidUuidRecord(
+                                        cUuid,
+                                        aUuid);
+                                // Write to JBIN file
+                                oos.writeUnshared(tempIdCompact);
+                            }
+
+                        }
+                        StringBuilder sb = new StringBuilder();
+                        sb.append("\n::: parseToUuidRemapCacheFile(..) in Rf2IdUuidRematArfMojo");
+                        sb.append("\n::: SNOMED CT UUID Schema (900000000000002006) cached");
+                        if (idSchemeSet.size() > 0) {
+                            sb.append("\n::: Other UUID Schemas (900000000000002006) not cached");
+                        }
+                        sb.append("\n::: PARSED & WRITTEN TO UUID ID REMAP CACHE: ");
+                        sb.append(f.file.toURI().toString());
+                        if (idSchemeSet.size() > 0) {
+                            Long[] idSchemeArray = idSchemeSet.toArray(new Long[0]);
+                            for (Long long1 : idSchemeArray) {
+                                sb.append("\n::: ID Schema: ");
+                                sb.append(long1.toString());
+                            }
+                        } else {
+                            sb.append("\n::: SNOMED CT UUID Schema (900000000000002006)");
+                        }
+                        sb.append("\n::: countNonActive=");
+                        sb.append(countNonActiveL);
+                        sb.append("\n::: countNonComputedIDs=");
+                        sb.append(countNonComputedIdsL);
+                        sb.append("\n::: totalParsedLinesL=");
+                        sb.append(totalParsedLinesL);
+                        sb.append("\n::: nonParsableLines=");
+                        sb.append(nonParsableLinesL);
+                        sb.append("\n::: dateTimeCount=");
+                        sb.append(dateTimeSet.size());
+                        Long[] moduleIdArray = moduleIdSet.toArray(new Long[0]);
+                        for (Long moduleIdLong : moduleIdArray) {
+                            sb.append("\n::: ModuleID: ");
+                            sb.append(moduleIdLong.toString());
+                        }
+                        Long[] dateTimeArray = dateTimeSet.toArray(new Long[0]);
+                        for (Long dateLong : dateTimeArray) {
+                            sb.append("\n:::     ");
+                            sb.append(Rf2x.convertTimeToDate(dateLong));
+                        }
+                        sb.append("\n::: \n");
+                        Logger logger = Logger.getLogger(Rf2IdUuidRemapArfMojo.class.getName());
+                        logger.info(sb.toString());
                     }
-                } else {
-                    sb.append("\n::: SNOMED CT UUID Schema (900000000000002006)");
+                    oos.flush();
+                } catch (Exception e) {
+                    Logger logger = Logger.getLogger(Rf2IdUuidRemapArfMojo.class.getName());
+                    logger.info(e.toString());
+                    e.printStackTrace();
                 }
-                sb.append("\n::: countNonActive=");
-                sb.append(countNonActiveL);
-                sb.append("\n::: countNonComputedIDs=");
-                sb.append(countNonComputedIdsL);
-                sb.append("\n::: totalParsedLinesL=");
-                sb.append(totalParsedLinesL);
-                sb.append("\n::: nonParsableLines=");
-                sb.append(nonParsableLinesL);
-                sb.append("\n::: dateTimeCount=");
-                sb.append(dateTimeSet.size());
-                Long[] moduleIdArray = moduleIdSet.toArray(new Long[0]);
-                for (Long moduleIdLong : moduleIdArray) {
-                    sb.append("\n::: ModuleID: ");
-                    sb.append(moduleIdLong.toString());
-                }
-                Long[] dateTimeArray = dateTimeSet.toArray(new Long[0]);
-                for (Long dateLong : dateTimeArray) {
-                    sb.append("\n:::     ");
-                    sb.append(Rf2x.convertTimeToDate(dateLong));
-                }
-                sb.append("\n::: \n");
-                Logger logger = Logger.getLogger(UuidUuidRecord.class.getName());
-                logger.info(sb.toString());
-            }
-            oos.flush();
-        }
     }
 }

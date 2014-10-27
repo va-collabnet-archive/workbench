@@ -30,6 +30,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import org.apache.log4j.Level;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
@@ -37,8 +38,8 @@ import org.dwfa.util.id.Type3UuidFactory;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 
 /**
- * Simple case: single date (no versioning). all active. one id schema. Handle
- * remapping of non-computed primordial UUIDs.
+ * Simple case: single date (no versioning). all active. one id schema. Handle remapping of
+ * non-computed primordial UUIDs.
  *
  * @author marc campbell
  */
@@ -92,135 +93,138 @@ public class Sct2_IdRecord implements Serializable {
                         new FileOutputStream(idCacheOutputPathFnameStr)))) {
                     // open searchable text file
                     File txtFile = new File(idCacheOutputPathFnameStr + ".txt");
-            try (BufferedWriter bw = new BufferedWriter(new FileWriter(txtFile))) {
-                AceLog.getAppLog().info("\n::: parseToIdPreCacheFile() ObjectOutStream() allocated");
-                    bw.append("SCT");
-                    bw.append(TAB_CHARACTER);
-                    bw.append("COMPUTED");
-                    bw.append(TAB_CHARACTER);
-                    bw.append("ASSIGNED");
-                    bw.append(LINE_TERMINATOR);
+                    try (BufferedWriter bw = new BufferedWriter(new FileWriter(txtFile))) {
+                        AceLog.getAppLog().info("\n::: parseToIdPreCacheFile() ObjectOutStream() allocated");
+                        bw.append("SCT");
+                        bw.append(TAB_CHARACTER);
+                        bw.append("COMPUTED");
+                        bw.append(TAB_CHARACTER);
+                        bw.append("ASSIGNED");
+                        bw.append(LINE_TERMINATOR);
 
-                    int IDENTIFIER_SCHEME_ID = 0;
-                    int ALTERNATE_IDENTIFIER = 1;
-                    int EFFECTIVE_TIME = 2;
-                    int ACTIVE = 3;
-                    int MODULE_ID = 4;
-                    int REFERENCED_COMPONENT_ID = 5;
-                    for (Rf2File f : fList) {
-                        BufferedReader br = new BufferedReader(
-                                new InputStreamReader(
-                                        new FileInputStream(f.file), "UTF-8"));
-                        br.readLine();
-                        countNonActiveL = 0;
-                        countNonComputedIdsL = 0;
-                        totalParsedLinesL = 0;
-                        nonParsableLinesL = 0;
-                        while (br.ready()) {
-                            String tempLine = br.readLine();
-                            String[] line = tempLine.split(TAB_CHARACTER);
-                            if (line.length < REFERENCED_COMPONENT_ID + 1) {
-                                System.err.println("not parsed: " + tempLine);
-                                nonParsableLinesL++;
-                                continue;
-                            } else {
-                                totalParsedLinesL++;
-                            }
-                            // IDENTIFIER_SCHEME_ID
-                            long identifierScheme = Long.parseLong(line[IDENTIFIER_SCHEME_ID]);
-                            if (identifierScheme != sctUuidSchemeIdL) {
-                                idSchemeSet.add(identifierScheme);
-                                continue;
-                            }
-                            // ACTIVE
-                            int activeData = Integer.parseInt(line[ACTIVE]);
-                            if (activeData != 1) {
-                                countNonActiveL++;
-                            }
-                            // EFFECTIVE_TIME
-                            String eTimeStr = Rf2x.convertEffectiveTimeToDate(line[EFFECTIVE_TIME]);
-                            long eTime = Rf2x.convertDateToTime(eTimeStr);
-                            dateTimeSet.add(eTime);
+                        int IDENTIFIER_SCHEME_ID = 0;
+                        int ALTERNATE_IDENTIFIER = 1;
+                        int EFFECTIVE_TIME = 2;
+                        int ACTIVE = 3;
+                        int MODULE_ID = 4;
+                        int REFERENCED_COMPONENT_ID = 5;
+                        for (Rf2File f : fList) {
+                            BufferedReader br = new BufferedReader(
+                                    new InputStreamReader(
+                                            new FileInputStream(f.file), "UTF-8"));
+                            br.readLine();
+                            countNonActiveL = 0;
+                            countNonComputedIdsL = 0;
+                            totalParsedLinesL = 0;
+                            nonParsableLinesL = 0;
+                            while (br.ready()) {
+                                String tempLine = br.readLine();
+                                String[] line = tempLine.split(TAB_CHARACTER);
+                                if (line.length < REFERENCED_COMPONENT_ID + 1) {
+                                    System.err.println("not parsed: " + tempLine);
+                                    nonParsableLinesL++;
+                                    continue;
+                                } else {
+                                    totalParsedLinesL++;
+                                }
+                                // IDENTIFIER_SCHEME_ID
+                                long identifierScheme = Long.parseLong(line[IDENTIFIER_SCHEME_ID]);
+                                if (identifierScheme != sctUuidSchemeIdL) {
+                                    idSchemeSet.add(identifierScheme);
+                                    continue;
+                                }
+                                // ACTIVE
+                                int activeData = Integer.parseInt(line[ACTIVE]);
+                                if (activeData != 1) {
+                                    countNonActiveL++;
+                                }
+                                // EFFECTIVE_TIME
+                                String eTimeStr = Rf2x.convertEffectiveTimeToDate(line[EFFECTIVE_TIME]);
+                                long eTime = Rf2x.convertDateToTime(eTimeStr);
+                                dateTimeSet.add(eTime);
 
-                            // MODULE_ID
-                            Long moduleIdL = Long.parseLong(line[MODULE_ID]);
-                            moduleIdSet.add(moduleIdL);
+                                // MODULE_ID
+                                Long moduleIdL = Long.parseLong(line[MODULE_ID]);
+                                moduleIdSet.add(moduleIdL);
 
                     // ALTERNATE_IDENTIFIER and REFERENCED_COMPONENT_ID
-                            // Assigned uuid
-                            UUID aUuid = UUID.fromString(line[ALTERNATE_IDENTIFIER]);
-                            // Computed uuid
-                            long sctIdL = Long.parseLong(line[REFERENCED_COMPONENT_ID]);
-                            UUID cUuid = UUID.fromString(
-                                    Type3UuidFactory.fromSNOMED(sctIdL).toString());
-                            // UUID cUuid = UUID.fromString(Rf2x.convertSctIdToUuidStr(sctIdL));
-                            if (aUuid.compareTo(cUuid) != 0) {
-                                countNonComputedIdsL++;
-                            }
+                                // Assigned uuid
+                                UUID aUuid = UUID.fromString(line[ALTERNATE_IDENTIFIER]);
+                                // Computed uuid
+                                long sctIdL = Long.parseLong(line[REFERENCED_COMPONENT_ID]);
+                                UUID cUuid = UUID.fromString(
+                                        Type3UuidFactory.fromSNOMED(sctIdL).toString());
+                                // UUID cUuid = UUID.fromString(Rf2x.convertSctIdToUuidStr(sctIdL));
+                                if (aUuid.compareTo(cUuid) != 0) {
+                                    countNonComputedIdsL++;
+                                }
 
-                            if (identifierScheme == sctUuidSchemeIdL) {
-                                Sct2_IdCompact tempIdCompact = new Sct2_IdCompact(
-                                        aUuid.getMostSignificantBits(),
-                                        aUuid.getLeastSignificantBits(),
-                                        sctIdL);
-                                // Write to JBIN file
-                                oos.writeUnshared(tempIdCompact);
+                                if (identifierScheme == sctUuidSchemeIdL) {
+                                    Sct2_IdCompact tempIdCompact = new Sct2_IdCompact(
+                                            aUuid.getMostSignificantBits(),
+                                            aUuid.getLeastSignificantBits(),
+                                            sctIdL);
+                                    // Write to JBIN file
+                                    oos.writeUnshared(tempIdCompact);
 
-                                // Write to TEXT file
-                                StringBuilder sb = new StringBuilder();
-                                sb.append(tempIdCompact.sctIdL);
-                                sb.append(TAB_CHARACTER);
-                                sb.append(cUuid);
-                                sb.append(TAB_CHARACTER);
-                                sb.append(aUuid);
-                                sb.append(LINE_TERMINATOR);
-                                bw.append(sb.toString());
+                                    // Write to TEXT file
+                                    StringBuilder sb = new StringBuilder();
+                                    sb.append(tempIdCompact.sctIdL);
+                                    sb.append(TAB_CHARACTER);
+                                    sb.append(cUuid);
+                                    sb.append(TAB_CHARACTER);
+                                    sb.append(aUuid);
+                                    sb.append(LINE_TERMINATOR);
+                                    bw.append(sb.toString());
+                                }
                             }
-                        }
-                        StringBuilder sb = new StringBuilder();
-                        sb.append("\n::: parseToIdPreCacheFile(..) ");
-                        sb.append("\n::: SNOMED CT UUID Schema (900000000000002006) cached");
-                        if (idSchemeSet.size() > 0) {
-                            sb.append("\n::: Other UUID Schemas (900000000000002006) not cached");
-                        }
-                        sb.append("\n::: PARSED & WRITTEN TO ID CACHE: ");
-                        sb.append(f.file.toURI().toString());
-                        if (idSchemeSet.size() > 0) {
-                            Long[] idSchemeArray = idSchemeSet.toArray(new Long[0]);
-                            for (Long long1 : idSchemeArray) {
-                                sb.append("\n::: ID Schema: ");
-                                sb.append(long1.toString());
+                            StringBuilder sb = new StringBuilder();
+                            sb.append("\n::: parseToIdPreCacheFile(..) ");
+                            sb.append("\n::: SNOMED CT UUID Schema (900000000000002006) cached");
+                            if (idSchemeSet.size() > 0) {
+                                sb.append("\n::: Other UUID Schemas (900000000000002006) not cached");
                             }
-                        } else {
-                            sb.append("\n::: SNOMED CT UUID Schema (900000000000002006)");
+                            sb.append("\n::: PARSED & WRITTEN TO ID CACHE: ");
+                            sb.append(f.file.toURI().toString());
+                            if (idSchemeSet.size() > 0) {
+                                Long[] idSchemeArray = idSchemeSet.toArray(new Long[0]);
+                                for (Long long1 : idSchemeArray) {
+                                    sb.append("\n::: ID Schema: ");
+                                    sb.append(long1.toString());
+                                }
+                            } else {
+                                sb.append("\n::: SNOMED CT UUID Schema (900000000000002006)");
+                            }
+                            sb.append("\n::: countNonActive=");
+                            sb.append(countNonActiveL);
+                            sb.append("\n::: countNonComputedIDs=");
+                            sb.append(countNonComputedIdsL);
+                            sb.append("\n::: totalParsedLinesL=");
+                            sb.append(totalParsedLinesL);
+                            sb.append("\n::: nonParsableLines=");
+                            sb.append(nonParsableLinesL);
+                            sb.append("\n::: dateTimeCount=");
+                            sb.append(dateTimeSet.size());
+                            Long[] moduleIdArray = moduleIdSet.toArray(new Long[0]);
+                            for (Long moduleIdLong : moduleIdArray) {
+                                sb.append("\n::: ModuleID: ");
+                                sb.append(moduleIdLong.toString());
+                            }
+                            Long[] dateTimeArray = dateTimeSet.toArray(new Long[0]);
+                            for (Long dateLong : dateTimeArray) {
+                                sb.append("\n:::     ");
+                                sb.append(Rf2x.convertTimeToDate(dateLong));
+                            }
+                            sb.append("\n::: \n");
+                            AceLog.getAppLog().info(sb.toString());
                         }
-                        sb.append("\n::: countNonActive=");
-                        sb.append(countNonActiveL);
-                        sb.append("\n::: countNonComputedIDs=");
-                        sb.append(countNonComputedIdsL);
-                        sb.append("\n::: totalParsedLinesL=");
-                        sb.append(totalParsedLinesL);
-                        sb.append("\n::: nonParsableLines=");
-                        sb.append(nonParsableLinesL);
-                        sb.append("\n::: dateTimeCount=");
-                        sb.append(dateTimeSet.size());
-                        Long[] moduleIdArray = moduleIdSet.toArray(new Long[0]);
-                        for (Long moduleIdLong : moduleIdArray) {
-                            sb.append("\n::: ModuleID: ");
-                            sb.append(moduleIdLong.toString());
-                        }
-                        Long[] dateTimeArray = dateTimeSet.toArray(new Long[0]);
-                        for (Long dateLong : dateTimeArray) {
-                            sb.append("\n:::     ");
-                            sb.append(Rf2x.convertTimeToDate(dateLong));
-                        }
-                        sb.append("\n::: \n");
-                        AceLog.getAppLog().info(sb.toString());
+                        oos.flush();
+                        oos.close();
+                        bw.flush();
+                    } catch (Exception e) {
+                        AceLog.getAppLog().info(e.toString());
+                        e.printStackTrace();
                     }
-                    oos.flush();
-                    oos.close();
-                    bw.flush();
-            }
                 }
     }
 

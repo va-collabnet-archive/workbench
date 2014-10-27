@@ -105,20 +105,17 @@ public class AddLegacyUuidsMojo extends AbstractMojo {
     private final String authorUuid = "f7495b58-6630-3499-a44e-2052b5fcf06c";
     private UUID aUuid;
     /**
-     * @parameter
-     * @required
+     * @parameter @required
      */
     private final String idSchemeUuid = "a27dce27-22d8-5729-8d3c-10b2708ef366";
     private UUID schemeIdAuthorityUuid;
     /**
-     * @parameter
-     * @required
+     * @parameter @required
      */
     private final String moduleUuid = "815d5052-4fd5-599f-b996-4640eb166eeb";
     private UUID schemeModuleUuid;
     /**
-     * @parameter
-     * @required
+     * @parameter @required
      */
     private final String pathUuid = "2bfc4102-f630-5fbe-96b8-625f2a6b3d5a";
     private UUID schemePathUuid;
@@ -143,9 +140,8 @@ public class AddLegacyUuidsMojo extends AbstractMojo {
      * The watch uuids.
      */
     private static HashSet<UUID> watchUuidSet;
-    
-    private final UUID SNOMED_CORE_PATH_UUID = UUID.fromString("8c230474-9f11-30ce-9cad-185a96fd03a2");
 
+    private final UUID SNOMED_CORE_PATH_UUID = UUID.fromString("8c230474-9f11-30ce-9cad-185a96fd03a2");
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
@@ -213,7 +209,16 @@ public class AddLegacyUuidsMojo extends AbstractMojo {
                     "_Identifier_", ".txt");
             if (filesIn == null || filesIn.isEmpty()) {
                 throw new UnsupportedOperationException("NOT SUPPORTED: AddLegacyUuidsMojo createUuidRemapCache no _Identifier_ file found.");
+            } else {
+                StringBuilder sb = new StringBuilder();
+                sb.append("\n### AddLegacyUuidsMojo ID Files");
+                for (Rf2File rf2File : filesIn) {
+                    sb.append("\n### FOUND: ").append(rf2File.toString());
+                }
+                Logger logger = Logger.getLogger(AddLegacyUuidsMojo.class.getName());
+                logger.info(sb.toString());
             }
+
             parseToUuidRemapCacheFile(filesIn, idCacheFName);
 
         } catch (Exception ex) {
@@ -357,6 +362,10 @@ public class AddLegacyUuidsMojo extends AbstractMojo {
                         logger.info(sb.toString());
                     }
                     oos.flush();
+                } catch (Exception e) {
+                    Logger logger = Logger.getLogger(AddLegacyUuidsMojo.class.getName());
+                    logger.info(e.toString());
+                    e.printStackTrace();
                 }
     } // parseToUuidRemapCacheFile
 
@@ -511,7 +520,7 @@ public class AddLegacyUuidsMojo extends AbstractMojo {
         if (descriptionList != null) {
             for (TkDescription tkd : descriptionList) {
                 tkd.additionalIds = processIdListWithIdScheme(
-                        tkd.primordialUuid, tkd.pathUuid, 
+                        tkd.primordialUuid, tkd.pathUuid,
                         tkd.additionalIds, idLookup, tkd.time);
             }
         }
@@ -618,7 +627,7 @@ public class AddLegacyUuidsMojo extends AbstractMojo {
             sb.append(((TkIdentifierUuid) existingAdditionalUuids.get(0)).denotation.toString());
             sb.append("\tAdditionalIdAuthority\t");
             sb.append(existingAdditionalUuids.get(0).authorityUuid.toString());
-            
+
             if (primordialPath.compareTo(this.schemePathUuid) == 0) {
                 sb.append("\t:ADDED UUID SCHEMA\n");
                 System.out.println(sb.toString());
@@ -642,16 +651,15 @@ public class AddLegacyUuidsMojo extends AbstractMojo {
                 sb.append("\t:NO ID EDIT\n");
                 System.out.println(sb.toString());
             }
-            
 
         } else { // no existing additional uuid
             UUID remapUuid = idLookup.getComputedUuid(primordialUuid);
             EIdentifierUuid tmpId;
-            
-            if(primordialPath.compareTo(SNOMED_CORE_PATH_UUID) != 0 && remapUuid != null) {
+
+            if (primordialPath.compareTo(SNOMED_CORE_PATH_UUID) != 0 && remapUuid != null) {
                 throw new UnsupportedOperationException("AddLegacyUuidsMojo: case not implemented, !SNOMED_CORE_PATH_UUID && remapUuid != null");
             }
-            
+
             if (remapUuid != null) {
                 // Use SCTID computed UUID
                 tmpId = createNewEIdentifierUuidWithIdScheme(remapUuid, timeL);
@@ -659,8 +667,7 @@ public class AddLegacyUuidsMojo extends AbstractMojo {
                 // Use primordial UUID
                 tmpId = createNewEIdentifierUuidWithIdScheme(primordialUuid, timeL);
             }
-            
-            
+
             // create additionalIds list if not present
             if (additionalIds == null) {
                 ArrayList<TkIdentifier> tmpAdditionalIds = new ArrayList<>();

@@ -119,6 +119,11 @@ public class BinaryChangeSetResolveIdsMojo extends AbstractMojo {
         }
 
         try {
+            getLog().info("\n::: BinaryChangeSetResolveIds() settings " 
+                    + "\n:::      changeSetDir:\t" + changeSetDir
+                    + "\n:::      genArtifactDir:\t" + genArtifactDir
+                    + "\n:::      extensionPathUuidStr:\t" + extensionPathUuidStr
+            );
             BinaryChangeSetResolveIds rcsi = new BinaryChangeSetResolveIds(changeSetDir, 
                     econceptsFileStr,
                     genArtifactDir, 
@@ -126,6 +131,7 @@ public class BinaryChangeSetResolveIdsMojo extends AbstractMojo {
                     true, // log "eccs_in.txt"
                     true, // log "eccs_out.txt"
                     extensionPathUuidStr);
+            getLog().info("\n::: BinaryChangeSetResolveIds() allocated ");
 
             // Import remap cache which has been 
             String cachePath = buildDir + FILE_SEPARATOR + idCacheDir + FILE_SEPARATOR;            
