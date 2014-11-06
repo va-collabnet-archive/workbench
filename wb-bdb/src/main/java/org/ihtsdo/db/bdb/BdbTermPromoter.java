@@ -225,7 +225,9 @@ public class BdbTermPromoter implements ProcessStampDataBI, ProcessUnfetchedConc
 
     @Override
     public void processUnfetchedConceptData(int conceptNid, ConceptFetcherBI fetcher) throws Exception {
-        processConcept(fetcher.fetch());
+        if(promotionConceptNids.isMember(conceptNid)){
+            processConcept(fetcher.fetch());
+        }
     }
 
     @Override
