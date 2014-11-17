@@ -670,7 +670,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                         Collection<RefexVersionBI> refexVersions = member.getVersions();
                         for (RefexVersionBI r : refexVersions) {
                             if (!sameCycleStampNids.contains(r.getStampNid()) || (latest != null && r.getStampNid() == latest.getStampNid())) {
-                                versions.add(r);
+                                    versions.add(r);
                             }
                         }
                     }
@@ -678,7 +678,9 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                     Collection<? extends RefexChronicleBI<?>> refsetMembers = childRefset.getRefsetMembers();
                     for (RefexChronicleBI member : refsetMembers) {
                         RefexVersionBI version = (RefexVersionBI) member.getVersion(viewCoordinateAllStatus);
-                        versions.add(version);
+                        if(version != null){
+                            versions.add(version);
+                        }
                     }
                 }
                 boolean write = true;
