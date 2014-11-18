@@ -115,6 +115,7 @@ public class Rf2RefexComputer implements ProcessUnfetchedConceptDataBI {
                 Snomed.MODULE_DEPENDENCY.getLenient().getConceptNid());
         memberBp.put(RefexCAB.RefexProperty.STRING1, sourceTime);
         memberBp.put(RefexCAB.RefexProperty.STRING2, targetTime);
+        memberBp.setMemberContentUuid();
         TerminologyBuilderBI builder = Ts.get().getTerminologyBuilder(editCoordinate, viewCoordinate);
         RefexChronicleBI<?> newMember = builder.constructIfNotCurrent(memberBp);
         Ts.get().addUncommitted(Ts.get().getConcept(Snomed.MODULE_DEPENDENCY.getLenient().getConceptNid()));
