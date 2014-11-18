@@ -540,9 +540,6 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
      * @throws Exception indicates an exception has occurred
      */
     private void process(ConceptChronicleBI concept) throws Exception {
-        if(concept.getPrimUuid().equals(UUID.fromString("c3e14568-a53a-3da3-9a44-6aa6908ead82"))){
-            System.out.println("### DEBUG");
-        }
         boolean write = true;
         if(sameCycleStampNids.contains(concept.getConceptAttributes().getPrimordialVersion().getStampNid())){
             if(!concept.getVersion(viewCoordinate).isActive(viewCoordinate)){
@@ -563,9 +560,6 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
 
             if (concept.getDescriptions() != null) {
                 for (DescriptionChronicleBI d : concept.getDescriptions()) {
-                    if(d.getPrimUuid().equals(UUID.fromString("308e6b53-c0a1-33bf-b1b3-17fcc9e814a5"))){
-                        System.out.println("### DEBUG");
-                    }
                     processDescription(d);
                     if (d.getAnnotations() != null) {
                         for (RefexChronicleBI annot : d.getAnnotations()) {
