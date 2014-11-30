@@ -39,6 +39,14 @@ public class RF2AssociationIdentExporterMojo extends AbstractMojo {
 	private String releaseDate;
 
 	/**
+	 * previuous release date. 
+	 * 
+	 * @parameter
+	 * @required
+	 */
+	private String previousReleaseDate;
+	
+	/**
 	 * Location of the exportFoler.
 	 * 
 	 * @parameter
@@ -70,6 +78,7 @@ public class RF2AssociationIdentExporterMojo extends AbstractMojo {
 			// set all the values passed via mojo
 			config.setOutputFolderName(exportFolder);
 			config.setReleaseDate(releaseDate);
+			config.setPreviousReleaseDate(previousReleaseDate);
 			config.setFlushCount(10000);
 			config.setInvokeDroolRules("false");
 			config.setFileExtension("txt");

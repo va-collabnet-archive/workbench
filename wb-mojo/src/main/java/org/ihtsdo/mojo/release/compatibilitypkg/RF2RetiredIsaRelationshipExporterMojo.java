@@ -36,6 +36,14 @@ public class RF2RetiredIsaRelationshipExporterMojo extends AbstractMojo {
 	private String releaseDate;
 
 	/**
+	 * previuous release date. 
+	 * 
+	 * @parameter
+	 * @required
+	 */
+	private String previousReleaseDate;
+	
+	/**
 	 * Location of the exportFoler.
 	 * 
 	 * @parameter
@@ -67,6 +75,8 @@ public class RF2RetiredIsaRelationshipExporterMojo extends AbstractMojo {
 			config.setOutputFolderName(exportFolder);
 
 			config.setReleaseDate(releaseDate);
+
+			config.setPreviousReleaseDate(previousReleaseDate);
 			config.setRf2Format(rF2Format);
 			config.setFlushCount(10000);
 			config.setInvokeDroolRules("false");
