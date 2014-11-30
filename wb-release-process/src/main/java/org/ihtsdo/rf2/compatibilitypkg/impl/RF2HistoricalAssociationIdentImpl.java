@@ -111,6 +111,10 @@ public class RF2HistoricalAssociationIdentImpl extends RF2AbstractImpl implement
 					}
 					effectiveTime = getDateFormat().format(new Date(rel.getTime()));
 
+					if (!(effectiveTime.compareTo(getConfig().getPreviousReleaseDate())>0) ||
+							!(effectiveTime.compareTo(getConfig().getReleaseDate())<=0)){
+						continue;
+					}
 					writeRF2TypeLine(relationshipUuid, effectiveTime, active, moduleId, identifierSchemeId, relationshipId);
 
 				}

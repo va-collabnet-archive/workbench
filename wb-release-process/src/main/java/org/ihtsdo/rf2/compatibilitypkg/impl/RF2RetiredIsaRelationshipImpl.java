@@ -120,6 +120,11 @@ public class RF2RetiredIsaRelationshipImpl extends RF2AbstractImpl implements I_
 					}
 					
 					effectiveTime = getDateFormat().format(new Date(rel.getTime()));
+
+					if (!(effectiveTime.compareTo(getConfig().getPreviousReleaseDate())>0) ||
+							!(effectiveTime.compareTo(getConfig().getReleaseDate())<=0)){
+						continue;
+					}
 					int relationshipGroup = rel.getGroup();
 
 					if (sourceId==null || sourceId.equals("")){
