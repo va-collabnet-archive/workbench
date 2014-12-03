@@ -30,6 +30,7 @@ import org.dwfa.vodb.types.IntSet;
 import org.ihtsdo.country.COUNTRY_CODE;
 import org.ihtsdo.db.bdb.Bdb;
 import org.ihtsdo.helper.export.Rf2Export;
+import org.ihtsdo.helper.refex.LanguageRefsetChecker;
 import org.ihtsdo.helper.refex.Rf2RefexComputer;
 import org.ihtsdo.helper.refex.TranslatedConceptsRefexComputer;
 import org.ihtsdo.helper.rf2.Rf2File.ReleaseType;
@@ -302,6 +303,11 @@ public class GenerateIncrementalRf2File extends AbstractMojo {
      * @parameter
      */
     private String translatedConceptsEditPath;
+    /**
+     * The language refset concept. Used to make sure that the members are in the correct language.
+     * @parameter @required
+     */
+    private ConceptDescriptor langRefsetConceptSpec;
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
@@ -394,6 +400,11 @@ public class GenerateIncrementalRf2File extends AbstractMojo {
                     refsetSpecComputer.writeRefsetSpecMetadata(metaDir); //only care about FULL for import
                 }
             }
+            LanguageRefsetChecker languageRefsetChecker = new LanguageRefsetChecker(vc,
+                    UUID.fromString(langRefsetConceptSpec.getUuid()),
+                    languageCode);
+            languageRefsetChecker.setup();
+            Ts.get().iterateConceptDataInParallel(languageRefsetChecker);
             if(translatedConceptsRefset != null){
                 UUID pathUuid = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, translatedConceptsEditPath);
                 EditCoordinate metaEc = Ts.get().getMetadataEditCoordinate();
