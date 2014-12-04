@@ -124,33 +124,42 @@ public class UpdateFloatDocumentListener implements DocumentListener, ActionList
         }
     }
 
-    private void doAction() throws PropertyVetoException, IOException {
+    private boolean doAction() throws PropertyVetoException, IOException {
         if (update) {
             try {
                 refex.setFloat1(Float.parseFloat(text));
+                if (!Ts.get().getConcept(refex.getRefexNid()).isAnnotationStyleRefex()) {
+                    Ts.get().addUncommitted(Ts.get().getConcept(refex.getRefexNid()));
+                }
+                ComponentChronicleBI<?> referencedComponent
+                        = Ts.get().getComponent(refex.getReferencedComponentNid());
+                Ts.get().addUncommitted(Ts.get().getConcept(referencedComponent.getConceptNid()));
             } catch (NumberFormatException e) {
+                update = false;
                 refex.setFloat1(-1);
+                if (!Ts.get().getConcept(refex.getRefexNid()).isAnnotationStyleRefex()) {
+                    Ts.get().addUncommitted(Ts.get().getConcept(refex.getRefexNid()));
+                }
+                ComponentChronicleBI<?> referencedComponent
+                        = Ts.get().getComponent(refex.getReferencedComponentNid());
+                Ts.get().addUncommitted(Ts.get().getConcept(referencedComponent.getConceptNid()));
+                return false;
             }
-
-            if (!Ts.get().getConcept(refex.getRefexNid()).isAnnotationStyleRefex()) {
-                Ts.get().addUncommitted(Ts.get().getConcept(refex.getRefexNid()));
-            }
-            ComponentChronicleBI<?> referencedComponent = 
-                    Ts.get().getComponent(refex.getReferencedComponentNid());
-            Ts.get().addUncommitted(Ts.get().getConcept(referencedComponent.getConceptNid()));
         }
         update = false;
+        return true;
     }
 
     @Override
     public void vetoableChange(PropertyChangeEvent pce) throws PropertyVetoException {
         try {
             if (text != null) {
-                doAction();
+                boolean valid = doAction();
+                if(!valid){
+                    throw new PropertyVetoException("Invalid refset value", pce);
+                }
             }
         } catch (IOException ex) {
-            AceLog.getAppLog().alertAndLogException(ex);
-        } catch (PropertyVetoException ex) {
             AceLog.getAppLog().alertAndLogException(ex);
         }
     }

@@ -93,9 +93,9 @@ public class GlobalPropertyChange {
                 } else {
                     vetoListenerToRemove.add(this);
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
+            } catch (PropertyVetoException e) {
                 vetoListenerToRemove.add(this);
+                throw new PropertyVetoException(e.getMessage(), pce);
             }
         }
 
