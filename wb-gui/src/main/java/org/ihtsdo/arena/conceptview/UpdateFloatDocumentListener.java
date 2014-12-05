@@ -10,8 +10,11 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyVetoException;
 import java.beans.VetoableChangeListener;
 import java.io.IOException;
+import java.text.NumberFormat;
+import java.util.Locale;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.swing.Timer;
 import javax.swing.event.DocumentEvent;
@@ -127,13 +130,17 @@ public class UpdateFloatDocumentListener implements DocumentListener, ActionList
     private boolean doAction() throws PropertyVetoException, IOException {
         if (update) {
             try {
-                refex.setFloat1(Float.parseFloat(text));
+                float value = Float.parseFloat(text);
+                refex.setFloat1(value);
                 if (!Ts.get().getConcept(refex.getRefexNid()).isAnnotationStyleRefex()) {
                     Ts.get().addUncommitted(Ts.get().getConcept(refex.getRefexNid()));
                 }
                 ComponentChronicleBI<?> referencedComponent
                         = Ts.get().getComponent(refex.getReferencedComponentNid());
                 Ts.get().addUncommitted(Ts.get().getConcept(referencedComponent.getConceptNid()));
+                if(value <= 0){
+                    return false;
+                }
             } catch (NumberFormatException e) {
                 update = false;
                 refex.setFloat1(-1);
