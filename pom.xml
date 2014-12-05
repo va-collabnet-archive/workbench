@@ -45,7 +45,7 @@ the specific language governing permissions and limitations under the License. -
         <je.version>5.0.55</je.version>
         <svnusername>${relusername}</svnusername>
         <svnpassword>${relpassword}</svnpassword>
-        <svnkit.version>1.3.5</svnkit.version>
+        <svnkit.version>1.8.6</svnkit.version>
         <junit.version>4.11</junit.version>
         <doxia.version>1.3</doxia.version>
         <maven-release-plugin.version>2.0</maven-release-plugin.version>
@@ -129,7 +129,7 @@ the specific language governing permissions and limitations under the License. -
             </dependency>
             <dependency>
                 <groupId>org.tmatesoft.svnkit</groupId>
-                <artifactId>svnkit-javahl</artifactId>
+                <artifactId>svnkit-javahl16</artifactId>
                 <version>${svnkit.version}</version>
             </dependency>
             <dependency>
@@ -252,7 +252,6 @@ the specific language governing permissions and limitations under the License. -
         <module>tk-workflow-api</module>
         <module>id-generation-ws-client</module>
         <module>id-generation-api</module>
-        <module>wb-release-process</module>
         <module>wb-mojo</module>
         <module>wb-gui</module>
         <module>wb-bdb</module>
@@ -260,6 +259,7 @@ the specific language governing permissions and limitations under the License. -
         <module>wb-dita-maven-plugin</module>
         <module>wb-docs</module>
         <module>wb-resources</module>
+        <module>wb-release-process</module>
         <module>tk-concept-component</module>
         <module>tk-drools</module>
         <module>tk-arena-spec</module>
