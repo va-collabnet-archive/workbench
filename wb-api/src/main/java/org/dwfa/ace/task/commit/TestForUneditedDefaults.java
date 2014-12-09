@@ -108,26 +108,28 @@ public class TestForUneditedDefaults extends AbstractConceptTest {
     }
     
     private List<AlertToDataConstraintFailure> testNumberRefex(I_GetConceptData concept, RelationshipChronicleBI rel,
-            boolean forCommit) throws TerminologyException, IOException, ContradictionException{
+            boolean forCommit) throws TerminologyException, IOException, ContradictionException {
         ViewCoordinate viewCoordinate = Terms.get().getActiveAceFrameConfig().getViewCoordinate();
         RelationshipVersionBI rv = rel.getVersion(viewCoordinate);
-        for(RefexVersionBI r : rv.getActiveAnnotations(viewCoordinate)){
-            if(RefexNidFloatVersionBI.class.isAssignableFrom(r.getClass())){
-                RefexNidFloatVersionBI refex = (RefexNidFloatVersionBI)r;
-                if(refex.isUncommitted()){
-                    if(refex.getFloat1() <= 0){
-                       String alertString = "<html>Default value found:<br> <font color='blue'>" + refex.getFloat1()
-                        + "</font><br>Please edit this value before commit...";
-                    AlertToDataConstraintFailure.ALERT_TYPE alertType = AlertToDataConstraintFailure.ALERT_TYPE.WARNING;
-                    if (forCommit) {
-                        alertType = AlertToDataConstraintFailure.ALERT_TYPE.ERROR;
-                    }
-                    AlertToDataConstraintFailure alert = new AlertToDataConstraintFailure(alertType, alertString,
-                        concept);
+        if (rv != null) {
+            for (RefexVersionBI r : rv.getActiveAnnotations(viewCoordinate)) {
+                if (RefexNidFloatVersionBI.class.isAssignableFrom(r.getClass())) {
+                    RefexNidFloatVersionBI refex = (RefexNidFloatVersionBI) r;
+                    if (refex.isUncommitted()) {
+                        if (refex.getFloat1() <= 0) {
+                            String alertString = "<html>Default value found:<br> <font color='blue'>" + refex.getFloat1()
+                                    + "</font><br>Please edit this value before commit...";
+                            AlertToDataConstraintFailure.ALERT_TYPE alertType = AlertToDataConstraintFailure.ALERT_TYPE.WARNING;
+                            if (forCommit) {
+                                alertType = AlertToDataConstraintFailure.ALERT_TYPE.ERROR;
+                            }
+                            AlertToDataConstraintFailure alert = new AlertToDataConstraintFailure(alertType, alertString,
+                                    concept);
 
-                    ArrayList<AlertToDataConstraintFailure> alertList = new ArrayList<AlertToDataConstraintFailure>();
-                    alertList.add(alert);
-                    return alertList;
+                            ArrayList<AlertToDataConstraintFailure> alertList = new ArrayList<AlertToDataConstraintFailure>();
+                            alertList.add(alert);
+                            return alertList;
+                        }
                     }
                 }
             }
