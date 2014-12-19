@@ -47,7 +47,7 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 import org.apache.lucene.analysis.TokenStream;
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
+import org.apache.lucene.analysis.standard.ClassicAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.index.IndexNotFoundException;
@@ -124,7 +124,7 @@ public class DocumentManager {
 			File directory = new File("documents");
 			File indexDir = new File("documentsIndex");
 			emptyFolder(indexDir);
-			IndexWriterConfig indexWriterConfig = new IndexWriterConfig(Version.LUCENE_35, new StandardAnalyzer(Version.LUCENE_35));
+			IndexWriterConfig indexWriterConfig = new IndexWriterConfig(Version.LUCENE_35, new ClassicAnalyzer(Version.LUCENE_35));
 			IndexWriter writer = new IndexWriter(FSDirectory.open(indexDir), indexWriterConfig);
 			File files[] = directory.listFiles();
 			int counter = 0;
@@ -219,7 +219,7 @@ public class DocumentManager {
 			Directory fsDir = FSDirectory.open(new File("documentsIndex"));
 			IndexSearcher is = new IndexSearcher(IndexReader.open(fsDir));
 
-			QueryParser qp = new QueryParser(Version.LUCENE_35, "text", new StandardAnalyzer(Version.LUCENE_35));
+			QueryParser qp = new QueryParser(Version.LUCENE_35, "text", new ClassicAnalyzer(Version.LUCENE_35));
 			Query query = qp.parse(q);
 
 			SimpleHTMLFormatter htmlFormatter = new SimpleHTMLFormatter("<font style='BACKGROUND-COLOR: yellow'>", "</font>");
@@ -236,7 +236,7 @@ public class DocumentManager {
 				int docId = hits[i].doc;
 				Document doc = is.doc(docId);
 				output = output + (i + 1) + ") <a href=\"file://" + doc.get("path").trim() + "\">" + doc.get("path") + "</a><br>";
-				TokenStream tokenStream = TokenSources.getAnyTokenStream(is.getIndexReader(), docId, "text", new StandardAnalyzer(Version.LUCENE_35));
+				TokenStream tokenStream = TokenSources.getAnyTokenStream(is.getIndexReader(), docId, "text", new ClassicAnalyzer(Version.LUCENE_35));
 				String frags = highlighter.getBestFragments(tokenStream, doc.get("text"), 3, "<br>");
 				output = output + frags + "<br><br><br>";
 			}
@@ -306,7 +306,7 @@ public class DocumentManager {
 			}
 
 			File indexDir = new File("translationMemory");
-			IndexWriterConfig indexWriterConfig = new IndexWriterConfig(Version.LUCENE_35, new StandardAnalyzer(Version.LUCENE_35));
+			IndexWriterConfig indexWriterConfig = new IndexWriterConfig(Version.LUCENE_35, new ClassicAnalyzer(Version.LUCENE_35));
 			IndexWriter writer = new IndexWriter(FSDirectory.open(indexDir), indexWriterConfig);
 			int count = 0;
 			for (int i = firstDataRow; i <= sheet.getLastRowNum(); i++) {
@@ -364,7 +364,7 @@ public class DocumentManager {
 
 			} else {
 
-				QueryParser qp = new QueryParser(Version.LUCENE_35, "source", new StandardAnalyzer(Version.LUCENE_35));
+				QueryParser qp = new QueryParser(Version.LUCENE_35, "source", new ClassicAnalyzer(Version.LUCENE_35));
 				String escapedTerm = QueryParser.escape(term);
 				Query query = qp.parse(escapedTerm);
 
@@ -414,7 +414,7 @@ public class DocumentManager {
 			IndexReader dictionaryReader = ParallelCompositeReader.open(fsDir);
 			Directory spellDir = FSDirectory.open(new File("spellIndexDirectory"));
 			SpellChecker spellchecker = new SpellChecker(spellDir);
-			IndexWriterConfig indexWriterConfig = new IndexWriterConfig(Version.LUCENE_35, new StandardAnalyzer(Version.LUCENE_35));
+			IndexWriterConfig indexWriterConfig = new IndexWriterConfig(Version.LUCENE_35, new ClassicAnalyzer(Version.LUCENE_35));
 			spellchecker.indexDictionary(new LuceneDictionary(dictionaryReader, "desc"), indexWriterConfig, true);
 			fsDir.close();
 			spellDir.close();
@@ -579,15 +579,15 @@ public class DocumentManager {
 		for (File file : sharedFiles) {
 			if (file.exists() && !file.isHidden()) {
 				AceLog.getAppLog().info("FILE: " + file.getAbsolutePath());
-				StandardAnalyzer standardAnalyzer = new StandardAnalyzer(Version.LUCENE_35);
-				IndexWriterConfig indexWriterConfig = new IndexWriterConfig(Version.LUCENE_35, standardAnalyzer);
+				ClassicAnalyzer classicAnalyzer = new ClassicAnalyzer(Version.LUCENE_35);
+				IndexWriterConfig indexWriterConfig = new IndexWriterConfig(Version.LUCENE_35, classicAnalyzer);
 				indexWriterConfig.setWriteLockTimeout(3000);
 				AceLog.getAppLog().info("Write lock timeout: " + indexWriterConfig.getWriteLockTimeout());
 				AceLog.getAppLog().info("Open mode: " + indexWriterConfig.getOpenMode());
 				InputStreamReader reader = new InputStreamReader(new FileInputStream(file), "UTF-8");
 				spellchecker.indexDictionary(new PlainTextDictionary(reader), indexWriterConfig, true);
 				reader.close();
-				standardAnalyzer.close();
+				classicAnalyzer.close();
 			}
 		}
 		spellchecker.close();
@@ -635,7 +635,7 @@ public class DocumentManager {
 		try {
 			Directory spellDir = FSDirectory.open(new File("spellIndexDirectory"));
 			SpellChecker spellchecker = new SpellChecker(spellDir);
-			IndexWriterConfig indexWriterConfig = new IndexWriterConfig(Version.LUCENE_35, new StandardAnalyzer(Version.LUCENE_35));
+			IndexWriterConfig indexWriterConfig = new IndexWriterConfig(Version.LUCENE_35, new ClassicAnalyzer(Version.LUCENE_35));
 			// To index a file containing words:
 			spellchecker.indexDictionary(new PlainTextDictionary(new StringReader(word)), indexWriterConfig, true);
 			spellDir.close();

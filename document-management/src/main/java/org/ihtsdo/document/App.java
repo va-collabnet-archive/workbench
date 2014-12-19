@@ -24,7 +24,7 @@ import java.io.PrintWriter;
 import java.util.Date;
 
 import org.apache.lucene.analysis.TokenStream;
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
+import org.apache.lucene.analysis.standard.ClassicAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.index.DirectoryReader;
@@ -88,7 +88,7 @@ public class App {
         try {
             File directory = new File("documents");
             File indexDir = new File("documentsIndex");
-            IndexWriterConfig config = new IndexWriterConfig(Version.LUCENE_43, new StandardAnalyzer(Version.LUCENE_43));
+            IndexWriterConfig config = new IndexWriterConfig(Version.LUCENE_43, new ClassicAnalyzer(Version.LUCENE_43));
             MergePolicy mergePolicy = new LogByteSizeMergePolicy();
 
             config.setMergePolicy(mergePolicy);
@@ -133,7 +133,7 @@ public class App {
         try {
             File directory = new File("documents");
             File indexDir = new File("documentsIndex");
-            IndexWriterConfig config = new IndexWriterConfig(Version.LUCENE_43, new StandardAnalyzer(Version.LUCENE_43));
+            IndexWriterConfig config = new IndexWriterConfig(Version.LUCENE_43, new ClassicAnalyzer(Version.LUCENE_43));
             MergePolicy mergePolicy = new LogByteSizeMergePolicy();
 
             config.setMergePolicy(mergePolicy);
@@ -198,7 +198,7 @@ public class App {
         String q = "\"clinical findings\"";
 
         //QueryParser qp = new QueryParser("transtiveclosure", new TermMedAnalyzer());
-        QueryParser qp = new QueryParser(Version.LUCENE_43, "text", new StandardAnalyzer(Version.LUCENE_43));
+        QueryParser qp = new QueryParser(Version.LUCENE_43, "text", new ClassicAnalyzer(Version.LUCENE_43));
         Query query = qp.parse(q);
 
         //SimpleHTMLFormatter htmlFormatter = new SimpleHTMLFormatter();
@@ -220,7 +220,7 @@ public class App {
             Document doc = is.doc(docId);
             htmlWriter.println((i + 1) + ") " + doc.get("path") + "<br>");
             TokenStream tokenStream = TokenSources.getAnyTokenStream(is.getIndexReader(), docId, "text",
-                    new StandardAnalyzer(Version.LUCENE_43));
+                    new ClassicAnalyzer(Version.LUCENE_43));
             String output;
             output = highlighter.getBestFragments(tokenStream, doc.get("text"), 3, "<br>");
             htmlWriter.println(output + "<br><br><br>");
@@ -241,7 +241,7 @@ public class App {
         IndexReader dictionaryReader = ParallelCompositeReader.open(fsDir);
         Directory spellDir = FSDirectory.open(new File("spellIndexDirectory"));
         SpellChecker spellchecker = new SpellChecker(spellDir);
-        IndexWriterConfig indexWriterConfig = new IndexWriterConfig(Version.LUCENE_43, new StandardAnalyzer(Version.LUCENE_35));
+        IndexWriterConfig indexWriterConfig = new IndexWriterConfig(Version.LUCENE_43, new ClassicAnalyzer(Version.LUCENE_35));
         // To index a field of a user index:
         spellchecker.indexDictionary(new LuceneDictionary(dictionaryReader, "desc"), indexWriterConfig, true);
         String[] suggestions = spellchecker.suggestSimilar(term, 5);

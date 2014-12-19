@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import org.apache.lucene.analysis.standard.ClassicAnalyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.queryparser.classic.QueryParser;
@@ -672,7 +673,7 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
         try {
             q =
                     new QueryParser(LuceneManager.version, "desc",
-                    new StandardAnalyzer(LuceneManager.version)).parse(conceptIdStr);
+                    new ClassicAnalyzer(LuceneManager.version)).parse(conceptIdStr);
             SearchResult result = LuceneManager.search(q, LuceneManager.LuceneSearchType.DESCRIPTION);
 
             for (int i = 0; i < result.topDocs.totalHits; i++) {

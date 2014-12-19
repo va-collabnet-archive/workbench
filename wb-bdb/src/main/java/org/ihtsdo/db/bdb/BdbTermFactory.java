@@ -152,6 +152,7 @@ import org.ihtsdo.tk.dto.concept.component.TkRevision;
 import com.sleepycat.je.DatabaseException;
 import java.util.logging.Logger;
 import org.apache.lucene.analysis.core.WhitespaceAnalyzer;
+import org.apache.lucene.analysis.standard.ClassicAnalyzer;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.util.Version;
 import org.ihtsdo.db.change.ChangeNotifier;
@@ -419,7 +420,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
             throws IOException, ParseException {
         try {
             Query q = new QueryParser(LuceneManager.version, "desc",
-                    new StandardAnalyzer(LuceneManager.version)).parse(query);
+                    new ClassicAnalyzer(LuceneManager.version)).parse(query);
 
             return LuceneManager.search(q, LuceneSearchType.DESCRIPTION);
         } catch (org.apache.lucene.queryparser.classic.ParseException ex) {
@@ -1101,7 +1102,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         try {
             query = query.replace("/","//");
             Query q = new QueryParser(LuceneManager.version, "desc",
-                    new StandardAnalyzer(LuceneManager.version)).parse(query);
+                    new ClassicAnalyzer(LuceneManager.version)).parse(query);
 
             if (LuceneManager.indexExists(LuceneSearchType.DESCRIPTION) == false) {
                 stringUpdater.setProgressInfo("Making lucene index -- this may take a while...");
@@ -1608,7 +1609,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
             Set<I_GetConceptData> matchingConcepts = new HashSet<I_GetConceptData>();
             Query q =
                     new QueryParser(LuceneManager.version, "desc",
-                    new StandardAnalyzer(LuceneManager.version)).parse(conceptIdStr);
+                    new ClassicAnalyzer(LuceneManager.version)).parse(conceptIdStr);
             SearchResult result = LuceneManager.search(q, LuceneSearchType.DESCRIPTION);
 
             for (int i = 0; i < result.topDocs.totalHits; i++) {
@@ -1632,7 +1633,7 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         try {
             q =
                     new QueryParser(LuceneManager.version, "desc",
-                    new StandardAnalyzer(LuceneManager.version)).parse(conceptIdStr);
+                    new ClassicAnalyzer(LuceneManager.version)).parse(conceptIdStr);
             SearchResult result = LuceneManager.search(q, LuceneSearchType.DESCRIPTION);
 
             for (int i = 0; i < result.topDocs.totalHits; i++) {

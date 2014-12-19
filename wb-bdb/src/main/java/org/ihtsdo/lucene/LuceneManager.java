@@ -12,7 +12,7 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
+import org.apache.lucene.analysis.standard.ClassicAnalyzer;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.CorruptIndexException;
@@ -193,7 +193,7 @@ public abstract class LuceneManager {
         }
         luceneDir.clearLock("write.lock");
 
-        IndexWriterConfig config = new IndexWriterConfig(version, new StandardAnalyzer(version));
+        IndexWriterConfig config = new IndexWriterConfig(version, new ClassicAnalyzer(version));
         MergePolicy mergePolicy = new LogByteSizeMergePolicy();
 
         config.setMergePolicy(mergePolicy);
