@@ -134,7 +134,12 @@ public class RF2RelationshipIDListCreatorMojo extends ReleaseConfigMojo {
 		config.setUpdateWbSctId(updateWbSctId);
 		config.setPreviousIdNotReleasedFile(previousIdNotReleasedFile);
 		config.setComponentType(componentType);
-		
+
+		File dirS=new File(targetDirectory,"generated-sources");
+		File dirIds=new File(dirS,"not-published-ids");
+		if (!dirIds.exists()){
+			dirIds.mkdirs();
+		}
 		getLog().info("Running the RF2 File ID Creation with the following ");
 		getLog().info("Destination Folder :" + destinationFolder);
 		

@@ -31,8 +31,10 @@ public class RF2ConceptWOmapFactory extends RF2AbstractFactory {
 				logger.info("Finished Concept without map export...");
 
 			} catch (IOException e) {
+				e.printStackTrace();
 				logger.error(e.getMessage());
 			} catch (Exception e) {
+				e.printStackTrace();
 				logger.error(e.getMessage());			
 			}
 		}
