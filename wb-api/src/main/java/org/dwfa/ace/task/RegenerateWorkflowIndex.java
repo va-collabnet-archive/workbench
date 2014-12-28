@@ -64,12 +64,14 @@ public class RegenerateWorkflowIndex extends AbstractTask{
                         @Override
                         public void run() {
                             try {
-                                if(ChangeSetImporter.indexGenerating.get() == false){
-                                    ChangeSetImporter.indexGenerating.getAndSet(true);
-                                System.out.println("*** Starting workflow history lucene index regeneration.");
-                                I_ConfigAceFrame config = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
-                                Ts.get().regenerateWfHxLuceneIndex(config.getViewCoordinate());
-                                ChangeSetImporter.indexGenerating.getAndSet(false);
+                                if(ChangeSetImporter.indexGenerationLock.tryLock()){
+                                try {
+                                    System.out.println("*** Starting workflow history lucene index regeneration.");
+                                    I_ConfigAceFrame config = (I_ConfigAceFrame) worker.readAttachement(WorkerAttachmentKeys.ACE_FRAME_CONFIG.name());
+                                    Ts.get().regenerateWfHxLuceneIndex(config.getViewCoordinate());
+                                } finally {
+                                     ChangeSetImporter.indexGenerationLock.unlock();
+                                }
                                 System.out.println("*** Finished workflow history lucene index regeneration.");
                                 }
                             } catch (IOException ex) {

@@ -26,7 +26,6 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.dwfa.ace.api.cs.ComponentValidator;
 import org.dwfa.ace.task.cs.ImportAllChangeSets;
 import org.dwfa.bpa.process.TaskFailedException;
-import org.ihtsdo.lucene.WfHxLuceneManager;
 
 /**
  * Read all binary change set under a specified directory hierarchy, and apply
@@ -51,7 +50,8 @@ public class BinaryChangeSetReadAll extends AbstractMojo {
     /**
      * The workflow lucene directory
      * 
-     * @parameter 
+     * @parameter default-value=
+     *            "${project.build.directory}/generated-resources/workflow/"
      */
     String wfLuceneDir;
     
@@ -87,9 +87,7 @@ public class BinaryChangeSetReadAll extends AbstractMojo {
         } catch (NoSuchAlgorithmException | IOException e) {
             throw new MojoExecutionException(e.getLocalizedMessage(), e);
         }
-        if (wfLuceneDir != null && wfLuceneDir.length() > 1) {
-            WfHxLuceneManager.wfHxLuceneDirFile = new File(wfLuceneDir);
-        }
+
         getLog().info("importing change sets in: " + changeSetDir);
         ImportAllChangeSets importAllChangeSetsTask = new ImportAllChangeSets();
         importAllChangeSetsTask.setValidateChangeSets(validate);

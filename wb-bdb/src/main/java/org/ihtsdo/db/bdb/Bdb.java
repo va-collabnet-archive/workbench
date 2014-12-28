@@ -602,9 +602,12 @@ public class Bdb {
                 activity.setProgressInfoLower("7/11: Starting BdbCommitManager shutdown.");
                 BdbCommitManager.shutdown();
                 activity.setProgressInfoLower("8/11: Starting LuceneManager close.");
-                LuceneManager.close(LuceneSearchType.DESCRIPTION);
-                LuceneManager.close(LuceneSearchType.WORKFLOW_HISTORY);
-
+                try {
+                    LuceneManager.close(LuceneSearchType.DESCRIPTION);
+                    LuceneManager.close(LuceneSearchType.WORKFLOW_HISTORY);
+                } catch (RuntimeException e) {
+                    AceLog.getAppLog().alertAndLogException(e);
+                }
 
                 NidDataFromBdb.close();
                 activity.setProgressInfoLower("9/11: Starting mutable.bdbEnv.sync().");

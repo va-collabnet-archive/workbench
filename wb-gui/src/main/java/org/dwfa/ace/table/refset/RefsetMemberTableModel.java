@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TimerTask;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.ExecutionException;
@@ -930,7 +931,8 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
                     refsetDefaults = preferences.getConceptPreferences();
                     extension = helper.newConceptRefsetExtension(refsetDefaults.getDefaultRefset().getConceptNid(),
                             tableComponentId,
-                            ((I_RefsetDefaultsConcept) refsetDefaults).getDefaultForConceptRefset().getConceptNid());
+                            ((I_RefsetDefaultsConcept) refsetDefaults).getDefaultForConceptRefset().getConceptNid(),
+                            UUID.randomUUID());
                     break;
                 case CON_INT:
                     extProps.setMemberType(org.ihtsdo.etypes.EConcept.REFSET_TYPES.CID_INT);

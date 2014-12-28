@@ -1235,10 +1235,6 @@ public class BdbTermFactory implements I_TermFactory, I_ImplementTermFactory, I_
         Map<Document, Float> returnResults = new HashMap<Document, Float>();
         LuceneWfHxProgressUpdator wfHxUpdater = (LuceneWfHxProgressUpdator) updater;
         CountDownLatch hitLatch;
-        File wfHxLucene = new File(System.getProperty("user.dir") + "/workflow/lucene");
-        if (WfHxLuceneManager.wfHxLuceneDirFile != wfHxLucene) {
-            WfHxLuceneManager.wfHxLuceneDirFile = wfHxLucene;
-        }
 
         try {
             if (LuceneManager.indexExists(LuceneSearchType.WORKFLOW_HISTORY) == false) {
