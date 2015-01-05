@@ -7,11 +7,11 @@ import java.util.List;
 import java.util.UUID;
 
 import org.apache.log4j.Logger;
+import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IdPart;
 import org.dwfa.ace.api.I_Identify;
 import org.dwfa.ace.api.I_ProcessConcepts;
-import org.dwfa.ace.api.I_RelPart;
 import org.dwfa.ace.api.I_RelTuple;
 import org.ihtsdo.rf2.constant.I_Constants;
 import org.ihtsdo.rf2.impl.RF2AbstractImpl;
@@ -24,7 +24,7 @@ import org.ihtsdo.tk.api.RelAssertionType;
  * Title: RF2StatedRelationshipImpl Description: Iterating over all the concept in workbench and fetching all the components required by RF2 StatedRelationship File Copyright: Copyright (c) 2010
  * Company: IHTSDO
  * 
- * @author Varsha Parekh
+ * * @author Alejandro Rodriguez
  * @version 1.0
  */
 public class RF2StatedRelationshipImpl extends RF2AbstractImpl implements I_ProcessConcepts {
@@ -54,23 +54,21 @@ public class RF2StatedRelationshipImpl extends RF2AbstractImpl implements I_Proc
 			String relationshipId = "";
 			String destinationId = "";
 			String relTypeId = "";
-			String moduleId =I_Constants.CORE_MODULE_ID;
+			
 			String active = "";
 			String characteristicTypeId = "";
 			String modifierId = I_Constants.SOMEMODIFIER;
 			int relationshipStatusId=0;
-			
-			//Change this to come from config
-			Date PREVIOUSRELEASEDATE = getDateFormat().parse(I_Constants.inactivation_policy_change);
-		
+
 			List<? extends I_RelTuple> relationships = sourceConcept.getSourceRelTuples(allStatuses, null, 
 					currenAceConfig.getViewPositionSetReadOnly(), 
 					Precedence.PATH, currenAceConfig.getConflictResolutionStrategy());
-			
+
 			for (I_RelTuple rel : relationships) {
 				characteristicTypeId="";
+				String moduleId =I_Constants.CORE_MODULE_ID;
 				I_Identify charId = tf.getId(rel.getCharacteristicId());
-			
+
 				List<? extends I_IdPart> idParts = charId.getVisibleIds(currenAceConfig.getViewPositionSetReadOnly(), 
 						snomedIntId);
 				if (idParts != null) {
@@ -97,7 +95,7 @@ public class RF2StatedRelationshipImpl extends RF2AbstractImpl implements I_Proc
 							}
 						}
 					}
-			
+
 					relTypeId = "";
 
 					id = tf.getId(rel.getTypeNid());
@@ -122,7 +120,7 @@ public class RF2StatedRelationshipImpl extends RF2AbstractImpl implements I_Proc
 							continue;
 						}
 					} 
-					
+
 					relationshipId = "";
 
 					id = tf.getId(rel.getNid());
@@ -138,39 +136,53 @@ public class RF2StatedRelationshipImpl extends RF2AbstractImpl implements I_Proc
 							}
 						}
 					}
-					
+
 					Date et = new Date(rel.getTime());
 					effectiveTime = getDateFormat().format(et);
-					
+
 					relationshipStatusId = rel.getStatusNid();
 					if (relationshipStatusId == activeNid) {               
 						active = "1";
-						moduleId = getConceptMetaModuleID(sourceConcept,releaseDate);
-				     } else if (relationshipStatusId == inactiveNid) {               
-					      active = "0";
-					      moduleId=I_Constants.CORE_MODULE_ID;
-//					      Long lastActiveDate=getLatestActivePart(rel.getFixedPart().getMutableParts());
-//						      
-//					      if (lastActiveDate!=null){
-//					      moduleId = getConceptMetaModuleID(sourceConcept,
-//					        getDateFormat().format(new Date(lastActiveDate)));
-//					      }else{
-//					       moduleId = getConceptMetaModuleID(sourceConcept,
-//					         getDateFormat().format(new Date(rel.getTime())));
-//					      }
-				     }
-				    
-					if(moduleId.equals(I_Constants.META_MODULE_ID)){		
-						//logger.info("==Meta Concept==" + sourceId + " & Name : " + sourceConcept.getInitialText());
-						incrementMetaDataCount();
+						if (!(sourceId.equals("900000000000441003") 
+								&& destinationId.equals("138875005")
+								&& relTypeId.equals("116680003") 
+								&& effectiveTime.compareTo("20130131")>0)){
+							List<? extends I_ConceptAttributeTuple> conceptAttributes = sourceConcept.getConceptAttributeTuples(
+									allStatuses, 
+									currenAceConfig.getViewPositionSetReadOnly(), 
+									Precedence.PATH, currenAceConfig.getConflictResolutionStrategy());
+
+							if (conceptAttributes != null && !conceptAttributes.isEmpty()) {
+								I_ConceptAttributeTuple attributes = conceptAttributes.iterator().next();
+
+								String conceptStatus = getStatusType(attributes.getStatusNid());
+								// Before Jan 31, 2010, then conceptstatus 0 & 6 means current concept (Active)
+								// After Jan 31, 2010 , then conceptstatus 0 means current but 6 means retired
+								String conceptActive;
+								if (conceptStatus.equals("0")) {
+									conceptActive = "1";
+								} else if (getConfig().getReleaseDate().compareTo(I_Constants.limited_policy_change)<0 && conceptStatus.equals("6")) {
+									conceptActive = "1";
+								} else {
+									conceptActive = "0";
+								}
+
+								if(conceptActive.equals("1")){
+									moduleId = computeModuleId(sourceConcept);	
+								}
+							}
+						}
+
+					} else if (relationshipStatusId == inactiveNid) {               
+						active = "0";
 					}
-					
+
 					int relationshipGroup = rel.getGroup();
 
 					if (sourceId==null || sourceId.equals("")){
 						sourceId=sourceConcept.getUids().iterator().next().toString();
 					}
-			
+
 					if (relTypeId==null || relTypeId.equals("")){
 						relTypeId=tf.getUids(rel.getTypeNid()).iterator().next().toString();
 					}
@@ -184,21 +196,21 @@ public class RF2StatedRelationshipImpl extends RF2AbstractImpl implements I_Proc
 							continue;
 						}
 					}
-					
+
 					if ((relationshipId==null || relationshipId.equals("")) && active.equals("1")){
 						relationshipId=rel.getUUIDs().iterator().next().toString();
 					}
-					
+
 					String authorName = tf.getConcept(rel.getAuthorNid()).getInitialText();
-					
+
 					if (relationshipId==null || relationshipId.equals("")){
 						logger.info("Unplublished Retired Stated Relationship: " + rel.getUUIDs().iterator().next().toString());
 					}else if(getConfig().getRf2Format().equals("false") ){
 						writeRF2TypeLine(relationshipId, effectiveTime, active, moduleId, sourceId, destinationId, relationshipGroup, relTypeId,
-							characteristicTypeId, modifierId, authorName);
+								characteristicTypeId, modifierId, authorName);
 					}else{
 						writeRF2TypeLine(relationshipId, effectiveTime, active, moduleId, sourceId, destinationId, relationshipGroup, relTypeId,
-							characteristicTypeId, modifierId);
+								characteristicTypeId, modifierId);
 					}
 				}
 			}
@@ -214,8 +226,8 @@ public class RF2StatedRelationshipImpl extends RF2AbstractImpl implements I_Proc
 		}
 
 	}
-	
-	
+
+
 
 	public static void writeRF2TypeLine(String relationshipId, String effectiveTime, String active, String moduleId, String sourceId, String destinationId, int relationshipGroup, String relTypeId,
 			String characteristicTypeId, String modifierId) throws IOException {
@@ -223,7 +235,7 @@ public class RF2StatedRelationshipImpl extends RF2AbstractImpl implements I_Proc
 				+ "\t" + characteristicTypeId + "\t" + modifierId);
 		WriteUtil.write(getConfig(), "\r\n");
 	}
-	
+
 	public static void writeRF2TypeLine(String relationshipId, String effectiveTime, String active, String moduleId, String sourceId, String destinationId, int relationshipGroup, String relTypeId,
 			String characteristicTypeId, String modifierId, String authorName) throws IOException {
 		WriteUtil.write(getConfig(), relationshipId + "\t" + effectiveTime + "\t" + active + "\t" + moduleId + "\t" + sourceId + "\t" + destinationId + "\t" + relationshipGroup + "\t" + relTypeId

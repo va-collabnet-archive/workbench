@@ -1,10 +1,13 @@
 package org.ihtsdo.rf2.postexport;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.LineNumberReader;
+import java.io.OutputStreamWriter;
 import java.util.Comparator;
 
 import org.apache.log4j.Logger;
@@ -35,6 +38,26 @@ public class FileHelper {
 		}
 	}
 
+	public static void copyTo(File inputFile,File outputFile)  throws IOException {
+
+		FileInputStream fis = new FileInputStream(inputFile);
+		InputStreamReader isr = new InputStreamReader(fis, "UTF-8");
+		LineNumberReader reader = new LineNumberReader(isr);
+		
+
+		FileOutputStream fos = new FileOutputStream( outputFile);
+		OutputStreamWriter osw = new OutputStreamWriter(fos,"UTF-8");
+		BufferedWriter bw = new BufferedWriter(osw);
+		
+		String lineRead = "";
+		while ((lineRead = reader.readLine()) != null) {
+			bw.append(lineRead);
+			bw.append("\r\n");
+		}
+		reader.close();
+		bw.close();
+			
+	}
 	public static void emptyFolder(File folder){
 		if(folder.isDirectory()){
 			File[] files = folder.listFiles();

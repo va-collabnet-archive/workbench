@@ -48,8 +48,8 @@ public class RF2FileRetrieve {
 	private String relationshipAuxiliaryFile = "";
 	private String statedRelationshipAuxiliaryFile = "";
 
-	private static final String ATTRIBUTEVALUE_FILENAME_PART = "_crefset_attributevaluefull_";
 	private static final String END_FILE = ".txt";
+	private static final String ATTRIBUTEVALUE_FILENAME_PART = "_crefset_attributevaluefull_";
 	private static final String ASSOCIATION_FILENAME_PART = "_crefset_associationreferencefull_int_";
 	private static final String LANGUAGE_FILENAME_PART = "_crefset_languagefull";
 	private static final String IDENTIFIER_FILENAME_PART = "_identifier_full_int_";
@@ -64,6 +64,17 @@ public class RF2FileRetrieve {
 	private static final String REFSETDESCRIPTOR_FILENAME_PART = "_ccirefset_refsetdescriptorfull_int_";
 	private static final String MODULEDEPENDENCY_FILENAME_PART = "_ssrefset_moduledependencyfull_int_";
 	private static final String ICD9_CROSSMAP_FILENAME_PART = "_iissscrefset_complexmapfull_int_";
+	
+	private static final String SNAP_ATTRIBUTEVALUE_FILENAME_PART = "_crefset_attributevaluesnapshot_";
+	private static final String SNAP_ASSOCIATION_FILENAME_PART = "_crefset_associationreferencesnapshot_int_";
+	private static final String SNAP_LANGUAGE_FILENAME_PART = "_crefset_languagesnapshot";
+	private static final String SNAP_SIMPLEMAP_FILENAME_PART = "srefset_simplemapsnapshot_int_";
+	private static final String SNAP_CONCEPT_FILENAME_PART = "_concept_snapshot_";
+	private static final String SNAP_DESCRIPTION_FILENAME_PART = "_description_snapshot";
+	private static final String SNAP_RELATIONSHIP_FILENAME_PART = "_relationship_snapshot_";
+	private static final String SNAP_STATEDRELATIONSHIP_FILENAME_PART = "_statedrelationship_snapshot_";
+	private static final String SNAP_REFSETSIMPLE_FILENAME_PART = "_refset_simplesnapshot_int_";
+	private static final String SNAP_TEXTDEFINITION_FILENAME_PART = "_textdefinition_snapshot";
 	public RF2FileRetrieve(String releaseFolder) throws Exception {
 		super();
 		this.releaseFolder = releaseFolder;
@@ -108,6 +119,26 @@ public class RF2FileRetrieve {
 						moduleDependencyFile = file.getAbsolutePath();
 					}else if(file.getName().toLowerCase().contains(ICD9_CROSSMAP_FILENAME_PART)){
 						ICD9CrossMapFile = file.getAbsolutePath();
+					}else if(file.getName().toLowerCase().contains(SNAP_ATTRIBUTEVALUE_FILENAME_PART)){
+						snapshotAttributeValueFile = file.getAbsolutePath();
+					}else if(file.getName().toLowerCase().contains(SNAP_ASSOCIATION_FILENAME_PART)){
+						snapshotAssociationFile = file.getAbsolutePath();
+					}else if(file.getName().toLowerCase().contains(SNAP_LANGUAGE_FILENAME_PART)){
+						snapshotLanguageFile = file.getAbsolutePath();
+					}else if(file.getName().toLowerCase().contains(SNAP_SIMPLEMAP_FILENAME_PART)){
+						snapshotSimpleMapFile = file.getAbsolutePath();
+					}else if(file.getName().toLowerCase().contains(SNAP_CONCEPT_FILENAME_PART)){
+						snapshotConceptFile = file.getAbsolutePath();
+					}else if(file.getName().toLowerCase().contains(SNAP_DESCRIPTION_FILENAME_PART)){
+						snapshotDescriptionFile = file.getAbsolutePath();
+					}else if(file.getName().toLowerCase().contains(SNAP_RELATIONSHIP_FILENAME_PART)){
+						snapshotRelationshipFile = file.getAbsolutePath();
+					}else if(file.getName().toLowerCase().contains(SNAP_STATEDRELATIONSHIP_FILENAME_PART)){
+						snapshotStatedRelationshipFile = file.getAbsolutePath();
+					}else if(file.getName().toLowerCase().contains(SNAP_REFSETSIMPLE_FILENAME_PART)){
+						snapshotRefsetSimpleFile = file.getAbsolutePath();
+					}else if(file.getName().toLowerCase().contains(SNAP_TEXTDEFINITION_FILENAME_PART)){
+						snapshotTextDefinitionFile = file.getAbsolutePath();
 					}
 				}
 			}

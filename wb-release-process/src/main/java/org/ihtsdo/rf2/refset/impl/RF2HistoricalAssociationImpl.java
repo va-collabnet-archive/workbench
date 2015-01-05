@@ -12,7 +12,6 @@ import org.dwfa.ace.api.I_IdPart;
 import org.dwfa.ace.api.I_Identify;
 import org.dwfa.ace.api.I_ProcessConcepts;
 import org.dwfa.ace.api.I_RelTuple;
-import org.dwfa.ace.api.Terms;
 import org.dwfa.util.id.Type5UuidFactory;
 import org.ihtsdo.rf2.constant.I_Constants;
 import org.ihtsdo.rf2.impl.RF2AbstractImpl;
@@ -24,7 +23,7 @@ import org.ihtsdo.tk.api.RelAssertionType;
 /**
  * Title: RF2RelationshipImpl Description: Iterating over all the concept in workbench and fetching all the components required by RF2 Relationship File Copyright: Copyright (c) 2010 Company: IHTSDO
  * 
- * @author Varsha Parekh
+ * * @author Alejandro Rodriguez
  * @version 1.0
  */
 

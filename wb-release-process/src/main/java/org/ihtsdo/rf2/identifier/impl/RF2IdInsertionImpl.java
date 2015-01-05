@@ -1,9 +1,6 @@
 package org.ihtsdo.rf2.identifier.impl;
 
 import java.io.IOException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -16,18 +13,16 @@ import org.dwfa.ace.api.I_IdPart;
 import org.dwfa.ace.api.I_Identify;
 import org.dwfa.ace.api.I_ProcessConcepts;
 import org.dwfa.ace.api.I_RelTuple;
-import org.ihtsdo.rf2.constant.I_Constants;
 import org.ihtsdo.rf2.impl.RF2AbstractImpl;
 import org.ihtsdo.rf2.util.Config;
 import org.ihtsdo.rf2.util.ExportUtil;
-import org.ihtsdo.rf2.util.WriteUtil;
 import org.ihtsdo.tk.api.Precedence;
 import org.ihtsdo.tk.api.RelAssertionType;
 
 /**
  * Title: RF2InsertIdentifierImpl Description: Inserting Identifier in the workbench by fetching newly created all the components Copyright: Copyright (c) 2010 Company: IHTSDO
  * 
- * @author Varsha Parekh
+ * * @author Alejandro Rodriguez
  * @version 1.0
  */
 

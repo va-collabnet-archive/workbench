@@ -11,7 +11,7 @@ import org.ihtsdo.rf2.util.ExportUtil;
 /**
  * Title: RF2DescriptionFactory Description: Creating Description Specific methods required by DescriptionIterator Copyright: Copyright (c) 2010 Company: IHTSDO
  * 
- * @author Varsha Parekh
+ * * @author Alejandro Rodriguez
  * @version 1.0
  */
 

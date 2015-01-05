@@ -1,9 +1,6 @@
 package org.ihtsdo.rf2.refset.impl;
 
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
 import java.util.UUID;
 
 import org.apache.log4j.Logger;
@@ -19,7 +16,7 @@ import org.ihtsdo.rf2.util.WriteUtil;
 /**
  * Title: RF2SnomedIdImpl Description: Iterating over all the concept in workbench and fetching all the components required by RF2 SnomedId Refset File Copyright: Copyright (c) 2010 Company: IHTSDO
  * 
- * @author Varsha Parekh
+ * * @author Alejandro Rodriguez
  * @version 1.0
  */
 

@@ -3,7 +3,7 @@ package org.ihtsdo.rf2.constant;
 /**
  * Title: I_Constants Description: Declared all the constants used by export routines Copyright: Copyright (c) 2010 Company: IHTSDO
  * 
- * @author Varsha Parekh
+ * * @author Alejandro Rodriguez
  * @version 1.0
  */
 

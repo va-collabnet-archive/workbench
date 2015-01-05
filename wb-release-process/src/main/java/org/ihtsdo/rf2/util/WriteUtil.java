@@ -44,17 +44,17 @@ public class WriteUtil {
 		else if (str.equals("\\t"))
 			writeTab(config, str);
 		else
-			config.getBw().write(str);
+			config.getBw().append(str);
 	}
 
 	public static void writeTab(Config config, String str) throws IOException {
-		config.getBw().write("\t");
+		config.getBw().append("\t");
 	}
 
 	public static void writeNewLine(Config config, String str) throws IOException {
 
-		// config.getBw().write("\r\n");
-		config.getBw().newLine();
+		 config.getBw().append("\r\n");
+//		config.getBw().newLine();
 
 		int count = getWriteCount();
 		setWriteCount(++count);

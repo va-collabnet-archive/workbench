@@ -24,7 +24,7 @@ import org.ihtsdo.tk.api.Precedence;
 /**
  * Title: RF2DescriptionImpl Description: Iterating over all the concept in workbench and fetching all the components required by RF2 Description File Copyright: Copyright (c) 2010 Company: IHTSDO
  * 
- * @author Varsha Parekh
+ * * @author Alejandro Rodriguez
  * @version 1.0
  */
 
@@ -108,6 +108,10 @@ public class RF2DescriptionReferencesImpl extends RF2AbstractImpl implements I_P
 
 									extensionStatusId = extensionPart.getStatusNid();
 									descriptionid = getDescriptionId(description.getDescId(), ExportUtil.getSnomedCorePathNid());
+
+									if (descriptionid==null || descriptionid.equals("") || descriptionid.equals("0")){
+										continue;
+									}
 									if (extensionStatusId == activeNid) { 														
 										active = "1";
 									} else if (extensionStatusId == inactiveNid) { 														

@@ -1,23 +1,17 @@
 package org.ihtsdo.rf2.refset.impl;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
 import org.apache.log4j.Logger;
-import org.drools.runtime.StatefulKnowledgeSession;
-import org.dwfa.ace.api.I_DescriptionPart;
 import org.dwfa.ace.api.I_DescriptionTuple;
-import org.dwfa.ace.api.I_DescriptionVersioned;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_ProcessConcepts;
-import org.dwfa.ace.api.Terms;
 import org.dwfa.util.id.Type5UuidFactory;
 import org.ihtsdo.rf2.constant.I_Constants;
 import org.ihtsdo.rf2.impl.RF2AbstractImpl;
-import org.ihtsdo.rf2.refset.dao.RefsetConceptDAO;
 import org.ihtsdo.rf2.util.Config;
 import org.ihtsdo.rf2.util.ExportUtil;
 import org.ihtsdo.rf2.util.WriteUtil;
@@ -27,7 +21,7 @@ import org.ihtsdo.tk.api.Precedence;
  * Title: RF2DescriptionRetiredWithoutReasonImpl Description: Iterating over all the concept in workbench and fetching all the no retirement reason for description components required by RF2 Refset QA File Copyright: Copyright
  * (c) 2010 Company: IHTSDO
  * 
- * @author Varsha Parekh
+ * * @author Alejandro Rodriguez
  * @version 1.0
  * 
  */

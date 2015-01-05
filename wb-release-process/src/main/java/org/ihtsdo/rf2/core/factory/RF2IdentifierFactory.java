@@ -9,7 +9,7 @@ import org.ihtsdo.rf2.util.Config;
 /**
  * Title: RF2IdentifierFactory Description: Creating Identifier File with the Header Copyright: Copyright (c) 2010 Company: IHTSDO
  * 
- * @author Varsha Parekh
+ * * @author Alejandro Rodriguez
  * @version 1.0
  */
 

@@ -1,10 +1,8 @@
 package org.ihtsdo.rf2.compatibilitypkg.impl;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 
 import org.apache.log4j.Logger;
 import org.dwfa.ace.api.I_GetConceptData;
@@ -23,7 +21,7 @@ import org.ihtsdo.tk.api.RelAssertionType;
  * Title: RF2StatedRelationshipImpl Description: Iterating over all the concept in workbench and fetching all the components required by RF2 StatedRelationship File Copyright: Copyright (c) 2010
  * Company: IHTSDO
  * 
- * @author Varsha Parekh
+ * * @author Alejandro Rodriguez
  * @version 1.0
  */
 public class RF2RetiredIsaStatedRelationshipImpl extends RF2AbstractImpl implements I_ProcessConcepts {

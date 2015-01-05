@@ -10,7 +10,6 @@ import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_ProcessConcepts;
-import org.dwfa.ace.api.Terms;
 import org.dwfa.util.id.Type5UuidFactory;
 import org.ihtsdo.rf2.constant.I_Constants;
 import org.ihtsdo.rf2.impl.RF2AbstractImpl;
@@ -23,7 +22,7 @@ import org.ihtsdo.tk.api.Precedence;
  * Title: RF2DescriptionInactivationImpl Description: Iterating over all the concept in workbench and fetching all the components required by RF2 ConceptInactivation Refset File Copyright: Copyright
  * (c) 2010 Company: IHTSDO
  * 
- * @author Varsha Parekh
+ * * @author Alejandro Rodriguez
  * @version 1.0
  * 
  */
@@ -65,8 +64,8 @@ public class RF2DescriptionInactivationImpl extends RF2AbstractImpl implements I
 				if (!sDescType.equals("4") && !description.getLang().equals("es"))  { // Ignore text-defination & spanish description
 					String referencedComponentId = getDescriptionId(description.getDescId(), ExportUtil.getSnomedCorePathNid());
 
-					if (referencedComponentId==null || referencedComponentId.equals("")){
-						referencedComponentId=Terms.get().getUids(description.getDescId()).iterator().next().toString();
+					if (referencedComponentId==null || referencedComponentId.equals("") || referencedComponentId.equals("0")){
+						continue;
 					}
 					UUID uuid = Type5UuidFactory.get(refsetId + referencedComponentId);
 

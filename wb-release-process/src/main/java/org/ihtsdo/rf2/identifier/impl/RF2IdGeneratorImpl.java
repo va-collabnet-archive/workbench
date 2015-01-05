@@ -6,32 +6,21 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 import java.util.UUID;
 
 import org.apache.log4j.Logger;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.dwfa.ace.api.I_ConceptAttributeTuple;
-import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.I_ProcessConcepts;
-import org.ihtsdo.rf2.constant.I_Constants;
-import org.ihtsdo.rf2.impl.RF2AbstractImpl;
 import org.ihtsdo.rf2.impl.RF2IDImpl;
 import org.ihtsdo.rf2.util.Config;
-import org.ihtsdo.rf2.util.WriteUtil;
-import org.ihtsdo.tk.api.Precedence;
 
 /**
  * Title: RF2IdGeneratorImpl Description: Generating sct identifier for all the newly created content RF2 Release File Copyright: Copyright (c) 2010 Company: IHTSDO
  * 
- * @author Varsha Parekh
+ * * @author Alejandro Rodriguez
  * @version 1.0
  */
 
