@@ -87,7 +87,7 @@ public class RefsetMemberFactory {
 
             if (refexColCon.isAnnotationIndex()) {
                 refexColCon.getData().getMemberNids().add(member.nid);
-            }else {
+            }else if(!refexColCon.isAnnotationIndex() && !refexColCon.isAnnotationStyleRefex()) {
                 refexColCon.getData().add(member);
             }
         }        
