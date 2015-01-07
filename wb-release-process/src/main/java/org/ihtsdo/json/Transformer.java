@@ -890,13 +890,13 @@ public class Transformer {
         Gson gson = new Gson();
 
         for (String moduleId : modulesSet) {
-            manifest.getModules().add(concepts.get(moduleId));
+            manifest.getModules().add(concepts.get(Long.parseLong( moduleId)));
         }
         for (String langRefsetId : langRefsetsSet) {
-            manifest.getLanguageRefsets().add(concepts.get(langRefsetId));
+            manifest.getLanguageRefsets().add(concepts.get(Long.parseLong(langRefsetId)));
         }
         for (String refsetId : refsetsSet) {
-            manifest.getRefsets().add(new RefsetDescriptor(concepts.get(refsetId), refsetsCount.get(refsetId)));
+            manifest.getRefsets().add(new RefsetDescriptor(concepts.get(Long.parseLong(refsetId)), refsetsCount.get(refsetId)));
         }
         bw.append(gson.toJson(manifest).toString());
 
