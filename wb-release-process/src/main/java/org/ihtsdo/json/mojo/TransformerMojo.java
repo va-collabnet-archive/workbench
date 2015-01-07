@@ -42,7 +42,13 @@ public class TransformerMojo extends AbstractMojo {	/**
 	 * @required
 	 */
 	String termType;
-	
+	/**
+	 * Release date.
+	 * 
+	 * @parameter
+	 * @required
+	 */
+	String releaseDate;
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		Transformer transformer=new Transformer();
@@ -52,6 +58,7 @@ public class TransformerMojo extends AbstractMojo {	/**
 		}else{
 			transformer.setDefaultTermType(transformer.synType);
 		}
+		transformer.setEffectiveTime(releaseDate);
 		try {
 			RF2FileRetrieve rf2Files=new RF2FileRetrieve(rf2FilesDirectory);
 			transformer.loadConceptsFile(new File(rf2Files.getSnapshotConceptFile()));
@@ -68,6 +75,7 @@ public class TransformerMojo extends AbstractMojo {	/**
 			rf2Files=null;
 			transformer.createConceptsJsonFile(targetDirectory.getName() +  "/json/concepts.json");
 			transformer.createTextIndexFile(targetDirectory.getName() +  "/json/text-index.json");
+			transformer.createManifestFile(targetDirectory.getName() +  "/json/manifest.json");
 			transformer=null;
 			System.gc();
 		} catch (Exception e) {

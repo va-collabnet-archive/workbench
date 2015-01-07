@@ -16,7 +16,7 @@ public class TextIndexDescription extends Description {
     private String fsn;
     private String semanticTag;
     private boolean conceptActive;
-    private Long typeId;
+    private String typeId;
     private List<String> words;
     private List<Long> refsetIds;
 
@@ -55,11 +55,11 @@ public class TextIndexDescription extends Description {
         this.words = words;
     }
 
-    public Long getTypeId() {
+    public String getTypeId() {
         return typeId;
     }
 
-    public void setTypeId(Long typeId) {
+    public void setTypeId(String typeId) {
         this.typeId = typeId;
     }
 
