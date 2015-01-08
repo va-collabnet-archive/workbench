@@ -101,7 +101,6 @@ public class Transformer {
         langCodes.put("fr", "french");
         langCodes.put("nl", "dutch");
         manifest = new ResourceSetManifest();
-        addManifestData();
 
         refsetsSet = new HashSet<String>();
         langRefsetsSet = new HashSet<String>();
@@ -576,6 +575,7 @@ public class Transformer {
         	ofile.getParentFile().mkdirs();
         }
 
+        addManifestData();
         FileOutputStream fos = new FileOutputStream(ofile);
         OutputStreamWriter osw = new OutputStreamWriter(fos, "UTF-8");
         BufferedWriter bw = new BufferedWriter(osw);
