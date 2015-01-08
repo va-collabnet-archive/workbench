@@ -344,7 +344,7 @@ public class Transformer {
                     if (!refsetsCount.containsKey(loopMember.getRefset().toString())) {
                         refsetsCount.put(loopMember.getRefset().toString(), 0);
                     }
-                    refsetsCount.put(loopMember.getRefset().toString(), refsetsCount.get(loopMember.getRefset()) + 1);
+                    refsetsCount.put(loopMember.getRefset().toString(), refsetsCount.get(loopMember.getRefset().toString()) + 1);
 
                     count++;
                     if (count % 100000 == 0) {
@@ -398,7 +398,7 @@ public class Transformer {
                     if (!refsetsCount.containsKey(loopMember.getRefset().toString())) {
                         refsetsCount.put(loopMember.getRefset().toString(), 0);
                     }
-                    refsetsCount.put(loopMember.getRefset().toString(), refsetsCount.get(loopMember.getRefset()) + 1);
+                    refsetsCount.put(loopMember.getRefset().toString(), refsetsCount.get(loopMember.getRefset().toString()) + 1);
 
                     count++;
                     if (count % 100000 == 0) {
@@ -452,7 +452,7 @@ public class Transformer {
                     if (!refsetsCount.containsKey(loopMember.getRefset().toString())) {
                         refsetsCount.put(loopMember.getRefset().toString(), 0);
                     }
-                    refsetsCount.put(loopMember.getRefset().toString(), refsetsCount.get(loopMember.getRefset()) + 1);
+                    refsetsCount.put(loopMember.getRefset().toString(), refsetsCount.get(loopMember.getRefset().toString()) + 1);
 
                     count++;
                     if (count % 100000 == 0) {
@@ -506,7 +506,7 @@ public class Transformer {
                     if (!refsetsCount.containsKey(loopMember.getRefset().toString())) {
                         refsetsCount.put(loopMember.getRefset().toString(), 0);
                     }
-                    refsetsCount.put(loopMember.getRefset().toString(), refsetsCount.get(loopMember.getRefset()) + 1);
+                    refsetsCount.put(loopMember.getRefset().toString(), refsetsCount.get(loopMember.getRefset().toString()) + 1);
 
                     count++;
                     if (count % 100000 == 0) {
