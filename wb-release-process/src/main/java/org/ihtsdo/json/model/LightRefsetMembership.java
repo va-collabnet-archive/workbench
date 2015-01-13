@@ -8,7 +8,7 @@ package org.ihtsdo.json.model;
 public class LightRefsetMembership extends Component {
 	
 	public enum RefsetMembershipType {
-		SIMPLEMAP("SIMPLEMAP"), ATTRIBUTE_VALUE("ATTRIBUTE_VALUE"), ASSOCIATION("ASSOCIATION"), SIMPLE_REFSET("SIMPLE_REFSET");
+		SIMPLEMAP("SIMPLEMAP"), ATTRIBUTE_VALUE("ATTRIBUTE_VALUE"), ASSOCIATION("ASSOCIATION"), SIMPLE_REFSET("SIMPLE_REFSET"),DAILY_BUILD("DAILY_BUILD");
 		private String type;
 		
 		RefsetMembershipType(String type) {
