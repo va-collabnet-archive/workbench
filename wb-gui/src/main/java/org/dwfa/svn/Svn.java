@@ -82,7 +82,7 @@ public class Svn implements I_HandleSubversion {
     private static int svnNotConnectedWarningCount = 0;
     public static int maxSvnNotConnectedWarningCount = 1;
     protected static boolean useCachedCredentials = false;
-    private static SvnImpl impl = SvnImpl.NATIVE;
+    private static SvnImpl impl = SvnImpl.SVN_KIT;
     private static SVNClientInterface client;
     private static SvnPrompter prompter = new SvnPrompter();
     public static final int SEMAPHORE_PERMITS = 10;
