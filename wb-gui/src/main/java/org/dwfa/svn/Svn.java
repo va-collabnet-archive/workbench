@@ -62,8 +62,14 @@ import org.tigris.subversion.javahl.SVNClientInterface;
 import org.tigris.subversion.javahl.Status;
 import org.tigris.subversion.javahl.StatusCallback;
 import org.tigris.subversion.javahl.StatusKind;
+import org.tmatesoft.svn.core.SVNDepth;
 import org.tmatesoft.svn.core.SVNErrorCode;
+import org.tmatesoft.svn.core.internal.wc17.SVNWCContext;
 import org.tmatesoft.svn.core.javahl.SVNClientImpl;
+import org.tmatesoft.svn.core.wc2.SvnGetStatus;
+import org.tmatesoft.svn.core.wc2.SvnOperationFactory;
+import org.tmatesoft.svn.core.wc2.SvnStatus;
+import org.tmatesoft.svn.core.wc2.SvnTarget;
 
 public class Svn implements I_HandleSubversion {
 
@@ -76,7 +82,7 @@ public class Svn implements I_HandleSubversion {
     private static int svnNotConnectedWarningCount = 0;
     public static int maxSvnNotConnectedWarningCount = 1;
     protected static boolean useCachedCredentials = false;
-    private static SvnImpl impl = SvnImpl.SVN_KIT;
+    private static SvnImpl impl = SvnImpl.NATIVE;
     private static SVNClientInterface client;
     private static SvnPrompter prompter = new SvnPrompter();
     public static final int SEMAPHORE_PERMITS = 10;
@@ -376,7 +382,14 @@ public class Svn implements I_HandleSubversion {
             int modifiedFiles = 0;
             for (Status s : status) {
                 if (s.isManaged()) {
-                    if (s.getTextStatus() == StatusKind.missing) {
+                    System.out.println("FILE CHECKED IS: " + s.getPath());
+                    System.out.println("TEXT STATUS IS: " + s.getTextStatus());
+                    System.out.println("DESCRIPTION: " + s.getTextStatusDescription());
+                    System.out.println("PROP STATUS IS: " + s.getPropStatus());
+                    System.out.println("DESCRIPTION: " + s.getPropStatusDescription());
+                    File f = new File(s.getPath());
+                    if (s.getTextStatus() == StatusKind.missing ||
+                         (s.getTextStatus() == StatusKind.normal &&!f.exists())) {
                         boolean delete = true;
                         if (s.getPath().endsWith(".bp")) {
                             String pathNameNoExtension = s.getPath().substring(0, s.getPath().lastIndexOf(".bp"));
