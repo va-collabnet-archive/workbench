@@ -180,11 +180,8 @@ public class Rf2IdUuidRemapArfMojo
                         || fileName.contains("ids.txt")) {
                     String fPathNameIn = dirPathName + FILE_SEPARATOR + fileName;
                     String fPathNameOut = dirPathName + FILE_SEPARATOR + "tmp_" + fileName;
-                    File inFile = new File(fPathNameIn);
-		    if (inFile.exists() && inFile.length() > 0) {
-		       remapFile(new File(fPathNameIn), new File(fPathNameOut), idLookup);
-                    }
-		}
+                    remapFile(new File(fPathNameIn), new File(fPathNameOut), idLookup);
+                }
             }
         }
 
