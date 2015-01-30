@@ -38,11 +38,13 @@ import org.dwfa.bpa.worker.Worker;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.tapi.TerminologyException;
+import org.dwfa.util.LogWithAlerts;
 import org.ihtsdo.helper.dto.DtoExtract;
 import org.ihtsdo.helper.dto.DtoToText;
 import org.ihtsdo.helper.export.ActiveOnlyExport;
 import org.ihtsdo.helper.io.FileIO;
 import org.ihtsdo.project.workflow.api.wf2.implementation.WorkflowStore;
+import org.ihtsdo.request.uscrs.UscrsContentRequestHandler;
 import org.ihtsdo.rules.RulesLibrary;
 import org.ihtsdo.rules.testmodel.TerminologyHelperDroolsWorkbench;
 import org.ihtsdo.tk.Ts;
@@ -138,7 +140,8 @@ public class ProgrammersPopupListener extends MouseAdapter implements ActionList
         PATCH_MSMITH("Patch msmith#80#"),
         TEST_ISA_CACHE("Test isa cache"),
         LAUNCH_WF_CHANGES_INIT("Launch workflow initiator on changes..."),
-        LAUNCH_BP("Launch Business Process...");
+        LAUNCH_BP("Launch Business Process..."),
+        USCRS_EXPORT("USCRS Export");
         //J+
         String menuText;
 
@@ -261,10 +264,12 @@ public class ProgrammersPopupListener extends MouseAdapter implements ActionList
                 break;
                 
             case LAUNCH_WF_CHANGES_INIT:
-            	lauchWfChangesInit();
-            	break;
+                lauchWfChangesInit();
+                break;
 
-
+            case USCRS_EXPORT:
+                exportForUSCRS();
+                break;
             default:
                 AceLog.getAppLog().alertAndLogException(new Exception("No support for: "
                         + optionMap.get(e.getActionCommand())));
@@ -272,9 +277,9 @@ public class ProgrammersPopupListener extends MouseAdapter implements ActionList
     }
 
     private void lauchWfChangesInit() {
-    	WorkflowStore wf = new WorkflowStore();
-		try {
-			String start = (String) JOptionPane.showInputDialog(
+        WorkflowStore wf = new WorkflowStore();
+        try {
+            String start = (String) JOptionPane.showInputDialog(
                     null,
                     "Enter start date as MM/dd/yy hh:mm:ss",
                     "Start Date",
@@ -282,12 +287,12 @@ public class ProgrammersPopupListener extends MouseAdapter implements ActionList
                     null,
                     null,
                     "");
-			
-			if (start == null || start.trim().isEmpty()) {
-				start = "02/01/13 00:00:00";
-			}
-			
-			String end = (String) JOptionPane.showInputDialog(
+            
+            if (start == null || start.trim().isEmpty()) {
+                start = "02/01/13 00:00:00";
+            }
+            
+            String end = (String) JOptionPane.showInputDialog(
                     null,
                     "Enter end date as MM/dd/yy hh:mm:ss",
                     "End Date",
@@ -295,19 +300,19 @@ public class ProgrammersPopupListener extends MouseAdapter implements ActionList
                     null,
                     null,
                     "");
-			
-			if (end == null || end.trim().isEmpty()) {
-				end = "12/31/13 00:00:00";
-			}
+            
+            if (end == null || end.trim().isEmpty()) {
+                end = "12/31/13 00:00:00";
+            }
 
-			wf.sendAllChangesInTimeRangeToDefaultWorkflow(start, end);
-		} catch (Exception e1) {
-			AceLog.getAppLog().alertAndLogException(e1);
-		}
-		
-	}
+            wf.sendAllChangesInTimeRangeToDefaultWorkflow(start, end);
+        } catch (Exception e1) {
+            AceLog.getAppLog().alertAndLogException(e1);
+        }
+        
+    }
 
-	private void addToWatch() {
+    private void addToWatch() {
         I_GetConceptData igcd = (I_GetConceptData) this.conceptPanel.getTermComponent();
 
         Terms.get().addToWatchList(igcd);
@@ -848,6 +853,17 @@ public class ProgrammersPopupListener extends MouseAdapter implements ActionList
         StringSelection contents = new StringSelection(igcd.toLongString());
 
         clip.setContents(contents, this);
+    }
+    
+    private void exportForUSCRS() {
+        try {
+            I_GetConceptData igcd = (I_GetConceptData) this.conceptPanel.getTermComponent();
+            new UscrsContentRequestHandler(igcd.getConceptNid());
+        } catch (Exception e) {
+            AceLog.getAppLog().alertAndLogException(e);
+            JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null), "Unexpected error performing export: " + e,
+                "USCRS Content Request", JOptionPane.ERROR_MESSAGE);
+        } 
     }
 
     //~--- get methods ---------------------------------------------------------
