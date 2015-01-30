@@ -166,7 +166,7 @@ public class RF2IdListGeneratorImpl extends RF2IDImpl {
 				String lineRead = "";
 				String sctid="";
 				while ((lineRead = rf2FileReader.readLine()) != null) {		
-					String[] part= lineRead.split("\t");
+					String[] part= lineRead.split("\t",-1);
 					sctid="";
 					for (int s = 0; s < Key.size(); s++) {
 						if(part[Integer.parseInt(Key.get(s))].contains("-")){	
