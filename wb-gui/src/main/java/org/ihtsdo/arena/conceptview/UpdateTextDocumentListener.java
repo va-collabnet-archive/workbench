@@ -367,7 +367,9 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
         desc.setText(text);
 
         usRefex.setNid1(prefNid);
-        gbRefex.setNid1(prefNid);
+        if(gbRefex != null){
+            gbRefex.setNid1(prefNid);
+        }
     }
 
     private void doSynUpdate(RefexNidAnalogBI gbRefex, RefexNidAnalogBI usRefex) throws PropertyVetoException,
