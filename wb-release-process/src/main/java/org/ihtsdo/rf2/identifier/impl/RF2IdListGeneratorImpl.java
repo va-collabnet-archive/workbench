@@ -180,9 +180,9 @@ public class RF2IdListGeneratorImpl extends RF2IDImpl {
 								sctid=String.valueOf(lSctId);
 							}else{
 								try {
-									sctid = getSCTId(getConfig(), UUID.fromString(uuid) , Integer.parseInt(namespaceId), partitionId , releaseId , executionId , moduleId);
+									sctid = getSCTId(getConfig(), UUID.fromString(uuid) , Integer.parseInt(namespaceId), partitionId , releaseId.substring(0,8) , executionId , moduleId);
 									if(sctid.equals("0")){
-										sctid = getSCTId(getConfig(), UUID.fromString(uuid) , Integer.parseInt(namespaceId), partitionId , releaseId , executionId , moduleId);
+										sctid = getSCTId(getConfig(), UUID.fromString(uuid) , Integer.parseInt(namespaceId), partitionId , releaseId.substring(0,8)  , executionId , moduleId);
 										// sctid = IdUtil.getSCTId(getConfig(), UUID.fromString(uuid));
 									}
 								} catch (NumberFormatException e) {
@@ -259,7 +259,7 @@ public class RF2IdListGeneratorImpl extends RF2IDImpl {
 								String executionId = getConfig().getRf2Files().get(f).sctidparam.executionId;
 								String moduleId = getConfig().getRf2Files().get(f).sctidparam.moduleId;			
 
-								res=getSCTIdList(getConfig(),list,Integer.parseInt(namespaceId), partitionId, releaseId, executionId,"1");
+								res=getSCTIdList(getConfig(),list,Integer.parseInt(namespaceId), partitionId, releaseId.substring(0,8) , executionId,"1");
 
 								if (idMapFile!=null && !idMapFile.equals("")){
 
