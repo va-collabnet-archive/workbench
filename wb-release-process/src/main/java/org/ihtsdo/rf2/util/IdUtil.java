@@ -233,6 +233,10 @@ public class IdUtil {
 			if (logger.isDebugEnabled())
 				logger.debug("getSCTID for UUID : " + componentUuid + " returned NULL calling create to generate a new SCTID");
 			try {
+
+				if (releaseId!=null && releaseId.length()>8){
+					releaseId=releaseId.substring(0,8);
+				}
 				sctId = idGen.createSCTID(componentUuid, namespaceId, partitionId, releaseId, executionId, moduleId);
 			} catch (Exception cE) {
 				logger.error("Message : SCTID creation error for UUID :" + componentUuid, cE);
@@ -256,7 +260,11 @@ public class IdUtil {
 			if (logger.isDebugEnabled())
 				logger.debug("getSCTID for UUID : " + uuid + " returned NULL calling create to generate a new SCTID");
 			try {
-				sctId = idGen.createSCTID(uuid, 0, "01", config.getReleaseDate(), "TEST EXECUTION", "12345");
+				String releaseId=config.getReleaseDate();
+				if (releaseId!=null && releaseId.length()>8){
+					releaseId=releaseId.substring(0,8);
+				}
+				sctId = idGen.createSCTID(uuid, 0, "01", releaseId, "TEST EXECUTION", "12345");
 			} catch (Exception cE) {
 				logger.error("Message : SCTID creation error for UUID :" + uuid, cE);
 			}
@@ -335,6 +343,10 @@ public class IdUtil {
 		HashMap<UUID, Long> sctId = new HashMap<UUID,Long>();
 
 		try {
+
+			if (releaseId!=null && releaseId.length()>8){
+				releaseId=releaseId.substring(0,8);
+			}
 			sctId = idGen.createSCTIDList(componentUuidlist, namespaceId, partitionId, releaseId, executionId, moduleId);
 		} catch (Exception cE) {
 			logger.error("Message : SCTID creation error for list " , cE);

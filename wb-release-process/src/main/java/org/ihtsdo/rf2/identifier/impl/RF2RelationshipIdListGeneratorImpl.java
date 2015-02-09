@@ -216,6 +216,10 @@ public class RF2RelationshipIdListGeneratorImpl extends RF2IDImpl {
 			if (componentTypeAction==null){
 				componentTypeAction="";
 			}
+
+			if (releaseId!=null && releaseId.length()>8){
+				releaseId=releaseId.substring(0,8);
+			}
 			hmTmp=hmTypeMap.get(idType);
 			// Creating SctIds			
 			logger.info("Creating SCTIds for ....................." + componentType);
@@ -255,10 +259,10 @@ public class RF2RelationshipIdListGeneratorImpl extends RF2IDImpl {
 								}else if (!componentTypeAction.toLowerCase().equals("nosctidcreate")){
 									//sctid = getSCTId(getConfig(), UUID.fromString(uuid) , Integer.parseInt(namespaceId), partitionId , releaseId , executionId , moduleId);
 									logger.info("Inferred relationship uuid sending to webservice "  +uuid);
-									sctid = getSCTId(getConfig(), uuid , Integer.parseInt(namespaceId), partitionId , releaseId.substring(0,8) , executionId , moduleId);
+									sctid = getSCTId(getConfig(), uuid , Integer.parseInt(namespaceId), partitionId , releaseId , executionId , moduleId);
 									if(sctid.equals("0")){
 										//sctid = getSCTId(getConfig(), UUID.fromString(uuid) , Integer.parseInt(namespaceId), partitionId , releaseId , executionId , moduleId);
-										sctid = getSCTId(getConfig(), uuid , Integer.parseInt(namespaceId), partitionId , releaseId.substring(0, 8) , executionId , moduleId);
+										sctid = getSCTId(getConfig(), uuid , Integer.parseInt(namespaceId), partitionId , releaseId , executionId , moduleId);
 									}
 								}else{
 									sctid=uuid.toString();
@@ -354,7 +358,10 @@ public class RF2RelationshipIdListGeneratorImpl extends RF2IDImpl {
 								String moduleId = getConfig().getRf2Files().get(f).sctidparam.moduleId;			
 								logger.info(list.size() + " inferred relationships in list sending to web service.");
 
-								res=getSCTIdList(getConfig(),list,Integer.parseInt(namespaceId), partitionId, releaseId.substring(0, 8), executionId,"1");
+								if (releaseId!=null && releaseId.length()>8){
+									releaseId=releaseId.substring(0,8);
+								}
+								res=getSCTIdList(getConfig(),list,Integer.parseInt(namespaceId), partitionId, releaseId, executionId,"1");
 
 								if (idMapFile!=null && !idMapFile.equals("")){
 

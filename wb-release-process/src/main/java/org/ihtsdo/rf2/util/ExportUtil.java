@@ -1974,6 +1974,9 @@ public class ExportUtil {
 			if (sctId!=null && !sctId.equals("") ){
 				return String.valueOf(sctId);
 			}
+			if (releaseId!=null && releaseId.length()>8){
+				releaseId=releaseId.substring(0,8);
+			}
 			sctId = idGen.createSCTID(componentUuid, namespaceId, partitionId, releaseId, executionId, moduleId);
 		} catch (Exception cE) {
 			logger.error("Message : SCTID creation error for UUID :" + componentUuid, cE);
@@ -2073,6 +2076,10 @@ public class ExportUtil {
 					releaseId	= config.getReleaseId();
 					executionId = config.getExecutionId();
 				}
+
+				if (releaseId!=null && releaseId.length()>8){
+					releaseId=releaseId.substring(0,8);
+				}
 				conceptId = idGen.createSCTID(uuid, Integer.parseInt(namespaceId) , partitionId, releaseId, executionId, sctModuleId);
 
 			} catch (Exception Ex) {
@@ -2108,6 +2115,10 @@ public class ExportUtil {
 		} catch (NullPointerException Ne) {
 			// There is no descriptionid in the repository so we are getting NULL
 			try{
+
+				if (releaseId!=null && releaseId.length()>8){
+					releaseId=releaseId.substring(0,8);
+				}
 				descriptionId = idGen.createSCTID(uuid, Integer.parseInt(namespaceId) , partitionId, releaseId, executionId, sctModuleId);
 
 			} catch (Exception Ex) {
@@ -2146,6 +2157,10 @@ public class ExportUtil {
 		} catch (NullPointerException Ne) {
 			// There is no relationshipId in the repository so we are getting NULL
 			try{
+
+				if (releaseId!=null && releaseId.length()>8){
+					releaseId=releaseId.substring(0,8);
+				}
 				relationshipId = idGen.createSCTID(uuid, Integer.parseInt(namespaceId) , partitionId, releaseId, executionId, sctModuleId);
 			} catch (Exception Ex) {
 				logger.error("Message : SCTID creation error for UUID :"  + uuid, Ex);
