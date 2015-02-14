@@ -317,13 +317,13 @@ public class ContradictionFinderSwingWorker
             
             if(conflictRefset.isAnnotationStyleRefex()){
                 ConceptChronicleBI memberToRetire = Ts.get().getConcept(component.getConceptNid());
-                Ts.get().addUncommitted(memberToRetire);
+                Ts.get().addUncommittedNoChecks(memberToRetire);
                 Ts.get().commit(memberToRetire,
                         adjudicationWorkListChangeSetPolicy);
             }
         }
         if(!conflictRefset.isAnnotationStyleRefex() || conflictRefset.isAnnotationIndex()){
-            Ts.get().addUncommitted(conflictRefset);
+            Ts.get().addUncommittedNoChecks(conflictRefset);
             Ts.get().commit(conflictRefset,
                 adjudicationWorkListChangeSetPolicy);
         }

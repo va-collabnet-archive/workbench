@@ -85,7 +85,7 @@ public class CommitActionListener implements ActionListener {
                 RefexCAB memberBp = member.makeBlueprint(vc);
                 memberBp.setRetired();
                 builder.construct(memberBp);
-                Ts.get().addUncommitted(conflictRefset);
+                Ts.get().addUncommittedNoChecks(conflictRefset);
                 Ts.get().commit(conflictRefset);
              }
              

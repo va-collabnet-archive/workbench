@@ -121,7 +121,7 @@ public class AcceptActionListener implements ActionListener {
                         RefexChronicleBI<?> newAdjudicationRecord = builder.constructIfNotCurrent(annotBp);
 
                         c.addAnnotation(newAdjudicationRecord);
-                        Ts.get().addUncommitted(c);
+                        Ts.get().addUncommittedNoChecks(c);
                     }
             }
                 
