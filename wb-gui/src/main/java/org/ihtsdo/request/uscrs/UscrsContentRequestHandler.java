@@ -31,7 +31,6 @@ import org.ihtsdo.tk.api.description.DescriptionChronicleBI;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.api.id.IdBI;
 import org.ihtsdo.tk.api.id.LongIdBI;
-import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 import org.ihtsdo.tk.binding.snomed.Snomed;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf1;
@@ -56,7 +55,7 @@ public class UscrsContentRequestHandler
 	/** The Constant LOG. */
 	private static final Logger LOG = LoggerFactory.getLogger(UscrsContentRequestHandler.class);
 	
-	private int currentRequestId;
+	private static ThreadLocal<Integer> currentRequestId = new ThreadLocal<>();
 	private ViewCoordinate vc;
 	
 	public UscrsContentRequestHandler(int conceptNid) throws IOException, TerminologyException
@@ -95,7 +94,7 @@ public class UscrsContentRequestHandler
 
 		try
 		{
-			UscrsContentRequestTrackingInfo info = submitContentRequest(concept);
+			UscrsContentRequestTrackingInfo info = submitContentRequest(Arrays.asList(new ConceptVersionBI[] {concept}), null);
 			if (info.isSuccessful())
 			{
 				JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null),
@@ -114,7 +113,13 @@ public class UscrsContentRequestHandler
 		}
 	}
 
-	private UscrsContentRequestTrackingInfo submitContentRequest(ConceptVersionBI concept) throws Exception
+	/**
+	 * @param concept - only set up for 'newConcept at the moment, pass in the concept you want written as a 'new' concept
+	 * @param outputFile - where to write the xls file, or null, to allow the user to be prompted for it.
+	 * @return
+	 * @throws Exception
+	 */
+	public static UscrsContentRequestTrackingInfo submitContentRequest(List<ConceptVersionBI> concepts, File outputFile) throws Exception
 	{
 		LOG.debug("Submit content Request");
 
@@ -123,63 +128,69 @@ public class UscrsContentRequestHandler
 
 		// Create workbook
 		USCRSBatchTemplate bt = new USCRSBatchTemplate(USCRSBatchTemplate.class.getResourceAsStream("/USCRS_Batch_Template-2015-01-27.xls"));
-
-		currentRequestId = globalRequestCounter.getAndIncrement();
 		
-		// Handle new concept
-		handleNewConcept(concept, bt);
-
-		// Handle non-isa relationships
-		handleNewRels(concept, bt);
-
-		// Save the file
-		LOG.info("Choose file to save");
-		JFileChooser fileChooser = new JFileChooser();
-		fileChooser.addChoosableFileFilter(new FileFilter() {
+		for (ConceptVersionBI concept : concepts)
+		{
+			currentRequestId.set(globalRequestCounter.getAndIncrement());
 			
-			@Override
-			public boolean accept(File pathname) {
-				if (pathname.isDirectory())
-				{
-					return true;
-				}
-				else
-				{
-					if (pathname.getName().toLowerCase().endsWith(".xls"))
+			// Handle new concept
+			handleNewConcept(concept, bt);
+	
+			// Handle non-isa relationships
+			handleNewRels(concept, bt);
+		}
+
+		
+		// Now determine
+		UscrsContentRequestTrackingInfo info = new UscrsContentRequestTrackingInfo();
+		info.setName("Batch of " + concepts.size() + " concepts");
+		// Save the file
+		if (outputFile == null)
+		{
+		
+			LOG.info("Choose file to save");
+			JFileChooser fileChooser = new JFileChooser();
+			fileChooser.addChoosableFileFilter(new FileFilter() {
+				
+				@Override
+				public boolean accept(File pathname) {
+					if (pathname.isDirectory())
 					{
 						return true;
 					}
-					return false;
+					else
+					{
+						if (pathname.getName().toLowerCase().endsWith(".xls"))
+						{
+							return true;
+						}
+						return false;
+					}
 				}
+	
+				@Override
+				public String getDescription() {
+					return "Excel files (*.xls)";
+				}
+			});
+	
+			// Set extension filter.
+			fileChooser.setSelectedFile(new File("USCRS_Export.xls"));
+
+			// Show save file dialog.
+			int result = fileChooser.showSaveDialog(LogWithAlerts.getActiveFrame(null));
+			if (result == JFileChooser.APPROVE_OPTION)
+			{
+				outputFile = fileChooser.getSelectedFile();
 			}
-
-			@Override
-			public String getDescription() {
-				return "Excel files (*.xls)";
-			}
-		});
-
-		// Set extension filter.
-		fileChooser.setSelectedFile(new File("USCRS_Export.xls"));
-		
-
-		// Now determine
-		UscrsContentRequestTrackingInfo info = new UscrsContentRequestTrackingInfo();
-		info.setName(concept.getDescriptionPreferred().getText());
-
-		// Show save file dialog.
-		int result = fileChooser.showSaveDialog(LogWithAlerts.getActiveFrame(null));
-		File file = null;
-		if (result == JFileChooser.APPROVE_OPTION)
-		{
-			file = fileChooser.getSelectedFile();
 		}
-		LOG.info("  file = " + file);
-		if (file != null)
+		
+		LOG.info("  file = " + outputFile);
+		if (outputFile != null)
 		{
-			bt.saveFile(file);
+			bt.saveFile(outputFile);
 			info.setIsSuccessful(true);
-			info.setFile(file.toString());
+			info.setFile(outputFile.toString());
 			info.setDetail("Batch USCRS submission spreadsheet successfully created.");
 		}
 		else
@@ -198,7 +209,7 @@ public class UscrsContentRequestHandler
 	 * @param bt the wb
 	 * @throws Exception the exception
 	 */
-	private void handleNewConcept(ConceptChronicleBI concept, USCRSBatchTemplate bt) throws Exception
+	private static void handleNewConcept(ConceptVersionBI concept, USCRSBatchTemplate bt) throws Exception
 	{
 		LOG.debug("  Handle new concept tab");
 
@@ -227,14 +238,9 @@ public class UscrsContentRequestHandler
 
 		// PARENTS
 		List<Long> parentIds = new ArrayList<>();
-		for (RelationshipChronicleBI rel : concept.getRelationshipsOutgoing())
+		for (RelationshipVersionBI<?> relVersion : concept.getRelationshipsOutgoingActiveIsa())
 		{
-			RelationshipVersionBI<?> relVersion = rel.getVersion(vc);
-			// check for "isa" relationship type
-			if ((relVersion.getTypeNid() == Snomed.IS_A.getLenient().getNid()) && relVersion.isActive(vc))
-			{
-				parentIds.add(getSCTId(Ts.get().getConcept(relVersion.getTargetNid())));
-			}
+			parentIds.add(getSCTId(Ts.get().getConcept(relVersion.getTargetNid())));
 		}
 		LOG.debug("      parents = " + parentIds.size());
 		if (parentIds.size() > 3)
@@ -244,12 +250,12 @@ public class UscrsContentRequestHandler
 
 		//Synonyms
 		List<String> synonyms = new ArrayList<>();
-		for (DescriptionChronicleBI desc : concept.getDescriptions())
+		for (DescriptionVersionBI<?> descVersion : concept.getDescriptionsActive())
 		{
-			DescriptionVersionBI<?> descVersion = desc.getVersion(vc);
 			// find active, non FSN descriptions not matching the preferred name
-			if (descVersion.isActive(vc) && (descVersion.getTypeNid() != Snomed.FULLY_SPECIFIED_DESCRIPTION_TYPE.getLenient().getNid())
-					&& !descVersion.getText().equals(concept.getVersion(vc).getDescriptionPreferred().getText()))
+			if (descVersion.getTypeNid() != SnomedMetadataRf1.FULLY_SPECIFIED_DESCRIPTION_TYPE.getLenient().getNid() 
+					&& descVersion.getTypeNid() != SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getLenient().getNid()
+					&& !descVersion.getText().equals(concept.getDescriptionPreferred().getText()))
 			{
 				synonyms.add(descVersion.getText());
 			}
@@ -264,7 +270,7 @@ public class UscrsContentRequestHandler
 			switch (c)
 			{
 				case Request_Id:
-					bt.addNumericCell(colNumber++, currentRequestId);
+					bt.addNumericCell(colNumber++, currentRequestId.get());
 					break;
 				case Topic:
 					// TODO: Topic - consider making the user enter this
@@ -274,7 +280,7 @@ public class UscrsContentRequestHandler
 					bt.addStringCell(colNumber++, concept.getPrimUuid().toString());
 					break;
 				case Local_Term:
-					bt.addStringCell(colNumber++, concept.getVersion(vc).getDescriptionPreferred().getText());
+					bt.addStringCell(colNumber++, concept.getDescriptionPreferred().getText());
 					break;
 				case Fully_Specified_Name:
 					// Fully Specified Name (without the semantic tag)
@@ -290,7 +296,7 @@ public class UscrsContentRequestHandler
 					if (fsn.indexOf('(') != -1)
 					{
 						String st = fsn.substring(fsn.lastIndexOf('(') + 1, fsn.lastIndexOf(')'));
-						tag = PICKLIST_Semantic_Tag.find(st);
+						tag = PICKLIST_Semantic_Tag.find(st.toLowerCase());
 					}
 					if (tag == null)
 					{
@@ -299,7 +305,7 @@ public class UscrsContentRequestHandler
 					bt.addStringCell(colNumber++, tag.toString());
 					break;
 				case Preferred_Term:
-					bt.addStringCell(colNumber++, concept.getVersion(vc).getDescriptionPreferred().getText());
+					bt.addStringCell(colNumber++, concept.getDescriptionPreferred().getText());
 					break;
 				case Terminology_1_:
 				case Terminology_2_:
@@ -342,21 +348,22 @@ public class UscrsContentRequestHandler
 					break;
 				case Note:
 					StringBuilder sb = new StringBuilder();
-					if (concept.getConceptAttributes().getVersion(vc).isDefined())
+					if (concept.getConceptAttributesActive() != null && concept.getConceptAttributesActive().isDefined())
 					{
 						sb.append("NOTE: this concept is fully defined. ");
 					}
 					//First two synonyms have cols, any others go in Note
-					boolean firstHasBeenSeen = false;
-					while (synonyms.size() > 2)
+					if (synonyms.size() >2 )
 					{
 						sb.append("NOTE: this concept also has the following synonyms: ");
-						if (firstHasBeenSeen)
+					}
+					while (synonyms.size() > 2)
+					{
+						sb.append(synonyms.remove(0));
+						if (synonyms.size() > 2)
 						{
 							sb.append(", ");
 						}
-						sb.append(synonyms.remove(0));
-						firstHasBeenSeen = true;
 					}
 					bt.addStringCell(colNumber++, sb.toString());
 					break;
@@ -376,18 +383,17 @@ public class UscrsContentRequestHandler
 	 * @param bt the wb
 	 * @throws Exception the exception
 	 */
-	private void handleNewRels(ConceptChronicleBI concept, USCRSBatchTemplate bt) throws Exception
+	private static void handleNewRels(ConceptVersionBI concept, USCRSBatchTemplate bt) throws Exception
 	{
 		LOG.debug("  Handle non-ISA rels");
 
 		bt.selectSheet(SHEET.New_Relationship);
 
-		for (RelationshipChronicleBI rel : concept.getRelationshipsOutgoing())
+		for (RelationshipVersionBI<?> relVersion : concept.getRelationshipsOutgoingActive())
 		{
-			RelationshipVersionBI<?> relVersion = rel.getVersion(vc);
 			// find active, non-ISA relationships
 			// TODO should this be excluding inferred relationships?
-			if (relVersion.isActive(vc) && (relVersion.getTypeNid() != Snomed.IS_A.getLenient().getNid()))
+			if (relVersion.getTypeNid() != Snomed.IS_A.getLenient().getNid())
 			{
 				bt.addRow();
 				int colNumber = 0;
@@ -405,11 +411,12 @@ public class UscrsContentRequestHandler
 							bt.addStringCell(colNumber++, PICKLIST_Source_Terminology.Current_Batch_Requests.toString());
 							break;
 						case Source_Concept_Id:
-							bt.addNumericCell(colNumber++, currentRequestId);
+							bt.addNumericCell(colNumber++, currentRequestId.get());
 							break;
 						case Relationship_Type:
+							//TODO fix this ugly hack on getting the description without referencing a VC
 							bt.addStringCell(colNumber++, PICKLIST_Relationship_Type.find(
-									Ts.get().getConceptVersion(vc, relVersion.getTypeNid()).getDescriptionPreferred().getText()).toString());
+									Ts.get().getConcept(relVersion.getTypeNid()).getVersions().iterator().next().getDescriptionPreferred().getText()).toString());
 							break;
 						case Destination_Terminology:
 							// Destination Termionlogy - TODO: here we're only supporting things linked to SNOMED, in the future we may need to link
@@ -443,7 +450,7 @@ public class UscrsContentRequestHandler
 		}
 	}
 	
-	private long getSCTId(ConceptChronicleBI conceptChronicle) throws IOException
+	private static long getSCTId(ConceptChronicleBI conceptChronicle) throws IOException
 	{
 		for (IdBI id : conceptChronicle.getAllIds()) {
 			if (id.getAuthorityNid() == Ts.get().getNidForUuids(ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.getUids())) 
