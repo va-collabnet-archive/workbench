@@ -136,6 +136,12 @@
 			<artifactId>dom4j</artifactId>
 			<version>1.6.1</version>
 		</dependency>
+		<dependency>
+			<groupId>net.sf.opencsv</groupId>
+			<artifactId>opencsv</artifactId>
+			<scope>compile</scope>
+			<version>2.3</version>
+		</dependency>
 	</dependencies>
 	<build>
 		<resources>
