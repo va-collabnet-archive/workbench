@@ -224,7 +224,7 @@ public class RefsetSpecTreeNode extends DefaultMutableTreeNode implements Compar
                             if (comparison != 0) {
                                 return comparison;
                             }
-                            return this.getConstraintDesc().compareTo(o.getClauseDesc());
+                            return this.getConstraintDesc().compareTo(o.getConstraintDesc());
                         case CID_CID_STR:
                             return -1;
                         default:
