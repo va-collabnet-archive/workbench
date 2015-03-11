@@ -45,7 +45,14 @@ public class ExportWorkflowHistoryMojo extends AbstractMojo {
 	 * 
 	 */
 	private String exportFolder;
-	
+
+	/**
+	 * componentType
+	 * 
+	 * @parameter default-value="LAST_WF_DATA"
+	 * 
+	 */
+	private String componentType;
 	
 	
 	public void execute() throws MojoExecutionException, MojoFailureException {
@@ -57,6 +64,7 @@ public class ExportWorkflowHistoryMojo extends AbstractMojo {
 			config.setReleaseDate(releaseDate);
 			config.setFlushCount(10000);
 			config.setFileExtension("txt");
+			config.setComponentType(componentType);
 			
 			// initialize meta hierarchy
 			ExportUtil.init();
