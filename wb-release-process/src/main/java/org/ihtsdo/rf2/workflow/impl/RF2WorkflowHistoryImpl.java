@@ -57,9 +57,10 @@ public class RF2WorkflowHistoryImpl extends RF2AbstractImpl implements I_Process
 				}
 				
 			}else{
-
-				WorkflowHistoryJavaBean bean=wfHistory.last();
-				exportBean(bean);
+				if (wfHistory.size()>0){
+					WorkflowHistoryJavaBean bean=wfHistory.last();
+					exportBean(bean);
+				}
 			}
 
 		} catch (IOException e) {
