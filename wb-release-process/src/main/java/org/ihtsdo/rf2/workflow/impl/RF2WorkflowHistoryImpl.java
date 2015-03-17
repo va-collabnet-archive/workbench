@@ -53,13 +53,13 @@ public class RF2WorkflowHistoryImpl extends RF2AbstractImpl implements I_Process
 			
 			if (getConfig().getComponentType().equals("FULL_WF_DATA")){
 				for (WorkflowHistoryJavaBean bean:wfHistory){
-					exportBean(bean);
+					exportBean(bean,conceptid);
 				}
 				
 			}else{
 				if (wfHistory.size()>0){
 					WorkflowHistoryJavaBean bean=wfHistory.last();
-					exportBean(bean);
+					exportBean(bean,conceptid);
 				}
 			}
 
@@ -73,9 +73,15 @@ public class RF2WorkflowHistoryImpl extends RF2AbstractImpl implements I_Process
 	}
 
 
-	private void exportBean(WorkflowHistoryJavaBean bean) throws IOException, TerminologyException {
+	private void exportBean(WorkflowHistoryJavaBean bean, String conceptid) throws Exception {
 		StringBuffer sb=new StringBuffer();
-		sb.append(bean.getConcept());
+		String newconceptid="";
+		if (conceptid.contains("-")){
+			newconceptid=getSCTId(getConfig(),bean.getConcept());
+		}else{
+			newconceptid=conceptid;
+		}
+		sb.append(newconceptid);
 		sb.append("\t");
 		sb.append(bean.getFullySpecifiedName());
 		sb.append("\t");
