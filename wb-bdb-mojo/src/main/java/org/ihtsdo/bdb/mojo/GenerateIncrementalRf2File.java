@@ -275,6 +275,13 @@ public class GenerateIncrementalRf2File extends AbstractMojo {
      */
     private boolean makeRf2Refsets;
     /**
+     * Set to true to create compute specificaiton refsets.
+     *
+     * @parameter
+     * @required
+     */
+    private boolean computeSpecRefsets;
+    /**
      * Taxonomy parent concepts.
      *
      * @parameter @required
@@ -372,13 +379,19 @@ public class GenerateIncrementalRf2File extends AbstractMojo {
             for (ConceptDescriptor cd : taxonomyParentConcepts) {
                 taxonomyParentNids.add(Ts.get().getNidForUuids(UUID.fromString(cd.getUuid())));
             }
-
+            
             vc = new ViewCoordinate(Ts.get().getMetadataViewCoordinate());
             vc.getIsaTypeNids().add(Snomed.IS_A.getLenient().getConceptNid());
             PathBI path = Ts.get().getPath(viewPathNid);
             PositionBI position = Ts.get().newPosition(path,
                     TimeHelper.getTimeFromString(endDate, TimeHelper.getFileDateFormat()));
             vc.setPositionSet(new PositionSet(position));
+            ViewCoordinate editPathVc = new ViewCoordinate(Ts.get().getMetadataViewCoordinate());
+            int editPathNid = Ts.get().getNidForUuids(Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, editPathConceptSpecFsn));
+            PathBI editPath = Ts.get().getPath(editPathNid);
+            PositionBI editPosition = Ts.get().newPosition(editPath,
+                    TimeHelper.getTimeFromString(endDate, TimeHelper.getFileDateFormat()));
+            editPathVc.setPositionSet(new PositionSet(editPosition));
             IntSet moduleIds = new IntSet();
             for (UUID uuid : moduleUuids) {
                 moduleIds.add(Ts.get().getNidForUuids(uuid));
@@ -387,18 +400,15 @@ public class GenerateIncrementalRf2File extends AbstractMojo {
             metaDir.mkdir();
 //          compute spec refsets
             Integer refsetParentConceptNid = null;
-            if (refsetParentConceptSpec != null) {
+            if (refsetParentConceptSpec != null && computeSpecRefsets) {
                 refsetParentConceptNid = Ts.get().getNidForUuids(UUID.fromString(refsetParentConceptSpec.getUuid()));
-                vc.getPositionSet().getViewPathNidSet();
                 EditCoordinate ec = new EditCoordinate(TermAux.USER.getLenient().getConceptNid(),
                         Ts.get().getNidForUuids(UUID.fromString(moduleConcepts[0].getUuid())),
                         viewPathNid);
-                ReleaseSpecProcessor refsetSpecComputer = new ReleaseSpecProcessor(ec,
-                        vc, ChangeSetPolicy.OFF, refsetParentConceptNid);
-                refsetSpecComputer.process();
-                if (releaseType == ReleaseType.FULL) {
-                    refsetSpecComputer.writeRefsetSpecMetadata(metaDir); //only care about FULL for import
-                }
+                    ReleaseSpecProcessor refsetSpecComputer = new ReleaseSpecProcessor(ec, vc,
+                        editPathVc, ChangeSetPolicy.OFF, refsetParentConceptNid);
+                    refsetSpecComputer.process();
+                    refsetSpecComputer.writeRefsetSpecMetadata(metaDir);
             }
             LanguageRefsetChecker languageRefsetChecker = new LanguageRefsetChecker(vc,
                     UUID.fromString(langRefsetConceptSpec.getUuid()),
@@ -449,8 +459,7 @@ public class GenerateIncrementalRf2File extends AbstractMojo {
             IntSet sapsToRemove = new IntSet();
             if (previousReleaseDate != null) {
                 IntSet allPaths = new IntSet(pathIds.getSetValues());
-                int nid = Ts.get().getNidForUuids(Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, editPathConceptSpecFsn));
-                allPaths.add(nid);
+                allPaths.add(editPathNid);
                 sapsToRemove = Bdb.getSapDb().getSpecifiedSapNids(allPaths,
                         TimeHelper.getTimeFromString(previousReleaseDate, TimeHelper.getFileDateFormat()),
                         TimeHelper.getTimeFromString("latest", TimeHelper.getFileDateFormat()));
