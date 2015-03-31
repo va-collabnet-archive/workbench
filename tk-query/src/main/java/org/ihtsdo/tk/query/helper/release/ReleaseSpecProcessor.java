@@ -114,6 +114,7 @@ public class ReleaseSpecProcessor {
                     TkConcept eC = new TkConcept(c);
                     for(TkRefexAbstractMember r: eC.getRefsetMembers()){
                         r.setPathUuid(TermAux.WB_AUX_PATH.getLenient().getPrimUuid());
+                        r.setAuthorUuid(TermAux.USER.getLenient().getPrimUuid());
                     }
                     eC.writeExternal(eConceptDOS);
                 }
