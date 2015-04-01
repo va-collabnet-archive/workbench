@@ -34,6 +34,7 @@ import org.ihtsdo.tk.api.cs.ChangeSetPolicy;
 import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
 import org.ihtsdo.tk.binding.snomed.TermAux;
 import org.ihtsdo.tk.dto.concept.TkConcept;
+import org.ihtsdo.tk.dto.concept.component.description.TkDescription;
 import org.ihtsdo.tk.dto.concept.component.refex.TkRefexAbstractMember;
 import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationship;
 import org.ihtsdo.tk.query.ComputeFromSpec;
@@ -112,6 +113,13 @@ public class ReleaseSpecProcessor {
                 
                 for(ConceptChronicleBI c : metadataConcepts){
                     TkConcept eC = new TkConcept(c);
+                    eC.getConceptAttributes().setAuthorUuid(TermAux.USER.getLenient().getPrimUuid());
+                    for(TkDescription d : eC.getDescriptions()){
+                        d.setAuthorUuid(TermAux.USER.getLenient().getPrimUuid());
+                    }
+                    for(TkRelationship r : eC.getRelationships()){
+                        r.setAuthorUuid(TermAux.USER.getLenient().getPrimUuid());
+                    }
                     for(TkRefexAbstractMember r: eC.getRefsetMembers()){
                         r.setPathUuid(TermAux.WB_AUX_PATH.getLenient().getPrimUuid());
                         r.setAuthorUuid(TermAux.USER.getLenient().getPrimUuid());
