@@ -35,9 +35,9 @@ import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
 import org.ihtsdo.tk.binding.snomed.TermAux;
 import org.ihtsdo.tk.dto.concept.TkConcept;
 import org.ihtsdo.tk.dto.concept.component.TkRevision;
+import org.ihtsdo.tk.dto.concept.component.attribute.TkConceptAttributes;
 import org.ihtsdo.tk.dto.concept.component.description.TkDescription;
 import org.ihtsdo.tk.dto.concept.component.refex.TkRefexAbstractMember;
-import org.ihtsdo.tk.dto.concept.component.refex.type_member.TkRefexRevision;
 import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationship;
 import org.ihtsdo.tk.query.ComputeFromSpec;
 import org.ihtsdo.tk.query.RefsetComputer;
@@ -87,6 +87,7 @@ public class ReleaseSpecProcessor {
                             refsetConcept,
                             computeType);
                     ComputeFromSpec.computeRefset(query, viewCoordinate, editCoordinate, conceptNid, csPolicy);
+                    Ts.get().commit(); //Commit compute time refset.
                     System.out.println("### FINISHED PROCESSING REFSET: " + refsetConcept.toUserString());
             }
         }
@@ -141,6 +142,7 @@ public class ReleaseSpecProcessor {
                 }
 //              write supporting metadata relationships on refset concept
                 TkConcept refsetEConcept = new TkConcept();
+                refsetEConcept.primordialUuid = refsetConcept.getPrimUuid();
                 refsetEConcept.annotationStyleRefex = refsetConcept.isAnnotationStyleRefex();
                 refsetEConcept.annotationIndexStyleRefex = refsetConcept.isAnnotationIndex();
                 refsetEConcept.primordialUuid = refsetConcept.getPrimUuid();

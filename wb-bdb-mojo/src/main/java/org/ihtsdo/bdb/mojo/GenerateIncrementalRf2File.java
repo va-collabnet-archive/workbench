@@ -396,6 +396,24 @@ public class GenerateIncrementalRf2File extends AbstractMojo {
             for (UUID uuid : moduleUuids) {
                 moduleIds.add(Ts.get().getNidForUuids(uuid));
             }
+            
+            //          write RF2 specific metadata refsets  
+            File refsetCs = new File(output.getParentFile(), "changesets");
+            refsetCs.mkdir();
+            if (makeRf2Refsets) {
+                Rf2RefexComputer rf2RefexComputer = new Rf2RefexComputer(vc, Ts.get().getMetadataEditCoordinate(),
+                        refsetCs, stampsToWrite.getAsSet(), effectiveDate, snomedCoreReleaseDate);
+                rf2RefexComputer.setup();
+                Ts.get().iterateConceptDataInSequence(rf2RefexComputer);
+                rf2RefexComputer.addModuleDependencyMember();
+                rf2RefexComputer.cleanup();
+
+                Set<Integer> newStampNids = rf2RefexComputer.getNewStampNids();
+                for (int stamp : newStampNids) {
+                    stampsToWrite.add(stamp);
+                }
+            }
+            
             File metaDir = new File(output.getParentFile(), "refset-econcept");
             metaDir.mkdir();
 //          compute spec refsets
@@ -433,28 +451,12 @@ public class GenerateIncrementalRf2File extends AbstractMojo {
                     TimeHelper.getTimeFromString(endDate, TimeHelper.getFileDateFormat()),
                     null, moduleIds, pathIds);
 
-            File refsetCs = new File(output.getParentFile(), "changesets");
-            refsetCs.mkdir();
+            
 //            get stamps after refset computations
             stampsToWrite = Bdb.getSapDb().getSpecifiedSapNids(null,
                     TimeHelper.getTimeFromString(startDate, TimeHelper.getFileDateFormat()),
                     TimeHelper.getTimeFromString(endDate, TimeHelper.getFileDateFormat()),
                     null, moduleIds, pathIds);
-
-//          write RF2 specific metadata refsets  
-            if (makeRf2Refsets) {
-                Rf2RefexComputer rf2RefexComputer = new Rf2RefexComputer(vc, Ts.get().getMetadataEditCoordinate(),
-                        refsetCs, stampsToWrite.getAsSet(), effectiveDate, snomedCoreReleaseDate);
-                rf2RefexComputer.setup();
-                Ts.get().iterateConceptDataInSequence(rf2RefexComputer);
-                rf2RefexComputer.addModuleDependencyMember();
-                rf2RefexComputer.cleanup();
-
-                Set<Integer> newStampNids = rf2RefexComputer.getNewStampNids();
-                for (int stamp : newStampNids) {
-                    stampsToWrite.add(stamp);
-                }
-            }
             
             IntSet sapsToRemove = new IntSet();
             if (previousReleaseDate != null) {
@@ -496,7 +498,7 @@ public class GenerateIncrementalRf2File extends AbstractMojo {
             if (conceptNumberRefsetParentConceptSpec != null) {
                 conNumRefsetParentConceptNid = Ts.get().getNidForUuids(UUID.fromString(conceptNumberRefsetParentConceptSpec.getUuid()));
             }
-
+            
             TaxonomyFilter filter = new TaxonomyFilter();
             Ts.get().iterateConceptDataInParallel(filter);
             NidBitSetBI nidsToRelease = filter.getResults();

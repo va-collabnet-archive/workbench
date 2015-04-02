@@ -579,9 +579,6 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
 
             if (concept.getRelationshipsOutgoing() != null) {
                 for (RelationshipChronicleBI r : concept.getRelationshipsOutgoing()) {
-                    if(r.getPrimUuid().equals(UUID.fromString("824c4941-bf10-3fdd-a23f-c6a41c55f30c"))){
-                        System.out.println("### DEBUG");
-                    }
                     processRelationship(r);
                 }
             }

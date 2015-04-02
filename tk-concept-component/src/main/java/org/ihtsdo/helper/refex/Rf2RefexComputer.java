@@ -18,11 +18,9 @@ package org.ihtsdo.helper.refex;
 import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentSkipListSet;
@@ -40,7 +38,6 @@ import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
 import org.ihtsdo.tk.api.changeset.ChangeSetGeneratorBI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
-import org.ihtsdo.tk.api.conceptattribute.ConceptAttributeVersionBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
@@ -119,7 +116,7 @@ public class Rf2RefexComputer implements ProcessUnfetchedConceptDataBI {
         TerminologyBuilderBI builder = Ts.get().getTerminologyBuilder(editCoordinate, viewCoordinate);
         RefexChronicleBI<?> newMember = builder.constructIfNotCurrent(memberBp);
         Ts.get().addUncommitted(Ts.get().getConcept(Snomed.MODULE_DEPENDENCY.getLenient().getConceptNid()));
-        Ts.get().commit(Ts.get().getConcept(Snomed.MODULE_DEPENDENCY.getLenient().getConceptNid()));
+        Ts.get().commit();
         for (int stampNid : newMember.getAllStampNids()) {
             newStamps.add(stampNid);
         }
