@@ -934,11 +934,13 @@ public class RefsetMemberTableModel extends AbstractTableModel implements Proper
                             ((I_RefsetDefaultsConcept) refsetDefaults).getDefaultForConceptRefset().getConceptNid());
                     break;
                 case CON_INT:
-                    extProps.setMemberType(org.ihtsdo.etypes.EConcept.REFSET_TYPES.CID_INT);
+                    //extProps.setMemberType(org.ihtsdo.etypes.EConcept.REFSET_TYPES.CID_INT);
                     refsetDefaults = preferences.getConIntPreferences();
-                    extProps.put(REFSET_PROPERTY.STATUS, refsetDefaults.getDefaultStatusForRefset().getConceptNid());
-                    extProps.put(REFSET_PROPERTY.CID_ONE, ((I_RefsetDefaultsConcept) refsetDefaults).getDefaultForConceptRefset().getConceptNid());
-                    extProps.put(REFSET_PROPERTY.INTEGER_VALUE, ((I_RefsetDefaultsConInt) refsetDefaults).getDefaultForIntegerValue());
+//                    extProps.put(REFSET_PROPERTY.STATUS, refsetDefaults.getDefaultStatusForRefset().getConceptNid());
+//                    extProps.put(REFSET_PROPERTY.CID_ONE, ((I_RefsetDefaultsConcept) refsetDefaults).getDefaultForConceptRefset().getConceptNid());
+//                    extProps.put(REFSET_PROPERTY.INTEGER_VALUE, ((I_RefsetDefaultsConInt) refsetDefaults).getDefaultForIntegerValue());
+                    extension = helper.newConceptIntRefsetExtension(refsetDefaults.getDefaultRefset().getConceptNid(), 
+                    		tableComponentId, ((I_RefsetDefaultsConcept) refsetDefaults).getDefaultForConceptRefset().getConceptNid(), Integer.MAX_VALUE);
                     break;
                 case CID_CID_CID:
                     refsetDefaults = preferences.getCidCidCidPreferences();
