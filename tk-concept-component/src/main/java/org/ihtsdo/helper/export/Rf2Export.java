@@ -677,11 +677,10 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                     for (RefexVersionBI refexVersion : versions) {
                         boolean write = true;
                         RefexChronicleBI chronicle = (RefexChronicleBI) refexVersion.getChronicle();
-                        if (sameCycleStampNids.contains(refexVersion.getStampNid())) {
-                            RefexVersionBI version = (RefexVersionBI) chronicle.getVersion(viewCoordinateAllStatus);
-//                            if (!version.isActive(viewCoordinate)) {
-//                                write = false;
-//                            }
+                        if (sameCycleStampNids.contains(refexVersion.getPrimordialVersion().getStampNid()) && sameCycleStampNids.contains(refexVersion.getStampNid())) {
+                            if (refexVersion == null || !refexVersion.isActive(viewCoordinate)) { //refset member has been created and retired in the same release cycle
+                                write = false;
+                            }
                         }
                         if (write) {
                             if (stampNids.contains(refexVersion.getStampNid())) {
