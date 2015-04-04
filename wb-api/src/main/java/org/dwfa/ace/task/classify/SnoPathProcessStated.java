@@ -9,10 +9,10 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
+import org.ihtsdo.task.ExcludeFromIteration;
 import org.ihtsdo.tk.api.ContradictionManagerBI;
 import org.dwfa.ace.api.I_ProcessConcepts;
 import org.dwfa.ace.api.I_RelTuple;
@@ -31,6 +31,7 @@ public class SnoPathProcessStated implements I_ProcessConcepts {
     private List<SnoRel> snorels;
     private List<SnoCon> snocons;
     // STATISTICS COUNTERS
+    private int skippedForPath;
     private int countConSeen;
     private int countConRoot;
     private int countConDuplVersion;
@@ -157,6 +158,12 @@ public class SnoPathProcessStated implements I_ProcessConcepts {
     public void processConcept(I_GetConceptData concept) throws Exception {
         // processUnfetchedConceptData(int cNid, I_FetchConceptFromCursor fcfc)
         int cNid = concept.getNid();
+        
+        if (ExcludeFromIteration.exclude(concept))
+        {
+        	skippedForPath++;
+        	return;
+        }
 
         if (++countConSeen % 25000 == 0) {
             if (logger != null) {
@@ -585,6 +592,7 @@ public class SnoPathProcessStated implements I_ProcessConcepts {
 
         s.append("\r\n::: concepts viewed:       \t").append(countConSeen);
         s.append("\r\n::: concepts added:        \t").append(countConAdded);
+        s.append("\r\n::: concepts skipped for path  \t").append(skippedForPath);
         s.append("\r\n::: relationships added:   \t").append(countRelAdded);
         s.append("\r\n:::");
 

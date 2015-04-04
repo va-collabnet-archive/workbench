@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import org.dwfa.ace.api.I_ConceptAttributePart;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_ProcessConcepts;
@@ -31,6 +30,7 @@ import org.dwfa.ace.api.I_ShowActivity;
 import org.dwfa.ace.api.I_TermFactory;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.cement.SNOMED;
+import org.ihtsdo.task.ExcludeFromIteration;
 import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 
@@ -52,6 +52,7 @@ public class SnoPathProcess implements I_ProcessConcepts {
     // The classifier itself is a "filter" what gets dropped.
     private boolean doNotCareIfHasSnomedIsa;
     // STATISTICS COUNTERS
+    private int skippedForPath;
     private int countConSeen = 0;
     private int countConRoot = 0;
     private int countConDuplVersion = 0;
@@ -114,6 +115,12 @@ public class SnoPathProcess implements I_ProcessConcepts {
     public void processConcept(I_GetConceptData concept) throws Exception {
         if (++countConSeen % 25000 == 0) {
             logger.log(Level.INFO, "::: [SnoPathProcess] Concepts viewed:\t{0}", countConSeen);
+        }
+        
+        if (ExcludeFromIteration.exclude(concept))
+        {
+        	skippedForPath++;
+        	return;
         }
         int cNid = concept.getNid();
 
@@ -322,6 +329,7 @@ public class SnoPathProcess implements I_ProcessConcepts {
         s.append("\r\n::: concepts viewed:      \t").append(countConSeen);
         s.append("\r\n::: concepts total current:\t").append(countSnoCon);
         s.append("\r\n::: concepts w/rel added:  \t").append(countConAdded);
+        s.append("\r\n::: concepts skipped for path  \t").append(skippedForPath);
         s.append("\r\n::: relationships added:   \t").append(countRelAdded);
         s.append("\r\n:::");
         s.append("\r\n::: rel group TOTAL:\t").append(countRelAddedGroups);

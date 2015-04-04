@@ -28,6 +28,7 @@ import org.ihtsdo.rules.RulesLibrary.INFERRED_VIEW_ORIGIN;
 import org.ihtsdo.rules.context.RulesContextHelper;
 import org.ihtsdo.rules.testmodel.ResultsCollectorWorkBench;
 import org.ihtsdo.rules.testmodel.TerminologyHelperDroolsWorkbench;
+import org.ihtsdo.task.ExcludeFromIteration;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 import org.ihtsdo.tk.helper.ResultsItem;
 
@@ -108,6 +109,13 @@ public class PerformQA implements I_ProcessConcepts {
 
 	@Override
 	public void processConcept(I_GetConceptData loopConcept) throws Exception {
+		
+        if (ExcludeFromIteration.exclude(loopConcept))
+        {
+        	skippedCount++;
+        	return;
+        }
+		
 		if (monitoredUuids.contains(loopConcept.getPrimUuid())) {
 			System.out.println("Monitored concept detected: " + loopConcept);
 			System.out.println(loopConcept.toLongString());

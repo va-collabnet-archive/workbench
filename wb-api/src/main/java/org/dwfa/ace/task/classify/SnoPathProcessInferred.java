@@ -5,10 +5,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
+import org.ihtsdo.task.ExcludeFromIteration;
 import org.ihtsdo.tk.api.ContradictionManagerBI;
 import org.dwfa.ace.api.I_ProcessConcepts;
 import org.dwfa.ace.api.I_RelTuple;
@@ -28,6 +28,7 @@ public class SnoPathProcessInferred implements I_ProcessConcepts {
     // Do not filter 'Is a' on classifier path
     // The classifier itself is a "filter" what gets dropped.
     // STATISTICS COUNTERS
+    private int skippedForPath;
     private int countConSeen;
     private int countConRoot;
     private int countConDuplVersion;
@@ -107,6 +108,13 @@ public class SnoPathProcessInferred implements I_ProcessConcepts {
         if (++countConSeen % 25000 == 0 && logger != null) {
             logger.log(Level.INFO, "::: [SnoPathProcess] Concepts viewed:\t{0}", countConSeen);
         }
+        
+        if (ExcludeFromIteration.exclude(concept))
+        {
+        	skippedForPath++;
+        	return;
+        }
+        
         if (cNid == rootNid) {
             if (snocons != null) {
                 snocons.add(new SnoCon(cNid, false));
@@ -185,6 +193,7 @@ public class SnoPathProcessInferred implements I_ProcessConcepts {
 
         s.append("\r\n::: concepts viewed:       \t").append(countConSeen);
         s.append("\r\n::: concepts added:        \t").append(countConAdded);
+        s.append("\r\n::: concepts skipped for path  \t").append(skippedForPath);
         s.append("\r\n::: relationships added:   \t").append(countRelAdded);
         s.append("\r\n:::");
 

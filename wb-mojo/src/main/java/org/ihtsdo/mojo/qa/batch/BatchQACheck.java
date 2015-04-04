@@ -449,7 +449,9 @@ public class BatchQACheck extends AbstractMojo {
 		//TODO: add header titles
 		findingPw.println("uuid" + "\t" + "database Uid" + "\t" + "path Uid" + "\t" + "run Id" + "\t" + "rule uid" + "\t" + "component uuid"  + "\t" + "details" + "\t" + "component name");
 		Long start = Calendar.getInstance().getTimeInMillis();
-		tf.iterateConcepts(new PerformQA(context, findingPw, config, executionUUID, contextHelper, database_uuid, test_path_uuid,allRules));
+		PerformQA qa = new PerformQA(context, findingPw, config, executionUUID, contextHelper, database_uuid, test_path_uuid,allRules);
+		tf.iterateConcepts(qa);
+		System.out.println("Skipped " + qa.skippedCount + " for being on an exclude path");
 		findingPw.flush();
 		findingPw.close();
 		Long end = Calendar.getInstance().getTimeInMillis();

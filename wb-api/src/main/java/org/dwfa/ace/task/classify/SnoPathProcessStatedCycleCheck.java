@@ -25,10 +25,10 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_IntSet;
+import org.ihtsdo.task.ExcludeFromIteration;
 import org.ihtsdo.tk.api.ContradictionManagerBI;
 import org.dwfa.ace.api.I_ProcessConcepts;
 import org.dwfa.ace.api.I_RelTuple;
@@ -45,6 +45,7 @@ public class SnoPathProcessStatedCycleCheck implements I_ProcessConcepts {
 
     private List<SnoCon> snocons;
     // STATISTICS COUNTERS
+    private int skippedForPath;
     private int countConSeen;
     private int countConRoot;
     private int countConDuplVersion;
@@ -132,16 +133,19 @@ public class SnoPathProcessStatedCycleCheck implements I_ProcessConcepts {
         // processUnfetchedConceptData(int cNid, I_FetchConceptFromCursor fcfc)
         int cNid = concept.getNid();
 
-        if (cNid == -2147327456) { // Organism (organism) 0bab48ac-3030-3568-93d8-aee0f63bf072
-            System.out.println(":!!!:DEBUG:");
-        }
-
         if (++countConSeen % 25000 == 0) {
             if (logger != null) {
                 logger.log(Level.INFO,
                         "::: [SnoPathProcessStatedCycleCheck] Concepts viewed:\t{0}", countConSeen);
             }
         }
+        
+        if (ExcludeFromIteration.exclude(concept))
+        {
+        	skippedForPath++;
+        	return;
+        }
+        
         if (cNid == rootNid) {
             countConAdded++;
             countConRoot++;
@@ -556,6 +560,7 @@ public class SnoPathProcessStatedCycleCheck implements I_ProcessConcepts {
 
         s.append("\r\n::: concepts viewed:       \t").append(countConSeen);
         s.append("\r\n::: concepts added:        \t").append(countConAdded);
+        s.append("\r\n::: concepts skipped for path  \t").append(skippedForPath);
         s.append("\r\n::: relationships added:   \t").append(countRelAdded);
         s.append("\r\n:::");
 
