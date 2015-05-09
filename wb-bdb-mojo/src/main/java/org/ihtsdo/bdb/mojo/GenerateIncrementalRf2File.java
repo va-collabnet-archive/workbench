@@ -46,6 +46,7 @@ import org.ihtsdo.tk.binding.snomed.Snomed;
 import org.ihtsdo.tk.binding.snomed.TermAux;
 import org.ihtsdo.tk.query.helper.release.ReleaseSpecProcessor;
 import org.ihtsdo.tk.spec.ConceptSpec;
+import org.ihtsdo.tk.spec.ValidationException;
 
 /**
  * Goal which generates an incremental Rf2 file. If first release, use a delta
@@ -278,6 +279,15 @@ public class GenerateIncrementalRf2File extends AbstractMojo {
      * @parameter @required
      */
     private ConceptDescriptor[] taxonomyParentConcepts;
+    
+    
+    /**
+     * Concepts which should not be exported.
+     *
+     * @parameter @optional
+     */
+    private ConceptDescriptor[] conceptsToSkip;
+    
     private IntSet stampsToWrite = new IntSet();
     private IntSet pathIds;
     ViewCoordinate vc;
@@ -492,9 +502,34 @@ public class GenerateIncrementalRf2File extends AbstractMojo {
     private class TaxonomyFilter implements ProcessUnfetchedConceptDataBI {
 
         ConcurrentSkipListSet<Integer> results = new ConcurrentSkipListSet<>();
+        
+        private HashSet<Integer> conceptNidsToSkip = new HashSet<Integer>();
+        
+        {
+            if (conceptsToSkip != null)
+            {
+                for (ConceptDescriptor cs : conceptsToSkip)
+                {
+                    try
+                    {
+                        int nid = Ts.get().getNidForUuids(UUID.fromString(cs.getUuid()));
+                        System.out.println("Will skip " + cs.getUuid() + " " + cs.getDescription() + nid);
+                        conceptNidsToSkip.add(nid);
+                    }
+                    catch (Exception e)
+                    {
+                        throw new RuntimeException(e);
+                    }
+                }
+            }
+        }
 
         @Override
         public void processUnfetchedConceptData(int conceptNid, ConceptFetcherBI conceptFetcher) throws Exception {
+            if (conceptNidsToSkip.contains(conceptNid))
+            {
+                return;
+            }
             for (int parentNid : taxonomyParentNids) {
                 if (Ts.get().wasEverKindOf(conceptNid, parentNid, vc)) {
                     results.add(conceptNid);
