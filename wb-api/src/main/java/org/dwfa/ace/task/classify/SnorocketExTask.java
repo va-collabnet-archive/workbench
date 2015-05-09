@@ -1448,7 +1448,17 @@ public class SnorocketExTask extends AbstractTask implements ActionListener {
         I_GetConceptData thisC1 = tf.getConcept(rel_B.c1Id);
         // @@@ WRITEBACK NEW ISAs --> ALL NEW RELATIONS
         // CREATE RELATIONSHIP PART W/ TermFactory-->VobdEnv
-        tf.newRelationshipNoCheck(UUID.randomUUID(), thisC1, rel_B.typeId, rel_B.c2Id,
+        
+        UUID relId = UUID.nameUUIDFromBytes((thisC1.getPrimUuid().toString() 
+                + ts.getUuidPrimordialForNid(rel_B.typeId).toString() 
+                + ts.getUuidPrimordialForNid(rel_B.c2Id).toString() 
+                + ts.getUuidPrimordialForNid(isCh_INFERRED_CHARACTERISTIC).toString()  
+                + ts.getUuidPrimordialForNid(isOPTIONAL_REFINABILITY).toString()
+                + rel_B.group 
+                + ts.getUuidPrimordialForNid(isCURRENT).toString() 
+                + ts.getUuidPrimordialForNid(snorocketAuthorNid).toString()).getBytes());
+        
+        tf.newRelationshipNoCheck(relId, thisC1, rel_B.typeId, rel_B.c2Id,
                 isCh_INFERRED_CHARACTERISTIC, isOPTIONAL_REFINABILITY, rel_B.group, isCURRENT,
                 snorocketAuthorNid, writeToNid, versionTime);
 
