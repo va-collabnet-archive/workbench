@@ -220,7 +220,7 @@ public class ExportConceptMemberRefsetToRefset {
                 //}
 
                 //Report file
-                if (refsetConcept.getInitialText().contains("JIF Reactants")) {
+                if (refsetConcept.getInitialText().contains("JIF Reactants") || refsetConcept.getInitialText().contains("VA Allergens")) {
                     I_ExtendByRefPartCid<?> concExt = (I_ExtendByRefPartCid<?>)ext;
                     outputReportFileWriter.append(begEnd + conceptId + sep + getDescForCon(conceptId) + sep + getDescForCon(concExt.getC1id()) 
                         + sep + reportTime + begEnd + "\r\n");

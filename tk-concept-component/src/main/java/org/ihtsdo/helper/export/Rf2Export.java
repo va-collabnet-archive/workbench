@@ -99,7 +99,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
     private Writer refsetDescWriter;
     private Writer associationWriter;
     private Writer attributeValueWriter;
-    private Writer jifReactantsWriter;
+    private Writer vaReactantsWriter;
     private Set<Integer> excludedRefsetIds;
     private ConceptSpec uuidIdScheme = new ConceptSpec("SNOMED CT universally unique identifier (core metadata concept)",
             UUID.fromString("680f3f6c-7a2a-365d-b527-8c9a96dd1a94"));
@@ -108,14 +108,14 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
     private Set<Integer> associationRefexNids = new HashSet<Integer>();
     private Set<Integer> attribValueRefexNids = new HashSet<Integer>();
     private Set<ConceptSpec> descTypes = new HashSet<ConceptSpec>();
-    private int jifReactantsRefsetNid;
+    private int vaReactantsRefsetNid;
 
     private ViewCoordinate newVc;
     private ConceptVersionBI parentCv;
     private static UUID REFSET_DESC_NAMESPACE = UUID.fromString("d1871eb0-8a47-11e1-b0c4-0800200c9a66");
     private static UUID MODULE_DEPEND_NAMESPACE = UUID.fromString("d1871eb2-8a47-11e1-b0c4-0800200c9a66");
     private static UUID DESC_TYPE_NAMESPACE = UUID.fromString("d1871eb3-8a47-11e1-b0c4-0800200c9a66");
-    private static UUID JIF_REACTANTS_REFSET_UUID = UUID.fromString("c439b4b1-ce66-4fa8-bad4-213d56651a81");
+    private static UUID VA_REACTANTS_REFSET_UUID = UUID.fromString("c439b4b1-ce66-4fa8-bad4-213d56651a81");
 
     private boolean makePrivateIdFile;
     private ConceptVersionBI refsetParentConcept;
@@ -344,8 +344,8 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                 + country.getFormatedCountryCode().toUpperCase() + namespace + "_"
                 + TimeHelper.getShortFileDateFormat().format(effectiveDate) + ".txt");
         
-        File jifReactantsFile = new File(directory, 
-                "der2_cRefset_JifReactants_UUID" + releaseType.suffix + "_"
+        File vaReactantsFile = new File(directory, 
+                "der2_cRefset_VAReactants_UUID" + releaseType.suffix + "_"
                 + country.getFormatedCountryCode().toUpperCase() + namespace + "_"
                 + TimeHelper.getShortFileDateFormat().format(effectiveDate) + ".txt");
 
@@ -387,8 +387,8 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
         FileOutputStream refDescOs = new FileOutputStream(refsetDescFile);
         refsetDescWriter = new BufferedWriter(new OutputStreamWriter(refDescOs, "UTF8"));
 
-        FileOutputStream jifReactantsOs = new FileOutputStream(jifReactantsFile);
-        jifReactantsWriter = new BufferedWriter(new OutputStreamWriter(jifReactantsOs, "UTF8"));
+        FileOutputStream vaReactantsOs = new FileOutputStream(vaReactantsFile);
+        vaReactantsWriter = new BufferedWriter(new OutputStreamWriter(vaReactantsOs, "UTF8"));
 
         for (Rf2File.ConceptsFileFields field : Rf2File.ConceptsFileFields.values()) {
             conceptsWriter.write(field.headerText + field.seperator);
@@ -439,8 +439,8 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
             refsetDescWriter.write(field.headerText + field.seperator);
         }
 
-        for (Rf2File.JifReactantsRefsetFileFields field : Rf2File.JifReactantsRefsetFileFields.values()) {
-            jifReactantsWriter.write(field.headerText + field.seperator);
+        for (Rf2File.VAReactantsRefsetFileFields field : Rf2File.VAReactantsRefsetFileFields.values()) {
+            vaReactantsWriter.write(field.headerText + field.seperator);
         }
 
         ConceptSpec fsnDesc = new ConceptSpec("Fully specified name (core metadata concept)",
@@ -475,8 +475,8 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
         attribValueRefexNids.add(SnomedMetadataRf2.DESC_INACTIVE_REFSET.getLenient().getConceptNid());
         attribValueRefexNids.add(SnomedMetadataRf2.CONCEPT_INACTIVE_REFSET.getLenient().getConceptNid());
         
-        // for Jif Reactants Refset
-        jifReactantsRefsetNid = Ts.get().getConcept(JIF_REACTANTS_REFSET_UUID).getNid();
+        // for VA Reactants Refset
+        vaReactantsRefsetNid = Ts.get().getConcept(VA_REACTANTS_REFSET_UUID).getNid();
     }
 
     //~--- methods -------------------------------------------------------------
@@ -539,8 +539,8 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
             refsetDescWriter.close();
         }
 
-        if (jifReactantsWriter != null){
-        	jifReactantsWriter.close();
+        if (vaReactantsWriter != null){
+        	vaReactantsWriter.close();
         }
     }
 
@@ -578,8 +578,8 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                     processAssociationRefset(annot);
                 } else if (attribValueRefexNids.contains(annot.getRefexNid())) {
                     processAttributeValueRefset(annot);
-                } else if (jifReactantsRefsetNid == annot.getRefexNid()) {
-                	processJifReactantsRefset(annot);
+                } else if (vaReactantsRefsetNid == annot.getRefexNid()) {
+                	processVAReactantsRefset(annot);
                 }
             }
 
@@ -1430,7 +1430,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
       }
       
 
-      private void processJifReactantsRefset(RefexChronicleBI refexChronicle) throws IOException, Exception {
+      private void processVAReactantsRefset(RefexChronicleBI refexChronicle) throws IOException, Exception {
         if (refexChronicle != null) {
             ComponentVersionBI primordialVersion = refexChronicle.getPrimordialVersion();
             Collection<RefexVersionBI> versions = new HashSet<>();
@@ -1460,34 +1460,34 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                     }
                     if (stampNids.contains(refex.getStampNid()) && write) {
                         RefexNidVersionBI member = (RefexNidVersionBI) refex;
-                        for (Rf2File.JifReactantsRefsetFileFields field : Rf2File.JifReactantsRefsetFileFields.values()) {
+                        for (Rf2File.VAReactantsRefsetFileFields field : Rf2File.VAReactantsRefsetFileFields.values()) {
                             switch (field) {
                                 case ID:
-                                    jifReactantsWriter.write(member.getPrimUuid().toString() + field.seperator);
+                                    vaReactantsWriter.write(member.getPrimUuid().toString() + field.seperator);
                                     break;
                                 case EFFECTIVE_TIME:
                                     if (sameCycleStampNids.contains(refex.getStampNid())) {
-                                        jifReactantsWriter.write(effectiveDateString + field.seperator);
+                                        vaReactantsWriter.write(effectiveDateString + field.seperator);
                                     }else{
-                                        jifReactantsWriter.write(TimeHelper.getShortFileDateFormat().format(member.getTime()) + field.seperator);
+                                        vaReactantsWriter.write(TimeHelper.getShortFileDateFormat().format(member.getTime()) + field.seperator);
                                     }                                    
                                     break;
                                 case ACTIVE:
-                                    jifReactantsWriter.write(Ts.get().getUuidPrimordialForNid(member.getStatusNid())
+                                    vaReactantsWriter.write(Ts.get().getUuidPrimordialForNid(member.getStatusNid())
                                             + field.seperator);
                                     break;
                                 case MODULE_ID:
-                                    jifReactantsWriter.write(module + field.seperator);
+                                    vaReactantsWriter.write(module + field.seperator);
                                     break;
                                 case REFSET_ID:
-                                    jifReactantsWriter.write(Ts.get().getUuidPrimordialForNid(member.getRefexNid())
+                                    vaReactantsWriter.write(Ts.get().getUuidPrimordialForNid(member.getRefexNid())
                                             + field.seperator);
                                     break;
                                 case REFERENCED_COMPONENT_ID:
-                                    jifReactantsWriter.write(Ts.get().getUuidPrimordialForNid(member.getReferencedComponentNid()) + field.seperator);
+                                    vaReactantsWriter.write(Ts.get().getUuidPrimordialForNid(member.getReferencedComponentNid()) + field.seperator);
                                     break;
                                 case REACTANTS:
-                                    jifReactantsWriter.write(Ts.get().getUuidPrimordialForNid(member.getNid1()) + field.seperator);
+                                    vaReactantsWriter.write(Ts.get().getUuidPrimordialForNid(member.getNid1()) + field.seperator);
                                     break;
                             }
                         }

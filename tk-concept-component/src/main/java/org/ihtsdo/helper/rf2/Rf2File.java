@@ -564,10 +564,10 @@ public class Rf2File {
     }
     
     /**
-     * The Enum JifReactantsRefsetFileFields represents the fields needed in the
+     * The Enum VAReactantsRefsetFileFields represents the fields needed in the
      * language refsets files.
      */
-    public enum JifReactantsRefsetFileFields {
+    public enum VAReactantsRefsetFileFields {
 
         /**
          * The member id field.
@@ -607,7 +607,7 @@ public class Rf2File {
          * @param headerText the text to display in the header
          * @param seperator the separator to use for separating the field
          */
-        private JifReactantsRefsetFileFields(String headerText, String seperator) {
+        private VAReactantsRefsetFileFields(String headerText, String seperator) {
             this.headerText = headerText;
             this.seperator = seperator;
         }
