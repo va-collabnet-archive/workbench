@@ -1855,8 +1855,22 @@ private void processIdentifiers(String line, Writer writer) throws IOException {
             return componentSctId;
         }
         if (!idExists) {
-            ComponentChronicleBI component = store.getComponent(componentUuid);
+            ComponentChronicleBI<?> component = store.getComponent(componentUuid);
             if (component != null) {
+                //Check the other UUIDs (if any) associated with this concept
+                for (UUID uuid : component.getUUIDs()) {
+                    if (uuid.equals(componentUuid)) {
+                        continue;
+                    }
+                    if (this.uuidToExistingSctMap.containsKey(uuid)) {
+                        componentSctId = this.uuidToExistingSctMap.get(uuid);
+                        return componentSctId;
+                    }
+                    if (this.uuidToSctMap.containsKey(uuid)) {
+                        componentSctId = this.uuidToSctMap.get(uuid);
+                        return componentSctId;
+                    }
+                }
                 Collection<IdBI> ids = (Collection<IdBI>) component.getAdditionalIds();
                 if (ids != null) {
                     for (IdBI id : ids) {
