@@ -17,14 +17,21 @@
 package org.dwfa.ace.file;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.ContradictionException;
+import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.api.id.IdBI;
+import sun.net.TelnetProtocolException;
 
 /**
  * Writes out a "Concept List" which is a tab delimited list of concepts
@@ -36,7 +43,7 @@ import org.ihtsdo.tk.api.id.IdBI;
  * @author aimeefurber
  * 
  */
-public class DescriptionListWriter extends GenericFileWriter<DescriptionVersionBI> {
+public class DescriptionListWriter extends GenericFileWriter<ConceptVersionBI> {
 
     private Integer snomedIntId;
 
@@ -46,24 +53,56 @@ public class DescriptionListWriter extends GenericFileWriter<DescriptionVersionB
      * @see org.dwfa.ace.file.GenericFileWriter#serialize(java.lang.Object)
      */
     @Override
-    protected String serialize(DescriptionVersionBI description) throws IOException, TerminologyException {
+    protected String serialize(ConceptVersionBI concept) throws IOException, TerminologyException {
 
-        if (snomedIntId == null) {
-            snomedIntId = Terms.get().uuidToNative(ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.getUids());
-        }
-
-        Object conceptId = null;
-        
-        for(IdBI id : description.getAdditionalIds()){
-            if(id.getAuthorityNid() == snomedIntId){
-                conceptId = id.getDenotation();
+        try {
+            if (snomedIntId == null) {
+                snomedIntId = Terms.get().uuidToNative(ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.getUids());
             }
+            Object conceptId = null;
+            for(IdBI id : concept.getAdditionalIds()){
+                if(id.getAuthorityNid() == snomedIntId){
+                    conceptId = id.getDenotation();
+                }
+            }
+            if (conceptId == null) {
+                conceptId = concept.getPrimUuid();
+            }
+            
+            DescriptionVersionBI fsn = concept.getDescriptionFullySpecified();
+            Collection<? extends DescriptionVersionBI> preferred = concept.getDescriptionsPreferredActive();
+            Collection<DescriptionVersionBI> preferredNonEN = new ArrayList<DescriptionVersionBI>();
+            Collection<? extends DescriptionVersionBI> synonyms = concept.getDescriptionsActive();
+            Collection<DescriptionVersionBI> synonymsNonEN =  new ArrayList<DescriptionVersionBI>();
+            synonyms.remove(fsn);
+            synonyms.removeAll(preferred);
+            
+            StringBuilder sb = new StringBuilder();
+            sb.append(conceptId + "\t");
+            sb.append(fsn.getText() + "\t");
+            for (DescriptionVersionBI p : preferred) {
+                if (p.getLang().equals("en")) {
+                    sb.append(p.getText() + "\t");
+                } else {
+                    preferredNonEN.add(p);
+                }
+            }
+            for (DescriptionVersionBI p : preferredNonEN) {
+                sb.append(p.getText() + "\t");
+            }
+            for (DescriptionVersionBI s : synonyms) {
+                if (s.getLang().equals("en")) {
+                    sb.append(s.getText() + "\t");
+                } else {
+                    synonymsNonEN.add(s);
+                }
+            }
+            for (DescriptionVersionBI s : synonymsNonEN) {
+                sb.append(s.getText() + "\t");
+            }
+            return sb.toString();
+        } catch (ContradictionException ex) {
+            throw new TerminologyException(ex);
         }
-
-        if (conceptId == null) {
-            conceptId = description.getPrimUuid();
-        }
-        
-        return conceptId + "\t" + description.getText();
     }
 }
