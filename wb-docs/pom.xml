@@ -5,7 +5,7 @@
 	<parent>
 		<artifactId>wb-mmb</artifactId>
 		<groupId>org.ihtsdo</groupId>
-		<version>1.0-trek2.66-se-release-fix-SNAPSHOT</version>
+		<version>2.66-trek-no-jini</version>
 	</parent>
 
 	<artifactId>wb-docs</artifactId>
