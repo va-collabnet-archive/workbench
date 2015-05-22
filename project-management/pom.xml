@@ -3,7 +3,7 @@
     <parent>
         <groupId>org.ihtsdo</groupId>
         <artifactId>wb-mmb</artifactId>
-        <version>2.66-trek-no-jini</version>
+        <version>1.0-trek2.66-se-release-fix-SNAPSHOT</version>
     </parent>
     <artifactId>project-management</artifactId>
     <packaging>jar</packaging>
