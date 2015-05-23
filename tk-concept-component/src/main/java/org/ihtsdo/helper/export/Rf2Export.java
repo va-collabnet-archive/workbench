@@ -119,6 +119,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
     private Collection<Integer> taxonomyParentNids;
     private ConceptVersionBI conNumRefsetParentConcept;
     private Date previousReleaseDate;
+    private ArrayList<UUID> uuidsToSkip = new ArrayList<>();
 
     //~--- constructors --------------------------------------------------------
         /**
@@ -458,6 +459,48 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
         //for attribute value refset file
         attribValueRefexNids.add(SnomedMetadataRf2.DESC_INACTIVE_REFSET.getLenient().getConceptNid());
         attribValueRefexNids.add(SnomedMetadataRf2.CONCEPT_INACTIVE_REFSET.getLenient().getConceptNid());
+        
+        uuidsToSkip.add(UUID.fromString("6e23b5e8-5d71-326c-b16d-30a9f92baefe"));
+        uuidsToSkip.add(UUID.fromString("d403e857-eb52-4c9c-883f-19ae04dfc039"));
+        uuidsToSkip.add(UUID.fromString("5eb17274-2ecb-4169-bf64-09e710536b3f"));
+        uuidsToSkip.add(UUID.fromString("20719df2-3625-3135-a61a-f9ff6ecee307"));
+        uuidsToSkip.add(UUID.fromString("a54dbce6-98d8-11e3-a5e2-0800200c9a66"));
+        uuidsToSkip.add(UUID.fromString("decec67f-1d4f-3fe1-97fe-99e3b83e6296"));
+        uuidsToSkip.add(UUID.fromString("47f754d2-2fb7-45c4-997d-18315fea2334"));
+        uuidsToSkip.add(UUID.fromString("52f78895-d74a-3dcf-b3b5-a9a14019fbd7"));
+        uuidsToSkip.add(UUID.fromString("2603c150-f846-30cd-9a41-e71c6afc2c72"));
+        uuidsToSkip.add(UUID.fromString("b4fa7fd9-4e4b-389d-b35a-2b082daec319"));
+        uuidsToSkip.add(UUID.fromString("bdbdcebc-b82c-4924-97e2-8e2ae32a176e"));
+        uuidsToSkip.add(UUID.fromString("d9a07cce-ad66-36af-9396-06313c490497"));
+        uuidsToSkip.add(UUID.fromString("3194910f-aa5c-35a7-8cc6-57aab307d975"));
+        uuidsToSkip.add(UUID.fromString("36ebb8dd-406b-3cf6-8752-fca4fd3e5fc6"));
+        uuidsToSkip.add(UUID.fromString("9ef7fe8c-6b00-360f-be75-576f03c57a01"));
+        uuidsToSkip.add(UUID.fromString("3d69e72b-3703-33c8-a4b0-46cfc0af265a"));
+        uuidsToSkip.add(UUID.fromString("0dbb2ca9-e399-31fe-81bd-6c0d04186841"));
+        uuidsToSkip.add(UUID.fromString("17db3434-db4a-3ba1-b2f8-a2169c9defd9"));
+        uuidsToSkip.add(UUID.fromString("50f92e0e-128a-4383-8199-47cb5a778762"));
+        uuidsToSkip.add(UUID.fromString("6936a025-65fa-3581-abec-ff43ffd7e7fb"));
+        uuidsToSkip.add(UUID.fromString("5f5a8494-24f6-11e3-b2c7-10bb7e44da78"));
+        uuidsToSkip.add(UUID.fromString("d45ed8db-9457-3e54-963e-4bf44920878d"));
+        uuidsToSkip.add(UUID.fromString("f13fc93c-fca3-3aa4-9206-2eff33e9cc53"));
+        uuidsToSkip.add(UUID.fromString("d147b304-5d71-47f7-bc5a-dfce97ca8973"));
+        uuidsToSkip.add(UUID.fromString("2ea80d81-36d0-3c30-9f7f-3f4d2afe272c"));
+        uuidsToSkip.add(UUID.fromString("2d910fc2-b4e9-3863-a9ad-2b3f2bfeaafe"));
+        uuidsToSkip.add(UUID.fromString("0c9d65cf-0289-3eef-862d-052a338ccb91"));
+        uuidsToSkip.add(UUID.fromString("f7d2d450-00e0-3264-bc8e-da6f04924b70"));
+        uuidsToSkip.add(UUID.fromString("419ace76-8bf3-395b-b17c-94fa28f3134f"));
+        uuidsToSkip.add(UUID.fromString("5e34bdea-4548-3777-a64e-f758c90c834f"));
+        uuidsToSkip.add(UUID.fromString("ea4e0e1d-2ac9-3bc4-94b7-aa01201c3617"));
+        uuidsToSkip.add(UUID.fromString("ce76531b-c9e2-42ec-86ce-933b06ab26f0"));
+        uuidsToSkip.add(UUID.fromString("d60abc94-ab2e-34ca-b4dc-2a8f58900f49"));
+        uuidsToSkip.add(UUID.fromString("8ea4e7b6-9761-3ded-aaba-d7a63f3a97ba"));
+        uuidsToSkip.add(UUID.fromString("dc2eaf33-e282-4892-a49e-9c37ca3f6fa0"));
+        uuidsToSkip.add(UUID.fromString("a54dbce8-98d8-11e3-a5e2-0800200c9a66"));
+        uuidsToSkip.add(UUID.fromString("06fdab86-7805-3edf-89e7-1dc1e1f777e7"));
+        uuidsToSkip.add(UUID.fromString("ccf16924-3318-3a2b-882e-325c78332366"));
+        uuidsToSkip.add(UUID.fromString("7713d598-ceb2-386a-b9e1-1ff307ec1801"));
+        uuidsToSkip.add(UUID.fromString("58eb48a8-1419-3190-aaa4-5133a31d0f50"));
+        uuidsToSkip.add(UUID.fromString("79c39774-2ae7-33c0-89cc-7711c4497fe3"));
     }
 
     //~--- methods -------------------------------------------------------------
@@ -549,12 +592,14 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
         }
         if (write) {
             ConceptAttributeChronicleBI ca = concept.getConceptAttributes();
-            processConceptAttribute(ca);
-            for (RefexChronicleBI annot : ca.getAnnotations()) {
-                if (associationRefexNids.contains(annot.getRefexNid())) {
-                    processAssociationRefset(annot);
-                } else if (attribValueRefexNids.contains(annot.getRefexNid())) {
-                    processAttributeValueRefset(annot);
+            if (!uuidsToSkip.contains(ca.getPrimUuid())) {
+                processConceptAttribute(ca);
+                for (RefexChronicleBI annot : ca.getAnnotations()) {
+                    if (associationRefexNids.contains(annot.getRefexNid())) {
+                        processAssociationRefset(annot);
+                    } else if (attribValueRefexNids.contains(annot.getRefexNid())) {
+                        processAttributeValueRefset(annot);
+                    }
                 }
             }
 
