@@ -3,7 +3,7 @@
   <parent>
       <groupId>org.ihtsdo</groupId>
       <artifactId>wb-mmb</artifactId>
-    <version>1.0-trek3.66-se-release-fix-SNAPSHOT</version>
+    <version>1.0-trek3.66-se-release-fix</version>
   </parent>
   <artifactId>wb-bdb-mojo</artifactId>
   <packaging>maven-plugin</packaging>
