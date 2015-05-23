@@ -17,7 +17,7 @@ the specific language governing permissions and limitations under the License. -
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.ihtsdo</groupId>
     <artifactId>wb-mmb</artifactId>
-    <version>1.0-trek3.66-se-release-fix</version>
+    <version>1.0-trek4.66-se-release-fix-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>${branch}: (MMP) Workbench Toolkit</name>
     <description>The IHTSDO Workbench provides two software frameworks for
@@ -28,9 +28,9 @@ the specific language governing permissions and limitations under the License. -
         needs of their end users.
     </description>
     <scm>
-        <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/tags/wb-mmb-1.0-trek3.66-se-release-fix</connection>
-        <developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/tags/wb-mmb-1.0-trek3.66-se-release-fix</developerConnection>
-        <url>https://csfe.aceworkspace.net/integration/viewvc/viewvc.cgi/tags/tags?root=workbench&amp;system=exsy1002/wb-mmb-2.66-trek-no-jini/wb-mmb-1.0-trek3.66-se-release-fix</url>
+        <connection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/branches/trek2.66-se-release-fix</connection>
+        <developerConnection>scm:svn:https://csfe.aceworkspace.net/svn/repos/workbench/branches/trek2.66-se-release-fix</developerConnection>
+        <url>https://csfe.aceworkspace.net/integration/viewvc/viewvc.cgi/tags/branches/trek2.66-se-release-fix?root=workbench&amp;system=exsy1002/wb-mmb-2.66-trek-no-jini</url>
     </scm>
     <properties>
         <branch>no-jini</branch>
