@@ -179,15 +179,28 @@ public class Rf2RefexComputer implements ProcessUnfetchedConceptDataBI {
                         }
                     } else {
                         Collection<? extends RefexVersionBI<?>> members = cvLatest.getAnnotationMembersActive(viewCoordinate, refexNid);
-                        for (RefexVersionBI member : members) {
-                            RefexCAB refexBp = member.makeBlueprint(viewCoordinate);
+                        if (members.isEmpty()) { //historical rel was added in international edition, but retired on extension
+                            RefexCAB refexBp = new RefexCAB(TK_REFEX_TYPE.CID,
+                                    rel.getSourceNid(),
+                                    refexNid);
+                            refexBp.put(RefexCAB.RefexProperty.CNID1, rel.getTargetNid());
                             refexBp.setRetired();
-                            refexBp.setMemberUuid(member.getPrimUuid());
-                            builder = Ts.get().getTerminologyBuilder(editCoordinate, viewCoordinate);
-                            RefexChronicleBI<?> retiredMember = builder.constructIfNotCurrent(refexBp);
-                            conceptChronicle.addAnnotation(retiredMember);
-                            for(int stampNid : retiredMember.getAllStampNids()){
+                            RefexChronicleBI<?> member = builder.constructIfNotCurrent(refexBp);
+                            conceptChronicle.addAnnotation(member);
+                            for (int stampNid : member.getAllStampNids()) {
                                 newStamps.add(stampNid);
+                            }
+                        } else {
+                            for (RefexVersionBI member : members) {
+                                RefexCAB refexBp = member.makeBlueprint(viewCoordinate);
+                                refexBp.setRetired();
+                                refexBp.setMemberUuid(member.getPrimUuid());
+                                builder = Ts.get().getTerminologyBuilder(editCoordinate, viewCoordinate);
+                                RefexChronicleBI<?> retiredMember = builder.constructIfNotCurrent(refexBp);
+                                conceptChronicle.addAnnotation(retiredMember);
+                                for (int stampNid : retiredMember.getAllStampNids()) {
+                                    newStamps.add(stampNid);
+                                }
                             }
                         }
                     }
@@ -208,7 +221,7 @@ public class Rf2RefexComputer implements ProcessUnfetchedConceptDataBI {
                                 conceptInactiveRefexNid);
                         refexBp.put(RefexCAB.RefexProperty.CNID1, getValueForRetirement(cv.getNid()));
                         RefexChronicleBI<?> member = builder.constructIfNotCurrent(refexBp);
-                        conceptChronicle.addAnnotation(member);
+//                        conceptChronicle.addAnnotation(member);
                         for (int stampNid : member.getAllStampNids()) {
                             newStamps.add(stampNid);
                         }

@@ -431,9 +431,13 @@ public class GenerateIncrementalRf2File extends AbstractMojo {
                     TimeHelper.getTimeFromString(endDate, TimeHelper.getFileDateFormat()),
                     null, moduleIds, pathIds);
 
-//          write RF2 specific metadata refsets  
+//          write RF2 specific metadata refsets
+            EditCoordinate metadataEditCoordinate = Ts.get().getMetadataEditCoordinate();
+            EditCoordinate ec = new EditCoordinate(metadataEditCoordinate.getAuthorNid(),//need to edit on release candidate path and extension module
+                    Ts.get().getNidForUuids(UUID.fromString(moduleConcepts[0].getUuid())), //assuming that there is just one module for now.
+                    vc.getPositionSet().getViewPathNidSet().getSetValues()[0]); //assuming only one path in view coordinate
             if (makeRf2Refsets) {
-                Rf2RefexComputer rf2RefexComputer = new Rf2RefexComputer(vc, Ts.get().getMetadataEditCoordinate(),
+                Rf2RefexComputer rf2RefexComputer = new Rf2RefexComputer(vc, ec,
                         refsetCs, stampsToWrite.getAsSet(), effectiveDate, snomedCoreReleaseDate);
                 rf2RefexComputer.setup();
                 Ts.get().iterateConceptDataInSequence(rf2RefexComputer);
