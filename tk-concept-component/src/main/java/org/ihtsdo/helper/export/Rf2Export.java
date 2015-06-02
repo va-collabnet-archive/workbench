@@ -460,6 +460,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
         attribValueRefexNids.add(SnomedMetadataRf2.DESC_INACTIVE_REFSET.getLenient().getConceptNid());
         attribValueRefexNids.add(SnomedMetadataRf2.CONCEPT_INACTIVE_REFSET.getLenient().getConceptNid());
         
+        uuidsToSkip.add(UUID.fromString("6145fb16-3723-3db9-bc41-3dae912a0d9a"));
         uuidsToSkip.add(UUID.fromString("6e23b5e8-5d71-326c-b16d-30a9f92baefe"));
         uuidsToSkip.add(UUID.fromString("d403e857-eb52-4c9c-883f-19ae04dfc039"));
         uuidsToSkip.add(UUID.fromString("5eb17274-2ecb-4169-bf64-09e710536b3f"));
