@@ -623,7 +623,8 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                 }
             }
 
-            if (concept.getRelationshipsOutgoing() != null) {
+            if (!uuidsToSkip.contains(ca.getPrimUuid()) && 
+                    concept.getRelationshipsOutgoing() != null) {
                 for (RelationshipChronicleBI r : concept.getRelationshipsOutgoing()) {
                     processRelationship(r);
                 }
@@ -729,9 +730,14 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
 //                                write = false;
 //                            }
                         }
+                        if (Ts.get().getUuidPrimordialForNid(chronicle.getReferencedComponentNid())
+                                .equals(UUID.fromString("6145fb16-3723-3db9-bc41-3dae912a0d9a"))) {
+                            write = false;
+                        }
                         if (write) {
                             if (stampNids.contains(refexVersion.getStampNid())) {
                                 for (Rf2File.SimpleRefsetFileFields field : Rf2File.SimpleRefsetFileFields.values()) {
+                                    /** skip this if referenced component == 6624005 */
                                     switch (field) {
                                         case ID:
                                             simpleRefsetWriter.write(refexVersion.getPrimUuid() + field.seperator);
