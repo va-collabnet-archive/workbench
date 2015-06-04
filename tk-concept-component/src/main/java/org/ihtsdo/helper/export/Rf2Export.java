@@ -461,7 +461,9 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
         attribValueRefexNids.add(SnomedMetadataRf2.DESC_INACTIVE_REFSET.getLenient().getConceptNid());
         attribValueRefexNids.add(SnomedMetadataRf2.CONCEPT_INACTIVE_REFSET.getLenient().getConceptNid());
         
-        seExtensionInactivatedConcept.add(UUID.fromString("e4c8897a-61b3-3f0b-9b50-6230a2a124de"));
+        seExtensionInactivatedConcept.add(UUID.fromString("6145fb16-3723-3db9-bc41-3dae912a0d9a"));
+        
+        
         uuidsToSkip.add(UUID.fromString("e4c8897a-61b3-3f0b-9b50-6230a2a124de"));
         uuidsToSkip.add(UUID.fromString("6e23b5e8-5d71-326c-b16d-30a9f92baefe"));
         uuidsToSkip.add(UUID.fromString("d403e857-eb52-4c9c-883f-19ae04dfc039"));
@@ -624,9 +626,10 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                     }
                 }
             }
-
-            if (!uuidsToSkip.contains(ca.getPrimUuid()) &&
-                !seExtensionInactivatedConcept.contains(ca.getPrimUuid()) &&
+/** &&
+                !seExtensionInactivatedConcept.contains(ca.getPrimUuid()) */
+            if (!uuidsToSkip.contains(ca.getPrimUuid())  && 
+                    !seExtensionInactivatedConcept.contains(ca.getPrimUuid()) &&
                     concept.getRelationshipsOutgoing() != null) {
                 for (RelationshipChronicleBI r : concept.getRelationshipsOutgoing()) {
                     processRelationship(r);
@@ -736,7 +739,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                         if (Ts.get().getUuidPrimordialForNid(chronicle.getReferencedComponentNid())
                                 .equals(UUID.fromString("6145fb16-3723-3db9-bc41-3dae912a0d9a"))) {
                             write = false;
-                        }
+                        } 
                         if (write) {
                             if (stampNids.contains(refexVersion.getStampNid())) {
                                 for (Rf2File.SimpleRefsetFileFields field : Rf2File.SimpleRefsetFileFields.values()) {
