@@ -120,6 +120,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
     private ConceptVersionBI conNumRefsetParentConcept;
     private Date previousReleaseDate;
     private ArrayList<UUID> uuidsToSkip = new ArrayList<>();
+    private ArrayList<UUID> seExtensionInactivatedConcept = new ArrayList<>();
 
     //~--- constructors --------------------------------------------------------
         /**
@@ -460,7 +461,8 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
         attribValueRefexNids.add(SnomedMetadataRf2.DESC_INACTIVE_REFSET.getLenient().getConceptNid());
         attribValueRefexNids.add(SnomedMetadataRf2.CONCEPT_INACTIVE_REFSET.getLenient().getConceptNid());
         
-        uuidsToSkip.add(UUID.fromString("6145fb16-3723-3db9-bc41-3dae912a0d9a"));
+        seExtensionInactivatedConcept.add(UUID.fromString("e4c8897a-61b3-3f0b-9b50-6230a2a124de"));
+        uuidsToSkip.add(UUID.fromString("e4c8897a-61b3-3f0b-9b50-6230a2a124de"));
         uuidsToSkip.add(UUID.fromString("6e23b5e8-5d71-326c-b16d-30a9f92baefe"));
         uuidsToSkip.add(UUID.fromString("d403e857-eb52-4c9c-883f-19ae04dfc039"));
         uuidsToSkip.add(UUID.fromString("5eb17274-2ecb-4169-bf64-09e710536b3f"));
@@ -623,7 +625,8 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                 }
             }
 
-            if (!uuidsToSkip.contains(ca.getPrimUuid()) && 
+            if (!uuidsToSkip.contains(ca.getPrimUuid()) &&
+                !seExtensionInactivatedConcept.contains(ca.getPrimUuid()) &&
                     concept.getRelationshipsOutgoing() != null) {
                 for (RelationshipChronicleBI r : concept.getRelationshipsOutgoing()) {
                     processRelationship(r);
@@ -737,7 +740,6 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                         if (write) {
                             if (stampNids.contains(refexVersion.getStampNid())) {
                                 for (Rf2File.SimpleRefsetFileFields field : Rf2File.SimpleRefsetFileFields.values()) {
-                                    /** skip this if referenced component == 6624005 */
                                     switch (field) {
                                         case ID:
                                             simpleRefsetWriter.write(refexVersion.getPrimUuid() + field.seperator);
