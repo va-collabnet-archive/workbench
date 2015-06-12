@@ -161,10 +161,14 @@ public class CollectionEditorContainer extends JPanel {
                         I_GetConceptData c = (I_GetConceptData) model.getElementAt(i);
                         ViewCoordinate vc = ace.getAceFrameConfig().getViewCoordinate();
                         ConceptVersionBI conceptVersion = Ts.get().getConceptVersion(vc, c.getPrimUuid());
+                        boolean foundNonEN = false;
                         for(DescriptionVersionBI desc : conceptVersion.getDescriptionsActive()){
                             if(!desc.getLang().equals("en")){
-                                writer.write(conceptVersion);
+                                foundNonEN = true;
                             }
+                        }
+                        if(foundNonEN){
+                            writer.write(conceptVersion);
                         }
                     }
 
