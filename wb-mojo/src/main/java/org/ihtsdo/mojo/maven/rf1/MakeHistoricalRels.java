@@ -136,8 +136,8 @@ public class MakeHistoricalRels extends AbstractMojo {
                     String isaType = "116680003";
                     String relGroup = "0";
                     String statedSct = "900000000000010007";
-                    String inferredSct = "";
-                    String modifierSct = "900000000000011006"; //exsitential
+                    String inferredSct = "900000000000011006";
+                    String modifierSct = "900000000000451002"; //exsitential
                     
                     //Stated Isa
                     statedWriter.append(id);
@@ -160,7 +160,6 @@ public class MakeHistoricalRels extends AbstractMojo {
                     statedWriter.append(tab);
                     statedWriter.append(modifierSct);
                     statedWriter.append(end);
-                    statedWriter.flush();
                     
                     //Historical
                     statedWriter.append(id);
@@ -182,7 +181,6 @@ public class MakeHistoricalRels extends AbstractMojo {
                     statedWriter.append(statedSct);
                     statedWriter.append(tab);
                     statedWriter.append(modifierSct);
-                    statedWriter.append(end);
                     
                     //Inferred Isa
                     inferredWriter.append(id);
