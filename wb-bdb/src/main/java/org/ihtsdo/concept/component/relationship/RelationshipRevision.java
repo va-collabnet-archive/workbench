@@ -168,6 +168,9 @@ public class RelationshipRevision extends Revision<RelationshipRevision, Relatio
         } else if (getCharacteristicNid() == SnomedMetadataRf1.STATED_DEFINING_CHARACTERISTIC_TYPE_RF1.getLenient().getNid()
                 || getCharacteristicNid() == SnomedMetadataRf2.STATED_RELATIONSHIP_RF2.getLenient().getNid()) {
             relType = TkRelationshipType.STATED_HIERARCHY;
+        } else if(getCharacteristicNid() == SnomedMetadataRf1.HISTORICAL_CHARACTERISTIC_TYPE_RF1.getLenient().getNid()
+                || getCharacteristicNid() == SnomedMetadataRf2.HISTORICAL_RELATIONSSHIP_RF2.getLenient().getNid()){
+            relType = TkRelationshipType.HISTORIC;
         }
         RelationshipCAB relBp = new RelationshipCAB(getSourceNid(),
                 getTypeNid(),

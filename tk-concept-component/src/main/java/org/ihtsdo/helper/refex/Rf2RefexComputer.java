@@ -28,6 +28,7 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentSkipListSet;
 import org.ihtsdo.helper.time.TimeHelper;
 import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.AnalogBI;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.ConceptFetcherBI;
 import org.ihtsdo.tk.api.ContradictionException;
@@ -36,6 +37,7 @@ import org.ihtsdo.tk.api.ProcessUnfetchedConceptDataBI;
 import org.ihtsdo.tk.api.TerminologyBuilderBI;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
+import org.ihtsdo.tk.api.blueprint.RelationshipCAB;
 import org.ihtsdo.tk.api.changeset.ChangeSetGenerationPolicy;
 import org.ihtsdo.tk.api.changeset.ChangeSetGeneratorBI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
@@ -44,13 +46,16 @@ import org.ihtsdo.tk.api.conceptattribute.ConceptAttributeVersionBI;
 import org.ihtsdo.tk.api.coordinate.EditCoordinate;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
+import org.ihtsdo.tk.api.id.IdBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
+import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 import org.ihtsdo.tk.binding.snomed.ConceptInactivationType;
 import org.ihtsdo.tk.binding.snomed.HistoricalRelType;
 import org.ihtsdo.tk.binding.snomed.Snomed;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
+import org.ihtsdo.tk.binding.snomed.TermAux;
 import org.ihtsdo.tk.dto.concept.component.refex.TK_REFEX_TYPE;
 import org.ihtsdo.tk.spec.ValidationException;
 
@@ -96,14 +101,14 @@ public class Rf2RefexComputer implements ProcessUnfetchedConceptDataBI {
         tempKey = UUID.randomUUID().toString();
         String changsetFileName = Ts.get().getConceptForNid(editCoordinate.getAuthorNid()).toUserString() + "#rf2Refset#"
                 + UUID.randomUUID().toString() + ".eccs";
-        ChangeSetGeneratorBI generator =
-                Ts.get().createDtoChangeSetGenerator(new File(output, changsetFileName), new File(output,
-                "#0#" + changsetFileName), ChangeSetGenerationPolicy.MUTABLE_ONLY);
+        ChangeSetGeneratorBI generator
+                = Ts.get().createDtoChangeSetGenerator(new File(output, changsetFileName), new File(output,
+                                "#0#" + changsetFileName), ChangeSetGenerationPolicy.MUTABLE_ONLY);
         Ts.get().addChangeSetGenerator(tempKey, generator);
 
     }
-    
-    public void addModuleDependencyMember() throws IOException, InvalidCAB, ContradictionException, ParseException{
+
+    public void addModuleDependencyMember() throws IOException, InvalidCAB, ContradictionException, ParseException {
         Date sourceDate = new Date(TimeHelper.getTimeFromString(sourceTime,
                 TimeHelper.getAltFileDateFormat()));
         Date targetDate = new Date(TimeHelper.getTimeFromString(targetTime,
@@ -157,120 +162,173 @@ public class Rf2RefexComputer implements ProcessUnfetchedConceptDataBI {
      *description inactivation refset
      *concept inactivation refset
      */
-    private void process(ConceptChronicleBI conceptChronicle) throws ContradictionException, IOException, InvalidCAB {
+    private void process(ConceptChronicleBI conceptChronicle) throws ContradictionException, IOException, InvalidCAB, ParseException {
         TerminologyBuilderBI builder = Ts.get().getTerminologyBuilder(editCoordinate, viewCoordinate);
-        ConceptVersionBI cvLatest = conceptChronicle.getVersion(vcAllStatus);
-        Collection<? extends RelationshipVersionBI> latestRels = cvLatest.getRelationshipsOutgoingActive();
-        Collection<? extends DescriptionVersionBI> latestDescs = cvLatest.getDescriptionsActive();
+        ConceptVersionBI cvAllStatus = conceptChronicle.getVersion(vcAllStatus);
+        Collection<? extends RelationshipVersionBI> latestRels = cvAllStatus.getRelationshipsOutgoingActive();
+        Collection<? extends DescriptionVersionBI> latestDescs = cvAllStatus.getDescriptionsActive();
         boolean changed = false;
-        for (RelationshipVersionBI rel : latestRels) {
-            if (stampNids.contains(rel.getStampNid())) {
-                if (historicalRelTypes.contains(rel.getTypeNid())) {
-                    int refexNid = getAssociationRefexForTypeNid(rel.getTypeNid());
-                    if (rel.isActive(viewCoordinate)) {
-                        RefexCAB refexBp = new RefexCAB(TK_REFEX_TYPE.CID,
-                                rel.getSourceNid(),
-                                refexNid);
-                        refexBp.put(RefexCAB.RefexProperty.CNID1, rel.getTargetNid());
-                        RefexChronicleBI<?> member = builder.constructIfNotCurrent(refexBp);
-                        conceptChronicle.addAnnotation(member);
-                        for(int stampNid : member.getAllStampNids()){
-                            newStamps.add(stampNid);
-                        }
-                    } else {
-                        Collection<? extends RefexVersionBI<?>> members = cvLatest.getAnnotationMembersActive(viewCoordinate, refexNid);
-                        if (members.isEmpty()) { //historical rel was added in international edition, but retired on extension
+        if (!cvAllStatus.getPrimUuid().equals(UUID.fromString("6145fb16-3723-3db9-bc41-3dae912a0d9a"))) { //skip SE problem concept "Ventricular tachyarrhythmia"
+            for (RelationshipVersionBI historicalRel : latestRels) {
+                if (stampNids.contains(historicalRel.getStampNid())) {
+                    if (historicalRelTypes.contains(historicalRel.getTypeNid())) {
+                        int refexNid = getAssociationRefexForTypeNid(historicalRel.getTypeNid());
+                        if (historicalRel.isActive(viewCoordinate)) {
                             RefexCAB refexBp = new RefexCAB(TK_REFEX_TYPE.CID,
-                                    rel.getSourceNid(),
+                                    historicalRel.getSourceNid(),
                                     refexNid);
-                            refexBp.put(RefexCAB.RefexProperty.CNID1, rel.getTargetNid());
-                            refexBp.setRetired();
+                            refexBp.put(RefexCAB.RefexProperty.CNID1, historicalRel.getTargetNid());
                             RefexChronicleBI<?> member = builder.constructIfNotCurrent(refexBp);
                             conceptChronicle.addAnnotation(member);
                             for (int stampNid : member.getAllStampNids()) {
                                 newStamps.add(stampNid);
                             }
+                            //retire any active relationships
+                            Collection<? extends RelationshipVersionBI> activeRels = conceptChronicle.getVersion(viewCoordinate).getRelationshipsOutgoingActive();
+                            for (RelationshipVersionBI rv : activeRels) {
+                                if (rv.isStated()) {
+                                    RelationshipCAB relBp = rv.makeBlueprint(viewCoordinate);
+                                    relBp.setRetired();
+                                    relBp.setComponentUuidNoRecompute(rv.getPrimUuid());
+                                    RelationshipChronicleBI updatedRel = builder.construct(relBp);
+                                    newStamps.addAll(updatedRel.getAllStampNids());
+                                }
+                                if(rv.isInferred()){ //classifier runs before this, so need to retire inferred rel also
+                                    AnalogBI updatedRel = rv.makeAnalog(SnomedMetadataRf2.INACTIVE_VALUE_RF2.getLenient().getConceptNid(),
+                                            Long.MAX_VALUE,
+                                            editCoordinate.getAuthorNid(),
+                                            editCoordinate.getModuleNid(),
+                                            editCoordinate.getEditPaths()[0]);
+                                    newStamps.addAll(rv.getAllStampNids());
+                                }
+                            }
+                            //fix relationships for RF2, historical Is-a should be inactive
+                            RelationshipCAB relBp = historicalRel.makeBlueprint(viewCoordinate);
+                            relBp.setRetired();
+                            relBp.setComponentUuidNoRecompute(historicalRel.getPrimUuid());
                         } else {
-                            for (RefexVersionBI member : members) {
-                                RefexCAB refexBp = member.makeBlueprint(viewCoordinate);
+                            Collection<? extends RefexVersionBI<?>> members = cvAllStatus.getAnnotationMembersActive(viewCoordinate, refexNid);
+                            if (members.isEmpty()) { //historical rel was added in international edition, but retired on extension
+                                RefexCAB refexBp = new RefexCAB(TK_REFEX_TYPE.CID,
+                                        historicalRel.getSourceNid(),
+                                        refexNid);
+                                refexBp.put(RefexCAB.RefexProperty.CNID1, historicalRel.getTargetNid());
                                 refexBp.setRetired();
-                                refexBp.setMemberUuid(member.getPrimUuid());
-                                builder = Ts.get().getTerminologyBuilder(editCoordinate, viewCoordinate);
-                                RefexChronicleBI<?> retiredMember = builder.constructIfNotCurrent(refexBp);
-                                conceptChronicle.addAnnotation(retiredMember);
-                                for (int stampNid : retiredMember.getAllStampNids()) {
+                                RefexChronicleBI<?> member = builder.constructIfNotCurrent(refexBp);
+                                conceptChronicle.addAnnotation(member);
+                                for (int stampNid : member.getAllStampNids()) {
+                                    newStamps.add(stampNid);
+                                }
+                            } else {
+                                for (RefexVersionBI member : members) {
+                                    RefexCAB refexBp = member.makeBlueprint(viewCoordinate);
+                                    refexBp.setRetired();
+                                    refexBp.setMemberUuid(member.getPrimUuid());
+                                    builder = Ts.get().getTerminologyBuilder(editCoordinate, viewCoordinate);
+                                    RefexChronicleBI<?> retiredMember = builder.constructIfNotCurrent(refexBp);
+                                    conceptChronicle.addAnnotation(retiredMember);
+                                    for (int stampNid : retiredMember.getAllStampNids()) {
+                                        newStamps.add(stampNid);
+                                    }
+                                }
+                            }
+                        }
+                    //need to add the descriptions to the Description inactivation indicator 
+                        //reference set with a value of Concept non-current (TIG 5.5.3.1)
+                        for (DescriptionVersionBI desc : cvAllStatus.getDescriptionsActive()) {
+                            boolean hasSctId = false;
+                            if (desc.getAdditionalIds() != null) {
+                                for (IdBI id : desc.getAdditionalIds()) {
+                                    if (id.getAuthorityNid() == TermAux.SCT_ID_AUTHORITY.getLenient().getConceptNid()) {
+                                        hasSctId = true;
+                                    }
+                                }
+                            }
+
+                            if (hasSctId) {
+                                RefexCAB refexBp = new RefexCAB(TK_REFEX_TYPE.CID,
+                                        desc.getNid(),
+                                        descInactiveRefexNid);
+                                refexBp.put(RefexCAB.RefexProperty.CNID1,
+                                        SnomedMetadataRf2.CONCEPT_NON_CURRENT_RF2.getLenient().getNid());
+                                RefexChronicleBI<?> newMember = builder.construct(refexBp);
+                                for (int stampNid : newMember.getAllStampNids()) {
                                     newStamps.add(stampNid);
                                 }
                             }
                         }
-                    }
-                    Ts.get().addUncommitted(Ts.get().getConcept(refexNid));
-                    Ts.get().commit(Ts.get().getConcept(refexNid));
-                    changed = true;
-                }
-            }
-        }
-        ConceptVersionBI cv = conceptChronicle.getVersion(viewCoordinate);
-        if (cv.getConceptAttributes() != null) {
-            ComponentVersionBI cav = cv.getConceptAttributes().getVersion(vcAllStatus);
-            if (!cv.isActive() && cav != null) {
-                if (stampNids.contains(cav.getStampNid())) {
-                    if(getValueForRetirement(cv.getNid()) != null){
-                        RefexCAB refexBp = new RefexCAB(TK_REFEX_TYPE.CID,
-                                cv.getNid(),
-                                conceptInactiveRefexNid);
-                        refexBp.put(RefexCAB.RefexProperty.CNID1, getValueForRetirement(cv.getNid()));
-                        RefexChronicleBI<?> member = builder.constructIfNotCurrent(refexBp);
-//                        conceptChronicle.addAnnotation(member);
-                        for (int stampNid : member.getAllStampNids()) {
-                            newStamps.add(stampNid);
-                        }
-                        Ts.get().addUncommitted(Ts.get().getConcept(conceptInactiveRefexNid));
-                        Ts.get().commit(Ts.get().getConcept(conceptInactiveRefexNid));
+
+                        Ts.get().addUncommitted(Ts.get().getConcept(descInactiveRefexNid));
+                        Ts.get().commit(Ts.get().getConcept(descInactiveRefexNid));
+
+                        Ts.get().addUncommitted(Ts.get().getConcept(refexNid));
+                        Ts.get().commit(Ts.get().getConcept(refexNid));
                         changed = true;
                     }
                 }
-
             }
-        }
-        for (DescriptionVersionBI desc : latestDescs) {
-            if (stampNids.contains(desc.getStampNid())) {
-                if (desc.hasAnnotationMemberActive(viewCoordinate, SnomedMetadataRf2.REFERS_TO_REFSET_RF2.getLenient().getConceptNid())) {
-                    //desc is added to refex during retire automation, only need to inactivate here if description has been reactivated
-                    if (desc.isActive(viewCoordinate)) {
-                        Collection<? extends RefexVersionBI<?>> members = desc.getAnnotationMembersActive(
-                                viewCoordinate,
-                                SnomedMetadataRf2.REFERS_TO_REFSET_RF2.getLenient().getConceptNid());
-                        for (RefexVersionBI member : members) {
-                            RefexCAB refexBp = member.makeBlueprint(viewCoordinate);
-                            refexBp.setRetired();
-                            refexBp.setMemberUuid(member.getPrimUuid());
+            ConceptVersionBI cv = conceptChronicle.getVersion(viewCoordinate);
+            if (cv.getConceptAttributes() != null) {
+                ComponentVersionBI cav = cv.getConceptAttributes().getVersion(vcAllStatus);
+                if (!cv.isActive() && cav != null) {
+                    if (stampNids.contains(cav.getStampNid())) {
+                        if (getValueForRetirement(cv.getNid()) != null) {
+                            RefexCAB refexBp = new RefexCAB(TK_REFEX_TYPE.CID,
+                                    cv.getNid(),
+                                    conceptInactiveRefexNid);
+                            refexBp.put(RefexCAB.RefexProperty.CNID1, getValueForRetirement(cv.getNid()));
+                            RefexChronicleBI<?> member = builder.constructIfNotCurrent(refexBp);
+//                        conceptChronicle.addAnnotation(member);
+                            for (int stampNid : member.getAllStampNids()) {
+                                newStamps.add(stampNid);
+                            }
+                            Ts.get().addUncommitted(Ts.get().getConcept(conceptInactiveRefexNid));
+                            Ts.get().commit(Ts.get().getConcept(conceptInactiveRefexNid));
+                            changed = true;
+                        }
+                    }
+
+                }
+            }
+            for (DescriptionVersionBI desc : latestDescs) {
+                if (stampNids.contains(desc.getStampNid())) {
+                    if (desc.hasAnnotationMemberActive(viewCoordinate, SnomedMetadataRf2.REFERS_TO_REFSET_RF2.getLenient().getConceptNid())) {
+                        //desc is added to refex during retire automation, only need to inactivate here if description has been reactivated
+                        if (desc.isActive(viewCoordinate)) {
+                            Collection<? extends RefexVersionBI<?>> members = desc.getAnnotationMembersActive(
+                                    viewCoordinate,
+                                    SnomedMetadataRf2.REFERS_TO_REFSET_RF2.getLenient().getConceptNid());
+                            for (RefexVersionBI member : members) {
+                                RefexCAB refexBp = member.makeBlueprint(viewCoordinate);
+                                refexBp.setRetired();
+                                refexBp.setMemberUuid(member.getPrimUuid());
+                                RefexChronicleBI<?> newMember = builder.construct(refexBp);
+                                for (int stampNid : newMember.getAllStampNids()) {
+                                    newStamps.add(stampNid);
+                                }
+                            }
+                        } else {
+                            RefexCAB refexBp = new RefexCAB(TK_REFEX_TYPE.CID,
+                                    desc.getNid(),
+                                    descInactiveRefexNid);
+                            refexBp.put(RefexCAB.RefexProperty.CNID1,
+                                    SnomedMetadataRf2.INAPPROPRIATE_COMPONENT_RF2.getLenient().getNid());
                             RefexChronicleBI<?> newMember = builder.construct(refexBp);
-                            for(int stampNid : newMember.getAllStampNids()){
+                            for (int stampNid : newMember.getAllStampNids()) {
                                 newStamps.add(stampNid);
                             }
                         }
-                    } else {
-                        RefexCAB refexBp = new RefexCAB(TK_REFEX_TYPE.CID,
-                                desc.getNid(),
-                                descInactiveRefexNid);
-                        refexBp.put(RefexCAB.RefexProperty.CNID1,
-                                SnomedMetadataRf2.INAPPROPRIATE_COMPONENT_RF2.getLenient().getNid());
-                        RefexChronicleBI<?> newMember = builder.construct(refexBp);
-                        for(int stampNid : newMember.getAllStampNids()){
-                                newStamps.add(stampNid);
-                            }
+                        Ts.get().addUncommitted(Ts.get().getConcept(descInactiveRefexNid));
+                        Ts.get().commit(Ts.get().getConcept(descInactiveRefexNid));
+                        changed = true;
                     }
-                    Ts.get().addUncommitted(Ts.get().getConcept(descInactiveRefexNid));
-                    Ts.get().commit(Ts.get().getConcept(descInactiveRefexNid));
-                    changed = true;
                 }
             }
-        }
-        //TODO assuming that refexes are annotations
-        if(changed){
-            Ts.get().addUncommitted(conceptChronicle);
-            Ts.get().commit(conceptChronicle);
+            //TODO assuming that refexes are annotations
+            if (changed) {
+                Ts.get().addUncommitted(conceptChronicle);
+                Ts.get().commit(conceptChronicle);
+            }
         }
     }
 
@@ -312,8 +370,8 @@ public class Rf2RefexComputer implements ProcessUnfetchedConceptDataBI {
         }
         return null;
     }
-    
-    public Set<Integer> getNewStampNids(){
+
+    public Set<Integer> getNewStampNids() {
         return newStamps;
     }
 }
