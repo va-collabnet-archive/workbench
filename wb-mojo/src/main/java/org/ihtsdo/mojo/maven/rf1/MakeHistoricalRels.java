@@ -131,7 +131,10 @@ public class MakeHistoricalRels extends AbstractMojo {
                     //relationshipGroup	typeId	characteristicTypeId	modifierId
                     String tab = "\t";
                     String end = "\r\n";
-                    String id= "999999999"; //this never gets used, so I'm making something up
+                    // RF1 historical rels are not released, they get a default ID of "FFFFFFFFF" 
+                    // which converts to 0 for the sake of compatibility with existing method signatures
+                    // a 0 will cause a random uuid to be generated
+                    String id= "FFFFFFFFF";
                     String active = "1";
                     String isaType = "116680003";
                     String relGroup = "0";
@@ -178,7 +181,7 @@ public class MakeHistoricalRels extends AbstractMojo {
                     statedWriter.append(tab);
                     statedWriter.append(relType);
                     statedWriter.append(tab);
-                    statedWriter.append(statedSct);
+                    statedWriter.append("-1"); //from arf-econcept for historical characteristic type (see Sct2_RelRecord.java)
                     statedWriter.append(tab);
                     statedWriter.append(modifierSct);
                     
