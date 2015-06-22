@@ -5951,4 +5951,15 @@ public class TerminologyProjectDAO {
     
     	return false;
 	}
+
+    public static void promoteContent(NidBitSetBI promotionNids, ViewCoordinate sourceViewCoordinate, int targetPathNid) throws Exception {
+        EditCoordinate editCoord = Terms.get().getActiveAceFrameConfig().getEditCoordinate();
+
+        PositionBI[] positionSet = sourceViewCoordinate.getPositionSet().getPositionArray();
+        PositionBI originPosition = positionSet[0].getAllOrigins().iterator().next();
+
+        TerminologyPromoterBI promoter = Ts.get().getTerminologyPromoter(sourceViewCoordinate, editCoord, targetPathNid, originPosition);
+
+        promoter.promote(promotionNids, false);
+    }
 }

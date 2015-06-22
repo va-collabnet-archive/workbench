@@ -59,7 +59,7 @@ public class WorkflowChangeListener implements PropertyChangeListener {
 								alreadySeen.add(possibleItr.nid());
 								concept=Ts.get().getConcept(possibleItr.nid());
 								if (concept!=null){
-									System.out.println("Sending to workflow: " + concept.toString());
+									System.out.println("Sending to workflow (GUI Listener): " + concept.toString());
 									WorkflowHelper2.addComponentToDefaultWorklist(concept);
 								}
 							}
