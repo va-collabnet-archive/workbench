@@ -34,6 +34,8 @@ import org.ihtsdo.tk.api.cs.ChangeSetPolicy;
 import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
 import org.ihtsdo.tk.binding.snomed.TermAux;
 import org.ihtsdo.tk.dto.concept.TkConcept;
+import org.ihtsdo.tk.dto.concept.component.TkRevision;
+import org.ihtsdo.tk.dto.concept.component.attribute.TkConceptAttributes;
 import org.ihtsdo.tk.dto.concept.component.description.TkDescription;
 import org.ihtsdo.tk.dto.concept.component.refex.TkRefexAbstractMember;
 import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationship;
@@ -85,6 +87,7 @@ public class ReleaseSpecProcessor {
                             refsetConcept,
                             computeType);
                     ComputeFromSpec.computeRefset(query, viewCoordinate, editCoordinate, conceptNid, csPolicy);
+                    Ts.get().commit(); //Commit compute time refset.
                     System.out.println("### FINISHED PROCESSING REFSET: " + refsetConcept.toUserString());
             }
         }
@@ -114,6 +117,10 @@ public class ReleaseSpecProcessor {
                 for(ConceptChronicleBI c : metadataConcepts){
                     TkConcept eC = new TkConcept(c);
                     eC.getConceptAttributes().setAuthorUuid(TermAux.USER.getLenient().getPrimUuid());
+                    for(TkRefexAbstractMember a : eC.getConceptAttributes().annotations){
+                        a.setAuthorUuid(TermAux.USER.getLenient().getPrimUuid());
+                        a.setPathUuid(TermAux.WB_AUX_PATH.getLenient().getPrimUuid());
+                    }
                     for(TkDescription d : eC.getDescriptions()){
                         d.setAuthorUuid(TermAux.USER.getLenient().getPrimUuid());
                     }
@@ -123,21 +130,32 @@ public class ReleaseSpecProcessor {
                     for(TkRefexAbstractMember r: eC.getRefsetMembers()){
                         r.setPathUuid(TermAux.WB_AUX_PATH.getLenient().getPrimUuid());
                         r.setAuthorUuid(TermAux.USER.getLenient().getPrimUuid());
+                        if (r.getRevisions() != null) {
+                            for (Object o : r.getRevisions()) {
+                                TkRevision rev = (TkRevision) o;
+                                rev.setAuthorUuid(TermAux.USER.getLenient().getPrimUuid());
+                                rev.setPathUuid(TermAux.WB_AUX_PATH.getLenient().getPrimUuid());
+                            }
+                        }
                     }
                     eC.writeExternal(eConceptDOS);
                 }
 //              write supporting metadata relationships on refset concept
                 TkConcept refsetEConcept = new TkConcept();
+                refsetEConcept.primordialUuid = refsetConcept.getPrimUuid();
                 refsetEConcept.annotationStyleRefex = refsetConcept.isAnnotationStyleRefex();
                 refsetEConcept.annotationIndexStyleRefex = refsetConcept.isAnnotationIndex();
                 refsetEConcept.primordialUuid = refsetConcept.getPrimUuid();
                 refsetEConcept.relationships = new ArrayList<TkRelationship>(refsetConcept.getRelationshipsOutgoing().size());
-
+                
                 for (RelationshipChronicleBI rel : refsetConcept.getRelationshipsOutgoing()) {
                     TkRelationship r = new TkRelationship(rel);
                     if(r.getPathUuid().equals(TermAux.WB_AUX_PATH.getLenient().getPrimUuid())){
                         refsetEConcept.relationships.add(r);
                     }
+                }
+                for(TkRelationship r : refsetEConcept.getRelationships()){
+                        r.setAuthorUuid(TermAux.USER.getLenient().getPrimUuid());
                 }
                 refsetEConcept.writeExternal(eConceptDOS);
             }
