@@ -9,7 +9,7 @@ public class Relationship extends Component {
 
     private ConceptDescriptor type;
     private ConceptDescriptor target;
-    private Long sourceId;
+    private String sourceId;
     private Integer groupId;
     private ConceptDescriptor charType;
     private String modifier;
@@ -34,11 +34,11 @@ public class Relationship extends Component {
 		this.target = target;
 	}
 
-	public Long getSourceId() {
+	public String getSourceId() {
 		return sourceId;
 	}
 
-	public void setSourceId(Long sourceId) {
+	public void setSourceId(String sourceId) {
 		this.sourceId = sourceId;
 	}
 

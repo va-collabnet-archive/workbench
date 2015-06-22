@@ -19,8 +19,10 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import org.ihtsdo.json.model.Concept;
@@ -31,8 +33,10 @@ import org.ihtsdo.json.model.LightDescription;
 import org.ihtsdo.json.model.LightLangMembership;
 import org.ihtsdo.json.model.LightRefsetMembership;
 import org.ihtsdo.json.model.LightRelationship;
+import org.ihtsdo.json.model.RefsetDescriptor;
 import org.ihtsdo.json.model.RefsetMembership;
 import org.ihtsdo.json.model.Relationship;
+import org.ihtsdo.json.model.ResourceSetManifest;
 import org.ihtsdo.json.model.TextIndexDescription;
 
 import com.google.gson.Gson;
@@ -43,7 +47,11 @@ import com.google.gson.Gson;
  */
 public class Transformer {
 
-    private String MODIFIER = "Existential restriction";
+    private static final String EXPIRATION_DATE = "20200202";
+	private static final String DEFAULT_LANG_REFSETID = "900000000000509007";
+	private static final String EDITION_NAME = "International Edition";
+	private static final String DATABASE_NAME = "en-edition";
+	private String MODIFIER = "Existential restriction";
     private String sep = System.getProperty("line.separator");
 
     private Map<Long, ConceptDescriptor> concepts;
@@ -65,7 +73,14 @@ public class Transformer {
 	private Map<Long, String> cptFSN;
 	private ArrayList<Long> textIndexDescRefsets;
 	private ArrayList<Long> textIndexConceptRefsets;
+    private ResourceSetManifest manifest;
+	private String effectiveTime;
+    private Set<String> refsetsSet;
+    private Set<String> langRefsetsSet;
+    private Set<String> modulesSet;
 
+    private Map<String, Integer> refsetsCount;
+    
     public Transformer() {
         concepts = new HashMap<Long, ConceptDescriptor>();
         descriptions = new HashMap<Long, List<LightDescription>>();
@@ -77,7 +92,7 @@ public class Transformer {
         simpleMapMembers = new HashMap<Long, List<LightRefsetMembership>>();
         languageMembers = new HashMap<Long, List<LightLangMembership>>();
         cptFSN = new HashMap<Long, String>();
-        
+
         langCodes = new HashMap<String, String>();
         langCodes.put("en", "english");
         langCodes.put("es", "spanish");
@@ -85,6 +100,14 @@ public class Transformer {
         langCodes.put("sv", "swedish");
         langCodes.put("fr", "french");
         langCodes.put("nl", "dutch");
+        manifest = new ResourceSetManifest();
+        addManifestData();
+
+        refsetsSet = new HashSet<String>();
+        langRefsetsSet = new HashSet<String>();
+        modulesSet = new HashSet<String>();
+        
+        refsetsCount = new HashMap<String, Integer>();
     }
 
 
@@ -102,13 +125,15 @@ public class Transformer {
                 String[] columns = line.split("\\t");
                 ConceptDescriptor loopConcept = new ConceptDescriptor();
                 Long conceptId = Long.parseLong(columns[0]);
-                loopConcept.setConceptId(conceptId);
+                loopConcept.setConceptId(conceptId.toString());
                 loopConcept.setActive(columns[2].equals("1"));
                 loopConcept.setEffectiveTime(columns[1]);
                 loopConcept.setModule(Long.parseLong(columns[3]));
                 loopConcept.setDefinitionStatus(columns[4].equals("900000000000074008") ? "Primitive" : "Fully defined");
                 concepts.put(conceptId, loopConcept);
                 line = br.readLine();
+
+                modulesSet.add(columns[3]);
                 count++;
                 if (count % 100000 == 0) {
                     System.out.print(".");
@@ -175,6 +200,8 @@ public class Transformer {
                 	cptFSN.put(sourceId,columns[7]);
                 }
                 line = br.readLine();
+
+                modulesSet.add(columns[3]);
                 descriptionsCount++;
                 if (descriptionsCount % 100000 == 0) {
                     System.out.print(".");
@@ -220,6 +247,8 @@ public class Transformer {
                 tdefMembers.put(sourceId, list);
 
                 line = br.readLine();
+
+                modulesSet.add(columns[3]);
                 descriptionsCount++;
                 if (descriptionsCount % 100000 == 0) {
                     System.out.print(".");
@@ -264,6 +293,8 @@ public class Transformer {
                 relList.add(loopRelationship);
                 relationships.put(sourceId, relList);
                 line = br.readLine();
+
+                modulesSet.add(columns[3]);
                 count++;
                 if (count % 100000 == 0) {
                     System.out.print(".");
@@ -307,6 +338,14 @@ public class Transformer {
                     }
                     list.add(loopMember);
                     simpleMembers.put(Long.parseLong(columns[5]), list);
+
+                    modulesSet.add(columns[3]);
+                    refsetsSet.add(columns[4]);
+                    if (!refsetsCount.containsKey(loopMember.getRefset().toString())) {
+                        refsetsCount.put(loopMember.getRefset().toString(), 0);
+                    }
+                    refsetsCount.put(loopMember.getRefset().toString(), refsetsCount.get(loopMember.getRefset()) + 1);
+
                     count++;
                     if (count % 100000 == 0) {
                         System.out.print(".");
@@ -353,6 +392,14 @@ public class Transformer {
                     }
                     list.add(loopMember);
                     assocMembers.put(Long.parseLong(columns[5]), list);
+
+                    modulesSet.add(columns[3]);
+                    refsetsSet.add(columns[4]);
+                    if (!refsetsCount.containsKey(loopMember.getRefset().toString())) {
+                        refsetsCount.put(loopMember.getRefset().toString(), 0);
+                    }
+                    refsetsCount.put(loopMember.getRefset().toString(), refsetsCount.get(loopMember.getRefset()) + 1);
+
                     count++;
                     if (count % 100000 == 0) {
                         System.out.print(".");
@@ -399,6 +446,14 @@ public class Transformer {
                     }
                     list.add(loopMember);
                     attrMembers.put(Long.parseLong(columns[5]), list);
+
+                    modulesSet.add(columns[3]);
+                    refsetsSet.add(columns[4]);
+                    if (!refsetsCount.containsKey(loopMember.getRefset().toString())) {
+                        refsetsCount.put(loopMember.getRefset().toString(), 0);
+                    }
+                    refsetsCount.put(loopMember.getRefset().toString(), refsetsCount.get(loopMember.getRefset()) + 1);
+
                     count++;
                     if (count % 100000 == 0) {
                         System.out.print(".");
@@ -444,6 +499,15 @@ public class Transformer {
                     }
                     list.add(loopMember);
                     simpleMapMembers.put(sourceId, list);
+
+                    modulesSet.add(columns[3]);
+                    refsetsSet.add(columns[4]);
+
+                    if (!refsetsCount.containsKey(loopMember.getRefset().toString())) {
+                        refsetsCount.put(loopMember.getRefset().toString(), 0);
+                    }
+                    refsetsCount.put(loopMember.getRefset().toString(), refsetsCount.get(loopMember.getRefset()) + 1);
+
                     count++;
                     if (count % 100000 == 0) {
                         System.out.print(".");
@@ -486,7 +550,11 @@ public class Transformer {
                         list = new ArrayList<LightLangMembership>();
                     }
                     list.add(loopMember);
+                    
                     languageMembers.put(sourceId, list);
+
+                    modulesSet.add(columns[3]);
+                    langRefsetsSet.add(columns[4]);
                     count++;
                     if (count % 100000 == 0) {
                         System.out.print(".");
@@ -507,7 +575,7 @@ public class Transformer {
         if (!ofile.getParentFile().exists()){
         	ofile.getParentFile().mkdirs();
         }
-        
+
         FileOutputStream fos = new FileOutputStream(ofile);
         OutputStreamWriter osw = new OutputStreamWriter(fos, "UTF-8");
         BufferedWriter bw = new BufferedWriter(osw);
@@ -532,7 +600,7 @@ public class Transformer {
             Concept cpt = new Concept();
             ConceptDescriptor cptdesc = concepts.get(cptId);
 
-            cpt.setConceptId(cptId);
+            cpt.setConceptId(cptId.toString());
             cpt.setActive(cptdesc.getActive());
             cpt.setDefaultTerm(cptdesc.getDefaultTerm());
             cpt.setEffectiveTime(cptdesc.getEffectiveTime());
@@ -547,9 +615,9 @@ public class Transformer {
                 for (LightDescription ldesc : listLD) {
                     Description d = new Description();
                     d.setActive(ldesc.getActive());
-                    d.setConceptId(ldesc.getConceptId());
+                    d.setConceptId(ldesc.getConceptId().toString());
                     descId = ldesc.getDescriptionId();
-                    d.setDescriptionId(descId);
+                    d.setDescriptionId(descId.toString());
                     d.setEffectiveTime(ldesc.getEffectiveTime());
                     d.setIcs(concepts.get(ldesc.getIcs()));
                     d.setTerm(ldesc.getTerm());
@@ -566,7 +634,7 @@ public class Transformer {
                             LangMembership lm = new LangMembership();
 
                             lm.setActive(llm.getActive());
-                            lm.setDescriptionId(descId);
+                            lm.setDescriptionId(descId.toString());
                             lm.setEffectiveTime(llm.getEffectiveTime());
                             lm.setModule(llm.getModule());
                             lm.setAcceptability(concepts.get(llm.getAcceptability()));
@@ -593,7 +661,7 @@ public class Transformer {
                             rm.setModule(lrm.getModule());
                             rm.setUuid(lrm.getUuid());
 
-                            rm.setReferencedComponentId(descId);
+                            rm.setReferencedComponentId(descId.toString());
                             rm.setRefset(concepts.get(lrm.getRefset()));
                             rm.setType(lrm.getType());
                             rm.setCidValue(concepts.get(lrm.getCidValue()));
@@ -619,9 +687,9 @@ public class Transformer {
                 for (LightDescription ldesc : listLD) {
                     Description d = new Description();
                     d.setActive(ldesc.getActive());
-                    d.setConceptId(ldesc.getConceptId());
+                    d.setConceptId(ldesc.getConceptId().toString());
                     descId = ldesc.getDescriptionId();
-                    d.setDescriptionId(descId);
+                    d.setDescriptionId(descId.toString());
                     d.setEffectiveTime(ldesc.getEffectiveTime());
                     d.setIcs(concepts.get(ldesc.getIcs()));
                     d.setTerm(ldesc.getTerm());
@@ -638,7 +706,7 @@ public class Transformer {
                             LangMembership lm = new LangMembership();
 
                             lm.setActive(llm.getActive());
-                            lm.setDescriptionId(descId);
+                            lm.setDescriptionId(descId.toString());
                             lm.setEffectiveTime(llm.getEffectiveTime());
                             lm.setModule(llm.getModule());
                             lm.setAcceptability(concepts.get(llm.getAcceptability()));
@@ -673,7 +741,7 @@ public class Transformer {
                         d.setModule(lrel.getModule());
                         d.setGroupId(lrel.getGroupId());
                         d.setModifier(MODIFIER);
-                        d.setSourceId(cptId);
+                        d.setSourceId(cptId.toString());
                         d.setTarget(concepts.get(lrel.getTarget()));
                         d.setType(concepts.get(lrel.getType()));
                         d.setCharType(concepts.get(lrel.getCharType()));
@@ -701,7 +769,7 @@ public class Transformer {
                         d.setModule(lrel.getModule());
                         d.setGroupId(lrel.getGroupId());
                         d.setModifier(MODIFIER);
-                        d.setSourceId(cptId);
+                        d.setSourceId(cptId.toString());
                         d.setTarget(concepts.get(lrel.getTarget()));
                         d.setType(concepts.get(lrel.getType()));
                         d.setCharType(concepts.get(lrel.getCharType()));
@@ -728,7 +796,7 @@ public class Transformer {
                     d.setModule(lrm.getModule());
                     d.setUuid(lrm.getUuid());
 
-                    d.setReferencedComponentId(cptId);
+                    d.setReferencedComponentId(cptId.toString());
                     d.setRefset(concepts.get(lrm.getRefset()));
                     d.setType(lrm.getType());
 
@@ -745,7 +813,7 @@ public class Transformer {
                     d.setModule(lrm.getModule());
                     d.setUuid(lrm.getUuid());
 
-                    d.setReferencedComponentId(cptId);
+                    d.setReferencedComponentId(cptId.toString());
                     d.setRefset(concepts.get(lrm.getRefset()));
                     d.setType(lrm.getType());
                     d.setOtherValue(lrm.getOtherValue());
@@ -762,7 +830,7 @@ public class Transformer {
                     d.setModule(lrm.getModule());
                     d.setUuid(lrm.getUuid());
 
-                    d.setReferencedComponentId(cptId);
+                    d.setReferencedComponentId(cptId.toString());
                     d.setRefset(concepts.get(lrm.getRefset()));
                     d.setType(lrm.getType());
                     d.setCidValue(concepts.get(lrm.getCidValue()));
@@ -779,7 +847,7 @@ public class Transformer {
                     d.setModule(lrm.getModule());
                     d.setUuid(lrm.getUuid());
 
-                    d.setReferencedComponentId(cptId);
+                    d.setReferencedComponentId(cptId.toString());
                     d.setRefset(concepts.get(lrm.getRefset()));
                     d.setType(lrm.getType());
                     d.setCidValue(concepts.get(lrm.getCidValue()));
@@ -800,7 +868,42 @@ public class Transformer {
         System.out.println(fileName + " Done");
     }
 
-    public String getDefaultLangCode() {
+    private void addManifestData() {
+
+        manifest.setDatabaseName(DATABASE_NAME);
+        manifest.setTextIndexNormalized(true);
+        manifest.setEffectiveTime(this.effectiveTime);
+        manifest.setDefaultTermLangCode(getDefaultLangCode());
+        manifest.setCollectionName(this.effectiveTime);
+        manifest.setDefaultTermLangRefset(DEFAULT_LANG_REFSETID);
+        manifest.setExpirationDate(EXPIRATION_DATE);
+        manifest.setDefaultTermType(getDefaultTermType());
+        manifest.setResourceSetName(EDITION_NAME);		
+	}
+
+
+    public void createManifestFile(String fileName) throws FileNotFoundException, UnsupportedEncodingException, IOException {
+        System.out.println("Starting creation of " + fileName);
+        FileOutputStream fos = new FileOutputStream(fileName);
+        OutputStreamWriter osw = new OutputStreamWriter(fos, "UTF-8");
+        BufferedWriter bw = new BufferedWriter(osw);
+        Gson gson = new Gson();
+
+        for (String moduleId : modulesSet) {
+            manifest.getModules().add(concepts.get(moduleId));
+        }
+        for (String langRefsetId : langRefsetsSet) {
+            manifest.getLanguageRefsets().add(concepts.get(langRefsetId));
+        }
+        for (String refsetId : refsetsSet) {
+            manifest.getRefsets().add(new RefsetDescriptor(concepts.get(refsetId), refsetsCount.get(refsetId)));
+        }
+        bw.append(gson.toJson(manifest).toString());
+
+        bw.close();
+        System.out.println(fileName + " Done");
+    }
+	public String getDefaultLangCode() {
         return defaultLangCode;
     }
 
@@ -830,9 +933,9 @@ public class Transformer {
                 d.setActive(ldesc.getActive());
                 d.setTerm(ldesc.getTerm());
                 d.setLength(ldesc.getTerm().length());
-                d.setTypeId(ldesc.getType());
-                d.setConceptId(ldesc.getConceptId());
-                d.setDescriptionId(ldesc.getDescriptionId());
+                d.setTypeId(ldesc.getType().toString());
+                d.setConceptId(ldesc.getConceptId().toString());
+                d.setDescriptionId(ldesc.getDescriptionId().toString());
                 // using long lang names for Mongo 2.4.x text indexes
                 d.setLang(langCodes.get(ldesc.getLang()));
                 ConceptDescriptor concept = concepts.get(ldesc.getConceptId());
@@ -933,6 +1036,16 @@ public class Transformer {
     public void setDefaultTermType(String defaultTermType) {
         this.defaultTermType = defaultTermType;
     }
+
+
+	public String getEffectiveTime() {
+		return effectiveTime;
+	}
+
+
+	public void setEffectiveTime(String effectiveTime) {
+		this.effectiveTime = effectiveTime;
+	}
     
     
 
