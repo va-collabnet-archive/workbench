@@ -216,6 +216,10 @@ public class RF2RelationshipIdListGeneratorImpl extends RF2IDImpl {
 			if (componentTypeAction==null){
 				componentTypeAction="";
 			}
+
+			if (releaseId!=null && releaseId.length()>8){
+				releaseId=releaseId.substring(0,8);
+			}
 			hmTmp=hmTypeMap.get(idType);
 			// Creating SctIds			
 			logger.info("Creating SCTIds for ....................." + componentType);
@@ -354,6 +358,9 @@ public class RF2RelationshipIdListGeneratorImpl extends RF2IDImpl {
 								String moduleId = getConfig().getRf2Files().get(f).sctidparam.moduleId;			
 								logger.info(list.size() + " inferred relationships in list sending to web service.");
 
+								if (releaseId!=null && releaseId.length()>8){
+									releaseId=releaseId.substring(0,8);
+								}
 								res=getSCTIdList(getConfig(),list,Integer.parseInt(namespaceId), partitionId, releaseId, executionId,"1");
 
 								if (idMapFile!=null && !idMapFile.equals("")){
