@@ -38,9 +38,11 @@ import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
+import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 import org.ihtsdo.tk.drools.facts.ConceptFact;
 import org.ihtsdo.tk.spec.ConceptSpec;
 import org.ihtsdo.tk.drools.facts.DescFact;
+import org.ihtsdo.tk.drools.facts.RelFact;
 import org.ihtsdo.tk.spec.ValidationException;
 
 public class IsMemberOfEvaluatorDefinition implements EvaluatorDefinition {
@@ -123,12 +125,61 @@ public class IsMemberOfEvaluatorDefinition implements EvaluatorDefinition {
             } else if (DescFact.class.isAssignableFrom(value1.getClass())) {
                 DescFact dFact = (DescFact) value1;
                 isMember = testDesc(dFact, value2);
-            } else {
+            }  else if (RelFact.class.isAssignableFrom(value1.getClass())) {
+                RelFact rFact = (RelFact) value1;
+                isMember = testRel(rFact, value2);
+            }
+            else {
                 throw new UnsupportedOperationException("Can't convert: " + value1);
             }
 
             return this.getOperator().isNegated() ^ (isMember);
 
+        }
+        
+            private boolean testRel(RelFact rFact, final Object value2) {
+            boolean member = false;
+
+            try {
+                RelationshipVersionBI rel = rFact.getComponent();
+                ViewCoordinate vc = rFact.getVc();
+                ConceptVersionBI possibleRefsetCV = null;
+                ConceptSpec possibleRefset = null;
+
+                int evalRefsetNid = 0;
+
+                if (ConceptVersionBI.class.isAssignableFrom(value2.getClass())) {
+                    possibleRefsetCV = (ConceptVersionBI) value2;
+                    evalRefsetNid = possibleRefsetCV.getNid();
+                } else if (ConceptSpec.class.isAssignableFrom(value2.getClass())) {
+                    possibleRefset = (ConceptSpec) value2;
+                    try {
+                        evalRefsetNid = possibleRefset.getStrict(vc).getNid();
+                    } catch (ValidationException ve) {
+                        return false;
+                    }
+                } else if (ConceptFact.class.isAssignableFrom(value2.getClass())) {
+                    ConceptFact fact = (ConceptFact) value2;
+                    possibleRefsetCV = (ConceptVersionBI) fact.getConcept();
+                    evalRefsetNid = possibleRefsetCV.getNid();
+                }
+
+                Collection<? extends RefexChronicleBI<?>> refexes =
+                        rel.getRefexesActive(vc);
+
+                if (refexes != null) {
+                    for (RefexChronicleBI<?> refex : refexes) {
+                        if (refex.getRefexNid() == evalRefsetNid) {
+                            member = true;
+                        }
+                    }
+                }
+
+                return member;
+            } catch (IOException e) {
+                Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "refset concept not found", e);
+                return member;
+            }
         }
 
         private boolean testDesc(DescFact dFact, final Object value2) {

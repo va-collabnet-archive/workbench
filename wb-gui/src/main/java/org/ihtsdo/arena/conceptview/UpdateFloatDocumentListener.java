@@ -10,7 +10,6 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyVetoException;
 import java.beans.VetoableChangeListener;
 import java.io.IOException;
-import java.util.Collection;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -20,21 +19,15 @@ import javax.swing.event.DocumentListener;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
-import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
-import org.ihtsdo.helper.dialect.UnsupportedDialectOrLanguage;
-import org.ihtsdo.lang.LANG_CODE;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.TerminologyBuilderBI;
-import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.thread.NamedThreadFactory;
-import org.ihtsdo.tk.api.ContradictionException;
-import org.ihtsdo.tk.api.blueprint.InvalidCAB;
-import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
+import org.ihtsdo.tk.api.ComponentChronicleBI;
+import org.ihtsdo.tk.api.TerminologyStoreDI;
 import org.ihtsdo.tk.api.refex.RefexAnalogBI;
 import org.ihtsdo.tk.api.refex.type_float.RefexFloatAnalogBI;
-import org.ihtsdo.tk.api.refex.type_int.RefexIntAnalogBI;
 
 /**
  *
@@ -42,10 +35,10 @@ import org.ihtsdo.tk.api.refex.type_int.RefexIntAnalogBI;
  */
 public class UpdateFloatDocumentListener implements DocumentListener, ActionListener, VetoableChangeListener {
 
-    private static ThreadGroup updateTextThreadGroup =
-            new ThreadGroup("updateTextThreadGroup");
+    private static ThreadGroup updateFloatThreadGroup =
+            new ThreadGroup("updateFloatThreadGroup");
     private static ExecutorService updateDocListenrService = Executors.newFixedThreadPool(1,
-            new NamedThreadFactory(updateTextThreadGroup, "updateTextThread"));
+            new NamedThreadFactory(updateFloatThreadGroup, "updateFloatThread"));
     FixedWidthJEditorPane editorPane;
     RefexFloatAnalogBI refex;
     Timer t;
@@ -61,6 +54,7 @@ public class UpdateFloatDocumentListener implements DocumentListener, ActionList
         this.editorPane = editorPane;
         this.refex = (RefexFloatAnalogBI) refex;
         t = new Timer(5000, this);
+        Ts.get().addVetoablePropertyChangeListener(TerminologyStoreDI.CONCEPT_EVENT.PRE_COMMIT, this);
     }
     long lastChange = Long.MIN_VALUE;
 
@@ -131,22 +125,29 @@ public class UpdateFloatDocumentListener implements DocumentListener, ActionList
     }
 
     private void doAction() throws PropertyVetoException, IOException {
-        try {
-            refex.setFloat1(Float.parseFloat(text));
-        } catch (NumberFormatException e) {
-            refex.setFloat1(-1);
-        }
+        if (update) {
+            try {
+                refex.setFloat1(Float.parseFloat(text));
+            } catch (NumberFormatException e) {
+                refex.setFloat1(-1);
+            }
 
-        if (!Ts.get().getConcept(refex.getRefexNid()).isAnnotationStyleRefex()) {
-            Ts.get().addUncommitted(Ts.get().getConcept(refex.getRefexNid()));
+            if (!Ts.get().getConcept(refex.getRefexNid()).isAnnotationStyleRefex()) {
+                Ts.get().addUncommitted(Ts.get().getConcept(refex.getRefexNid()));
+            }
+            ComponentChronicleBI<?> referencedComponent = 
+                    Ts.get().getComponent(refex.getReferencedComponentNid());
+            Ts.get().addUncommitted(Ts.get().getConcept(referencedComponent.getConceptNid()));
         }
-        Ts.get().addUncommitted(Ts.get().getConcept(refex.getReferencedComponentNid()));
+        update = false;
     }
 
     @Override
     public void vetoableChange(PropertyChangeEvent pce) throws PropertyVetoException {
         try {
-            doAction();
+            if (text != null) {
+                doAction();
+            }
         } catch (IOException ex) {
             AceLog.getAppLog().alertAndLogException(ex);
         } catch (PropertyVetoException ex) {

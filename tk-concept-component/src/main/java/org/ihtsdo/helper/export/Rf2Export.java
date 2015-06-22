@@ -563,9 +563,6 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
      * @throws Exception indicates an exception has occurred
      */
     private void process(ConceptChronicleBI concept) throws Exception {
-        if(concept.getPrimUuid().equals(UUID.fromString("c3e14568-a53a-3da3-9a44-6aa6908ead82"))){
-            System.out.println("### DEBUG");
-        }
         boolean write = true;
         if(sameCycleStampNids.contains(concept.getConceptAttributes().getPrimordialVersion().getStampNid())){
             if(!concept.getVersion(viewCoordinate).isActive(viewCoordinate)){
@@ -588,9 +585,6 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
 
             if (concept.getDescriptions() != null) {
                 for (DescriptionChronicleBI d : concept.getDescriptions()) {
-                    if(d.getPrimUuid().equals(UUID.fromString("308e6b53-c0a1-33bf-b1b3-17fcc9e814a5"))){
-                        System.out.println("### DEBUG");
-                    }
                     processDescription(d);
                     if (d.getAnnotations() != null) {
                         for (RefexChronicleBI annot : d.getAnnotations()) {
@@ -695,7 +689,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                         Collection<RefexVersionBI> refexVersions = member.getVersions();
                         for (RefexVersionBI r : refexVersions) {
                             if (!sameCycleStampNids.contains(r.getStampNid()) || (latest != null && r.getStampNid() == latest.getStampNid())) {
-                                versions.add(r);
+                                    versions.add(r);
                             }
                         }
                     }
@@ -703,17 +697,19 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                     Collection<? extends RefexChronicleBI<?>> refsetMembers = childRefset.getRefsetMembers();
                     for (RefexChronicleBI member : refsetMembers) {
                         RefexVersionBI version = (RefexVersionBI) member.getVersion(viewCoordinateAllStatus);
-                        versions.add(version);
+                        if(version != null){
+                            versions.add(version);
+                        }
                     }
                 }
-                boolean write = true;
                     for (RefexVersionBI refexVersion : versions) {
+                        boolean write = true;
                         RefexChronicleBI chronicle = (RefexChronicleBI) refexVersion.getChronicle();
                         if (sameCycleStampNids.contains(refexVersion.getStampNid())) {
                             RefexVersionBI version = (RefexVersionBI) chronicle.getVersion(viewCoordinateAllStatus);
-                            if (!version.isActive(viewCoordinate)) {
-                                write = false;
-                            }
+//                            if (!version.isActive(viewCoordinate)) {
+//                                write = false;
+//                            }
                         }
                         if (write) {
                             if (stampNids.contains(refexVersion.getStampNid())) {
