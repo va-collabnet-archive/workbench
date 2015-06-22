@@ -43,6 +43,7 @@ import org.ihtsdo.helper.dto.DtoExtract;
 import org.ihtsdo.helper.dto.DtoToText;
 import org.ihtsdo.helper.export.ActiveOnlyExport;
 import org.ihtsdo.helper.io.FileIO;
+import org.dwfa.ace.reporting.AuthorReporter;
 import org.ihtsdo.project.workflow.api.wf2.implementation.WorkflowStore;
 import org.ihtsdo.request.uscrs.UscrsContentRequestHandler;
 import org.ihtsdo.rules.RulesLibrary;
@@ -142,6 +143,7 @@ public class ProgrammersPopupListener extends MouseAdapter implements ActionList
         LAUNCH_WF_CHANGES_INIT("Launch workflow initiator on changes..."),
         LAUNCH_BP("Launch Business Process..."),
         USCRS_EXPORT("USCRS Export");
+        AUTHOR_REPORT("All changes by current user to text");
         //J+
         String menuText;
 
@@ -265,6 +267,10 @@ public class ProgrammersPopupListener extends MouseAdapter implements ActionList
                 
             case LAUNCH_WF_CHANGES_INIT:
                 lauchWfChangesInit();
+                break;
+                
+            case AUTHOR_REPORT:
+                generateAuthorReport();
                 break;
 
             case USCRS_EXPORT:
@@ -864,6 +870,24 @@ public class ProgrammersPopupListener extends MouseAdapter implements ActionList
             JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null), "Unexpected error performing export: " + e,
                 "USCRS Content Request", JOptionPane.ERROR_MESSAGE);
         } 
+    }
+    
+    private void generateAuthorReport() {
+        try {
+            JFileChooser chooser = new JFileChooser();
+            chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+            chooser.setDialogTitle("Select report destination.");
+            int returnVal = chooser.showOpenDialog(null);
+            if (returnVal == JFileChooser.APPROVE_OPTION) {
+                AuthorReporter reporter = new AuthorReporter(
+                        conceptPanel.getConfig().getEditCoordinate().getAuthorNid(),
+                        chooser.getSelectedFile());
+                Ts.get().iterateConceptDataInParallel(reporter);
+                reporter.report();
+            }
+        } catch (Exception e) {
+            AceLog.getAppLog().alertAndLogException(e);
+        }
     }
 
     //~--- get methods ---------------------------------------------------------
