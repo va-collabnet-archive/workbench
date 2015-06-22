@@ -63,6 +63,8 @@ public class Transformer {
 	private HashMap<Long, List<LightRefsetMembership>> assocMembers;
 	private Map<String, String> charConv;
 	private Map<Long, String> cptFSN;
+	private ArrayList<Long> textIndexDescRefsets;
+	private ArrayList<Long> textIndexConceptRefsets;
 
     public Transformer() {
         concepts = new HashMap<Long, ConceptDescriptor>();
@@ -821,6 +823,8 @@ public class Transformer {
         for (long conceptId : descriptions.keySet()) {
 //            count++;
             //if (count > 10) break;
+            textIndexConceptRefsets=new ArrayList<Long>();
+        	getAllRefsetIds(conceptId,"c");
             for (LightDescription ldesc : descriptions.get(conceptId)) {
                 TextIndexDescription d = new TextIndexDescription();
                 d.setActive(ldesc.getActive());
@@ -853,6 +857,10 @@ public class Transformer {
                 String convertedTerm=convertTerm(cleanTerm);
                 String[] tokens = convertedTerm.toLowerCase().split("\\s+");
                 d.setWords(Arrays.asList(tokens));
+                textIndexDescRefsets=new ArrayList<Long>();
+                getAllRefsetIds(ldesc.getDescriptionId(),"d");
+                textIndexDescRefsets.addAll(textIndexConceptRefsets);
+                d.setRefsetIds(textIndexDescRefsets);
                 bw.append(gson.toJson(d).toString());
                 bw.append(sep);
             }
@@ -862,7 +870,34 @@ public class Transformer {
         System.out.println(fileName + " Done");
     }
 
-    private String convertTerm(String cleanTerm) {
+    private void getAllRefsetIds(long id, String type) {
+    	
+    	getRefsetIds(id,attrMembers,type);
+    	getRefsetIds(id,assocMembers,type);
+    	getRefsetIds(id,simpleMembers,type);
+    	getRefsetIds(id,simpleMapMembers,type);
+    	
+    	return;
+	}
+
+
+	private void getRefsetIds(long id,
+			Map<Long, List<LightRefsetMembership>> refset, String type) {
+		List<LightRefsetMembership> members=refset.get(id);
+		if (members!=null){
+			for (LightRefsetMembership member:members){
+				if (type.equals("c")){
+					textIndexConceptRefsets.add(member.getRefset());
+				}else{
+					textIndexDescRefsets.add(member.getRefset());
+					
+				}
+			}
+		}
+	}
+
+
+	private String convertTerm(String cleanTerm) {
     	for (String code:charConv.keySet()){
     		String test="\\u" + code;
     		String repl=charConv.get(code);

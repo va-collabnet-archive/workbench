@@ -289,14 +289,12 @@ public class ProcessDescriptionSubmissions extends AbstractTask {
                                 langRefexNid);
                         annotBp.put(RefexCAB.RefexProperty.CNID1, acceptabilityNid);
                         RefexChronicleBI<?> annotation = builder.construct(annotBp);
-                        description.addAnnotation(annotation);
                         if (addSecondDialectRefex) {
                             RefexCAB secondAnnotBp = new RefexCAB(TK_REFEX_TYPE.CID,
                                     description.getNid(),
                                     secondDialectRefexNid);
                             secondAnnotBp.put(RefexCAB.RefexProperty.CNID1, acceptabilityNid);
                             RefexChronicleBI<?> secondAnnotation = builder.construct(secondAnnotBp);
-                            description.addAnnotation(secondAnnotation);
                             addSecondDialectRefex = false;
                         }
                         conceptsToCommit.add(concept);
