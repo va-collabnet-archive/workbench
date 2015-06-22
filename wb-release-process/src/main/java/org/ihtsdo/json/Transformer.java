@@ -344,7 +344,7 @@ public class Transformer {
                     if (!refsetsCount.containsKey(loopMember.getRefset().toString())) {
                         refsetsCount.put(loopMember.getRefset().toString(), 0);
                     }
-                    refsetsCount.put(loopMember.getRefset().toString(), refsetsCount.get(loopMember.getRefset()) + 1);
+                    refsetsCount.put(loopMember.getRefset().toString(), refsetsCount.get(loopMember.getRefset().toString()) + 1);
 
                     count++;
                     if (count % 100000 == 0) {
@@ -398,7 +398,7 @@ public class Transformer {
                     if (!refsetsCount.containsKey(loopMember.getRefset().toString())) {
                         refsetsCount.put(loopMember.getRefset().toString(), 0);
                     }
-                    refsetsCount.put(loopMember.getRefset().toString(), refsetsCount.get(loopMember.getRefset()) + 1);
+                    refsetsCount.put(loopMember.getRefset().toString(), refsetsCount.get(loopMember.getRefset().toString()) + 1);
 
                     count++;
                     if (count % 100000 == 0) {
@@ -452,7 +452,7 @@ public class Transformer {
                     if (!refsetsCount.containsKey(loopMember.getRefset().toString())) {
                         refsetsCount.put(loopMember.getRefset().toString(), 0);
                     }
-                    refsetsCount.put(loopMember.getRefset().toString(), refsetsCount.get(loopMember.getRefset()) + 1);
+                    refsetsCount.put(loopMember.getRefset().toString(), refsetsCount.get(loopMember.getRefset().toString()) + 1);
 
                     count++;
                     if (count % 100000 == 0) {
@@ -506,7 +506,7 @@ public class Transformer {
                     if (!refsetsCount.containsKey(loopMember.getRefset().toString())) {
                         refsetsCount.put(loopMember.getRefset().toString(), 0);
                     }
-                    refsetsCount.put(loopMember.getRefset().toString(), refsetsCount.get(loopMember.getRefset()) + 1);
+                    refsetsCount.put(loopMember.getRefset().toString(), refsetsCount.get(loopMember.getRefset().toString()) + 1);
 
                     count++;
                     if (count % 100000 == 0) {
@@ -890,13 +890,13 @@ public class Transformer {
         Gson gson = new Gson();
 
         for (String moduleId : modulesSet) {
-            manifest.getModules().add(concepts.get(moduleId));
+            manifest.getModules().add(concepts.get(Long.parseLong( moduleId)));
         }
         for (String langRefsetId : langRefsetsSet) {
-            manifest.getLanguageRefsets().add(concepts.get(langRefsetId));
+            manifest.getLanguageRefsets().add(concepts.get(Long.parseLong(langRefsetId)));
         }
         for (String refsetId : refsetsSet) {
-            manifest.getRefsets().add(new RefsetDescriptor(concepts.get(refsetId), refsetsCount.get(refsetId)));
+            manifest.getRefsets().add(new RefsetDescriptor(concepts.get(Long.parseLong(refsetId)), refsetsCount.get(refsetId)));
         }
         bw.append(gson.toJson(manifest).toString());
 
