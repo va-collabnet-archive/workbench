@@ -27,7 +27,6 @@ import java.util.Iterator;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentSkipListSet;
 import org.ihtsdo.tk.Ts;
-import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.ConceptFetcherBI;
 import org.ihtsdo.tk.api.NidBitSetBI;
 import org.ihtsdo.tk.api.ProcessUnfetchedConceptDataBI;
@@ -49,7 +48,7 @@ public class AuthorReporter implements ProcessUnfetchedConceptDataBI {
     int authorNid;
     File resultsDir;
     ConcurrentSkipListSet<String> resultsText = new ConcurrentSkipListSet<>();
-    ConcurrentSkipListSet<String> resultsUuid = new ConcurrentSkipListSet<>(); //component and concept uuid, tab delimited
+    ConcurrentSkipListSet<String> resultsUuid = new ConcurrentSkipListSet<>(); //concept then component uuid, tab delimited
 
     public AuthorReporter(int authorNid, File resultsDir) {
         this.authorNid = authorNid;
@@ -63,13 +62,13 @@ public class AuthorReporter implements ProcessUnfetchedConceptDataBI {
         for (ConceptAttributeVersionBI version : concept.getConceptAttributes().getVersions()) {
             if (version.getAuthorNid() == authorNid) {
                 resultsText.add(version.toString());
-                resultsUuid.add(version.getPrimUuid().toString() + "\t" + Ts.get().getUuidPrimordialForNid(version.getConceptNid()));
+                resultsUuid.add(Ts.get().getUuidPrimordialForNid(version.getConceptNid()) + "\t" + version.getPrimUuid().toString());
                 for (RefexChronicleBI refexChronicle : version.getAnnotations()) {
                     for (Object o : refexChronicle.getVersions()) {
                         RefexVersionBI refexVersion = (RefexVersionBI) o;
                         if (refexVersion.getAuthorNid() == authorNid) {
                             resultsText.add(refexVersion.toString());
-                            resultsUuid.add(refexVersion.getPrimUuid().toString() + "\t" + Ts.get().getUuidPrimordialForNid(refexVersion.getConceptNid()));
+                            resultsUuid.add(Ts.get().getUuidPrimordialForNid(refexVersion.getConceptNid()) + "\t" + refexVersion.getPrimUuid().toString());
                         }
                     }
                 }
@@ -80,14 +79,14 @@ public class AuthorReporter implements ProcessUnfetchedConceptDataBI {
             for (DescriptionVersionBI version : chronicle.getVersions()) {
                 if (version.getAuthorNid() == authorNid) {
                     resultsText.add(version.toString());
-                    resultsUuid.add(version.getPrimUuid().toString() + "\t" + Ts.get().getUuidPrimordialForNid(version.getConceptNid()));
+                    resultsUuid.add(Ts.get().getUuidPrimordialForNid(version.getConceptNid()) + "\t" + version.getPrimUuid().toString());
                 }
                 for (RefexChronicleBI refexChronicle : version.getAnnotations()) {
                     for (Object o : refexChronicle.getVersions()) {
                         RefexVersionBI refexVersion = (RefexVersionBI) o;
                         if (refexVersion.getAuthorNid() == authorNid) {
                             resultsText.add(refexVersion.toString());
-                            resultsUuid.add(refexVersion.getPrimUuid().toString() + "\t" + Ts.get().getUuidPrimordialForNid(refexVersion.getConceptNid()));
+                            resultsUuid.add(Ts.get().getUuidPrimordialForNid(refexVersion.getConceptNid()) + "\t" + refexVersion.getPrimUuid().toString());
                         }
                     }
                 }
@@ -97,14 +96,14 @@ public class AuthorReporter implements ProcessUnfetchedConceptDataBI {
             for (RelationshipVersionBI version : chronicle.getVersions()) {
                 if (version.getAuthorNid() == authorNid) {
                     resultsText.add(version.toString());
-                    resultsUuid.add(version.getPrimUuid().toString() + "\t" + Ts.get().getUuidPrimordialForNid(version.getConceptNid()));
+                    resultsUuid.add(Ts.get().getUuidPrimordialForNid(version.getConceptNid()) + "\t" + version.getPrimUuid().toString());
                 }
                 for (RefexChronicleBI refexChronicle : version.getAnnotations()) {
                     for (Object o : refexChronicle.getVersions()) {
                         RefexVersionBI refexVersion = (RefexVersionBI) o;
                         if (refexVersion.getAuthorNid() == authorNid) {
                             resultsText.add(refexVersion.toString());
-                            resultsUuid.add(refexVersion.getPrimUuid().toString() + "\t" + Ts.get().getUuidPrimordialForNid(refexVersion.getConceptNid()));
+                            resultsUuid.add(Ts.get().getUuidPrimordialForNid(refexVersion.getConceptNid()) + "\t" + refexVersion.getPrimUuid().toString());
                         }
                     }
                 }
@@ -115,7 +114,7 @@ public class AuthorReporter implements ProcessUnfetchedConceptDataBI {
                 RefexVersionBI refexVersion = (RefexVersionBI) o;
                 if (refexVersion.getAuthorNid() == authorNid) {
                     resultsText.add(refexVersion.toString());
-                    resultsUuid.add(refexVersion.getPrimUuid().toString() + "\t" + Ts.get().getUuidPrimordialForNid(refexVersion.getConceptNid()));
+                    resultsUuid.add(Ts.get().getUuidPrimordialForNid(refexVersion.getConceptNid()) + "\t" + refexVersion.getPrimUuid().toString());
                 }
             }
         }
@@ -124,7 +123,7 @@ public class AuthorReporter implements ProcessUnfetchedConceptDataBI {
                 RefexVersionBI refexVersion = (RefexVersionBI) o;
                 if (refexVersion.getAuthorNid() == authorNid) {
                     resultsText.add(refexVersion.toString());
-                    resultsUuid.add(refexVersion.getPrimUuid().toString() + "\t" + Ts.get().getUuidPrimordialForNid(refexVersion.getConceptNid()));
+                    resultsUuid.add(Ts.get().getUuidPrimordialForNid(refexVersion.getConceptNid()) + "\t" + refexVersion.getPrimUuid().toString());
                 }
             }
         }

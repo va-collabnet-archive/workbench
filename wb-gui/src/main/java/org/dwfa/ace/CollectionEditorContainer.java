@@ -32,6 +32,7 @@ import org.dwfa.ace.api.I_HostConceptPlugins.HOST_ENUM;
 import org.dwfa.ace.api.I_ModelTerminologyList;
 import org.dwfa.ace.file.ConceptListReader;
 import org.dwfa.ace.file.ConceptListWriter;
+import org.dwfa.ace.file.DescriptionListWriter;
 import org.dwfa.ace.gui.concept.ConceptPanel;
 import org.dwfa.ace.list.TerminologyList;
 import org.dwfa.ace.list.TerminologyListModel;
@@ -52,6 +53,9 @@ import org.ihtsdo.arena.Arena;
 import org.ihtsdo.batch.BatchActionEditorPanel;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
+import org.ihtsdo.tk.api.concept.ConceptVersionBI;
+import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
+import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.ttk.preferences.gui.PanelLinkingPreferences.LINK_TYPE;
 
 public class CollectionEditorContainer extends JPanel {
@@ -79,6 +83,60 @@ public class CollectionEditorContainer extends JPanel {
         }
     }
 
+    public class ExportDescriptionsInListButtonListener implements ActionListener {
+
+        private static final String EXTENSION = ".txt";
+
+        @Override
+        public void actionPerformed(ActionEvent arg0) {
+            FileDialog dialog = new FileDialog(new Frame(), "Enter file name: ");
+            dialog.setMode(FileDialog.SAVE);
+            dialog.setDirectory(System.getProperty("user.dir"));
+            dialog.setVisible(true);
+            if (dialog.getFile() != null) {
+                if (dialog.getFile().toLowerCase().endsWith(EXTENSION) == false) {
+                    dialog.setFile(dialog.getFile() + EXTENSION);
+                }
+
+                DescriptionListWriter writer = new DescriptionListWriter();
+                try {
+                    writer.open(new File(dialog.getDirectory(), dialog.getFile()), false);
+
+                    ListModel model = list.getModel();
+
+                    for (int i = 0; i < model.getSize(); i++) {
+                        I_GetConceptData c = (I_GetConceptData) model.getElementAt(i);
+                        ViewCoordinate vc = ace.getAceFrameConfig().getViewCoordinate();
+                        ConceptVersionBI conceptVersion = Ts.get().getConceptVersion(vc, c.getPrimUuid());
+                        for(DescriptionVersionBI desc : conceptVersion.getDescriptionsActive()){
+                            writer.write(desc);
+                        }
+                    }
+
+                    writer.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+
+                    final JDialog alert = new JDialog();
+                    JPanel panel = new JPanel(new GridLayout(2, 1));
+                    panel.add(new JLabel("Failed to write to file " + dialog.getFile() + " due to "
+                            + e.getLocalizedMessage()));
+                    JButton button = new JButton("OK");
+                    button.addActionListener(new ActionListener() {
+
+                        @Override
+                        public void actionPerformed(ActionEvent arg0) {
+                            alert.dispose();
+                        }
+                    });
+
+                    panel.add(button);
+                    alert.add(panel);
+                }
+            }
+        }
+    }
+    
     public class ExportListButtonListener implements ActionListener {
 
         private static final String EXTENSION = ".txt";
@@ -323,7 +381,7 @@ public CollectionEditorContainer(TerminologyTable table, ACE ace)
         exportListButton.addActionListener(new ExportListButtonListener());
         exportListButton.setToolTipText("save the list to a file");
         listEditorTopPanel.add(exportListButton, c);
-
+        
         c.gridx++;
 
         JButton importListButton = new JButton(new ImageIcon(ACE.class.getResource("/32x32/plain/notebook_read.png")));
@@ -339,6 +397,14 @@ public CollectionEditorContainer(TerminologyTable table, ACE ace)
         addUncommittedToListButton.addActionListener(new AddUncommittedToListButtonListener());
         addUncommittedToListButton.setToolTipText("Add concepts with uncommitted components to the list view");
         listEditorTopPanel.add(addUncommittedToListButton, c);
+
+        c.gridx++;
+        
+        JButton exportDescriptionsButton = new JButton(new ImageIcon(ACE.class.getResource("/32x32/plain/arrow_down_blue.png")));
+        exportDescriptionsButton.setVisible(ACE.editMode);
+        exportDescriptionsButton.addActionListener(new ExportDescriptionsInListButtonListener());
+        exportDescriptionsButton.setToolTipText("export all descriptions from concepts in list to file");
+        listEditorTopPanel.add(exportDescriptionsButton, c);
 
         c.gridx++;
 
