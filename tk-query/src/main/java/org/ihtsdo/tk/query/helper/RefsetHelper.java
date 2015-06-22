@@ -138,6 +138,17 @@ public class RefsetHelper {
         return builder.constructIfNotCurrent(memberBp);
     }
     
+    public RefexChronicleBI newConceptRefsetExtension(int refsetNid, int componentNid,
+            int c1Nid, UUID memberUuid) throws Exception {
+        RefexCAB memberBp = new RefexCAB(TK_REFEX_TYPE.CID,
+                componentNid,
+                refsetNid);
+        memberBp.put(RefexProperty.CNID1, c1Nid);
+        memberBp.setMemberUuid(memberUuid);
+        System.out.println("newConceptRefsetExtension with UUID:  " + memberUuid);
+        return builder.constructIfNotCurrent(memberBp);
+    }
+    
     public RefexChronicleBI newBooleanRefsetExtension(int refsetNid, int componentNid,
             boolean boolean1) throws Exception {
         RefexCAB memberBp = new RefexCAB(TK_REFEX_TYPE.BOOLEAN,

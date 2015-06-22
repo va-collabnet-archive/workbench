@@ -19,8 +19,7 @@ package org.ihtsdo.mojo.mojo;
 import java.io.File;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
-
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
+import org.apache.lucene.analysis.standard.ClassicAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.index.IndexWriter;
@@ -78,7 +77,7 @@ public class VodbCreateLuceneIndex extends AbstractMojo {
             luceneDirFile.mkdirs();
 			Directory luceneDir = new SimpleFSDirectory(luceneDirFile);
 			
-        IndexWriterConfig config = new IndexWriterConfig(LuceneManager.version, new StandardAnalyzer(LuceneManager.version));
+        IndexWriterConfig config = new IndexWriterConfig(LuceneManager.version, new ClassicAnalyzer(LuceneManager.version));
         MergePolicy mergePolicy = new LogByteSizeMergePolicy();
 
         config.setMergePolicy(mergePolicy);

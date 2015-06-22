@@ -1,23 +1,15 @@
 package org.ihtsdo.rf2.core.impl;
 
-import java.io.IOException;
-import java.util.Date;
-import java.util.List;
-
 import org.apache.log4j.Logger;
-import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_ProcessConcepts;
-import org.ihtsdo.rf2.constant.I_Constants;
 import org.ihtsdo.rf2.impl.RF2AbstractImpl;
 import org.ihtsdo.rf2.util.Config;
-import org.ihtsdo.rf2.util.WriteUtil;
-import org.ihtsdo.tk.api.Precedence;
 
 /**
  * Title: RF2ConceptImpl Description: Iterating over all the concept in workbench and fetching all the components required by RF2 Concept File Copyright: Copyright (c) 2010 Company: IHTSDO
  * 
- * @author Varsha Parekh
+ * * @author Alejandro Rodriguez
  * @version 1.0
  */
 

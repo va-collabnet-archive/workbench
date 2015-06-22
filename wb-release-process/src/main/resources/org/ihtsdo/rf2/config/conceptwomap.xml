@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<config>
+	<exportFileName>concwomap</exportFileName>
+	<droolsDrlFile>org/ihtsdo/rf2/drools/ConceptReleaseRules.drl</droolsDrlFile>
+	<column>
+		<name>uuid</name>
+		<descripton></descripton>
+		<delimiter>\t</delimiter>
+	</column>
+	<column>
+		<name>sctid</name>
+		<descripton></descripton>
+		<delimiter>\t</delimiter>
+	</column>
+	<column>
+		<name>active</name>
+		<descripton></descripton>
+		<delimiter>\t</delimiter>
+	</column><column>
+		<name>ctv3id</name>
+		<descripton></descripton>
+		<delimiter>\t</delimiter>
+	</column>
+	<column>
+		<name>snomedid</name>
+		<descripton></descripton>
+		<delimiter>\r\n</delimiter>
+	</column>
+</config>

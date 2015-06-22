@@ -7,14 +7,12 @@ import org.dwfa.ace.api.Terms;
 import org.ihtsdo.rf2.factory.RF2AbstractFactory;
 import org.ihtsdo.rf2.refset.impl.RF2ConceptInactivationImpl;
 import org.ihtsdo.rf2.refset.impl.RF2DescriptionInactivationImpl;
-import org.ihtsdo.rf2.refset.impl.RF2RefinabilityImpl;
 import org.ihtsdo.rf2.util.Config;
-import org.ihtsdo.rf2.util.ExportUtil;
 
 /**
  * Title: RF2AttributeValueRefsetFactory Description: Creating Attribute Value Refset Specific methods Copyright: Copyright (c) 2010 Company: IHTSDO
  * 
- * @author Varsha Parekh
+ * * @author Alejandro Rodriguez
  * @version 1.0
  */
 

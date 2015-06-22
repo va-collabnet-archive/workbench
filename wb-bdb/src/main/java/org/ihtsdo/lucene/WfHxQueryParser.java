@@ -5,7 +5,7 @@ import java.util.UUID;
 import java.util.logging.Level;
 
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
+import org.apache.lucene.analysis.standard.ClassicAnalyzer;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.BooleanClause;
@@ -100,7 +100,7 @@ public class WfHxQueryParser {
 			return null;
 		} else {
 			// Add clause to examining if workflowId's whose final state is ACCEPT 
-			Query q = new QueryParser(LuceneManager.version, "lastState", new StandardAnalyzer(LuceneManager.version)).parse(WorkflowHelper.getApprovedState().toString());
+			Query q = new QueryParser(LuceneManager.version, "lastState", new ClassicAnalyzer(LuceneManager.version)).parse(WorkflowHelper.getApprovedState().toString());
 
 			// if wfInProgress is selected, add 'NOT' directive to clause
 			if (completedWf) {
@@ -183,14 +183,14 @@ public class WfHxQueryParser {
 		
 		String key = identifyKey(wfCrit);
 		String val = identifyVal(wfCrit);
-		
-		Query q = new QueryParser(LuceneManager.version, key, new StandardAnalyzer(LuceneManager.version)).parse(val);
+                
+		Query q = new QueryParser(LuceneManager.version, key, new ClassicAnalyzer(LuceneManager.version)).parse(val);
 		
 		return new BooleanClause(q, Occur.MUST);
 	}
 	
 	public Query searchByWfId(UUID workflowId) throws ParseException {
-        return new QueryParser(LuceneManager.version, "workflowId", new StandardAnalyzer(LuceneManager.version)).parse(workflowId.toString());
+        return new QueryParser(LuceneManager.version, "workflowId", new ClassicAnalyzer(LuceneManager.version)).parse(workflowId.toString());
 	}
 
 	private String identifyKey(AbstractWorkflowHistorySearchTest wfCrit) {
@@ -246,7 +246,7 @@ public class WfHxQueryParser {
 	}
 
 	public Query getRefsetMemberIdQuery(String testMemberId) throws ParseException {
-		Analyzer refsetIdAnalyzer = new StandardAnalyzer(LuceneManager.version);
+		Analyzer refsetIdAnalyzer = new ClassicAnalyzer(LuceneManager.version);
 		QueryParser refsetIdParser = new QueryParser(LuceneManager.version, refsetMemberIdKey, refsetIdAnalyzer);
 		
 		return refsetIdParser.parse(testMemberId);

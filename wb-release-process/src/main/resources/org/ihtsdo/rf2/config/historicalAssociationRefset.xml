@@ -33,7 +33,7 @@
 		<delimiter>\t</delimiter>
 	</column>
 	<column>
-		<name>targetComponent</name>
+		<name>targetComponentId</name>
 		<description></description>
 		<delimiter>\r\n</delimiter>
 	</column>

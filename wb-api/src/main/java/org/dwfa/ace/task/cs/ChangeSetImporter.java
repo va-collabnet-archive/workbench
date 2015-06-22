@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
@@ -49,7 +50,7 @@ public abstract class ChangeSetImporter implements ActionListener {
     private static boolean commitAfterImport = false;
     private static int conceptCount = 0;
     private static int wfConceptCount = 0;
-    public static AtomicBoolean indexGenerating = new AtomicBoolean(false);
+    public static ReentrantLock indexGenerationLock = new ReentrantLock();
     private boolean fromMojo;
 
     

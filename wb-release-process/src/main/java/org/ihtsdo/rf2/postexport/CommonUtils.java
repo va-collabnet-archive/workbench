@@ -66,6 +66,64 @@ public class CommonUtils {
 			e.printStackTrace();
 		}
 		return result;
+	}	
+	public static void concatFile(HashSet<File> hFile, File outputfile) {
+
+		try{
+			
+			String fileName=outputfile.getName();
+			File fTmp = new File(outputfile.getParentFile()  + "/tmp_" + fileName);
+
+			if (fTmp.exists())
+				fTmp.delete();
+			
+			FileOutputStream fos = new FileOutputStream( fTmp);
+			OutputStreamWriter osw = new OutputStreamWriter(fos,"UTF-8");
+			BufferedWriter bw = new BufferedWriter(osw);
+
+			boolean first = true;
+			String nextLine;
+			for (File file:hFile){
+
+				FileInputStream fis = new FileInputStream(file	);
+				InputStreamReader isr = new InputStreamReader(fis,"UTF-8");
+				BufferedReader br = new BufferedReader(isr);
+				
+				nextLine=br.readLine();
+				if (first && nextLine!=null){
+					bw.append(nextLine);
+					bw.append("\r\n");
+					first=false;
+				}
+
+				while ((nextLine=br.readLine())!=null){
+					bw.append(nextLine);
+					bw.append("\r\n");
+
+				}
+				br.close();
+				isr.close();
+				fis.close();
+				br=null;
+				isr=null;
+				fis=null;
+
+			}
+
+			bw.close();
+
+			if (outputfile.exists())
+				outputfile.delete();
+			fTmp.renameTo(outputfile) ;
+			
+			if (fTmp.exists())
+				fTmp.delete();
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}finally{
+
+		}
 	}
 	public static void MergeFile(HashSet<File> hFile, File outputfile) {
 

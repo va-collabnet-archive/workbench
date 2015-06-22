@@ -896,10 +896,10 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
 
     @Override
     public RefsetMember<?, ?> getRefsetMemberForComponent(int componentNid) throws IOException {
-       if(refsetMembers == null){
+       if(refsetMembers.get() == null){
             getRefsetMembers();
         }
-
+       
         if (refsetMembers.get().size() < useMemberMapThreshold) {
             Iterator<RefsetMember<?, ?>> iterator = refsetMembers.get().iterator();
          while(iterator.hasNext()){
@@ -931,11 +931,19 @@ public class ConceptDataSimpleReference extends ConceptDataManager {
                     members.add(member);
                 }
             }
-
-            return new AddMemberSet(members);
-        }
-
-        if (refsetMembers.get() == null) {
+            AddMemberSet memberSet = new AddMemberSet(members);
+            if (refsetMembers.get() == null) {
+                refsetMembersLock.lock();
+                try {
+                    if (refsetMembers.get() == null) {
+                        refsetMembers.compareAndSet(null,
+                                memberSet);
+                    }
+                } finally {
+                    refsetMembersLock.unlock();
+                }
+            }
+        }else if (refsetMembers.get() == null) {
             refsetMembersLock.lock();
 
             try {

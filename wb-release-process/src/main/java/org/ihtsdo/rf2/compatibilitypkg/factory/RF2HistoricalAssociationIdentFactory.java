@@ -11,7 +11,7 @@ import org.ihtsdo.rf2.util.Config;
 /**
  * Title: RF2HistoricalAssociationRefsetFactory Description: Creating Historical Association Refset Specific methods Copyright: Copyright (c) 2010 Company: IHTSDO
  * 
- * @author Varsha Parekh
+ * * @author Alejandro Rodriguez
  * @version 1.0
  */
 

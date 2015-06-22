@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import org.apache.lucene.analysis.standard.ClassicAnalyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.queryparser.classic.QueryParser;
@@ -17,7 +18,7 @@ import org.dwfa.ace.api.Terms;
 import org.ihtsdo.tk.api.cs.ChangeSetPolicy;
 import org.ihtsdo.tk.api.cs.ChangeSetWriterThreading;
 import org.dwfa.ace.log.AceLog;
-import static org.dwfa.ace.task.cs.ChangeSetImporter.indexGenerating;
+import static org.dwfa.ace.task.cs.ChangeSetImporter.indexGenerationLock;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.cement.SNOMED;
 import org.dwfa.tapi.PathNotExistsException;
@@ -672,7 +673,7 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
         try {
             q =
                     new QueryParser(LuceneManager.version, "desc",
-                    new StandardAnalyzer(LuceneManager.version)).parse(conceptIdStr);
+                    new ClassicAnalyzer(LuceneManager.version)).parse(conceptIdStr);
             SearchResult result = LuceneManager.search(q, LuceneManager.LuceneSearchType.DESCRIPTION);
 
             for (int i = 0; i < result.topDocs.totalHits; i++) {
@@ -874,22 +875,25 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
     
     @Override
     public boolean regenerateWfHxLuceneIndex(ViewCoordinate viewCoordinate) throws Exception {
-        if (indexGenerating.get() == false) {
-            indexGenerating.getAndSet(true);
-            String wfDirPath = WfHxLuceneManager.wfHxLuceneDirFile.getAbsolutePath();
-            if (LuceneManager.indexExists(LuceneManager.LuceneSearchType.WORKFLOW_HISTORY) == true) {
-                if (WfHxLuceneManager.wfHxLuceneDirFile.exists()) {
-                    for (File wfFile : WfHxLuceneManager.wfHxLuceneDirFile.listFiles()) {
+        if (indexGenerationLock.tryLock()) {
+            try {
+            LuceneManager.killWorkflowIndex();
+            
+           if (LuceneManager.indexExists(LuceneManager.LuceneSearchType.WORKFLOW_HISTORY) == true) {
+                if (WfHxLuceneManager.runningLuceneDirFile.exists()) {
+                    for (File wfFile : WfHxLuceneManager.runningLuceneDirFile.listFiles()) {
                         wfFile.delete();
                     }
-                    WfHxLuceneManager.wfHxLuceneDirFile.delete();
+                    WfHxLuceneManager.runningLuceneDirFile.delete();
                 }
             }
-            LuceneManager.setLuceneRootDir(WfHxLuceneManager.wfHxLuceneDirFile, LuceneManager.LuceneSearchType.WORKFLOW_HISTORY);
+            LuceneManager.setLuceneRootDir(WfHxLuceneManager.runningLuceneDirFile, LuceneManager.LuceneSearchType.WORKFLOW_HISTORY);
             WfHxIndexGenerator.setSourceInputFile(null);
             LuceneManager.createLuceneIndex(LuceneManager.LuceneSearchType.WORKFLOW_HISTORY, viewCoordinate);
-            indexGenerating.getAndSet(false);
             return true;
+            } finally {
+                indexGenerationLock.unlock();
+            }
         }
         return false;
     }

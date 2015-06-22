@@ -89,9 +89,6 @@ public class BinaryChangeSetReadAll extends AbstractMojo {
         } catch (IOException e) {
             throw new MojoExecutionException(e.getLocalizedMessage(), e);
         }
-        if (wfLuceneDir != null && wfLuceneDir.length() > 1) {
-            WfHxLuceneManager.wfHxLuceneDirFile = new File(wfLuceneDir);
-        }
         getLog().info("importing change sets in: " + changeSetDir);
         ImportAllChangeSets importAllChangeSetsTask = new ImportAllChangeSets();
         importAllChangeSetsTask.setValidateChangeSets(validate);

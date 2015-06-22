@@ -12,7 +12,7 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
+import org.apache.lucene.analysis.standard.ClassicAnalyzer;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.CorruptIndexException;
@@ -70,6 +70,18 @@ public abstract class LuceneManager {
             wfHxWriter.commit();
         }
         
+    }
+    
+    public static void killWorkflowIndex() {
+            if (wfHxWriter != null) {
+                try {
+                    wfHxWriter.rollback();
+                    wfHxWriter.close(false);
+                    wfHxWriter = null;
+                } catch (Throwable e) {
+                    AceLog.getAppLog().alertAndLogException(e);
+                }
+            }        
     }
 
     public static void close(LuceneSearchType type) {
@@ -147,17 +159,14 @@ public abstract class LuceneManager {
                 initSemaphore.acquireUninterruptibly();
                 try {
                     if (wfHxLuceneDir == null) {
-                        if (WfHxLuceneManager.runningLuceneDirFile.exists()) {
+                        
                             // For execution in application
                             setLuceneRootDir(WfHxLuceneManager.runningLuceneDirFile, LuceneSearchType.WORKFLOW_HISTORY);
                             wfHxLuceneDir = initDirectory(WfHxLuceneManager.runningLuceneDirFile, true, LuceneSearchType.WORKFLOW_HISTORY);
                             if (DirectoryReader.indexExists(wfHxLuceneDir)) {
                                 wfReadOnlyReader = DirectoryReader.open(wfHxLuceneDir);
                             }
-                         } else {
-                            // For creating index via LoadWfToBdb mojo for which setLuceneRootDir has already been called
-                            wfHxLuceneDir = initDirectory(WfHxLuceneManager.wfHxLuceneDirFile, true, LuceneSearchType.WORKFLOW_HISTORY);
-                        }
+                         
                     }
                 } finally {
                     initSemaphore.release();
@@ -193,7 +202,7 @@ public abstract class LuceneManager {
         }
         luceneDir.clearLock("write.lock");
 
-        IndexWriterConfig config = new IndexWriterConfig(version, new StandardAnalyzer(version));
+        IndexWriterConfig config = new IndexWriterConfig(version, new ClassicAnalyzer(version));
         MergePolicy mergePolicy = new LogByteSizeMergePolicy();
 
         config.setMergePolicy(mergePolicy);
@@ -244,7 +253,7 @@ public abstract class LuceneManager {
         if (type == LuceneSearchType.DESCRIPTION) {
             return DescriptionLuceneManager.descLuceneMutableDirFile.exists();
         } else {
-            return WfHxLuceneManager.wfHxLuceneDirFile.exists();
+            return WfHxLuceneManager.runningLuceneDirFile.exists();
         }
     }
 
@@ -396,8 +405,8 @@ public abstract class LuceneManager {
                 DescriptionLuceneManager.descLuceneMutableDirFile.mkdirs();
                 descLuceneMutableDir = setupWriter(DescriptionLuceneManager.descLuceneMutableDirFile, descLuceneMutableDir, type);
             } else {
-                WfHxLuceneManager.wfHxLuceneDirFile.mkdirs();
-                wfHxLuceneDir = setupWriter(WfHxLuceneManager.wfHxLuceneDirFile, wfHxLuceneDir, type);
+                WfHxLuceneManager.runningLuceneDirFile.mkdirs();
+                wfHxLuceneDir = setupWriter(WfHxLuceneManager.runningLuceneDirFile, wfHxLuceneDir, type);
             }
         }
 
@@ -429,7 +438,7 @@ public abstract class LuceneManager {
             DescriptionLuceneManager.descLuceneReadOnlyDirFile = new File(root, DescriptionLuceneManager.descReadOnlyDirectorySuffix);
             writer = descWriter;
         } else {
-            WfHxLuceneManager.wfHxLuceneDirFile = root;
+            WfHxLuceneManager.runningLuceneDirFile = root;
             writer = wfHxWriter;
         }
 

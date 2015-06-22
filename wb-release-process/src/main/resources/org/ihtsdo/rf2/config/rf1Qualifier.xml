@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<config>
+	<exportFileName>sct1_Qualifiers_</exportFileName>
+	<droolsDrlFile>org/ihtsdo/rf2/drools/QualifierReleaseRules.drl</droolsDrlFile>
+	<column>
+		<name>RELATIONSHIPID</name>
+		<description></description>
+		<delimiter>\t</delimiter>
+	</column>
+	<column>
+		<name>CONCEPTID1</name>
+		<description></description>
+		<delimiter>\t</delimiter>
+	</column>
+	<column>
+		<name>RELATIONSHIPTYPE</name>
+		<description></description>
+		<delimiter>\t</delimiter>
+	</column>
+	<column>
+		<name>CONCEPTID2</name>
+		<description></description>
+		<delimiter>\t</delimiter>
+	</column>
+	<column>
+		<name>CHARACTERISTICTYPE</name>
+		<description></description>
+		<delimiter>\t</delimiter>
+	</column>
+	<column>
+		<name>REFINABILITY</name>
+		<description></description>
+		<delimiter>\t</delimiter>
+	</column>
+	<column>
+		<name>RELATIONSHIPGROUP</name>
+		<description></description>
+		<delimiter>\r\n</delimiter>
+	</column>
+</config>
