@@ -68,6 +68,13 @@ public class SetProcessSubjectFSNFromProp extends AbstractTask {
         try {
             String line = (String) process.readProperty(newSubjectProp);
             String[] parts = line.split("\t");
+            if(parts.length < 4){
+                System.out.println("File should be tab delimited and contain: [UUID of new concept] [FSN of new concept] [parent ID] [parent FSN]");
+                System.out.println("File can optionally contain (at end of line): [SCTID of new concept] [SCTID of new FSN]");
+                System.out.println("The line with incorrect formatting is: " + line);
+                throw new TaskFailedException("Import file is formatted incorrectly.");
+                
+            }
             process.setSubject(parts[1] + " -- " + line);
         } catch (Exception e) {
             throw new TaskFailedException(e);

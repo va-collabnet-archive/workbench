@@ -80,6 +80,7 @@ public class Transformer {
     private Set<String> modulesSet;
 
     private Map<String, Integer> refsetsCount;
+	private Map<String, String> refsetType;
     
     public Transformer() {
         concepts = new HashMap<Long, ConceptDescriptor>();
@@ -101,12 +102,12 @@ public class Transformer {
         langCodes.put("fr", "french");
         langCodes.put("nl", "dutch");
         manifest = new ResourceSetManifest();
-        addManifestData();
 
         refsetsSet = new HashSet<String>();
         langRefsetsSet = new HashSet<String>();
         modulesSet = new HashSet<String>();
         
+        refsetType=new HashMap<String, String>();
         refsetsCount = new HashMap<String, Integer>();
     }
 
@@ -345,7 +346,11 @@ public class Transformer {
                         refsetsCount.put(loopMember.getRefset().toString(), 0);
                     }
                     refsetsCount.put(loopMember.getRefset().toString(), refsetsCount.get(loopMember.getRefset().toString()) + 1);
-
+                    if (loopMember.getRefset()<1000l){
+                    	refsetType.put(loopMember.getRefset().toString(), LightRefsetMembership.RefsetMembershipType.DAILY_BUILD.name());
+                    }else{
+                    	refsetType.put(loopMember.getRefset().toString(), LightRefsetMembership.RefsetMembershipType.SIMPLE_REFSET.name());
+                    }
                     count++;
                     if (count % 100000 == 0) {
                         System.out.print(".");
@@ -399,7 +404,7 @@ public class Transformer {
                         refsetsCount.put(loopMember.getRefset().toString(), 0);
                     }
                     refsetsCount.put(loopMember.getRefset().toString(), refsetsCount.get(loopMember.getRefset().toString()) + 1);
-
+                    refsetType.put(loopMember.getRefset().toString(), LightRefsetMembership.RefsetMembershipType.ASSOCIATION.name());
                     count++;
                     if (count % 100000 == 0) {
                         System.out.print(".");
@@ -453,6 +458,7 @@ public class Transformer {
                         refsetsCount.put(loopMember.getRefset().toString(), 0);
                     }
                     refsetsCount.put(loopMember.getRefset().toString(), refsetsCount.get(loopMember.getRefset().toString()) + 1);
+                    refsetType.put(loopMember.getRefset().toString(), LightRefsetMembership.RefsetMembershipType.ATTRIBUTE_VALUE.name());
 
                     count++;
                     if (count % 100000 == 0) {
@@ -507,6 +513,7 @@ public class Transformer {
                         refsetsCount.put(loopMember.getRefset().toString(), 0);
                     }
                     refsetsCount.put(loopMember.getRefset().toString(), refsetsCount.get(loopMember.getRefset().toString()) + 1);
+                    refsetType.put(loopMember.getRefset().toString(), LightRefsetMembership.RefsetMembershipType.SIMPLEMAP.name());
 
                     count++;
                     if (count % 100000 == 0) {
@@ -576,6 +583,7 @@ public class Transformer {
         	ofile.getParentFile().mkdirs();
         }
 
+        addManifestData();
         FileOutputStream fos = new FileOutputStream(ofile);
         OutputStreamWriter osw = new OutputStreamWriter(fos, "UTF-8");
         BufferedWriter bw = new BufferedWriter(osw);
@@ -888,7 +896,7 @@ public class Transformer {
         OutputStreamWriter osw = new OutputStreamWriter(fos, "UTF-8");
         BufferedWriter bw = new BufferedWriter(osw);
         Gson gson = new Gson();
-
+        String type="";
         for (String moduleId : modulesSet) {
             manifest.getModules().add(concepts.get(Long.parseLong( moduleId)));
         }
@@ -896,7 +904,10 @@ public class Transformer {
             manifest.getLanguageRefsets().add(concepts.get(Long.parseLong(langRefsetId)));
         }
         for (String refsetId : refsetsSet) {
-            manifest.getRefsets().add(new RefsetDescriptor(concepts.get(Long.parseLong(refsetId)), refsetsCount.get(refsetId)));
+        	type=refsetType.get(refsetId);
+        	RefsetDescriptor refsetDescriptor=new RefsetDescriptor(concepts.get(Long.parseLong(refsetId)), refsetsCount.get(refsetId));
+        	refsetDescriptor.setType(type);
+            manifest.getRefsets().add(refsetDescriptor);
         }
         bw.append(gson.toJson(manifest).toString());
 
