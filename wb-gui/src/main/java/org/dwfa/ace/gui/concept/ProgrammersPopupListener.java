@@ -142,7 +142,7 @@ public class ProgrammersPopupListener extends MouseAdapter implements ActionList
         TEST_ISA_CACHE("Test isa cache"),
         LAUNCH_WF_CHANGES_INIT("Launch workflow initiator on changes..."),
         LAUNCH_BP("Launch Business Process..."),
-        USCRS_EXPORT("USCRS Export");
+        USCRS_EXPORT("USCRS Export"),
         AUTHOR_REPORT("All changes by current user to text");
         //J+
         String menuText;
