@@ -41,6 +41,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
@@ -405,7 +406,7 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
     private SimpleDateFormat arfSimpleDateFormatDash;
     private SimpleDateFormat arfSimpleDateFormatDot;
     private SimpleDateFormat arfSimpleDateFormat;
-    private HashMap<Long, ArrayList<Sct2_IdCompact>> additionalIds;
+    private HashMap<Long, HashSet<Sct2_IdCompact>> additionalIds;
 
     private class ARFFile {
 
@@ -905,33 +906,40 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
         }
         additionalIds = new HashMap<>();
         for (int i = 0; i < arfInputDirs.length; i++) {
-            if (arfInputDirs[i].endsWith("additional.txt")) {
-                ObjectInputStream ois = null;
                 try {
-                    ois = new ObjectInputStream(new BufferedInputStream(new FileInputStream(arfInputDirs[i])));
-                    Object obj;
-                    while ((obj = ois.readObject()) != null) {
-                        if (obj instanceof Sct2_IdCompact) {
-                            Sct2_IdCompact sct = (Sct2_IdCompact) obj;
-                            long id = sct.sctIdL;
-                            if(additionalIds.containsKey(id)){
-                                additionalIds.get(id).add(sct);
-                            }else{
-                                ArrayList<Sct2_IdCompact> scts = new ArrayList<>();
-                                scts.add(sct);
-                                additionalIds.put(id, scts);
-                            }
+                    File additionalIdsFile = new File(targetDir + File.separatorChar + "input-files"+ File.separatorChar + File.separatorChar + arfInputDirs[i] + File.separatorChar + "additional.txt");
+                    BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(additionalIdsFile),"UTF-8"));
+                    int sctId = 0;
+                    int lsb = 1;
+                    int msb = 2;
+                    int time = 3;
+                    String line = br.readLine();
+                    while (line != null) {
+                        String[] parts = line.split("\t");
+                        if(additionalIds.containsKey(Long.parseLong(parts[sctId]))){
+                            additionalIds.get(Long.parseLong(parts[sctId])).add(new Sct2_IdCompact(
+                                Long.parseLong(parts[msb]), 
+                                Long.parseLong(parts[lsb]), 
+                                Long.parseLong(parts[sctId]), 
+                                Long.parseLong(parts[time]))
+                            );
+                        }else{
+                            HashSet<Sct2_IdCompact> ids = new HashSet<>();
+                            ids.add(new Sct2_IdCompact(
+                                Long.parseLong(parts[msb]), 
+                                Long.parseLong(parts[lsb]), 
+                                Long.parseLong(parts[sctId]), 
+                                Long.parseLong(parts[time])));
+                            additionalIds.put(Long.parseLong(parts[sctId]),ids);
                         }
+                        line = br.readLine();
                     }
-                    ois.close();
+                    br.close();
                 } catch (FileNotFoundException ex) {
                     Logger.getLogger(Sct1ArfToEConceptMojo.class.getName()).log(Level.SEVERE, null, ex);
                 } catch (IOException ex) {
                     Logger.getLogger(Sct1ArfToEConceptMojo.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (ClassNotFoundException ex) {
-                    Logger.getLogger(Sct1ArfToEConceptMojo.class.getName()).log(Level.SEVERE, null, ex);
                 }
-            }
             arfInputDirs[i] = arfInputDirs[i].replace('/', File.separatorChar);
             getLog().info("POM ARF Input Directory (" + i + ") = " + arfInputDirs[i]);
             if (!arfInputDirs[i].startsWith(FILE_SEPARATOR)) {

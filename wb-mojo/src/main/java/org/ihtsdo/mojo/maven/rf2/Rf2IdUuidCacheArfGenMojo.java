@@ -18,8 +18,10 @@ package org.ihtsdo.mojo.maven.rf2;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Serializable;
+import java.text.ParseException;
 import java.util.List;
 import java.util.UUID;
 import java.util.logging.Level;
@@ -109,67 +111,67 @@ public class Rf2IdUuidCacheArfGenMojo extends AbstractMojo implements Serializab
     @Override
     public void execute()
             throws MojoExecutionException, MojoFailureException {
-        List<Rf2File> filesIn;
-        getLog().info("::: BEGIN Rf2UuidXmapGenMojo");
-        try {
-            // SHOW DIRECTORIES
-            String wDir = targetDirectory.getAbsolutePath();
-            getLog().info("  POM       Target Directory:           " 
-                    + targetDirectory.getAbsolutePath());
-            getLog().info("  POM Input Target/Sub Directory:       " 
-                    + inputSubDir);
-            getLog().info("  POM Input Target/Sub/SCTID Directory: " 
-                    + inputSctDir);
-            getLog().info("  POM ID SCT/UUID Cache Directory:      " 
-                    + idCacheDir);
-            getLog().info("  POM Output Target/Sub Directory:      " 
-                    + outputSubDir);
-            getLog().info("  POM Output Target/Sub/ARF Directory:  " 
-                    + outputArfDir);
-            
-            // Setup directory paths
-            getLog().info("::: Input Sct Path: " + wDir + FILE_SEPARATOR 
-                    + inputSubDir + FILE_SEPARATOR + inputSctDir);
-            String cachePath = wDir + FILE_SEPARATOR + idCacheDir + FILE_SEPARATOR;
-            String idCacheFName = cachePath + "idSctUuidCache.ser";
-            if ((new File(cachePath)).mkdirs()) {
-                getLog().info("ID Cache directory created ... ");
-            }
-            getLog().info("::: ID Cache : " + idCacheFName);
-            String arfOutPath = wDir + FILE_SEPARATOR + outputSubDir 
-                    + FILE_SEPARATOR + outputArfDir + FILE_SEPARATOR;
-            if ((new File(arfOutPath)).mkdirs()) {
-                getLog().info("::: Output Arf directory created ... ");
-            }
-            getLog().info("::: Output Arf Path: " + arfOutPath);
+            try {
+                List<Rf2File> filesIn;
+                getLog().info("::: BEGIN Rf2UuidXmapGenMojo");
+                // SHOW DIRECTORIES
+                String wDir = targetDirectory.getAbsolutePath();
+                getLog().info("  POM       Target Directory:           "
+                        + targetDirectory.getAbsolutePath());
+                getLog().info("  POM Input Target/Sub Directory:       "
+                        + inputSubDir);
+                getLog().info("  POM Input Target/Sub/SCTID Directory: "
+                        + inputSctDir);
+                getLog().info("  POM ID SCT/UUID Cache Directory:      "
+                        + idCacheDir);
+                getLog().info("  POM Output Target/Sub Directory:      "
+                        + outputSubDir);
+                getLog().info("  POM Output Target/Sub/ARF Directory:  "
+                        + outputArfDir);
+                
+                // Setup directory paths
+                getLog().info("::: Input Sct Path: " + wDir + FILE_SEPARATOR
+                        + inputSubDir + FILE_SEPARATOR + inputSctDir);
+                String cachePath = wDir + FILE_SEPARATOR + idCacheDir + FILE_SEPARATOR;
+                String idCacheFName = cachePath + "idSctUuidCache.ser";
+                if ((new File(cachePath)).mkdirs()) {
+                    getLog().info("ID Cache directory created ... ");
+                }
+                getLog().info("::: ID Cache : " + idCacheFName);
+                String arfOutPath = wDir + FILE_SEPARATOR + outputSubDir
+                        + FILE_SEPARATOR + outputArfDir + FILE_SEPARATOR;
+                if ((new File(arfOutPath)).mkdirs()) {
+                    getLog().info("::: Output Arf directory created ... ");
+                }
+                getLog().info("::: Output Arf Path: " + arfOutPath);
 
-            // Parse IHTSDO Terminology Identifiers to Sct_CompactId cache file.
-            filesIn = Rf2File.getFiles(wDir, inputSubDir, inputSctDir,
-                    "_Identifier", ".txt");
-            Sct2_IdRecord.parseToIdPreCacheFile(filesIn, idCacheFName);
-            // Setup id array cache object
-            // idCacheDir + FILE_SEPARATOR + "idObjectCache.jbin"
-            long startTime = System.currentTimeMillis();
-            Sct2_IdLookUp idLookup = new Sct2_IdLookUp(idCacheFName);
-            System.out.println((System.currentTimeMillis() - startTime) + " mS");
-
-            // Create an ARF file of primordial UUIDs
-            String idAssignedArfFName = arfOutPath + "ids_assigned.txt";
-            try (BufferedWriter bwIdArf = new BufferedWriter(
-                            new OutputStreamWriter(
-                            new FileOutputStream(
-                            idAssignedArfFName), "UTF-8"))) {
-                getLog().info("::: Assigned SCTID/UUID ARF output: "
-                        + idAssignedArfFName);
-                Sct2_IdRecord.parseIdsToArf(filesIn, bwIdArf, idLookup,
-                        uuidPath, uuidAuthor);
-                bwIdArf.flush();
-                bwIdArf.close();
-            }
-
-        } catch (Exception ex) {
+                // Parse IHTSDO Terminology Identifiers to Sct_CompactId cache file.
+                filesIn = Rf2File.getFiles(wDir, inputSubDir, inputSctDir,
+                        "_Identifier", ".txt");
+                Sct2_IdRecord.parseToIdPreCacheFile(filesIn, idCacheFName);
+                // Setup id array cache object
+                // idCacheDir + FILE_SEPARATOR + "idObjectCache.jbin"
+                long startTime = System.currentTimeMillis();
+                Sct2_IdLookUp idLookup = new Sct2_IdLookUp(idCacheFName);
+                System.out.println((System.currentTimeMillis() - startTime) + " mS");
+                
+                // Create an ARF file of primordial UUIDs
+                String idAssignedArfFName = arfOutPath + "ids_assigned.txt";
+                try (BufferedWriter bwIdArf = new BufferedWriter(
+                        new OutputStreamWriter(
+                                new FileOutputStream(
+                                        idAssignedArfFName), "UTF-8"))) {
+                    getLog().info("::: Assigned SCTID/UUID ARF output: "
+                            + idAssignedArfFName);
+                    Sct2_IdRecord.parseIdsToArf(filesIn, bwIdArf, idLookup,
+                            uuidPath, uuidAuthor);
+                    bwIdArf.flush();
+                    bwIdArf.close();
+                }
+                
+            }   catch (ParseException | IOException ex) {
             Logger.getLogger(Rf2IdUuidCacheArfGenMojo.class.getName()).log(Level.SEVERE, null, ex);
-        } 
-
+        }
+            
     }
 }

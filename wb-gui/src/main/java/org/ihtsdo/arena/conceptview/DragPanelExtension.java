@@ -188,7 +188,8 @@ public class DragPanelExtension extends DragPanelComponentVersion<RefexVersionBI
         gbc.gridx++;
         textPane.getDocument().addDocumentListener(new UpdateFloatDocumentListener(textPane, (RefexAnalogBI) getRefexV()));
         classFound = true;
-      }else if (RefexNidNidNidVersionBI.class.isAssignableFrom(getRefexV().getClass())) {
+      }
+      if (RefexNidNidNidVersionBI.class.isAssignableFrom(getRefexV().getClass())) {
          int                cnid = ((RefexNidNidNidVersionBI) getRefexV()).getNid3();
          TermComponentLabel ext  = getLabel(cnid, canDrop, getSettings().getC3Refex());
 
@@ -198,7 +199,8 @@ public class DragPanelExtension extends DragPanelComponentVersion<RefexVersionBI
          add(ext, gbc);
          gbc.gridx++;
          classFound = true;
-      }else if (RefexNidNidVersionBI.class.isAssignableFrom(getRefexV().getClass())) {
+      }
+      if (RefexNidNidVersionBI.class.isAssignableFrom(getRefexV().getClass())) {
          int                cnid = ((RefexNidNidVersionBI) getRefexV()).getNid2();
          TermComponentLabel ext  = getLabel(cnid, canDrop, getSettings().getC2Refex());
 
@@ -208,7 +210,8 @@ public class DragPanelExtension extends DragPanelComponentVersion<RefexVersionBI
          add(ext, gbc);
          gbc.gridx++;
          classFound = true;
-      }else if (RefexNidVersionBI.class.isAssignableFrom(getRefexV().getClass())) {
+      }
+      if (RefexNidVersionBI.class.isAssignableFrom(getRefexV().getClass())) {
           RefexNidVersionBI refex = (RefexNidVersionBI) getRefexV();
          int                cnid = refex.getNid1();
          TermComponentLabel ext  = getLabel(cnid, canDrop, getSettings().getC1Refex());
@@ -241,7 +244,8 @@ public class DragPanelExtension extends DragPanelComponentVersion<RefexVersionBI
                   //nothing to do 
               }
       });
-      }else if (RefexStringVersionBI.class.isAssignableFrom(getRefexV().getClass())) {
+      }
+      if (RefexStringVersionBI.class.isAssignableFrom(getRefexV().getClass())) {
          String                text     = ((RefexStringVersionBI) getRefexV()).getString1();
          FixedWidthJEditorPane textPane = new FixedWidthJEditorPane();
 
@@ -253,7 +257,8 @@ public class DragPanelExtension extends DragPanelComponentVersion<RefexVersionBI
          add(textPane, gbc);
          gbc.gridx++;
          classFound = true;
-      }else if (RefexIntVersionBI.class.isAssignableFrom(getRefexV().getClass())) {
+      }
+      if (RefexIntVersionBI.class.isAssignableFrom(getRefexV().getClass())) {
          int    value      = ((RefexIntVersionBI) getRefexV()).getInt1();
          JLabel valueLabel = new JLabel(Integer.toString(value));
 
@@ -264,7 +269,8 @@ public class DragPanelExtension extends DragPanelComponentVersion<RefexVersionBI
          add(valueLabel, gbc);
          gbc.gridx++;
          classFound = true;
-      }else if (RefexBooleanVersionBI.class.isAssignableFrom(getRefexV().getClass())) {
+      }
+      if (RefexBooleanVersionBI.class.isAssignableFrom(getRefexV().getClass())) {
          Boolean value      = ((RefexBooleanVersionBI) getRefexV()).getBoolean1();
          JLabel  valueLabel = new JLabel(value.toString());
 
