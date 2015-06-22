@@ -418,66 +418,71 @@ public class BdbCommitManager {
         boolean performCommit = true;
         WriteLock datacheckWriteLock = dataCheckLock.writeLock();
         I_RepresentIdSet allUncommitted = new IdentifierSet();
-        try {
-            
-            synchronized (uncommittedCNids) {
-                synchronized (uncommittedCNidsNoChecks) {
-                    synchronized (uncommittedWfMemberIds) {
-                        allUncommitted.or(uncommittedCNids);
-                        allUncommitted.or(uncommittedCNidsNoChecks);
-                        for (I_ExtendByRef ref : uncommittedWfMemberIds) {
-                            allUncommitted.setMember(ref.getMemberId());
-                        }
-                        try {
-                            GlobalPropertyChange.fireVetoableChange(TerminologyStoreDI.CONCEPT_EVENT.PRE_COMMIT, null, allUncommitted);
-                        } catch (PropertyVetoException ex) {
-                            return false;
-                        }
+        synchronized (uncommittedCNids) {
+            synchronized (uncommittedCNidsNoChecks) {
+                synchronized (uncommittedWfMemberIds) {
+                    allUncommitted.or(uncommittedCNids);
+                    allUncommitted.or(uncommittedCNidsNoChecks);
+                    for (I_ExtendByRef ref : uncommittedWfMemberIds) {
+                        allUncommitted.setMember(ref.getMemberId());
+                    }
+                    try {
+                        GlobalPropertyChange.fireVetoableChange(TerminologyStoreDI.CONCEPT_EVENT.PRE_COMMIT, null, allUncommitted);
+                    } catch (PropertyVetoException ex) {
+                        return false;
+                    }
 
-                        int errorCount = 0;
-                        int warningCount = 0;
-                        
-                        if (performCreationTests) {
+                    int errorCount = 0;
+                    int warningCount = 0;
+
+                    if (performCreationTests) {
+                        try {
                             datacheckWriteLock.lock();
                             NidBitSetItrBI uncommittedCNidItr = uncommittedCNids.iterator();
 
                             DataCheckRunner.cancelAll();
                             dataCheckMap.clear();
                             while (uncommittedCNidItr.next()) {
-                                Set<AlertToDataConstraintFailure> warningsAndErrors =
-                                        new HashSet<AlertToDataConstraintFailure>();
+                                Set<AlertToDataConstraintFailure> warningsAndErrors
+                                        = new HashSet<AlertToDataConstraintFailure>();
                                 Concept concept = Concept.get(uncommittedCNidItr.nid());
-                                    if (!warningsAndErrors.isEmpty()) {
-                                        dataCheckMap.put(concept, warningsAndErrors);
-                                    } else {
-                                        if (dataCheckMap.containsKey(concept)) {
-                                            dataCheckMap.remove(concept);
-                                        }
+                                if (!warningsAndErrors.isEmpty()) {
+                                    dataCheckMap.put(concept, warningsAndErrors);
+                                } else {
+                                    if (dataCheckMap.containsKey(concept)) {
+                                        dataCheckMap.remove(concept);
                                     }
-                                    DataCheckRunner checkRunner = DataCheckRunner.runDataChecks(concept, commitTests);
-                                    checkRunner.latch.await();
+                                }
+                                DataCheckRunner checkRunner = DataCheckRunner.runDataChecks(concept, commitTests);
+                                checkRunner.latch.await();
 
-                                    warningsAndErrors.addAll(checkRunner.get());
-                                    for (AlertToDataConstraintFailure alert : warningsAndErrors) {
-                                        if (alert.getAlertType().equals(ALERT_TYPE.ERROR)) {
-                                            errorCount++;
-                                        } else if (alert.getAlertType().equals(ALERT_TYPE.OMG)) {
-                                            errorCount++;
-                                        } else if (alert.getAlertType().equals(ALERT_TYPE.WARNING)) {
-                                            warningCount++;
-                                        }
+                                warningsAndErrors.addAll(checkRunner.get());
+                                for (AlertToDataConstraintFailure alert : warningsAndErrors) {
+                                    if (alert.getAlertType().equals(ALERT_TYPE.ERROR)) {
+                                        errorCount++;
+                                    } else if (alert.getAlertType().equals(ALERT_TYPE.OMG)) {
+                                        errorCount++;
+                                    } else if (alert.getAlertType().equals(ALERT_TYPE.WARNING)) {
+                                        warningCount++;
                                     }
-                                    
-                                    if (checkRunner.get().isEmpty() || errorCount == 0) {
-                                        ConceptTemplates.dataChecks.put(uncommittedCNidItr.nid(), false);
-                                        Ts.get().touchComponentAlert(uncommittedCNidItr.nid());
-                                    } else {
-                                        ConceptTemplates.dataChecks.put(uncommittedCNidItr.nid(), true);
-                                        Ts.get().touchComponentAlert(uncommittedCNidItr.nid());
-                                    }
-                                    
+                                }
+
+                                if (checkRunner.get().isEmpty() || errorCount == 0) {
+                                    ConceptTemplates.dataChecks.put(uncommittedCNidItr.nid(), false);
+                                    Ts.get().touchComponentAlert(uncommittedCNidItr.nid());
+                                } else {
+                                    ConceptTemplates.dataChecks.put(uncommittedCNidItr.nid(), true);
+                                    Ts.get().touchComponentAlert(uncommittedCNidItr.nid());
+                                }
+
                             }
+                        } catch (Exception e1) {
+                            AceLog.getAppLog().alertAndLogException(e1);
+                        } finally {
+                            datacheckWriteLock.unlock();
                         }
+                    }
+                    try {
                         if (errorCount + warningCount != 0) {
                             if (errorCount > 0) {
                                 performCommit = false;
@@ -495,7 +500,7 @@ public class BdbCommitManager {
                                     int selection = JOptionPane.showConfirmDialog(new JFrame(),
                                             "Do you want to continue with commit?", "Warnings Detected",
                                             JOptionPane.YES_NO_OPTION);
-                                    if(selection == JOptionPane.YES_OPTION){
+                                    if (selection == JOptionPane.YES_OPTION) {
                                     }
                                     performCommit = selection == JOptionPane.YES_OPTION;
                                 } else {
@@ -554,10 +559,10 @@ public class BdbCommitManager {
                                         uncommittedCNidsNoChecks.or(uncommittedCNids);
 
                                         if (uncommittedCNidsNoChecks.cardinality() > 0) {
-                                            ChangeSetWriterHandler handler =
-                                                    new ChangeSetWriterHandler(uncommittedCNidsNoChecks, commitTime,
-                                                    sapNidsFromCommit, changeSetPolicy.convert(),
-                                                    changeSetWriterThreading, Svn.rwl, writeAdjudication);
+                                            ChangeSetWriterHandler handler
+                                                    = new ChangeSetWriterHandler(uncommittedCNidsNoChecks, commitTime,
+                                                            sapNidsFromCommit, changeSetPolicy.convert(),
+                                                            changeSetWriterThreading, Svn.rwl, writeAdjudication);
 
                                             changeSetWriterService.execute(handler);
                                             passedRelease = true;
@@ -584,8 +589,8 @@ public class BdbCommitManager {
                             luceneWriterService.execute(new DescLuceneWriter(descNidsToCommit));
 
                             if (uncommittedWfMemberIds.size() > 0) {
-                                Set<I_ExtendByRef> wfMembersToCommit =
-                                        uncommittedWfMemberIds.getClass().newInstance();
+                                Set<I_ExtendByRef> wfMembersToCommit
+                                        = uncommittedWfMemberIds.getClass().newInstance();
 
                                 wfMembersToCommit.addAll(uncommittedWfMemberIds);
 
@@ -601,18 +606,21 @@ public class BdbCommitManager {
                             dataCheckMap.clear();
                         }
                         GlobalPropertyChange.firePropertyChange(TerminologyStoreDI.CONCEPT_EVENT.POST_COMMIT, null, allUncommitted);
+                    } catch (Exception e1) {
+                        AceLog.getAppLog().alertAndLogException(e1);
                     }
                 }
             }
-
+        }
+        try {
             if (performCommit) {
                 Bdb.sync();
                 BdbCommitSequence.nextSequence();
             }
+
         } catch (Exception e1) {
             AceLog.getAppLog().alertAndLogException(e1);
-        } finally {
-            datacheckWriteLock.unlock();
+        }finally {
             if (!passedRelease) {
                 Svn.rwl.release();
             }
@@ -623,7 +631,7 @@ public class BdbCommitManager {
         if (performCommit) {
             GlobalPropertyChange.firePropertyChange(TerminologyStoreDI.CONCEPT_EVENT.POST_SUCESSFUL_COMMIT, null, allUncommitted);
             return true;
-        }else{
+        } else {
             updateAlerts();
         }
 

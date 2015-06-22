@@ -10,8 +10,11 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyVetoException;
 import java.beans.VetoableChangeListener;
 import java.io.IOException;
+import java.text.NumberFormat;
+import java.util.Locale;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.swing.Timer;
 import javax.swing.event.DocumentEvent;
@@ -124,33 +127,46 @@ public class UpdateFloatDocumentListener implements DocumentListener, ActionList
         }
     }
 
-    private void doAction() throws PropertyVetoException, IOException {
+    private boolean doAction() throws PropertyVetoException, IOException {
         if (update) {
             try {
-                refex.setFloat1(Float.parseFloat(text));
+                float value = Float.parseFloat(text);
+                refex.setFloat1(value);
+                if (!Ts.get().getConcept(refex.getRefexNid()).isAnnotationStyleRefex()) {
+                    Ts.get().addUncommitted(Ts.get().getConcept(refex.getRefexNid()));
+                }
+                ComponentChronicleBI<?> referencedComponent
+                        = Ts.get().getComponent(refex.getReferencedComponentNid());
+                Ts.get().addUncommitted(Ts.get().getConcept(referencedComponent.getConceptNid()));
+                if(value <= 0){
+                    return false;
+                }
             } catch (NumberFormatException e) {
+                update = false;
                 refex.setFloat1(-1);
+                if (!Ts.get().getConcept(refex.getRefexNid()).isAnnotationStyleRefex()) {
+                    Ts.get().addUncommitted(Ts.get().getConcept(refex.getRefexNid()));
+                }
+                ComponentChronicleBI<?> referencedComponent
+                        = Ts.get().getComponent(refex.getReferencedComponentNid());
+                Ts.get().addUncommitted(Ts.get().getConcept(referencedComponent.getConceptNid()));
+                return false;
             }
-
-            if (!Ts.get().getConcept(refex.getRefexNid()).isAnnotationStyleRefex()) {
-                Ts.get().addUncommitted(Ts.get().getConcept(refex.getRefexNid()));
-            }
-            ComponentChronicleBI<?> referencedComponent = 
-                    Ts.get().getComponent(refex.getReferencedComponentNid());
-            Ts.get().addUncommitted(Ts.get().getConcept(referencedComponent.getConceptNid()));
         }
         update = false;
+        return true;
     }
 
     @Override
     public void vetoableChange(PropertyChangeEvent pce) throws PropertyVetoException {
         try {
             if (text != null) {
-                doAction();
+                boolean valid = doAction();
+                if(!valid){
+                    throw new PropertyVetoException("Invalid refset value", pce);
+                }
             }
         } catch (IOException ex) {
-            AceLog.getAppLog().alertAndLogException(ex);
-        } catch (PropertyVetoException ex) {
             AceLog.getAppLog().alertAndLogException(ex);
         }
     }
