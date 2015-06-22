@@ -4,7 +4,7 @@
 	<droolsDrlFile>org/ihtsdo/rf2/drools/NONEReleaseRules.drl</droolsDrlFile>
 	
 	<column>
-		<name>conceptUuid</name>
+		<name>conceptId</name>
 		<description></description>
 		<delimiter>\t</delimiter>
 	</column>

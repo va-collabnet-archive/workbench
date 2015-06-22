@@ -84,6 +84,40 @@ public class RefsetSpecFactory {
         return query;
 
     }
+    
+    public static RefsetSpecQuery createQueryTwoPaths(ViewCoordinate releasePathVc, ViewCoordinate editPathVc,
+            ConceptChronicleBI refsetSpec, ConceptChronicleBI refset, ComputeType refsetType) throws Exception {
+        vc = releasePathVc;
+        // create tree object that corresponds to the database's refset spec
+        
+        Collection<? extends RefexChronicleBI> extensions =
+                refsetSpec.getRefsetMembersActive(editPathVc);
+        HashMap<Integer, DefaultMutableTreeNode> extensionMap = new HashMap<Integer, DefaultMutableTreeNode>();
+        HashSet<Integer> fetchedComponents = new HashSet<Integer>();
+        fetchedComponents.add(refsetSpec.getConceptNid());
+
+        addExtensionsToMap(extensions, extensionMap, fetchedComponents,
+                refsetSpec.getConceptNid());
+
+        DefaultMutableTreeNode root = new DefaultMutableTreeNode(refsetSpec);
+        for (DefaultMutableTreeNode extNode : extensionMap.values()) {
+            RefexVersionBI r = (RefexVersionBI) extNode.getUserObject();
+            if (r.getReferencedComponentNid() == refsetSpec.getConceptNid()) {
+                root.add(extNode);
+            } else {
+                extensionMap.get(r.getReferencedComponentNid()).add(extNode);
+            }
+        }
+
+        // create refset spec query
+        ConceptChronicleBI orConcept = ts.getConcept(RefsetAuxiliary.Concept.REFSET_OR_GROUPING.getUids());
+
+        RefsetSpecQuery query = new RefsetSpecQuery(orConcept, true, releasePathVc);
+        query = processNode(root, query, refsetType, releasePathVc, refsetSpec.getNid());
+
+        return query;
+
+    }
 
     public static List<String> removeDangles(RefsetSpecQuery query) {
         List<String> warningList = new ArrayList<String>();

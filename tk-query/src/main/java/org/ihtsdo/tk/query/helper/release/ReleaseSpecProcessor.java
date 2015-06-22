@@ -23,7 +23,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.UUID;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ContradictionException;
@@ -35,9 +34,7 @@ import org.ihtsdo.tk.api.cs.ChangeSetPolicy;
 import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
 import org.ihtsdo.tk.binding.snomed.TermAux;
 import org.ihtsdo.tk.dto.concept.TkConcept;
-import org.ihtsdo.tk.dto.concept.component.attribute.TkConceptAttributes;
 import org.ihtsdo.tk.dto.concept.component.refex.TkRefexAbstractMember;
-import org.ihtsdo.tk.dto.concept.component.refex.type_member.TkRefexMember;
 import org.ihtsdo.tk.dto.concept.component.relationship.TkRelationship;
 import org.ihtsdo.tk.query.ComputeFromSpec;
 import org.ihtsdo.tk.query.RefsetComputer;
@@ -52,13 +49,15 @@ import org.ihtsdo.tk.spec.ValidationException;
 public class ReleaseSpecProcessor {
     private EditCoordinate editCoordinate;
     private ViewCoordinate viewCoordinate;
+    private ViewCoordinate editPathViewCoordinate;
     private Set<Integer> refsetParentNids = new HashSet<>();
     private ChangeSetPolicy csPolicy;
     
-    public ReleaseSpecProcessor(EditCoordinate editCoordinate, ViewCoordinate viewCoordinate,
+    public ReleaseSpecProcessor(EditCoordinate editCoordinate, ViewCoordinate viewCoordinate,ViewCoordinate editPathVc,
             ChangeSetPolicy csPolicy, int... refsetParentNid) throws IOException, ValidationException, ContradictionException {
         this.editCoordinate = editCoordinate;
         this.viewCoordinate = viewCoordinate;
+        this.editPathViewCoordinate = editPathVc;
         this.csPolicy = csPolicy;
         for(int i = 0; i < refsetParentNid.length; i++){
             Set<Integer> children = Ts.get().getChildren(refsetParentNid[i], viewCoordinate);
@@ -79,7 +78,8 @@ public class ReleaseSpecProcessor {
                     } else if (refsetSpecHelper.isRelationshipComputeType()) {
                         //throw something
                     }
-                    RefsetSpecQuery query = RefsetSpecFactory.createQuery(viewCoordinate,
+                    RefsetSpecQuery query = RefsetSpecFactory.createQueryTwoPaths(viewCoordinate,
+                            editPathViewCoordinate,
                             refsetSpec,
                             refsetConcept,
                             computeType);
@@ -114,6 +114,7 @@ public class ReleaseSpecProcessor {
                     TkConcept eC = new TkConcept(c);
                     for(TkRefexAbstractMember r: eC.getRefsetMembers()){
                         r.setPathUuid(TermAux.WB_AUX_PATH.getLenient().getPrimUuid());
+                        r.setAuthorUuid(TermAux.USER.getLenient().getPrimUuid());
                     }
                     eC.writeExternal(eConceptDOS);
                 }
