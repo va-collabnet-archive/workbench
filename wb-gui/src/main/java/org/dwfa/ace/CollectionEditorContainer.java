@@ -108,9 +108,7 @@ public class CollectionEditorContainer extends JPanel {
                         I_GetConceptData c = (I_GetConceptData) model.getElementAt(i);
                         ViewCoordinate vc = ace.getAceFrameConfig().getViewCoordinate();
                         ConceptVersionBI conceptVersion = Ts.get().getConceptVersion(vc, c.getPrimUuid());
-                        for(DescriptionVersionBI desc : conceptVersion.getDescriptionsActive()){
-                            writer.write(desc);
-                        }
+                        writer.write(conceptVersion);
                     }
 
                     writer.close();
