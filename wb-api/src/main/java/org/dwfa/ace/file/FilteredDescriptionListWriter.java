@@ -30,14 +30,14 @@ import org.ihtsdo.tk.api.id.IdBI;
 /**
  * Writes out a "Concept List" which is a tab delimited list of concepts
  * containing
- * the concepts identifier and all descriptions. The identifier will be the
+ * the concepts identifier and all non-English descriptions. The identifier will be the
  * concept's
  * SNOMED CT ID if it has one, or its UUID if it does not.
  * 
  * @author aimeefurber
  * 
  */
-public class DescriptionListWriter extends GenericFileWriter<ConceptVersionBI> {
+public class FilteredDescriptionListWriter extends GenericFileWriter<ConceptVersionBI> {
 
     private Integer snomedIntId;
 
@@ -73,26 +73,18 @@ public class DescriptionListWriter extends GenericFileWriter<ConceptVersionBI> {
             
             StringBuilder sb = new StringBuilder();
             sb.append(conceptId + "\t");
-            sb.append(fsn.getText() + "\t");
-            for (DescriptionVersionBI p : preferred) {
-                if (p.getLang().equals("en")) {
-                    sb.append(p.getText() + "\t");
-                } else {
-                    preferredNonEN.add(p);
-                }
+            if(!fsn.getLang().equals("en")){
+                sb.append(fsn.getText() + "\t");
             }
-            for (DescriptionVersionBI p : preferredNonEN) {
-                sb.append(p.getText() + "\t");
+            for (DescriptionVersionBI p : preferred) {
+                if(!p.getLang().equals("en")) {
+                    sb.append(p.getText() + "\t");
+                }
             }
             for (DescriptionVersionBI s : synonyms) {
-                if (s.getLang().equals("en")) {
+                if (!s.getLang().equals("en")) {
                     sb.append(s.getText() + "\t");
-                } else {
-                    synonymsNonEN.add(s);
                 }
-            }
-            for (DescriptionVersionBI s : synonymsNonEN) {
-                sb.append(s.getText() + "\t");
             }
             return sb.toString();
         } catch (ContradictionException ex) {

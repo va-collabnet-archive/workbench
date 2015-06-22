@@ -33,6 +33,7 @@ import org.dwfa.ace.api.I_ModelTerminologyList;
 import org.dwfa.ace.file.ConceptListReader;
 import org.dwfa.ace.file.ConceptListWriter;
 import org.dwfa.ace.file.DescriptionListWriter;
+import org.dwfa.ace.file.FilteredDescriptionListWriter;
 import org.dwfa.ace.gui.concept.ConceptPanel;
 import org.dwfa.ace.list.TerminologyList;
 import org.dwfa.ace.list.TerminologyListModel;
@@ -109,6 +110,66 @@ public class CollectionEditorContainer extends JPanel {
                         ViewCoordinate vc = ace.getAceFrameConfig().getViewCoordinate();
                         ConceptVersionBI conceptVersion = Ts.get().getConceptVersion(vc, c.getPrimUuid());
                         writer.write(conceptVersion);
+                    }
+
+                    writer.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+
+                    final JDialog alert = new JDialog();
+                    JPanel panel = new JPanel(new GridLayout(2, 1));
+                    panel.add(new JLabel("Failed to write to file " + dialog.getFile() + " due to "
+                            + e.getLocalizedMessage()));
+                    JButton button = new JButton("OK");
+                    button.addActionListener(new ActionListener() {
+
+                        @Override
+                        public void actionPerformed(ActionEvent arg0) {
+                            alert.dispose();
+                        }
+                    });
+
+                    panel.add(button);
+                    alert.add(panel);
+                }
+            }
+        }
+    }
+    
+    public class ExportFilteredDescriptionsInListButtonListener implements ActionListener {
+
+        private static final String EXTENSION = ".txt";
+
+        @Override
+        public void actionPerformed(ActionEvent arg0) {
+            FileDialog dialog = new FileDialog(new Frame(), "Enter file name: ");
+            dialog.setMode(FileDialog.SAVE);
+            dialog.setDirectory(System.getProperty("user.dir"));
+            dialog.setVisible(true);
+            if (dialog.getFile() != null) {
+                if (dialog.getFile().toLowerCase().endsWith(EXTENSION) == false) {
+                    dialog.setFile(dialog.getFile() + EXTENSION);
+                }
+
+                FilteredDescriptionListWriter writer = new FilteredDescriptionListWriter();
+                try {
+                    writer.open(new File(dialog.getDirectory(), dialog.getFile()), false);
+
+                    ListModel model = list.getModel();
+
+                    for (int i = 0; i < model.getSize(); i++) {
+                        I_GetConceptData c = (I_GetConceptData) model.getElementAt(i);
+                        ViewCoordinate vc = ace.getAceFrameConfig().getViewCoordinate();
+                        ConceptVersionBI conceptVersion = Ts.get().getConceptVersion(vc, c.getPrimUuid());
+                        boolean foundNonEN = false;
+                        for(DescriptionVersionBI desc : conceptVersion.getDescriptionsActive()){
+                            if(!desc.getLang().equals("en")){
+                                foundNonEN = true;
+                            }
+                        }
+                        if(foundNonEN){
+                            writer.write(conceptVersion);
+                        }
                     }
 
                     writer.close();
@@ -403,6 +464,14 @@ public CollectionEditorContainer(TerminologyTable table, ACE ace)
         exportDescriptionsButton.addActionListener(new ExportDescriptionsInListButtonListener());
         exportDescriptionsButton.setToolTipText("export all descriptions from concepts in list to file");
         listEditorTopPanel.add(exportDescriptionsButton, c);
+        
+        c.gridx++;
+        
+        JButton exportFilteredDescriptionsButton = new JButton(new ImageIcon(ACE.class.getResource("/32x32/plain/funnel_down.png")));
+        exportFilteredDescriptionsButton.setVisible(ACE.editMode);
+        exportFilteredDescriptionsButton.addActionListener(new ExportFilteredDescriptionsInListButtonListener());
+        exportFilteredDescriptionsButton.setToolTipText("export all non-English descriptions from concepts in list to file");
+        listEditorTopPanel.add(exportFilteredDescriptionsButton, c);
 
         c.gridx++;
 
