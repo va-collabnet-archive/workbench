@@ -15,6 +15,9 @@ import org.ihtsdo.rf2.workflow.impl.RF2WorkflowHistoryImpl;
  * 
  * @author Varsha Parekh
  * @version 1.0
+ * 
+ * Modified by Alejandro Rodriguez
+ * Date 20150311
  */
 
 public class RF2WorkflowHistoryFactory extends RF2AbstractFactory {
@@ -31,9 +34,9 @@ public class RF2WorkflowHistoryFactory extends RF2AbstractFactory {
 
 		try {
 
-//			RF2WorkflowHistoryImpl iterator = new RF2WorkflowHistoryImpl(getConfig());
+			RF2WorkflowHistoryImpl iterator = new RF2WorkflowHistoryImpl(getConfig());
 
-//			Terms.get().iterateConcepts(iterator);
+			Terms.get().iterateConcepts(iterator);
 
 			closeExportFileWriter();
 			

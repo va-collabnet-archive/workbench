@@ -2,32 +2,27 @@ package org.ihtsdo.rf2.workflow.impl;
 
 import java.io.IOException;
 import java.util.Date;
-import java.util.List;
-import java.util.UUID;
-
+import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
-import org.dwfa.ace.api.I_ConceptAttributeTuple;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.I_ProcessConcepts;
-import org.dwfa.ace.api.ebr.I_ExtendByRef;
-import org.dwfa.ace.api.ebr.I_ExtendByRefPartCid;
-import org.dwfa.ace.api.ebr.I_ExtendByRefPartStr;
-import org.dwfa.ace.api.ebr.I_ExtendByRefVersion;
-import org.dwfa.cement.RefsetAuxiliary;
-import org.dwfa.util.id.Type5UuidFactory;
-import org.ihtsdo.rf2.constant.I_Constants;
+import org.dwfa.ace.api.Terms;
+import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.rf2.impl.RF2AbstractImpl;
 import org.ihtsdo.rf2.util.Config;
 import org.ihtsdo.rf2.util.WriteUtil;
-import org.ihtsdo.tk.api.Precedence;
-import org.ihtsdo.workflow.WorkflowHistoryRefsetSearcher;
+import org.ihtsdo.workflow.WorkflowHistoryJavaBean;
+import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 
 /**
  * Title: RF2ConceptImpl Description: Iterating over all the concept in workbench and fetching all the components required by RF2 Concept File Copyright: Copyright (c) 2010 Company: IHTSDO
  * 
  * @author Varsha Parekh
  * @version 1.0
+ * 
+ * Modified by Alejandro Rodriguez
+ * Date 20150311
  */
 
 public class RF2WorkflowHistoryImpl extends RF2AbstractImpl implements I_ProcessConcepts {
@@ -54,58 +49,17 @@ public class RF2WorkflowHistoryImpl extends RF2AbstractImpl implements I_Process
 	public void export(I_GetConceptData concept, String conceptid)  {
 		try {
 
-
-			String refsetId  = RefsetAuxiliary.Concept.WORKFLOW_HISTORY.getPrimoridalUid().toString();
-			//int refsetTermAuxId = getNid(I_Constants.WORKFLOW_HISTORY_REFSET_UID);	
-			int refsetTermAuxId = getNid(RefsetAuxiliary.Concept.WORKFLOW_HISTORY.getPrimoridalUid().toString());		
-			WorkflowHistoryRefsetSearcher searcher = new WorkflowHistoryRefsetSearcher();
-
-			List<? extends I_ExtendByRef> extensions = tf.getAllExtensionsForComponent(concept.getNid(), true);
-			I_ExtendByRefPartStr<?> extensionPart;
-			int extensionStatusId = 0;
-			String active = "";
-
-			if (!extensions.isEmpty()) {
-				for (I_ExtendByRef extension : extensions) {
-					if (extension.getRefsetId() == refsetTermAuxId) {
-						if (extension != null) {
-							long lastVersion = Long.MIN_VALUE;
-							extensionPart=null;
-							for (I_ExtendByRefVersion loopTuple : extension.getTuples(allStatusSet,currenAceConfig.getViewPositionSetReadOnly(),
-									Precedence.PATH,currenAceConfig.getConflictResolutionStrategy())) {
-								if (loopTuple.getTime() >= lastVersion) {
-									lastVersion = loopTuple.getTime();
-									extensionPart = (I_ExtendByRefPartStr) loopTuple.getMutablePart();
-								}
-							}
-
-							if (extensionPart == null) {
-								if (logger.isDebugEnabled()) {
-									logger.debug("Refset extension part not found!");
-								}
-							}else{
-
-
-								//System.out.println(" get Nid " + extension.getNid());
-//								String workflowMemberInfo =  searcher.getMemberWfHxForDatabaseImport(extension.getNid());
-//
-//								extensionStatusId = extensionPart.getStatusNid();
-//								if ( (extensionStatusId == activeNid) || (extensionStatusId == currentNid)) { 														
-//									active = "1";
-//								} else if (extensionStatusId == inactiveNid || (extensionStatusId == retiredNid)) {
-//									System.out.println(workflowMemberInfo);
-//									active = "0";
-//								} else {
-//									logger.error("unknown extensionStatusId =====>" + extensionStatusId);
-//								}
-//
-//								if(active.equals("1")){
-//									writeRF2TypeLine(workflowMemberInfo);
-//								}
-							}
-						}
-					}							
+			TreeSet<WorkflowHistoryJavaBean> wfHistory = WorkflowHelper.getAllWorkflowHistory(concept);
+			
+			if (getConfig().getComponentType().equals("FULL_WF_DATA")){
+				for (WorkflowHistoryJavaBean bean:wfHistory){
+					exportBean(bean);
 				}
+				
+			}else{
+
+				WorkflowHistoryJavaBean bean=wfHistory.last();
+				exportBean(bean);
 			}
 
 		} catch (IOException e) {
@@ -117,6 +71,35 @@ public class RF2WorkflowHistoryImpl extends RF2AbstractImpl implements I_Process
 		} 
 	}
 
+
+	private void exportBean(WorkflowHistoryJavaBean bean) throws IOException, TerminologyException {
+		StringBuffer sb=new StringBuffer();
+		sb.append(bean.getConcept());
+		sb.append("\t");
+		sb.append(bean.getFullySpecifiedName());
+		sb.append("\t");
+		sb.append(bean.getWorkflowId());
+		sb.append("\t");
+		sb.append(Terms.get().getConcept(bean.getPath()).getInitialText());
+		sb.append("\t");
+		sb.append(Terms.get().getConcept(bean.getModeler()).getInitialText());
+		sb.append("\t");
+		sb.append(Terms.get().getConcept(bean.getAction()).getInitialText());
+		sb.append("\t");
+		sb.append(Terms.get().getConcept(bean.getState()).getInitialText());
+		sb.append("\t");
+		sb.append(getDateFormat().format(new Date(bean.getEffectiveTime())));
+		sb.append("\t");
+		sb.append(getDateFormat().format(new Date(bean.getWorkflowTime())));
+		sb.append("\t");
+		sb.append(bean.getAutoApproved());
+		sb.append("\t");
+		sb.append(bean.getOverridden());
+		sb.append("\t");
+		sb.append(bean.getRefexMemberNid());
+		
+		writeRF2TypeLine(sb.toString());
+	}
 
 	private void writeRF2TypeLine(String workflowMemberInfo) throws IOException {		
 		WriteUtil.write(getConfig(), workflowMemberInfo);

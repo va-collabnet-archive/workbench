@@ -1,44 +1,65 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <config>
-	<exportFileName>sct2_wfHx_Full-en_INT_</exportFileName>
+	<exportFileName>workflowfHistory-en_INT_</exportFileName>
 	<droolsDrlFile>org/ihtsdo/rf2/drools/NONEReleaseRules.drl</droolsDrlFile>
+	
 	<column>
-		<name>WorkflowUUID</name>
+		<name>conceptUuid</name>
 		<description></description>
 		<delimiter>\t</delimiter>
 	</column>
 	<column>
-		<name>ConceptUUID</name>
+		<name>fsn</name>
 		<description></description>
 		<delimiter>\t</delimiter>
 	</column>
 	<column>
-		<name>Modeler</name>
+		<name>workflowId</name>
 		<description></description>
 		<delimiter>\t</delimiter>
 	</column>
 	<column>
-		<name>WorkflowAction</name>
+		<name>path</name>
 		<description></description>
 		<delimiter>\t</delimiter>
 	</column>
 	<column>
-		<name>WorkflowState</name>
+		<name>modeler</name>
 		<description></description>
 		<delimiter>\t</delimiter>
 	</column>
 	<column>
-		<name>FSN</name>
+		<name>workflowAction</name>
 		<description></description>
 		<delimiter>\t</delimiter>
 	</column>
 	<column>
-		<name>WorkflowTime</name>
+		<name>workflowState</name>
 		<description></description>
 		<delimiter>\t</delimiter>
 	</column>	
 	<column>
-		<name>EFFECTIVETIME</name>
+		<name>effectiveTime</name>
+		<description></description>
+		<delimiter>\t</delimiter>
+	</column>
+	<column>
+		<name>workflowTime</name>
+		<description></description>
+		<delimiter>\t</delimiter>
+	</column>
+	<column>
+		<name>autoApproved</name>
+		<description></description>
+		<delimiter>\t</delimiter>
+	</column>
+	<column>
+		<name>overridden</name>
+		<description></description>
+		<delimiter>\t</delimiter>
+	</column>
+	<column>
+		<name>refexMemberId</name>
 		<description></description>
 		<delimiter>\r\n</delimiter>
 	</column>
