@@ -54,12 +54,16 @@ public class DescriptionListWriter extends GenericFileWriter<ConceptVersionBI> {
                 snomedIntId = Terms.get().uuidToNative(ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.getUids());
             }
             Object conceptId = null;
-            for(IdBI id : concept.getAdditionalIds()){
-                if(id.getAuthorityNid() == snomedIntId){
-                    conceptId = id.getDenotation();
+            Collection<? extends IdBI> additionalIds = concept.getAdditionalIds();
+            if (additionalIds != null) {
+                for (IdBI id : concept.getAdditionalIds()) {
+                    if (id.getAuthorityNid() == snomedIntId) {
+                        conceptId = id.getDenotation();
+                    }
                 }
             }
-            if (conceptId == null) {
+            //No SCT ID, so use UUID
+            if (additionalIds == null || conceptId == null) {
                 conceptId = concept.getPrimUuid();
             }
             
