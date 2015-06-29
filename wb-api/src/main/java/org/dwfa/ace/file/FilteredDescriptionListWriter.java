@@ -19,6 +19,7 @@ package org.dwfa.ace.file;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.cement.ArchitectonicAuxiliary;
 import org.dwfa.tapi.TerminologyException;
@@ -54,10 +55,13 @@ public class FilteredDescriptionListWriter extends GenericFileWriter<ConceptVers
                 snomedIntId = Terms.get().uuidToNative(ArchitectonicAuxiliary.Concept.SNOMED_INT_ID.getUids());
             }
             Object conceptId = null;
+            List<IdBI> additionalIDList = (List<IdBI>) concept.getAdditionalIds();
+            if (additionalIDList != null) {
             for(IdBI id : concept.getAdditionalIds()){
                 if(id.getAuthorityNid() == snomedIntId){
                     conceptId = id.getDenotation();
                 }
+            }
             }
             if (conceptId == null) {
                 conceptId = concept.getPrimUuid();
