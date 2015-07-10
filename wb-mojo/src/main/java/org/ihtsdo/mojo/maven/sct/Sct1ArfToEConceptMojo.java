@@ -32,7 +32,6 @@ import java.io.OutputStreamWriter;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -75,11 +74,9 @@ import org.ihtsdo.etypes.ERefsetStrStrMember;
 import org.ihtsdo.etypes.ERefsetStrStrRevision;
 import org.ihtsdo.etypes.ERelationship;
 import org.ihtsdo.etypes.ERelationshipRevision;
-import org.ihtsdo.helper.time.TimeHelper;
 import org.ihtsdo.mojo.maven.rf2.Sct2_IdCompact;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf1;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
-import org.ihtsdo.tk.binding.snomed.TermAux;
 import org.ihtsdo.tk.dto.concept.component.attribute.TkConceptAttributesRevision;
 import org.ihtsdo.tk.dto.concept.component.description.TkDescription;
 import org.ihtsdo.tk.dto.concept.component.description.TkDescriptionRevision;
@@ -3453,7 +3450,11 @@ public class Sct1ArfToEConceptMojo extends AbstractMojo implements Serializable 
                 addRsByRs = rsByRsList;
             }
 
-            if (theCon.compareTo(theDes) == IS_EQUAL && theCon.compareTo(theRel) == IS_EQUAL
+            if (theCon.compareTo(theDes) != IS_EQUAL && theCon.compareTo(theRel) == IS_EQUAL && 
+            	((theCon.compareTo(theRelDest) != IS_EQUAL) || (theCon.compareTo(theRelDest) == IS_EQUAL))) {
+	            // MISSING CASE(s)  theCon !=theDes ==theRel ==theRelDest/!=theRelDest
+	            createEConcept(conList, null, relList, null, addRsByCon, addRsByRs, dos);
+		    } else if (theCon.compareTo(theDes) == IS_EQUAL && theCon.compareTo(theRel) == IS_EQUAL
                     && theCon.compareTo(theRelDest) == IS_EQUAL) {
                 // MIDDLE CASE theCon ==theDes ==theRel ==theRelDest
                 createEConcept(conList, desList, relList, relDestList, addRsByCon, addRsByRs, dos);
