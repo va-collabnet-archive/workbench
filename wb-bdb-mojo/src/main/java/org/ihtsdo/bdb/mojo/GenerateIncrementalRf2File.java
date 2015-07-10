@@ -343,6 +343,9 @@ public class GenerateIncrementalRf2File extends AbstractMojo {
                             exportPathFsn)));
                 }
             }
+             
+            // Need to manually add SNOMED CT export path b/c UUID in WB preceedes using Type5 UUID generation 
+            pathIds.add(Ts.get().getNidForUuids(UUID.fromString("8c230474-9f11-30ce-9cad-185a96fd03a2"))); 
 
             IntSet excludedRefsetIds = new IntSet();
             if (refsetsToExclude != null) {
