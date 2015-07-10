@@ -149,7 +149,7 @@ public class SctRf2LrsToArfMojo extends AbstractMojo implements Serializable {
             BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(
                     outDir + "concept_language_rf2.refset"), "UTF-8"));
             getLog().info("::: LANGUAGE REFSET FILE: " + outDir + "concept_language_rf2.refset");
-            filesIn = Rf2File.getFiles(wDir, targetSubDir, inputDir, "der2_cRefset_Language", ".txt");
+            filesIn = Rf2File.getFiles(wDir, targetSubDir, inputDir, "der2_cRefset_ExtensionLanguage", ".txt");
             for (Rf2File rf2File : filesIn) {
                 Rf2_RefsetCRecord[] members = Rf2_RefsetCRecord.parseRefset(rf2File, null);
                 for (Rf2_RefsetCRecord m : members) {
