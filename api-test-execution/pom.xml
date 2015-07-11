@@ -23,7 +23,7 @@
         <dependency>
             <groupId>org.ihtsdo.sct.baseline</groupId>
             <artifactId>sct-bdb</artifactId>
-            <version>2013.01.31-build-8</version>
+            <version>2015.01.31-build-7</version>
             <classifier>all</classifier>
             <type>zip</type>
             <exclusions>
