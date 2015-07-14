@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import javax.swing.AbstractAction;
 import javax.swing.AbstractSpinnerModel;
 import javax.swing.BorderFactory;
@@ -45,6 +46,7 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
@@ -52,6 +54,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.JToggleButton;
 import javax.swing.KeyStroke;
+import javax.swing.ListModel;
 import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
@@ -65,7 +68,9 @@ import javax.swing.tree.TreePath;
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_ContainTermComponent;
+import org.dwfa.ace.api.I_DescriptionTuple;
 import org.dwfa.ace.api.I_GetConceptData;
+import org.dwfa.ace.api.I_ModelTerminologyList;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.ace.dnd.TerminologyTransferHandler;
 import org.dwfa.ace.gui.concept.ConceptPanel;
@@ -83,6 +88,7 @@ import org.ihtsdo.ace.table.WorkflowHistoryTableModel.WorkflowStringWithConceptT
 import org.ihtsdo.ace.table.WorkflowHistoryTableRenderer;
 import org.ihtsdo.ace.task.workflow.search.AbstractWorkflowHistorySearchTest;
 import org.ihtsdo.concurrent.future.FutureHelper;
+import org.ihtsdo.lucene.WorkflowLuceneSearchResult;
 import org.ihtsdo.taxonomy.model.NodePath;
 import org.ihtsdo.taxonomy.model.TaxonomyModel;
 import org.ihtsdo.taxonomy.nodes.RootNode;
@@ -129,10 +135,26 @@ public class WorkflowHistorySearchPanel extends JPanel implements I_MakeCriterio
 
     public class AddToList implements ActionListener {
 
-
+        @Override
         public void actionPerformed(ActionEvent e) {
-        }
+            try {
+                JList conceptList = config.getBatchConceptList();
+                I_ModelTerminologyList conceptListModel = (I_ModelTerminologyList) conceptList.getModel();
 
+                HashSet<String> conceptsAdded = new HashSet<String>();
+                for (int i = 0; i < model.getRowCount(); i++) {
+                    WorkflowLuceneSearchResult bean = model.getBean(i);
+                    String conceptString = bean.getConcept();
+                    if (conceptsAdded.contains(conceptString) == false) {
+                        conceptsAdded.add(conceptString);
+                        I_GetConceptData cb = Terms.get().getConcept(UUID.fromString(conceptString));
+                        conceptListModel.addElement(cb);
+                    }
+                }
+            } catch (Exception ex) {
+                AceLog.getAppLog().alertAndLogException(ex);
+            }
+        }
     }
 
     public class SaveQuery implements ActionListener {
@@ -478,7 +500,7 @@ public class WorkflowHistorySearchPanel extends JPanel implements I_MakeCriterio
         searchButton.setToolTipText("perform a search");
         gbc.anchor = GridBagConstraints.NORTHWEST;
         add(searchButton, gbc);
-
+        
         stopButton = new JButton(new ImageIcon(ACE.class.getResource("/32x32/plain/stop.png")));
         stopButton.setVisible(false);
         stopButton.setToolTipText("stop the current search");
@@ -505,6 +527,12 @@ public class WorkflowHistorySearchPanel extends JPanel implements I_MakeCriterio
         linkSpinner.setEditor(new LinkEditor(linkSpinner));
 
         add(linkSpinner, gbc);
+        
+        gbc.gridx++;
+        addToList = new JButton(new ImageIcon(ACE.class.getResource("/24x24/plain/notebook_add.png")));
+        addToList.addActionListener(new AddToList());
+        addToList.setToolTipText("add concepts from search results to list view");
+        add(addToList, gbc);
 
         /*
         showHistory = new JToggleButton(new ImageIcon(ACE.class.getResource("/24x24/plain/history.png")));

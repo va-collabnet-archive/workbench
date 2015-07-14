@@ -864,7 +864,8 @@ public class ProgrammersPopupListener extends MouseAdapter implements ActionList
             if (returnVal == JFileChooser.APPROVE_OPTION) {
                 AuthorReporter reporter = new AuthorReporter(
                         conceptPanel.getConfig().getEditCoordinate().getAuthorNid(),
-                        chooser.getSelectedFile());
+                        chooser.getSelectedFile(),
+                        conceptPanel.getConfig().getViewCoordinate());
                 Ts.get().iterateConceptDataInParallel(reporter);
                 reporter.report();
             }

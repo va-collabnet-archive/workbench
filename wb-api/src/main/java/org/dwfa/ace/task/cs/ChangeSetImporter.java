@@ -205,7 +205,7 @@ public abstract class ChangeSetImporter implements ActionListener {
                         if (fromMojo) {
                             System.out.println("*** Starting workflow history lucene index regeneration.");
                             Ts.get().regenerateWfHxLuceneIndex(Terms.get().getActiveAceFrameConfig().getViewCoordinate());
-                            System.out.println("*** Finished workflow history lucene index regeneration.");
+                            System.out.println("*** Finished workflow history lucene index regeneration. ***");
                         } else {
                             new Thread(
                                     new Runnable() {
@@ -214,7 +214,7 @@ public abstract class ChangeSetImporter implements ActionListener {
                                     try {
                                         System.out.println("*** Starting workflow history lucene index regeneration on background thread.");
                                         Ts.get().regenerateWfHxLuceneIndex(Terms.get().getActiveAceFrameConfig().getViewCoordinate());
-                                        System.out.println("*** Finished workflow history lucene index regeneration.");
+                                        System.out.println("*** Finished workflow history lucene index regeneration. ***");
                                     } catch (IOException ex) {
                                         AceLog.getAppLog().alertAndLogException(ex);
                                     } catch (Exception ex) {
