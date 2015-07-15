@@ -25,116 +25,118 @@ import org.ihtsdo.workflow.WorkflowHistoryRefsetSearcher;
 import org.ihtsdo.workflow.refset.utilities.WorkflowHelper;
 
 public class WfHxLuceneManager extends LuceneManager {
-	public final static int matchLimit = 10000000;
+
+    public final static int matchLimit = 10000000;
     static final String wfLuceneFileSuffix = "lucene";
-	public static File runningLuceneDirFile = new File("workflow/lucene");
+    public static File runningLuceneDirFile = new File("workflow/lucene");
 
-	private static HashSet<WorkflowHistoryJavaBean> beansToAdd;
+    private static HashSet<WorkflowHistoryJavaBean> beansToAdd;
 
-	public static int writeToLuceneNoLock(Collection<WorkflowHistoryJavaBean> beans, Map<UUID, WorkflowLuceneSearchResult> lastBeanInWfMap, ViewCoordinate viewCoord) throws IOException, TerminologyException {
-		int recordsImported = 0;
-		Set<UUID> processedIds = new HashSet<UUID>();
+    public static int writeToLuceneNoLock(Collection<WorkflowHistoryJavaBean> beans, Map<UUID, WorkflowLuceneSearchResult> lastBeanInWfMap, ViewCoordinate viewCoord) throws IOException, TerminologyException {
+        int recordsImported = 0;
+        Set<UUID> processedIds = new HashSet<UUID>();
         WorkflowHistoryRefsetSearcher searcher = new WorkflowHistoryRefsetSearcher();
         WorkflowHistoryJavaBean currentBean = null;
 
         if (wfHxWriter == null) {
             wfHxLuceneDir = setupWriter(runningLuceneDirFile, wfHxLuceneDir, LuceneSearchType.WORKFLOW_HISTORY);
-	}
-        
+        }
+
         WfHxIndexGenerator.initializeSemTags(viewCoord);
 
         try {
             if (searcher.isInitialized()) {
-				for (WorkflowHistoryJavaBean bean : beans) {
-					currentBean = bean;
-					
-					if (!processedIds.contains(bean.getWorkflowId())) {
-						processedIds.add(bean.getWorkflowId());
-						
-						// Delete existing records for workflowId and regenerate
-						wfHxWriter.deleteDocuments(new Term("workflowId", bean.getWorkflowId().toString()));
-	
-						// Get all WfHx for WfId
-				    	I_GetConceptData con = Terms.get().getConcept(bean.getConcept());
-						Set<WorkflowHistoryJavaBean> wfIdBeans = searcher.getAllHistoryForWorkflowId(con, bean.getWorkflowId());
-						
-						// Get the latest Wf entry for Wf
-						WorkflowLuceneSearchResult lastBeanVals = null;
-						if (lastBeanInWfMap != null) {
-							lastBeanVals = lastBeanInWfMap.get(bean.getWorkflowId());
-						} else {
-							WorkflowHistoryJavaBean lastBean = WorkflowHelper.getLatestWfHxJavaBeanForWorkflowId(con, bean.getWorkflowId());
-							if (lastBean == null) {
-								lastBean = bean;
-							} 
+                for (WorkflowHistoryJavaBean bean : beans) {
+                    currentBean = bean;
 
-							// Add all workflow Id beans as lucene document
-							lastBeanVals = new WorkflowLuceneSearchResult(lastBean);
-						}
-							
-						// Add all workflow Id beans as lucene document
-			            if (lastBeanVals != null) {
-				            for (WorkflowHistoryJavaBean beanToIndex : wfIdBeans) {
-				            	recordsImported++;
-				            	wfHxWriter.addDocument(WfHxIndexGenerator.createDoc(beanToIndex, lastBeanVals));
-				            }
-			            } 
-					}
-				}
-	        }
+                    if (!processedIds.contains(bean.getWorkflowId())) {
+                        processedIds.add(bean.getWorkflowId());
+
+                        // Delete existing records for workflowId and regenerate
+                        wfHxWriter.deleteDocuments(new Term("workflowId", bean.getWorkflowId().toString()));
+
+                        // Get all WfHx for WfId
+                        I_GetConceptData con = Terms.get().getConcept(bean.getConcept());
+                        Set<WorkflowHistoryJavaBean> wfIdBeans = searcher.getAllHistoryForWorkflowId(con, bean.getWorkflowId());
+
+                        // Get the latest Wf entry for Wf
+                        WorkflowLuceneSearchResult lastBeanVals = null;
+                        if (lastBeanInWfMap != null) {
+                            lastBeanVals = lastBeanInWfMap.get(bean.getWorkflowId());
+                        } else {
+                            WorkflowHistoryJavaBean lastBean = WorkflowHelper.getLatestWfHxJavaBeanForWorkflowId(con, bean.getWorkflowId());
+                            if (lastBean == null) {
+                                lastBean = bean;
+                            }
+
+                            // Add all workflow Id beans as lucene document
+                            lastBeanVals = new WorkflowLuceneSearchResult(lastBean);
+                        }
+
+                        // Add all workflow Id beans as lucene document
+                        if (lastBeanVals != null) {
+                            for (WorkflowHistoryJavaBean beanToIndex : wfIdBeans) {
+                                recordsImported++;
+                                wfHxWriter.addDocument(WfHxIndexGenerator.createDoc(beanToIndex, lastBeanVals));
+                            }
+                        }
+                    }
+                }
+            }
         } catch (Exception e) {
-			AceLog.getAppLog().warning("Failed on bean: " + currentBean);
+            AceLog.getAppLog().warning("Stopping workflow history indexing! Failed on bean: " + currentBean);
+            throw new IOException(e);
+        }
+        
+            AceLog.getAppLog().log(Level.INFO, "Have written " + recordsImported + " workflow history lucene records to " + wfHxWriter.getDirectory());
+            beans.clear();
+            return recordsImported;
         }
 
-		AceLog.getAppLog().log(Level.INFO, "Have written " + recordsImported + " workflow history lucene records to " + wfHxWriter.getDirectory());
-		beans.clear();
-                return recordsImported;
-    }
-
-	public static SearchResult searchAllWorkflowCriterion(List<I_TestSearchResults> checkList, boolean wfInProgress, boolean completedWf) throws Exception {
+    public static SearchResult searchAllWorkflowCriterion(List<I_TestSearchResults> checkList, boolean wfInProgress, boolean completedWf) throws Exception {
         WorkflowHistoryRefsetSearcher searcher = new WorkflowHistoryRefsetSearcher();
-        
-		if (searcher.isInitialized()) {
-	        WfHxQueryParser wfHxParser = new WfHxQueryParser(checkList, wfInProgress, completedWf);
-	        
-	        // Create Query
-	        Query wfQuery = wfHxParser.getStandardAnalyzerQuery();
 
-	        if (wfQuery != null) {
-		        // Search WfHx
-		        SearchResult result = LuceneManager.search(wfQuery, LuceneSearchType.WORKFLOW_HISTORY);
-	
-		        if (result.topDocs.totalHits > 0) {
-		            AceLog.getAppLog().info("StandardAnalyzer query returned " + result.topDocs.totalHits + " hits");
-		        } else {
-		            AceLog.getAppLog().info("StandardAnalyzer query returned empty results.");
-		        }
-		        
-		        return result;
-	        }
-		}
+        if (searcher.isInitialized()) {
+            WfHxQueryParser wfHxParser = new WfHxQueryParser(checkList, wfInProgress, completedWf);
 
-		// If searcher not initialize or Query is empty, return 0 results
+            // Create Query
+            Query wfQuery = wfHxParser.getStandardAnalyzerQuery();
+
+            if (wfQuery != null) {
+                // Search WfHx
+                SearchResult result = LuceneManager.search(wfQuery, LuceneSearchType.WORKFLOW_HISTORY);
+
+                if (result.topDocs.totalHits > 0) {
+                    AceLog.getAppLog().info("StandardAnalyzer query returned " + result.topDocs.totalHits + " hits");
+                } else {
+                    AceLog.getAppLog().info("StandardAnalyzer query returned empty results.");
+                }
+
+                return result;
+            }
+        }
+
+        // If searcher not initialize or Query is empty, return 0 results
         TopDocs emptyDocs = new TopDocs(0, new ScoreDoc[0], 0);
         return new SearchResult(emptyDocs, null);
-	}
-	
-	public static void addToLuceneNoWrite(WorkflowHistoryJavaBean latestWorkflow) {
-		if (beansToAdd == null) {
-			beansToAdd = new HashSet<WorkflowHistoryJavaBean>();
-		}
-		
-		beansToAdd.add(latestWorkflow);
-	}
+    }
 
-	public static int writeUnwrittenWorkflows() throws IOException, TerminologyException {
-		init(LuceneSearchType.WORKFLOW_HISTORY);
+    public static void addToLuceneNoWrite(WorkflowHistoryJavaBean latestWorkflow) {
+        if (beansToAdd == null) {
+            beansToAdd = new HashSet<WorkflowHistoryJavaBean>();
+        }
 
-	    if (LuceneManager.indexExists(LuceneSearchType.WORKFLOW_HISTORY) != false) {
-		int records = writeToLuceneNoLock(beansToAdd, null, null);
-		beansToAdd.clear();
-                return records;
-	    }
-            return 0;
-	} 
+        beansToAdd.add(latestWorkflow);
+    }
+
+    public static int writeUnwrittenWorkflows() throws IOException, TerminologyException {
+        init(LuceneSearchType.WORKFLOW_HISTORY);
+
+        if (LuceneManager.indexExists(LuceneSearchType.WORKFLOW_HISTORY) != false) {
+            int records = writeToLuceneNoLock(beansToAdd, null, null);
+            beansToAdd.clear();
+            return records;
+        }
+        return 0;
+    }
 }
