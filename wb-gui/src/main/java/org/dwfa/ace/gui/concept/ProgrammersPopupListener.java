@@ -43,6 +43,8 @@ import org.ihtsdo.helper.dto.DtoToText;
 import org.ihtsdo.helper.export.ActiveOnlyExport;
 import org.ihtsdo.helper.io.FileIO;
 import org.dwfa.ace.reporting.AuthorReporter;
+import org.ihtsdo.helper.bdb.NidDuplicateFinder;
+import org.ihtsdo.helper.bdb.NidDuplicateReporter;
 import org.ihtsdo.project.workflow.api.wf2.implementation.WorkflowStore;
 import org.ihtsdo.rules.RulesLibrary;
 import org.ihtsdo.rules.testmodel.TerminologyHelperDroolsWorkbench;
@@ -140,7 +142,8 @@ public class ProgrammersPopupListener extends MouseAdapter implements ActionList
         TEST_ISA_CACHE("Test isa cache"),
         LAUNCH_WF_CHANGES_INIT("Launch workflow initiator on changes..."),
         LAUNCH_BP("Launch Business Process..."),
-        AUTHOR_REPORT("All changes by current user to text");
+        AUTHOR_REPORT("All changes by current user to text"),
+        DUP_NID_CHECKER("Check database for duplicate nids");
         //J+
         String menuText;
 
@@ -269,7 +272,11 @@ public class ProgrammersPopupListener extends MouseAdapter implements ActionList
             case AUTHOR_REPORT:
                 generateAuthorReport();
                 break;
-
+            
+            case DUP_NID_CHECKER:
+                checkForDuplicateNids();
+                break;    
+                
             default:
                 AceLog.getAppLog().alertAndLogException(new Exception("No support for: "
                         + optionMap.get(e.getActionCommand())));
@@ -872,6 +879,34 @@ public class ProgrammersPopupListener extends MouseAdapter implements ActionList
         } catch (Exception e) {
             AceLog.getAppLog().alertAndLogException(e);
         }
+    }
+    
+    private void checkForDuplicateNids() {
+        Ts.get().disableComponentsCRHM();
+        try{
+        AceLog.getAppLog().info("Testing for duplicate nids.");
+        NidDuplicateFinder dupFinder = new NidDuplicateFinder();
+
+        Ts.get().iterateConceptDataInParallel(dupFinder);
+        System.out.println();
+
+        if (dupFinder.getDupNids().isEmpty()) {
+            AceLog.getAppLog().info("No duplicate nids found.");
+        } else {
+            dupFinder.writeDupFile();
+            AceLog.getAppLog().severe("\n\nDuplicate nids found: " + dupFinder.getDupNids().size() + "\n"
+                    + dupFinder.getDupNids() + "\n");
+
+            NidDuplicateReporter reporter = new NidDuplicateReporter(dupFinder.getDupNids());
+
+            Ts.get().iterateConceptDataInParallel(reporter);
+            reporter.reportDupClasses();
+        }
+        } catch (Exception e) {
+            AceLog.getAppLog().alertAndLogException(e);
+        }
+        AceLog.getAppLog().info("Finished testing for duplicate nids.");
+        Ts.get().enableComponentsCRHM();
     }
 
     //~--- get methods ---------------------------------------------------------

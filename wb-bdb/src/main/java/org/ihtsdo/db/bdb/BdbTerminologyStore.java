@@ -94,6 +94,16 @@ public class BdbTerminologyStore implements TerminologyStoreDI {
     }
     
     @Override
+    public void disableComponentsCRHM(){
+        Concept.disableComponentsCRHM();
+    }
+    
+    @Override
+    public void enableComponentsCRHM(){
+        Concept.enableComponentsCRHM();
+    }
+    
+    @Override
     public void addTermChangeListener(TermChangeListener cl) {
         ChangeNotifier.addTermChangeListener(cl);
     }

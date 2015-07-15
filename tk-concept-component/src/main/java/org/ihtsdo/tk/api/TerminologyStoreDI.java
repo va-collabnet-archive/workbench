@@ -70,6 +70,16 @@ public interface TerminologyStoreDI extends TerminologyDI {
      */
     @Deprecated
     void resumeChangeNotifications();
+    
+    /**
+     * Disables the component CRHM, only for use in debugging duplicate/empty components.
+     */
+    void disableComponentsCRHM();
+    
+    /**
+     * Enables the component CRHM, only for use in debugging duplicate/empty components.
+     */
+    void enableComponentsCRHM();
 
     /**
      * Iterates over a set of concept data and processes it according to the
