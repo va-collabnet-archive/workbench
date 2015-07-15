@@ -40,16 +40,20 @@ import org.ihtsdo.tk.api.description.DescriptionChronicleBI;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
+import org.ihtsdo.tk.api.refex.type_member.RefexMemberVersionBI;
 import org.ihtsdo.tk.api.refex.type_nid.RefexNidVersionBI;
 import org.ihtsdo.tk.api.refex.type_nid_float.RefexNidFloatVersionBI;
 import org.ihtsdo.tk.api.refex.type_string_string.RefexStringStringVersionBI;
 import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
+import org.ihtsdo.tk.binding.snomed.ConceptInactivationType;
+import org.ihtsdo.tk.binding.snomed.HistoricalRelType;
 import org.ihtsdo.tk.binding.snomed.RefsetAux;
 import org.ihtsdo.tk.binding.snomed.Snomed;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 import org.ihtsdo.tk.spec.ConceptSpec;
+import org.ihtsdo.tk.spec.ValidationException;
 import org.ihtsdo.tk.uuid.UuidT5Generator;
 
 /**
@@ -120,8 +124,6 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
     private Collection<Integer> taxonomyParentNids;
     private ConceptVersionBI conNumRefsetParentConcept;
     private Date previousReleaseDate;
-	private int US_EXT_PATH_NID;
-	private int ACTIVE_STATUS;
 
     //~--- constructors --------------------------------------------------------
         /**
@@ -273,10 +275,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
     }
     
     private void setup() throws FileNotFoundException, UnsupportedEncodingException, IOException, ContradictionException{
-    	US_EXT_PATH_NID = Ts.get().getNidForUuids(UUID.fromString("520892e2-05e7-5e1f-bae8-5de5dbc89d04"));
-    	ACTIVE_STATUS = SnomedMetadataRf2.ACTIVE_VALUE_RF2.getLenient().getNid();
-
-    	File conceptsFile = new File(directory,
+                File conceptsFile = new File(directory,
                 "sct2_Concept_UUID_" + releaseType.suffix + "_"
                 + country.getFormatedCountryCode().toUpperCase() + namespace + "_"
                 + TimeHelper.getShortFileDateFormat().format(effectiveDate) + ".txt");
@@ -569,10 +568,6 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
             if(!concept.getVersion(viewCoordinate).isActive(viewCoordinate)){
                 //concept was created and retired in same cycle, don't write any part
                 write = false;
-                
-                if (badConceptHack(concept)) {
-                	write = true;
-                }
             }
         }
         if (write) {
@@ -900,25 +895,12 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                 //if not previously released or latest version remove
                 ConceptAttributeVersionBI latest = conceptAttributeChronicle.getVersion(viewCoordinateAllStatus);
                 for(ConceptAttributeVersionBI ca : conceptAttributeChronicle.getVersions()){
-                    if ((!sameCycleStampNids.contains(ca.getStampNid()) || (latest != null && ca.getStampNid() == latest.getStampNid())) &&
-                    	(ca.getPathNid() == US_EXT_PATH_NID)) {
+                    if(!sameCycleStampNids.contains(ca.getStampNid()) || (latest != null && ca.getStampNid() == latest.getStampNid())){
                         versions.add(ca);
                     }
                 }
             } else {
                 ConceptAttributeVersionBI version = conceptAttributeChronicle.getVersion(viewCoordinateAllStatus);
-                if (version == null || version.getPathNid() != US_EXT_PATH_NID) {
-                	ConceptAttributeVersionBI latestV = null;
-                	long latestTime = Long.MIN_VALUE;
-                	for (ConceptAttributeVersionBI v : conceptAttributeChronicle.getVersions()) {
-                		if (latestTime < v.getTime() && v.getPathNid() == US_EXT_PATH_NID) {
-                			latestTime = v.getTime();
-                			latestV = v;
-                		}
-                	}
-
-                	version = latestV;
-                }
                 if(version != null){
                     versions.add(version);
                 }
@@ -933,7 +915,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                     }
                 }
                 if (write) {
-                    if (stampNids.contains(car.getStampNid()) && hasNewUsAndSctCase(car)) {
+                    if (stampNids.contains(car.getStampNid())) {
                         if (writeIds) {
                             writeIds = false;
                             if (sameCycleStampNids.contains(car.getStampNid())) {
@@ -1003,25 +985,12 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                 //if not previously released or latest version remove
                 DescriptionVersionBI latest = descriptionChronicle.getVersion(viewCoordinateAllStatus);
                 for(DescriptionVersionBI d : descriptionChronicle.getVersions()){
-                    if ((!sameCycleStampNids.contains(d.getStampNid()) || (latest != null &&  d.getStampNid() == latest.getStampNid()))
-                    	&& (d.getPathNid() == US_EXT_PATH_NID)) {
+                    if(!sameCycleStampNids.contains(d.getStampNid()) || (latest != null &&  d.getStampNid() == latest.getStampNid())){
                         versions.add(d);
                     }
                 }
             } else {
                 DescriptionVersionBI version = descriptionChronicle.getVersion(viewCoordinateAllStatus);
-                if (version == null || version.getPathNid() != US_EXT_PATH_NID) {
-                	DescriptionVersionBI latestV = null;
-                	long latestTime = Long.MIN_VALUE;
-                	for (DescriptionVersionBI v : descriptionChronicle.getVersions()) {
-                		if (latestTime < v.getTime() && v.getPathNid() == US_EXT_PATH_NID) {
-                			latestTime = v.getTime();
-                			latestV = v;
-                		}
-                	}
-
-                	version = latestV;
-                }
                 if(version != null){
                     versions.add(version);
                 }
@@ -1037,7 +1006,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                     }
                 }
                 if (write) {
-                    if (stampNids.contains(descr.getStampNid()) && hasNewUsAndSctCase(descr)) {
+                    if (stampNids.contains(descr.getStampNid())) {
                         if (writeIds) {
                             writeIds = false;
                             if (sameCycleStampNids.contains(descr.getStampNid())) {
@@ -1122,25 +1091,12 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                 //if not previously released or latest version remove
                 RelationshipVersionBI latest = relationshipChronicle.getVersion(viewCoordinateAllStatus);
                 for(RelationshipVersionBI r : relationshipChronicle.getVersions()){
-                    if((!sameCycleStampNids.contains(r.getStampNid()) || (latest != null && r.getStampNid() == latest.getStampNid())) &&
-                    	(r.getPathNid() == US_EXT_PATH_NID)) {
+                    if(!sameCycleStampNids.contains(r.getStampNid()) || (latest != null && r.getStampNid() == latest.getStampNid())){
                         versions.add(r);
                     }
                 }
             } else {
                 RelationshipVersionBI version = relationshipChronicle.getVersion(viewCoordinateAllStatus);
-                if (version == null || version.getPathNid() != US_EXT_PATH_NID) {
-                	RelationshipVersionBI latestV = null;
-                	long latestTime = Long.MIN_VALUE;
-                	for (RelationshipVersionBI v : relationshipChronicle.getVersions()) {
-                		if (latestTime < v.getTime() && v.getPathNid() == US_EXT_PATH_NID) {
-                			latestTime = v.getTime();
-                			latestV = v;
-                		}
-                	}
-
-                	version = latestV;
-                }
                 if(version != null){
                     versions.add(version);
                 }
@@ -1158,7 +1114,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                 }
                 if (write) {
                     if (rv.getTypeNid() != RefsetAux.MARKED_PARENT_ISA.getLenient().getConceptNid()) {
-                        if (stampNids.contains(rv.getStampNid()) && hasNewUsAndSctCase(rv)) {
+                        if (stampNids.contains(rv.getStampNid())) {
                             for (int parentNid : taxonomyParentNids) {
                                 if (Ts.get().wasEverKindOf(rv.getTargetNid(), parentNid, viewCoordinate)) {
                                     inTaxonomy = true;
@@ -1607,37 +1563,19 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
      */
     private void processLangRefsets(RefexChronicleBI refexChronicle) throws IOException, ContradictionException {
         if (refexChronicle != null) {
-            if (!excludedRefsetIds.contains(refexChronicle.getRefexNid()) && !refexChronicle.getPrimUuid().equals(UUID.fromString("0b6f0e24-5fe2-3869-9342-c18008f53283"))) {
+            if (!excludedRefsetIds.contains(refexChronicle.getRefexNid())) {
                 Collection<RefexVersionBI> versions = new HashSet<>();
                 if (releaseType.equals(ReleaseType.FULL)) {
                     //if not previously released or latest version remove
                     RefexVersionBI latest = (RefexVersionBI) refexChronicle.getVersion(viewCoordinateAllStatusTime); //CHANGE FOR DK, before merge back use viewCoordinateAllStatus
                     for (Object o : refexChronicle.getVersions()) {
                         RefexVersionBI r = (RefexVersionBI) o;
-                        if ((!sameCycleStampNids.contains(r.getStampNid()) || (latest != null && r.getStampNid() == latest.getStampNid())) &&
-                    		(r.getPathNid() == US_EXT_PATH_NID)) {
+                        if (!sameCycleStampNids.contains(r.getStampNid()) || (latest != null && r.getStampNid() == latest.getStampNid())) {
                             versions.add(r);
                         }
                     }
                 } else {
                     RefexVersionBI version = (RefexVersionBI) refexChronicle.getVersion(viewCoordinateAllStatus);
-                    if (version == null || version.getPathNid() != US_EXT_PATH_NID) {
-                    	RefexVersionBI latestV = null;
-                    	long latestTime = Long.MIN_VALUE;
-                    	for (Object ov : refexChronicle.getVersions()) {
-                        		RefexVersionBI v = (RefexVersionBI)ov;
-
-                    		if (latestTime < v.getTime() && v.getPathNid() == US_EXT_PATH_NID) {
-                    			latestTime = v.getTime();
-                    			latestV = v;
-                    		}
-                    	}
-
-                    	if (latestV != null) {
-                    		version = latestV;
-                    	}
-                    }
-
                     if (version != null) {
                         versions.add(version);
                     }
@@ -1650,7 +1588,7 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                             write = false;
                         }
                     }
-                    if (stampNids.contains(rv.getStampNid()) && hasNewUsAndSctCase(rv)&& write) {
+                    if (stampNids.contains(rv.getStampNid()) && write) {
                         if (refexChronicle.getRefexNid() == RefsetAux.EN_GB_REFEX.getLenient().getNid()) {
                             processLang(rv);
                         } else if (refexChronicle.getRefexNid() == RefsetAux.EN_US_REFEX.getLenient().getNid()) {
@@ -2372,108 +2310,4 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
     public NidBitSetBI getNidSet() throws IOException {
         return conceptsToProcess;
     }
-
-
-    private boolean badConceptHack(ConceptChronicleBI concept) throws IOException {
-    	long latestTime = Long.MIN_VALUE;
-    	ConceptAttributeVersionBI retV = null;
-    	boolean hasSct = false;
-    	boolean hasNonUsSct = false;
-
-		for (ConceptAttributeVersionBI v : concept.getConceptAttributes().getVersions()) {
-    		if (v.getTime() > latestTime) {
-    			retV = v;
-    			latestTime = v.getTime();
-    		}
-		}
-
-		return (retV.getStatusNid() == ACTIVE_STATUS);
-
-    }
-
-    private boolean hasNewUsAndSctCase(ConceptAttributeVersionBI car) {
-    	Collection<? extends ConceptAttributeVersionBI> versions = car.getVersions();
-    	
-    	long earliestTime = Long.MAX_VALUE;
-    	ConceptAttributeVersionBI retV = null;
-    	boolean hasSct = false;
-    	boolean hasUs = false;
-    	
-		for (ConceptAttributeVersionBI v : versions) {
-    		if (v.getPathNid() == US_EXT_PATH_NID) {
-    			return true;
-    		}
-    	}
-    	
-		
-		// Case #1 is start with US Ext with later SCT (and no other paths)
-		// Case #2 is only US Extension
-    	
-		return false;
-	}
-    
-    private boolean hasNewUsAndSctCase(DescriptionChronicleBI descr) {
-    	Collection<? extends DescriptionVersionBI> versions = descr.getVersions();
-    	
-    	long earliestTime = Long.MAX_VALUE;
-    	DescriptionVersionBI retV = null;
-    	boolean hasSct = false;
-    	boolean hasUs = false;
-    	
-		for (DescriptionVersionBI v : versions) {
-    		 if (v.getPathNid() == US_EXT_PATH_NID) {
-    			return true;
-    		}
-    	}
-    	
-		
-		// Case #1 is start with US Ext with later SCT (and no other paths)
-		// Case #2 is only US Extension
-    	
-		return false;
-	}
-    
-    private boolean hasNewUsAndSctCase(RelationshipVersionBI rv) {
-    	Collection<? extends RelationshipVersionBI> versions = rv.getVersions();
-    	
-    	long earliestTime = Long.MAX_VALUE;
-    	RelationshipVersionBI retV = null;
-    	boolean hasSct = false;
-    	boolean hasUs = false;
-    	
-		for (RelationshipVersionBI v : versions) {
-    		if (v.getPathNid() == US_EXT_PATH_NID) {
-    			return true;
-    		}
-    	}
-    	
-		
-		// Case #1 is start with US Ext with later SCT (and no other paths)
-		// Case #2 is only US Extension
-    	
-		return false;
-	}
-
-
-    private boolean hasNewUsAndSctCase(RefexVersionBI rv) {
-    	Collection<? extends RefexChronicleBI> versions = rv.getVersions();
-    	
-    	long earliestTime = Long.MAX_VALUE;
-    	ConceptAttributeVersionBI retV = null;
-    	boolean hasSct = false;
-    	boolean hasUs = false;
-    	
-		for (Object obj : versions) {
-			RefexVersionBI v = (RefexVersionBI)obj;
-    		if (v.getPathNid() == US_EXT_PATH_NID) {
-    			return true;
-    		}
-    	}
-    	
-		
-		// Case #1 is start with US Ext with later SCT (and no other paths)
-		// Case #2 is only US Extension
-
-		return false;
-	}
 }
