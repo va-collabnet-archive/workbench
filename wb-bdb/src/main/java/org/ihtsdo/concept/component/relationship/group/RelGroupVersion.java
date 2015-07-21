@@ -416,4 +416,9 @@ public class RelGroupVersion implements RelationshipGroupVersionBI {
     public boolean isUncommitted() {
         return false;
     }
+
+    @Override
+    public boolean isCanceled() throws IOException {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
 }

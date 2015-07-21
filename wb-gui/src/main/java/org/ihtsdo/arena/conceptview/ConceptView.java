@@ -24,10 +24,12 @@ import org.intsdo.tk.drools.manager.DroolsExecutionManager;
 //~--- JDK imports ------------------------------------------------------------
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.ComponentOrientation;
 import java.awt.FlowLayout;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
+import java.awt.KeyboardFocusManager;
 import java.awt.LayoutManager;
 import java.awt.MouseInfo;
 import java.awt.Point;
@@ -62,10 +64,13 @@ import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.Timer;
+import static org.ihtsdo.arena.conceptview.DragPanelDescription.OK_TO_MOVE;
+import static org.ihtsdo.arena.conceptview.DragPanelDescription.YEILD_FOCUS;
 import org.ihtsdo.tk.api.*;
 
 public class ConceptView extends JPanel {
@@ -95,6 +100,8 @@ public class ConceptView extends JPanel {
     private ConceptViewSettings settings;
     private CVChangeListener cvChangeListener = new CVChangeListener();
     public boolean focus = true;
+    private String focusUuid = "";
+    private int caretPosition = 0;
 
     protected void redoConceptViewLayout() throws IOException {
         if (concept != null) {
@@ -132,6 +139,7 @@ public class ConceptView extends JPanel {
         kb = ConceptTemplates.getKb();
         addCommitListener(settings);
         addFontListener(settings);
+        addComponentFoucsTracker();
         setupPrefMap();
         dropPanelMgr = new DropPanelActionManager();
         Ts.get().addTermChangeListener(cvChangeListener);
@@ -148,19 +156,19 @@ public class ConceptView extends JPanel {
                     try {
                         if (ConceptView.this.concept == null) {
                             if (evt.getOldValue() != null || evt.getNewValue() != null) {
-                                layoutConcept(ConceptView.this.concept);
-                            }
-
+                                                layoutConcept(ConceptView.this.concept);
+                                            }
+                                            
                         } else {
                             if (ConceptView.this.concept.isCanceled()) {
                                 getSettings().getHost().setTermComponent(null);
                             } else {
-                                layoutConcept(ConceptView.this.concept);
-                            }
-                        }
-                    } catch (IOException ex) {
-                        AceLog.getAppLog().alertAndLogException(ex);
-                    }
+                                                layoutConcept(ConceptView.this.concept);
+                                            }
+                                        }
+                                                } catch (IOException ex) {
+                                                    AceLog.getAppLog().alertAndLogException(ex);
+                                                }
 
                     if (evt.getPropagationId() != null) {
                         lastPropId = (Long) evt.getPropagationId();
@@ -168,6 +176,30 @@ public class ConceptView extends JPanel {
                 }
             }
         });
+    }
+    
+    private void addComponentFoucsTracker(){
+        //TODO: handle reset when concept changes
+        KeyboardFocusManager focusManager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
+        focusManager.addPropertyChangeListener(new PropertyChangeListener() {
+                @Override
+                public void propertyChange(PropertyChangeEvent evt) {
+                    String prop = evt.getPropertyName();
+                    if(prop.equals("focusOwner") && (evt.getNewValue() instanceof JTextArea)){
+                        JTextArea textArea = (JTextArea) evt.getNewValue();
+//                        System.out.println("DEBUG -- Moving focus TO: " + textArea.getText());
+                        if(textArea.isEditable()){
+                            focusUuid = textArea.getName();
+                            caretPosition = textArea.getCaretPosition();
+                        }
+//                        System.out.println("DEBUG -- Caret is at position: " + caretPosition + " for component with name: " + focusUuid);
+                    } else if(prop.equals("focusOwner") && evt.getNewValue() == null){
+//                        System.out.println("DEBUG -- Moving focus TO: " + evt.getNewValue());
+//                        Thread.dumpStack();
+                    }
+                }
+            }
+        );
     }
 
     private void addFontListener(ConceptViewSettings settings) {
@@ -246,8 +278,8 @@ public class ConceptView extends JPanel {
             try {
                 Boolean redoLayout = get();
                 if (redoLayout && ConceptView.this.concept == validConcept) {
-                    layoutConcept(validConcept);
-                }
+                                    layoutConcept(validConcept);
+                                }
             } catch (Exception ex) {
                 AceLog.getAppLog().alertAndLogException(ex);
             }
@@ -283,7 +315,20 @@ public class ConceptView extends JPanel {
         }
 
         lastTouchLayoutSequence = lastTouchSequence;
-
+//        System.out.println("DEBUG -- Removing all components from panel.");
+        //get focused component name
+        if(System.getProperty(YEILD_FOCUS).equals(Boolean.FALSE.toString())){
+            System.setProperty(CONCEPT_REDRAW, Boolean.TRUE.toString());
+            System.setProperty(YEILD_FOCUS, Boolean.TRUE.toString());
+            Component owner = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
+            if(owner instanceof JTextArea){
+                JTextArea focusOwner = (JTextArea) owner;
+//                System.out.println("DEBUG -- Removing focus for redraw. Component: " + focusOwner);
+                focusOwner.putClientProperty(OK_TO_MOVE, true);
+                setFocusUuid(focusOwner.getName());
+                setCaretPosition(focusOwner.getCaretPosition());
+            }
+        }
         removeAll();
 
         if ((concept == null) || (this.concept == null) || (this.concept.equals(concept) == false)
@@ -306,6 +351,7 @@ public class ConceptView extends JPanel {
         redoConceptViewLayout();
         getCvRenderer().updateCancelAndCommit();
     }
+    public static final String CONCEPT_REDRAW = "concept redraw";
 
     public void resetLastLayoutSequence() {
         lastChangeModificationLayoutSequence = Long.MIN_VALUE;
@@ -484,6 +530,21 @@ public class ConceptView extends JPanel {
         return historyShown;
     }
 
+    protected String getFocusUuid() {
+        return focusUuid;
+    }
+
+    protected int getCaretPosition() {
+        return caretPosition;
+    }
+
+    protected void setFocusUuid(String focusText) {
+        this.focusUuid = focusText;
+    }
+
+    protected void setCaretPosition(int caretPosition) {
+        this.caretPosition = caretPosition;
+    }
     //~--- set methods ---------------------------------------------------------
     public void setHistoryShown(boolean historyShown) {
         this.historyShown = historyShown;
