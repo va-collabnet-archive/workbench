@@ -27,9 +27,11 @@ import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import org.dwfa.ace.log.AceLog;
 
 /**
@@ -43,8 +45,9 @@ public class Sct2_IdLookUp {
     private long uuidLsbArray[];
     BufferedWriter uuidsWriter;
     protected File additionalUuidsFile;
+    private HashMap<UUID, Long> UUIDtoSCTMap = null;
 
-    public Sct2_IdLookUp(String filePathName)
+    public Sct2_IdLookUp(String filePathName, boolean enableUUIDtoSCTMap)
             throws IOException {
         int indexOf = filePathName.indexOf("target");
         String uuidsFileName = filePathName.substring(0, indexOf);
@@ -69,10 +72,16 @@ public class Sct2_IdLookUp {
             // getLog().info(" relationship count = " + count + " @EOF\r\n");
             ois.close();
         }
+        if (enableUUIDtoSCTMap) {
+            UUIDtoSCTMap = new HashMap<UUID, Long>();
+        }
         setupArrays(idList);
     }
 
-    public Sct2_IdLookUp(ArrayList<Sct2_IdCompact> idList) throws IOException {
+    public Sct2_IdLookUp(ArrayList<Sct2_IdCompact> idList, boolean enableUUIDtoSCTMap) throws IOException {
+        if (enableUUIDtoSCTMap) {
+            UUIDtoSCTMap = new HashMap<UUID, Long>();
+        }
         setupArrays(idList);
     }
 
@@ -110,6 +119,9 @@ public class Sct2_IdLookUp {
             this.sctIdArray[i] = sct2_IdCompact.sctIdL;
             this.uuidMsbArray[i] = sct2_IdCompact.uuidMsbL;
             this.uuidLsbArray[i] = sct2_IdCompact.uuidLsbL;
+            if (UUIDtoSCTMap != null) {
+                UUIDtoSCTMap.put(new UUID(sct2_IdCompact.uuidMsbL, sct2_IdCompact.uuidLsbL), sct2_IdCompact.sctIdL);
+            }
         }
     }
 
@@ -126,5 +138,10 @@ public class Sct2_IdLookUp {
         } else {
             return null;
         }
+    }
+    
+    public Long getSCTId(UUID uuid)
+    {
+        return UUIDtoSCTMap == null ? null : UUIDtoSCTMap.get(uuid);
     }
 }

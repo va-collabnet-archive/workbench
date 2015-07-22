@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.UUID;
 
 import org.dwfa.util.id.Type3UuidFactory;
+import org.ihtsdo.mojo.maven.rf2.Rf2x;
 
 class Sct1_ConRecord implements Comparable<Object>, Serializable {
     private static final long serialVersionUID = 1L;
@@ -59,7 +60,8 @@ class Sct1_ConRecord implements Comparable<Object>, Serializable {
     
     public Sct1_ConRecord(UUID cUuid, int s, int p,
             long revDate, int pathIdx, int authorIdx, int moduleIdx) {
-        this.conSnoId = Long.MAX_VALUE;
+        Long temp = Rf2x.getSCTIDforUUID(cUuid);
+        this.conSnoId = temp == null ? Long.MAX_VALUE : temp;
         this.conUuidMsb = cUuid.getMostSignificantBits();
         this.conUuidLsb = cUuid.getLeastSignificantBits();
         this.status = s;

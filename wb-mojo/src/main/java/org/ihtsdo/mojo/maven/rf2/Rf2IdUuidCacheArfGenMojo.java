@@ -93,6 +93,13 @@ public class Rf2IdUuidCacheArfGenMojo extends AbstractMojo implements Serializab
      * @parameter default-value="8c230474-9f11-30ce-9cad-185a96fd03a2"
      */
     private UUID uuidPath;
+    
+    /**
+     * Enable storing an in-memory map from UUIDs to SCTIDs.  May not always be necessary - set to false to reduce memory usage.
+     *
+     * @parameter default-value=true
+     */
+    private boolean enableUUIDToSCTIDMap = true;
 
     public void setUuidPath(String uuidStr) {
         uuidPath = UUID.fromString(uuidStr);
@@ -152,7 +159,7 @@ public class Rf2IdUuidCacheArfGenMojo extends AbstractMojo implements Serializab
                 // Setup id array cache object
                 // idCacheDir + FILE_SEPARATOR + "idObjectCache.jbin"
                 long startTime = System.currentTimeMillis();
-                Sct2_IdLookUp idLookup = new Sct2_IdLookUp(idCacheFName);
+                Sct2_IdLookUp idLookup = new Sct2_IdLookUp(idCacheFName, enableUUIDToSCTIDMap);
                 System.out.println((System.currentTimeMillis() - startTime) + " mS");
                 
                 // Create an ARF file of primordial UUIDs

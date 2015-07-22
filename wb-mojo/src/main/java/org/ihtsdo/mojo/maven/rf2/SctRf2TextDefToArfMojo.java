@@ -87,6 +87,13 @@ public class SctRf2TextDefToArfMojo extends AbstractMojo implements Serializable
      * @parameter default-value="8c230474-9f11-30ce-9cad-185a96fd03a2"
      */
     private String pathUuid;
+    
+    /**
+     * Enable storing an in-memory map from UUIDs to SCTIDs.  May not always be necessary - set to false to reduce memory usage.
+     *
+     * @parameter default-value=true
+     */
+    private boolean enableUUIDToSCTIDMap = true;
     String uuidSourceSnomedLongStr;
 
     @Override
@@ -115,7 +122,7 @@ public class SctRf2TextDefToArfMojo extends AbstractMojo implements Serializable
         getLog().info("    Path UUID: " + pathStr);
         
         try {
-            Rf2x.setupIdCache(targetDirectory.getAbsolutePath());
+            Rf2x.setupIdCache(targetDirectory.getAbsolutePath(), enableUUIDToSCTIDMap);
 
             // SETUP CONSTANTS
             uuidSourceSnomedLongStr =

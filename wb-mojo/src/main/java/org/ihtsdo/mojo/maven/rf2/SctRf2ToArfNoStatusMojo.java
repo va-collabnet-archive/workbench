@@ -84,6 +84,13 @@ public class SctRf2ToArfNoStatusMojo extends AbstractMojo implements Serializabl
      * @parameter default-value="8c230474-9f11-30ce-9cad-185a96fd03a2"
      */
     private String pathUuid;
+    
+    /**
+     * Enable storing an in-memory map from UUIDs to SCTIDs.  May not always be necessary - set to false to reduce memory usage.
+     *
+     * @parameter default-value=true
+     */
+    private boolean enableUUIDToSCTIDMap = true;
     String uuidSourceSnomedLongStr;
 
     @Override
@@ -100,19 +107,19 @@ public class SctRf2ToArfNoStatusMojo extends AbstractMojo implements Serializabl
 
         String pathStr = null;
         try {
-        	pathStr = pathConcept.getUuid();
-        	// If either pathUuid is not the default and pathStr is, override with pathUuid
-        	if (!pathUuid.equals("8c230474-9f11-30ce-9cad-185a96fd03a2") &&
-        			pathStr.equals("8c230474-9f11-30ce-9cad-185a96fd03a2"))
-        		pathStr = pathUuid;
+            pathStr = pathConcept.getUuid();
+            // If either pathUuid is not the default and pathStr is, override with pathUuid
+            if (!pathUuid.equals("8c230474-9f11-30ce-9cad-185a96fd03a2") &&
+                    pathStr.equals("8c230474-9f11-30ce-9cad-185a96fd03a2"))
+                pathStr = pathUuid;
         } catch (RuntimeException e) {
-        	getLog().error("Poorly configured path concept, at least one UUID must be specified", e);
-        	throw e;
+            getLog().error("Poorly configured path concept, at least one UUID must be specified", e);
+            throw e;
         }
         getLog().info("    Path UUID: " + pathStr);
 
         try {
-            Rf2x.setupIdCache(targetDirectory.getAbsolutePath());
+            Rf2x.setupIdCache(targetDirectory.getAbsolutePath(), enableUUIDToSCTIDMap);
 
             // SETUP CONSTANTS
             uuidSourceSnomedLongStr =
@@ -160,7 +167,7 @@ public class SctRf2ToArfNoStatusMojo extends AbstractMojo implements Serializabl
                 getLog().info("    ... " + rf2File.file.getName());
                 Sct2_DesRecord[] descriptions = Sct2_DesRecord.parseDescriptions(rf2File, pathStr);
                 for (Sct2_DesRecord d : descriptions) {
-                	  d.setPath(pathStr);
+                      d.setPath(pathStr);
                     d.writeArf(bw);
                     if (Rf2x.isSctIdInUuidCache(d.desSnoIdL) == false) {
                         writeSctSnomedLongId(bwIds, d.desSnoIdL, d.effDateStr, d.pathUuidStr);
@@ -194,7 +201,7 @@ public class SctRf2ToArfNoStatusMojo extends AbstractMojo implements Serializabl
                 getLog().info("    ... " + rf2File.file.getName());
                 Sct2_RelRecord[] rels = Sct2_RelRecord.parseRelationships(rf2File, false, pathStr);
                 for (Sct2_RelRecord r : rels) {
-                	  r.setPath(pathStr);
+                      r.setPath(pathStr);
                     r.writeArf(bw);
                     if (Rf2x.isSctIdInUuidCache(r.relSnoId) == false) {
                         writeSctSnomedLongId(bwIds, r.relSnoId, r.effDateStr, r.pathUuidStr);

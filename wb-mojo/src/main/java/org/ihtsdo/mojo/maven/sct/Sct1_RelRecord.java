@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.UUID;
 
 import org.dwfa.util.id.Type3UuidFactory;
+import org.ihtsdo.mojo.maven.rf2.Rf2x;
 
 class Sct1_RelRecord implements Comparable<Object>, Serializable {
     private static final long serialVersionUID = 1L;
@@ -125,7 +126,8 @@ class Sct1_RelRecord implements Comparable<Object>, Serializable {
             int characteristic, int refinability, int group, long revTime,
             int pathIdx, int userIdx, int moduleIdx) {
         
-        this.relSnoId = Long.MAX_VALUE; // SNOMED RELATIONSHIPID, if applicable
+        Long temp = Rf2x.getSCTIDforUUID(uuidRelId);
+        this.relSnoId = temp == null ? Long.MAX_VALUE : temp; // SNOMED RELATIONSHIPID, if applicable
         this.relUuidMsb = uuidRelId.getMostSignificantBits();
         this.relUuidLsb = uuidRelId.getLeastSignificantBits();
         // additionalIds = null;

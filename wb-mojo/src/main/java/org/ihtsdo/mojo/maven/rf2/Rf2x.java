@@ -39,7 +39,7 @@ public class Rf2x {
         sctid2UuidCache = null;
     }
 
-    public static void setupIdCache(String targetPath) 
+    public static void setupIdCache(String targetPath, boolean enableUUIDtoSCTIDMap) 
             throws IOException {
         cachePath = targetPath + FILE_SEPARATOR + "id-cache" + FILE_SEPARATOR + "idSctUuidCache.ser";
         System.out.println(":::INFO: checking SCTID/UUID cache file location ...");
@@ -49,11 +49,11 @@ public class Rf2x {
         if (!file.exists()) {
             System.out.println(":::      SCTID/UUID cache file does not exist!!!@!");
             // Initialize with an empty id list
-            sctid2UuidCache = new Sct2_IdLookUp(new ArrayList<Sct2_IdCompact>());
+            sctid2UuidCache = new Sct2_IdLookUp(new ArrayList<Sct2_IdCompact>(), enableUUIDtoSCTIDMap);
             notMappedCounter = 0;
         } else {
             System.out.println(":::      SCTID/UUID cache file exists!!!@!");
-            sctid2UuidCache = new Sct2_IdLookUp(file.getAbsolutePath());
+            sctid2UuidCache = new Sct2_IdLookUp(file.getAbsolutePath(), enableUUIDtoSCTIDMap);
             notMappedCounter = 0;
         }
     }
@@ -211,6 +211,14 @@ public class Rf2x {
             return false;
         } 
         return true;
+    }
+    
+    public static Long getSCTIDforUUID(UUID uuid)
+    {
+        if (sctid2UuidCache == null) {
+            throw new RuntimeException("Rf2x.setupIdCache(path) needs to be called first");
+        }
+        return sctid2UuidCache.getSCTId(uuid);
     }
 
 }

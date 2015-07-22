@@ -26,6 +26,7 @@ import java.util.Arrays;
 import java.util.UUID;
 
 import org.dwfa.util.id.Type3UuidFactory;
+import org.ihtsdo.mojo.maven.rf2.Rf2x;
 
 class Sct1_DesRecord implements Comparable<Object>, Serializable {
     private static final long serialVersionUID = 1L;
@@ -76,7 +77,8 @@ class Sct1_DesRecord implements Comparable<Object>, Serializable {
     public Sct1_DesRecord(UUID desUuid, int status, UUID uuidCon, String termStr,
             int capitalization, int desTypeIdx, String langCodeStr, long revTime,
             int pathIdx, int authorIdx, int moduleIdx) {
-        this.desSnoId = Long.MAX_VALUE; // DESCRIPTIONID
+        Long temp = Rf2x.getSCTIDforUUID(desUuid);
+        this.desSnoId = temp == null ? Long.MAX_VALUE : temp; // DESCRIPTIONID
         this.desUuidMsb = desUuid.getMostSignificantBits();
         this.desUuidLsb = desUuid.getLeastSignificantBits();
         this.status = status; // DESCRIPTIONSTATUS

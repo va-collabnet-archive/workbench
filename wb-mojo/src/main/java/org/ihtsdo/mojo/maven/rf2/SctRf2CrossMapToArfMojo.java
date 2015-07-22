@@ -70,6 +70,13 @@ public class SctRf2CrossMapToArfMojo extends AbstractMojo implements Serializabl
      * @parameter default-value="generated-arf"
      */
     private String outputDir;
+    
+    /**
+     * Enable storing an in-memory map from UUIDs to SCTIDs.  May not always be necessary - set to false to reduce memory usage.
+     *
+     * @parameter default-value=true
+     */
+    private boolean enableUUIDToSCTIDMap = true;
 
     /**
      * Path on which to load data. Defaults to SNOMED Core.
@@ -100,7 +107,7 @@ public class SctRf2CrossMapToArfMojo extends AbstractMojo implements Serializabl
         getLog().info("    Path UUID: " + pathStr);
         
         try {
-            Rf2x.setupIdCache(targetDirectory.getAbsolutePath());
+            Rf2x.setupIdCache(targetDirectory.getAbsolutePath(), enableUUIDToSCTIDMap);
 
             // SETUP CONSTANTS
             Rf2_CrossmapRecord.uuidSourceSnomedRtStr =
