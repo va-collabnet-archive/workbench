@@ -452,12 +452,12 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     private List<UUID> availableWorkflowActions = null;
 
     // 53
-	private I_GetConceptData defaultProjectForChangedConcept;
-	// 53
-	private I_GetConceptData defaultWorkflowForChangedConcept;
-	// 54
-	private boolean isVaProject = false;
-	
+    private I_GetConceptData defaultProjectForChangedConcept;
+    // 53
+    private I_GetConceptData defaultWorkflowForChangedConcept;
+    // 54
+    private boolean isVaProject = false;
+    
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeInt(dataVersion);
         out.writeBoolean(active);
@@ -635,7 +635,15 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     : pathColorMapKeyIntList.getListValues () 
         ) {
             Color pathColor = pathColorMap.get(key);
-        out.writeObject(pathColor);
+            if (key == 0 || key == Integer.MAX_VALUE) {
+                //Do not write this pathColor - because the IntList code - above - skips any entries where the nid is 0.  Since we don't have a size variable
+                //written on color list - the color list _must_ remain the same length as the number of items actually written by the IntList
+                System.err.println("ERROR:  The file userConfig.txt contains a color specification of " + pathColor.toString() + " which was not mapped to a valid path."
+                        + " Please report this to the bundle manager.");
+            }
+            else {
+                out.writeObject(pathColor);
+            }
     }
 
     IntList.writeIntList (out, languagePreferenceList);
@@ -1199,25 +1207,25 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
             }
 
             if (objDataVersion >= 53) {
-            	try {
-					defaultProjectForChangedConcept = readConceptFromSerializedUuids(in);
-				} catch (TerminologyException e) {
-					  throw new IOException(e);
-				}
+                try {
+                    defaultProjectForChangedConcept = readConceptFromSerializedUuids(in);
+                } catch (TerminologyException e) {
+                      throw new IOException(e);
+                }
             }
 
             if (objDataVersion >= 53) {
-            	try {
-					defaultWorkflowForChangedConcept = readConceptFromSerializedUuids(in);
-				} catch (TerminologyException e) {
-					  throw new IOException(e);
-				}
+                try {
+                    defaultWorkflowForChangedConcept = readConceptFromSerializedUuids(in);
+                } catch (TerminologyException e) {
+                      throw new IOException(e);
+                }
             }
             //54 see above
             if (objDataVersion >= 54) {
-				isVaProject = in.readBoolean();
-			} else {
-				isVaProject = false;
+                isVaProject = in.readBoolean();
+            } else {
+                isVaProject = false;
             }
         } else {
             throw new IOException("Can't handle dataversion: " + objDataVersion);
@@ -3524,32 +3532,32 @@ public class AceFrameConfig implements Serializable, I_ConfigAceFrame {
     }
     
     @Override    
-	public void setDefaultProjectForChangedConcept(I_GetConceptData project) {
-		this.defaultProjectForChangedConcept=project;
-	}
+    public void setDefaultProjectForChangedConcept(I_GetConceptData project) {
+        this.defaultProjectForChangedConcept=project;
+    }
     
     @Override
-	public I_GetConceptData getDefaultProjectForChangedConcept() {
-		return defaultProjectForChangedConcept;
-	}
+    public I_GetConceptData getDefaultProjectForChangedConcept() {
+        return defaultProjectForChangedConcept;
+    }
     
     @Override
-	public void setDefaultWorkflowForChangedConcept(I_GetConceptData workflow) {
-		this.defaultWorkflowForChangedConcept = workflow;
-	}
+    public void setDefaultWorkflowForChangedConcept(I_GetConceptData workflow) {
+        this.defaultWorkflowForChangedConcept = workflow;
+    }
     
     @Override
-	public I_GetConceptData getDefaultWorkflowForChangedConcept() {
-		return defaultWorkflowForChangedConcept;
-	}
+    public I_GetConceptData getDefaultWorkflowForChangedConcept() {
+        return defaultWorkflowForChangedConcept;
+    }
 
-	@Override
-	public void setVaProject(boolean isVaProject) {
-		this.isVaProject = isVaProject;
-	}
+    @Override
+    public void setVaProject(boolean isVaProject) {
+        this.isVaProject = isVaProject;
+    }
 
-	@Override
-	public boolean isVaProject() {
-		return this.isVaProject;
-	}
+    @Override
+    public boolean isVaProject() {
+        return this.isVaProject;
+    }
 }
