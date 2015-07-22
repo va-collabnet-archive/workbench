@@ -20,6 +20,8 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.LayoutManager;
 import java.awt.datatransfer.DataFlavor;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 
 import java.beans.PropertyVetoException;
 
@@ -35,6 +37,7 @@ import javax.swing.JSeparator;
 import javax.swing.JTextArea;
 import javax.swing.SwingConstants;
 import javax.swing.TransferHandler;
+import org.dwfa.ace.ACE;
 import org.dwfa.ace.DynamicWidthTermComponentLabel;
 import org.ihtsdo.arena.editor.ArenaEditor;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
@@ -49,7 +52,8 @@ public class DragPanelDescription extends DragPanelComponentVersion<DescriptionA
     private static final long serialVersionUID = 1L;
     private ConceptViewLayout viewLayout;
     private JTextArea textPane;
-
+    public static final String FOCUSED_COMPONENT = "focused component";
+    public static final String FOCUSED_CARET = "focused caret";
     //~--- constructors --------------------------------------------------------
     public DragPanelDescription(ConceptViewLayout viewLayout, CollapsePanel parentCollapsePanel,
             DescriptionAnalogBI desc)
@@ -297,6 +301,7 @@ public class DragPanelDescription extends DragPanelComponentVersion<DescriptionA
         textPane.setFont(textPane.getFont().deriveFont(getSettings().getFontSize()));
         textPane.setText(getDesc().getText());
         textPane.setToolTipText(textPane.getText());
+        textPane.setName(getDraggedThing().getPrimUuid().toString());
 
         add(textPane, gbc);
         gbc.weightx = 0;

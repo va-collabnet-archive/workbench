@@ -4,6 +4,8 @@
  */
 package org.ihtsdo.arena.conceptview;
 
+import java.awt.Component;
+import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
@@ -38,6 +40,8 @@ import org.ihtsdo.tk.api.description.DescriptionAnalogBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.dto.concept.component.refex.TK_REFEX_TYPE;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
+import static org.ihtsdo.arena.conceptview.DragPanelDescription.FOCUSED_CARET;
+import static org.ihtsdo.arena.conceptview.DragPanelDescription.FOCUSED_COMPONENT;
 import org.ihtsdo.helper.dialect.DialectHelper;
 import org.ihtsdo.lang.LANG_CODE;
 import org.ihtsdo.thread.NamedThreadFactory;
@@ -190,6 +194,13 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
     }
 
     private void doAction() throws IOException, PropertyVetoException, InvalidCAB, UnsupportedDialectOrLanguage, TerminologyException, ContradictionException {
+        Component focusOwner = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
+        if(focusOwner instanceof JTextArea){
+            JTextArea focusedText = (JTextArea) focusOwner;
+            System.setProperty(FOCUSED_COMPONENT, focusOwner.getName());
+            Integer caretPosition = focusedText.getCaretPosition();
+            System.setProperty(FOCUSED_CARET, caretPosition.toString());
+        }
         config = Terms.get().getActiveAceFrameConfig();
         tc = Ts.get().getTerminologyBuilder(config.getEditCoordinate(),
                 config.getViewCoordinate());

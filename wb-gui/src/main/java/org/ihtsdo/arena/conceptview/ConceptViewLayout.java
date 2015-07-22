@@ -1065,6 +1065,12 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
                 }
             }
         });
+        for(DragPanelDescription panel : activeDescriptionPanels){      
+            if(System.getProperty(DragPanelDescription.FOCUSED_COMPONENT).equals(panel.getTextPane().getName())){
+                boolean requestFocusInWindow = panel.getTextPane().requestFocusInWindow();
+                panel.getTextPane().setCaretPosition(Integer.parseInt(System.getProperty(DragPanelDescription.FOCUSED_CARET)));
+            }
+        }
     }
     
     private HashSet<RelationshipVersionBI> findProximalPrimitveOLD(Collection<? extends RelationshipVersionBI> rel) throws IOException, ContradictionException{

@@ -179,6 +179,7 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.LogWithAlerts;
 import org.dwfa.vodb.types.IntList;
 import org.ihtsdo.arena.Arena;
+import org.ihtsdo.arena.conceptview.DragPanelDescription;
 import org.ihtsdo.custom.statics.CustomStatics;
 import org.ihtsdo.helper.descriptionlogic.DescriptionLogic;
 import org.ihtsdo.objectCache.ObjectCache;
@@ -238,6 +239,8 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
     static {
         swingTimer.start();
+        System.setProperty(DragPanelDescription.FOCUSED_COMPONENT, "");
+        System.setProperty(DragPanelDescription.FOCUSED_CARET, "0");
     }
 
     //~--- fields --------------------------------------------------------------
