@@ -274,7 +274,6 @@ public class ConceptNavigator extends JPanel {
             @Override
             public void run() {
                 updateHistoryPanel();
-                view.getSettings().fireConceptChanged();
                 historyScroller.revalidate();
                 SwingUtilities.invokeLater(new Runnable() {
                     @Override

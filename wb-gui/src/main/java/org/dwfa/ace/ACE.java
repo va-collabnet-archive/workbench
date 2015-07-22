@@ -19,7 +19,6 @@
 
 package org.dwfa.ace;
 
-import java.awt.AWTEvent;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -32,7 +31,6 @@ import java.awt.KeyboardFocusManager;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
-import java.awt.event.AWTEventListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
@@ -45,7 +43,6 @@ import java.beans.IntrospectionException;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyVetoException;
-import java.beans.VetoableChangeListener;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -97,7 +94,6 @@ import javax.swing.JRootPane;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
-import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.JToggleButton;
@@ -183,9 +179,6 @@ import org.dwfa.tapi.TerminologyException;
 import org.dwfa.util.LogWithAlerts;
 import org.dwfa.vodb.types.IntList;
 import org.ihtsdo.arena.Arena;
-import static org.ihtsdo.arena.conceptview.ConceptView.CONCEPT_REDRAW;
-import static org.ihtsdo.arena.conceptview.DragPanelDescription.OK_TO_MOVE;
-import static org.ihtsdo.arena.conceptview.DragPanelDescription.YEILD_FOCUS;
 import org.ihtsdo.custom.statics.CustomStatics;
 import org.ihtsdo.helper.descriptionlogic.DescriptionLogic;
 import org.ihtsdo.objectCache.ObjectCache;
@@ -245,53 +238,6 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
     static {
         swingTimer.start();
-        System.setProperty("yeildFocus", "true");
-        KeyboardFocusManager.getCurrentKeyboardFocusManager().addVetoableChangeListener("focusOwner", new VetoableChangeListener() {
-
-            @Override
-            public void vetoableChange(PropertyChangeEvent evt) throws PropertyVetoException {
-                if(evt.getNewValue() == null){
-//                    System.out.println("DEBUG -- New component is null, should yeild focus? " + System.getProperty(YEILD_FOCUS));
-                }
-                if (System.getProperty(YEILD_FOCUS) != null) {
-                    if (System.getProperty(YEILD_FOCUS).equals(Boolean.FALSE.toString())) {
-//                        System.out.println("DEBUG -- Vetoing change in focus");
-//                        System.out.println("DEBUG -- Old: " + evt.getOldValue() + " New: " + evt.getNewValue() + " Source: " + evt.getSource());
-                        throw new PropertyVetoException("Vetoed focus change.", evt);
-                    }
-                }
-            }
-        });
-        
-        Toolkit.getDefaultToolkit().addAWTEventListener(new AWTEventListener() {
-            public void eventDispatched(AWTEvent event) {
-                if (event instanceof MouseEvent) {
-                    MouseEvent evt = (MouseEvent) event;
-                    if (evt.getID() == MouseEvent.MOUSE_CLICKED) {
-                        //clicking to another text area
-                        if (editingComponent != null) {
-                            if (!editingComponent.contains(evt.getPoint())) {
-                                editingComponent.putClientProperty(OK_TO_MOVE, true);
-//                                System.out.println("DEBUG -- 1 - OK to move: " + editingComponent.getClientProperty(OK_TO_MOVE) + " " + editingComponent.getText());
-                                System.setProperty(YEILD_FOCUS, Boolean.TRUE.toString());
-//                                System.out.println("DEBUG -- System yeilding focus.");
-                            } else if (evt.getSource() instanceof JTextArea) {
-                                JTextArea clickedText = (JTextArea) evt.getSource();
-                                if (clickedText.getName() != null
-                                        && clickedText != editingComponent) {
-                                    editingComponent.putClientProperty(OK_TO_MOVE, true);
-//                                    System.out.println("DEBUG -- 1 - OK to move: " + editingComponent.getClientProperty(OK_TO_MOVE) + " " + editingComponent.getText());
-                                    System.setProperty(YEILD_FOCUS, Boolean.TRUE.toString());
-                                    clickedText.requestFocusInWindow();
-//                                    System.out.println("DEBUG -- System yeilding focus.");
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }, AWTEvent.MOUSE_EVENT_MASK);
-        System.setProperty(CONCEPT_REDRAW, Boolean.FALSE.toString());
     }
 
     //~--- fields --------------------------------------------------------------
@@ -383,7 +329,6 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
     private static AtomicBoolean active = new AtomicBoolean(true);
     private static ArrayList<WeakReference<ListenForDataChecks>> dataChecks = new ArrayList<>();
     public static PanelLinkingPreferences linkPref;
-    public static JTextArea editingComponent;
 
     //~--- constructors --------------------------------------------------------
 
@@ -2726,7 +2671,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         c.gridy           = 0;
         showHistoryButton =
                 new JToggleButton(new ImageIcon(ACE.class.getResource("/32x32/plain/history2.png")));
-        showHistoryButton.setFocusable(false);
+
         if (editMode) {
             showHistoryButton.setToolTipText("history of user commits and concepts viewed");
         } else {
@@ -2745,7 +2690,6 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         showAddressesButton =
                 new JToggleButton(new ImageIcon(ACE.class.getResource("/32x32/plain/address_book3.png")));
         showAddressesButton.setToolTipText("address book of project participants");
-        showAddressesButton.setFocusable(false);
         apal = new AddressPaletteActionListener();
         showAddressesButton.addActionListener(apal);
         showAddressesButton.setVisible(editMode);
@@ -2764,7 +2708,6 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         c.weightx      = 0;
         showTreeButton = new JToggleButton(new ImageIcon(ACE.class.getResource("/32x32/plain/text_tree.png")));
         showTreeButton.setToolTipText("Show the hierarchy view of the terminology content.");
-        showTreeButton.setFocusable(false);
         showTreeButton.setSelected(true);
         showTreeButton.addActionListener(resizeListener);
 
@@ -2777,7 +2720,6 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         showComponentButton =
                 new JToggleButton(new ImageIcon(ACE.class.getResource("/32x32/plain/components.png")));
         showComponentButton.setToolTipText("Show the component view of the terminology content.");
-        showComponentButton.setFocusable(false);
         showComponentButton.setSelected(true);
         showComponentButton.addActionListener(resizeListener);
 
@@ -2790,7 +2732,6 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         topPanel.add(new JPanel(), c);
         c.gridx++;
         showProgressButton = new JButton(new ImageIcon(ACE.class.getResource("/32x32/plain/gears_view.png")));
-        showProgressButton.setFocusable(false);
         showProgressButton.setToolTipText("Show the activity viewer, and bring to the front.");
         showProgressButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
@@ -2837,7 +2778,7 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                 if (iconBytes != null) {
                     ImageIcon icon         = new ImageIcon(iconBytes);
                     JButton   pluginButton = new JButton(icon);
-                    pluginButton.setFocusable(false);
+
                     pluginButton.setToolTipText(bp.getSubject());
                     pluginButton.addActionListener(new PluginListener(f));
                     c.gridx++;
@@ -2847,11 +2788,10 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                     if (bp.getName().equals("Synchronize with Subversion")) {
                         synchronizeButton = pluginButton;
                         synchronizeButton.setEnabled(Svn.isConnectedToSvn());
-                        synchronizeButton.setFocusable(false);
                     }
                 } else {
                     JButton pluginButton = new JButton(bp.getName());
-                    pluginButton.setFocusable(false);
+
                     pluginButton.setToolTipText(bp.getSubject());
                     pluginButton.addActionListener(new PluginListener(f));
                     c.gridx++;
@@ -2861,7 +2801,6 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
                     if (bp.getName().equals("Synchronize with Subversion")) {
                         synchronizeButton = pluginButton;
                         synchronizeButton.setEnabled(Svn.isConnectedToSvn());
-                        synchronizeButton.setFocusable(false);
                     }
                 }
             }
@@ -2873,11 +2812,10 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
         TransporterLabel flashButton =
                 new TransporterLabel(new ImageIcon(ACE.class.getResource("/32x32/plain/flash.png")), this);
-        flashButton.setFocusable(false);
+
         topPanel.add(flashButton, c);
         c.gridx++;
         showQueuesButton = new JToggleButton(new ImageIcon(ACE.class.getResource("/32x32/plain/inbox.png")));
-        showQueuesButton.setFocusable(false);
         topPanel.add(showQueuesButton, c);
         showQueuesActionListener = new QueuesPaletteActionListener();
         showQueuesButton.addActionListener(showQueuesActionListener);
@@ -2890,7 +2828,6 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         c.gridx++;
         showProcessBuilder =
                 new JToggleButton(new ImageIcon(ACE.class.getResource("/32x32/plain/cube_molecule.png")));
-        showProcessBuilder.setFocusable(false);
         topPanel.add(showProcessBuilder, c);
         showProcessBuilderActionListener = new ProcessPaletteActionListener();
         showProcessBuilder.addActionListener(showProcessBuilderActionListener);
@@ -2903,7 +2840,6 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
 
         c.gridx++;
         showSubversionButton = new JToggleButton(new ImageIcon(ACE.class.getResource("/32x32/plain/svn.png")));
-        showSubversionButton.setFocusable(false);
         topPanel.add(showSubversionButton, c);
         showSubversionButton.addActionListener(new SubversionPaletteActionListener());
         showSubversionButton.setToolTipText("Show Subversion panel...");
@@ -2915,7 +2851,6 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
         c.gridx++;
         showPreferencesButton =
                 new JToggleButton(new ImageIcon(ACE.class.getResource("/32x32/plain/preferences.png")));
-        showPreferencesButton.setFocusable(false);
         preferencesActionListener = new PreferencesPaletteActionListener();
         showPreferencesButton.addActionListener(preferencesActionListener);
         topPanel.add(showPreferencesButton, c);
@@ -3265,7 +3200,6 @@ public class ACE extends JPanel implements PropertyChangeListener, I_DoQuitActio
     public static void setSynchronizeButtonIsEnabled(boolean enabled) {
         if (synchronizeButton != null) {
             synchronizeButton.setEnabled(enabled);
-            synchronizeButton.setFocusable(false);
         }
     }
 

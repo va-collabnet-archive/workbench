@@ -45,7 +45,6 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -83,9 +82,6 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import org.dwfa.cement.RefsetAuxiliary;
 import org.dwfa.util.id.Type5UuidFactory;
-import static org.ihtsdo.arena.conceptview.ConceptView.CONCEPT_REDRAW;
-import static org.ihtsdo.arena.conceptview.DragPanelDescription.OK_TO_MOVE;
-import static org.ihtsdo.arena.conceptview.DragPanelDescription.YEILD_FOCUS;
 import org.ihtsdo.helper.bdb.MultiEditorContradictionCase;
 import org.ihtsdo.helper.bdb.MultiEditorContradictionDetector;
 import org.ihtsdo.tk.api.*;
@@ -503,7 +499,7 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
             }
             
             Map<SpecBI, Integer> templates = get();
-
+            
             cView.removeAll();
             cView.setLayout(new GridBagLayout());
             
@@ -654,14 +650,11 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
                     
                     sortDescriptions();
                     
-                    boolean resetFocusTracking = true;
                     for (DragPanelDescription dc : activeDescriptionPanels) {
                         if (stop) {
                             return;
                         }
-                        if(dc.getDraggedThing().isUncommitted()){
-                            resetFocusTracking = false;
-                        }
+                        
                         setShowConflicts(dc.getComponentVersion(), dc);
                         seperatorComponents.add(dc);
                         cpd.addToggleComponent(dc);
@@ -671,19 +664,11 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
                         cpd.setRefexCount(cpd.refexCount += dc.getRefexSubpanelCount());
                         cpd.setHistoryCount(cpd.historyCount += dc.getHistorySubpanelCount());
                         cpd.setTemplateCount(cpd.templateCount += dc.getTemplateSubpanelCount());
-//                        if (dc.getDraggedThing().isUncommitted() && 
-//                                dc.getTextPane().getName().equals(cView.getFocusUuid())
-//                                && !dc.getTextPane().hasFocus()) {
-//                            dc.getTextPane().setCaretPosition(cView.getCaretPosition());
-//                            dc.getTextPane().getCaret().setVisible(true);
-//                            dc.getTextPane().requestFocusInWindow();
-//                        }
+                        if(dc.getThingToDrag().isUncommitted() && cView.focus){
+                                dc.getTextPane().requestFocusInWindow();
+                                cView.focus = false;
+                        }
                     }
-                    if(resetFocusTracking){
-                        cView.setCaretPosition(0);
-                        cView.setFocusUuid("");
-                    }
-                    
                     
                     boolean descHistoryIsShown = cpd.isShown(DragPanelComponentVersion.SubPanelTypes.HISTORY);
                     
@@ -1080,7 +1065,6 @@ public class ConceptViewLayout extends SwingWorker<Map<SpecBI, Integer>, Object>
                 }
             }
         });
-//        cView.requestFocusInWindow();
     }
     
     private HashSet<RelationshipVersionBI> findProximalPrimitveOLD(Collection<? extends RelationshipVersionBI> rel) throws IOException, ContradictionException{
