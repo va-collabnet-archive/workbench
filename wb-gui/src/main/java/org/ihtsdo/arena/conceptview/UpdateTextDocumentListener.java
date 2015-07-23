@@ -14,6 +14,7 @@ import java.beans.VetoableChangeListener;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Level;
@@ -265,6 +266,7 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
                     desc.getNid(),
                     usConcept.getNid());
             refexSpecUs.put(RefexProperty.CNID1, prefNid);
+            refexSpecUs.setMemberUuid(UUID.randomUUID());
             RefexChronicleBI<?> newRefexUs = tc.construct(refexSpecUs);
 
             RefexCAB refexSpecGb = new RefexCAB(
@@ -272,6 +274,7 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
                     desc.getNid(),
                     gbConcept.getNid());
             refexSpecGb.put(RefexProperty.CNID1, prefNid);
+            refexSpecGb.setMemberUuid(UUID.randomUUID());
             RefexChronicleBI<?> newRefexGb = tc.construct(refexSpecGb);
 
             I_GetConceptData refexGb = Terms.get().getConceptForNid(newRefexGb.getNid());
@@ -292,6 +295,7 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
                         desc.getNid(),
                         usConcept.getNid());
                 refexSpecUs.put(RefexProperty.CNID1, acceptNid);
+                refexSpecUs.setMemberUuid(UUID.randomUUID());
                 RefexChronicleBI<?> newRefexUs = tc.construct(refexSpecUs);
 
                 RefexCAB refexSpecGb = new RefexCAB(
@@ -299,6 +303,7 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
                         desc.getNid(),
                         gbConcept.getNid());
                 refexSpecGb.put(RefexProperty.CNID1, acceptNid);
+                refexSpecGb.setMemberUuid(UUID.randomUUID());
                 RefexChronicleBI<?> newRefexGb = tc.construct(refexSpecGb);
 
                 I_GetConceptData refexGb = Terms.get().getConceptForNid(newRefexGb.getNid());
@@ -311,6 +316,7 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
                         desc.getNid(),
                         usConcept.getNid());
                 refexSpecUs.put(RefexProperty.CNID1, acceptNid);
+                refexSpecUs.setMemberUuid(UUID.randomUUID());
                 RefexChronicleBI<?> newRefexUs = tc.construct(refexSpecUs);
 
                 I_GetConceptData refexUs = Terms.get().getConceptForNid(newRefexUs.getConceptNid());
@@ -321,6 +327,7 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
                         desc.getNid(),
                         gbConcept.getNid());
                 refexSpecGb.put(RefexProperty.CNID1, acceptNid);
+                refexSpecGb.setMemberUuid(UUID.randomUUID());
                 RefexChronicleBI<?> newRefexGb = tc.construct(refexSpecGb);
 
                 I_GetConceptData refexGb = Terms.get().getConceptForNid(newRefexGb.getConceptNid());
@@ -341,6 +348,7 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
                         desc.getNid(),
                         usConcept.getNid());
                 refexSpecUs.put(RefexProperty.CNID1, prefNid);
+                refexSpecUs.setMemberUuid(UUID.randomUUID());
                 RefexChronicleBI<?> newRefexUs = tc.construct(refexSpecUs);
 
                 RefexCAB refexSpecGb = new RefexCAB(
@@ -348,6 +356,7 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
                         desc.getNid(),
                         gbConcept.getNid());
                 refexSpecGb.put(RefexProperty.CNID1, prefNid);
+                refexSpecGb.setMemberUuid(UUID.randomUUID());
                 RefexChronicleBI<?> newRefexGb = tc.construct(refexSpecGb);
 
                 I_GetConceptData refexGb = Terms.get().getConceptForNid(newRefexGb.getNid());
@@ -360,6 +369,7 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
                         desc.getNid(),
                         usConcept.getNid());
                 refexSpecUs.put(RefexProperty.CNID1, prefNid);
+                refexSpecUs.setMemberUuid(UUID.randomUUID());
                 RefexChronicleBI<?> newRefexUs = tc.construct(refexSpecUs);
 
                 I_GetConceptData refexUs = Terms.get().getConceptForNid(newRefexUs.getConceptNid());
@@ -370,6 +380,7 @@ public class UpdateTextDocumentListener implements DocumentListener, ActionListe
                         desc.getNid(),
                         gbConcept.getNid());
                 refexSpecGb.put(RefexProperty.CNID1, prefNid);
+                refexSpecGb.setMemberUuid(UUID.randomUUID());
                 RefexChronicleBI<?> newRefexGb = tc.construct(refexSpecGb);
 
                 I_GetConceptData refexGb = Terms.get().getConceptForNid(newRefexGb.getConceptNid());
