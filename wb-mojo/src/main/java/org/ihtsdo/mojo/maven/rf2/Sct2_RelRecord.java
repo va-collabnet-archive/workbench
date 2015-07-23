@@ -299,7 +299,15 @@ class Sct2_RelRecord implements Comparable<Sct2_RelRecord>, Serializable {
         br.readLine(); // Header row
         while (br.ready()) {
             String[] line = br.readLine().split(TAB_CHARACTER);
-
+            
+            // RF1 historical rels are not released, they get a default ID of "FFFFFFFFF" 
+            // which converts to 0 for the sake of compatibility with existing method signatures
+            // a 0 will cause a random uuid to be generated
+            long thisRelId = 0;
+            if(!line[ID].equals("FFFFFFFFF")){
+                thisRelId = Long.parseLong(line[ID]);
+            }
+            
             // Get characteristic sct id
             long thisCharacteristicId = Long.parseLong(line[CHARACTERISTIC_TYPE]);
             // Get role type sct id
@@ -331,7 +339,7 @@ class Sct2_RelRecord implements Comparable<Sct2_RelRecord>, Serializable {
                 thisRefinabilityId = refinibilityMandatoryId;
             }
             
-            a[idx] = new Sct2_RelRecord(Long.parseLong(line[ID]),
+            a[idx] = new Sct2_RelRecord(thisRelId,
                     Rf2x.convertEffectiveTimeToDate(line[EFFECTIVE_TIME]),
                     Rf2x.convertStringToBoolean(line[ACTIVE]),
                     Rf2x.convertSctIdToUuidStr(line[MODULE_ID]),

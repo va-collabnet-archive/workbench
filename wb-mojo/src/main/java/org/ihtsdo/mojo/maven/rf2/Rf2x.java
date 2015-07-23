@@ -173,6 +173,12 @@ public class Rf2x {
 
     static UUID convertSctIdToUuid(long id) 
             throws IOException {
+        // RF1 historical rels are not released, they get a default ID of "FFFFFFFFF" 
+        // which converts to 0 for the sake of compatibility with existing method signatures
+        // a 0 will cause a random uuid to be generated
+        if(id == 0){
+            return UUID.randomUUID();
+        }
         UUID uuid;
         if (sctid2UuidCache == null) {
             throw new IOException("Rf2x.setupIdCache(path) needs to be called first");
