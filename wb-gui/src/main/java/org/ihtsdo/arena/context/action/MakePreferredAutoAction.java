@@ -16,6 +16,7 @@
 package org.ihtsdo.arena.context.action;
 
 import java.awt.event.ActionEvent;
+import java.beans.PropertyVetoException;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.logging.Level;
@@ -27,15 +28,14 @@ import org.ihtsdo.lang.LANG_CODE;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.TerminologyBuilderBI;
-import org.ihtsdo.tk.api.blueprint.DescriptionCAB;
 import org.ihtsdo.tk.api.blueprint.InvalidCAB;
 import org.ihtsdo.tk.api.blueprint.RefexCAB;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
-import org.ihtsdo.tk.api.refex.RefexChronicleBI;
+import org.ihtsdo.tk.api.refex.RefexAnalogBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
-import org.ihtsdo.tk.binding.snomed.RefsetAux;
+import org.ihtsdo.tk.api.refex.type_nid.RefexNidAnalogBI;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
 import org.ihtsdo.tk.drools.facts.DescFact;
 
@@ -81,6 +81,10 @@ public class MakePreferredAutoAction extends AbstractAction{
                         handleDescriptions(desc, d, gbRefsetNid);
                         handleDescriptions(desc, d, usRefsetNid);
                     }
+                }
+                if(notHandled){
+                    handleDescriptions(desc, null, gbRefsetNid);
+                    handleDescriptions(desc, null, usRefsetNid);
                 }
                 
             }else if(dialect.equals(LANG_CODE.EN_US)){
@@ -130,14 +134,20 @@ public class MakePreferredAutoAction extends AbstractAction{
             AceLog.getAppLog().alertAndLogException(ex);
         } catch (InvalidCAB ex) {
             AceLog.getAppLog().alertAndLogException(ex);
+        } catch (PropertyVetoException ex) {
+            AceLog.getAppLog().alertAndLogException(ex);
         }
          
     }
     
     private void handleDescriptions(DescriptionVersionBI newPreferred, DescriptionVersionBI oldPreferred, int refexNid) throws IOException,
-            ContradictionException, InvalidCAB{
+            ContradictionException, InvalidCAB, PropertyVetoException{
         notHandled = false;
         for(RefexVersionBI r : newPreferred.getAnnotationMembersActive(vc, refexNid)){
+            if(r.isUncommitted()){
+                RefexNidAnalogBI ra = (RefexNidAnalogBI) r;
+                ra.setNid1(preferredNid);
+            }
             RefexCAB bp = r.makeBlueprint(vc);
             bp.put(RefexCAB.RefexProperty.CNID1, preferredNid);
             bp.setMemberUuid(r.getPrimUuid());
