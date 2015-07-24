@@ -35,6 +35,10 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.apache.mahout.math.list.IntArrayList;
+import org.ihtsdo.db.uuidmap.UuidIntProcedure;
 import org.ihtsdo.db.uuidmap.UuidToIntHashMap;
 
 /**
@@ -48,6 +52,7 @@ public class UuidToNidMapBdb extends ComponentBdb {
 
    private IdSequence    idSequence;
    private ReentrantLock generateLock = new ReentrantLock();
+   private int largestNid = Integer.MIN_VALUE;
    
     UuidToIntHashMap readOnlyMap;
     ConcurrentHashMap<UUID,Integer> mutableMap;
@@ -125,6 +130,36 @@ public class UuidToNidMapBdb extends ComponentBdb {
            mutableMap = mutableMapBinder.entryToObject(theData);
        } else {
            mutableMap = new ConcurrentHashMap<>();
+       }
+       largestNid = Integer.MIN_VALUE;
+       readOnlyMap.forEachPair(new UuidIntProcedure() {
+
+           @Override
+           public boolean apply(long[] uuid, int nid) {
+               largestNid = Math.max(largestNid, nid);
+               return true;
+           }
+
+           @Override
+           public void close() {
+               //nothing to do
+           }
+       });
+       
+       Iterator<Map.Entry<UUID, Integer>> mutableMapItr = mutableMap.entrySet().iterator();
+       
+       while(mutableMapItr.hasNext()){
+           int nid = mutableMapItr.next().getValue();
+           largestNid = Math.max(largestNid, nid);
+       }
+       
+       //add + 1 get what the next nid (sequence) should be
+       largestNid = largestNid + 1;
+       
+       //write to log if the two disagree (sequence and found value);
+       if(largestNid != idSequence.sequence.get()){
+           Logger.getLogger(UuidToNidMapBdb.class.getName()).log(Level.SEVERE, "Nid sequence and nids do not match. Sequence is: " + idSequence.sequence.get() + " Should be: " + largestNid);
+           new IdSequence(largestNid);
        }
    }
 
