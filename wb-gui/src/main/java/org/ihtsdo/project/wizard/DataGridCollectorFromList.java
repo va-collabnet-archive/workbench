@@ -815,7 +815,7 @@ public class DataGridCollectorFromList extends JPanel implements I_fastWizard {
 		DefaultTableModel model = (DefaultTableModel) tblObjs.getModel();
 		for (int i = 1; i < columnNames.length; i += 2) {
 			if (rolesMap.containsKey(columnNames[i])) {
-				String defUser = def.get(columnNames[i]).toString();
+				String defUser = def.get(columnNames[i]);
 				List<WfMembership> users = rolesMap.get(columnNames[i]);
 				for (WfMembership user : users) {
 					for (int j = 0; j < model.getRowCount(); j++) {
