@@ -322,7 +322,8 @@ public class GenerateIncrementalRf2File extends AbstractMojo {
     private String translatedConceptsEditPath;
     /**
      * The language refset concept. Used to make sure that the members are in the correct language.
-     * @parameter @required
+     * If not provided, it doesn't run.
+     * @parameter @optional
      */
     private ConceptDescriptor langRefsetConceptSpec;
 
@@ -438,11 +439,13 @@ public class GenerateIncrementalRf2File extends AbstractMojo {
                     refsetSpecComputer.process();
                     refsetSpecComputer.writeRefsetSpecMetadata(metaDir);
             }
-            LanguageRefsetChecker languageRefsetChecker = new LanguageRefsetChecker(vc,
-                    UUID.fromString(langRefsetConceptSpec.getUuid()),
-                    languageCode);
-            languageRefsetChecker.setup();
-            Ts.get().iterateConceptDataInParallel(languageRefsetChecker);
+            if (langRefsetConceptSpec != null) {
+                LanguageRefsetChecker languageRefsetChecker = new LanguageRefsetChecker(vc,
+                        UUID.fromString(langRefsetConceptSpec.getUuid()),
+                        languageCode);
+                languageRefsetChecker.setup();
+                Ts.get().iterateConceptDataInParallel(languageRefsetChecker);
+            }
             if(translatedConceptsRefset != null){
                 UUID pathUuid = Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, translatedConceptsEditPath);
                 EditCoordinate metaEc = Ts.get().getMetadataEditCoordinate();
@@ -544,6 +547,9 @@ public class GenerateIncrementalRf2File extends AbstractMojo {
             writer.close();
             handler.writeMaps();
         } catch (Exception e) {
+            if (e.getCause() != null) {
+                e.getCause().printStackTrace();
+            }
             throw new MojoExecutionException(e.getLocalizedMessage(), e);
         }
     }
