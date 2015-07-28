@@ -168,14 +168,14 @@ public class Rf2RefexComputer implements ProcessUnfetchedConceptDataBI {
         Collection<? extends RelationshipVersionBI> latestRels = cvAllStatus.getRelationshipsOutgoingActive();
         Collection<? extends DescriptionVersionBI> latestDescs = cvAllStatus.getDescriptionsActive();
         boolean changed = false;
-        if (conceptChronicle.getPrimUuid().equals(UUID.fromString("9465bd0c-bca9-360b-a36b-0cf5a236c14c"))) {
-            System.out.println("DEBUG -- Inactive concept FLPR");
-        }
         for (RelationshipVersionBI historicalRel : latestRels) {
                 if (stampNids.contains(historicalRel.getStampNid())) {
                     if (historicalRelTypes.contains(historicalRel.getTypeNid())) {
                         int refexNid = getAssociationRefexForTypeNid(historicalRel.getTypeNid());
-                        if (historicalRel.isActive(viewCoordinate)) {
+                        //Fix for DK, relationship has been retired in DELTA run, but needs to be in SNAPSHOT and FULL
+                        //TODO: take out after DK relase is finished
+                        if (historicalRel.isActive(viewCoordinate) || 
+                                conceptChronicle.getPrimUuid().equals(UUID.fromString("e8634ede-7d05-42ef-95e1-675cf4af0a83"))) { 
                             RefexCAB refexBp = new RefexCAB(TK_REFEX_TYPE.CID,
                                     historicalRel.getSourceNid(),
                                     refexNid);
