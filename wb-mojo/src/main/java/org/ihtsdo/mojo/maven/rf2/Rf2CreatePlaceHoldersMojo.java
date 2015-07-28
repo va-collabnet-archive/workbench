@@ -282,7 +282,7 @@ public class Rf2CreatePlaceHoldersMojo extends AbstractMojo implements Serializa
                     + (System.currentTimeMillis() - start) + " milliseconds");
             
         } catch (Exception e) {
-            throw new MojoFailureException("parseForConceptIds failed");
+            throw new MojoFailureException("parseForConceptIds failed", e);
         }
         
         return a;
