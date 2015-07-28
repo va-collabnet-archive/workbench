@@ -115,7 +115,9 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
     private static UUID REFSET_DESC_NAMESPACE = UUID.fromString("d1871eb0-8a47-11e1-b0c4-0800200c9a66");
     private static UUID MODULE_DEPEND_NAMESPACE = UUID.fromString("d1871eb2-8a47-11e1-b0c4-0800200c9a66");
     private static UUID DESC_TYPE_NAMESPACE = UUID.fromString("d1871eb3-8a47-11e1-b0c4-0800200c9a66");
-    private static UUID VA_REACTANTS_REFSET_UUID = UUID.fromString("c439b4b1-ce66-4fa8-bad4-213d56651a81");
+    private static List<UUID> VA_REACTANTS_REFSET_UUID = Arrays.asList(new UUID[]{UUID.fromString("931fea01-0045-5689-ae2a-fd57f5dbb900"),
+        UUID.fromString("c439b4b1-ce66-4fa8-bad4-213d56651a81")});
+
 
     private boolean makePrivateIdFile;
     private ConceptVersionBI refsetParentConcept;
