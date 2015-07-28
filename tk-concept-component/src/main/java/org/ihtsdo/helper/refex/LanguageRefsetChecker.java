@@ -60,22 +60,32 @@ public class LanguageRefsetChecker implements ProcessUnfetchedConceptDataBI{
     @Override
     public void processUnfetchedConceptData(int conceptNid, ConceptFetcherBI conceptFetcher) throws Exception {
         ConceptVersionBI cv = conceptFetcher.fetch(vc);
-        for(DescriptionVersionBI d: cv.getDescriptionsActive()){
-            Collection<? extends RefexVersionBI<?>> langAnnotations = d.getActiveAnnotations(vc, languageRefset.getNid());
-            Collection<? extends RefexVersionBI<?>> usAnnotations = d.getActiveAnnotations(vc, RefsetAux.EN_US_REFEX.getLenient().getNid());
-            Collection<? extends RefexVersionBI<?>> gbAnnotations = d.getActiveAnnotations(vc, RefsetAux.EN_GB_REFEX.getLenient().getNid());
-            
-//             !d.getLang().equalsIgnoreCase("en") && (usAnnotations.size() > 0) ||
-//                    !d.getLang().equalsIgnoreCase("en") && (gbAnnotations.size() > 0
-            
-            if((d.getLang().equalsIgnoreCase("en") && (langAnnotations.size() > 0))||
-                (d.getLang().equalsIgnoreCase(lang) && (usAnnotations.size() > 0) )||
-                (d.getLang().equalsIgnoreCase(lang) && (gbAnnotations.size() > 0))){
-                Collection<? extends IdBI> additionalIds = cv.getChronicle().getAdditionalIds();
-                for(IdBI id : additionalIds){
-                    if (id.getAuthorityNid() == TermAux.SCT_ID_AUTHORITY.getLenient().getNid()) {
-                            String sctId = id.getDenotation().toString();
-                            System.out.println(sctId + "\t" + d.getText());
+        if (cv != null)
+        {
+            for(DescriptionVersionBI d: cv.getDescriptionsActive()){
+                Collection<? extends RefexVersionBI<?>> langAnnotations = d.getActiveAnnotations(vc, languageRefset.getNid());
+                Collection<? extends RefexVersionBI<?>> usAnnotations = d.getActiveAnnotations(vc, RefsetAux.EN_US_REFEX.getLenient().getNid());
+                Collection<? extends RefexVersionBI<?>> gbAnnotations = d.getActiveAnnotations(vc, RefsetAux.EN_GB_REFEX.getLenient().getNid());
+                
+    //             !d.getLang().equalsIgnoreCase("en") && (usAnnotations.size() > 0) ||
+    //                    !d.getLang().equalsIgnoreCase("en") && (gbAnnotations.size() > 0
+                
+                if((d.getLang().equalsIgnoreCase("en") && (langAnnotations.size() > 0))||
+                    (d.getLang().equalsIgnoreCase(lang) && (usAnnotations.size() > 0) )||
+                    (d.getLang().equalsIgnoreCase(lang) && (gbAnnotations.size() > 0))){
+                    Collection<? extends IdBI> additionalIds = cv.getChronicle().getAdditionalIds();
+                    if (additionalIds != null)
+                    {
+                        for(IdBI id : additionalIds){
+                            if (id.getAuthorityNid() == TermAux.SCT_ID_AUTHORITY.getLenient().getNid()) {
+                                    String sctId = id.getDenotation().toString();
+                                    System.out.println(sctId + "\t" + d.getText());
+                            }
+                        }
+                    }
+                    else
+                    {
+                        //who knows.... this "tool" is really poorly designed.
                     }
                 }
             }
