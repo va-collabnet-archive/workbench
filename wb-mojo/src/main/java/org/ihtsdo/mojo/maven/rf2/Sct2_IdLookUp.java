@@ -96,8 +96,9 @@ public class Sct2_IdLookUp {
             if (tempIdList.get(i).sctIdL == tempIdList.get(i + 1).sctIdL) {
                 //remove and write to additional ids file
                 idList.remove(i);
-                Sct2_IdCompact sct = tempIdList.get(i);
-                uuidsWriter.write(tempIdList.get(i).toString());
+                Sct2_IdCompact sct = tempIdList.remove(i);
+                i--;
+                uuidsWriter.write(sct.toString());
             }
         }
         uuidsWriter.flush();
