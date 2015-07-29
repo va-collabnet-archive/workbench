@@ -279,7 +279,7 @@ public class Sct2_IdRecord implements Serializable {
                     UUID pUuid = UUID.fromString(parts[ALTERNATE_IDENTIFIER]);
                     if (sctIdUuid == null || pUuid.compareTo(sctIdUuid) != 0) {
                         if (!additionalIds.contains(parts[REFERENCED_COMPONENT_ID])) {
-                            throw new MojoFailureException("ALTERNATE_IDENTIFIER not found in cache");
+                            throw new MojoFailureException("ALTERNATE_IDENTIFIER not found in cache: " + parts[REFERENCED_COMPONENT_ID]);
                         }
                         continue;
                     }
