@@ -374,7 +374,7 @@ public class ConceptVersion implements ConceptVersionBI, Comparable<ConceptVersi
 
     @Override
     public ConceptAttributeVersionBI getConceptAttributesActive() throws IOException, ContradictionException {
-        return concept.getConceptAttributes().getVersion(vc);
+        return concept.getConceptAttributes() == null ? null : concept.getConceptAttributes().getVersion(vc);
     }
 
     @Override
