@@ -886,6 +886,8 @@ public class NewConceptFromBatch extends PreviousNextOrCancel {
                 addUsDescPref = true;
                 addGbDescPref = false;
                 addGbDescFsn = false;
+            }else{
+                throw new UnsupportedDialectOrLanguage("Check to make sure description does not contain both US and GB terms.");
             }
         } catch (UnsupportedDialectOrLanguage ex) {
             AceLog.getAppLog().alertAndLogException(ex);
