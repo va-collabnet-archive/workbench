@@ -264,13 +264,15 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
             this.conNumRefsetParentConcept = Ts.get().getConceptVersion(viewCoordinate, conNumRefesetParentConceptNid);
         }
         this.previousReleaseDate = previousReleaseDate;
+        ArrayList<Integer> stampHolder = new ArrayList<>();
         if(releaseType.equals(ReleaseType.DELTA) && previousReleaseDate != null){
             for(int stamp : stampNids){
                 long time = Ts.get().getTimeForStampNid(stamp);
                 if(time < previousReleaseDate.getTime()){
-                    stampNids.remove(stamp);
+                    stampHolder.add(stamp);
                 }
             }
+            stampNids.removeAll(stampHolder);
         }
         viewCoordinateAllStatusTime.setPrecedence(Precedence.TIME);
         setup();
@@ -704,10 +706,11 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                     for (RefexVersionBI refexVersion : versions) {
                         boolean write = true;
                         RefexChronicleBI chronicle = (RefexChronicleBI) refexVersion.getChronicle();
-                        if (sameCycleStampNids.contains(refexVersion.getPrimordialVersion().getStampNid()) && sameCycleStampNids.contains(refexVersion.getStampNid())) {
-                            if (refexVersion == null || !refexVersion.isActive(viewCoordinate)) { //refset member has been created and retired in the same release cycle
-                                write = false;
-                            }
+                        if (sameCycleStampNids.contains(refexVersion.getStampNid())) {
+                            RefexVersionBI version = (RefexVersionBI) chronicle.getVersion(viewCoordinateAllStatus);
+//                            if (!version.isActive(viewCoordinate)) {
+//                                write = false;
+//                            }
                         }
                         if (write) {
                             if (stampNids.contains(refexVersion.getStampNid())) {
@@ -1123,6 +1126,15 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                                 }
                             }
                             if (inTaxonomy) {
+                                if (rv.getCharacteristicNid()
+                                        == SnomedMetadataRfx.getREL_CH_INFERRED_RELATIONSHIP_NID()) {
+                                    processInferredRelationship(rv);
+                                } else if (rv.getCharacteristicNid()
+                                        == SnomedMetadataRfx.getREL_CH_STATED_RELATIONSHIP_NID()) {
+                                    processStatedRelationship(rv);
+                                } else{
+                                    writeIds = false; //rel is historical and part of RF1 not RF2
+                                }
                                 if (writeIds) {
                                     writeIds = false;
                                     if (sameCycleStampNids.contains(rv.getStampNid())) {
@@ -1134,13 +1146,6 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
                                                 rv.getStampNid(),
                                                 relationshipChronicle.getPrimordialVersion().getTime());
                                     }
-                                }
-                                if (rv.getCharacteristicNid()
-                                        == SnomedMetadataRfx.getREL_CH_INFERRED_RELATIONSHIP_NID()) {
-                                    processInferredRelationship(rv);
-                                } else if (rv.getCharacteristicNid()
-                                        == SnomedMetadataRfx.getREL_CH_STATED_RELATIONSHIP_NID()) {
-                                    processStatedRelationship(rv);
                                 }
                             }
                         }
@@ -1301,34 +1306,44 @@ public class Rf2Export implements ProcessUnfetchedConceptDataBI {
     
     private void processAssociationRefset(RefexChronicleBI refexChronicle) throws IOException, Exception {
         if (refexChronicle != null) {
-            Collection<RefexVersionBI> versions = new HashSet<>();
-            ComponentVersionBI primordialVersion = refexChronicle.getPrimordialVersion();
+            Collection<RefexNidVersionBI> versions = new HashSet<>();
+            RefexNidVersionBI primordialVersion = (RefexNidVersionBI) refexChronicle.getPrimordialVersion();
             if (releaseType.equals(ReleaseType.FULL)) {
                 //if not previously released or latest version remove
-                RefexVersionBI latest = (RefexVersionBI) refexChronicle.getVersion(viewCoordinateAllStatus);
-                for(Object o : refexChronicle.getVersions()){
-                    RefexVersionBI r = (RefexVersionBI)o;
-                    if(!sameCycleStampNids.contains(r.getStampNid()) || (latest != null && r.getStampNid() == latest.getStampNid())){
-                        versions.add(r);
+                if (refexChronicle.getVersions().size() == 1) {
+                    versions.add(primordialVersion);
+                } else {
+                    RefexVersionBI latest = (RefexVersionBI) refexChronicle.getVersion(viewCoordinateAllStatus);
+                    for (Object o : refexChronicle.getVersions()) {
+                        RefexNidVersionBI r = (RefexNidVersionBI) o;
+                        if (!sameCycleStampNids.contains(r.getStampNid()) || (latest != null && r.getStampNid() == latest.getStampNid())) {
+                            versions.add(r);
+                        }
                     }
                 }
             } else {
-                RefexVersionBI version = (RefexVersionBI) refexChronicle.getVersion(viewCoordinateAllStatus);
-                if(version != null){
-                    versions.add(version);
+                if (refexChronicle.getVersions().size() == 1) {
+                    versions.add(primordialVersion);
+                } else {
+                    RefexNidVersionBI version = (RefexNidVersionBI) refexChronicle.getVersion(viewCoordinateAllStatus);
+                    if (version != null) {
+                        versions.add(version);
+                    }
                 }
             }
             boolean write = true;
-                for (RefexVersionBI refex : versions) {
+            for (RefexNidVersionBI refex : versions) {
+                if (!refex.equals(primordialVersion)) { //primordial version is inactive if retiring on extension from content created on core
                     if (sameCycleStampNids.contains(primordialVersion.getStampNid()) && sameCycleStampNids.contains(refex.getStampNid())) {
                         RefexVersionBI version = (RefexVersionBI) refexChronicle.getVersion(viewCoordinateAllStatus);
                         if (version == null || !version.isActive(viewCoordinate)) { //refex member has been created and inactivated during the same release cycle
                             write = false;
                         }
                     }
-                    if (stampNids.contains(refex.getStampNid()) && write) {
-                        RefexNidVersionBI member = (RefexNidVersionBI) refex;
-                        for (Rf2File.AssociationRefsetFileFields field : Rf2File.AssociationRefsetFileFields.values()) {
+                }
+                if (stampNids.contains(refex.getStampNid()) && write) {
+                    RefexNidVersionBI member = (RefexNidVersionBI) refex;
+                    for (Rf2File.AssociationRefsetFileFields field : Rf2File.AssociationRefsetFileFields.values()) {
                             switch (field) {
                                 case ID:
                                     associationWriter.write(member.getPrimUuid().toString() + field.seperator);
