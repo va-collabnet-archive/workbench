@@ -59,7 +59,6 @@ public class CloneAndRetireAction extends AbstractAction {
     @Override
     public void actionPerformed(ActionEvent e) {
         try {
-//            System.out.println("DEBUG -- Starting clone and retire action.");
             I_GetConceptData concept = Terms.get().getConceptForNid(component.getNid());
             Iterator<PathBI> pathItr = config.getEditingPathSet().iterator();
             if (ConceptAttributeVersionBI.class.isAssignableFrom(component.getClass())) {
@@ -165,7 +164,6 @@ public class CloneAndRetireAction extends AbstractAction {
 
             Terms.get().addUncommitted(concept);
 
-//            System.out.println("DEBUG -- Finished clone and retire action.");
 
         } catch (TerminologyException e1) {
             AceLog.getAppLog().alertAndLogException(e1);

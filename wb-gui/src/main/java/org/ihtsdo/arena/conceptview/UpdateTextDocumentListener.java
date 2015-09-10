@@ -6,27 +6,28 @@ package org.ihtsdo.arena.conceptview;
 
 import java.awt.Component;
 import java.awt.KeyboardFocusManager;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyVetoException;
 import java.beans.VetoableChangeListener;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.List;
-import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.InputVerifier;
-import javax.swing.JComponent;
 import javax.swing.JTextArea;
-import javax.swing.SwingUtilities;
 
+import javax.swing.Timer;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 import org.dwfa.ace.api.I_ConfigAceFrame;
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
+import org.dwfa.ace.log.AceLog;
 import org.dwfa.tapi.TerminologyException;
 import org.ihtsdo.helper.dialect.UnsupportedDialectOrLanguage;
 import org.ihtsdo.tk.Ts;
@@ -39,6 +40,8 @@ import org.ihtsdo.tk.api.description.DescriptionAnalogBI;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.dto.concept.component.refex.TK_REFEX_TYPE;
 import org.dwfa.ace.api.ebr.I_ExtendByRef;
+import static org.ihtsdo.arena.conceptview.DragPanelDescription.FOCUSED_CARET;
+import static org.ihtsdo.arena.conceptview.DragPanelDescription.FOCUSED_COMPONENT;
 import org.ihtsdo.helper.dialect.DialectHelper;
 import org.ihtsdo.lang.LANG_CODE;
 import org.ihtsdo.thread.NamedThreadFactory;
@@ -53,11 +56,17 @@ import org.ihtsdo.tk.binding.snomed.SnomedMetadataRfx;
  *
  * @author kec
  */
-public class DescriptionLanguageRefsetVerifier extends InputVerifier implements VetoableChangeListener{
+public class UpdateTextDocumentListener implements DocumentListener, ActionListener, VetoableChangeListener {
 
+    private static ThreadGroup updateTextThreadGroup
+            = new ThreadGroup("updateTextThreadGroup");
+    private static ExecutorService updateDocListenrService = Executors.newFixedThreadPool(1,
+            new NamedThreadFactory(updateTextThreadGroup, "updateTextThread"));
     JTextArea editorPane;
     DescriptionAnalogBI desc;
+    Timer t;
     I_GetConceptData c;
+    boolean update = false;
     I_ConfigAceFrame config;
     Collection<? extends RefexChronicleBI<?>> refexes;
     ConceptChronicleBI gbConcept;
@@ -66,180 +75,196 @@ public class DescriptionLanguageRefsetVerifier extends InputVerifier implements 
     int acceptNid;
     TerminologyBuilderBI tc;
     String text;
-    ConceptView view;
 
-    public DescriptionLanguageRefsetVerifier(JTextArea editorPane,
-            DescriptionAnalogBI desc, ConceptView view) throws TerminologyException, IOException {
+    public UpdateTextDocumentListener(JTextArea editorPane,
+            DescriptionAnalogBI desc) throws TerminologyException, IOException {
         super();
         this.editorPane = editorPane;
         this.desc = desc;
-        this.view = view;
+        t = new Timer(5000, this);
         c = Terms.get().getConcept(desc.getConceptNid());
         Ts.get().addVetoablePropertyChangeListener(TerminologyStoreDI.CONCEPT_EVENT.PRE_COMMIT, this);
     }
     long lastChange = Long.MIN_VALUE;
-    
-    @Override
-    public boolean shouldYieldFocus(JComponent input) {
-        Boolean okToMove = (Boolean) input.getClientProperty("okToMove");
-        JTextArea textArea = (JTextArea) input;
-//        System.out.println("DEBUG -- Verifier should yeild focus? okToMove property is: " + okToMove + " for: " + textArea.getText());
-        if(okToMove){
-            return verify(input);
-        }
-//        System.out.println("DEBUG -- Not yeilding focus.");
-        return false;
-    }
-    
-    @Override
-    public boolean verify(JComponent input) {
-        if (desc.getLang().equals(LANG_CODE.EN.getFormatedLanguageCode())) {
-            Runnable runnable = new Runnable() {
-                
-                @Override
-                public void run() {
-                    try {
-                        if (!desc.isCanceled()) {  //version has been cancelled
-                            text = editorPane.getText();
-                            if (!desc.getText().equals(text)) {
-//                                System.out.println("DEBUG -- doing action for description: " + editorPane.getText());
-                                text = text.replaceAll("[\\s]", " ");
-                                text = text.replaceAll("   *", " ");
-                                KeyboardFocusManager focusManager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
-                                Component focusOwner = focusManager.getFocusOwner();
-                                if(focusOwner instanceof JTextArea){
-                                    JTextArea textArea = (JTextArea) focusOwner;
-                                    view.setCaretPosition(textArea.getCaretPosition());
-                                    view.setFocusUuid(textArea.getName());
-                                }
-                                doAction();
-//                                System.out.println("DEBUG -- finished action for description: " + editorPane.getText());
-                            }
-                        } else {
-//                            System.out.println("DEBUG -- stopping update, description was canceled");
-                        }
-                    } catch (IOException ex) {
-                        Logger.getLogger(DescriptionLanguageRefsetVerifier.class.getName()).log(Level.SEVERE, null, ex);
-                    } catch (PropertyVetoException ex) {
-                        Logger.getLogger(DescriptionLanguageRefsetVerifier.class.getName()).log(Level.SEVERE, null, ex);
-                    } catch (InvalidCAB ex) {
-                        Logger.getLogger(DescriptionLanguageRefsetVerifier.class.getName()).log(Level.SEVERE, null, ex);
-                    } catch (UnsupportedDialectOrLanguage ex) {
-                        Logger.getLogger(DescriptionLanguageRefsetVerifier.class.getName()).log(Level.SEVERE, null, ex);
-                    } catch (TerminologyException ex) {
-                        Logger.getLogger(DescriptionLanguageRefsetVerifier.class.getName()).log(Level.SEVERE, null, ex);
-                    } catch (ContradictionException ex) {
-                        Logger.getLogger(DescriptionLanguageRefsetVerifier.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                }
-            };
-            
-            if(SwingUtilities.isEventDispatchThread()){
-                SwingUtilities.invokeLater(runnable);
-            }else{
-                try {
-                    SwingUtilities.invokeAndWait(runnable);
-                } catch (InterruptedException ex) {
-                    Logger.getLogger(DescriptionLanguageRefsetVerifier.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (InvocationTargetException ex) {
-                    Logger.getLogger(DescriptionLanguageRefsetVerifier.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
 
+    @Override
+    public void insertUpdate(DocumentEvent e) {
+        lastChange++;
+        text = editorPane.getText();
+        text = text.replaceAll("[\\s]", " ");
+        text = text.replaceAll("   *", " ");
+        try {
+            desc.setText(text);
+        } catch (PropertyVetoException ex) {
+            AceLog.getAppLog().alertAndLogException(ex);
+        }
+        if (t.isRunning()) {
+            t.restart();
         } else {
-            Runnable runnable = new Runnable() {
-                
-                @Override
-                public void run() {
-                    try {
-                        I_GetConceptData concept = Terms.get().getConceptForNid(desc.getNid());
-                        Terms.get().addUncommitted(concept);
-                    } catch (IOException ex) {
-                        Logger.getLogger(DescriptionLanguageRefsetVerifier.class.getName()).log(Level.SEVERE, null, ex);
+            t.start();
+        }
+        update = true;
+    }
+
+    @Override
+    public void removeUpdate(DocumentEvent e) {
+        lastChange++;
+        text = editorPane.getText();
+        text = text.replaceAll("[\\s]", " ");
+        text = text.replaceAll("   *", " ");
+        try {
+            desc.setText(text);
+        } catch (PropertyVetoException ex) {
+            AceLog.getAppLog().alertAndLogException(ex);
+        }
+        if (t.isRunning()) {
+            t.restart();
+        } else {
+            t.start();
+        }
+        update = true;
+    }
+
+    @Override
+    public void changedUpdate(DocumentEvent e) {
+        lastChange++;
+        text = editorPane.getText();
+        text = text.replaceAll("[\\s]", " ");
+        text = text.replaceAll("   *", " ");
+        try {
+            desc.setText(text);
+        } catch (PropertyVetoException ex) {
+            AceLog.getAppLog().alertAndLogException(ex);
+        }
+        if (t.isRunning()) {
+            t.restart();
+        } else {
+            t.start();
+        }
+        update = true;
+    }
+    long lastAction = Long.MIN_VALUE;
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if (lastAction < lastChange) {
+            lastAction = lastChange;
+
+            if (desc.getLang().equals(LANG_CODE.EN.getFormatedLanguageCode())) {
+                updateDocListenrService.submit(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        try {
+                            if (!desc.isCanceled()) {
+                                doAction();
+                            }
+                        } catch (IOException ex) {
+                            Logger.getLogger(UpdateTextDocumentListener.class.getName()).log(Level.SEVERE, null, ex);
+                        } catch (PropertyVetoException ex) {
+                            Logger.getLogger(UpdateTextDocumentListener.class.getName()).log(Level.SEVERE, null, ex);
+                        } catch (InvalidCAB ex) {
+                            Logger.getLogger(UpdateTextDocumentListener.class.getName()).log(Level.SEVERE, null, ex);
+                        } catch (UnsupportedDialectOrLanguage ex) {
+                            Logger.getLogger(UpdateTextDocumentListener.class.getName()).log(Level.SEVERE, null, ex);
+                        } catch (TerminologyException ex) {
+                            Logger.getLogger(UpdateTextDocumentListener.class.getName()).log(Level.SEVERE, null, ex);
+                        } catch (ContradictionException ex) {
+                            Logger.getLogger(UpdateTextDocumentListener.class.getName()).log(Level.SEVERE, null, ex);
+                        }
                     }
-                }
-            };
-            
-            if(SwingUtilities.isEventDispatchThread()){
-                SwingUtilities.invokeLater(runnable);
-            }else{
-                try {
-                    SwingUtilities.invokeAndWait(runnable);
-                } catch (InterruptedException ex) {
-                    Logger.getLogger(DescriptionLanguageRefsetVerifier.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (InvocationTargetException ex) {
-                    Logger.getLogger(DescriptionLanguageRefsetVerifier.class.getName()).log(Level.SEVERE, null, ex);
-                }
+                });
+
+            } else {
+                updateDocListenrService.submit(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        try {
+                            I_GetConceptData concept = Terms.get().getConceptForNid(desc.getNid());
+                            Terms.get().addUncommitted(concept);
+                        } catch (IOException ex) {
+                            Logger.getLogger(UpdateTextDocumentListener.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                    }
+                });
             }
         }
-        return true;
+
     }
 
     private void doAction() throws IOException, PropertyVetoException, InvalidCAB, UnsupportedDialectOrLanguage, TerminologyException, ContradictionException {
+        Component focusOwner = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
+        if(focusOwner instanceof JTextArea){
+            JTextArea focusedText = (JTextArea) focusOwner;
+            System.setProperty(FOCUSED_COMPONENT, focusOwner.getName());
+            Integer caretPosition = focusedText.getCaretPosition();
+            System.setProperty(FOCUSED_CARET, caretPosition.toString());
+        }
         config = Terms.get().getActiveAceFrameConfig();
         tc = Ts.get().getTerminologyBuilder(config.getEditCoordinate(),
                 config.getViewCoordinate());
-        if (!desc.isCanceled()) {
-            desc.setText(text);
-            if (desc.getLang().equals(LANG_CODE.EN.getFormatedLanguageCode())) {
+        if (update) { //create new
+            if (!desc.isCanceled()) {
+                if (desc.getLang().equals(LANG_CODE.EN.getFormatedLanguageCode())) {
 
-                refexes = desc.getAnnotationsActive(config.getViewCoordinate());
-                int type = desc.getTypeNid();
-                int fsn = SnomedMetadataRfx.getDES_FULL_SPECIFIED_NAME_NID();
-                int definition = SnomedMetadataRf2.DEFINITION_RF2.getLenient().getConceptNid();
+                    refexes = desc.getAnnotationsActive(config.getViewCoordinate());
+                    int type = desc.getTypeNid();
+                    int fsn = SnomedMetadataRfx.getDES_FULL_SPECIFIED_NAME_NID();
+                    int definition = SnomedMetadataRf2.DEFINITION_RF2.getLenient().getConceptNid();
 
-                //get rf1/rf2 concept
-                gbConcept = Ts.get().getConcept(SnomedMetadataRfx.getGB_DIALECT_REFEX_NID());
-                usConcept = Ts.get().getConcept(SnomedMetadataRfx.getUS_DIALECT_REFEX_NID());
-                acceptNid = SnomedMetadataRfx.getDESC_ACCEPTABLE_NID();
-                prefNid = SnomedMetadataRfx.getDESC_PREFERRED_NID();
+                    //get rf1/rf2 concept
+                    gbConcept = Ts.get().getConcept(SnomedMetadataRfx.getGB_DIALECT_REFEX_NID());
+                    usConcept = Ts.get().getConcept(SnomedMetadataRfx.getUS_DIALECT_REFEX_NID());
+                    acceptNid = SnomedMetadataRfx.getDESC_ACCEPTABLE_NID();
+                    prefNid = SnomedMetadataRfx.getDESC_PREFERRED_NID();
 
-                if (refexes.isEmpty()) { //check for previous changes
-                    if (type == fsn) {
-                        doFsnUpdate();
-                    } else if (type == definition) {
-                        doDefUpdate();
-                    } else if (type == SnomedMetadataRfx.getDES_SYNONYM_NID()) {
-                        doSynUpdate();
-                    }
+                    if (refexes.isEmpty()) { //check for previous changes
+                        if (type == fsn) {
+                            doFsnUpdate();
+                        } else if (type == definition) {
+                            doDefUpdate();
+                        } else if (type == SnomedMetadataRfx.getDES_SYNONYM_NID()) {
+                            doSynUpdate();
+                        }
 
-                } else { //TODO modify uncomitted version
-                    RefexNidAnalogBI gbRefex = null;
-                    RefexNidAnalogBI usRefex = null;
-                    for (RefexChronicleBI<?> descRefex : refexes) {
-                        if (descRefex.isUncommitted()) {
-                            if (descRefex.getRefexNid() == gbConcept.getNid()) {
-                                gbRefex = (RefexNidAnalogBI) descRefex;;
-                            } else if (descRefex.getRefexNid() == usConcept.getNid()) {
-                                usRefex = (RefexNidAnalogBI) descRefex;
+                    } else { //TODO modify uncomitted version
+                        RefexNidAnalogBI gbRefex = null;
+                        RefexNidAnalogBI usRefex = null;
+                        for (RefexChronicleBI<?> descRefex : refexes) {
+                            if (descRefex.isUncommitted()) {
+                                if (descRefex.getRefexNid() == gbConcept.getNid()) {
+                                    gbRefex = (RefexNidAnalogBI) descRefex;;
+                                } else if (descRefex.getRefexNid() == usConcept.getNid()) {
+                                    usRefex = (RefexNidAnalogBI) descRefex;
+                                }
                             }
                         }
-                    }
-                    if (type == fsn) {
-                        doFsnUpdate(gbRefex, usRefex);
-                    } else if (type == definition) {
-                        doDefUpdate(gbRefex, usRefex);
-                    } else if (type == SnomedMetadataRfx.getDES_SYNONYM_NID()) {
-                        doSynUpdate(gbRefex, usRefex);
+                        if (type == fsn) {
+                            doFsnUpdate(gbRefex, usRefex);
+                        } else if (type == definition) {
+                            doDefUpdate(gbRefex, usRefex);
+                        } else if (type == SnomedMetadataRfx.getDES_SYNONYM_NID()) {
+                            doSynUpdate(gbRefex, usRefex);
+                        }
                     }
                 }
+                I_GetConceptData concept = Terms.get().getConceptForNid(desc.getNid());
+                Terms.get().addUncommitted(concept);
             }
-            I_GetConceptData concept = Terms.get().getConceptForNid(desc.getNid());
-            Terms.get().addUncommitted(concept);
         }
+        update = false;
     }
 
     private void doFsnUpdate() throws PropertyVetoException, IOException, InvalidCAB, UnsupportedDialectOrLanguage,
             ContradictionException {
-
-        if (!desc.isCanceled()) {  //version has been canceled
+        if (!desc.isCanceled()) {
             desc.setText(text);
             RefexCAB refexSpecUs = new RefexCAB(
                     TK_REFEX_TYPE.CID,
                     desc.getNid(),
                     usConcept.getNid());
             refexSpecUs.put(RefexProperty.CNID1, prefNid);
-            refexSpecUs.setMemberUuid(UUID.randomUUID());
             RefexChronicleBI<?> newRefexUs = tc.construct(refexSpecUs);
 
             RefexCAB refexSpecGb = new RefexCAB(
@@ -247,20 +272,17 @@ public class DescriptionLanguageRefsetVerifier extends InputVerifier implements 
                     desc.getNid(),
                     gbConcept.getNid());
             refexSpecGb.put(RefexProperty.CNID1, prefNid);
-            refexSpecGb.setMemberUuid(UUID.randomUUID());
             RefexChronicleBI<?> newRefexGb = tc.construct(refexSpecGb);
 
             I_GetConceptData refexGb = Terms.get().getConceptForNid(newRefexGb.getNid());
             Ts.get().addUncommitted(refexGb);
             I_GetConceptData refexUs = Terms.get().getConceptForNid(newRefexUs.getNid());
             Ts.get().addUncommitted(refexUs);
-        } else {
-//            System.out.println("DEBUG -- stopping update, description was canceled");
         }
     }
 
     private void doSynUpdate() throws PropertyVetoException, IOException, InvalidCAB, UnsupportedDialectOrLanguage, ContradictionException {
-        if (!desc.isCanceled()) {  //version has been canceled
+        if (!desc.isCanceled()) {
             desc.setText(text);
 
             if (DialectHelper.isTextForDialect(text, Language.EN_US.getLenient().getNid())
@@ -270,7 +292,6 @@ public class DescriptionLanguageRefsetVerifier extends InputVerifier implements 
                         desc.getNid(),
                         usConcept.getNid());
                 refexSpecUs.put(RefexProperty.CNID1, acceptNid);
-                refexSpecUs.setMemberUuid(UUID.randomUUID());
                 RefexChronicleBI<?> newRefexUs = tc.construct(refexSpecUs);
 
                 RefexCAB refexSpecGb = new RefexCAB(
@@ -278,7 +299,6 @@ public class DescriptionLanguageRefsetVerifier extends InputVerifier implements 
                         desc.getNid(),
                         gbConcept.getNid());
                 refexSpecGb.put(RefexProperty.CNID1, acceptNid);
-                refexSpecGb.setMemberUuid(UUID.randomUUID());
                 RefexChronicleBI<?> newRefexGb = tc.construct(refexSpecGb);
 
                 I_GetConceptData refexGb = Terms.get().getConceptForNid(newRefexGb.getNid());
@@ -291,7 +311,6 @@ public class DescriptionLanguageRefsetVerifier extends InputVerifier implements 
                         desc.getNid(),
                         usConcept.getNid());
                 refexSpecUs.put(RefexProperty.CNID1, acceptNid);
-                refexSpecUs.setMemberUuid(UUID.randomUUID());
                 RefexChronicleBI<?> newRefexUs = tc.construct(refexSpecUs);
 
                 I_GetConceptData refexUs = Terms.get().getConceptForNid(newRefexUs.getConceptNid());
@@ -302,20 +321,17 @@ public class DescriptionLanguageRefsetVerifier extends InputVerifier implements 
                         desc.getNid(),
                         gbConcept.getNid());
                 refexSpecGb.put(RefexProperty.CNID1, acceptNid);
-                refexSpecGb.setMemberUuid(UUID.randomUUID());
                 RefexChronicleBI<?> newRefexGb = tc.construct(refexSpecGb);
 
                 I_GetConceptData refexGb = Terms.get().getConceptForNid(newRefexGb.getConceptNid());
                 Ts.get().addUncommitted(refexGb);
 
             }
-        } else {
-//            System.out.println("DEBUG -- stopping update, description was canceled");
         }
     }
 
     private void doDefUpdate() throws PropertyVetoException, IOException, InvalidCAB, UnsupportedDialectOrLanguage, ContradictionException {
-        if (!desc.isCanceled()) {  //version has been canceled
+        if (!desc.isCanceled()) {
             desc.setText(text);
 
             if (DialectHelper.isTextForDialect(text, Language.EN_US.getLenient().getNid())
@@ -325,7 +341,6 @@ public class DescriptionLanguageRefsetVerifier extends InputVerifier implements 
                         desc.getNid(),
                         usConcept.getNid());
                 refexSpecUs.put(RefexProperty.CNID1, prefNid);
-                refexSpecUs.setMemberUuid(UUID.randomUUID());
                 RefexChronicleBI<?> newRefexUs = tc.construct(refexSpecUs);
 
                 RefexCAB refexSpecGb = new RefexCAB(
@@ -333,7 +348,6 @@ public class DescriptionLanguageRefsetVerifier extends InputVerifier implements 
                         desc.getNid(),
                         gbConcept.getNid());
                 refexSpecGb.put(RefexProperty.CNID1, prefNid);
-                refexSpecGb.setMemberUuid(UUID.randomUUID());
                 RefexChronicleBI<?> newRefexGb = tc.construct(refexSpecGb);
 
                 I_GetConceptData refexGb = Terms.get().getConceptForNid(newRefexGb.getNid());
@@ -346,7 +360,6 @@ public class DescriptionLanguageRefsetVerifier extends InputVerifier implements 
                         desc.getNid(),
                         usConcept.getNid());
                 refexSpecUs.put(RefexProperty.CNID1, prefNid);
-                refexSpecUs.setMemberUuid(UUID.randomUUID());
                 RefexChronicleBI<?> newRefexUs = tc.construct(refexSpecUs);
 
                 I_GetConceptData refexUs = Terms.get().getConceptForNid(newRefexUs.getConceptNid());
@@ -357,21 +370,18 @@ public class DescriptionLanguageRefsetVerifier extends InputVerifier implements 
                         desc.getNid(),
                         gbConcept.getNid());
                 refexSpecGb.put(RefexProperty.CNID1, prefNid);
-                refexSpecGb.setMemberUuid(UUID.randomUUID());
                 RefexChronicleBI<?> newRefexGb = tc.construct(refexSpecGb);
 
                 I_GetConceptData refexGb = Terms.get().getConceptForNid(newRefexGb.getConceptNid());
                 Ts.get().addUncommitted(refexGb);
 
             }
-        } else {
-//            System.out.println("DEBUG -- stopping update, description was canceled");
         }
     }
 
     private void doFsnUpdate(RefexNidAnalogBI gbRefex, RefexNidAnalogBI usRefex)
             throws PropertyVetoException, IOException, InvalidCAB, UnsupportedDialectOrLanguage {
-        if (!desc.isCanceled()) {  //version has been canceled
+        if (!desc.isCanceled()) {
             TerminologyBuilderBI tc = Ts.get().getTerminologyBuilder(config.getEditCoordinate(),
                     config.getViewCoordinate());
 
@@ -381,14 +391,12 @@ public class DescriptionLanguageRefsetVerifier extends InputVerifier implements 
             if (gbRefex != null) {
                 gbRefex.setNid1(prefNid);
             }
-        } else {
-//            System.out.println("DEBUG -- stopping update, description was canceled");
         }
     }
 
     private void doSynUpdate(RefexNidAnalogBI gbRefex, RefexNidAnalogBI usRefex) throws PropertyVetoException,
             IOException, InvalidCAB, UnsupportedDialectOrLanguage, ContradictionException {
-        if (!desc.isCanceled()) {  //version has been canceled
+        if (!desc.isCanceled()) {
             TerminologyBuilderBI tc = Ts.get().getTerminologyBuilder(config.getEditCoordinate(),
                     config.getViewCoordinate());
 
@@ -448,14 +456,12 @@ public class DescriptionLanguageRefsetVerifier extends InputVerifier implements 
                     }
                 }
             }
-        } else {
-//            System.out.println("DEBUG -- stopping update, description was canceled");
         }
     }
 
     private void doDefUpdate(RefexNidAnalogBI gbRefex, RefexNidAnalogBI usRefex) throws PropertyVetoException,
             IOException, InvalidCAB, UnsupportedDialectOrLanguage, ContradictionException {
-        if (!desc.isCanceled()) {  //version has been canceled
+        if (!desc.isCanceled()) {
             TerminologyBuilderBI tc = Ts.get().getTerminologyBuilder(config.getEditCoordinate(),
                     config.getViewCoordinate());
 
@@ -515,17 +521,14 @@ public class DescriptionLanguageRefsetVerifier extends InputVerifier implements 
                     }
                 }
             }
-        } else {
-//            System.out.println("DEBUG -- stopping update, description was canceled");
         }
     }
 
-    @Override //will make sure refsets are updated appropriately when the commit button is pushed if the verfication didn't happen
+    @Override
     public void vetoableChange(PropertyChangeEvent pce) throws PropertyVetoException {
         try {
             if (desc.getLang().equals(LANG_CODE.EN.getFormatedLanguageCode())) {
-                if (!desc.isCanceled()) {  //version has been cancelled
-//                    System.out.println("DEBUG -- very sneaky!");
+                if (!desc.isCanceled()) {
                     doAction();
                 }
             } else {

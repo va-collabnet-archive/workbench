@@ -18,23 +18,17 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.KeyboardFocusManager;
 import java.awt.LayoutManager;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 
 import java.beans.PropertyVetoException;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -42,11 +36,9 @@ import javax.swing.JLabel;
 import javax.swing.JSeparator;
 import javax.swing.JTextArea;
 import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
 import javax.swing.TransferHandler;
 import org.dwfa.ace.ACE;
 import org.dwfa.ace.DynamicWidthTermComponentLabel;
-import static org.ihtsdo.arena.conceptview.ConceptView.CONCEPT_REDRAW;
 import org.ihtsdo.arena.editor.ArenaEditor;
 import org.ihtsdo.tk.api.refex.RefexChronicleBI;
 import org.ihtsdo.tk.api.refex.RefexVersionBI;
@@ -60,7 +52,8 @@ public class DragPanelDescription extends DragPanelComponentVersion<DescriptionA
     private static final long serialVersionUID = 1L;
     private ConceptViewLayout viewLayout;
     private JTextArea textPane;
-
+    public static final String FOCUSED_COMPONENT = "focused component";
+    public static final String FOCUSED_CARET = "focused caret";
     //~--- constructors --------------------------------------------------------
     public DragPanelDescription(ConceptViewLayout viewLayout, CollapsePanel parentCollapsePanel,
             DescriptionAnalogBI desc)
@@ -308,126 +301,9 @@ public class DragPanelDescription extends DragPanelComponentVersion<DescriptionA
         textPane.setFont(textPane.getFont().deriveFont(getSettings().getFontSize()));
         textPane.setText(getDesc().getText());
         textPane.setToolTipText(textPane.getText());
-        textPane.setName(getDesc().getPrimUuid().toString());
-
-        if (getDesc().isUncommitted()
-                && (getDesc().getStatusNid() != SnomedMetadataRfx.getSTATUS_RETIRED_NID())) {
-            textPane.setInputVerifier(new DescriptionLanguageRefsetVerifier(textPane, getDesc(), viewLayout.cView));
-        }
-        textPane.setFocusTraversalKeysEnabled(false);
-         
-        
-        textPane.addKeyListener(new KeyListener() {
-
-            @Override
-            public void keyTyped(KeyEvent e) {
-                if( e.getKeyCode() == KeyEvent.VK_ENTER ){
-//                    System.out.println("DEBUG -- Setting okToMove property to true");
-                    textPane.putClientProperty(OK_TO_MOVE, true);
-//                    System.out.println("DEBUG -- 2 - OK to move: " + textPane.getClientProperty(OK_TO_MOVE) + getDesc().getText());
-                    System.setProperty(YEILD_FOCUS, Boolean.TRUE.toString());
-                }else{
-                    textPane.putClientProperty(OK_TO_MOVE, false);
-//                    System.out.println("DEBUG -- 3 - OK to move: " + textPane.getClientProperty(OK_TO_MOVE) + getDesc().getText());
-                    System.setProperty(YEILD_FOCUS, Boolean.FALSE.toString());
-                }
-            }
-
-            @Override
-            public void keyPressed(KeyEvent e) {
-                if( e.getKeyCode() == KeyEvent.VK_ENTER ){
-//                    System.out.println("DEBUG -- Setting okToMove property to true");
-                    textPane.putClientProperty(OK_TO_MOVE, true);
-                    System.setProperty(YEILD_FOCUS, Boolean.TRUE.toString());
-                }else{
-                    textPane.putClientProperty(OK_TO_MOVE, false);
-                    System.setProperty(YEILD_FOCUS, Boolean.FALSE.toString());
-                }
-            }
-
-            @Override
-            public void keyReleased(KeyEvent e) {
-                if( e.getKeyCode() == KeyEvent.VK_ENTER ){
-//                    System.out.println("DEBUG -- Setting okToMove property to true");
-                    textPane.putClientProperty(OK_TO_MOVE, true);
-                    System.setProperty(YEILD_FOCUS, Boolean.TRUE.toString());
-                }else{
-                    textPane.putClientProperty(OK_TO_MOVE, false);
-                    System.setProperty(YEILD_FOCUS, Boolean.FALSE.toString());
-                }
-            }
-        });
-        
-        textPane.addFocusListener(new FocusListener() {
-
-            @Override
-            public void focusGained(FocusEvent e) {
-                if (getDraggedThing().isUncommitted()) {
-//                    System.out.println("DEBUG -- Focus gained " + getDraggedThing().getText());
-                    textPane.putClientProperty(OK_TO_MOVE, false);
-//                    System.out.println("DEBUG -- 4 - OK to move: " + textPane.getClientProperty(OK_TO_MOVE) + " " + getDesc().getText());
-                    System.setProperty(YEILD_FOCUS, Boolean.FALSE.toString());
-//                    System.out.println("DEBUG -- Yeild focus: " + System.getProperty(YEILD_FOCUS) + " " + getDesc().getText());
-                    ACE.editingComponent = textPane;
-                }
-            }
-
-            @Override
-            public void focusLost(FocusEvent e) {
-//                System.out.println("DEBUG -- Focus lost " + getDraggedThing().getText());
-                textPane.getCaret().setVisible(false);
-            }
-        });
+        textPane.setName(getDraggedThing().getPrimUuid().toString());
 
         add(textPane, gbc);
-        if (System.getProperty(CONCEPT_REDRAW).equals(Boolean.TRUE.toString())
-                && textPane.getName().equals(viewLayout.cView.getFocusUuid())) {
-                            
-            if (SwingUtilities.isEventDispatchThread()) {
-                SwingUtilities.invokeLater(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        //update where focus was before redraw
-                        System.setProperty(CONCEPT_REDRAW, Boolean.FALSE.toString());
-                        KeyboardFocusManager.getCurrentKeyboardFocusManager().downFocusCycle(textPane);
-                        boolean gettingFocus = textPane.requestFocusInWindow(); //not getting focus
-                        if (gettingFocus) {
-                            textPane.setCaretPosition(viewLayout.cView.getCaretPosition());
-                            System.setProperty(YEILD_FOCUS, Boolean.FALSE.toString());
-                            textPane.putClientProperty(OK_TO_MOVE, false);
-                            textPane.getCaret().setVisible(true);
-                        }
-                        System.out.print("Restoring focus to " + textPane.getText() + " successful? " + gettingFocus);
-                    }
-                });
-            } else {
-                try {
-                    SwingUtilities.invokeAndWait(new Runnable() {
-
-                        @Override
-                        public void run() {
-                            //update where focus was before redraw
-                            System.setProperty(CONCEPT_REDRAW, Boolean.FALSE.toString());
-                            KeyboardFocusManager.getCurrentKeyboardFocusManager().downFocusCycle(textPane);
-                            boolean gettingFocus = textPane.requestFocusInWindow(); //not getting focus
-                            if (gettingFocus) {
-                                textPane.setCaretPosition(viewLayout.cView.getCaretPosition());
-                                System.setProperty(YEILD_FOCUS, Boolean.FALSE.toString());
-                                textPane.putClientProperty(OK_TO_MOVE, false);
-                                textPane.getCaret().setVisible(true);
-                            }
-                            System.out.print("Restoring focus to " + textPane.getText() + " successful? " + gettingFocus);
-                        }
-                    });
-                } catch (InterruptedException ex) {
-                    Logger.getLogger(DragPanelDescription.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (InvocationTargetException ex) {
-                    Logger.getLogger(DragPanelDescription.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
-        }
-        
         gbc.weightx = 0;
         gbc.weighty = 1;
         gbc.gridwidth = 1;
@@ -442,14 +318,16 @@ public class DragPanelDescription extends DragPanelComponentVersion<DescriptionA
                 && (getDesc().getStatusNid() == SnomedMetadataRfx.getSTATUS_RETIRED_NID())) {
             textPane.setEditable(false);
         }
-        
+
+        if (getDesc().isUncommitted()
+                && (getDesc().getStatusNid() != SnomedMetadataRfx.getSTATUS_RETIRED_NID())) {
+            textPane.getDocument().addDocumentListener(new UpdateTextDocumentListener(textPane, getDesc()));
+        }
         gbc.gridy = 3;
         gbc.gridheight = 1;
         gbc.fill = GridBagConstraints.BOTH;
         addSubPanels(gbc);
     }
-    public static final String OK_TO_MOVE = "okToMove";
-    public static final String YEILD_FOCUS = "yeildFocus";
 
     //~--- get methods ---------------------------------------------------------
     private DescriptionAnalogBI getDesc() {
