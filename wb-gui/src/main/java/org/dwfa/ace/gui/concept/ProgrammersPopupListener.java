@@ -46,6 +46,8 @@ import org.ihtsdo.helper.io.FileIO;
 import org.dwfa.ace.reporting.AuthorReporter;
 import org.ihtsdo.helper.bdb.NidDuplicateFinder;
 import org.ihtsdo.helper.bdb.NidDuplicateReporter;
+import org.ihtsdo.helper.bdb.UuidDupFinder;
+import org.ihtsdo.helper.bdb.UuidDupReporter;
 import org.ihtsdo.project.workflow.api.wf2.implementation.WorkflowStore;
 import org.ihtsdo.request.uscrs.UscrsContentRequestHandler;
 import org.ihtsdo.rules.RulesLibrary;
@@ -146,7 +148,8 @@ public class ProgrammersPopupListener extends MouseAdapter implements ActionList
         LAUNCH_BP("Launch Business Process..."),
         USCRS_EXPORT("USCRS Export"),
         AUTHOR_REPORT("All changes by current user to text");
-        DUP_NID_CHECKER("Check database for duplicate nids");
+        DUP_NID_CHECKER("Check database for duplicate nids"),
+        DUP_UUID_CHECKER("Check database for duplicate uuids");
         //J+
         String menuText;
 
@@ -278,7 +281,11 @@ public class ProgrammersPopupListener extends MouseAdapter implements ActionList
             
             case DUP_NID_CHECKER:
                 checkForDuplicateNids();
-                break;    
+                break;
+            
+            case DUP_UUID_CHECKER:
+                checkForDuplicateUuids();
+                break;
                 
             case USCRS_EXPORT:
                 exportForUSCRS();
@@ -923,6 +930,34 @@ public class ProgrammersPopupListener extends MouseAdapter implements ActionList
             AceLog.getAppLog().alertAndLogException(e);
         }
         AceLog.getAppLog().info("Finished testing for duplicate nids.");
+        Ts.get().enableComponentsCRHM();
+    }
+    
+    private void checkForDuplicateUuids() {
+        Ts.get().disableComponentsCRHM();
+        try{
+        AceLog.getAppLog().info("Testing for duplicate uuids.");
+        UuidDupFinder dupFinder = new UuidDupFinder();
+
+        Ts.get().iterateConceptDataInParallel(dupFinder);
+        System.out.println();
+
+        if (dupFinder.getDupUuids().isEmpty()) {
+            AceLog.getAppLog().info("No duplicate uuids found.");
+        } else {
+            dupFinder.writeDupFile();
+            AceLog.getAppLog().severe("\n\nDuplicate uuids found: " + dupFinder.getDupUuids().size() + "\n"
+                    + dupFinder.getDupUuids() + "\n");
+
+            UuidDupReporter reporter = new UuidDupReporter(dupFinder.getDupUuids());
+
+            Ts.get().iterateConceptDataInParallel(reporter);
+            reporter.reportDupClasses();
+        }
+        } catch (Exception e) {
+            AceLog.getAppLog().alertAndLogException(e);
+        }
+        AceLog.getAppLog().info("Finished testing for duplicate uuids.");
         Ts.get().enableComponentsCRHM();
     }
 

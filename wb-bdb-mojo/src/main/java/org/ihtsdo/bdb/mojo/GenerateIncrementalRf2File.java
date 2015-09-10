@@ -390,59 +390,39 @@ public class GenerateIncrementalRf2File extends AbstractMojo {
             for (ConceptDescriptor cd : taxonomyParentConcepts) {
                 taxonomyParentNids.add(Ts.get().getNidForUuids(UUID.fromString(cd.getUuid())));
             }
-            
+
             vc = new ViewCoordinate(Ts.get().getMetadataViewCoordinate());
             vc.getIsaTypeNids().add(Snomed.IS_A.getLenient().getConceptNid());
             PathBI path = Ts.get().getPath(viewPathNid);
             PositionBI position = Ts.get().newPosition(path,
                     TimeHelper.getTimeFromString(endDate, TimeHelper.getFileDateFormat()));
             vc.setPositionSet(new PositionSet(position));
+            IntSet moduleIds = new IntSet();
+            for (UUID uuid : moduleUuids) {
+                moduleIds.add(Ts.get().getNidForUuids(uuid));
+            }
+            File metaDir = new File(output.getParentFile(), "refset-econcept");
+            metaDir.mkdir();
+//          compute spec refsets
+            Integer refsetParentConceptNid = null;
             ViewCoordinate editPathVc = new ViewCoordinate(Ts.get().getMetadataViewCoordinate());
             int editPathNid = Ts.get().getNidForUuids(Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, editPathConceptSpecFsn));
             PathBI editPath = Ts.get().getPath(editPathNid);
             PositionBI editPosition = Ts.get().newPosition(editPath,
                     TimeHelper.getTimeFromString(endDate, TimeHelper.getFileDateFormat()));
             editPathVc.setPositionSet(new PositionSet(editPosition));
-            IntSet moduleIds = new IntSet();
-            for (UUID uuid : moduleUuids) {
-                moduleIds.add(Ts.get().getNidForUuids(uuid));
-            }
-            
-            //          write RF2 specific metadata refsets  
-            File refsetCs = new File(output.getParentFile(), "changesets");
-            refsetCs.mkdir();
-            if (makeRf2Refsets) {
-                EditCoordinate metadataEditCoordinate = Ts.get().getMetadataEditCoordinate();
-                EditCoordinate ec = new EditCoordinate(metadataEditCoordinate.getAuthorNid(),//need to edit on release candidate path and extension module
-                        Ts.get().getNidForUuids(UUID.fromString(moduleConcepts[0].getUuid())), //assuming that there is just one module for now.
-                        vc.getPositionSet().getViewPathNidSet().getSetValues()[0]); //assuming only one path in view coordinate
-                Rf2RefexComputer rf2RefexComputer = new Rf2RefexComputer(vc, ec,
-                        refsetCs, stampsToWrite.getAsSet(), effectiveDate, snomedCoreReleaseDate);
-
-                rf2RefexComputer.setup();
-                Ts.get().iterateConceptDataInSequence(rf2RefexComputer);
-                rf2RefexComputer.addModuleDependencyMember();
-                rf2RefexComputer.cleanup();
-
-                Set<Integer> newStampNids = rf2RefexComputer.getNewStampNids();
-                for (int stamp : newStampNids) {
-                    stampsToWrite.add(stamp);
-                }
-            }
-            
-            File metaDir = new File(output.getParentFile(), "refset-econcept");
-            metaDir.mkdir();
-//          compute spec refsets
-            Integer refsetParentConceptNid = null;
-            if (refsetParentConceptSpec != null && computeSpecRefsets) {
+            if (refsetParentConceptSpec != null && computeSpecRefsets) { //&& computeRefsetSpec ??
                 refsetParentConceptNid = Ts.get().getNidForUuids(UUID.fromString(refsetParentConceptSpec.getUuid()));
+                vc.getPositionSet().getViewPathNidSet();
                 EditCoordinate ec = new EditCoordinate(TermAux.USER.getLenient().getConceptNid(),
                         Ts.get().getNidForUuids(UUID.fromString(moduleConcepts[0].getUuid())),
                         viewPathNid);
-                    ReleaseSpecProcessor refsetSpecComputer = new ReleaseSpecProcessor(ec, vc,
-                        editPathVc, ChangeSetPolicy.OFF, refsetParentConceptNid);
-                    refsetSpecComputer.process();
-                    refsetSpecComputer.writeRefsetSpecMetadata(metaDir);
+                ReleaseSpecProcessor refsetSpecComputer = new ReleaseSpecProcessor(ec,
+                        vc, editPathVc, ChangeSetPolicy.OFF, refsetParentConceptNid);
+                refsetSpecComputer.process();
+                if (releaseType == ReleaseType.FULL) {
+                    refsetSpecComputer.writeRefsetSpecMetadata(metaDir); //only care about FULL for import
+                }
             }
             if (langRefsetConceptSpec != null) {
                 LanguageRefsetChecker languageRefsetChecker = new LanguageRefsetChecker(vc,
@@ -469,17 +449,38 @@ public class GenerateIncrementalRf2File extends AbstractMojo {
                     TimeHelper.getTimeFromString(endDate, TimeHelper.getFileDateFormat()),
                     null, moduleIds, pathIds);
 
-            
+            File refsetCs = new File(output.getParentFile(), "changesets");
+            refsetCs.mkdir();
 //            get stamps after refset computations
             stampsToWrite = Bdb.getSapDb().getSpecifiedSapNids(null,
                     TimeHelper.getTimeFromString(startDate, TimeHelper.getFileDateFormat()),
                     TimeHelper.getTimeFromString(endDate, TimeHelper.getFileDateFormat()),
                     null, moduleIds, pathIds);
+
+//          write RF2 specific metadata refsets
+            EditCoordinate metadataEditCoordinate = Ts.get().getMetadataEditCoordinate();
+            EditCoordinate ec = new EditCoordinate(metadataEditCoordinate.getAuthorNid(),//need to edit on release candidate path and extension module
+                    Ts.get().getNidForUuids(UUID.fromString(moduleConcepts[0].getUuid())), //assuming that there is just one module for now.
+                    vc.getPositionSet().getViewPathNidSet().getSetValues()[0]); //assuming only one path in view coordinate
+            if (makeRf2Refsets) {
+                Rf2RefexComputer rf2RefexComputer = new Rf2RefexComputer(vc, ec,
+                        refsetCs, stampsToWrite.getAsSet(), effectiveDate, snomedCoreReleaseDate);
+                rf2RefexComputer.setup();
+                Ts.get().iterateConceptDataInSequence(rf2RefexComputer);
+                rf2RefexComputer.addModuleDependencyMember();
+                rf2RefexComputer.cleanup();
+
+                Set<Integer> newStampNids = rf2RefexComputer.getNewStampNids();
+                for (int stamp : newStampNids) {
+                    stampsToWrite.add(stamp);
+                }
+            }
             
             IntSet sapsToRemove = new IntSet();
             if (previousReleaseDate != null) {
                 IntSet allPaths = new IntSet(pathIds.getSetValues());
-                allPaths.add(editPathNid);
+                int nid = Ts.get().getNidForUuids(Type5UuidFactory.get(Type5UuidFactory.PATH_ID_FROM_FS_DESC, editPathConceptSpecFsn));
+                allPaths.add(nid);
                 sapsToRemove = Bdb.getSapDb().getSpecifiedSapNids(allPaths,
                         TimeHelper.getTimeFromString(previousReleaseDate, TimeHelper.getFileDateFormat()),
                         TimeHelper.getTimeFromString("latest", TimeHelper.getFileDateFormat()));
@@ -516,7 +517,7 @@ public class GenerateIncrementalRf2File extends AbstractMojo {
             if (conceptNumberRefsetParentConceptSpec != null) {
                 conNumRefsetParentConceptNid = Ts.get().getNidForUuids(UUID.fromString(conceptNumberRefsetParentConceptSpec.getUuid()));
             }
-            
+
             TaxonomyFilter filter = new TaxonomyFilter();
             Ts.get().iterateConceptDataInParallel(filter);
             NidBitSetBI nidsToRelease = filter.getResults();

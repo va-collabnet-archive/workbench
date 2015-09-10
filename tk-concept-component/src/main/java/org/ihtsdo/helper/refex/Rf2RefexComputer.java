@@ -60,7 +60,7 @@ import org.ihtsdo.tk.dto.concept.component.refex.TK_REFEX_TYPE;
 import org.ihtsdo.tk.spec.ValidationException;
 
 /**
- * Maintains refexs needed for RF2 release.
+ * Maintains refexs needed for RF2 release. This should only run on the delta files.
  *
  */
 public class Rf2RefexComputer implements ProcessUnfetchedConceptDataBI {
@@ -168,8 +168,10 @@ public class Rf2RefexComputer implements ProcessUnfetchedConceptDataBI {
         Collection<? extends RelationshipVersionBI> latestRels = cvAllStatus.getRelationshipsOutgoingActive();
         Collection<? extends DescriptionVersionBI> latestDescs = cvAllStatus.getDescriptionsActive();
         boolean changed = false;
-        if (!cvAllStatus.getPrimUuid().equals(UUID.fromString("6145fb16-3723-3db9-bc41-3dae912a0d9a"))) { //skip SE problem concept "Ventricular tachyarrhythmia"
-            for (RelationshipVersionBI historicalRel : latestRels) {
+        if (conceptChronicle.getPrimUuid().equals(UUID.fromString("9465bd0c-bca9-360b-a36b-0cf5a236c14c"))) {
+            System.out.println("DEBUG -- Inactive concept FLPR");
+        }
+        for (RelationshipVersionBI historicalRel : latestRels) {
                 if (stampNids.contains(historicalRel.getStampNid())) {
                     if (historicalRelTypes.contains(historicalRel.getTypeNid())) {
                         int refexNid = getAssociationRefexForTypeNid(historicalRel.getTypeNid());
@@ -233,9 +235,9 @@ public class Rf2RefexComputer implements ProcessUnfetchedConceptDataBI {
                                 }
                             }
                         }
-                    //need to add the descriptions to the Description inactivation indicator 
+                        //need to add the descriptions to the Description inactivation indicator 
                         //reference set with a value of Concept non-current (TIG 5.5.3.1)
-                        for (DescriptionVersionBI desc : cvAllStatus.getDescriptionsActive()) {
+                        for (DescriptionVersionBI desc : conceptChronicle.getVersion(viewCoordinate).getDescriptionsActive()) {
                             boolean hasSctId = false;
                             if (desc.getAdditionalIds() != null) {
                                 for (IdBI id : desc.getAdditionalIds()) {
@@ -264,6 +266,52 @@ public class Rf2RefexComputer implements ProcessUnfetchedConceptDataBI {
                         Ts.get().addUncommitted(Ts.get().getConcept(refexNid));
                         Ts.get().commit(Ts.get().getConcept(refexNid));
                         changed = true;
+                    } else if (historicalRel.getTargetNid() == ConceptInactivationType.REASON_NOT_STATED_CONCEPT.getLenient().getConceptNid()) {
+                        //need to add to description inactivation refset? what about historical association refset?
+                        //only need to retire any active relationships
+                        Collection<? extends RelationshipVersionBI> activeRels = conceptChronicle.getVersion(viewCoordinate).getRelationshipsOutgoingActive();
+                        for (RelationshipVersionBI rv : activeRels) {
+                            if (rv.isStated()) {
+                                RelationshipCAB relBp = rv.makeBlueprint(viewCoordinate);
+                                relBp.setRetired();
+                                relBp.setComponentUuidNoRecompute(rv.getPrimUuid());
+                                RelationshipChronicleBI updatedRel = builder.construct(relBp);
+                                newStamps.addAll(updatedRel.getAllStampNids());
+                            }
+                            if (rv.isInferred()) { //classifier runs before this, so need to retire inferred rel also
+                                AnalogBI updatedRel = rv.makeAnalog(SnomedMetadataRf2.INACTIVE_VALUE_RF2.getLenient().getConceptNid(),
+                                        Long.MAX_VALUE,
+                                        editCoordinate.getAuthorNid(),
+                                        editCoordinate.getModuleNid(),
+                                        editCoordinate.getEditPaths()[0]);
+                                newStamps.addAll(rv.getAllStampNids());
+                            }
+                        }
+                        //need to add the descriptions to the Description inactivation indicator 
+                        //reference set with a value of Concept non-current (TIG 5.5.3.1)
+                        for (DescriptionVersionBI desc : conceptChronicle.getVersion(viewCoordinate).getDescriptionsActive()) {
+                            boolean hasSctId = false;
+                            if (desc.getAdditionalIds() != null) {
+                                for (IdBI id : desc.getAdditionalIds()) {
+                                    if (id.getAuthorityNid() == TermAux.SCT_ID_AUTHORITY.getLenient().getConceptNid()) {
+                                        hasSctId = true;
+                                    }
+                                }
+                            }
+
+                            if (hasSctId) {
+                                RefexCAB refexBp = new RefexCAB(TK_REFEX_TYPE.CID,
+                                        desc.getNid(),
+                                        descInactiveRefexNid);
+                                refexBp.put(RefexCAB.RefexProperty.CNID1,
+                                        SnomedMetadataRf2.CONCEPT_NON_CURRENT_RF2.getLenient().getNid());
+                                RefexChronicleBI<?> newMember = builder.construct(refexBp);
+                                for (int stampNid : newMember.getAllStampNids()) {
+                                    newStamps.add(stampNid);
+                                }
+                            }
+                        }
+                        changed = true;
                     }
                 }
             }
@@ -278,7 +326,7 @@ public class Rf2RefexComputer implements ProcessUnfetchedConceptDataBI {
                                     conceptInactiveRefexNid);
                             refexBp.put(RefexCAB.RefexProperty.CNID1, getValueForRetirement(cv.getNid()));
                             RefexChronicleBI<?> member = builder.constructIfNotCurrent(refexBp);
-//                        conceptChronicle.addAnnotation(member);
+                            conceptChronicle.addAnnotation(member);
                             for (int stampNid : member.getAllStampNids()) {
                                 newStamps.add(stampNid);
                             }
@@ -329,7 +377,6 @@ public class Rf2RefexComputer implements ProcessUnfetchedConceptDataBI {
                 Ts.get().addUncommitted(conceptChronicle);
                 Ts.get().commit(conceptChronicle);
             }
-        }
     }
 
     private Integer getValueForRetirement(int conceptNid) throws ValidationException, IOException, ContradictionException {
