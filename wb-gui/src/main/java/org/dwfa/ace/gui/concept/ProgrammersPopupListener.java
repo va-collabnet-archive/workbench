@@ -147,7 +147,7 @@ public class ProgrammersPopupListener extends MouseAdapter implements ActionList
         LAUNCH_WF_CHANGES_INIT("Launch workflow initiator on changes..."),
         LAUNCH_BP("Launch Business Process..."),
         USCRS_EXPORT("USCRS Export"),
-        AUTHOR_REPORT("All changes by current user to text");
+        AUTHOR_REPORT("All changes by current user to text"),
         DUP_NID_CHECKER("Check database for duplicate nids"),
         DUP_UUID_CHECKER("Check database for duplicate uuids");
         //J+
