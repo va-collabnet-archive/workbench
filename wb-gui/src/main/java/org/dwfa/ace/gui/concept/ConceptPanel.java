@@ -46,6 +46,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.UUID;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -759,16 +760,29 @@ public class ConceptPanel extends JPanel implements I_HostConceptPlugins, Proper
 
     @Override
     public void setTermComponent(final I_AmTermComponent termComponent) {
-        SwingUtilities.invokeLater(new Runnable() {
-
-            @Override
-            public void run() {
+        try {
+            if (SwingUtilities.isEventDispatchThread()) {
                 if (termComponent != null || label.getTermComponent() != null) {
                     label.setTermComponent(termComponent);
                     contentScroller.scrollRectToVisible(new Rectangle(0, 0, 1, 1));
                 }
+            } else {
+                SwingUtilities.invokeAndWait(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        if (termComponent != null || label.getTermComponent() != null) {
+                            label.setTermComponent(termComponent);
+                            contentScroller.scrollRectToVisible(new Rectangle(0, 0, 1, 1));
+                        }
+                    }
+                });
             }
-        });
+        } catch (InterruptedException ex) {
+            Logger.getLogger(ConceptPanel.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (InvocationTargetException ex) {
+            Logger.getLogger(ConceptPanel.class.getName()).log(Level.SEVERE, null, ex);
+        }
 
     }
 

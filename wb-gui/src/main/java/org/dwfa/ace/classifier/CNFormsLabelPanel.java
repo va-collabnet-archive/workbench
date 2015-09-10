@@ -1697,6 +1697,11 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
         public ConceptAttributeAB makeBlueprint(ViewCoordinate vc) throws IOException, ContradictionException {
             throw new UnsupportedOperationException("Not supported yet.");
         }
+
+        @Override
+        public boolean isCanceled() throws IOException {
+            return part.isCanceled();
+        }
    }
 
 
@@ -2358,6 +2363,11 @@ public class CNFormsLabelPanel extends JPanel implements ActionListener {
         @Override
         public RelationshipCAB makeBlueprint(ViewCoordinate vc) throws IOException, ContradictionException {
             throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        @Override
+        public boolean isCanceled() throws IOException {
+            return fixedPart.isCanceled();
         }
    }
 }

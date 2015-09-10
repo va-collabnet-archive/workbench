@@ -148,6 +148,11 @@ public interface ComponentVersionBI extends ComponentBI, VersionPointBI {
      * @return <code>true</code>, if the version is uncommitted
      */
     public boolean isUncommitted();
+    
+    /**
+     * Checks to see if the particular version has been canceled.
+     */
+    public boolean isCanceled() throws IOException;
 
     /**
      * Checks if a version is from the baseline generation of data.

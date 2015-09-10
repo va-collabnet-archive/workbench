@@ -492,6 +492,19 @@ public abstract class Revision<V extends Revision<V, C>, C extends ConceptCompon
     public boolean isUncommitted() {
         return getTime() == Long.MAX_VALUE;
     }
+    
+    @Override
+    public boolean isCanceled() {
+        boolean canceled = false;
+
+        if (getTime() == Long.MIN_VALUE) {
+            return true;
+        } else if (getStampNid() < 0) {
+            return true;
+        }
+
+        return canceled;
+    }
 
     //~--- set methods ---------------------------------------------------------
     @Override

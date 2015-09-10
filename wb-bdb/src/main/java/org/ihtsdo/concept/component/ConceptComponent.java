@@ -2014,6 +2014,19 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
     public boolean isBaselineGeneration() {
         return primordialSapNid <= Bdb.getSapDb().getReadOnlyMax();
     }
+    
+    @Override
+    public boolean isCanceled() {
+        boolean canceled = false;
+
+        if (getTime() == Long.MIN_VALUE) {
+            return true;
+        } else if (getStampNid() < 0) {
+            return true;
+        }
+
+        return canceled;
+    }
 
     public static boolean isCanceled(TupleInput input) {
         int nid = input.readInt();
@@ -2841,6 +2854,19 @@ public abstract class ConceptComponent<R extends Revision<R, C>, C extends Conce
         @Override
         public boolean isUncommitted() {
             return getTime() == Long.MAX_VALUE;
+        }
+        
+        @Override
+        public boolean isCanceled(){
+            boolean canceled = false;
+            
+            if(getTime() == Long.MIN_VALUE){
+                return true;
+            }else if(getStampNid() < 0){
+                return true;
+            }
+            
+            return canceled;
         }
 
         //~--- set methods ------------------------------------------------------
