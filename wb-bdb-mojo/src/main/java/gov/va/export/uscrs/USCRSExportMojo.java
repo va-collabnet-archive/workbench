@@ -29,6 +29,7 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.dwfa.ace.api.Terms;
 import org.dwfa.util.id.Type5UuidFactory;
 import org.ihtsdo.db.bdb.Bdb;
+import org.ihtsdo.helper.time.TimeHelper;
 import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.NidSet;
 import org.ihtsdo.tk.api.NidSetBI;
@@ -51,6 +52,7 @@ public class USCRSExportMojo extends AbstractMojo {
      * output directory.
      *
      * @parameter 
+	 * expression="${project.build.directory}/generated-resources/uscrs"
      * @required
      */
     private File output;
@@ -76,6 +78,7 @@ public class USCRSExportMojo extends AbstractMojo {
      * using the Type5UuidFactory.PATH_ID_FROM_FS_DESC namespace.
      *
      * @parameter
+     * @required
      */
     private String viewPathConceptSpecFsn;
     
@@ -105,7 +108,7 @@ public class USCRSExportMojo extends AbstractMojo {
             int namespaceId = parseNamespace(namespace);
 
             if (previousReleaseDate != null) {
-            	long previousExportTime = parsePrevExportDate(previousReleaseDate);
+            	long previousExportTime = TimeHelper.getTimeFromString(previousReleaseDate, TimeHelper.getFileDateFormat());
             	handler = new USCRSRequestHandler(vc, output, namespaceId, previousExportTime);
             } else {
             	handler = new USCRSRequestHandler(vc, output, namespaceId);
