@@ -4,6 +4,8 @@
 package org.dwfa.ace.gui.concept;
 
 //~--- non-JDK imports --------------------------------------------------------
+import gov.va.export.uscrs.USCRSRequestHandler;
+
 import java.awt.FileDialog;
 import java.awt.Frame;
 import java.awt.Toolkit;
@@ -49,7 +51,6 @@ import org.ihtsdo.helper.bdb.NidDuplicateReporter;
 import org.ihtsdo.helper.bdb.UuidDupFinder;
 import org.ihtsdo.helper.bdb.UuidDupReporter;
 import org.ihtsdo.project.workflow.api.wf2.implementation.WorkflowStore;
-import org.ihtsdo.request.uscrs.UscrsContentRequestHandler;
 import org.ihtsdo.rules.RulesLibrary;
 import org.ihtsdo.rules.testmodel.TerminologyHelperDroolsWorkbench;
 import org.ihtsdo.tk.Ts;
@@ -878,7 +879,7 @@ public class ProgrammersPopupListener extends MouseAdapter implements ActionList
     private void exportForUSCRS() {
         try {
             I_GetConceptData igcd = (I_GetConceptData) this.conceptPanel.getTermComponent();
-            new UscrsContentRequestHandler(igcd.getConceptNid());
+            new USCRSRequestHandler(igcd);
         } catch (Exception e) {
             AceLog.getAppLog().alertAndLogException(e);
             JOptionPane.showMessageDialog(LogWithAlerts.getActiveFrame(null), "Unexpected error performing export: " + e,
