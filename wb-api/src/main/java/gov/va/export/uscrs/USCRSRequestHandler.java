@@ -42,13 +42,9 @@ public class USCRSRequestHandler implements I_ProcessConcepts {
 	/** logging */
 	private static final Logger LOG = LoggerFactory.getLogger(USCRSRequestHandler.class);
 
-	/** The request id counter. */
-	private static AtomicInteger globalRequestCounter = new AtomicInteger(1);
-
 	private USCRSInitiator initiator = null;
 	private USCRSProcessor processor;
 	private ViewCoordinate vc;
-
 
 	private SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
 	private final long emptyPreviousExportTime = -1;
@@ -271,12 +267,6 @@ public class USCRSRequestHandler implements I_ProcessConcepts {
 
 	@Override
 	public void processConcept(I_GetConceptData concept) throws Exception {
-/*		
- * if (!concept.getPrimUuid().equals(UUID.fromString("1b475397-3c49-3222-b27f-94016283e99d"))) {
-			return;
-		}
-		
-*/		
 		if(examinedConCount++  % 50000 == 0) { //TODO: Modify this based on what options are passed in above
 			LOG.debug("Uscrs Content Request Exported " + examinedConCount + " concepts");
 			System.out.println("Uscrs Content Request Exported " + examinedConCount + " concepts");
@@ -324,7 +314,19 @@ public class USCRSRequestHandler implements I_ProcessConcepts {
 		
 	}
 	
-	public void completeProcess() {
+	public void completeProcess() throws Exception {
+		
+		if(previousRequestedExportTime > 0) {
+			for (int genId : processor.getCurrentRequestMap().values())
+			{
+				if (!processor.getNewConceptRequestIds().contains(genId))
+				{
+					throw new Exception("We wrote out the generated ID: " + genId + " but failed to create a new concept for that ID.  Logic failure!");
+				}
+			}
+		}
+		
+
 		LOG.info("USCRS Export Operation Successful. Processed " + processedConcepts + " concepts while examined " + examinedConCount + " concepts");
 		System.out.println("USCRS Export Operation Successful. Processed " + processedConcepts + " concepts while examined " + examinedConCount + " concepts");
 

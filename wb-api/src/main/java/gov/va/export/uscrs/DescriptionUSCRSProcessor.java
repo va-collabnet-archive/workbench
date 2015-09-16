@@ -50,7 +50,7 @@ public class DescriptionUSCRSProcessor extends USCRSProcessor {
 				getBt().addStringCell(column, getJustification());
 				break;
 			case Note: 
-				getCompSctId(descVersion);
+				getBt().addStringCell(column, getNote(descVersion));
 				break;
 			default :
 				throw new RuntimeException("Unexpected column type found in Sheet: " + column + " - " + SHEET.New_Synonym);
@@ -103,7 +103,7 @@ public class DescriptionUSCRSProcessor extends USCRSProcessor {
 					getBt().addStringCell(column, getJustification());
 					break;
 				case Note:
-					getCompSctId(d);
+					getBt().addStringCell(column, getNote(d));
 					break;
 				default :
 					throw new RuntimeException("Unexpected column type found in Sheet: " + column + " - " + SHEET.Change_Description);
@@ -147,7 +147,7 @@ public class DescriptionUSCRSProcessor extends USCRSProcessor {
 					getBt().addStringCell(column, getJustification());
 					break;
 				case Note:
-					getCompSctId(d);
+					getBt().addStringCell(column, getNote(d));
 					break;
 				default :
 					throw new RuntimeException("Unexpected column type found in Sheet: " + column + " - " + SHEET.Retire_Description);

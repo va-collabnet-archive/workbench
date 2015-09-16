@@ -28,11 +28,12 @@ public class ConceptUSCRSProcessor extends USCRSProcessor {
 	 * if there are more than 3.It also returns all non ISA relationships
 	 *
 	 * @param concept the concept
+	 * @param previousExportTime 
 	 * @param getBt() the wb
 	 * @return ArrayList<RelationshipVersionBI> extra relationships (if more than 3 ISA, those are returned), plus all non ISA
 	 * @throws Exception the exception
 	 */
-	ArrayList<RelationshipVersionBI<?>> handleNewConcept(ConceptChronicleBI concept) throws Exception
+	ArrayList<RelationshipVersionBI<?>> handleNewConcept(ConceptChronicleBI concept, long previousExportTime) throws Exception
 	{
 		ArrayList<RelationshipVersionBI<?>> extraRels = new ArrayList<RelationshipVersionBI<?>>();
 		// PARENTS
@@ -78,18 +79,17 @@ public class ConceptUSCRSProcessor extends USCRSProcessor {
 			switch (column)
 			{
 				case Request_Id:
-					//long reqId = getSct(concept.getNid());
-					//if (reqId > Integer.MAX_VALUE) //TODO: This isn't 100% safe when detecting if we got an SCT or not. It's just guessing.
-					//{
-					//	if(dateFilterChecking) {
-					//		throw new RuntimeException("We appear to have found an SCTID when we only expected a generated sequence ID");
-					//	} else {
-					//		break; //TODO: Verify this doesen't leave blank rows
-					//	}
-					//}
-					//newConceptRequestIds.add((int)reqId);
-					//getBt().addNumericCell(column, reqId);
-					getBt().addStringCell(column, "");
+					int reqId = Integer.parseInt(getConSctId(conVer));
+					if (reqId > 999999) 
+					{
+						getBt().addStringCell(column, "");
+					} else {
+						if(previousExportTime < 0) {
+							throw new RuntimeException("We appear to have found an SCTID when we only expected a generated sequence ID");
+						}
+						newConceptRequestIds.add(reqId);
+						getBt().addNumericCell(column, reqId);
+					}
 					break;
 				case Topic:
 					getBt().addStringCell(column, getTopic(concept));
@@ -151,15 +151,15 @@ public class ConceptUSCRSProcessor extends USCRSProcessor {
 				case Note:
 					StringBuilder sb = new StringBuilder();
 					
-					sb.append("SCT ID: " + getCompSctId(conVer));
+					sb.append(getNote(conVer));
 					
 					ConceptAttributeVersionBI<?> conceptDefined = concept.getConceptAttributes().getVersion(vc);
-					
 					if(conceptDefined != null) {
 						if (conceptDefined.isDefined()){
 							sb.append("NOTE: this concept is fully defined. ");
 						}
 					}
+
 					getBt().addStringCell(column, sb.toString());
 					break;
 				case Synonym:
@@ -254,7 +254,7 @@ public class ConceptUSCRSProcessor extends USCRSProcessor {
 					getBt().addStringCell(column, getJustification());
 					break;
 				case Note:
-						getNote(concept);
+					getBt().addStringCell(column, getNote(concept));
 					break;
 				default :
 					throw new RuntimeException("Unexpected column type found in Sheet: " + column + " - " + SHEET.Retire_Concept);

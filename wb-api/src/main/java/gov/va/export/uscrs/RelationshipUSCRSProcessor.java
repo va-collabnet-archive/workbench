@@ -62,7 +62,7 @@ public class RelationshipUSCRSProcessor extends USCRSProcessor {
 							getBt().addStringCell(column, getJustification());
 							break;
 						case Note:
-							getCompSctId(rel);
+							getBt().addStringCell(column, getNote(rel));
 							break;
 						default :
 							throw new RuntimeException("Unexpected column type found in Sheet: " + column + " - " + SHEET.Add_Parent);
@@ -122,7 +122,7 @@ public class RelationshipUSCRSProcessor extends USCRSProcessor {
 							getBt().addStringCell(column, getJustification());
 							break;
 						case Note:
-							getCompSctId(rel);
+							getBt().addStringCell(column, getNote(rel));
 							break;
 						default :
 							throw new RuntimeException("Unexpected column type found in Sheet: " + column + " - " + SHEET.New_Relationship);
@@ -170,7 +170,7 @@ public class RelationshipUSCRSProcessor extends USCRSProcessor {
 							getBt().addStringCell(column, getJustification());
 							break;
 						case Note:
-							getCompSctId(rel);
+							getBt().addStringCell(column, getNote(rel));
 							break;
 						default :
 							throw new RuntimeException("Unexpected column type found in Sheet: " + column + " - " + SHEET.Change_Parent);
@@ -236,7 +236,7 @@ public class RelationshipUSCRSProcessor extends USCRSProcessor {
 							getBt().addStringCell(column, getJustification());
 							break;
 						case Note:
-							getCompSctId(rel);
+							getBt().addStringCell(column, getNote(rel));
 							break;
 						default :
 							throw new RuntimeException("Unexpected column type found in Sheet: " + column + " - " + SHEET.Change_Relationship);
@@ -291,7 +291,7 @@ public class RelationshipUSCRSProcessor extends USCRSProcessor {
 						getBt().addStringCell(column, getJustification());
 						break;
 					case Note:
-						getCompSctId(rel);
+						getBt().addStringCell(column, getNote(rel));
 						break;
 					default :
 						throw new RuntimeException("Unexpected column type found in Sheet: " + column + " - " + SHEET.Retire_Relationship);

@@ -37,6 +37,7 @@ public class USCRSInitiator {
 	private RelationshipUSCRSProcessor relationshipHandler = new RelationshipUSCRSProcessor();
 	private int ACTIVE_STATUS_NID;
 	private boolean conceptCreated;
+	private long previousExportTime;
 
 
 	USCRSInitiator(ViewCoordinate viewCoordinate) throws ValidationException, IOException {
@@ -49,13 +50,15 @@ public class USCRSInitiator {
 	boolean examineConcept(I_GetConceptData concept, long previousExportTime) throws Exception {
 		exportRelsUnFiltered.clear();
 		if (previousExportTime < 0) {
+			this.previousExportTime = -1;
 			return noDateExamination(concept.getVersion(vc));
 		} else {
-			return dateExamination(concept, previousExportTime);
+			this.previousExportTime = previousExportTime;
+			return dateExamination(concept);
 		}
 	}
 
-	private boolean dateExamination(I_GetConceptData concept, long previousExportTime) throws Exception {
+	private boolean dateExamination(I_GetConceptData concept) throws Exception {
 		boolean changeMade = false;
 		ViewCoordinate vcPreviousRelease = new ViewCoordinate(vc);
 		conceptCreated = false;
@@ -74,13 +77,13 @@ public class USCRSInitiator {
 		vcPreviousRelease.setAllowedStatusNids(null);
 
 		// Examine Content
-		changeMade = handleDateExamCon(changeMade, concept, previousExportTime, vcPreviousRelease);
+		changeMade = handleDateExamCon(changeMade, concept, vcPreviousRelease);
 			
 		// If concept was created & retired prior to previous release, don't need to export anything else
 		if (!inactiveNeverReleased(concept, vcPreviousRelease)) {
-			changeMade = handleDateExamDescs(changeMade, concept, previousExportTime, vcPreviousRelease);
+			changeMade = handleDateExamDescs(changeMade, concept, vcPreviousRelease);
 			
-			changeMade = handleDateExamRels(changeMade, concept, previousExportTime, vcPreviousRelease);
+			changeMade = handleDateExamRels(changeMade, concept, vcPreviousRelease);
 		}
 		
 		return changeMade;		
@@ -99,9 +102,7 @@ public class USCRSInitiator {
 	}
 
 
-	private boolean handleDateExamCon(boolean changeMade,
-			I_GetConceptData concept, long previousExportTime,
-			ViewCoordinate vcPreviousRelease) throws Exception {
+	private boolean handleDateExamCon(boolean changeMade, I_GetConceptData concept, ViewCoordinate vcPreviousRelease) throws Exception {
 
 		try {
 			ConceptAttributeChronicleBI cac = concept.getVersion(vc).getConceptAttributes();
@@ -137,7 +138,7 @@ public class USCRSInitiator {
 					if(cavRetiredCheck != null) {
 						// Place in the edit concept tab (un-retired)
 					} else {
-						exportRelsUnFiltered.addAll(conceptHandler.handleNewConcept(concept));
+						exportRelsUnFiltered.addAll(conceptHandler.handleNewConcept(concept, previousExportTime));
 						changeMade = true;
 						conceptCreated = true;
 					}
@@ -154,9 +155,7 @@ public class USCRSInitiator {
 	}
 
 
-	private boolean handleDateExamDescs(boolean changeMade,
-			I_GetConceptData concept, long previousExportTime,
-			ViewCoordinate vcPreviousRelease) throws IOException, Exception {
+	private boolean handleDateExamDescs(boolean changeMade, I_GetConceptData concept, ViewCoordinate vcPreviousRelease) throws IOException, Exception {
 		//Export Descriptions
 		for (DescriptionChronicleBI d : concept.getDescriptions()) {
 			try {
@@ -211,7 +210,7 @@ public class USCRSInitiator {
 	}
 
 
-	private boolean handleDateExamRels(boolean changeMade, I_GetConceptData concept, long previousExportTime, ViewCoordinate vcPreviousRelease) throws Exception {
+	private boolean handleDateExamRels(boolean changeMade, I_GetConceptData concept, ViewCoordinate vcPreviousRelease) throws Exception {
 		//Export Relationships
 		if(conceptCreated) {
 			LOG.debug("USCRS Handler - Concept was already created, handeling components accordingly (skip first 3 ISA relationships");
@@ -309,7 +308,7 @@ public class USCRSInitiator {
 		
 		try {
 			if (con.getStatusNid() == ACTIVE_STATUS_NID) {
-				exportRelsUnFiltered.addAll(conceptHandler.handleNewConcept(con));
+				exportRelsUnFiltered.addAll(conceptHandler.handleNewConcept(con, previousExportTime));
 			}
 		} catch (Exception e) {
 			throw new Exception("Could not export concept " + con.getConceptNid(), e);

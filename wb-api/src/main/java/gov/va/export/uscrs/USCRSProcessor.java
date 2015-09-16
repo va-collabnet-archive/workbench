@@ -1,12 +1,13 @@
 package gov.va.export.uscrs;
 
-import gov.va.export.uscrs.USCRSBatchTemplate.COLUMN;
 import gov.va.export.uscrs.USCRSBatchTemplate.PICKLIST_Source_Terminology;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import org.dwfa.cement.ArchitectonicAuxiliary;
@@ -43,13 +44,18 @@ public class USCRSProcessor {
     private static final UUID SNOMED_ROOT_UUID = UUID.fromString("ee9ac5d2-a07c-3981-a57a-f7f26baf38d8");
 	
     static Map<Integer, Integer> currentRequestMap = new HashMap<Integer, Integer>();
+	static Set<Integer> newConceptRequestIds = new HashSet<Integer>();
+	private static int globalRequestCounter = 1;
+	
 
 	static NidSetBI activeStatusNids;
 
 	private static String UNASSIGNED_SCTID = "unassigned";
 
 	USCRSProcessor() {
-		
+		newConceptRequestIds.clear();
+		globalRequestCounter = 1;
+		currentRequestMap.clear();
 	}
 	
 	USCRSProcessor(USCRSBatchTemplate batchTemplate, 
@@ -73,6 +79,10 @@ public class USCRSProcessor {
 
 		namespace = ns;
 		snomedRootNid = Ts.get().getNidForUuids(SNOMED_ROOT_UUID);
+		
+		newConceptRequestIds.clear();
+		globalRequestCounter = 1;
+		currentRequestMap.clear();
 	}
 	
 
@@ -156,11 +166,16 @@ public class USCRSProcessor {
 	
 	static String getConSctId(ConceptVersionBI con) throws IOException
 	{
-		if (getSctId(con).equals(UNASSIGNED_SCTID)) {
-			
+		String retVal = getSctId(con);
+		
+		if (retVal.equals(UNASSIGNED_SCTID)) {
+			if(!currentRequestMap.containsKey(con.getConceptNid())) {
+				currentRequestMap.put(con.getConceptNid(), globalRequestCounter++);
+			}
+			return Integer.toString(currentRequestMap.get(con.getConceptNid()));
 		}
 		
-		return s;
+		return retVal;
 	}
 
 	String getTopic(ConceptChronicleBI concept) throws Exception {
@@ -205,8 +220,8 @@ public class USCRSProcessor {
 	 * @throws ContradictionException 
 	 * @throws ValidationException 
 	 */
-	void getNote(ComponentVersionBI comp) throws IOException {
-		getNote(comp, "");
+	String getNote(ComponentVersionBI comp) throws IOException {
+		return getNote(comp, "");
 	}
 	
 	/**
@@ -214,15 +229,24 @@ public class USCRSProcessor {
 	 *  disabled then print the value of alternateNote
 	 * @param nid
 	 * @param alternateNote if testing is disabled, print this instead
+	 * @return 
 	 * @throws IOException 
 	 * @throws ContradictionException 
 	 * @throws ValidationException 
 	 */
-	void getNote(ComponentVersionBI comp, String alternateNote) throws IOException  {
-		bt.addStringCell(COLUMN.Note, "SCT ID: " + getSctId(comp));
+	String getNote(ComponentVersionBI comp, String alternateNote) throws IOException  {
+		return "SCT ID: " + getCompSctId(comp);
 	}
 	
 	String getJustification() {
 		return "Developed as part of extension namespace " + namespace; 
+	}
+
+	public Map<Integer, Integer> getCurrentRequestMap() {
+		return currentRequestMap;
+	}
+
+	public Set<Integer> getNewConceptRequestIds() {
+		return newConceptRequestIds;
 	}
 }
