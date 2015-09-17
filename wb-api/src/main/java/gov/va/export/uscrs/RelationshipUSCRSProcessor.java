@@ -302,7 +302,7 @@ public class RelationshipUSCRSProcessor extends USCRSProcessor {
 	
 	private String getRelType(ConceptVersionBI typeCon) throws IOException, ContradictionException {
 		try {
-			return PICKLIST_Relationship_Type.find(typeCon.getDescriptionPreferred().getText()).toString();	
+			return PICKLIST_Relationship_Type.find(getPreferredTerm(typeCon, vc)).toString();	
 		} catch(EnumConstantNotPresentException ecnpe) {
 			LOG.error("USCRS PICKLIST API Missing Relationship Type Value " + ecnpe.constantName());
 			return "";
@@ -314,7 +314,7 @@ public class RelationshipUSCRSProcessor extends USCRSProcessor {
 	
     private String getCharType(int characteristicNid) throws IOException, ContradictionException {
 		try {
-			String characteristic = Ts.get().getConceptVersion(vc, characteristicNid).getDescriptionPreferred().getText(); 
+			String characteristic = getPreferredTerm(Ts.get().getConceptVersion(vc, characteristicNid), vc); 
 			if(characteristic.equalsIgnoreCase("stated")) {
 				return "Stated";
 				//return PICKLIST_Characteristic_Type.Defining_relationship.toString(); 
@@ -335,7 +335,7 @@ public class RelationshipUSCRSProcessor extends USCRSProcessor {
 
     private String getRefinability(int refinabilityNid) throws IOException, ContradictionException {
     	try {
-    		String desc = Ts.get().getConceptVersion(vc, refinabilityNid).getDescriptionPreferred().getText();
+    		String desc = getPreferredTerm(Ts.get().getConceptVersion(vc, refinabilityNid), vc);
 			String descToPicklist = desc;
 			
 			//Map the words optional and mandatory to their equal ENUMS b/c of API limitations

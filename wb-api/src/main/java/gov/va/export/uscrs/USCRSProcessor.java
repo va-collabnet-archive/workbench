@@ -4,6 +4,7 @@ import gov.va.export.uscrs.USCRSBatchTemplate.PICKLIST_Source_Terminology;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -22,6 +23,10 @@ import org.ihtsdo.tk.api.description.DescriptionChronicleBI;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
 import org.ihtsdo.tk.api.id.IdBI;
 import org.ihtsdo.tk.api.id.LongIdBI;
+import org.ihtsdo.tk.api.refex.RefexChronicleBI;
+import org.ihtsdo.tk.api.refex.RefexVersionBI;
+import org.ihtsdo.tk.api.refex.type_nid.RefexNidVersionBI;
+import org.ihtsdo.tk.binding.snomed.RefsetAux;
 import org.ihtsdo.tk.binding.snomed.Snomed;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf1;
 import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
@@ -235,7 +240,13 @@ public class USCRSProcessor {
 	 * @throws ValidationException 
 	 */
 	String getNote(ComponentVersionBI comp, String alternateNote) throws IOException  {
-		return "SCT ID: " + getCompSctId(comp);
+		String sctId = getCompSctId(comp);
+		
+		if (!sctId.equals(UNASSIGNED_SCTID)) {
+			return "SCT ID: " + getCompSctId(comp);
+		} else {
+			return "UUID: " + comp.getPrimUuid();
+		}
 	}
 	
 	String getJustification() {
@@ -249,4 +260,55 @@ public class USCRSProcessor {
 	public Set<Integer> getNewConceptRequestIds() {
 		return newConceptRequestIds;
 	}
+	
+	String getPreferredTerm(ConceptVersionBI con, ViewCoordinate vc) throws ContradictionException, IOException {
+		for (DescriptionChronicleBI d : con.getDescriptions()) {
+			DescriptionVersionBI<?> dv = d.getVersion(vc);
+			
+			if (isPreferredTerm(dv)) {
+				return dv.getText(); 
+			}
+		}
+		
+		return null;
+	}
+	
+    boolean isPreferredTerm(DescriptionVersionBI<?> desc) {
+        try {
+        	if (desc.getTypeNid() == SnomedMetadataRf2.SYNONYM_RF2.getLenient().getNid()) {
+        		 Collection<? extends RefexChronicleBI<?>> annotations = desc.getAnnotations();
+        		 
+        		 for (RefexChronicleBI<?> annot : annotations) {
+        			 // Is it in EN_US Refset?
+        			 if (annot.getRefexNid() == RefsetAux.EN_US_REFEX.getLenient().getNid()) {
+                        
+        				 // Is it versionable?
+        				 if (RefexVersionBI.class.isAssignableFrom(annot.getClass())) {
+                            RefexVersionBI<?> rv = (RefexVersionBI<?>) annot;
+
+                            // Is it a CidRefset Member?
+                            if (RefexNidVersionBI.class.isAssignableFrom(rv.getClass())) {
+                                int cnid = ((RefexNidVersionBI<?>) rv).getNid1();
+                                
+                                // Is the Cid Preferred?
+                                if (cnid == SnomedMetadataRfx.getDESC_PREFERRED_NID()) {
+                                    return true;
+                                }
+                            } else {
+                                System.out.println("Can't convert: RefexCnidVersionBI:  " + rv);
+                            }
+                        } else {
+                            System.out.println("Can't convert: RefexVersionBI:  " + annot);
+                        }
+                    }
+                }
+            }
+        	
+        } catch (IOException e) {
+        	LOG.error("Error finding if desc is Preferred Term on : " + desc.getText() + "(" + desc.getNid() +")");
+    	}
+
+        return false;
+    }
+
 }

@@ -4,9 +4,14 @@ import gov.va.export.uscrs.USCRSBatchTemplate.COLUMN;
 import gov.va.export.uscrs.USCRSBatchTemplate.PICKLIST_Case_Significance;
 import gov.va.export.uscrs.USCRSBatchTemplate.SHEET;
 
+import java.io.IOException;
+
 import org.ihtsdo.tk.Ts;
+import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.description.DescriptionVersionBI;
+import org.ihtsdo.tk.binding.snomed.SnomedMetadataRf2;
+import org.ihtsdo.tk.spec.ValidationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -170,6 +175,13 @@ public class DescriptionUSCRSProcessor extends USCRSProcessor {
 			LOG.error("USCRS Case Sifnificance Error");
 			return "";
 		}
+	}
+
+	public boolean isSynonym(ConceptVersionBI conceptVersionBI, DescriptionVersionBI<?> d) throws ValidationException, IOException, ContradictionException {
+		return d != null &&
+			   conceptVersionBI.getDescriptionFullySpecified().getNid() != d.getNid() &&
+			   !isPreferredTerm(d) &&
+			   d.getTypeNid() != SnomedMetadataRf2.DEFINITION_RF2.getLenient().getNid();
 	}
 }
 

@@ -11,7 +11,6 @@ import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
-import org.ihtsdo.tk.api.conceptattribute.ConceptAttributeVersionBI;
 import org.ihtsdo.tk.api.relationship.RelationshipChronicleBI;
 import org.ihtsdo.tk.api.relationship.RelationshipVersionBI;
 import org.ihtsdo.tk.binding.snomed.Snomed;
@@ -85,7 +84,7 @@ public class ConceptUSCRSProcessor extends USCRSProcessor {
 						getBt().addStringCell(column, "");
 					} else {
 						if(previousExportTime < 0) {
-							throw new RuntimeException("We appear to have found an SCTID when we only expected a generated sequence ID");
+							//throw new RuntimeException("We appear to have found an SCTID when we only expected a generated sequence ID");
 						}
 						newConceptRequestIds.add(reqId);
 						getBt().addNumericCell(column, reqId);
@@ -98,7 +97,7 @@ public class ConceptUSCRSProcessor extends USCRSProcessor {
 					getBt().addStringCell(column, concept.getPrimUuid().toString());
 					break;
 				case Local_Term: 
-					getBt().addStringCell(column, conVer.getDescriptionPreferred().getText());
+					getBt().addStringCell(column, getPreferredTerm(conVer, vc));
 					break;
 				case Fully_Specified_Name:
 					getBt().addStringCell(column, getFsnWithoutSemTag(conVer));
@@ -107,7 +106,7 @@ public class ConceptUSCRSProcessor extends USCRSProcessor {
 					getBt().addStringCell(column, getSemanticTag(conVer));
 					break;
 				case Preferred_Term:
-					getBt().addStringCell(column, conVer.getDescriptionPreferred().getText());
+					getBt().addStringCell(column, getPreferredTerm(conVer, vc));
 					break;
 				//Note that this logic is fragile, and will break, if we encounter a parentConcept column before the corresponding terminology column....
 				//but we should be processing them in order, as far as I know.
@@ -149,18 +148,7 @@ public class ConceptUSCRSProcessor extends USCRSProcessor {
 					getBt().addStringCell(column, getJustification());
 					break;
 				case Note:
-					StringBuilder sb = new StringBuilder();
-					
-					sb.append(getNote(conVer));
-					
-					ConceptAttributeVersionBI<?> conceptDefined = concept.getConceptAttributes().getVersion(vc);
-					if(conceptDefined != null) {
-						if (conceptDefined.isDefined()){
-							sb.append("NOTE: this concept is fully defined. ");
-						}
-					}
-
-					getBt().addStringCell(column, sb.toString());
+					getBt().addStringCell(column, getNote(conVer));
 					break;
 				case Synonym:
 					getBt().addStringCell(column, "");

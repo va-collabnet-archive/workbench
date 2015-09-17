@@ -101,7 +101,6 @@ public class USCRSInitiator {
 		}
 	}
 
-
 	private boolean handleDateExamCon(boolean changeMade, I_GetConceptData concept, ViewCoordinate vcPreviousRelease) throws Exception {
 
 		try {
@@ -192,7 +191,7 @@ public class USCRSInitiator {
 							changeMade = true;
 						} else {
 							DescriptionVersionBI<?> dvLatestG = dvLatest;
-							if(isSynonym(concept.getVersion(vc), dvLatestG)) {
+							if(descriptionHandler.isSynonym(concept.getVersion(vc), dvLatestG)) {
 								descriptionHandler.handleNewSyn(dvLatestG);
 								changeMade = true;
 							}
@@ -303,54 +302,50 @@ public class USCRSInitiator {
 	}
 
 	private boolean noDateExamination(ConceptVersionBI con) throws Exception {
-		//No date filter, process everything that way
-		LOG.info("USCRS Handler -Filter Set. Not a Date Filter. Exporting all concepts.");
+		LOG.info("USCRS Handler -Filter Set. Not a Date Filter. Exporting all active concepts.");
+
+		ConceptAttributeChronicleBI cac = con.getChronicle().getVersion(USCRSProcessor.vcAllStatus).getConceptAttributes();
+		ConceptAttributeVersionBI<?> caLatest = cac.getVersion(USCRSProcessor.vcAllStatus);
 		
-		try {
-			if (con.getStatusNid() == ACTIVE_STATUS_NID) {
+		// Get latest version with AllStatus and use that to ensure only process active concepts
+		if (caLatest != null && caLatest.getStatusNid() == ACTIVE_STATUS_NID) {
+			try {
 				exportRelsUnFiltered.addAll(conceptHandler.handleNewConcept(con, previousExportTime));
-			}
-		} catch (Exception e) {
-			throw new Exception("Could not export concept " + con.getConceptNid(), e);
-		} 
-
-		for (RelationshipChronicleBI rc : exportRelsUnFiltered)
-		{
-			try {
-				RelationshipVersionBI<?> relVer = rc.getVersion(vc);
-				
-				if (relVer.getStatusNid() == ACTIVE_STATUS_NID) {
-					relationshipHandler.handleNewParent(relVer);
-					relationshipHandler.handleNewRel(relVer);
-				}
 			} catch (Exception e) {
-				throw new Exception("Could not export rel: " + rc.getNid() + " on concept " + con.getConceptNid(), e);
+				throw new Exception("Could not export concept " + con.getConceptNid(), e);
 			} 
-		}
-		
-		Collection<? extends DescriptionChronicleBI> descriptions = con.getDescriptions();
-		
-		for(DescriptionChronicleBI d : descriptions) {
-			try {
-				DescriptionVersionBI<?> dv = d.getVersion(vc);
-
-				if(dv.getStatusNid() == ACTIVE_STATUS_NID && isSynonym(con, dv)) {
-					descriptionHandler.handleNewSyn(dv);
-				}
-			} catch (Exception e) {
-				throw new Exception("Could not export desc: " + d.getNid() + " on concept " + con.getConceptNid(), e);
-			} 
-		}
-						
-		
-		return true;
-	}
-
 	
-	private boolean isSynonym(ConceptVersionBI conceptVersionBI, DescriptionVersionBI<?> d) throws ValidationException, IOException, ContradictionException {
-		return d != null &&
-			   conceptVersionBI.getDescriptionFullySpecified().getNid() != d.getNid() &&
-			   conceptVersionBI.getDescriptionPreferred().getNid() != d.getNid() &&
-			   d.getTypeNid() != SnomedMetadataRf2.DEFINITION_RF2.getLenient().getNid();
+			for (RelationshipChronicleBI rc : exportRelsUnFiltered)
+			{
+				try {
+					RelationshipVersionBI<?> relVer = rc.getVersion(vc);
+					
+					if (relVer != null && relVer.getStatusNid() == ACTIVE_STATUS_NID) {
+						relationshipHandler.handleNewParent(relVer);
+						relationshipHandler.handleNewRel(relVer);
+					}
+				} catch (Exception e) {
+					throw new Exception("Could not export rel: " + rc.getNid() + " on concept " + con.getConceptNid(), e);
+				} 
+			}
+			
+			Collection<? extends DescriptionChronicleBI> descriptions = con.getDescriptions();
+			
+			for(DescriptionChronicleBI d : descriptions) {
+				try {
+					DescriptionVersionBI<?> dv = d.getVersion(vc);
+	
+					if(dv != null && dv.getStatusNid() == ACTIVE_STATUS_NID && descriptionHandler.isSynonym(con, dv)) {
+						descriptionHandler.handleNewSyn(dv);
+					}
+				} catch (Exception e) {
+					throw new Exception("Could not export desc: " + d.getNid() + " on concept " + con.getConceptNid(), e);
+				} 
+			}
+			
+			return true;
+		}
+
+		return false;
 	}
 }
