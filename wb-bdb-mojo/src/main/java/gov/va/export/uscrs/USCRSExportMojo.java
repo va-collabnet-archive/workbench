@@ -15,8 +15,6 @@
  */
 package gov.va.export.uscrs;
 
-import gov.va.export.uscrs.USCRSRequestHandler;
-
 import java.io.File;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
