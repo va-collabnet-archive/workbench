@@ -107,6 +107,11 @@ public class USCRSExportMojo extends AbstractMojo {
 
             if (previousReleaseDate != null) {
             	long previousExportTime = TimeHelper.getTimeFromString(previousReleaseDate, TimeHelper.getFileDateFormat());
+            	
+            	// Hack against bot being confused with no-date.  Check is for less than 0 while long 0 is 1970
+            	if (previousReleaseDate.equals("bot")) {
+            		previousExportTime = 0;
+            	}
             	handler = new USCRSRequestHandler(vc, output, namespaceId, previousExportTime);
             } else {
             	handler = new USCRSRequestHandler(vc, output, namespaceId);
@@ -116,7 +121,7 @@ public class USCRSExportMojo extends AbstractMojo {
             	throw new Exception("Failed setup of USCRS Request Handler");
             }
 
-            if (!nidsToInvestigate.isEmpty()) {
+            if (nidsToInvestigate != null && !nidsToInvestigate.isEmpty()) {
             	handler.setConceptsToInvestigate(nidsToInvestigate);
             }
             
