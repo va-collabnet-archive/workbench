@@ -30,12 +30,12 @@ public class RelationshipUSCRSProcessor extends USCRSProcessor {
 	 */
 	void handleNewParent(RelationshipVersionBI<?> rel) throws Exception
 	{
-		ConceptVersionBI sourceCon = Ts.get().getConceptVersion(vc, rel.getConceptNid());
-		ConceptVersionBI targetCon = Ts.get().getConceptVersion(vc, rel.getTargetNid());
-		
-		if (activeStatusNids.contains(rel.getStatusNid()) && rel.getTypeNid() == Snomed.IS_A.getLenient().getNid()) 
+		if (rel.getPathNid() == getViewPath() && activeStatusNids.contains(rel.getStatusNid()) && rel.getTypeNid() == Snomed.IS_A.getLenient().getNid()) 
 		{
 			if (rel.getCharacteristicNid() == SnomedMetadataRf2.STATED_RELATIONSHIP_RF2.getLenient().getNid()) {
+				ConceptVersionBI sourceCon = Ts.get().getConceptVersion(vc, rel.getConceptNid());
+				ConceptVersionBI targetCon = Ts.get().getConceptVersion(vc, rel.getTargetNid());
+				
 				LOG.info("New Parent Handler");
 				getBt().selectSheet(SHEET.Add_Parent);
 				getBt().addRow();
@@ -79,7 +79,7 @@ public class RelationshipUSCRSProcessor extends USCRSProcessor {
 	 * @throws Exception the exception
 	 */	
 	void handleNewRel(RelationshipVersionBI<?> rel) throws Exception {
-		if (rel.getTypeNid() != Snomed.IS_A.getLenient().getNid()) 
+		if (rel.getPathNid() == getViewPath() && rel.getTypeNid() != Snomed.IS_A.getLenient().getNid()) 
 		{
 			if (rel.getCharacteristicNid() == SnomedMetadataRf2.STATED_RELATIONSHIP_RF2.getLenient().getNid()) {
 				ConceptVersionBI sourceCon = Ts.get().getConceptVersion(vc, rel.getConceptNid());
@@ -140,12 +140,12 @@ public class RelationshipUSCRSProcessor extends USCRSProcessor {
 	 */
 	void handleChangeParent(RelationshipVersionBI<?> rel) throws Exception
 	{	
-		ConceptVersionBI sourceCon = Ts.get().getConceptVersion(vc, rel.getConceptNid());
-		ConceptVersionBI targetCon = Ts.get().getConceptVersion(vc, rel.getTargetNid());
-
-		if (rel.getTypeNid() == Snomed.IS_A.getLenient().getNid()) 
+		if (rel.getPathNid() == getViewPath() && rel.getTypeNid() == Snomed.IS_A.getLenient().getNid()) 
 		{
 			if (rel.getCharacteristicNid() == SnomedMetadataRf2.STATED_RELATIONSHIP_RF2.getLenient().getNid()) {
+				ConceptVersionBI sourceCon = Ts.get().getConceptVersion(vc, rel.getConceptNid());
+				ConceptVersionBI targetCon = Ts.get().getConceptVersion(vc, rel.getTargetNid());
+
 				getBt().selectSheet(SHEET.Change_Parent);
 				getBt().addRow();
 				for (COLUMN column : getBt().getColumnsOfSheet(SHEET.Change_Parent)) {
@@ -189,13 +189,13 @@ public class RelationshipUSCRSProcessor extends USCRSProcessor {
 	 */
 	void handleChangeRels(RelationshipVersionBI<?> rel) throws Exception
 	{
-		ConceptVersionBI sourceCon = Ts.get().getConceptVersion(vc, rel.getConceptNid());
-		ConceptVersionBI targetCon = Ts.get().getConceptVersion(vc, rel.getTargetNid());
-		ConceptVersionBI typeCon = Ts.get().getConceptVersion(vc, rel.getTypeNid());
-
-		if (rel.getTypeNid() != Snomed.IS_A.getLenient().getNid()) 
+		if (rel.getPathNid() == getViewPath() && rel.getTypeNid() != Snomed.IS_A.getLenient().getNid()) 
 		{
 			if (rel.getCharacteristicNid() == SnomedMetadataRf2.STATED_RELATIONSHIP_RF2.getLenient().getNid()) {
+				ConceptVersionBI sourceCon = Ts.get().getConceptVersion(vc, rel.getConceptNid());
+				ConceptVersionBI targetCon = Ts.get().getConceptVersion(vc, rel.getTargetNid());
+				ConceptVersionBI typeCon = Ts.get().getConceptVersion(vc, rel.getTypeNid());
+
 				getBt().selectSheet(SHEET.Change_Relationship);
 				getBt().addRow();
 				for (COLUMN column : getBt().getColumnsOfSheet(SHEET.Change_Relationship))
@@ -255,46 +255,48 @@ public class RelationshipUSCRSProcessor extends USCRSProcessor {
 	 */
 	void handleRetireRelationship(RelationshipVersionBI<?> rel) throws Exception
 	{
-		ConceptVersionBI sourceCon = Ts.get().getConceptVersion(vc, rel.getConceptNid());
-		ConceptVersionBI targetCon = Ts.get().getConceptVersion(vc, rel.getTargetNid());
-		ConceptVersionBI typeCon = Ts.get().getConceptVersion(vc, rel.getTypeNid());
-		
-		getBt().selectSheet(SHEET.Retire_Relationship);
-		getBt().addRow();
-		for (COLUMN column : getBt().getColumnsOfSheet(SHEET.Retire_Relationship))
-		{
-			if (rel.getCharacteristicNid() == SnomedMetadataRf2.STATED_RELATIONSHIP_RF2.getLenient().getNid()) {
-				switch (column)
-				{
-					case Topic:
-						getBt().addStringCell(column, getTopic(sourceCon));
-						break;
-					case Source_Terminology:
-						getBt().addStringCell(column, getTerminology(sourceCon));
-						break;
-					case Source_Concept_Id:
-						getBt().addStringCell(column, getConSctId(sourceCon ));
-						break;
-					case Relationship_Id:  
-						getBt().addStringCell(column, getCompSctId(rel));
-						break;
-					case Destination_Terminology:
-						getBt().addStringCell(column, getTerminology(targetCon));
-						break;
-					case Destination_Concept_Id:
-						getBt().addStringCell(column, getConSctId(targetCon));
-						break;
-					case Relationship_Type:
-						getBt().addStringCell(column, getRelType(typeCon));
-						break;
-					case Justification:
-						getBt().addStringCell(column, getJustification());
-						break;
-					case Note:
-						getBt().addStringCell(column, getNote(rel));
-						break;
-					default :
-						throw new RuntimeException("Unexpected column type found in Sheet: " + column + " - " + SHEET.Retire_Relationship);
+		if (rel.getPathNid() == getViewPath()) {
+			ConceptVersionBI sourceCon = Ts.get().getConceptVersion(vc, rel.getConceptNid());
+			ConceptVersionBI targetCon = Ts.get().getConceptVersion(vc, rel.getTargetNid());
+			ConceptVersionBI typeCon = Ts.get().getConceptVersion(vc, rel.getTypeNid());
+			
+			getBt().selectSheet(SHEET.Retire_Relationship);
+			getBt().addRow();
+			for (COLUMN column : getBt().getColumnsOfSheet(SHEET.Retire_Relationship))
+			{
+				if (rel.getCharacteristicNid() == SnomedMetadataRf2.STATED_RELATIONSHIP_RF2.getLenient().getNid()) {
+					switch (column)
+					{
+						case Topic:
+							getBt().addStringCell(column, getTopic(sourceCon));
+							break;
+						case Source_Terminology:
+							getBt().addStringCell(column, getTerminology(sourceCon));
+							break;
+						case Source_Concept_Id:
+							getBt().addStringCell(column, getConSctId(sourceCon ));
+							break;
+						case Relationship_Id:  
+							getBt().addStringCell(column, getCompSctId(rel));
+							break;
+						case Destination_Terminology:
+							getBt().addStringCell(column, getTerminology(targetCon));
+							break;
+						case Destination_Concept_Id:
+							getBt().addStringCell(column, getConSctId(targetCon));
+							break;
+						case Relationship_Type:
+							getBt().addStringCell(column, getRelType(typeCon));
+							break;
+						case Justification:
+							getBt().addStringCell(column, getJustification());
+							break;
+						case Note:
+							getBt().addStringCell(column, getNote(rel));
+							break;
+						default :
+							throw new RuntimeException("Unexpected column type found in Sheet: " + column + " - " + SHEET.Retire_Relationship);
+					}
 				}
 			}
 		}

@@ -16,6 +16,7 @@ import org.ihtsdo.tk.Ts;
 import org.ihtsdo.tk.api.ComponentVersionBI;
 import org.ihtsdo.tk.api.ContradictionException;
 import org.ihtsdo.tk.api.NidSetBI;
+import org.ihtsdo.tk.api.PositionBI;
 import org.ihtsdo.tk.api.concept.ConceptChronicleBI;
 import org.ihtsdo.tk.api.concept.ConceptVersionBI;
 import org.ihtsdo.tk.api.coordinate.ViewCoordinate;
@@ -44,7 +45,8 @@ public class USCRSProcessor {
 	static int namespace;
 	static ViewCoordinate vc;
 	static ViewCoordinate vcAllStatus;
-	
+	static int viewPathNid;
+
 	private static final int US_EXTENSION_MODULE_NID = -2144087550;
     private static final UUID SNOMED_ROOT_UUID = UUID.fromString("ee9ac5d2-a07c-3981-a57a-f7f26baf38d8");
 	
@@ -78,6 +80,10 @@ public class USCRSProcessor {
 		info.setDetail("Batch USCRS submission spreadsheet successfully created.");
 
 		vc = viewCoordinate;
+		PositionBI[] currentPosSet = vc.getPositionSet().getPositionArray();
+		PositionBI viewPos = currentPosSet[0];
+		viewPathNid = viewPos.getPath().getConceptNid();
+
 		activeStatusNids = vc.getAllowedStatusNids();
 		vcAllStatus = new ViewCoordinate(vc);
 		vcAllStatus.setAllowedStatusNids(null);
@@ -310,5 +316,8 @@ public class USCRSProcessor {
 
         return false;
     }
-
+    
+    int getViewPath() {
+    	return viewPathNid;
+    }
 }

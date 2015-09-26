@@ -35,128 +35,132 @@ public class ConceptUSCRSProcessor extends USCRSProcessor {
 	ArrayList<RelationshipVersionBI<?>> handleNewConcept(ConceptChronicleBI concept, long previousExportTime) throws Exception
 	{
 		ArrayList<RelationshipVersionBI<?>> extraRels = new ArrayList<RelationshipVersionBI<?>>();
-		// PARENTS
-		LinkedList<Integer> parentNids = new LinkedList<Integer>();
-		LinkedList<String> parentsTerms = new LinkedList<String>();
+		ConceptVersionBI conVer = concept.getVersion(vc);
 
-		int count = 0;
-		for (RelationshipChronicleBI rel : concept.getRelationshipsOutgoing())
-		{
-			RelationshipVersionBI<?> relVersion = rel.getVersion(vc);
-			
-			if(relVersion != null) {
-				if(activeStatusNids.contains(relVersion.getStatusNid())) 
-				{
-					if ((relVersion.getTypeNid() == Snomed.IS_A.getLenient().getNid())) 
+		if (concept.getVersion(vc).getConceptAttributes().getVersion(vc).getPathNid() == getViewPath()) {
+			// PARENTS
+			LinkedList<Integer> parentNids = new LinkedList<Integer>();
+			LinkedList<String> parentsTerms = new LinkedList<String>();
+	
+			int count = 0;
+			for (RelationshipChronicleBI rel : concept.getRelationshipsOutgoing())
+			{
+				RelationshipVersionBI<?> relVersion = rel.getVersion(vc);
+				
+				if(relVersion != null) {
+					if(activeStatusNids.contains(relVersion.getStatusNid())) 
 					{
-						if (relVersion.getCharacteristicNid() == SnomedMetadataRf2.STATED_RELATIONSHIP_RF2.getLenient().getNid()) {
-							int relDestNid = relVersion.getTargetNid();
-							parentNids.add(count, relDestNid);
-							ComponentVersionBI compVer = Ts.get().getComponentVersion(vc, relDestNid);
-							ConceptVersionBI destConVer = Ts.get().getConceptVersion(vc, compVer.getConceptNid());
-							
-							parentsTerms.add(count, getTerminology(destConVer));
-							
-							if(count > 2 && relVersion != null) {
-								extraRels.add(relVersion);
+						if ((relVersion.getTypeNid() == Snomed.IS_A.getLenient().getNid())) 
+						{
+							if (relVersion.getCharacteristicNid() == SnomedMetadataRf2.STATED_RELATIONSHIP_RF2.getLenient().getNid()) {
+								int relDestNid = relVersion.getTargetNid();
+								parentNids.add(count, relDestNid);
+								ComponentVersionBI compVer = Ts.get().getComponentVersion(vc, relDestNid);
+								ConceptVersionBI destConVer = Ts.get().getConceptVersion(vc, compVer.getConceptNid());
+								
+								parentsTerms.add(count, getTerminology(destConVer));
+								
+								if(count > 2 && relVersion != null) {
+									extraRels.add(relVersion);
+								}
+								count++;
 							}
-							count++;
+						} else {
+							extraRels.add(relVersion);
 						}
-					} else {
-						extraRels.add(relVersion);
 					}
+				}
+			}
+			
+			getBt().selectSheet(SHEET.New_Concept);
+			getBt().addRow();
+	
+			for (COLUMN column : getBt().getColumnsOfSheet(SHEET.New_Concept))
+			{
+				switch (column)
+				{
+					case Request_Id:
+						int reqId = Integer.parseInt(getConSctId(conVer));
+						if (reqId > 999999) 
+						{
+							getBt().addStringCell(column, "");
+						} else {
+							if(previousExportTime < 0) {
+								//throw new RuntimeException("We appear to have found an SCTID when we only expected a generated sequence ID");
+							}
+							newConceptRequestIds.add(reqId);
+							getBt().addNumericCell(column, reqId);
+						}
+						break;
+					case Topic:
+						getBt().addStringCell(column, getTopic(concept));
+						break;
+					case Local_Code:
+						getBt().addStringCell(column, concept.getPrimUuid().toString());
+						break;
+					case Local_Term: 
+						getBt().addStringCell(column, getPreferredTerm(conVer, vc));
+						break;
+					case Fully_Specified_Name:
+						getBt().addStringCell(column, getFsnWithoutSemTag(conVer));
+						break;
+					case Semantic_Tag:
+						getBt().addStringCell(column, getSemanticTag(conVer));
+						break;
+					case Preferred_Term:
+						getBt().addStringCell(column, getPreferredTerm(conVer, vc));
+						break;
+					//Note that this logic is fragile, and will break, if we encounter a parentConcept column before the corresponding terminology column....
+					//but we should be processing them in order, as far as I know.
+					case Terminology_1_:
+					case Terminology_2_:
+					case Terminology_3_:
+						if (parentNids.size() >= 1)
+						{
+							getBt().addStringCell(column, getTerminology(Ts.get().getConceptVersion(vc, parentNids.get(0))));
+						}
+						else
+						{
+							getBt().addStringCell(column, "");
+						}
+						break;
+					case Parent_Concept_Id_1_:
+					case Parent_Concept_Id_2_:
+					case Parent_Concept__Id_3_:
+						if(parentNids.size() >= 1) 
+						{
+							 ConceptVersionBI parCon = Ts.get().getConceptVersion(vc, parentNids.remove(0));
+							getBt().addStringCell(column, getConSctId(parCon));
+							
+						} else 
+						{
+							getBt().addStringCell(column, "");
+						}
+						break;
+					case UMLS_CUI:
+						getBt().addStringCell(column, ""); //Not in API
+						break;
+					case Definition:
+						getBt().addStringCell(column, "Needed for VA purposes");
+						break;
+					case Proposed_Use:
+						getBt().addStringCell(column, ""); //User Input
+						break;
+					case Justification:
+						getBt().addStringCell(column, getJustification());
+						break;
+					case Note:
+						getBt().addStringCell(column, getNote(conVer));
+						break;
+					case Synonym:
+						getBt().addStringCell(column, "");
+						break;
+					default :
+						throw new RuntimeException("Unexpected column type found in Sheet: " + column + " - " + SHEET.New_Concept);
 				}
 			}
 		}
 		
-		getBt().selectSheet(SHEET.New_Concept);
-		getBt().addRow();
-		ConceptVersionBI conVer = concept.getVersion(vc);
-
-		for (COLUMN column : getBt().getColumnsOfSheet(SHEET.New_Concept))
-		{
-			switch (column)
-			{
-				case Request_Id:
-					int reqId = Integer.parseInt(getConSctId(conVer));
-					if (reqId > 999999) 
-					{
-						getBt().addStringCell(column, "");
-					} else {
-						if(previousExportTime < 0) {
-							//throw new RuntimeException("We appear to have found an SCTID when we only expected a generated sequence ID");
-						}
-						newConceptRequestIds.add(reqId);
-						getBt().addNumericCell(column, reqId);
-					}
-					break;
-				case Topic:
-					getBt().addStringCell(column, getTopic(concept));
-					break;
-				case Local_Code:
-					getBt().addStringCell(column, concept.getPrimUuid().toString());
-					break;
-				case Local_Term: 
-					getBt().addStringCell(column, getPreferredTerm(conVer, vc));
-					break;
-				case Fully_Specified_Name:
-					getBt().addStringCell(column, getFsnWithoutSemTag(conVer));
-					break;
-				case Semantic_Tag:
-					getBt().addStringCell(column, getSemanticTag(conVer));
-					break;
-				case Preferred_Term:
-					getBt().addStringCell(column, getPreferredTerm(conVer, vc));
-					break;
-				//Note that this logic is fragile, and will break, if we encounter a parentConcept column before the corresponding terminology column....
-				//but we should be processing them in order, as far as I know.
-				case Terminology_1_:
-				case Terminology_2_:
-				case Terminology_3_:
-					if (parentNids.size() >= 1)
-					{
-						getBt().addStringCell(column, getTerminology(Ts.get().getConceptVersion(vc, parentNids.get(0))));
-					}
-					else
-					{
-						getBt().addStringCell(column, "");
-					}
-					break;
-				case Parent_Concept_Id_1_:
-				case Parent_Concept_Id_2_:
-				case Parent_Concept__Id_3_:
-					if(parentNids.size() >= 1) 
-					{
-						 ConceptVersionBI parCon = Ts.get().getConceptVersion(vc, parentNids.remove(0));
-						getBt().addStringCell(column, getConSctId(parCon));
-						
-					} else 
-					{
-						getBt().addStringCell(column, "");
-					}
-					break;
-				case UMLS_CUI:
-					getBt().addStringCell(column, ""); //Not in API
-					break;
-				case Definition:
-					getBt().addStringCell(column, "Needed for VA purposes");
-					break;
-				case Proposed_Use:
-					getBt().addStringCell(column, ""); //User Input
-					break;
-				case Justification:
-					getBt().addStringCell(column, getJustification());
-					break;
-				case Note:
-					getBt().addStringCell(column, getNote(conVer));
-					break;
-				case Synonym:
-					getBt().addStringCell(column, "");
-					break;
-				default :
-					throw new RuntimeException("Unexpected column type found in Sheet: " + column + " - " + SHEET.New_Concept);
-			}
-		}
 		return extraRels;
 	}
 
@@ -217,37 +221,38 @@ public class ConceptUSCRSProcessor extends USCRSProcessor {
 	 */
 	void handleRetireConcept(ConceptVersionBI concept) throws Exception
 	{
-		getBt().selectSheet(SHEET.Retire_Concept);
-		getBt().addRow();
-		for (COLUMN column : getBt().getColumnsOfSheet(SHEET.Retire_Concept))
-		{
-			switch (column)
+		if (concept.getVersion(vc).getConceptAttributes().getVersion(vc).getPathNid() == getViewPath()) {
+			getBt().selectSheet(SHEET.Retire_Concept);
+			getBt().addRow();
+			for (COLUMN column : getBt().getColumnsOfSheet(SHEET.Retire_Concept))
 			{
-				case Topic:
-					getBt().addStringCell(column, this.getTopic(concept));
-					break;
-				case Terminology:
-					getBt().addStringCell(column, getTerminology(concept));
-					break;
-				case Concept_Id:
-					getBt().addStringCell(column, getConSctId(concept));
-					break;
-				case Change_Concept_Status_To: 
-					getBt().addStringCell(column, USCRSBatchTemplate.PICKLIST_Change_Concept_Status_To.Retired.toString());
-					break;
-				case Duplicate_Concept_Id: 
-					getBt().addStringCell(column, "");
-					break;
-				case Justification:
-					getBt().addStringCell(column, getJustification());
-					break;
-				case Note:
-					getBt().addStringCell(column, getNote(concept));
-					break;
-				default :
-					throw new RuntimeException("Unexpected column type found in Sheet: " + column + " - " + SHEET.Retire_Concept);
+				switch (column)
+				{
+					case Topic:
+						getBt().addStringCell(column, this.getTopic(concept));
+						break;
+					case Terminology:
+						getBt().addStringCell(column, getTerminology(concept));
+						break;
+					case Concept_Id:
+						getBt().addStringCell(column, getConSctId(concept));
+						break;
+					case Change_Concept_Status_To: 
+						getBt().addStringCell(column, USCRSBatchTemplate.PICKLIST_Change_Concept_Status_To.Retired.toString());
+						break;
+					case Duplicate_Concept_Id: 
+						getBt().addStringCell(column, "");
+						break;
+					case Justification:
+						getBt().addStringCell(column, getJustification());
+						break;
+					case Note:
+						getBt().addStringCell(column, getNote(concept));
+						break;
+					default :
+						throw new RuntimeException("Unexpected column type found in Sheet: " + column + " - " + SHEET.Retire_Concept);
+				}
 			}
 		}
 	}
-
 }

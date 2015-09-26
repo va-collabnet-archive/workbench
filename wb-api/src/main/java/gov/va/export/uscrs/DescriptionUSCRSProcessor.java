@@ -27,42 +27,44 @@ public class DescriptionUSCRSProcessor extends USCRSProcessor {
 	 */
     void handleNewSyn(DescriptionVersionBI<?> descVersion) throws Exception
 	{	
-		ConceptVersionBI conVersion = Ts.get().getConceptVersion(vc, descVersion.getConceptNid());
-
-		LOG.info("Creating new Synonym (Description)");
-		getBt().selectSheet(SHEET.New_Synonym);
-		getBt().addRow();
-		
-		for (COLUMN column : getBt().getColumnsOfSheet(SHEET.New_Synonym)) {
-			switch(column)
-			{
-			case Topic:
-				getBt().addStringCell(column, getTopic(conVersion));
-				break;
-			case Terminology:
-				getBt().addStringCell(column, getTerminology(conVersion));
-				break;
-			case Concept_Id:
-				getBt().addStringCell(column, getConSctId(conVersion));
-				break;
-			case Term:
-				getBt().addStringCell(column, descVersion.getText());
-				break;
-			case Case_Significance:
-				getBt().addStringCell(column, getCaseSig(descVersion.isInitialCaseSignificant()));
-				break;
-			case Justification:
-				getBt().addStringCell(column, getJustification());
-				break;
-			case Note: 
-				getBt().addStringCell(column, getNote(descVersion));
-				break;
-			default :
-				throw new RuntimeException("Unexpected column type found in Sheet: " + column + " - " + SHEET.New_Synonym);
+    	if (descVersion.getPathNid() == getViewPath()) {
+			ConceptVersionBI conVersion = Ts.get().getConceptVersion(vc, descVersion.getConceptNid());
+	
+			LOG.info("Creating new Synonym (Description)");
+			getBt().selectSheet(SHEET.New_Synonym);
+			getBt().addRow();
+			
+			for (COLUMN column : getBt().getColumnsOfSheet(SHEET.New_Synonym)) {
+				switch(column)
+				{
+				case Topic:
+					getBt().addStringCell(column, getTopic(conVersion));
+					break;
+				case Terminology:
+					getBt().addStringCell(column, getTerminology(conVersion));
+					break;
+				case Concept_Id:
+					getBt().addStringCell(column, getConSctId(conVersion));
+					break;
+				case Term:
+					getBt().addStringCell(column, descVersion.getText());
+					break;
+				case Case_Significance:
+					getBt().addStringCell(column, getCaseSig(descVersion.isInitialCaseSignificant()));
+					break;
+				case Justification:
+					getBt().addStringCell(column, getJustification());
+					break;
+				case Note: 
+					getBt().addStringCell(column, getNote(descVersion));
+					break;
+				default :
+					throw new RuntimeException("Unexpected column type found in Sheet: " + column + " - " + SHEET.New_Synonym);
+				}
 			}
-		}
-	}		
-
+		}		
+	}
+    
 
 	/**
 	 * Pass in an ArrayList of description versions and a workbook and a new row will be created for each description 
@@ -74,44 +76,46 @@ public class DescriptionUSCRSProcessor extends USCRSProcessor {
 	 */
 	void handleChangeDesc(DescriptionVersionBI<?> d) throws Exception
 	{
-		ConceptVersionBI conVersion = Ts.get().getConceptVersion(vc, d.getConceptNid());
-
-		getBt().selectSheet(SHEET.Change_Description);
-		getBt().addRow();
-		for (COLUMN column : getBt().getColumnsOfSheet(SHEET.Change_Description))
-		{
-			switch (column)
+		if (d.getPathNid() == getViewPath()) {
+			ConceptVersionBI conVersion = Ts.get().getConceptVersion(vc, d.getConceptNid());
+	
+			getBt().selectSheet(SHEET.Change_Description);
+			getBt().addRow();
+			for (COLUMN column : getBt().getColumnsOfSheet(SHEET.Change_Description))
 			{
-				case Topic:
-					try {
-						getBt().addStringCell(column, getTopic(conVersion));
-					} catch(Exception e) {
-						LOG.error("Error Creating Desc Topic", e);
-					}
-					break;
-				case Terminology:
-					getBt().addStringCell(column, getTerminology(conVersion));
-					break;
-				case Concept_Id:
-					getBt().addStringCell(column, getConSctId(conVersion));
-					break;
-				case Description_Id:
-					getBt().addStringCell(column, getCompSctId(d));
-					break;
-				case Term: 
-					getBt().addStringCell(column, d.getText());
-					break;
-				case Case_Significance:
-					getBt().addStringCell(column, getCaseSig(d.isInitialCaseSignificant()));
-					break;
-				case Justification:
-					getBt().addStringCell(column, getJustification());
-					break;
-				case Note:
-					getBt().addStringCell(column, getNote(d));
-					break;
-				default :
-					throw new RuntimeException("Unexpected column type found in Sheet: " + column + " - " + SHEET.Change_Description);
+				switch (column)
+				{
+					case Topic:
+						try {
+							getBt().addStringCell(column, getTopic(conVersion));
+						} catch(Exception e) {
+							LOG.error("Error Creating Desc Topic", e);
+						}
+						break;
+					case Terminology:
+						getBt().addStringCell(column, getTerminology(conVersion));
+						break;
+					case Concept_Id:
+						getBt().addStringCell(column, getConSctId(conVersion));
+						break;
+					case Description_Id:
+						getBt().addStringCell(column, getCompSctId(d));
+						break;
+					case Term: 
+						getBt().addStringCell(column, d.getText());
+						break;
+					case Case_Significance:
+						getBt().addStringCell(column, getCaseSig(d.isInitialCaseSignificant()));
+						break;
+					case Justification:
+						getBt().addStringCell(column, getJustification());
+						break;
+					case Note:
+						getBt().addStringCell(column, getNote(d));
+						break;
+					default :
+						throw new RuntimeException("Unexpected column type found in Sheet: " + column + " - " + SHEET.Change_Description);
+				}
 			}
 		}
 	}
@@ -125,41 +129,42 @@ public class DescriptionUSCRSProcessor extends USCRSProcessor {
 	 */
 	void handleRetireDescription(DescriptionVersionBI<?> d) throws Exception
 	{
-		ConceptVersionBI conVersion = Ts.get().getConceptVersion(vc, d.getConceptNid());
-		
-		getBt().selectSheet(SHEET.Retire_Description);
-		getBt().addRow();
-		for (COLUMN column : getBt().getColumnsOfSheet(SHEET.Retire_Description))
-		{
-			switch (column)
+		if (d.getPathNid() == getViewPath()) {
+			ConceptVersionBI conVersion = Ts.get().getConceptVersion(vc, d.getConceptNid());
+			
+			getBt().selectSheet(SHEET.Retire_Description);
+			getBt().addRow();
+			for (COLUMN column : getBt().getColumnsOfSheet(SHEET.Retire_Description))
 			{
-				case Topic:
-					getBt().addStringCell(column, getTopic(conVersion));
-					break;
-				case Terminology:
-					getBt().addStringCell(column, getTerminology(conVersion));
-					break;
-				case Concept_Id:
-					getBt().addStringCell(column, getConSctId(conVersion));
-					break;
-				case Description_Id:
-					getBt().addStringCell(column, getCompSctId(d));
-					break;
-				case Change_Description_Status_To:
-					getBt().addStringCell(column, USCRSBatchTemplate.PICKLIST_Change_Concept_Status_To.Retired.toString());
-					break;
-				case Justification:
-					getBt().addStringCell(column, getJustification());
-					break;
-				case Note:
-					getBt().addStringCell(column, getNote(d));
-					break;
-				default :
-					throw new RuntimeException("Unexpected column type found in Sheet: " + column + " - " + SHEET.Retire_Description);
+				switch (column)
+				{
+					case Topic:
+						getBt().addStringCell(column, getTopic(conVersion));
+						break;
+					case Terminology:
+						getBt().addStringCell(column, getTerminology(conVersion));
+						break;
+					case Concept_Id:
+						getBt().addStringCell(column, getConSctId(conVersion));
+						break;
+					case Description_Id:
+						getBt().addStringCell(column, getCompSctId(d));
+						break;
+					case Change_Description_Status_To:
+						getBt().addStringCell(column, USCRSBatchTemplate.PICKLIST_Change_Concept_Status_To.Retired.toString());
+						break;
+					case Justification:
+						getBt().addStringCell(column, getJustification());
+						break;
+					case Note:
+						getBt().addStringCell(column, getNote(d));
+						break;
+					default :
+						throw new RuntimeException("Unexpected column type found in Sheet: " + column + " - " + SHEET.Retire_Description);
+				}
 			}
 		}
 	}
-
 	
 	private String getCaseSig(boolean caseSig) {
 		try {
@@ -179,7 +184,7 @@ public class DescriptionUSCRSProcessor extends USCRSProcessor {
 
 	public boolean isSynonym(ConceptVersionBI conceptVersionBI, DescriptionVersionBI<?> d) throws ValidationException, IOException, ContradictionException {
 		return d != null &&
-			   conceptVersionBI.getDescriptionFullySpecified().getNid() != d.getNid() &&
+				d.getTypeNid() != SnomedMetadataRf2.FULLY_SPECIFIED_NAME_RF2.getLenient().getNid() && 
 			   !isPreferredTerm(d) &&
 			   d.getTypeNid() != SnomedMetadataRf2.DEFINITION_RF2.getLenient().getNid();
 	}

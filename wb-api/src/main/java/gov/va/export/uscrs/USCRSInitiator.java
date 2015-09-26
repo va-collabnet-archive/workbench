@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import org.dwfa.ace.api.I_GetConceptData;
 import org.dwfa.ace.api.Terms;
@@ -77,6 +78,8 @@ public class USCRSInitiator {
 		vcPreviousRelease.setAllowedStatusNids(null);
 
 		// Examine Content
+		
+		// TODO: Need to update notification fo change Made based on using View Path explicitely
 		changeMade = handleDateExamCon(changeMade, concept, vcPreviousRelease);
 			
 		// If concept was created & retired prior to previous release, don't need to export anything else
